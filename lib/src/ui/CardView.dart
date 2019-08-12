@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/store_list.dart';
+import 'package:restroapp/src/networkhandler/ApiController.dart';
+import 'package:restroapp/src/utils/Constants.dart';
+import 'package:restroapp/src/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Cardview extends StatefulWidget {
 
@@ -21,7 +26,6 @@ class CardviewState extends State<Cardview> {
   CardviewState(this.store);
 
   Widget get storeCard {
-
     String imgUrl = "https://s3.amazonaws.com/store-asset/1562067647-unnamed_(1).png";
     if(store.store_logo.isEmpty){
 
@@ -56,8 +60,40 @@ class CardviewState extends State<Cardview> {
     );
   }
 
-  onCardTapped(String id) {
-    print("----onCardTapped ${id}");
+  onCardTapped(String storeId) async{
+    try {
+      //print("----storeId ${storeId}");
+      callVersionApi(AppConstant.DEVICE_ID,storeId);
+    } catch (e) {
+      print(e);
+    }
 
   }
+
+  callVersionApi(String key,String storeId) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String deviceId = prefs.getString(key);
+      print("----deviceId ${deviceId}");
+      ApiController.versionApiRequest(storeId,deviceId).then((storeData) {
+
+        print(storeData.store.id);
+        if(storeData.success){
+
+        }else{
+
+          Utils.showToast("Please try again", false);
+        }
+
+      });
+
+
+    } catch (e) {
+      print(e);
+    }
+
+
+  }
+
 }
+

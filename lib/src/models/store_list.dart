@@ -8,8 +8,7 @@ class StoreListModel{
   String country;
   String store_logo;
 
-  StoreListModel({this.id,this.store_name, this.location,this.city,
-    this.state,this.country,this.store_logo,
+  StoreListModel({this.id,this.store_name, this.location,this.city,this.state,this.country,this.store_logo,
   });
 
 

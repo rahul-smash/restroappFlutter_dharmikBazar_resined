@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'src/MyApp.dart';
+import 'package:restroapp/src/Screens/StoreListScreen.dart';
 
 void main(){
 
-  var app = MyApp();
+  var app = StoreListScreen();
 
   runApp(app);
 

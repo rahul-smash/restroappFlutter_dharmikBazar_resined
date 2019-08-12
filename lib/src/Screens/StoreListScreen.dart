@@ -1,15 +1,19 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/StoreSelectedEvent.dart';
+import 'package:restroapp/src/models/store_list.dart';
+import 'package:restroapp/src/networkhandler/ApiConstants.dart';
+import 'package:restroapp/src/networkhandler/ApiController.dart';
 import 'package:restroapp/src/ui/CardView.dart';
-import 'dart:convert';
-import 'models/store_data.dart';
-import 'models/store_list.dart';
+import 'package:device_id/device_id.dart';
+import 'package:restroapp/src/utils/Constants.dart';
 
-class MyApp extends StatelessWidget {
+class StoreListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController editingController = TextEditingController();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Restro App',
@@ -18,10 +22,10 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         appBar: AppBar(
-            title: Text('Search'),
-            leading: IconButton(icon:Icon(Icons.arrow_back),
+            title: Text('RestroApp'),
+            /*leading: IconButton(icon:Icon(Icons.arrow_back),
               onPressed:() => Navigator.pop(context, false),
-            )
+            )*/
         ),
         body: StoreListUI(),
       ),
@@ -33,16 +37,29 @@ class StoreListUI extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
     print("createStatee createState");
+    getDeviceId();
+
     return _StoreListWithSearch();
   }
+}
+
+Future<String> getDeviceId()  async {
+  /*DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+  print('Running on ${androidInfo.androidId}');  // e.g. "Moto G (4)"
+
+  String DeviceId = androidInfo.androidId;*/
+  String device_id = await DeviceId.getID;
+  print("-----device id------ ${device_id}");
+  SharedPrefs.storeSharedValue(AppConstant.DEVICE_ID, device_id);
+  return device_id;
 }
 
 class _StoreListWithSearch extends State<StoreListUI> {
 
   TextEditingController editingController = TextEditingController();
-  String url = 'https://app.restroapp.com/1/api_v5/storeList';
-  Map<String, String> headers = {"device_id": "abaf785580c22722","user_id": "","device_token": "","platform": "android"};
-
+  Map<String, String> headers = {"device_id": "abaf785580c22722",
+    "user_id": "","device_token": "","platform": "android"};
 
   @override
   Widget build(BuildContext context) {
@@ -94,35 +111,13 @@ class _StoreListWithSearch extends State<StoreListUI> {
                           }
                         }
                       },
-                      future: postRequest(url,headers),
+                      future: ApiController.storeListRequest(ApiConstants.storeList,headers),
                     ),
                   ),
-
-
                 ],
             ),
         ),
-
     );
   }
-
 }
 
-Future<List<StoreListModel>> postRequest(String url, Map jsonMap) async {
-  //print('$url , $jsonMap');
-
-  HttpClient httpClient = new HttpClient();
-  HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
-  request.headers.set('content-type', 'application/json');
-  request.add(utf8.encode(json.encode(jsonMap)));
-  HttpClientResponse response = await request.close();
-  String reply = await response.transform(utf8.decoder).join();
-  print(reply);
-  //print("API response $reply");
-  httpClient.close();
-  final parsed = json.decode(reply);
-  List<StoreListModel> storelist = (parsed["data"] as List).map<StoreListModel>((json) => new StoreListModel.fromJson(json)).toList();
-  //print(" storelist ${storelist.length}");
-
-  return storelist;
-}
