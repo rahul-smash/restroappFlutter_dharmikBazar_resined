@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/HomeScreen.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/store_list.dart';
 import 'package:restroapp/src/networkhandler/ApiController.dart';
@@ -80,13 +81,12 @@ class CardviewState extends State<Cardview> {
         print(storeData.store.id);
         if(storeData.success){
 
-        }else{
+          Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(storeData)),);
 
+        }else{
           Utils.showToast("Please try again", false);
         }
-
       });
-
 
     } catch (e) {
       print(e);
