@@ -1,9 +1,10 @@
 import 'dart:io';
+import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/store_list.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:restroapp/src/utils/Utils.dart';
+//import 'package:http/http.dart' as http;
 
 class ApiController{
 
@@ -41,5 +42,16 @@ class ApiController{
     return storeData;
   }
 
+  static Future<List<CategoriesData>> getCategoriesApiRequest(String storeId) async {
+    String categoriesUrl = "https://app.restroapp.com/${storeId}/api_v5/getCategories";
+    print('$storeId , $categoriesUrl');
+
+    Response response = await Dio().get(categoriesUrl);
+    print(response);
+    Categories categories = Categories.fromJson(response.data);
+    print("-------Categories.length ---${categories.data.length}");
+
+    return categories.data;
+  }
 
 }

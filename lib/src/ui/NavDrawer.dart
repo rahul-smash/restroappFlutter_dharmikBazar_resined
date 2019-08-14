@@ -1,81 +1,90 @@
 import 'package:flutter/material.dart';
 
-class NavDrawer extends StatefulWidget {
-  @override  _NavDrawerState createState() => _NavDrawerState();
-}
+class NavDrawer extends StatelessWidget {
 
-class _NavDrawerState extends State<NavDrawer> {
-  @override  Widget build(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
+
     return Scaffold(
-      appBar: AppBar(title: Text("Nav Drawer")),
-      drawer: new Drawer(
-        child: new ListView(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: <Widget>[
-            new UserAccountsDrawerHeader(
-              accountName: new Text("Pratap Kumar"),
-              accountEmail: new Text("kprathap23@gmail.com"),
-              decoration: new BoxDecoration(
-                image: new DecorationImage(
-                  image: new ExactAssetImage('download.jpeg'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              currentAccountPicture: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      "https://randomuser.me/api/portraits/men/46.jpg")),
+            UserAccountsDrawerHeader(
+              accountName: Text('Achin verma'),
+              accountEmail: Text('achin@signity.com'),
+              currentAccountPicture:
+              Image.network('https://winaero.com/blog/wp-content/uploads/2015/05/windows-10-user-account-login-icon.png'),
+              decoration: BoxDecoration(color: Colors.deepOrange),
             ),
-            new ListTile(
-                leading: Icon(Icons.library_music),
-                title: new Text("Music"),
-                onTap: () {
-                  Navigator.pop(context);
-                }),
-            new ListTile(
-                leading: Icon(Icons.movie),
-                title: new Text("Movies"),
-                onTap: () {
-                  Navigator.pop(context);
-                }),
-            new ListTile(
-                leading: Icon(Icons.shopping_cart),
-                title: new Text("Shopping"),
-                onTap: () {
-                  Navigator.pop(context);
-                }),
-            new ListTile(
-                leading: Icon(Icons.apps),
-                title: new Text("Apps"),
-                onTap: () {
-                  Navigator.pop(context);
-                }),
-            new ListTile(
-                leading: Icon(Icons.dashboard),
-                title: new Text("Docs"),
-                onTap: () {
-                  Navigator.pop(context);
-                }),
-            new ListTile(
-                leading: Icon(Icons.settings),
-                title: new Text("Settings"),
-                onTap: () {
-                  Navigator.pop(context);
-                }),
-            new Divider(),
-            new ListTile(
-                leading: Icon(Icons.info),
-                title: new Text("About"),
-                onTap: () {
-                  Navigator.pop(context);
-                }),
-            new ListTile(
-                leading: Icon(Icons.power_settings_new),
-                title: new Text("Logout"),
-                onTap: () {
-                  Navigator.pop(context);
-                }),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Home'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('My Profile'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Delivery Address'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('My Orders'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Book Now'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('My Favorites'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('About Us'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Refer & Earn'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Logout'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+
           ],
         ),
       ),
     );
   }
 }
+

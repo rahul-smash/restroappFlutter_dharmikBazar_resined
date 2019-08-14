@@ -66,6 +66,7 @@ class _StoreListWithSearch extends State<StoreListUI> {
     // TODO: implement build
 
     return new Scaffold(
+
         body:Container(
             child:Column(
                 children: <Widget>[

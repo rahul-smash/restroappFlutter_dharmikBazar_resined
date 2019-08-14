@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:restroapp/src/networkhandler/ApiController.dart';
+import 'package:restroapp/src/ui/CategoriesView.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 
 class HomeScreen extends StatelessWidget {
-  StoreData storeData;
 
+  StoreData storeData;
   HomeScreen(this.storeData);
 
   @override
@@ -14,7 +17,6 @@ class HomeScreen extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: storeData.store.storeName,
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
       ),
@@ -22,7 +24,6 @@ class HomeScreen extends StatelessWidget {
         body: HomeScreenUI(storeData),
       ),
     );
-    ;
   }
 }
 
@@ -43,17 +44,14 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
 
   final List<String> imgList = [];
   int _currentIndex = 0;
-  final List<Widget> _children = [
-    PlaceholderWidget(Colors.white),
-    PlaceholderWidget(Colors.deepOrange),
-    PlaceholderWidget(Colors.green)
-  ];
   StoreData storeData;
   _StoreListWithSearch(this.storeData);
+
 
   @override
   void initState() {
     //print("------------ initState---------------");
+
     try {
       if (storeData.store.banners.isEmpty) {
         imgList.add(AppConstant.PLACEHOLDER);
@@ -82,13 +80,13 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
       viewportFraction: 0.9,
       aspectRatio: 2.0,
       autoPlay: true,
-      enlargeCenterPage: true,
+      enlargeCenterPage: false,
       items: imgList.map(
         (url) {
           return Container(
-            margin: EdgeInsets.all(3.0),
+            margin: EdgeInsets.all(0.0),
             child: ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(5.0)),
+              borderRadius: BorderRadius.all(Radius.circular(0.0)),
               child: Image.network(
                 url,
                 fit: BoxFit.cover,
@@ -103,67 +101,117 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
     void onTabTapped(int index) {
       setState(() {
         _currentIndex = index;
+        print("_currentIndex ${_currentIndex}");
       });
     }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(storeData.store.storeName),
+        centerTitle: true,
       ),
-      body: ListView(
-        children: <Widget>[
-          Padding(
-              padding: EdgeInsets.symmetric(vertical: 0.0),
-              child: Column(children: [
-                storeBanners,
-              ]))
-        ],
+      body: Container(
+          child : Column(
+            children: <Widget>[
+              Padding(
+                  padding: EdgeInsets.symmetric(vertical: 0.0),
+                  child: Column(children: [
+                    storeBanners,
+                  ])),
+              Expanded(
+                child: FutureBuilder<List<CategoriesData>>(
+                  future: ApiController.getCategoriesApiRequest(storeData.store.id), // a previously-obtained Future<String> or null
+                    builder: (context, projectSnap) {
+                      if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
+                        //print('project snapshot data is: ${projectSnap.data}');
+                        return Container(color: const Color(0xFFFFE306));
+                      } else {
+                        if(projectSnap.hasData){
+
+
+                          return Container(
+                            margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                            padding: const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+                              decoration: BoxDecoration(
+                                border: new Border.all(color: Colors.deepOrange),
+                                image: DecorationImage(
+                                  image: AssetImage("images/categories_bg.png"),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            child: GridView.count(
+                                crossAxisCount: 2,
+                                childAspectRatio: 1.5,
+                                padding: const EdgeInsets.all(14.0),
+                                mainAxisSpacing: 4.0,
+                                crossAxisSpacing: 4.0,
+                                shrinkWrap: true,
+                                children: projectSnap.data.map((CategoriesData categoriesData) {
+
+                                  return GridTile(child: CategoriesView(categoriesData));
+                                }).toList()
+                            ),
+                          );
+                          //return projectSnap.data.toString();
+
+                        } else {
+                          return Center(
+                            child: CircularProgressIndicator(
+                                backgroundColor: Colors.black26,
+                                valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
+                          );
+                        }
+                      }
+                    }
+                ),
+              ),
+            ],
+          ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex, // new
         backgroundColor: Colors.red,
+        type: BottomNavigationBarType.fixed,
         onTap: onTabTapped, // new
         items: [
           new BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              title: Text('Cart'),
+              icon: Icon(Icons.shopping_cart, color: Colors.white),
+              title: Text('Cart', style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red),
+
           new BottomNavigationBarItem(
-            icon: Icon(Icons.mail),
-            title: Text('Offers'),
+            icon: Icon(Icons.local_offer, color: Colors.white),
+            title: Text('Offers', style: TextStyle(color: Colors.white)),
             backgroundColor: Colors.red,
           ),
+
           new BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              title: Text('History'),
+              icon: Icon(Icons.history, color: Colors.white),
+              title: Text('History', style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red),
+
           new BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              title: Text('Contact'),
+              icon: Icon(Icons.contact_mail, color: Colors.white),
+              title: Text('Contact', style: TextStyle(color: Colors.white)),
               backgroundColor: Colors.red)
         ],
       ),
+
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
-
             UserAccountsDrawerHeader(
               accountName: Text('Achin verma'),
               accountEmail: Text('achin@signity.com'),
               currentAccountPicture:
               Image.network('https://winaero.com/blog/wp-content/uploads/2015/05/windows-10-user-account-login-icon.png'),
-              decoration: BoxDecoration(color: Colors.blueAccent),
+              decoration: BoxDecoration(color: Colors.deepOrange),
             ),
-
-
             ListTile(
               leading: Icon(Icons.account_circle),
               title: Text('Home'),
               onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
                 Navigator.pop(context);
               },
             ),
@@ -171,28 +219,62 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
               leading: Icon(Icons.account_circle),
               title: Text('My Profile'),
               onTap: () {
-                // Update the state of the app
-                // ...
-                // Then close the drawer
                 Navigator.pop(context);
               },
             ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Delivery Address'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('My Orders'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Book Now'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('My Favorites'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('About Us'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Refer & Earn'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Logout'),
+              onTap: () {
+                Navigator.pop(context);
+              },
+            ),
+
           ],
         ),
       ),
-    );
-  }
-}
-
-class PlaceholderWidget extends StatelessWidget {
-  final Color color;
-
-  PlaceholderWidget(this.color);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: color,
     );
   }
 }
