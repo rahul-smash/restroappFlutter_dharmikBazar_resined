@@ -54,4 +54,22 @@ class ApiController{
     return categories.data;
   }
 
+  static Future<String> getSubCategoryProducts(String storeId,String catId ,String deviceId) async {
+    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/getSubCategoryProducts/${catId}';
+    print('$versionApi , $storeId');
+
+    FormData formData = new FormData.from(
+        {"device_id": deviceId, "device_token":"", "user_id":"", "platform":"android"});
+    Dio dio = new Dio();
+    Response response = await dio.post(versionApi, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    print(response.data);
+    //StoreData storeData = StoreData.fromJson(response.data);
+    //print("-------store.success ---${storeData.success}");
+    return "";
+  }
+
+
+
 }

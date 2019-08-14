@@ -81,7 +81,10 @@ class CardviewState extends State<Cardview> {
         print(storeData.store.id);
         if(storeData.success){
 
-          Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(storeData)),);
+          Route route = MaterialPageRoute(builder: (context) => HomeScreen(storeData));
+          Navigator.pushReplacement(context, route);
+
+          //Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(storeData)),);
 
         }else{
           Utils.showToast("Please try again", false);
@@ -91,8 +94,6 @@ class CardviewState extends State<Cardview> {
     } catch (e) {
       print(e);
     }
-
-
   }
 
 }

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/SubCategoryProducstScreen.dart';
 import 'package:restroapp/src/models/Categories.dart';
-import 'package:circular_profile_avatar/circular_profile_avatar.dart';
+import 'package:restroapp/src/networkhandler/ApiController.dart';
+import 'package:restroapp/src/utils/Constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoriesView extends StatelessWidget {
 
@@ -12,17 +15,26 @@ class CategoriesView extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return Container(
-      margin: EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
+      margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       alignment: Alignment.center,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Flexible(
+          GestureDetector(
+            onTap: () {
+              //do what you want here
+              print("cat click ${categoriesData.id}");
+              print("subCategory.length ${categoriesData.subCategory.length}");
+              if(categoriesData != null && categoriesData.subCategory.isNotEmpty){
+                Navigator.push(context, MaterialPageRoute(builder: (context) => SubCategoryProducstScreen(categoriesData)),);
+              }
+            },
             child: CircleAvatar(
               radius: 40,
               backgroundImage: NetworkImage(categoriesData.image300200),
             ),
           ),
+
           Padding(
             padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
             child: Text(
@@ -38,3 +50,6 @@ class CategoriesView extends StatelessWidget {
     );
   }
 }
+
+
+
