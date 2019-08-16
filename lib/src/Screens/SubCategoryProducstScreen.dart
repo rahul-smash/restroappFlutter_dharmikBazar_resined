@@ -13,37 +13,38 @@ class SubCategoryProducstScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    print("----- Tabs length----- ${categoriesData.subCategory.length}");
-
+    //print("----- Tabs length----- ${categoriesData.subCategory.length}");
     if(categoriesData.subCategory.length == 1){
-      print("-ID's--${categoriesData.id}--Id=- ${categoriesData.subCategory[0].id}----");
+      //print("-ID's--${categoriesData.id}--Id=- ${categoriesData.subCategory[0].id}----");
+      return MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.deepOrange,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: ProductsListView(categoriesData),
+      );
     }else{
-
-    }
-
-    for (int i = 0; i< categoriesData.subCategory.length; i++) {
-      tabs.add(new Tab(text: categoriesData.subCategory[i].title));
-    }
-
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: Container(
-        child: DefaultTabController(length: categoriesData.subCategory.length,
+      for (int i = 0; i< categoriesData.subCategory.length; i++) {
+        tabs.add(new Tab(text: categoriesData.subCategory[i].title));
+      }
+      return MaterialApp(
+        theme: ThemeData(
+          primarySwatch: Colors.deepOrange,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: Container(
+          child: DefaultTabController(length: categoriesData.subCategory.length,
             child: Scaffold(
-                appBar: AppBar(
+              appBar: AppBar(
                   title: Text(categoriesData.title),
                   centerTitle: true,
-                    bottom:TabBar(
-                      tabs: tabs,
-                    ),
-                    leading: IconButton(icon:Icon(Icons.arrow_back),
-                      onPressed:() => Navigator.pop(context, false),
-                    )
-                ),
+                  bottom:TabBar(
+                    tabs: tabs,
+                  ),
+                  leading: IconButton(icon:Icon(Icons.arrow_back),
+                    onPressed:() => Navigator.pop(context, false),
+                  )
+              ),
               body: TabBarView(
                 children: new List.generate(categoriesData.subCategory.length, (int index){
                   //print(categoriesData.subCategory[index].title);
@@ -51,8 +52,30 @@ class SubCategoryProducstScreen extends StatelessWidget {
                 }),
               ),
             ),
+          ),
         ),
+      );
+    }
+  }
+}
+
+class ProductsListView extends StatelessWidget {
+
+  CategoriesData categoriesData;
+
+  ProductsListView(this.categoriesData);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(categoriesData.title),
+          centerTitle: true,
+          leading: IconButton(icon:Icon(Icons.arrow_back),
+            onPressed:() => Navigator.pop(context, false),
+          )
       ),
+      body: getProductsWidget(categoriesData, categoriesData.subCategory[0].id),
     );
   }
 }
