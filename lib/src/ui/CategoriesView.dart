@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/SubCategoryProducstScreen.dart';
 import 'package:restroapp/src/models/Categories.dart';
-import 'package:restroapp/src/networkhandler/ApiController.dart';
-import 'package:restroapp/src/utils/Constants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CategoriesView extends StatelessWidget {
 

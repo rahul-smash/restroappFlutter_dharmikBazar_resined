@@ -10,7 +10,7 @@ String subCategoriesToJson(SubCategories data) => json.encode(data.toJson());
 
 class SubCategories {
   bool success;
-  List<Datum> data;
+  List<SubCatData> data;
 
   SubCategories({
     this.success,
@@ -19,7 +19,7 @@ class SubCategories {
 
   factory SubCategories.fromJson(Map<String, dynamic> json) => new SubCategories(
     success: json["success"],
-    data: new List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+    data: new List<SubCatData>.from(json["data"].map((x) => SubCatData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -28,7 +28,7 @@ class SubCategories {
   };
 }
 
-class Datum {
+class SubCatData {
   String id;
   String title;
   String version;
@@ -41,7 +41,7 @@ class Datum {
   String image;
   List<Product> products;
 
-  Datum({
+  SubCatData({
     this.id,
     this.title,
     this.version,
@@ -55,7 +55,7 @@ class Datum {
     this.products,
   });
 
-  factory Datum.fromJson(Map<String, dynamic> json) => new Datum(
+  factory SubCatData.fromJson(Map<String, dynamic> json) => new SubCatData(
     id: json["id"],
     title: json["title"],
     version: json["version"],
