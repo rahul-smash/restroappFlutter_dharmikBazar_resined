@@ -80,7 +80,6 @@ class CardviewState extends State<Cardview> {
 
         print(storeData.store.id);
         if(storeData.success){
-
           Route route = MaterialPageRoute(builder: (context) => HomeScreen(storeData));
           Navigator.pushReplacement(context, route);
 

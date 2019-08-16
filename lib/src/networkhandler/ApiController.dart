@@ -1,9 +1,13 @@
 import 'dart:io';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/StoreData.dart';
+import 'package:restroapp/src/models/SubCategories.dart';
 import 'package:restroapp/src/models/store_list.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:restroapp/src/utils/Constants.dart';
+import 'package:restroapp/src/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:http/http.dart' as http;
 
 class ApiController{
@@ -54,9 +58,12 @@ class ApiController{
     return categories.data;
   }
 
-  static Future<String> getSubCategoryProducts(String storeId,String catId ,String deviceId) async {
+  static Future<List<Product>> getSubCategoryProducts(String storeId,String catId ) async {
     String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/getSubCategoryProducts/${catId}';
-    print('$versionApi , $storeId');
+    print('$storeId , $versionApi');
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
 
     FormData formData = new FormData.from(
         {"device_id": deviceId, "device_token":"", "user_id":"", "platform":"android"});
@@ -65,9 +72,17 @@ class ApiController{
         options: new Options(
             contentType: ContentType.parse("application/json")));
     print(response.data);
-    //StoreData storeData = StoreData.fromJson(response.data);
-    //print("-------store.success ---${storeData.success}");
-    return "";
+    SubCategories subCategories = SubCategories.fromJson(response.data);
+    //print("-------subCategories.success ---${subCategories.data.length}");
+    if(subCategories.success){
+
+    }else{
+      Utils.showToast("No data found", false);
+    }
+
+    List<Product> subProductList = subCategories.data[0].products;
+    //print("-------subProductList ---${subProductList.length}");
+    return subProductList;
   }
 
 
