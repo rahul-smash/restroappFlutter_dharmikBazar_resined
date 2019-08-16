@@ -14,9 +14,16 @@ class SubCategoryProducstScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    if(categoriesData.subCategory.length >1){
+
+    }else{
+
+    }
+
     for (int i = 0; i< categoriesData.subCategory.length; i++) {
       tabs.add(new Tab(text: categoriesData.subCategory[i].title));
     }
+    print("----- Tabs length----- ${categoriesData.subCategory.length}");
 
     return MaterialApp(
       theme: ThemeData(
@@ -40,7 +47,7 @@ class SubCategoryProducstScreen extends StatelessWidget {
                 children: new List.generate(categoriesData.subCategory.length, (int index){
                   //print(categoriesData.subCategory[index].title);
                   //print(index);
-                  return projectWidget(categoriesData,categoriesData.subCategory[index].id);
+                  return getProductsWidget(categoriesData,categoriesData.subCategory[index].id);
                 }),
               ),
             ),
@@ -50,33 +57,27 @@ class SubCategoryProducstScreen extends StatelessWidget {
   }
 }
 
-Widget projectWidget(CategoriesData categoriesData,String catId) {
+Widget getProductsWidget(CategoriesData categoriesData,String catId) {
 
   return FutureBuilder(
-    //future: openSubCategories(categoriesData,catId),
     future: ApiController.getSubCategoryProducts(categoriesData.id,catId),
     builder: (context, projectSnap) {
-
       if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
-        print('project snapshot data is: ${projectSnap.data}');
+        //print('project snapshot data is: ${projectSnap.data}');
         return Container(color: const Color(0xFFFFE306));
       } else {
         if(projectSnap.hasData){
-          print('-------projectSnap.hasData---------------');
-
+          //print('-------projectSnap.hasData---------------');
           return ListView.builder(
-
             itemCount: projectSnap.data.length,
             itemBuilder: (context, index) {
               Product subCatProducts = projectSnap.data[index];
-              print('-------ListView.builder---------');
+              //print('-------ListView.builder---------');
               return Column(
                 children: <Widget>[
                   new ListTile(
                     title: new Text(subCatProducts.title,
-                        style: new TextStyle(fontWeight: FontWeight.w500,
-                            fontSize: 20.0,
-                            color:Colors.deepOrange)),
+                        style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
                     subtitle: new Text("\$${subCatProducts.variants[0].price}"),
                     leading: new Icon(
                       Icons.favorite, color: Colors.grey,
@@ -87,7 +88,7 @@ Widget projectWidget(CategoriesData categoriesData,String catId) {
             },
           );
         }else {
-          print('-------CircularProgressIndicator----------');
+          //print('-------CircularProgressIndicator----------');
           return Center(
             child: CircularProgressIndicator(
                 backgroundColor: Colors.black26,
@@ -95,7 +96,6 @@ Widget projectWidget(CategoriesData categoriesData,String catId) {
           );
         }
       }
-
     },
   );
 }
