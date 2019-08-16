@@ -14,8 +14,10 @@ class SubCategoryProducstScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    if(categoriesData.subCategory.length >1){
+    print("----- Tabs length----- ${categoriesData.subCategory.length}");
 
+    if(categoriesData.subCategory.length == 1){
+      print("-ID's--${categoriesData.id}--Id=- ${categoriesData.subCategory[0].id}----");
     }else{
 
     }
@@ -23,7 +25,6 @@ class SubCategoryProducstScreen extends StatelessWidget {
     for (int i = 0; i< categoriesData.subCategory.length; i++) {
       tabs.add(new Tab(text: categoriesData.subCategory[i].title));
     }
-    print("----- Tabs length----- ${categoriesData.subCategory.length}");
 
     return MaterialApp(
       theme: ThemeData(
@@ -46,7 +47,6 @@ class SubCategoryProducstScreen extends StatelessWidget {
               body: TabBarView(
                 children: new List.generate(categoriesData.subCategory.length, (int index){
                   //print(categoriesData.subCategory[index].title);
-                  //print(index);
                   return getProductsWidget(categoriesData,categoriesData.subCategory[index].id);
                 }),
               ),
@@ -76,8 +76,7 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
               return Column(
                 children: <Widget>[
                   new ListTile(
-                    title: new Text(subCatProducts.title,
-                        style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
+                    title: new Text(subCatProducts.title,style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
                     subtitle: new Text("\$${subCatProducts.variants[0].price}"),
                     leading: new Icon(
                       Icons.favorite, color: Colors.grey,
