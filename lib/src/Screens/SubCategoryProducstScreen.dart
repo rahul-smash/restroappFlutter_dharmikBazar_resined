@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
 import 'package:restroapp/src/networkhandler/ApiController.dart';
@@ -50,6 +51,41 @@ class SubCategoryProducstScreen extends StatelessWidget {
                   //print(categoriesData.subCategory[index].title);
                   return getProductsWidget(categoriesData,categoriesData.subCategory[index].id);
                 }),
+              ),
+              bottomNavigationBar: BottomAppBar(
+                color: Colors.white,
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: SizedBox(
+                        height: 50,
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: InkWell(
+                            onTap: () {
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Text("Total",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
+                                ),
+                                Text("\$0.00",style: TextStyle(fontSize: 20),),
+                                Expanded(child: SizedBox()),
+                                new Expanded(
+                                  child: Text("Proceed To Order",
+                                      style: TextStyle(fontSize: 15,backgroundColor:Colors.white)),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -116,7 +152,6 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
   );
 }
 
-
 class ListTileItem extends StatefulWidget {
 
   Product subCatProducts;
@@ -145,9 +180,7 @@ class _ListTileItemState extends State<ListTileItem> {
           counter != 0?
           IconButton(
             icon: new Icon(Icons.remove),
-            onPressed: ()=> setState(()=> counter--),
-          ):
-          new Container(),
+            onPressed: ()=> setState(()=> counter--),):new Container(),
           Text("${counter}"),
           IconButton(
             icon: Icon(Icons.add),
@@ -158,12 +191,5 @@ class _ListTileItemState extends State<ListTileItem> {
       ),
     );
   }
-
-  void remove(){
-    setState(() {
-      counter--;
-    });
-  }
-
 }
 
