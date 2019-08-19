@@ -107,6 +107,7 @@ class Product {
   String image300200;
   List<Variant> variants;
   SelectedVariant selectedVariant;
+  int mCounter = 0;
 
   Product({
     this.id,
@@ -131,6 +132,7 @@ class Product {
     this.image300200,
     this.variants,
     this.selectedVariant,
+    this.mCounter,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => new Product(

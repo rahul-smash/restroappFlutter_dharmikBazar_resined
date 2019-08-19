@@ -98,13 +98,7 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
               //print('-------ListView.builder---------');
               return Column(
                 children: <Widget>[
-                  new ListTile(
-                    title: new Text(subCatProducts.title,style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
-                    subtitle: new Text("\$${subCatProducts.variants[0].price}"),
-                    leading: new Icon(
-                      Icons.favorite, color: Colors.grey,
-                    ),
-                  ),
+                  new ListTileItem(subCatProducts),
                 ],
               );
             },
@@ -120,5 +114,56 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
       }
     },
   );
+}
+
+
+class ListTileItem extends StatefulWidget {
+
+  Product subCatProducts;
+  ListTileItem(this.subCatProducts);
+
+  @override
+  _ListTileItemState createState() => new _ListTileItemState();
+}
+
+class _ListTileItemState extends State<ListTileItem> {
+
+  int counter = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    print("---_ListTileItemState-${counter}--");
+    return new ListTile(
+      title: new Text(widget.subCatProducts.title,style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
+      subtitle: new Text("\$${widget.subCatProducts.variants[0].price}"),
+      leading: new Icon(
+        Icons.favorite, color: Colors.grey,
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          counter != 0?
+          IconButton(
+            icon: new Icon(Icons.remove),
+            onPressed: ()=> setState(()=> counter--),
+          ):
+          new Container(),
+          Text("${counter}"),
+          IconButton(
+            icon: Icon(Icons.add),
+            highlightColor: Colors.black,
+            onPressed: () => setState(()=> counter++),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void remove(){
+    setState(() {
+      counter--;
+    });
+  }
+
 }
 
