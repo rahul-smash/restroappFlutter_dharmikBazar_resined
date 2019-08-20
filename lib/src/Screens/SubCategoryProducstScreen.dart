@@ -15,6 +15,7 @@ class SubCategoryProducstScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     //print("----- Tabs length----- ${categoriesData.subCategory.length}");
+
     if(categoriesData.subCategory.length == 1){
       //print("-ID's--${categoriesData.id}--Id=- ${categoriesData.subCategory[0].id}----");
       return MaterialApp(
@@ -103,6 +104,7 @@ class ProductsListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
         title: Text(categoriesData.title),

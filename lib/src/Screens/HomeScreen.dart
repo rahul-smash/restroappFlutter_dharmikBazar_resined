@@ -128,6 +128,7 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
                       } else {
                         if(projectSnap.hasData){
 
+                          //print('------Master-Categories---------: ${projectSnap.data.length}');
 
                           return Container(
                             margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),

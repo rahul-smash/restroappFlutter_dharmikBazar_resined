@@ -11,6 +11,7 @@ class CategoriesView extends StatelessWidget {
 
   Widget build(BuildContext context) {
 
+
     return Container(
       margin: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       alignment: Alignment.center,
@@ -20,8 +21,8 @@ class CategoriesView extends StatelessWidget {
           GestureDetector(
             onTap: () {
               //do what you want here
-              print("cat click ${categoriesData.id}");
-              print("subCategory.length ${categoriesData.subCategory.length}");
+              //print("cat click ${categoriesData.id}");
+              //print("subCategory.length ${categoriesData.subCategory.length}");
               if(categoriesData != null && categoriesData.subCategory.isNotEmpty){
                 Navigator.push(context, MaterialPageRoute(builder: (context) => SubCategoryProducstScreen(categoriesData)),);
               }

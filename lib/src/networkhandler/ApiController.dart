@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
@@ -55,6 +56,26 @@ class ApiController{
     Categories categories = Categories.fromJson(response.data);
     print("-------Categories.length ---${categories.data.length}");
 
+    try {
+      DatabaseHelper databaseHelper = new DatabaseHelper();
+      databaseHelper.getCount(DatabaseHelper.Categories_Table).then((count){
+        print("---Categories-getCount------${count}");
+        if(count == 0){
+          for (int i = 0; i< categories.data.length; i++) {
+            databaseHelper.saveCategories(categories.data[i]);
+            String cat_id = categories.data[i].id;
+
+            if(categories.data[i].subCategory != null){
+              for (int j = 0; j< categories.data[i].subCategory.length; j++) {
+                databaseHelper.saveSubCategories(categories.data[i].subCategory[j],cat_id);
+              }
+            }
+          }
+        }
+      });
+    } catch (e) {
+      print(e);
+    }
     return categories.data;
   }
 

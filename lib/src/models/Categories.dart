@@ -78,6 +78,23 @@ class CategoriesData {
     "image": image,
     "sub_category": new List<dynamic>.from(subCategory.map((x) => x.toJson())),
   };
+
+  Map<String, dynamic> toMap() {
+    var map = new Map<String, dynamic>();
+    map["id"] = id;
+    map["title"] = title;
+    map["version"] = version;
+    map["deleted"] = deleted;
+    map["show_product_image"] = showProductImage;
+    map["sort"] = sort;
+    map["image_100_80"] = image10080;
+    map["image_300_200"] = image300200;
+    //print(subCategory.map((x) => x.toJson().toString()));
+    List jsonList = SubCategory.encondeToJson(subCategory);
+    map["sub_category"] = jsonList.toString();
+    map["image"] = image;
+    return map;
+  }
 }
 
 class SubCategory {
@@ -114,4 +131,25 @@ class SubCategory {
     "deleted": deleted,
     "sort": sort,
   };
+
+  Map<String, dynamic> toMap(String parent_id) {
+    var map = new Map<String, dynamic>();
+    map["id"] = id;
+    map["parent_id"] = parent_id;
+    map["title"] = title;
+    map["version"] = version;
+    map["status"] = status;
+    map["deleted"] = deleted;
+    map["sort"] = sort;
+    return map;
+  }
+
+  static List encondeToJson(List<SubCategory>list){
+    List jsonList = List();
+    list.map((item)=>
+        jsonList.add(item.toJson())
+    ).toList();
+    return jsonList;
+  }
+
 }
