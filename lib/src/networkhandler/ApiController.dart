@@ -94,7 +94,7 @@ class ApiController{
             contentType: ContentType.parse("application/json")));
     print(response.data);
     SubCategories subCategories = SubCategories.fromJson(response.data);
-    //print("-------subCategories.success ---${subCategories.data.length}");
+    //print("-------subCategories.length ---${subCategories.data.length}");
     if(subCategories.success){
 
     }else{
@@ -102,7 +102,21 @@ class ApiController{
     }
 
     List<Product> subProductList = subCategories.data[0].products;
-    //print("-------subProductList ---${subProductList.length}");
+    print("-------ProductList ---${subProductList.length}");
+
+    DatabaseHelper databaseHelper = new DatabaseHelper();
+    for(int i = 0; i < subProductList.length; i++){
+      //print("-------Product-title ---${subProductList[i].title}");
+      databaseHelper.checkProductsExist(DatabaseHelper.Products_Table, subProductList[i].categoryIds).then((count){
+        print("------checkProductsExist-----${count}");
+        if(count == 0){
+          databaseHelper.saveProducts(subProductList[i],
+              DatabaseHelper.Favorite, subProductList[i].variants[0].mrpPrice,
+              subProductList[i].variants[0].price, subProductList[i].variants[0].discount);
+        }
+      });
+    }
+
     return subProductList;
   }
 

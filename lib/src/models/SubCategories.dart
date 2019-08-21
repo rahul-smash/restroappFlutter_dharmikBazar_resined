@@ -184,6 +184,33 @@ class Product {
     "variants": new List<dynamic>.from(variants.map((x) => x.toJson())),
     "selectedVariant": selectedVariant.toJson(),
   };
+
+  Map<String, dynamic> toMap(String favorite, String mrp_price, String price, String discount) {
+    var map = new Map<String, dynamic>();
+    map["id"] = id;
+    map["store_id"] = storeId;
+    map["category_ids"] = categoryIds;
+    map["title"] = title;
+    map["brand"] = brand;
+    map["nutrient"] = nutrient;
+    map["description"] = description;
+    map["image"] = image;
+    map["imageUrl"] = imageUrl;
+    map["showPrice"] = showPrice;
+    map["isTaxEnable"] = isTaxEnable;
+    map["gstTaxType"] = gstTaxType;
+    map["gstTaxRate"] = gstTaxRate;
+    map["status"] = status;
+    map["sort"] = sort;
+    map["favorite"] = favorite;
+    map["image_100_80"] = image10080;
+    map["image_300_200"] = image300200;
+    map["variants_mrp_price"] = mrp_price;
+    map["variants_price"] = price;
+    map["variants_discount"] = discount;
+    return map;
+  }
+
 }
 
 class SelectedVariant {

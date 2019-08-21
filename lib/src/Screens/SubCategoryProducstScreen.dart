@@ -169,7 +169,7 @@ class _ListTileItemState extends State<ListTileItem> {
 
   @override
   Widget build(BuildContext context) {
-    print("---_ListTileItemState-${counter}--");
+    //print("---_ListTileItemState-${counter}--");
     return new ListTile(
       title: new Text(widget.subCatProducts.title,style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
       subtitle: new Text("\$${widget.subCatProducts.variants[0].price}"),
