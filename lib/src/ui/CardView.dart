@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/HomeScreen.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/store_list.dart';
-import 'package:restroapp/src/networkhandler/ApiController.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';

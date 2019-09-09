@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
-import 'package:restroapp/src/networkhandler/ApiController.dart';
 
 class SubCategoryProducstScreen extends StatelessWidget {
 
@@ -128,12 +128,12 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
         return Container(color: const Color(0xFFFFE306));
       } else {
         if(projectSnap.hasData){
-          //print('-------projectSnap.hasData---------------');
+          print('-------projectSnap.hasData---------------');
           return ListView.builder(
             itemCount: projectSnap.data.length,
             itemBuilder: (context, index) {
               Product subCatProducts = projectSnap.data[index];
-              //print('-------ListView.builder---------');
+              print('-------ListView.builder-----${index}');
               return Column(
                 children: <Widget>[
                   new ListTileItem(subCatProducts),
@@ -179,16 +179,28 @@ class _ListTileItemState extends State<ListTileItem> {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
+
           counter != 0?
-          IconButton(
-            icon: new Icon(Icons.remove),
-            onPressed: ()=> setState(()=> counter--),):new Container(),
+          IconButton(icon: new Icon(Icons.remove),
+            //onPressed: ()=> setState(()=> counter--),
+            onPressed: (){
+              setState(()=> counter--);
+              print("--remove-onPressed-${counter}--");
+
+            },
+          ):new Container(),
+
           Text("${counter}"),
-          IconButton(
-            icon: Icon(Icons.add),
+
+          IconButton(icon: Icon(Icons.add),
             highlightColor: Colors.black,
-            onPressed: () => setState(()=> counter++),
+            onPressed: (){
+              setState(()=> counter++);
+              print("--add-onPressed-${counter}--");
+            },
+            //onPressed: () => setState(()=> counter++),
           ),
+
         ],
       ),
     );

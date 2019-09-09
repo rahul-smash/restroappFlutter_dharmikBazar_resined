@@ -112,7 +112,8 @@ class ApiController{
         if(count == 0){
           databaseHelper.saveProducts(subProductList[i],
               DatabaseHelper.Favorite, subProductList[i].variants[0].mrpPrice,
-              subProductList[i].variants[0].price, subProductList[i].variants[0].discount);
+              subProductList[i].variants[0].price, subProductList[i].variants[0].discount
+              , subProductList[i].variants[0].id);
         }
       });
     }

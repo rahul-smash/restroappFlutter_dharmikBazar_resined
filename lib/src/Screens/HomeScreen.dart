@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:restroapp/src/networkhandler/ApiController.dart';
 import 'package:restroapp/src/ui/CategoriesView.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 

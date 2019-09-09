@@ -11,9 +11,13 @@ class DatabaseHelper {
   factory DatabaseHelper() => _instance;
   static Database _db;
 
+  // Database table names
   static final String Categories_Table = "categories";
   static final String Sub_Categories_Table = "sub_categories";
   static final String Products_Table = "products";
+  static final String CART_Table = "cart";
+
+  // Database Columns
   static final String Favorite = "0";
 
   Future<Database> get db async {
@@ -84,10 +88,23 @@ class DatabaseHelper {
             "image_300_200 TEXT, "
             "variants_mrp_price TEXT, "
             "variants_price TEXT, "
-            "variants_discount TEXT "
+            "variants_discount TEXT, "
+            "variants_id TEXT "
             ")"
     );
-
+    await db.execute(
+        "CREATE TABLE ${CART_Table}("
+            "id INTEGER PRIMARY KEY, "
+            "variant_id TEXT, "
+            "product_id TEXT, "
+            "weight TEXT, "
+            "mrp_price TEXT, "
+            "price TEXT, "
+            "discount TEXT, "
+            "quantity TEXT, "
+            "isTaxEnable TEXT"
+            ")"
+    );
 
   }
 
@@ -103,9 +120,9 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<int> saveProducts(Product products,String favorite,String mrp_price, String price, String discount) async {
+  Future<int> saveProducts(Product products,String favorite,String mrp_price, String price, String discount, String var_id) async {
     var dbClient = await db;
-    int res = await dbClient.insert(Products_Table, products.toMap(favorite,mrp_price,price,discount));
+    int res = await dbClient.insert(Products_Table, products.toMap(favorite,mrp_price,price,discount,var_id));
     return res;
   }
 

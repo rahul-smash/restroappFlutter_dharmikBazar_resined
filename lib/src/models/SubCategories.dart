@@ -185,7 +185,7 @@ class Product {
     "selectedVariant": selectedVariant.toJson(),
   };
 
-  Map<String, dynamic> toMap(String favorite, String mrp_price, String price, String discount) {
+  Map<String, dynamic> toMap(String favorite, String mrp_price, String price, String discount, String variants_id) {
     var map = new Map<String, dynamic>();
     map["id"] = id;
     map["store_id"] = storeId;
@@ -208,6 +208,7 @@ class Product {
     map["variants_mrp_price"] = mrp_price;
     map["variants_price"] = price;
     map["variants_discount"] = discount;
+    map["variants_id"] = variants_id;
     return map;
   }
 
