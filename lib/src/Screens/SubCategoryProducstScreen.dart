@@ -23,7 +23,10 @@ class SubCategoryProducstScreen extends StatelessWidget {
           primarySwatch: Colors.deepOrange,
         ),
         debugShowCheckedModeBanner: false,
-        home: ProductsListView(categoriesData),
+        home: Scaffold(
+          body: ProductsListView(categoriesData),
+          bottomNavigationBar: TotalPriceBottomBar(),
+        ),
       );
     }else{
       for (int i = 0; i< categoriesData.subCategory.length; i++) {
@@ -53,41 +56,7 @@ class SubCategoryProducstScreen extends StatelessWidget {
                   return getProductsWidget(categoriesData,categoriesData.subCategory[index].id);
                 }),
               ),
-              bottomNavigationBar: BottomAppBar(
-                color: Colors.white,
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: SizedBox(
-                        height: 50,
-                        child: Material(
-                          type: MaterialType.transparency,
-                          child: InkWell(
-                            onTap: () {
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.all(10.0),
-                                  child: Text("Total",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
-                                ),
-                                Text("\$0.00",style: TextStyle(fontSize: 20),),
-                                Expanded(child: SizedBox()),
-                                new Expanded(
-                                  child: Text("Proceed To Order",
-                                      style: TextStyle(fontSize: 15,backgroundColor:Colors.white)),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              bottomNavigationBar: TotalPriceBottomBar(),
             ),
           ),
         ),
@@ -96,24 +65,29 @@ class SubCategoryProducstScreen extends StatelessWidget {
   }
 }
 
-class ProductsListView extends StatelessWidget {
+class ProductsListView extends StatefulWidget {
 
   CategoriesData categoriesData;
 
   ProductsListView(this.categoriesData);
 
   @override
+  _ProductsListViewState createState() => _ProductsListViewState();
+}
+
+class _ProductsListViewState extends State<ProductsListView> {
+  @override
   Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(categoriesData.title),
+        title: Text(widget.categoriesData.title),
           centerTitle: true,
           leading: IconButton(icon:Icon(Icons.arrow_back),
             onPressed:() => Navigator.pop(context, false),
           )
       ),
-      body: getProductsWidget(categoriesData, categoriesData.subCategory[0].id),
+      body: getProductsWidget(widget.categoriesData, widget.categoriesData.subCategory[0].id),
     );
   }
 }
@@ -154,7 +128,6 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
   );
 }
 
-
 //============================Cart List Item widget=====================================
 class ListTileItem extends StatefulWidget {
 
@@ -164,7 +137,7 @@ class ListTileItem extends StatefulWidget {
   @override
   _ListTileItemState createState() => new _ListTileItemState();
 }
-//============================Cart List Item widget=====================================
+//============================Cart List Item State=====================================
 class _ListTileItemState extends State<ListTileItem> {
 
   DatabaseHelper databaseHelper = new DatabaseHelper();
@@ -177,6 +150,7 @@ class _ListTileItemState extends State<ListTileItem> {
     databaseHelper.getProductQuantitiy(int.parse(widget.subCatProducts.id)).then((count){
       //print("---getProductQuantitiy---${count}");
       counter = int.parse(count);
+      //priceBottomBar.updateTotalPrice(9999);
       setState(() {
       });
     });
@@ -286,5 +260,66 @@ class _ListTileItemState extends State<ListTileItem> {
     }
   }
 
+}
+
+class TotalPriceBottomBar extends StatefulWidget{
+
+  int totalPrice = 0;
+
+  TotalPriceBottomBar();
+
+  final _PriceBottomBarState state = new _PriceBottomBarState();
+
+  @override
+  _PriceBottomBarState createState() => state;
+
+}
+
+class _PriceBottomBarState extends State<TotalPriceBottomBar>{
+
+  @override
+  Widget build(BuildContext context) {
+    print("-------TotalPriceBottomBar---${widget.totalPrice}----");
+
+    // TODO: implement build
+    return BottomAppBar(
+      color: Colors.white,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: SizedBox(
+              height: 50,
+              child: Material(
+                type: MaterialType.transparency,
+                child: InkWell(
+                  onTap: () {
+                  },
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.all(10.0),
+                        child: Text("Total",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
+                      ),
+                      Text("\$${widget.totalPrice}",style: TextStyle(fontSize: 20),
+
+                      ),
+                      //Text("\$0.00",style: TextStyle(fontSize: 20),),
+                      Expanded(child: SizedBox()),
+                      new Expanded(
+                        child: Text("Proceed To Order",
+                            style: TextStyle(fontSize: 15,backgroundColor:Colors.white)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
