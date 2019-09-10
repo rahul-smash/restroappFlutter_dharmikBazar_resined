@@ -19,6 +19,15 @@ class DatabaseHelper {
 
   // Database Columns
   static final String Favorite = "0";
+  static final String ID = "id";
+  static final String VARIENT_ID = "variant_id";
+  static final String PRODUCT_ID = "product_id";
+  static final String WEIGHT = "weight";
+  static final String MRP_PRICE = "mrp_price";
+  static final String PRICE = "price";
+  static final String DISCOUNT = "discount";
+  static final String QUANTITY = "quantity";
+  static final String IS_TAX_ENABLE = "isTaxEnable";
 
   Future<Database> get db async {
     if (_db != null)
@@ -126,10 +135,56 @@ class DatabaseHelper {
     return res;
   }
 
+  Future<int> addProductToCart(Map<String, dynamic> row) async {
+    var dbClient = await db;
+    int res = await dbClient.insert(CART_Table,row);
+    return res;
+  }
+
+  Future<int> updateProductInCart(Map<String, dynamic> row, int product_id) async {
+    var dbClient = await db;
+
+    return dbClient.update(CART_Table, row, where: "${ID} = ?", whereArgs: [product_id]);
+
+  }
+
   Future<int> checkProductsExist(String table,String category_id) async {
     //database connection
     var dbClient = await db;
     List<Map> list = await dbClient.rawQuery('SELECT * from $table where category_ids = $category_id');
+    int count = list.length;
+    return count;
+  }
+
+  Future<int> getProductQuantitiy(int product_id) async {
+    int count = 0;
+    //database connection
+    var dbClient = await db;
+    // get single row
+    List<String> columnsToSelect = [QUANTITY];
+    String whereClause = '${DatabaseHelper.ID} = ?';
+    List<dynamic> whereArguments = [product_id];
+    List<Map> result = await dbClient.query(CART_Table, columns: columnsToSelect,where: whereClause, whereArgs: whereArguments);
+    // print the results
+    if(result != null && result.isNotEmpty){
+      //print("---result.length--- ${result.length}");
+      result.forEach((row){
+        print("-1-quantity--- ${row['quantity']}");
+        count = int.parse(row[QUANTITY]);
+        //return count;
+      });
+    }else{
+      print("-X-quantity--- return 0");
+      //return count;
+      count = 0;
+    }
+    return count;
+  }
+
+  Future<int> checkIfProductsExistInCart(String table, int product_id) async {
+    //database connection
+    var dbClient = await db;
+    List<Map> list = await dbClient.rawQuery('SELECT * from $table where ${ID} = $product_id');
     int count = list.length;
     return count;
   }
@@ -142,27 +197,10 @@ class DatabaseHelper {
     return count;
   }
 
-  /*Future<int> delete(int id) async {
+  Future<int> delete(String table,int id) async {
     var dbClient = await db;
-    return await dbClient.delete(TABLE, where: '$ID = ?', whereArgs: [id]);
-  }*/
-
-  /*
-  Future<List<UserModel>> getUserModelData() async {
-    var dbClient = await db;
-    String sql;
-    sql = "SELECT * FROM user";
-
-    var result = await dbClient.rawQuery(sql);
-    if (result.length == 0) return null;
-
-    List<UserModel> list = result.map((item) {
-      return UserModel.fromMap(item);
-    }).toList();
-
-    print(result);
-    return list;
-  }*/
+    return await dbClient.delete(table, where: '$ID = ?', whereArgs: [id]);
+  }
 
   Future close() async {
     var dbClient = await db;

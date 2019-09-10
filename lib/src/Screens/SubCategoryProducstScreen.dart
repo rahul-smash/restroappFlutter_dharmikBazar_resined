@@ -3,6 +3,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class SubCategoryProducstScreen extends StatelessWidget {
 
@@ -120,6 +121,8 @@ class ProductsListView extends StatelessWidget {
 
 Widget getProductsWidget(CategoriesData categoriesData,String catId) {
 
+  DatabaseHelper databaseHelper = new DatabaseHelper();
+
   return FutureBuilder(
     future: ApiController.getSubCategoryProducts(categoriesData.id,catId),
     builder: (context, projectSnap) {
@@ -128,7 +131,7 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
         return Container(color: const Color(0xFFFFE306));
       } else {
         if(projectSnap.hasData){
-          print('-------projectSnap.hasData---------------');
+          //print('---projectSnap.Data-length-${projectSnap.data.length}---');
           return ListView.builder(
             itemCount: projectSnap.data.length,
             itemBuilder: (context, index) {
@@ -154,6 +157,8 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
   );
 }
 
+
+//============================Cart List Item widget=====================================
 class ListTileItem extends StatefulWidget {
 
   Product subCatProducts;
@@ -162,14 +167,29 @@ class ListTileItem extends StatefulWidget {
   @override
   _ListTileItemState createState() => new _ListTileItemState();
 }
-
+//============================Cart List Item widget=====================================
 class _ListTileItemState extends State<ListTileItem> {
 
+  DatabaseHelper databaseHelper = new DatabaseHelper();
   int counter = 0;
 
   @override
+  initState() {
+    super.initState();
+    //print("---initState initState----initState-");
+    databaseHelper.getProductQuantitiy(int.parse(widget.subCatProducts.id)).then((count){
+      //print("---getProductQuantitiy---${count}");
+      counter = count;
+      setState(() {
+        //print("---setState---setState---");
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    //print("---_ListTileItemState-${counter}--");
+    //print("---_Widget build----${widget.subCatProducts.title}--");
+
     return new ListTile(
       title: new Text(widget.subCatProducts.title,style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
       subtitle: new Text("\$${widget.subCatProducts.variants[0].price}"),
@@ -185,8 +205,14 @@ class _ListTileItemState extends State<ListTileItem> {
             //onPressed: ()=> setState(()=> counter--),
             onPressed: (){
               setState(()=> counter--);
-              print("--remove-onPressed-${counter}--");
-
+              //print("--remove-onPressed-${counter}--");
+              if(counter == 0){
+                // delete from cart table
+                removeFromCartTable(widget.subCatProducts.id);
+              }else{
+                // insert/update to cart table
+                insertInCartTable(widget.subCatProducts,counter);
+              }
             },
           ):new Container(),
 
@@ -196,7 +222,14 @@ class _ListTileItemState extends State<ListTileItem> {
             highlightColor: Colors.black,
             onPressed: (){
               setState(()=> counter++);
-              print("--add-onPressed-${counter}--");
+              //print("--add-onPressed-${counter}--");
+              if(counter == 0){
+                // delete from cart table
+                removeFromCartTable(widget.subCatProducts.id);
+              }else{
+                // insert/update to cart table
+                insertInCartTable(widget.subCatProducts,counter);
+              }
             },
             //onPressed: () => setState(()=> counter++),
           ),
@@ -205,5 +238,66 @@ class _ListTileItemState extends State<ListTileItem> {
       ),
     );
   }
+
+  void insertInCartTable(Product subCatProducts, int quantity) {
+    //print("--insertInCartTable-${counter}--");
+    String id = subCatProducts.id;
+    String variantsId = subCatProducts.variants[0].id;
+    String productId = subCatProducts.id;
+    String weight = subCatProducts.variants[0].weight;
+    String mrp_price = subCatProducts.variants[0].mrpPrice;
+    String price = subCatProducts.variants[0].price;
+    String discount = subCatProducts.variants[0].discount;
+    String productQuantity = quantity.toString();
+    String isTaxEnable = subCatProducts.isTaxEnable;
+    var mId = int.parse(id);
+    // row to insert
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID : mId,
+      DatabaseHelper.VARIENT_ID  : variantsId,
+      DatabaseHelper.PRODUCT_ID : productId,
+      DatabaseHelper.WEIGHT : weight,
+      DatabaseHelper.MRP_PRICE : mrp_price,
+      DatabaseHelper.PRICE : price,
+      DatabaseHelper.DISCOUNT : discount,
+      DatabaseHelper.QUANTITY : productQuantity,
+      DatabaseHelper.IS_TAX_ENABLE : isTaxEnable,
+    };
+
+    databaseHelper.checkIfProductsExistInCart(DatabaseHelper.CART_Table, mId).then((count){
+      //print("------checkProductsExist-----${count}");
+      if(count == 0){
+        //print("------Products NOT ExistInCart-----${count}");
+        databaseHelper.addProductToCart(row).then((count){
+          //print("--addProductToCart-${count}--");
+          //Utils.showToast("Product added in Cart", false);
+        });
+      }else{
+        //Utils.showToast("Product already Exist in Cart", false);
+        databaseHelper.updateProductInCart(row, mId).then((count){
+          //print("-----updateProductInCart----${count}--");
+        });
+      }
+    });
+
+
+  }
+
+  void removeFromCartTable(String product_id) {
+    //print("--removeFromCartTable-${counter}--");
+    try {
+      databaseHelper.delete(DatabaseHelper.CART_Table, int.parse(product_id));
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  String getProductQuantity(String product_id){
+    databaseHelper.getProductQuantitiy(int.parse(product_id)).then((quantCount){
+      print("-2-quantity--- ${quantCount}");
+      return quantCount.toString();
+    });
+  }
+
 }
 
