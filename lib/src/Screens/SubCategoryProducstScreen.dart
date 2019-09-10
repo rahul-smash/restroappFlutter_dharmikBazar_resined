@@ -193,7 +193,7 @@ class _ListTileItemState extends State<ListTileItem> {
                 // insert/update to cart table
                 insertInCartTable(widget.subCatProducts,counter);
               }
-              bottomBar.state.updateTotalPrice();
+              bottomBar.state.updateTotalPrice(900);
             },
           ):new Container(),
 
@@ -212,7 +212,7 @@ class _ListTileItemState extends State<ListTileItem> {
                 // insert/update to cart table
                 insertInCartTable(widget.subCatProducts,counter);
               }
-              bottomBar.state.updateTotalPrice();
+              bottomBar.state.updateTotalPrice(900);
             },
           ),
         ],
@@ -277,25 +277,21 @@ class _ListTileItemState extends State<ListTileItem> {
 
 class TotalPriceBottomBar extends StatefulWidget{
 
-  int totalPrice = 0;
-
-  TotalPriceBottomBar();
 
   final _PriceBottomBarState state = new _PriceBottomBarState();
 
   @override
   _PriceBottomBarState createState() => state;
 
-  updatePrice(){
-    print("------updatePrice-----");
-    state.updateTotalPrice();
-  }
 }
 
 class _PriceBottomBarState extends State<TotalPriceBottomBar>{
 
-  updateTotalPrice(){
-    print("------updateTotalPrice---updateTotalPrice----");
+  int totalPrice = 100;
+
+  updateTotalPrice(int totalCartPrice){
+    //print("------updateTotalPrice---${totalCartPrice}----");
+    totalPrice = totalCartPrice;
     setState(() {
 
     });
@@ -303,7 +299,7 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
 
   @override
   Widget build(BuildContext context) {
-    print("-------TotalPriceBottomBar---${widget.totalPrice}----");
+    print("-------TotalPriceBottomBar---${totalPrice}----");
 
     // TODO: implement build
     return BottomAppBar(
@@ -326,7 +322,7 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                         padding: EdgeInsets.all(10.0),
                         child: Text("Total",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
                       ),
-                      Text("\$${widget.totalPrice}",style: TextStyle(fontSize: 20),
+                      Text("\$${totalPrice}",style: TextStyle(fontSize: 20),
 
                       ),
                       //Text("\$0.00",style: TextStyle(fontSize: 20),),
