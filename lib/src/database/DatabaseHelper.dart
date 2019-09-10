@@ -156,8 +156,8 @@ class DatabaseHelper {
     return count;
   }
 
-  Future<int> getProductQuantitiy(int product_id) async {
-    int count = 0;
+  Future<String> getProductQuantitiy(int product_id) async {
+    String count = "0";
     //database connection
     var dbClient = await db;
     // get single row
@@ -170,13 +170,13 @@ class DatabaseHelper {
       //print("---result.length--- ${result.length}");
       result.forEach((row){
         print("-1-quantity--- ${row['quantity']}");
-        count = int.parse(row[QUANTITY]);
+        count = row[QUANTITY];
         //return count;
       });
     }else{
       print("-X-quantity--- return 0");
       //return count;
-      count = 0;
+      count = "0";
     }
     return count;
   }

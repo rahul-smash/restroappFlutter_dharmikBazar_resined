@@ -3,7 +3,6 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
-import 'package:restroapp/src/utils/Utils.dart';
 
 class SubCategoryProducstScreen extends StatelessWidget {
 
@@ -121,8 +120,6 @@ class ProductsListView extends StatelessWidget {
 
 Widget getProductsWidget(CategoriesData categoriesData,String catId) {
 
-  DatabaseHelper databaseHelper = new DatabaseHelper();
-
   return FutureBuilder(
     future: ApiController.getSubCategoryProducts(categoriesData.id,catId),
     builder: (context, projectSnap) {
@@ -136,7 +133,7 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
             itemCount: projectSnap.data.length,
             itemBuilder: (context, index) {
               Product subCatProducts = projectSnap.data[index];
-              print('-------ListView.builder-----${index}');
+              //print('-------ListView.builder-----${index}');
               return Column(
                 children: <Widget>[
                   new ListTileItem(subCatProducts),
@@ -179,9 +176,8 @@ class _ListTileItemState extends State<ListTileItem> {
     //print("---initState initState----initState-");
     databaseHelper.getProductQuantitiy(int.parse(widget.subCatProducts.id)).then((count){
       //print("---getProductQuantitiy---${count}");
-      counter = count;
+      counter = int.parse(count);
       setState(() {
-        //print("---setState---setState---");
       });
     });
   }
@@ -231,9 +227,7 @@ class _ListTileItemState extends State<ListTileItem> {
                 insertInCartTable(widget.subCatProducts,counter);
               }
             },
-            //onPressed: () => setState(()=> counter++),
           ),
-
         ],
       ),
     );
@@ -290,13 +284,6 @@ class _ListTileItemState extends State<ListTileItem> {
     } catch (e) {
       print(e);
     }
-  }
-
-  String getProductQuantity(String product_id){
-    databaseHelper.getProductQuantitiy(int.parse(product_id)).then((quantCount){
-      print("-2-quantity--- ${quantCount}");
-      return quantCount.toString();
-    });
   }
 
 }
