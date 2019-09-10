@@ -11,6 +11,7 @@ class SubCategoryProducstScreen extends StatelessWidget {
   SubCategoryProducstScreen(this.categoriesData);
   List<String> titles = [];
   List<Tab> tabs = new List();
+  TotalPriceBottomBar bottomBar = TotalPriceBottomBar();
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +25,8 @@ class SubCategoryProducstScreen extends StatelessWidget {
         ),
         debugShowCheckedModeBanner: false,
         home: Scaffold(
-          body: ProductsListView(categoriesData),
-          bottomNavigationBar: TotalPriceBottomBar(),
+          body: ProductsListView(categoriesData,bottomBar),
+          bottomNavigationBar: bottomBar,
         ),
       );
     }else{
@@ -53,10 +54,10 @@ class SubCategoryProducstScreen extends StatelessWidget {
               body: TabBarView(
                 children: new List.generate(categoriesData.subCategory.length, (int index){
                   //print(categoriesData.subCategory[index].title);
-                  return getProductsWidget(categoriesData,categoriesData.subCategory[index].id);
+                  return getProductsWidget(categoriesData,categoriesData.subCategory[index].id,bottomBar);
                 }),
               ),
-              bottomNavigationBar: TotalPriceBottomBar(),
+              bottomNavigationBar: bottomBar,
             ),
           ),
         ),
@@ -68,14 +69,19 @@ class SubCategoryProducstScreen extends StatelessWidget {
 class ProductsListView extends StatefulWidget {
 
   CategoriesData categoriesData;
+  TotalPriceBottomBar bottomBar;
 
-  ProductsListView(this.categoriesData);
+  ProductsListView(this.categoriesData, this.bottomBar);
 
   @override
-  _ProductsListViewState createState() => _ProductsListViewState();
+  _ProductsListViewState createState() => _ProductsListViewState(bottomBar);
 }
 
 class _ProductsListViewState extends State<ProductsListView> {
+  TotalPriceBottomBar bottomBar;
+
+  _ProductsListViewState(this.bottomBar);
+
   @override
   Widget build(BuildContext context) {
 
@@ -87,12 +93,12 @@ class _ProductsListViewState extends State<ProductsListView> {
             onPressed:() => Navigator.pop(context, false),
           )
       ),
-      body: getProductsWidget(widget.categoriesData, widget.categoriesData.subCategory[0].id),
+      body: getProductsWidget(widget.categoriesData, widget.categoriesData.subCategory[0].id,bottomBar),
     );
   }
 }
 
-Widget getProductsWidget(CategoriesData categoriesData,String catId) {
+Widget getProductsWidget(CategoriesData categoriesData,String catId, TotalPriceBottomBar bottomBar) {
 
   return FutureBuilder(
     future: ApiController.getSubCategoryProducts(categoriesData.id,catId),
@@ -110,7 +116,7 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
               //print('-------ListView.builder-----${index}');
               return Column(
                 children: <Widget>[
-                  new ListTileItem(subCatProducts),
+                  new ListTileItem(subCatProducts,bottomBar),
                 ],
               );
             },
@@ -132,16 +138,21 @@ Widget getProductsWidget(CategoriesData categoriesData,String catId) {
 class ListTileItem extends StatefulWidget {
 
   Product subCatProducts;
-  ListTileItem(this.subCatProducts);
+  TotalPriceBottomBar bottomBar;
+
+  ListTileItem(this.subCatProducts, this.bottomBar);
 
   @override
-  _ListTileItemState createState() => new _ListTileItemState();
+  _ListTileItemState createState() => new _ListTileItemState(bottomBar);
 }
 //============================Cart List Item State=====================================
 class _ListTileItemState extends State<ListTileItem> {
 
+  TotalPriceBottomBar bottomBar;
   DatabaseHelper databaseHelper = new DatabaseHelper();
   int counter = 0;
+
+  _ListTileItemState(this.bottomBar);
 
   @override
   initState() {
@@ -170,8 +181,7 @@ class _ListTileItemState extends State<ListTileItem> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
 
-          counter != 0?
-          IconButton(icon: new Icon(Icons.remove),
+          counter != 0?IconButton(icon: new Icon(Icons.remove),
             //onPressed: ()=> setState(()=> counter--),
             onPressed: (){
               setState(()=> counter--);
@@ -183,6 +193,7 @@ class _ListTileItemState extends State<ListTileItem> {
                 // insert/update to cart table
                 insertInCartTable(widget.subCatProducts,counter);
               }
+              bottomBar.state.updateTotalPrice();
             },
           ):new Container(),
 
@@ -193,6 +204,7 @@ class _ListTileItemState extends State<ListTileItem> {
             onPressed: (){
               setState(()=> counter++);
               //print("--add-onPressed-${counter}--");
+
               if(counter == 0){
                 // delete from cart table
                 removeFromCartTable(widget.subCatProducts.id);
@@ -200,6 +212,7 @@ class _ListTileItemState extends State<ListTileItem> {
                 // insert/update to cart table
                 insertInCartTable(widget.subCatProducts,counter);
               }
+              bottomBar.state.updateTotalPrice();
             },
           ),
         ],
@@ -273,9 +286,20 @@ class TotalPriceBottomBar extends StatefulWidget{
   @override
   _PriceBottomBarState createState() => state;
 
+  updatePrice(){
+    print("------updatePrice-----");
+    state.updateTotalPrice();
+  }
 }
 
 class _PriceBottomBarState extends State<TotalPriceBottomBar>{
+
+  updateTotalPrice(){
+    print("------updateTotalPrice---updateTotalPrice----");
+    setState(() {
+
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
