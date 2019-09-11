@@ -172,11 +172,30 @@ class _ListTileItemState extends State<ListTileItem> {
 
   @override
   Widget build(BuildContext context) {
-    //print("---_Widget build----${widget.subCatProducts.title}--");
+    //print("---_Widget build--${widget.subCatProducts.title}-and discount-${widget.subCatProducts.variants[0].discount}");
+
+    Row row;
+    String discount = widget.subCatProducts.variants[0].discount.toString();
+    if(discount == "0.00" || discount == "0" || discount == "0.0"){
+      row = new Row(
+        children: <Widget>[
+          Text("\$${widget.subCatProducts.variants[0].price}"),
+        ],
+      );
+    }else{
+      row = new Row(
+          children: <Widget>[
+            Text("\$${widget.subCatProducts.variants[0].discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
+            Text(" "),
+            Text("${widget.subCatProducts.variants[0].price}"),
+          ],
+      );
+    }
 
     return new ListTile(
       title: new Text(widget.subCatProducts.title,style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
-      subtitle: new Text("\$${widget.subCatProducts.variants[0].price}"),
+      //subtitle: new Text("\$${widget.subCatProducts.variants[0].price}"),
+      subtitle: row,
       leading: new Icon(
         Icons.favorite, color: Colors.grey,
       ),
@@ -336,9 +355,7 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                         padding: EdgeInsets.all(10.0),
                         child: Text("Total",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
                       ),
-                      Text("\$${totalPrice}",style: TextStyle(fontSize: 20),
-
-                      ),
+                      Text("\$${totalPrice}",style: TextStyle(fontSize: 20),),
                       //Text("\$0.00",style: TextStyle(fontSize: 20),),
                       Expanded(child: SizedBox()),
                       new Expanded(
