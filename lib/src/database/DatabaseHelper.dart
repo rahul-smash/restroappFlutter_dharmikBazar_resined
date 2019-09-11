@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:restroapp/src/models/Categories.dart';
@@ -179,6 +180,44 @@ class DatabaseHelper {
       count = "0";
     }
     return count;
+  }
+
+
+  Future<double> getTotalPrice() async {
+    double totalPrice = 0.00;
+    //database connection
+    var dbClient = await db;
+    // get single row
+    List<String> columnsToSelect = [MRP_PRICE,PRICE,DISCOUNT,QUANTITY];
+    List<Map> resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
+    // print the results
+    if(resultList != null && resultList.isNotEmpty){
+      print("---result.length--- ${resultList.length}");
+      resultList.forEach((row) => print(row));
+      String price = "0";
+      String quantity = "0";
+      resultList.forEach((row){
+        price = row[PRICE];
+        quantity = row[QUANTITY];
+        try {
+          double total = int.parse(quantity) * double.parse(price);
+          print("-------total------${roundOffPrice(total,2)}");
+          totalPrice = totalPrice + roundOffPrice(total,2);
+        } catch (e) {
+          print(e);
+        }
+      });
+      return totalPrice;
+      //print("-totalPrice is ${totalPrice}--");
+    }else{
+      print("-empty cart---");
+    }
+    return totalPrice;
+  }
+
+  double roundOffPrice(double val, int places){
+    double mod = pow(10.0, places);
+    return ((val * mod).round().toDouble() / mod);
   }
 
   Future<int> checkIfProductsExistInCart(String table, int product_id) async {

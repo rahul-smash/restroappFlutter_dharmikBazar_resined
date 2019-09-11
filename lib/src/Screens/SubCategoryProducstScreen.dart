@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -158,6 +160,7 @@ class _ListTileItemState extends State<ListTileItem> {
   initState() {
     super.initState();
     //print("---initState initState----initState-");
+    //bottomBar.state.updateTotalPrice();
     databaseHelper.getProductQuantitiy(int.parse(widget.subCatProducts.id)).then((count){
       //print("---getProductQuantitiy---${count}");
       counter = int.parse(count);
@@ -193,7 +196,7 @@ class _ListTileItemState extends State<ListTileItem> {
                 // insert/update to cart table
                 insertInCartTable(widget.subCatProducts,counter);
               }
-              bottomBar.state.updateTotalPrice(900);
+              bottomBar.state.updateTotalPrice();
             },
           ):new Container(),
 
@@ -212,7 +215,6 @@ class _ListTileItemState extends State<ListTileItem> {
                 // insert/update to cart table
                 insertInCartTable(widget.subCatProducts,counter);
               }
-              bottomBar.state.updateTotalPrice(900);
             },
           ),
         ],
@@ -251,12 +253,14 @@ class _ListTileItemState extends State<ListTileItem> {
         //print("------Products NOT ExistInCart-----${count}");
         databaseHelper.addProductToCart(row).then((count){
           //print("--addProductToCart-${count}--");
+          bottomBar.state.updateTotalPrice();
           //Utils.showToast("Product added in Cart", false);
         });
       }else{
         //Utils.showToast("Product already Exist in Cart", false);
         databaseHelper.updateProductInCart(row, mId).then((count){
           //print("-----updateProductInCart----${count}--");
+          bottomBar.state.updateTotalPrice();
         });
       }
     });
@@ -267,7 +271,9 @@ class _ListTileItemState extends State<ListTileItem> {
   void removeFromCartTable(String product_id) {
     //print("--removeFromCartTable-${counter}--");
     try {
-      databaseHelper.delete(DatabaseHelper.CART_Table, int.parse(product_id));
+      databaseHelper.delete(DatabaseHelper.CART_Table, int.parse(product_id)).then((count){
+        bottomBar.state.updateTotalPrice();
+      });
     } catch (e) {
       print(e);
     }
@@ -276,7 +282,6 @@ class _ListTileItemState extends State<ListTileItem> {
 }
 
 class TotalPriceBottomBar extends StatefulWidget{
-
 
   final _PriceBottomBarState state = new _PriceBottomBarState();
 
@@ -287,20 +292,29 @@ class TotalPriceBottomBar extends StatefulWidget{
 
 class _PriceBottomBarState extends State<TotalPriceBottomBar>{
 
-  int totalPrice = 100;
+  double totalPrice = 0.00;
+  DatabaseHelper databaseHelper = new DatabaseHelper();
+  bool xyz = false;
 
-  updateTotalPrice(int totalCartPrice){
-    //print("------updateTotalPrice---${totalCartPrice}----");
-    totalPrice = totalCartPrice;
-    setState(() {
-
+  updateTotalPrice(){
+    databaseHelper.getTotalPrice().then((mtotalPrice){
+      setState(() {
+        totalPrice = mtotalPrice;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    print("-------TotalPriceBottomBar---${totalPrice}----");
-
+    //print("-------TotalPriceBottomBar---${totalPrice}----");
+    if(xyz == false){
+      databaseHelper.getTotalPrice().then((mtotalPrice){
+        xyz = true;
+        setState(() {
+          totalPrice = mtotalPrice;
+        });
+      });
+    }
     // TODO: implement build
     return BottomAppBar(
       color: Colors.white,
@@ -340,6 +354,11 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
         ],
       ),
     );
+  }
+
+  double roundOffPrice(double val, int places){
+    double mod = pow(10.0, places);
+    return ((val * mod).round().toDouble() / mod);
   }
 }
 

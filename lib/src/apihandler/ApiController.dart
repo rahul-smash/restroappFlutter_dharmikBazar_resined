@@ -122,5 +122,17 @@ class ApiController{
   }
 
 
+/*
+  To get the saved deliveryAddress:
+  POST https://app.restroapp.com/store_-id/api_v5/deliveryAddress
+  method=GET & user_id=349
+
+  when we click pn Area Filed then api hit
+  https://app.restroapp.com/1/api_v5/deliveryAreas/Area
+
+  when we send the data in DelieveryaDDress APi
+  https://app.restroapp.com/1/api_v5/deliveryAddress
+
+*/
 
 }
