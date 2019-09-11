@@ -5,6 +5,7 @@ import 'package:restroapp/src/Screens/AddDeliveryAddressScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
+import 'package:restroapp/src/models/MyCartScreen.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
 
 class SubCategoryProducstScreen extends StatelessWidget {
@@ -350,7 +351,7 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                     print("-------onTap---");
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
+                      MaterialPageRoute(builder: (context) => MyCart()),
                     );
                   },
                   child: Row(
