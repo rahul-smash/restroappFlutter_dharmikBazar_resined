@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/AddDeliveryAddressScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
@@ -346,6 +347,11 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                 type: MaterialType.transparency,
                 child: InkWell(
                   onTap: () {
+                    print("-------onTap---");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
+                    );
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -371,11 +377,6 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
         ],
       ),
     );
-  }
-
-  double roundOffPrice(double val, int places){
-    double mod = pow(10.0, places);
-    return ((val * mod).round().toDouble() / mod);
   }
 }
 
