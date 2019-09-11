@@ -363,7 +363,6 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                         child: Text("Total",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
                       ),
                       Text("\$${totalPrice}",style: TextStyle(fontSize: 20),),
-                      //Text("\$0.00",style: TextStyle(fontSize: 20),),
                       Expanded(child: SizedBox()),
                       new Expanded(
                         child: Text("Proceed To Order",
