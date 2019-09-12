@@ -27,6 +27,8 @@ class Utils{
                 fontSize: 16.0
             );
           }
+      /*Scaffold.of(_context).showSnackBar(SnackBar(content: Text("$result"),
+      duration: Duration(seconds: 3),));*/
     } catch (e) {
       print(e);
     }

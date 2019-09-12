@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/AddDeliveryAddressScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartData.dart';
+import 'package:restroapp/src/utils/Constants.dart';
 
 class MyCart extends StatelessWidget {
-
   ProceedBottomBar proceedBottomBar = new ProceedBottomBar();
   DatabaseHelper databaseHelper = new DatabaseHelper();
+
+  MyCart(BuildContext context);
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class MyCart extends StatelessWidget {
             centerTitle: true,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () => Navigator.pop(context, AppConstant.Refresh),
             )),
         body: Column(
           children: <Widget>[
@@ -30,31 +32,36 @@ class MyCart extends StatelessWidget {
             FutureBuilder(
               future: databaseHelper.getCartItemList(),
               builder: (context, projectSnap) {
-                if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
+                if (projectSnap.connectionState == ConnectionState.none &&
+                    projectSnap.hasData == null) {
                   //print('project snapshot data is: ${projectSnap.data}');
                   return Container(color: const Color(0xFFFFE306));
                 } else {
-                  if(projectSnap.hasData){
-                    print('---projectSnap.Data-length-${projectSnap.data.length}---');
+                  if (projectSnap.hasData) {
+                    print(
+                        '---projectSnap.Data-length-${projectSnap.data.length}---');
                     return ListView.builder(
-                      shrinkWrap: true, //Your Column doesn't know how much height it will take. use this
+                      shrinkWrap: true,
+                      //Your Column doesn't know how much height it will take. use this
                       itemCount: projectSnap.data.length,
                       itemBuilder: (context, index) {
-                        CartProductData cartProductData = projectSnap.data[index];
+                        CartProductData cartProductData =
+                            projectSnap.data[index];
                         //print('-------ListView.builder-----${index}');
                         return Column(
                           children: <Widget>[
-                            new ListTileItem(cartProductData,proceedBottomBar),
+                            new ListTileItem(cartProductData, proceedBottomBar),
                           ],
                         );
                       },
                     );
-                  }else {
+                  } else {
                     //print('-------CircularProgressIndicator----------');
                     return Center(
                       child: CircularProgressIndicator(
                           backgroundColor: Colors.black26,
-                          valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.black26)),
                     );
                   }
                 }
@@ -68,20 +75,19 @@ class MyCart extends StatelessWidget {
   }
 }
 
-
 //============================Cart List Item widget=====================================
 class ListTileItem extends StatefulWidget {
-
   CartProductData cartProductData;
   ProceedBottomBar proceedBottomBar;
+
   ListTileItem(this.cartProductData, this.proceedBottomBar);
 
   @override
   _ListTileItemState createState() => new _ListTileItemState(proceedBottomBar);
 }
+
 //============================Cart List Item State=====================================
 class _ListTileItemState extends State<ListTileItem> {
-
   ProceedBottomBar bottomBar;
   int counter = 0;
   DatabaseHelper databaseHelper = new DatabaseHelper();
@@ -92,11 +98,12 @@ class _ListTileItemState extends State<ListTileItem> {
   initState() {
     super.initState();
     print("---initState product_id---${widget.cartProductData.product_id}-");
-    databaseHelper.getProductQuantitiy(int.parse(widget.cartProductData.product_id)).then((count){
+    databaseHelper
+        .getProductQuantitiy(int.parse(widget.cartProductData.product_id))
+        .then((count) {
       //print("---getProductQuantitiy---${count}");
       counter = int.parse(count);
-      setState(() {
-      });
+      setState(() {});
     });
   }
 
@@ -105,16 +112,17 @@ class _ListTileItemState extends State<ListTileItem> {
     //print("---_Widget build--${widget.subCatProducts.title}-and discount-${widget.subCatProducts.variants[0].discount}");
     Row row;
     String discount = widget.cartProductData.discount;
-    if(discount == "0.00" || discount == "0" || discount == "0.0"){
+    if (discount == "0.00" || discount == "0" || discount == "0.0") {
       row = new Row(
         children: <Widget>[
           Text("\$${widget.cartProductData.price}"),
         ],
       );
-    }else{
+    } else {
       row = new Row(
         children: <Widget>[
-          Text("\$${widget.cartProductData.discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
+          Text("\$${widget.cartProductData.discount}",
+              style: TextStyle(decoration: TextDecoration.lineThrough)),
           Text(" "),
           Text("${widget.cartProductData.price}"),
         ],
@@ -122,41 +130,46 @@ class _ListTileItemState extends State<ListTileItem> {
     }
 
     return new ListTile(
-      title: new Text(widget.cartProductData.product_name,style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 20.0, color:Colors.deepOrange)),
+      title: new Text(widget.cartProductData.product_name,
+          style: new TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 20.0,
+              color: Colors.deepOrange)),
       //subtitle: new Text("\$${widget.subCatProducts.variants[0].price}"),
       subtitle: row,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
-
-          counter != 0?IconButton(icon: new Icon(Icons.remove),
-            //onPressed: ()=> setState(()=> counter--),
-            onPressed: (){
-              setState(()=> counter--);
-              //print("--remove-onPressed-${counter}--");
-              if(counter == 0){
-                // delete from cart table
-                removeFromCartTable(widget.cartProductData.product_id);
-              }else{
-                // insert/update to cart table
-                insertInCartTable(widget.cartProductData,counter);
-              }
-            },
-          ):new Container(),
-
+          counter != 0
+              ? IconButton(
+                  icon: new Icon(Icons.remove),
+                  //onPressed: ()=> setState(()=> counter--),
+                  onPressed: () {
+                    setState(() => counter--);
+                    //print("--remove-onPressed-${counter}--");
+                    if (counter == 0) {
+                      // delete from cart table
+                      removeFromCartTable(widget.cartProductData.product_id);
+                    } else {
+                      // insert/update to cart table
+                      insertInCartTable(widget.cartProductData, counter);
+                    }
+                  },
+                )
+              : new Container(),
           Text("${counter}"),
-
-          IconButton(icon: Icon(Icons.add),
+          IconButton(
+            icon: Icon(Icons.add),
             highlightColor: Colors.black,
-            onPressed: (){
-              setState(()=> counter++);
+            onPressed: () {
+              setState(() => counter++);
               //print("--add-onPressed-${counter}--");
-              if(counter == 0){
+              if (counter == 0) {
                 // delete from cart table
                 removeFromCartTable(widget.cartProductData.product_id);
-              }else{
+              } else {
                 // insert/update to cart table
-                insertInCartTable(widget.cartProductData,counter);
+                insertInCartTable(widget.cartProductData, counter);
               }
             },
           ),
@@ -164,6 +177,7 @@ class _ListTileItemState extends State<ListTileItem> {
       ),
     );
   }
+
   void insertInCartTable(CartProductData subCatProducts, int quantity) {
     //print("--insertInCartTable-${counter}--");
     String id = subCatProducts.product_id;
@@ -179,43 +193,45 @@ class _ListTileItemState extends State<ListTileItem> {
     var mId = int.parse(id);
     // row to insert
     Map<String, dynamic> row = {
-      DatabaseHelper.ID : mId,
-      DatabaseHelper.VARIENT_ID  : variantsId,
-      DatabaseHelper.PRODUCT_ID : productId,
-      DatabaseHelper.WEIGHT : weight,
-      DatabaseHelper.MRP_PRICE : mrp_price,
-      DatabaseHelper.PRICE : price,
-      DatabaseHelper.DISCOUNT : discount,
-      DatabaseHelper.QUANTITY : productQuantity,
-      DatabaseHelper.IS_TAX_ENABLE : isTaxEnable,
-      DatabaseHelper.Product_Name : title,
+      DatabaseHelper.ID: mId,
+      DatabaseHelper.VARIENT_ID: variantsId,
+      DatabaseHelper.PRODUCT_ID: productId,
+      DatabaseHelper.WEIGHT: weight,
+      DatabaseHelper.MRP_PRICE: mrp_price,
+      DatabaseHelper.PRICE: price,
+      DatabaseHelper.DISCOUNT: discount,
+      DatabaseHelper.QUANTITY: productQuantity,
+      DatabaseHelper.IS_TAX_ENABLE: isTaxEnable,
+      DatabaseHelper.Product_Name: title,
     };
 
-    databaseHelper.checkIfProductsExistInCart(DatabaseHelper.CART_Table, mId).then((count){
+    databaseHelper
+        .checkIfProductsExistInCart(DatabaseHelper.CART_Table, mId)
+        .then((count) {
       //print("------checkProductsExist-----${count}");
-      if(count == 0){
+      if (count == 0) {
         //print("------Products NOT ExistInCart-----${count}");
-        databaseHelper.addProductToCart(row).then((count){
+        databaseHelper.addProductToCart(row).then((count) {
           //print("--addProductToCart-${count}--");
           bottomBar.state.updateTotalPrice();
           //Utils.showToast("Product added in Cart", false);
         });
-      }else{
+      } else {
         //Utils.showToast("Product already Exist in Cart", false);
-        databaseHelper.updateProductInCart(row, mId).then((count){
+        databaseHelper.updateProductInCart(row, mId).then((count) {
           //print("-----updateProductInCart----${count}--");
           bottomBar.state.updateTotalPrice();
         });
       }
     });
-
-
   }
 
   void removeFromCartTable(String product_id) {
     //print("--removeFromCartTable-${counter}--");
     try {
-      databaseHelper.delete(DatabaseHelper.CART_Table, int.parse(product_id)).then((count){
+      databaseHelper
+          .delete(DatabaseHelper.CART_Table, int.parse(product_id))
+          .then((count) {
         bottomBar.state.updateTotalPrice();
       });
     } catch (e) {
@@ -225,7 +241,6 @@ class _ListTileItemState extends State<ListTileItem> {
 }
 
 class ProceedBottomBar extends StatefulWidget {
-
   final _ProceedBottomBarState state = new _ProceedBottomBarState();
 
   @override
@@ -233,13 +248,12 @@ class ProceedBottomBar extends StatefulWidget {
 }
 
 class _ProceedBottomBarState extends State<ProceedBottomBar> {
-
   double totalPrice = 0.00;
   DatabaseHelper databaseHelper = new DatabaseHelper();
   bool xyz = false;
 
-  updateTotalPrice(){
-    databaseHelper.getTotalPrice().then((mtotalPrice){
+  updateTotalPrice() {
+    databaseHelper.getTotalPrice().then((mtotalPrice) {
       setState(() {
         totalPrice = mtotalPrice;
       });
@@ -249,8 +263,8 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    if(xyz == false){
-      databaseHelper.getTotalPrice().then((mtotalPrice){
+    if (xyz == false) {
+      databaseHelper.getTotalPrice().then((mtotalPrice) {
         xyz = true;
         setState(() {
           totalPrice = mtotalPrice;
@@ -259,28 +273,47 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
     }
 
     return Container(
-      height: 50.0,
+      height: 80.0,
       color: Colors.deepOrange,
-      child: InkWell(
-        onTap: () {
-          //print("on click message");
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
-          );
-        },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Proceed ${databaseHelper.roundOffPrice(totalPrice,2)}",
-              style: TextStyle(color: Colors.white, fontSize: 20.0),
+      child: Column(
+        children: <Widget>[
+          InkWell(
+            onTap: () {
+              //print("on click message");
+            },
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(15, 8, 15, 0),
+              child: Row(
+                //crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Text("Total", style: TextStyle(color: Colors.white, fontSize: 20.0),),
+                  Text("\$${databaseHelper.roundOffPrice(totalPrice, 2)}",style: TextStyle(color: Colors.white, fontSize: 20.0),),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+          Divider(color: Colors.white, thickness: 2.0,),
+          InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
+              );
+            },
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  "Place Order",
+                  style: TextStyle(color: Colors.white, fontSize: 20.0),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-
     );
   }
 }

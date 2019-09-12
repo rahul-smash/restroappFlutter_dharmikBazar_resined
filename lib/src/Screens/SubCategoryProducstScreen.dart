@@ -4,6 +4,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/MyCartScreen.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
+import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SubCategoryProducstScreen extends StatelessWidget {
@@ -309,14 +310,14 @@ class TotalPriceBottomBar extends StatefulWidget{
 
 }
 
-class _PriceBottomBarState extends State<TotalPriceBottomBar>{
+class _PriceBottomBarState extends State<TotalPriceBottomBar> {
 
   double totalPrice = 0.00;
   DatabaseHelper databaseHelper = new DatabaseHelper();
-  bool xyz = false;
+  bool firstTime = false;
 
-  updateTotalPrice(){
-    databaseHelper.getTotalPrice().then((mtotalPrice){
+  updateTotalPrice() {
+    databaseHelper.getTotalPrice().then((mtotalPrice) {
       setState(() {
         totalPrice = mtotalPrice;
       });
@@ -326,9 +327,9 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
   @override
   Widget build(BuildContext context) {
     //print("-------TotalPriceBottomBar---${totalPrice}----");
-    if(xyz == false){
-      databaseHelper.getTotalPrice().then((mtotalPrice){
-        xyz = true;
+    if (firstTime == false) {
+      databaseHelper.getTotalPrice().then((mtotalPrice) {
+        firstTime = true;
         setState(() {
           totalPrice = mtotalPrice;
         });
@@ -347,15 +348,11 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                 child: InkWell(
                   onTap: () {
                     print("-------onTap--${totalPrice}-");
-                    if(totalPrice == 0.0){
+                    if (totalPrice == 0.0) {
                       Utils.showToast("Please add items in cart", false);
-                    }else{
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MyCart()),
-                      );
+                    } else {
+                      goToMyCartScreen(context);
                     }
-
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -363,13 +360,16 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                     children: <Widget>[
                       Padding(
                         padding: EdgeInsets.all(10.0),
-                        child: Text("Total",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
+                        child: Text("Total", style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 21)),
                       ),
-                      Text("\$${databaseHelper.roundOffPrice(totalPrice,2)}",style: TextStyle(fontSize: 20),),
+                      Text("\$${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                        style: TextStyle(fontSize: 20),),
                       Expanded(child: SizedBox()),
                       new Expanded(
                         child: Text("Proceed To Order",
-                            style: TextStyle(fontSize: 15,backgroundColor:Colors.white)),
+                            style: TextStyle(
+                                fontSize: 15, backgroundColor: Colors.white)),
                       ),
                     ],
                   ),
@@ -381,5 +381,17 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
       ),
     );
   }
+
+  void goToMyCartScreen(BuildContext _context) async {
+    var result = await Navigator.push(_context, new MaterialPageRoute(
+      builder: (BuildContext context) => new MyCart(context),
+      fullscreenDialog: true,)
+    );
+    if(result == AppConstant.Refresh){
+      //print("----Refresh---Refresh Refresh-");
+      updateTotalPrice();
+    }
+  }
+
 }
 
