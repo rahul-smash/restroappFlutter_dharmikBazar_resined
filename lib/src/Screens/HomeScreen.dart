@@ -142,7 +142,7 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
                               ),
                             child: GridView.count(
                                 crossAxisCount: 2,
-                                childAspectRatio: 1.5,
+                                childAspectRatio: 1.3,
                                 padding: const EdgeInsets.all(14.0),
                                 mainAxisSpacing: 4.0,
                                 crossAxisSpacing: 4.0,
