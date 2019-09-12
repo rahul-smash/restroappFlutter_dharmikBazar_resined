@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:restroapp/src/models/CartData.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
 import 'package:sqflite/sqflite.dart';
@@ -29,6 +30,7 @@ class DatabaseHelper {
   static final String DISCOUNT = "discount";
   static final String QUANTITY = "quantity";
   static final String IS_TAX_ENABLE = "isTaxEnable";
+  static final String Product_Name = "product_name";
 
   Future<Database> get db async {
     if (_db != null)
@@ -105,6 +107,7 @@ class DatabaseHelper {
     await db.execute(
         "CREATE TABLE ${CART_Table}("
             "id INTEGER PRIMARY KEY, "
+            "product_name TEXT, "
             "variant_id TEXT, "
             "product_id TEXT, "
             "weight TEXT, "
@@ -183,11 +186,14 @@ class DatabaseHelper {
   }
 
 
+  /*
+    this method will get all the data from cart table and it will calculate the cart total price
+    for the item added in the cart by the user
+  * */
   Future<double> getTotalPrice() async {
     double totalPrice = 0.00;
     //database connection
     var dbClient = await db;
-    // get single row
     List<String> columnsToSelect = [MRP_PRICE,PRICE,DISCOUNT,QUANTITY];
     List<Map> resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
     // print the results
@@ -201,7 +207,7 @@ class DatabaseHelper {
         quantity = row[QUANTITY];
         try {
           double total = int.parse(quantity) * double.parse(price);
-          print("-------total------${roundOffPrice(total,2)}");
+          //print("-------total------${roundOffPrice(total,2)}");
           totalPrice = totalPrice + roundOffPrice(total,2);
         } catch (e) {
           print(e);
@@ -213,6 +219,34 @@ class DatabaseHelper {
       print("-empty cart---");
     }
     return totalPrice;
+  }
+
+  /*
+    this method will get all the data from cart table
+  * */
+  Future<List<CartProductData>> getCartItemList() async {
+    List<CartProductData> cartList = new List();
+    //database connection
+    var dbClient = await db;
+    List<String> columnsToSelect = [MRP_PRICE,PRICE,DISCOUNT,QUANTITY,Product_Name];
+    List<Map> resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
+    // print the results
+    if(resultList != null && resultList.isNotEmpty){
+      print("---result.length--- ${resultList.length}");
+      resultList.forEach((row){
+        CartProductData cartProductData = new CartProductData();
+        cartProductData.mrp_price = row[MRP_PRICE];
+        cartProductData.price = row[PRICE];
+        cartProductData.discount = row[DISCOUNT];
+        cartProductData.quantity = row[QUANTITY];
+        cartProductData.product_name = row[Product_Name];
+        cartList.add(cartProductData);
+
+      });
+    }else{
+      print("-empty cart-in db--");
+    }
+    return cartList;
   }
 
   double roundOffPrice(double val, int places){

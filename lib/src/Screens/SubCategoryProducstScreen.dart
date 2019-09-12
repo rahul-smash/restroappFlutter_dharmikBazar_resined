@@ -7,6 +7,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/MyCartScreen.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class SubCategoryProducstScreen extends StatelessWidget {
 
@@ -175,7 +176,6 @@ class _ListTileItemState extends State<ListTileItem> {
   @override
   Widget build(BuildContext context) {
     //print("---_Widget build--${widget.subCatProducts.title}-and discount-${widget.subCatProducts.variants[0].discount}");
-
     Row row;
     String discount = widget.subCatProducts.variants[0].discount.toString();
     if(discount == "0.00" || discount == "0" || discount == "0.0"){
@@ -254,6 +254,7 @@ class _ListTileItemState extends State<ListTileItem> {
     String discount = subCatProducts.variants[0].discount;
     String productQuantity = quantity.toString();
     String isTaxEnable = subCatProducts.isTaxEnable;
+    String title = subCatProducts.title;
     var mId = int.parse(id);
     // row to insert
     Map<String, dynamic> row = {
@@ -266,6 +267,7 @@ class _ListTileItemState extends State<ListTileItem> {
       DatabaseHelper.DISCOUNT : discount,
       DatabaseHelper.QUANTITY : productQuantity,
       DatabaseHelper.IS_TAX_ENABLE : isTaxEnable,
+      DatabaseHelper.Product_Name : title,
     };
 
     databaseHelper.checkIfProductsExistInCart(DatabaseHelper.CART_Table, mId).then((count){
@@ -348,11 +350,16 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                 type: MaterialType.transparency,
                 child: InkWell(
                   onTap: () {
-                    print("-------onTap---");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => MyCart()),
-                    );
+                    print("-------onTap--${totalPrice}-");
+                    if(totalPrice == 0.0){
+                      Utils.showToast("Please add items in cart", false);
+                    }else{
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MyCart()),
+                      );
+                    }
+
                   },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
