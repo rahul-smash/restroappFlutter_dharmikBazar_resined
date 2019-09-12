@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:restroapp/src/Screens/AddDeliveryAddressScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
@@ -228,7 +225,6 @@ class _ListTileItemState extends State<ListTileItem> {
             onPressed: (){
               setState(()=> counter++);
               //print("--add-onPressed-${counter}--");
-
               if(counter == 0){
                 // delete from cart table
                 removeFromCartTable(widget.subCatProducts.id);
@@ -369,7 +365,7 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar>{
                         padding: EdgeInsets.all(10.0),
                         child: Text("Total",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 21)),
                       ),
-                      Text("\$${totalPrice}",style: TextStyle(fontSize: 20),),
+                      Text("\$${databaseHelper.roundOffPrice(totalPrice,2)}",style: TextStyle(fontSize: 20),),
                       Expanded(child: SizedBox()),
                       new Expanded(
                         child: Text("Proceed To Order",

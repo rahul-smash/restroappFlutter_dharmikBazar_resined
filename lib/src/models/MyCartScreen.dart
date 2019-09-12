@@ -8,6 +8,7 @@ class MyCart extends StatelessWidget {
 
   ProceedBottomBar proceedBottomBar = new ProceedBottomBar();
   DatabaseHelper databaseHelper = new DatabaseHelper();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,8 +36,6 @@ class MyCart extends StatelessWidget {
                 } else {
                   if(projectSnap.hasData){
                     print('---projectSnap.Data-length-${projectSnap.data.length}---');
-                    //List<CartProductData> cartList = projectSnap.data;
-                    //return Text("Done ${cartList.length}");
                     return ListView.builder(
                       shrinkWrap: true, //Your Column doesn't know how much height it will take. use this
                       itemCount: projectSnap.data.length,
@@ -45,7 +44,7 @@ class MyCart extends StatelessWidget {
                         //print('-------ListView.builder-----${index}');
                         return Column(
                           children: <Widget>[
-                            new ListTileItem(cartProductData),
+                            new ListTileItem(cartProductData,proceedBottomBar),
                           ],
                         );
                       },
@@ -74,20 +73,31 @@ class MyCart extends StatelessWidget {
 class ListTileItem extends StatefulWidget {
 
   CartProductData cartProductData;
-  ListTileItem(this.cartProductData);
+  ProceedBottomBar proceedBottomBar;
+  ListTileItem(this.cartProductData, this.proceedBottomBar);
 
   @override
-  _ListTileItemState createState() => new _ListTileItemState();
+  _ListTileItemState createState() => new _ListTileItemState(proceedBottomBar);
 }
 //============================Cart List Item State=====================================
 class _ListTileItemState extends State<ListTileItem> {
 
+  ProceedBottomBar bottomBar;
   int counter = 0;
+  DatabaseHelper databaseHelper = new DatabaseHelper();
+
+  _ListTileItemState(this.bottomBar);
 
   @override
   initState() {
     super.initState();
-    //print("---initState initState----initState-");
+    print("---initState product_id---${widget.cartProductData.product_id}-");
+    databaseHelper.getProductQuantitiy(int.parse(widget.cartProductData.product_id)).then((count){
+      //print("---getProductQuantitiy---${count}");
+      counter = int.parse(count);
+      setState(() {
+      });
+    });
   }
 
   @override
@@ -124,6 +134,13 @@ class _ListTileItemState extends State<ListTileItem> {
             onPressed: (){
               setState(()=> counter--);
               //print("--remove-onPressed-${counter}--");
+              if(counter == 0){
+                // delete from cart table
+                removeFromCartTable(widget.cartProductData.product_id);
+              }else{
+                // insert/update to cart table
+                insertInCartTable(widget.cartProductData,counter);
+              }
             },
           ):new Container(),
 
@@ -134,17 +151,81 @@ class _ListTileItemState extends State<ListTileItem> {
             onPressed: (){
               setState(()=> counter++);
               //print("--add-onPressed-${counter}--");
-
+              if(counter == 0){
+                // delete from cart table
+                removeFromCartTable(widget.cartProductData.product_id);
+              }else{
+                // insert/update to cart table
+                insertInCartTable(widget.cartProductData,counter);
+              }
             },
           ),
         ],
       ),
     );
   }
+  void insertInCartTable(CartProductData subCatProducts, int quantity) {
+    //print("--insertInCartTable-${counter}--");
+    String id = subCatProducts.product_id;
+    String variantsId = subCatProducts.variant_id;
+    String productId = subCatProducts.product_id;
+    String weight = subCatProducts.weight;
+    String mrp_price = subCatProducts.mrp_price;
+    String price = subCatProducts.price;
+    String discount = subCatProducts.discount;
+    String productQuantity = quantity.toString();
+    String isTaxEnable = subCatProducts.isTaxEnable;
+    String title = subCatProducts.product_name;
+    var mId = int.parse(id);
+    // row to insert
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID : mId,
+      DatabaseHelper.VARIENT_ID  : variantsId,
+      DatabaseHelper.PRODUCT_ID : productId,
+      DatabaseHelper.WEIGHT : weight,
+      DatabaseHelper.MRP_PRICE : mrp_price,
+      DatabaseHelper.PRICE : price,
+      DatabaseHelper.DISCOUNT : discount,
+      DatabaseHelper.QUANTITY : productQuantity,
+      DatabaseHelper.IS_TAX_ENABLE : isTaxEnable,
+      DatabaseHelper.Product_Name : title,
+    };
 
+    databaseHelper.checkIfProductsExistInCart(DatabaseHelper.CART_Table, mId).then((count){
+      //print("------checkProductsExist-----${count}");
+      if(count == 0){
+        //print("------Products NOT ExistInCart-----${count}");
+        databaseHelper.addProductToCart(row).then((count){
+          //print("--addProductToCart-${count}--");
+          bottomBar.state.updateTotalPrice();
+          //Utils.showToast("Product added in Cart", false);
+        });
+      }else{
+        //Utils.showToast("Product already Exist in Cart", false);
+        databaseHelper.updateProductInCart(row, mId).then((count){
+          //print("-----updateProductInCart----${count}--");
+          bottomBar.state.updateTotalPrice();
+        });
+      }
+    });
+
+
+  }
+
+  void removeFromCartTable(String product_id) {
+    //print("--removeFromCartTable-${counter}--");
+    try {
+      databaseHelper.delete(DatabaseHelper.CART_Table, int.parse(product_id)).then((count){
+        bottomBar.state.updateTotalPrice();
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
 }
 
 class ProceedBottomBar extends StatefulWidget {
+
   final _ProceedBottomBarState state = new _ProceedBottomBarState();
 
   @override
@@ -152,9 +233,31 @@ class ProceedBottomBar extends StatefulWidget {
 }
 
 class _ProceedBottomBarState extends State<ProceedBottomBar> {
+
+  double totalPrice = 0.00;
+  DatabaseHelper databaseHelper = new DatabaseHelper();
+  bool xyz = false;
+
+  updateTotalPrice(){
+    databaseHelper.getTotalPrice().then((mtotalPrice){
+      setState(() {
+        totalPrice = mtotalPrice;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
+    if(xyz == false){
+      databaseHelper.getTotalPrice().then((mtotalPrice){
+        xyz = true;
+        setState(() {
+          totalPrice = mtotalPrice;
+        });
+      });
+    }
+
     return Container(
       height: 50.0,
       color: Colors.deepOrange,
@@ -171,7 +274,7 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              "Proceed",
+              "Proceed ${databaseHelper.roundOffPrice(totalPrice,2)}",
               style: TextStyle(color: Colors.white, fontSize: 20.0),
             ),
           ],

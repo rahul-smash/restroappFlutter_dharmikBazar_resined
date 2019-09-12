@@ -171,14 +171,14 @@ class DatabaseHelper {
     List<Map> result = await dbClient.query(CART_Table, columns: columnsToSelect,where: whereClause, whereArgs: whereArguments);
     // print the results
     if(result != null && result.isNotEmpty){
-      //print("---result.length--- ${result.length}");
+      print("---result.length--- ${result.length}");
       result.forEach((row){
-        //print("-1-quantity--- ${row['quantity']}");
+        print("-1-quantity--- ${row['quantity']}");
         count = row[QUANTITY];
         //return count;
       });
     }else{
-      //print("-X-quantity--- return 0");
+      print("-X-quantity--- return 0");
       //return count;
       count = "0";
     }
@@ -228,7 +228,8 @@ class DatabaseHelper {
     List<CartProductData> cartList = new List();
     //database connection
     var dbClient = await db;
-    List<String> columnsToSelect = [MRP_PRICE,PRICE,DISCOUNT,QUANTITY,Product_Name];
+    List<String> columnsToSelect = [MRP_PRICE,PRICE,DISCOUNT,QUANTITY,
+      Product_Name,VARIENT_ID,WEIGHT,PRODUCT_ID];
     List<Map> resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
     // print the results
     if(resultList != null && resultList.isNotEmpty){
@@ -240,6 +241,9 @@ class DatabaseHelper {
         cartProductData.discount = row[DISCOUNT];
         cartProductData.quantity = row[QUANTITY];
         cartProductData.product_name = row[Product_Name];
+        cartProductData.variant_id = row[VARIENT_ID];
+        cartProductData.weight = row[WEIGHT];
+        cartProductData.product_id = row[PRODUCT_ID];
         cartList.add(cartProductData);
 
       });

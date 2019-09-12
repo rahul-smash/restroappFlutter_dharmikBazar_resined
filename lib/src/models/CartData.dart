@@ -10,6 +10,7 @@ class CartProductData {
   String _quantity = "";
   String _isTaxEnable = "";
 
+
   String get product_name => _product_name;
 
   set product_name(String value) {
