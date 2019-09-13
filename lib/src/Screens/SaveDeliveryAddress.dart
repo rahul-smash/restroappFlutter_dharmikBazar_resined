@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
   @override
@@ -39,6 +40,11 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
             child: InkWell(
               onTap: () {
                 print("Select Area click");
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AreaCustomDialog(
+                  ),
+                );
               },
               child: Column(
                 children: <Widget>[
@@ -162,4 +168,115 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       ),
     );
   }
+}
+
+class AreaCustomDialog extends StatelessWidget {
+
+  AreaCustomDialog();
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Consts.padding),
+      ),
+      elevation: 0.0,
+      backgroundColor: Colors.transparent,
+      //child: dialogContent(context),
+      child: FutureBuilder(
+        future: ApiController.deliveryAreasRequest(),
+        builder: (context, projectSnap){
+          if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
+            //print('project snapshot data is: ${projectSnap.data}');
+            return Container(color: const Color(0xFFFFE306));
+          }else{
+            if(projectSnap.hasData){
+              //print('---projectSnap.Data-length-${projectSnap.data.length}---');
+              return Container(color: const Color(0xFFFFE306));
+            }else {
+              //print('-------CircularProgressIndicator----------');
+              return Center(
+                child: CircularProgressIndicator(
+                    backgroundColor: Colors.black26,
+                    valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
+              );
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  dialogContent(BuildContext context) {
+    TextEditingController editingController = TextEditingController();
+    return Container(
+      decoration: new BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(Consts.padding),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            offset: const Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Container(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Select Area",
+                    style: TextStyle(color: Colors.black, fontSize: 20.0),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                onChanged: (value) {
+                  filterSearchResults(value);
+                },
+                controller: editingController,
+                decoration: InputDecoration(
+                    labelText: "Search",
+                    hintText: "Search",
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(25.0)))),
+              ),
+            ),
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: 20,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text('item is ${index}'),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void filterSearchResults(String value) {
+    print("filterSearchResults ${value}");
+  }
+}
+
+class Consts {
+  Consts._();
+
+  static const double padding = 10.0;
 }

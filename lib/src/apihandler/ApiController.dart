@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
+import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
 import 'package:restroapp/src/models/store_list.dart';
@@ -121,17 +122,28 @@ class ApiController{
     return subProductList;
   }
 
+  static Future<StoreAreaData> deliveryAreasRequest() async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
+
+    String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAreas/Area';
+    print('$deliveryAreas , $storeId');
+
+    Response response = await Dio().get(deliveryAreas);
+    print(response.data);
+    StoreAreaData storeAreaData = StoreAreaData.fromJson(response.data);
+    print("-------store.success ---${storeAreaData.success}");
+    return storeAreaData;
+  }
 
 /*
-  To get the saved deliveryAddress:
+  To get the saved deliveryAddress of the logined user:
   POST https://app.restroapp.com/store_-id/api_v5/deliveryAddress
   method=GET & user_id=349
 
-  when we click pn Area Filed then api hit
+  when we click pn Area Filed then api hit - to get the area of the store
   https://app.restroapp.com/1/api_v5/deliveryAreas/Area
-
-  when we send the data in DelieveryaDDress APi
-  https://app.restroapp.com/1/api_v5/deliveryAddress
 
 */
 

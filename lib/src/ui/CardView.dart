@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/store_list.dart';
 import 'package:restroapp/src/utils/Constants.dart';
@@ -76,15 +77,16 @@ class CardviewState extends State<Cardview> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String deviceId = prefs.getString(key);
       print("----deviceId ${deviceId}");
+
+      SharedPrefs.storeSharedValue(AppConstant.STORE_ID, storeId);
+
       ApiController.versionApiRequest(storeId,deviceId).then((storeData) {
 
         print(storeData.store.id);
         if(storeData.success){
           Route route = MaterialPageRoute(builder: (context) => HomeScreen(storeData));
           Navigator.pushReplacement(context, route);
-
           //Navigator.push(context, MaterialPageRoute(builder: (context) => HomeScreen(storeData)),);
-
         }else{
           Utils.showToast("Please try again", false);
         }

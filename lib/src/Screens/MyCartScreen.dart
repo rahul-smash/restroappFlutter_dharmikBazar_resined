@@ -6,6 +6,7 @@ import 'package:restroapp/src/models/CartData.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 
 class MyCart extends StatelessWidget {
+
   ProceedBottomBar proceedBottomBar = new ProceedBottomBar();
   DatabaseHelper databaseHelper = new DatabaseHelper();
 
