@@ -140,6 +140,24 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
             ),
           ),
           Divider(color: Colors.grey, height: 2.0),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
+            child: ButtonTheme(
+              minWidth: 150.0,
+              height: 45.0,
+              child: RaisedButton(
+                shape: new RoundedRectangleBorder(
+                    borderRadius: new BorderRadius.circular(28.0),
+                    side: BorderSide(color: Colors.red)
+                ),
+                onPressed: () {},
+                color: Colors.red,
+                padding: EdgeInsets.all(5.0),
+                textColor: Colors.white,
+                child: Text("Done".toUpperCase(),style: TextStyle(fontSize: 20)),
+              ),
+            ),
+          ),
         ],
       ),
     );
