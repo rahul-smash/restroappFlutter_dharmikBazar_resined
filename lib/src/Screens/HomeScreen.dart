@@ -15,7 +15,11 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
 
-    return MaterialApp(
+    return Scaffold(
+      body: HomeScreenUI(storeData),
+    );
+
+    /*return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.deepOrange,
@@ -23,7 +27,7 @@ class HomeScreen extends StatelessWidget {
       home: Scaffold(
         body: HomeScreenUI(storeData),
       ),
-    );
+    );*/
   }
 }
 

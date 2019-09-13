@@ -13,64 +13,58 @@ class MyCart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-            title: Text("My Cart"),
-            centerTitle: true,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.pop(context, AppConstant.Refresh),
-            )),
-        body: Column(
-          children: <Widget>[
-            Divider(color: Colors.white, height: 2.0),
-            FutureBuilder(
-              future: databaseHelper.getCartItemList(),
-              builder: (context, projectSnap) {
-                if (projectSnap.connectionState == ConnectionState.none &&
-                    projectSnap.hasData == null) {
-                  //print('project snapshot data is: ${projectSnap.data}');
-                  return Container(color: const Color(0xFFFFE306));
+    return Scaffold(
+      appBar: AppBar(
+          title: Text("My Cart"),
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context, AppConstant.Refresh),
+          )),
+      body: Column(
+        children: <Widget>[
+          Divider(color: Colors.white, height: 2.0),
+          FutureBuilder(
+            future: databaseHelper.getCartItemList(),
+            builder: (context, projectSnap) {
+              if (projectSnap.connectionState == ConnectionState.none &&
+                  projectSnap.hasData == null) {
+                //print('project snapshot data is: ${projectSnap.data}');
+                return Container(color: const Color(0xFFFFE306));
+              } else {
+                if (projectSnap.hasData) {
+                  print(
+                      '---projectSnap.Data-length-${projectSnap.data.length}---');
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    //Your Column doesn't know how much height it will take. use this
+                    itemCount: projectSnap.data.length,
+                    itemBuilder: (context, index) {
+                      CartProductData cartProductData =
+                      projectSnap.data[index];
+                      //print('-------ListView.builder-----${index}');
+                      return Column(
+                        children: <Widget>[
+                          new ListTileItem(cartProductData, proceedBottomBar),
+                        ],
+                      );
+                    },
+                  );
                 } else {
-                  if (projectSnap.hasData) {
-                    print(
-                        '---projectSnap.Data-length-${projectSnap.data.length}---');
-                    return ListView.builder(
-                      shrinkWrap: true,
-                      //Your Column doesn't know how much height it will take. use this
-                      itemCount: projectSnap.data.length,
-                      itemBuilder: (context, index) {
-                        CartProductData cartProductData =
-                            projectSnap.data[index];
-                        //print('-------ListView.builder-----${index}');
-                        return Column(
-                          children: <Widget>[
-                            new ListTileItem(cartProductData, proceedBottomBar),
-                          ],
-                        );
-                      },
-                    );
-                  } else {
-                    //print('-------CircularProgressIndicator----------');
-                    return Center(
-                      child: CircularProgressIndicator(
-                          backgroundColor: Colors.black26,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.black26)),
-                    );
-                  }
+                  //print('-------CircularProgressIndicator----------');
+                  return Center(
+                    child: CircularProgressIndicator(
+                        backgroundColor: Colors.black26,
+                        valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.black26)),
+                  );
                 }
-              },
-            ),
-          ],
-        ),
-        bottomNavigationBar: proceedBottomBar,
+              }
+            },
+          ),
+        ],
       ),
+      bottomNavigationBar: proceedBottomBar,
     );
   }
 }
@@ -97,7 +91,7 @@ class _ListTileItemState extends State<ListTileItem> {
   @override
   initState() {
     super.initState();
-    print("---initState product_id---${widget.cartProductData.product_id}-");
+    //print("---initState product_id---${widget.cartProductData.product_id}-");
     databaseHelper
         .getProductQuantitiy(int.parse(widget.cartProductData.product_id))
         .then((count) {
@@ -250,7 +244,7 @@ class ProceedBottomBar extends StatefulWidget {
 class _ProceedBottomBarState extends State<ProceedBottomBar> {
   double totalPrice = 0.00;
   DatabaseHelper databaseHelper = new DatabaseHelper();
-  bool xyz = false;
+  bool firstTime = false;
 
   updateTotalPrice() {
     databaseHelper.getTotalPrice().then((mtotalPrice) {
@@ -263,9 +257,9 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    if (xyz == false) {
+    if (firstTime == false) {
       databaseHelper.getTotalPrice().then((mtotalPrice) {
-        xyz = true;
+        firstTime = true;
         setState(() {
           totalPrice = mtotalPrice;
         });
@@ -278,9 +272,6 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
       child: Column(
         children: <Widget>[
           InkWell(
-            onTap: () {
-              //print("on click message");
-            },
             child: Padding(
               padding: const EdgeInsets.fromLTRB(15, 8, 15, 0),
               child: Row(

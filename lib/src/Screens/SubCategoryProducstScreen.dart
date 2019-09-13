@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
-import 'package:restroapp/src/models/MyCartScreen.dart';
+import 'package:restroapp/src/Screens/MyCartScreen.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -22,7 +22,12 @@ class SubCategoryProducstScreen extends StatelessWidget {
 
     if(categoriesData.subCategory.length == 1){
       //print("-ID's--${categoriesData.id}--Id=- ${categoriesData.subCategory[0].id}----");
-      return MaterialApp(
+      return Scaffold(
+        body: ProductsListView(categoriesData,bottomBar),
+        bottomNavigationBar: bottomBar,
+      );
+
+      /*return MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.deepOrange,
         ),
@@ -31,12 +36,37 @@ class SubCategoryProducstScreen extends StatelessWidget {
           body: ProductsListView(categoriesData,bottomBar),
           bottomNavigationBar: bottomBar,
         ),
-      );
+      );*/
     }else{
       for (int i = 0; i< categoriesData.subCategory.length; i++) {
         tabs.add(new Tab(text: categoriesData.subCategory[i].title));
       }
-      return MaterialApp(
+
+      return Container(
+        child: DefaultTabController(length: categoriesData.subCategory.length,
+          child: Scaffold(
+            appBar: AppBar(
+                title: Text(categoriesData.title),
+                centerTitle: true,
+                bottom:TabBar(
+                  tabs: tabs,
+                ),
+                leading: IconButton(icon:Icon(Icons.arrow_back),
+                  onPressed:() => Navigator.pop(context, false),
+                )
+            ),
+            body: TabBarView(
+              children: new List.generate(categoriesData.subCategory.length, (int index){
+                //print(categoriesData.subCategory[index].title);
+                return getProductsWidget(categoriesData,categoriesData.subCategory[index].id,bottomBar);
+              }),
+            ),
+            bottomNavigationBar: bottomBar,
+          ),
+        ),
+      );
+
+      /*return MaterialApp(
         theme: ThemeData(
           primarySwatch: Colors.deepOrange,
         ),
@@ -64,7 +94,7 @@ class SubCategoryProducstScreen extends StatelessWidget {
             ),
           ),
         ),
-      );
+      );*/
     }
   }
 }

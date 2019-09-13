@@ -171,14 +171,14 @@ class DatabaseHelper {
     List<Map> result = await dbClient.query(CART_Table, columns: columnsToSelect,where: whereClause, whereArgs: whereArguments);
     // print the results
     if(result != null && result.isNotEmpty){
-      print("---result.length--- ${result.length}");
+      //print("---result.length--- ${result.length}");
       result.forEach((row){
-        print("-1-quantity--- ${row['quantity']}");
+        //print("-1-quantity--- ${row['quantity']}");
         count = row[QUANTITY];
         //return count;
       });
     }else{
-      print("-X-quantity--- return 0");
+      //print("-X-quantity--- return 0");
       //return count;
       count = "0";
     }
