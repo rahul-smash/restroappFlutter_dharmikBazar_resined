@@ -26,17 +26,6 @@ class SubCategoryProducstScreen extends StatelessWidget {
         body: ProductsListView(categoriesData,bottomBar),
         bottomNavigationBar: bottomBar,
       );
-
-      /*return MaterialApp(
-        theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-        ),
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-          body: ProductsListView(categoriesData,bottomBar),
-          bottomNavigationBar: bottomBar,
-        ),
-      );*/
     }else{
       for (int i = 0; i< categoriesData.subCategory.length; i++) {
         tabs.add(new Tab(text: categoriesData.subCategory[i].title));
@@ -65,36 +54,6 @@ class SubCategoryProducstScreen extends StatelessWidget {
           ),
         ),
       );
-
-      /*return MaterialApp(
-        theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-        ),
-        debugShowCheckedModeBanner: false,
-        home: Container(
-          child: DefaultTabController(length: categoriesData.subCategory.length,
-            child: Scaffold(
-              appBar: AppBar(
-                  title: Text(categoriesData.title),
-                  centerTitle: true,
-                  bottom:TabBar(
-                    tabs: tabs,
-                  ),
-                  leading: IconButton(icon:Icon(Icons.arrow_back),
-                    onPressed:() => Navigator.pop(context, false),
-                  )
-              ),
-              body: TabBarView(
-                children: new List.generate(categoriesData.subCategory.length, (int index){
-                  //print(categoriesData.subCategory[index].title);
-                  return getProductsWidget(categoriesData,categoriesData.subCategory[index].id,bottomBar);
-                }),
-              ),
-              bottomNavigationBar: bottomBar,
-            ),
-          ),
-        ),
-      );*/
     }
   }
 }
@@ -418,7 +377,7 @@ class _PriceBottomBarState extends State<TotalPriceBottomBar> {
       fullscreenDialog: true,)
     );
     if(result == AppConstant.Refresh){
-      //print("----Refresh---Refresh Refresh-");
+      print("----Refresh-Cart--Refresh Refresh-");
       updateTotalPrice();
     }
   }
