@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Social extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: <Widget>[
         Container(
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
@@ -23,7 +24,7 @@ class Social extends StatelessWidget {
             child: Icon(
               FontAwesomeIcons.facebookF,
               color: Colors.white,
-              size: 20,
+              size: 30,
             ),
           ),
         ),
@@ -31,8 +32,8 @@ class Social extends StatelessWidget {
           width: 10,
         ),
         Container(
-          width: 40,
-          height: 40,
+          width: 50,
+          height: 50,
           decoration: BoxDecoration(
             color: Color(0xffff4645),
             shape: BoxShape.circle,
@@ -41,7 +42,7 @@ class Social extends StatelessWidget {
             child: Icon(
               FontAwesomeIcons.google,
               color: Colors.white,
-              size: 20,
+              size: 30,
             ),
           ),
         ),

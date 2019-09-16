@@ -52,7 +52,7 @@ class Login extends StatelessWidget {
               labelStyle: TextStyle(
                 fontFamily: 'Medium',
                 color: colorText,
-                fontSize: 12,
+                fontSize: 14,
               ),
             ),
           ),
@@ -71,7 +71,7 @@ class Login extends StatelessWidget {
               labelStyle: TextStyle(
                 fontFamily: 'Medium',
                 color: colorText,
-                fontSize: 12,
+                fontSize: 14,
               ),
             ),
           ),
@@ -83,7 +83,7 @@ class Login extends StatelessWidget {
               'Forgot password?',
               style: TextStyle(
                 fontFamily: 'Medium',
-                fontSize: 12,
+                fontSize: 14,
                 color: colorBlueText,
               ),
             ),
