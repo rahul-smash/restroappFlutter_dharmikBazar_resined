@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 
 class RegisterUser extends StatefulWidget {
 
@@ -14,6 +16,7 @@ class RegisterUser extends StatefulWidget {
 class _RegisterUserState extends State<RegisterUser> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  UserData userData = new UserData();
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +49,7 @@ class _RegisterUserState extends State<RegisterUser> {
                     inputFormatters: [new LengthLimitingTextInputFormatter(30)],
                     validator: (val) => val.isEmpty ? 'Name is required' : null,
                     onSaved: (val) {
-
+                      userData._name = val;
                     },
                   ),
                   new TextFormField(
@@ -61,7 +64,7 @@ class _RegisterUserState extends State<RegisterUser> {
                       WhitelistingTextInputFormatter.digitsOnly,
                     ],
                     onSaved: (val) {
-
+                      userData._phone = val;
                     },
                   ),
                   new TextFormField(
@@ -75,7 +78,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         ? null
                         : 'Please enter a valid email address',
                     onSaved: (val) {
-
+                      userData._email = val;
                     },
                   ),
                   new TextFormField(
@@ -85,9 +88,9 @@ class _RegisterUserState extends State<RegisterUser> {
                       labelText: 'Password',
                     ),
                     keyboardType: TextInputType.visiblePassword,
-                    validator: (val) => val.isEmpty ? 'Name is required' : null,
+                    validator: (val) => val.isEmpty ? 'Password is required' : null,
                     onSaved: (val) {
-
+                      userData._password = val;
                     },
                   ),
                   new TextFormField(
@@ -97,9 +100,9 @@ class _RegisterUserState extends State<RegisterUser> {
                       labelText: 'Confirm Password',
                     ),
                     keyboardType: TextInputType.visiblePassword,
-                    validator: (val) => val.isEmpty ? 'Name is required' : null,
+                    validator: (val) => val.isEmpty ? 'Confirm Password is required' : null,
                     onSaved: (val) {
-
+                      userData.confirmPassword = val;
                     },
                   ),
                   new Container(
@@ -140,21 +143,97 @@ class _RegisterUserState extends State<RegisterUser> {
     final FormState form = _formKey.currentState;
 
     if (!form.validate()) {
-      //Utils.showToast('Signup Data is not valid!  Please review and correct.',true);
+      //Utils.showToast('"Confirm Password should match password".',true);
     } else {
       form.save(); //This invokes each onSaved event
+      //print('Form save called, newContact is now up to date...');
+      //print("${equals(userData._confirmPassword, userData._password)}");
 
-      /*print('Form save called, newContact is now up to date...');
-      print('Email: ${newContact.name}');
-      print('Dob: ${newContact.dob}');
-      print('Phone: ${newContact.phone}');
-      print('Email: ${newContact.email}');
-      print('Favorite Color: ${newContact.favoriteColor}');
+      if(!equals(userData._confirmPassword, userData._password)){
+
+        Utils.showToast('"Confirm Password should match password".',true);
+
+      }else{
+
+        /*FutureBuilder(future: ApiController.registerApiRequest(userData.name,
+            userData._password,userData._phone, userData._email),
+          builder: ,
+        );*/
+        ProgressDialog pr;
+        //For normal dialog
+        pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+        pr.show();
+
+        ApiController.registerApiRequest(userData.name, userData._password,
+            userData._phone, userData._email).then((response){
+          print('Submited to back end...');
+          if(response != null){
+            print("${response.data.id}");
+            if(response.success){
+              Navigator.pop(context);
+            }
+          }
+          pr.hide();
+        });
+      }
+      /*print('name: ${userData.name}');
+      print('Phone: ${userData.phone}');
+      print('Email: ${userData.email}');
+      print('_password: ${userData._password}');
+      print('_confirmPassword: ${userData._confirmPassword}');
       print('========================================');
-      print('Submitting to back end...');
       print('TODO - we will write the submission part next...');*/
     }
   }
 
+  equals(String confirmation, String password) {
+    print('_password: ${password}');
+    print('confirmation: ${confirmation}');
+    if(confirmation == password){
 
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+
+}
+
+class UserData {
+  String _name="";
+  String _password;
+  String _confirmPassword;
+  String _phone = '';
+  String _email = '';
+
+  String get confirmPassword => _confirmPassword;
+
+  set confirmPassword(String value) {
+    _confirmPassword = value;
+  }
+
+  String get name => _name;
+
+  set name(String value) {
+    _name = value;
+  }
+
+  String get password => _password;
+
+  set password(String value) {
+    _password = value;
+  }
+
+  String get phone => _phone;
+
+  set phone(String value) {
+    _phone = value;
+  }
+
+  String get email => _email;
+
+  set email(String value) {
+    _email = value;
+  }
 }

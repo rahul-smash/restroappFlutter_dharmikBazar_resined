@@ -33,6 +33,7 @@ dependencies:
   circular_profile_avatar: ^0.2.0
   sqflite: ^1.1.6
   font_awesome_flutter: ^8.4.0
+  progress_dialog: ^1.2.0
 
 dev_dependencies:
   flutter_test:
@@ -62,6 +63,7 @@ flutter:
     - images/loginbackground.png
     - images/logo.png
     - images/offer_bg.png
+    - images/ic_launcher.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

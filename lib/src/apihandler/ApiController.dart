@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/ApiErrorResponse.dart';
 import 'package:restroapp/src/models/Categories.dart';
+import 'package:restroapp/src/models/RegisterUserData.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
@@ -137,7 +140,66 @@ class ApiController{
     return storeAreaData;
   }
 
+  static Future<RegisterUser> registerApiRequest(String full_name,String password,String phone,String email) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
+    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+
+    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/userSignup';
+    print('$versionApi , $storeId');
+
+    FormData formData = new FormData.from(
+        {"full_name": full_name,
+        "password":password,
+        "device_id":deviceId,
+        "device_token":"",
+        "phone":phone,
+        "email":email,
+        "platform":"android"
+        }
+          );
+    Dio dio = new Dio();
+    Response response = await dio.post(versionApi, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    try {
+      print(response.data);
+      RegisterUser registerUser = RegisterUser.fromJson(response.data);
+      print("-------store.success ---${registerUser.success}");
+
+      if(registerUser != null && registerUser.success){
+        SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
+        SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
+        SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
+        SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
+        SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
+        SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
+        SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
+        Utils.showToast(registerUser.message, true);
+      }
+      return registerUser;
+
+    } catch (e) {
+      print(e);
+      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
+      print("--.ApiErrorResponse ---${storeData.success}");
+      Utils.showToast(storeData.message, true);
+      return null;
+    }
+    //{success: false, message: User already exist.}
+  }
+
 /*
+  https://app.restroapp.com/49/api_v5/userSignup
+  password:Test@123
+  full_name:29August
+  device_id:abaf785580c22722
+  &phone=2132123212
+  device_token:fkUCpZLs08Q%3AAPA91bFWngo1c3UP5iOA8NGty3UO1G4loOuSpuOgTJsXiwG1dk0qsMndyvFvOAFpVK7O_xLGzy3Ut5pkkjhlcgHiaZilvdZQEnco_FZ4p7mLie24V6TyPashe8vQPuWzkvepDXwKQNY5type:
+  email:assaaaa@signitysolutions.in
+  platform:android
+
   To get the saved deliveryAddress of the logined user:
   POST https://app.restroapp.com/store_-id/api_v5/deliveryAddress
   method=GET & user_id=349

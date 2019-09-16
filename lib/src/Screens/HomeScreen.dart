@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/LoginScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:restroapp/src/ui/CategoriesView.dart';
 import 'package:restroapp/src/utils/Constants.dart';
+import 'package:restroapp/src/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatelessWidget {
 
@@ -48,15 +51,17 @@ class HomeScreenUI extends StatefulWidget {
 class _StoreListWithSearch extends State<HomeScreenUI> {
 
   final List<String> imgList = [];
+  GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
+  int _counter =0;
   int _currentIndex = 0;
   StoreData storeData;
   _StoreListWithSearch(this.storeData);
-
+  String userName = "";
+  String loginText = "";
 
   @override
   void initState() {
     //print("------------ initState---------------");
-
     try {
       if (storeData.store.banners.isEmpty) {
         imgList.add(AppConstant.PLACEHOLDER);
@@ -111,9 +116,13 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
     }
 
     return Scaffold(
+      key: _key,
       appBar: AppBar(
         title: Text(storeData.store.storeName),
         centerTitle: true,
+        leading: new IconButton(icon: new Icon(
+            Icons.menu
+        ),onPressed:_handleDrawer,),
       ),
       body: Container(
           child : Column(
@@ -208,11 +217,14 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             UserAccountsDrawerHeader(
-              accountName: Text('Achin verma'),
-              accountEmail: Text('achin@signity.com'),
+              decoration: BoxDecoration(
+                color: Colors.black,
+              ),
+              accountName: Text('Welcome'),
+              accountEmail: Text(userName),
               currentAccountPicture:
-              Image.network('https://winaero.com/blog/wp-content/uploads/2015/05/windows-10-user-account-login-icon.png'),
-              decoration: BoxDecoration(color: Colors.deepOrange),
+                  Image.asset("images/ic_launcher.png"),
+              //Image.network('https://winaero.com/blog/wp-content/uploads/2015/05/windows-10-user-account-login-icon.png'),
             ),
             ListTile(
               leading: Icon(Icons.home),
@@ -272,13 +284,19 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
             ),
             ListTile(
               leading: Icon(Icons.exit_to_app),
-              title: Text('Login'),
+              title: Text(loginText),
               onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
-                );
+                if(loginText == "Logout"){
+                  print("Logout");
+                  _showDialog();
+                }else{
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginScreen()),
+                  );
+                }
+
               },
             ),
 
@@ -287,4 +305,78 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
       ),
     );
   }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Logout"),
+          content: new Text("Are you sure you want to Logout?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("CANCEL"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: const Text('YES'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                logout();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _handleDrawer() async{
+    _key.currentState.openDrawer();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    setState(()  {
+      ///DO MY Logic CALLS
+      _counter++;
+
+      userName = prefs.getString(AppConstant.USER_NAME);
+      if(userName == null){
+        userName = "";
+      }
+      String userId = prefs.getString(AppConstant.USER_ID);
+      if(userId == null || userId.isEmpty){
+        loginText = "Login";
+      }else{
+        loginText = "Logout";
+      }
+
+    });
+  }
+
+  Future logout() async {
+
+    try {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      preferences.clear();
+
+      DatabaseHelper databaseHelper = new DatabaseHelper();
+      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+
+      Utils.showToast("Logged out sucessfuly", true);
+
+      Navigator.pop(context);
+    } catch (e) {
+      print(e);
+    }
+
+  }
+
 }

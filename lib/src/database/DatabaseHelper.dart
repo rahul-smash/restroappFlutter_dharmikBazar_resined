@@ -279,6 +279,11 @@ class DatabaseHelper {
     return await dbClient.delete(table, where: '$ID = ?', whereArgs: [id]);
   }
 
+  Future<int> deleteTable(String table) async {
+    var dbClient = await db;
+    return await dbClient.delete(table);
+  }
+
   Future close() async {
     var dbClient = await db;
     dbClient.close();
