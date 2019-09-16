@@ -274,7 +274,7 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
               leading: Icon(Icons.exit_to_app),
               title: Text('Login'),
               onTap: () {
-                //Navigator.pop(context);
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => LoginScreen()),

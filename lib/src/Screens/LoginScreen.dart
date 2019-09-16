@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/RegisterScreen.dart';
 import 'package:restroapp/src/ui/login.dart';
 import 'package:restroapp/src/ui/social.dart';
 import 'package:restroapp/src/utils/HeaderLogo.dart';
@@ -101,27 +102,37 @@ class LoginScreen extends StatelessWidget {
                     alignment: Alignment.topCenter,
                     child: Social(),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: RichText(
-                        text: TextSpan(
-                          text: 'New User?',
-                          style: TextStyle(
-                              fontFamily: 'Medium',
-                              fontSize: 16,
-                              color: Colors.deepOrange),
-                          children: [
-                            TextSpan(
-                              text: ' Sign Up',
-                              style: TextStyle(
-                                  fontFamily: 'Medium',
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.deepOrange),
-                            ),
-                          ],
+                  InkWell(
+                    onTap: (){
+                      print("--------onTap----------");
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterUser()),
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Align(
+                        alignment: Alignment.bottomCenter,
+                        child: RichText(
+                          text: TextSpan(
+                            text: 'New User?',
+                            style: TextStyle(
+                                fontFamily: 'Medium',
+                                fontSize: 16,
+                                color: Colors.deepOrange),
+                            children: [
+                              TextSpan(
+                                text: ' Sign Up',
+                                style: TextStyle(
+                                    fontFamily: 'Medium',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.deepOrange),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
