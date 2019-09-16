@@ -14,6 +14,7 @@ class RegisterUser extends StatefulWidget {
 }
 
 class _RegisterUserState extends State<RegisterUser> {
+
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   UserData userData = new UserData();
@@ -141,24 +142,14 @@ class _RegisterUserState extends State<RegisterUser> {
 
   void _submitForm() {
     final FormState form = _formKey.currentState;
-
     if (!form.validate()) {
       //Utils.showToast('"Confirm Password should match password".',true);
     } else {
       form.save(); //This invokes each onSaved event
-      //print('Form save called, newContact is now up to date...');
-      //print("${equals(userData._confirmPassword, userData._password)}");
 
       if(!equals(userData._confirmPassword, userData._password)){
-
         Utils.showToast('"Confirm Password should match password".',true);
-
       }else{
-
-        /*FutureBuilder(future: ApiController.registerApiRequest(userData.name,
-            userData._password,userData._phone, userData._email),
-          builder: ,
-        );*/
         ProgressDialog pr;
         //For normal dialog
         pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -166,7 +157,7 @@ class _RegisterUserState extends State<RegisterUser> {
 
         ApiController.registerApiRequest(userData.name, userData._password,
             userData._phone, userData._email).then((response){
-          print('Submited to back end...');
+          print('--------Submited to back end.--------..');
           if(response != null){
             print("${response.data.id}");
             if(response.success){
@@ -176,13 +167,6 @@ class _RegisterUserState extends State<RegisterUser> {
           pr.hide();
         });
       }
-      /*print('name: ${userData.name}');
-      print('Phone: ${userData.phone}');
-      print('Email: ${userData.email}');
-      print('_password: ${userData._password}');
-      print('_confirmPassword: ${userData._confirmPassword}');
-      print('========================================');
-      print('TODO - we will write the submission part next...');*/
     }
   }
 

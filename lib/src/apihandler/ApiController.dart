@@ -190,6 +190,54 @@ class ApiController{
     //{success: false, message: User already exist.}
   }
 
+  static Future<RegisterUser> loginApiRequest(String full_name,String password) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
+    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+
+    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/userLogin';
+    print('$versionApi , $storeId');
+
+    FormData formData = new FormData.from(
+        {"email": full_name,
+          "password":password,
+          "device_id":deviceId,
+          "device_token":"",
+          "platform":"android"
+        }
+    );
+    Dio dio = new Dio();
+    Response response = await dio.post(versionApi, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    try {
+      print(response.data);
+      RegisterUser registerUser = RegisterUser.fromJson(response.data);
+      print("----login---store.success ---${registerUser.success}");
+
+      if(registerUser != null && registerUser.success){
+        SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
+        SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
+        SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
+        SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
+        SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
+        SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
+        SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
+        Utils.showToast("You have log in successfully", true);
+      }
+      return registerUser;
+
+    } catch (e) {
+      print(e);
+      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
+      print("-login-.ApiErrorResponse ---${storeData.success}");
+      Utils.showToast(storeData.message, true);
+      return null;
+    }
+    //{success: false, message: User already exist.}
+  }
+
 /*
   https://app.restroapp.com/49/api_v5/userSignup
   password:Test@123

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/LoginScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -359,18 +360,22 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
   }
 
   Future logout() async {
-
     try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
-      preferences.clear();
+      preferences.clear().then((status){
+        if(status == true){
 
-      DatabaseHelper databaseHelper = new DatabaseHelper();
-      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
-      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
-      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
-      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+          DatabaseHelper databaseHelper = new DatabaseHelper();
+          databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+          databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+          databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+          databaseHelper.deleteTable(DatabaseHelper.CART_Table);
 
-      Utils.showToast("Logged out sucessfuly", true);
+          Utils.showToast("You have logged out successfully", true);
+
+          SharedPrefs.storeSharedValue(AppConstant.STORE_ID, storeData.store.id);
+        }
+      });
 
       Navigator.pop(context);
     } catch (e) {
