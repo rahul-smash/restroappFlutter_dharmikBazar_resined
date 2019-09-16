@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/LoginScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/StoreData.dart';
@@ -214,7 +215,7 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
               decoration: BoxDecoration(color: Colors.deepOrange),
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: Icon(Icons.home),
               title: Text('Home'),
               onTap: () {
                 Navigator.pop(context);
@@ -228,52 +229,56 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: Icon(Icons.location_on),
               title: Text('Delivery Address'),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: Icon(Icons.shopping_cart),
               title: Text('My Orders'),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: Icon(Icons.assignment),
               title: Text('Book Now'),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: Icon(Icons.favorite),
               title: Text('My Favorites'),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: Icon(Icons.account_box),
               title: Text('About Us'),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
+              leading: Icon(Icons.share),
               title: Text('Refer & Earn'),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              leading: Icon(Icons.account_circle),
-              title: Text('Logout'),
+              leading: Icon(Icons.exit_to_app),
+              title: Text('Login'),
               onTap: () {
-                Navigator.pop(context);
+                //Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
               },
             ),
 
