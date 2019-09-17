@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
   @override
@@ -10,6 +11,10 @@ class SaveDeliveryAddress extends StatefulWidget {
 class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
 
   String areaTitle = "select here";
+  String areaId = "";
+  TextEditingController addressController = new TextEditingController();
+  TextEditingController zipCodeController = new TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +57,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   setState((){
                     print("showDialog setState");
                     areaTitle = dialog.state.selectedArea.typeName;
+                    areaId = dialog.state.selectedArea.id;
                     print(dialog.state.selectedArea.id);
                     print(dialog.state.selectedArea.typeName);
 
@@ -105,14 +111,17 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         color: Colors.grey[200],
                         height: 100.0,
                         child: new TextField(
+                          controller: addressController,
                           keyboardType: TextInputType.multiline,
                           maxLength: null,
                           maxLines: null,
                           decoration: new InputDecoration(
                               border: InputBorder.none,
+                              hintStyle: TextStyle(color: Colors.grey),
                               focusedBorder: InputBorder.none,
                               contentPadding: EdgeInsets.only( left: 5, bottom: 5, top: 5, right: 5),
                               hintText: 'enter here'),
+
                         ),
                       ),
                     ),
@@ -143,6 +152,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       alignment: Alignment.topLeft,
                       child: new Container(
                         child: new TextField(
+                          controller: zipCodeController,
                           keyboardType: TextInputType.number,
                           decoration: new InputDecoration(
                               border: InputBorder.none,
@@ -168,7 +178,22 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                     borderRadius: new BorderRadius.circular(28.0),
                     side: BorderSide(color: Colors.red)
                 ),
-                onPressed: () {},
+                onPressed: () {
+
+                  print(areaTitle);
+                  if(areaId.isEmpty){
+                    Utils.showToast("Select Area", false);
+                    return;
+                  }
+                  if(addressController.text.trim().isEmpty){
+                    Utils.showToast("enter address", false);
+                    return;
+                  }
+                  print(areaId);
+                  print(addressController.text);
+                  print(zipCodeController.text);
+
+                },
                 color: Colors.red,
                 padding: EdgeInsets.all(5.0),
                 textColor: Colors.white,
@@ -184,15 +209,10 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
 
 class AreaCustomDialog extends StatefulWidget {
 
-  AreaCustomDialog();
-
   AreaCustomDialogState state = new AreaCustomDialogState();
-
   @override
   AreaCustomDialogState createState() => state;
 
-  /*@override
-  _AreaCustomDialogState createState() => _AreaCustomDialogState();*/
 }
 
 class AreaCustomDialogState extends State<AreaCustomDialog> {
