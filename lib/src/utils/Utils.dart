@@ -1,5 +1,9 @@
+import 'package:device_id/device_id.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:connectivity/connectivity.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/utils/Constants.dart';
 
 class Utils{
 
@@ -34,5 +38,22 @@ class Utils{
     }
   }
 
+  static Future<bool> isNetworkAvailable() async {
+    bool isNetworkAvailable = false;
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      isNetworkAvailable = true;
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      isNetworkAvailable =  true;
+    }
+    return isNetworkAvailable;
+  }
+
+  static Future<String> getDeviceId()  async {
+    String device_id = await DeviceId.getID;
+    print("-----device id------ ${device_id}");
+    SharedPrefs.storeSharedValue(AppConstant.DEVICE_ID, device_id);
+    return device_id;
+  }
 
 }

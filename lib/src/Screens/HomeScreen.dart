@@ -374,6 +374,8 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
           Utils.showToast("You have logged out successfully", true);
 
           SharedPrefs.storeSharedValue(AppConstant.STORE_ID, storeData.store.id);
+
+          Utils.getDeviceId();
         }
       });
 

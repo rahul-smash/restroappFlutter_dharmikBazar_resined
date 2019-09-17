@@ -1,12 +1,23 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/SaveDeliveryAddress.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
-class AddDeliveryAddress extends StatelessWidget {
+class AddDeliveryAddress extends StatefulWidget {
+
+  @override
+  _AddDeliveryAddressState createState() => _AddDeliveryAddressState();
+}
+
+class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
+
   ProceedBottomBar proceedBottomBar = new ProceedBottomBar();
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
           title: Text("Delivery Addresses"),
@@ -50,12 +61,53 @@ class AddDeliveryAddress extends StatelessWidget {
               ),
             ),
           ),
-
+          DeliverAddressList(),
         ],
       ),
       bottomNavigationBar: proceedBottomBar,
     );
   }
+}
+
+class DeliverAddressList extends StatefulWidget{
+
+  DeliverAddressListState state = new DeliverAddressListState();
+
+  @override
+  DeliverAddressListState createState() => state;
+
+}
+
+class DeliverAddressListState extends State<DeliverAddressList>{
+
+  @override
+  Widget build(BuildContext context) {
+
+    return FutureBuilder(
+      future: ApiController.deliveryAddressApiRequest(context),
+        builder: (context, projectSnap) {
+          if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
+            //print('project snapshot data is: ${projectSnap.data}');
+            return Container(color: const Color(0xFFFFE306));
+          }else{
+            if(projectSnap.hasData){
+              print('---projectSnap.Data-length-${projectSnap.data.length}---');
+              return Container(color: const Color(0xFFFFE306));
+
+            }else {
+              print('-------CircularProgressIndicator----------');
+              return Center(
+                child: CircularProgressIndicator(
+                    backgroundColor: Colors.black26,
+                    valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
+              );
+            }
+
+          }
+        },
+    );
+  }
+
 }
 
 class ProceedBottomBar extends StatefulWidget {
@@ -87,7 +139,6 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
           ],
         ),
       ),
-
     );
   }
 }

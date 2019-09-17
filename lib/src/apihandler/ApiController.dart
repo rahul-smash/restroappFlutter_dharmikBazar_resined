@@ -1,8 +1,11 @@
 import 'dart:io';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ApiErrorResponse.dart';
 import 'package:restroapp/src/models/Categories.dart';
+import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/RegisterUserData.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/models/StoreData.dart';
@@ -125,8 +128,8 @@ class ApiController{
     return subProductList;
   }
 
-  static Future<StoreAreaData> deliveryAreasRequest() async {
-
+  static Future<List<Area>> deliveryAreasRequest() async {
+    List<Area> areaList = new List();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String storeId = prefs.getString(AppConstant.STORE_ID);
 
@@ -137,7 +140,38 @@ class ApiController{
     print(response.data);
     StoreAreaData storeAreaData = StoreAreaData.fromJson(response.data);
     print("-------store.success ---${storeAreaData.success}");
-    return storeAreaData;
+    areaList = storeAreaData.data;
+    return areaList;
+  }
+
+  /*To get the saved deliveryAddress of the logined user:
+  POST https://app.restroapp.com/store_-id/api_v5/deliveryAddress
+  method=GET & user_id=349*/
+
+  static Future<List<DeliveryAddressData>> deliveryAddressApiRequest(BuildContext context) async {
+    List<DeliveryAddressData> dataList = new List();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
+    String userId = prefs.getString(AppConstant.USER_ID);
+    String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAddress';
+    print('$deliveryAreas , $storeId');
+
+    FormData formData = new FormData.from({"method": "GET", "user_id":userId});
+    Dio dio = new Dio();
+    Response response = await dio.post(deliveryAreas, data: formData,
+        options: new Options( contentType: ContentType.parse("application/json")));
+    print(response.data);
+    DeliveryAddressResponse deliveryAddressResponse = DeliveryAddressResponse.fromJson(response.data);
+    //print("--DeliveryAddressResponse---${deliveryAddressResponse.success}");
+    dataList = deliveryAddressResponse.data;
+    if(deliveryAddressResponse.success){
+      if(deliveryAddressResponse.data.isEmpty){
+        //Utils.showToast("No data found!", false);
+      }
+    }else{
+      //Utils.showToast("No data found!", false);
+    }
+    return dataList;
   }
 
   static Future<RegisterUser> registerApiRequest(String full_name,String password,String phone,String email) async {

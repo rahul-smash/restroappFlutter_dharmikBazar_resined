@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/StoreAreasData.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
   @override
@@ -7,6 +8,8 @@ class SaveDeliveryAddress extends StatefulWidget {
 }
 
 class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
+
+  String areaTitle = "select here";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,11 +43,20 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
             child: InkWell(
               onTap: () {
                 print("Select Area click");
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) => AreaCustomDialog(
-                  ),
-                );
+
+                AreaCustomDialog dialog = new AreaCustomDialog();
+
+                showDialog(context: context,
+                  builder: (BuildContext context) => dialog,
+                ).then((_) async {
+                  setState((){
+                    print("showDialog setState");
+                    areaTitle = dialog.state.selectedArea.typeName;
+                    print(dialog.state.selectedArea.id);
+                    print(dialog.state.selectedArea.typeName);
+
+                });
+                });
               },
               child: Column(
                 children: <Widget>[
@@ -60,7 +72,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: new Text(
-                        "Area",
+                        "${areaTitle}",//
                         style: TextStyle(color: Colors.black, fontSize: 22.0),
                       ),
                     ),
@@ -170,18 +182,32 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   }
 }
 
-class AreaCustomDialog extends StatelessWidget {
+class AreaCustomDialog extends StatefulWidget {
 
   AreaCustomDialog();
 
+  AreaCustomDialogState state = new AreaCustomDialogState();
+
+  @override
+  AreaCustomDialogState createState() => state;
+
+  /*@override
+  _AreaCustomDialogState createState() => _AreaCustomDialogState();*/
+}
+
+class AreaCustomDialogState extends State<AreaCustomDialog> {
+
+  Area selectedArea = new Area();
+
   @override
   Widget build(BuildContext context) {
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(Consts.padding),
       ),
       elevation: 0.0,
-      backgroundColor: Colors.transparent,
+      //backgroundColor: Colors.transparent,
       //child: dialogContent(context),
       child: FutureBuilder(
         future: ApiController.deliveryAreasRequest(),
@@ -192,7 +218,9 @@ class AreaCustomDialog extends StatelessWidget {
           }else{
             if(projectSnap.hasData){
               //print('---projectSnap.Data-length-${projectSnap.data.length}---');
-              return Container(color: const Color(0xFFFFE306));
+              //return Container(color: const Color(0xFFFFE306));
+              List<Area> areaList  = projectSnap.data;
+              return dialogContent(context,areaList);
             }else {
               //print('-------CircularProgressIndicator----------');
               return Center(
@@ -207,7 +235,7 @@ class AreaCustomDialog extends StatelessWidget {
     );
   }
 
-  dialogContent(BuildContext context) {
+  dialogContent(BuildContext context, List<Area> areaList) {
     TextEditingController editingController = TextEditingController();
     return Container(
       decoration: new BoxDecoration(
@@ -256,10 +284,19 @@ class AreaCustomDialog extends StatelessWidget {
             Expanded(
               child: ListView.builder(
                 shrinkWrap: true,
-                itemCount: 20,
+                itemCount: areaList.length,
                 itemBuilder: (context, index) {
+                  Area area = areaList[index];
                   return ListTile(
-                    title: Text('item is ${index}'),
+                    onTap: (){
+                      print(area.typeName);
+                      selectedArea = area;
+                      Navigator.pop(context,true);
+                      /*setState(() {
+                        print("dialog area list click");
+                      });*/
+                    },
+                    title: Text(area.typeName),
                   );
                 },
               ),
@@ -273,6 +310,7 @@ class AreaCustomDialog extends StatelessWidget {
   void filterSearchResults(String value) {
     print("filterSearchResults ${value}");
   }
+
 }
 
 class Consts {
