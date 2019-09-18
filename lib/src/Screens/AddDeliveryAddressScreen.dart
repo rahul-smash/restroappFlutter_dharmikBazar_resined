@@ -84,7 +84,7 @@ class DeliverAddressListState extends State<DeliverAddressList>{
   Widget build(BuildContext context) {
 
     return FutureBuilder(
-      future: ApiController.deliveryAddressApiRequest(context),
+      future: ApiController.deliveryAddressApiRequest(),
         builder: (context, projectSnap) {
           if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
             //print('project snapshot data is: ${projectSnap.data}');

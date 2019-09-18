@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -192,6 +193,16 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   print(areaId);
                   print(addressController.text);
                   print(zipCodeController.text);
+
+                  ProgressDialog pr;
+                  //For normal dialog
+                  pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+                  pr.show();
+
+                  ApiController.saveDeliveryAddressApiRequest(zipCodeController.text,
+                      addressController.text, areaId, areaTitle).then((value){
+                    pr.hide();
+                  });
 
                 },
                 color: Colors.red,

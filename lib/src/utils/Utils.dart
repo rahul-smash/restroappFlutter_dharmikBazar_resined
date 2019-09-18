@@ -2,11 +2,13 @@ import 'package:device_id/device_id.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 
 class Utils{
 
+  static ProgressDialog pr;
 
   static void showToast(String msg, bool shortLength){
     try {
@@ -54,6 +56,22 @@ class Utils{
     print("-----device id------ ${device_id}");
     SharedPrefs.storeSharedValue(AppConstant.DEVICE_ID, device_id);
     return device_id;
+  }
+
+  static void showProgressDialog(BuildContext context){
+    //For normal dialog
+    if(pr != null && pr.isShowing()){
+      pr.dismiss();
+    }
+    pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+    pr.show();
+  }
+
+  static void hideProgressDialog(BuildContext context){
+    //For normal dialog
+    if(pr != null && pr.isShowing()){
+      pr.dismiss();
+    }
   }
 
 }

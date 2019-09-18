@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -20,6 +19,103 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiController{
 
+  static Future<RegisterUser> registerApiRequest(String full_name,String password,String phone,String email) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
+    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+
+    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/userSignup';
+    print('$versionApi , $storeId');
+
+    FormData formData = new FormData.from(
+        {"full_name": full_name,
+          "password":password,
+          "device_id":deviceId,
+          "device_token":"",
+          "phone":phone,
+          "email":email,
+          "platform":"android"
+        }
+    );
+    Dio dio = new Dio();
+    Response response = await dio.post(versionApi, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    try {
+      print(response.data);
+      RegisterUser registerUser = RegisterUser.fromJson(response.data);
+      print("-------store.success ---${registerUser.success}");
+
+      if(registerUser != null && registerUser.success){
+        SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
+        SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
+        SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
+        SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
+        SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
+        SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
+        SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
+        Utils.showToast(registerUser.message, true);
+      }
+      return registerUser;
+
+    } catch (e) {
+      print(e);
+      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
+      print("--.ApiErrorResponse ---${storeData.success}");
+      Utils.showToast(storeData.message, true);
+      return null;
+    }
+    //{success: false, message: User already exist.}
+  }
+
+  static Future<RegisterUser> loginApiRequest(String full_name,String password) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
+    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+
+    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/userLogin';
+    print('$versionApi , $storeId');
+
+    FormData formData = new FormData.from(
+        {"email": full_name,
+          "password":password,
+          "device_id":deviceId,
+          "device_token":"",
+          "platform":"android"
+        }
+    );
+    Dio dio = new Dio();
+    Response response = await dio.post(versionApi, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    try {
+      print(response.data);
+      RegisterUser registerUser = RegisterUser.fromJson(response.data);
+      print("----login---store.success ---${registerUser.success}");
+
+      if(registerUser != null && registerUser.success){
+        SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
+        SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
+        SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
+        SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
+        SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
+        SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
+        SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
+        Utils.showToast("You have log in successfully", true);
+      }
+      return registerUser;
+
+    } catch (e) {
+      print(e);
+      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
+      print("-login-.ApiErrorResponse ---${storeData.success}");
+      Utils.showToast(storeData.message, true);
+      return null;
+    }
+    //{success: false, message: User already exist.}
+  }
 
   static Future<List<StoreListModel>> storeListRequest(String url, Map jsonMap) async {
     //print('$url , $jsonMap');
@@ -144,11 +240,7 @@ class ApiController{
     return areaList;
   }
 
-  /*To get the saved deliveryAddress of the logined user:
-  POST https://app.restroapp.com/store_-id/api_v5/deliveryAddress
-  method=GET & user_id=349*/
-
-  static Future<List<DeliveryAddressData>> deliveryAddressApiRequest(BuildContext context) async {
+  static Future<List<DeliveryAddressData>> deliveryAddressApiRequest() async {
     List<DeliveryAddressData> dataList = new List();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String storeId = prefs.getString(AppConstant.STORE_ID);
@@ -166,7 +258,7 @@ class ApiController{
     dataList = deliveryAddressResponse.data;
     if(deliveryAddressResponse.success){
       if(deliveryAddressResponse.data.isEmpty){
-        //Utils.showToast("No data found!", false);
+        Utils.showToast("No address found!", false);
       }
     }else{
       //Utils.showToast("No data found!", false);
@@ -174,121 +266,34 @@ class ApiController{
     return dataList;
   }
 
-  static Future<RegisterUser> registerApiRequest(String full_name,String password,String phone,String email) async {
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String storeId = prefs.getString(AppConstant.STORE_ID);
-    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
-
-    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/userSignup';
-    print('$versionApi , $storeId');
-
-    FormData formData = new FormData.from(
-        {"full_name": full_name,
-        "password":password,
-        "device_id":deviceId,
-        "device_token":"",
-        "phone":phone,
-        "email":email,
-        "platform":"android"
-        }
-          );
-    Dio dio = new Dio();
-    Response response = await dio.post(versionApi, data: formData,
-        options: new Options(
-            contentType: ContentType.parse("application/json")));
+  static Future<String> saveDeliveryAddressApiRequest(
+      String zipcode,String address,String area_id,String area_name) async {
     try {
-      print(response.data);
-      RegisterUser registerUser = RegisterUser.fromJson(response.data);
-      print("-------store.success ---${registerUser.success}");
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String storeId = prefs.getString(AppConstant.STORE_ID);
+      String userId = prefs.getString(AppConstant.USER_ID);
+      String mobile = prefs.getString(AppConstant.USER_PHONE);
+      String first_name = prefs.getString(AppConstant.USER_NAME);
+      String email = prefs.getString(AppConstant.USER_EMAIL);
 
-      if(registerUser != null && registerUser.success){
-        SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
-        SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
-        SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
-        SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
-        SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
-        SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
-        SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
-        Utils.showToast(registerUser.message, true);
-      }
-      return registerUser;
+      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAddress';
+      print('$deliveryAreas , $storeId');
+
+      FormData formData = new FormData.from({"method": "ADD", "user_id":userId,
+            "zipcode": zipcode, "country":"","address": address, "city":"" ,"area_name":area_name,
+            "mobile":mobile,"state":"","area_id":area_id,"first_name":first_name,"email":email});
+      Dio dio = new Dio();
+      Response response = await dio.post(deliveryAreas, data: formData,
+              options: new Options( contentType: ContentType.parse("application/json")));
+      print(response.data);
+
+      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
+      Utils.showToast(storeData.message, false);
 
     } catch (e) {
       print(e);
-      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
-      print("--.ApiErrorResponse ---${storeData.success}");
-      Utils.showToast(storeData.message, true);
-      return null;
     }
-    //{success: false, message: User already exist.}
+    return "";
   }
-
-  static Future<RegisterUser> loginApiRequest(String full_name,String password) async {
-
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String storeId = prefs.getString(AppConstant.STORE_ID);
-    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
-
-    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/userLogin';
-    print('$versionApi , $storeId');
-
-    FormData formData = new FormData.from(
-        {"email": full_name,
-          "password":password,
-          "device_id":deviceId,
-          "device_token":"",
-          "platform":"android"
-        }
-    );
-    Dio dio = new Dio();
-    Response response = await dio.post(versionApi, data: formData,
-        options: new Options(
-            contentType: ContentType.parse("application/json")));
-    try {
-      print(response.data);
-      RegisterUser registerUser = RegisterUser.fromJson(response.data);
-      print("----login---store.success ---${registerUser.success}");
-
-      if(registerUser != null && registerUser.success){
-        SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
-        SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
-        SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
-        SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
-        SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
-        SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
-        SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
-        Utils.showToast("You have log in successfully", true);
-      }
-      return registerUser;
-
-    } catch (e) {
-      print(e);
-      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
-      print("-login-.ApiErrorResponse ---${storeData.success}");
-      Utils.showToast(storeData.message, true);
-      return null;
-    }
-    //{success: false, message: User already exist.}
-  }
-
-/*
-  https://app.restroapp.com/49/api_v5/userSignup
-  password:Test@123
-  full_name:29August
-  device_id:abaf785580c22722
-  &phone=2132123212
-  device_token:fkUCpZLs08Q%3AAPA91bFWngo1c3UP5iOA8NGty3UO1G4loOuSpuOgTJsXiwG1dk0qsMndyvFvOAFpVK7O_xLGzy3Ut5pkkjhlcgHiaZilvdZQEnco_FZ4p7mLie24V6TyPashe8vQPuWzkvepDXwKQNY5type:
-  email:assaaaa@signitysolutions.in
-  platform:android
-
-  To get the saved deliveryAddress of the logined user:
-  POST https://app.restroapp.com/store_-id/api_v5/deliveryAddress
-  method=GET & user_id=349
-
-  when we click pn Area Filed then api hit - to get the area of the store
-  https://app.restroapp.com/1/api_v5/deliveryAreas/Area
-
-*/
 
 }
