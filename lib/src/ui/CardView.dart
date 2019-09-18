@@ -80,9 +80,12 @@ class CardviewState extends State<Cardview> {
 
       SharedPrefs.storeSharedValue(AppConstant.STORE_ID, storeId);
 
+      Utils.showProgressDialog(context);
+
       ApiController.versionApiRequest(storeId,deviceId).then((storeData) {
 
         print(storeData.store.id);
+        Utils.hideProgressDialog(context);
         if(storeData.success){
           Route route = MaterialPageRoute(builder: (context) => HomeScreen(storeData));
           Navigator.pushReplacement(context, route);

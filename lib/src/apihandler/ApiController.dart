@@ -296,4 +296,40 @@ class ApiController{
     return "";
   }
 
+  /*======================================
+  https://app.restroapp.com/1/api_v5/deliveryAddress
+  device_id=abaf785580c22722&
+  method=DELETE&
+  user_id=396
+  &device_token=e7RIye653Cg%3AAPA91bGiSiG_TK1WYTWpulosswo6KtYU6ghbvjDDAQMt9b94zuWl_OUfTeGqsevVnw6oZmKZxiu2siot-9Sg8y-fuOQfDBc0NCfbjH_f66rAYHoqpwkVIJ0prVXY3-AS1vZX3yzkhFNJ&
+  address_id=143&
+  platform=android
+*/
+  static Future<String> deleteDeliveryAddressApiRequest(String address_id) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String storeId = prefs.getString(AppConstant.STORE_ID);
+      String userId = prefs.getString(AppConstant.USER_ID);
+      String device_id = prefs.getString(AppConstant.DEVICE_ID);
+
+      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAddress';
+      print('$deliveryAreas , $storeId');
+
+      FormData formData = new FormData.from({"method": "DELETE", "device_id":device_id,
+        "user_id": userId, "device_token":"","address_id": address_id,"platform":"android"});
+
+      Dio dio = new Dio();
+      Response response = await dio.post(deliveryAreas, data: formData,
+          options: new Options( contentType: ContentType.parse("application/json")));
+      print(response.data);
+
+      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
+      Utils.showToast(storeData.message, false);
+
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
 }

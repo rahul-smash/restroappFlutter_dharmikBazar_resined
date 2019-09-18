@@ -27,7 +27,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
           centerTitle: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context, AppConstant.Refresh),
+            onPressed: () => Navigator.pop(context, AppConstant.NOT_Refresh),
           )),
       body: Column(
         children: <Widget>[
@@ -203,6 +203,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   ApiController.saveDeliveryAddressApiRequest(zipCodeController.text,
                       addressController.text, areaId, areaTitle).then((value){
                     pr.hide();
+                    Navigator.pop(context, AppConstant.Refresh);
                   });
 
                 },

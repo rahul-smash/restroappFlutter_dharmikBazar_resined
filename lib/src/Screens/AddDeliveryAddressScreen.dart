@@ -9,8 +9,10 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class AddDeliveryAddress extends StatefulWidget {
 
+  _AddDeliveryAddressState addressState = new _AddDeliveryAddressState();
+
   @override
-  _AddDeliveryAddressState createState() => _AddDeliveryAddressState();
+  _AddDeliveryAddressState createState() => addressState;
 }
 
 class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
@@ -36,12 +38,16 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
             color: Colors.deepOrange,
             child: InkWell(
               onTap: () {
-                goToNextScreen(context);
                 //print("on click message");
-                /*Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => SaveDeliveryAddress()),
-                );*/
+                goToNextScreen(context).then((value){
+                   print("-------on activity results--------");
+                   if(value == AppConstant.Refresh){
+                     print("-------Refresh View--------");
+                     setState(() {
+
+                     });
+                   }
+                });
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -64,7 +70,167 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
               ),
             ),
           ),
-          DeliveryAddressList(),
+          FutureBuilder(
+            future: ApiController.deliveryAddressApiRequest(),
+            builder: (context, projectSnap) {
+              if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
+                //print('project snapshot data is: ${projectSnap.data}');
+                return Container(color: const Color(0xFFFFE306));
+              }else{
+                if(projectSnap.hasData){
+                  //print('---projectSnap.Data-length-${projectSnap.data.length}---');
+                  List<DeliveryAddressData> dataList =projectSnap.data;
+                  //print('---DeliveryAddressData----: ${dataList.length}');
+                  return Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: dataList.length,
+                      itemBuilder: (context, index) {
+                        DeliveryAddressData area = dataList[index];
+
+                        return new Card(
+                          child: Column(
+                            children: <Widget>[
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+                                  child: Text(area.firstName,
+                                    style: TextStyle(fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                        fontSize: 20.0),
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                child: Row(
+                                  children: <Widget>[
+                                    new Icon(
+                                      Icons.phone, color: Colors.grey,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                                      child: Text(area.mobile),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+                                child: Row(
+                                  children: <Widget>[
+                                    new Icon(
+                                      Icons.location_on, color: Colors.grey,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                                      child: Text(area.address),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5, 10, 5, 5),
+                                child: Row(
+                                  children: <Widget>[
+                                    new Icon(
+                                      Icons.email, color: Colors.grey,
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                                      child: Text(area.email),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Divider(color: Colors.grey, thickness: 1.0),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+                                child: new Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Flexible(
+                                      child: InkWell(
+                                        child: Align(
+                                          alignment: Alignment.center,
+                                          child: new Text("Edit Address"),
+                                        ),
+                                        onTap: (){
+                                          print("onTap Edit Address");
+                                        },
+                                      ),
+                                    ),
+                                    Container(color: Colors.grey, height: 30, width: 1,),
+                                    Flexible(
+                                        child: InkWell(
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: new Text("Remove Address"),
+                                          ),
+                                          onTap: (){
+                                            print("onTap Remove Address");
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                // return object of type Dialog
+                                                return AlertDialog(
+                                                  title: new Text("Delete"),
+                                                  content: new Text("Are you sure you want to delete this address?"),
+                                                  actions: <Widget>[
+                                                    // usually buttons at the bottom of the dialog
+                                                    new FlatButton(
+                                                      child: new Text("Yes"),
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop();
+
+                                                        Utils.showProgressDialog(context);
+                                                        ApiController.deleteDeliveryAddressApiRequest(area.id).then((value){
+
+                                                          Utils.hideProgressDialog(context);
+
+                                                          setState(() {
+
+                                                          });
+
+                                                        });
+                                                      },
+                                                    ),
+                                                    new FlatButton(
+                                                      child: new Text("No"),
+                                                      onPressed: () {
+                                                        Navigator.of(context).pop();
+                                                      },
+                                                    ),
+                                                  ],
+                                                );
+                                              },
+                                            );
+                                          },
+                                        )
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                            ],
+                          ),
+                        );
+
+                      },
+                    ),
+                  );
+                }else {
+                  //print('-------CircularProgressIndicator----------');
+                  return Center(
+                    child: CircularProgressIndicator(
+                        backgroundColor: Colors.black26,
+                        valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
+                  );
+                }
+              }
+            },
+          ),
         ],
       ),
       bottomNavigationBar: proceedBottomBar,
@@ -72,149 +238,18 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
   }
 }
 
-void goToNextScreen(BuildContext _context) async {
+
+Future<String> goToNextScreen(BuildContext _context) async {
   var result = await Navigator.push(_context, new MaterialPageRoute(
     builder: (BuildContext context) => new SaveDeliveryAddress(),
     fullscreenDialog: true,)
   );
   if(result == AppConstant.Refresh){
     print("----Refresh-Cart--Refresh Refresh-");
-    //updateTotalPrice();
+    return AppConstant.Refresh;
+  }else{
+    return AppConstant.NOT_Refresh;
   }
-}
-
-class DeliveryAddressList extends StatefulWidget{
-
-  DeliveryAddressListState state = new DeliveryAddressListState();
-
-  @override
-  DeliveryAddressListState createState() => state;
-
-}
-
-class DeliveryAddressListState extends State<DeliveryAddressList>{
-
-  @override
-  Widget build(BuildContext context) {
-
-    return FutureBuilder(
-      future: ApiController.deliveryAddressApiRequest(),
-        builder: (context, projectSnap) {
-          if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
-            //print('project snapshot data is: ${projectSnap.data}');
-            return Container(color: const Color(0xFFFFE306));
-          }else{
-            if(projectSnap.hasData){
-              //print('---projectSnap.Data-length-${projectSnap.data.length}---');
-              List<DeliveryAddressData> dataList =projectSnap.data;
-              print('---DeliveryAddressData----: ${dataList.length}');
-              //return Container(color: const Color(0xFFFFE306));
-              return Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: dataList.length,
-                  itemBuilder: (context, index) {
-                    DeliveryAddressData area = dataList[index];
-
-                    return new Card(
-                      child: Column(
-                        children: <Widget>[
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Container(
-                              padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
-                              child: Text(area.firstName,
-                                style: TextStyle(fontWeight: FontWeight.bold,
-                                    color: Colors.black,
-                                    fontSize: 20.0),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
-                            child: Row(
-                              children: <Widget>[
-                                new Icon(
-                                  Icons.phone, color: Colors.grey,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                                  child: Text(area.mobile),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
-                            child: Row(
-                              children: <Widget>[
-                                new Icon(
-                                  Icons.location_on, color: Colors.grey,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                                  child: Text(area.address),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(5, 10, 5, 5),
-                            child: Row(
-                              children: <Widget>[
-                                new Icon(
-                                  Icons.email, color: Colors.grey,
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                                  child: Text(area.email),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Divider(color: Colors.grey, thickness: 1.0),
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
-                            child: new Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Flexible(
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: new Text("Edit Address"),
-                                    ),
-                                ),
-                                Container(color: Colors.grey, height: 30, width: 1,),
-                                Flexible(
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: new Text("Remove Address"),
-                                    ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    );
-
-                  },
-                ),
-              );
-            }else {
-              //print('-------CircularProgressIndicator----------');
-              return Center(
-                child: CircularProgressIndicator(
-                    backgroundColor: Colors.black26,
-                    valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
-              );
-            }
-          }
-        },
-    );
-  }
-
 }
 
 class ProceedBottomBar extends StatefulWidget {
