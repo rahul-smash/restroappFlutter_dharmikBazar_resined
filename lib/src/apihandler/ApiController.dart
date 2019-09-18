@@ -195,7 +195,7 @@ class ApiController{
     Response response = await dio.post(versionApi, data: formData,
         options: new Options(
             contentType: ContentType.parse("application/json")));
-    print(response.data);
+    print(response.data.toString());
     SubCategories subCategories = SubCategories.fromJson(response.data);
     //print("-------subCategories.length ---${subCategories.data.length}");
     if(subCategories.success){
@@ -233,7 +233,7 @@ class ApiController{
     print('$deliveryAreas , $storeId');
 
     Response response = await Dio().get(deliveryAreas);
-    print(response.data);
+    print(response.data.toString());
     StoreAreaData storeAreaData = StoreAreaData.fromJson(response.data);
     print("-------store.success ---${storeAreaData.success}");
     areaList = storeAreaData.data;
@@ -252,7 +252,7 @@ class ApiController{
     Dio dio = new Dio();
     Response response = await dio.post(deliveryAreas, data: formData,
         options: new Options( contentType: ContentType.parse("application/json")));
-    print(response.data);
+    print(response.data.toString());
     DeliveryAddressResponse deliveryAddressResponse = DeliveryAddressResponse.fromJson(response.data);
     //print("--DeliveryAddressResponse---${deliveryAddressResponse.success}");
     dataList = deliveryAddressResponse.data;
@@ -266,8 +266,8 @@ class ApiController{
     return dataList;
   }
 
-  static Future<String> saveDeliveryAddressApiRequest(
-      String zipcode,String address,String area_id,String area_name) async {
+  static Future<String> saveDeliveryAddressApiRequest(String method,
+      String zipcode,String address,String area_id,String area_name,String address_id) async {
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String storeId = prefs.getString(AppConstant.STORE_ID);
@@ -277,15 +277,31 @@ class ApiController{
       String email = prefs.getString(AppConstant.USER_EMAIL);
 
       String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAddress';
-      print('$deliveryAreas , $storeId');
+      print('$method , $deliveryAreas');
+      FormData formData;
+      if(method == AppConstant.EDIT){
+        formData = new FormData.from(
+            {
+              "method": method, "user_id":userId,"address_id":address_id,
+              "zipcode": zipcode, "country":"","address": address, "city":"" ,"area_name":area_name,
+              "mobile":mobile,"state":"","area_id":area_id,"first_name":first_name,"email":email
+            }
+        );
+      }else{
+        formData = new FormData.from(
+            {
+              "method": method, "user_id":userId,
+              "zipcode": zipcode, "country":"","address": address, "city":"" ,"area_name":area_name,
+              "mobile":mobile,"state":"","area_id":area_id,"first_name":first_name,"email":email
+            }
+        );
+      }
 
-      FormData formData = new FormData.from({"method": "ADD", "user_id":userId,
-            "zipcode": zipcode, "country":"","address": address, "city":"" ,"area_name":area_name,
-            "mobile":mobile,"state":"","area_id":area_id,"first_name":first_name,"email":email});
+      //print(formData.toString());
       Dio dio = new Dio();
       Response response = await dio.post(deliveryAreas, data: formData,
               options: new Options( contentType: ContentType.parse("application/json")));
-      print(response.data);
+      print(response.data.toString());
 
       ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
       Utils.showToast(storeData.message, false);

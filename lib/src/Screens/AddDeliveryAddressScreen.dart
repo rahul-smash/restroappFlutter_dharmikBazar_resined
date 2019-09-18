@@ -39,7 +39,7 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
             child: InkWell(
               onTap: () {
                 //print("on click message");
-                goToNextScreen(context).then((value){
+                goToNextScreen(context,false,null).then((value){
                    print("-------on activity results--------");
                    if(value == AppConstant.Refresh){
                      print("-------Refresh View--------");
@@ -158,6 +158,15 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                                         ),
                                         onTap: (){
                                           print("onTap Edit Address");
+                                          goToNextScreen(context,true,area).then((value){
+                                            print("-------on activity results--------");
+                                            if(value == AppConstant.Refresh){
+                                              print("-------Refresh View--------");
+                                              setState(() {
+
+                                              });
+                                            }
+                                          });
                                         },
                                       ),
                                     ),
@@ -239,9 +248,9 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
 }
 
 
-Future<String> goToNextScreen(BuildContext _context) async {
+Future<String> goToNextScreen(BuildContext _context, bool isEditAddress, DeliveryAddressData area) async {
   var result = await Navigator.push(_context, new MaterialPageRoute(
-    builder: (BuildContext context) => new SaveDeliveryAddress(),
+    builder: (BuildContext context) => new SaveDeliveryAddress(isEditAddress,area),
     fullscreenDialog: true,)
   );
   if(result == AppConstant.Refresh){

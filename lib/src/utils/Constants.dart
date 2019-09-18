@@ -13,4 +13,6 @@ class AppConstant{
   static final String BASE_URL = "https://app.restroapp.com/";
   static final String Refresh = "refresh_view";
   static final String NOT_Refresh = "not_refresh_view";
+  static final String ADD = "ADD";
+  static final String EDIT = "EDIT";
 }

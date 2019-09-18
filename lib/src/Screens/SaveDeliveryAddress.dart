@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
+
+  bool isEditAddress;
+  DeliveryAddressData area;
+  SaveDeliveryAddress(this.isEditAddress,this.area);
+
   @override
   _SaveDeliveryAddressState createState() => _SaveDeliveryAddressState();
 }
@@ -14,11 +20,25 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
 
   String areaTitle = "select here";
   String areaId = "";
+  String address_id="";
   TextEditingController addressController = new TextEditingController();
   TextEditingController zipCodeController = new TextEditingController();
+  bool runForFirstOnly = false;
 
   @override
   Widget build(BuildContext context) {
+
+    if(runForFirstOnly == false){
+      if(widget.isEditAddress){
+        areaTitle = widget.area.areaName;
+        areaId = widget.area.areaId;
+        address_id = widget.area.id;
+        addressController.text = widget.area.address;
+        zipCodeController.text = widget.area.zipcode;
+        runForFirstOnly = true;
+      }
+    }
+
     return Scaffold(
       resizeToAvoidBottomInset: false, // set it to false
       //body: SingleChildScrollView(child: YourBody()),
@@ -57,7 +77,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   builder: (BuildContext context) => dialog,
                 ).then((_) async {
                   setState((){
-                    print("showDialog setState");
+                    print("--------------showDialog setState------------------");
                     areaTitle = dialog.state.selectedArea.typeName;
                     areaId = dialog.state.selectedArea.id;
                     print(dialog.state.selectedArea.id);
@@ -200,8 +220,15 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   pr = new ProgressDialog(context,type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
                   pr.show();
 
-                  ApiController.saveDeliveryAddressApiRequest(zipCodeController.text,
-                      addressController.text, areaId, areaTitle).then((value){
+                  String method;
+                  if(widget.isEditAddress){
+                    method = AppConstant.EDIT;
+                  }else{
+                    method = AppConstant.ADD;
+                  }
+                  // edit and save api
+                  ApiController.saveDeliveryAddressApiRequest(method,zipCodeController.text,
+                      addressController.text, areaId, areaTitle,address_id).then((value){
                     pr.hide();
                     Navigator.pop(context, AppConstant.Refresh);
                   });
