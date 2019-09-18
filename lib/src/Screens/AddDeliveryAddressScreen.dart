@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class AddDeliveryAddress extends StatefulWidget {
@@ -34,11 +36,12 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
             color: Colors.deepOrange,
             child: InkWell(
               onTap: () {
-                print("on click message");
-                Navigator.push(
+                goToNextScreen(context);
+                //print("on click message");
+                /*Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SaveDeliveryAddress()),
-                );
+                );*/
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -61,7 +64,7 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
               ),
             ),
           ),
-          DeliverAddressList(),
+          DeliveryAddressList(),
         ],
       ),
       bottomNavigationBar: proceedBottomBar,
@@ -69,16 +72,27 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
   }
 }
 
-class DeliverAddressList extends StatefulWidget{
+void goToNextScreen(BuildContext _context) async {
+  var result = await Navigator.push(_context, new MaterialPageRoute(
+    builder: (BuildContext context) => new SaveDeliveryAddress(),
+    fullscreenDialog: true,)
+  );
+  if(result == AppConstant.Refresh){
+    print("----Refresh-Cart--Refresh Refresh-");
+    //updateTotalPrice();
+  }
+}
 
-  DeliverAddressListState state = new DeliverAddressListState();
+class DeliveryAddressList extends StatefulWidget{
+
+  DeliveryAddressListState state = new DeliveryAddressListState();
 
   @override
-  DeliverAddressListState createState() => state;
+  DeliveryAddressListState createState() => state;
 
 }
 
-class DeliverAddressListState extends State<DeliverAddressList>{
+class DeliveryAddressListState extends State<DeliveryAddressList>{
 
   @override
   Widget build(BuildContext context) {
@@ -91,18 +105,90 @@ class DeliverAddressListState extends State<DeliverAddressList>{
             return Container(color: const Color(0xFFFFE306));
           }else{
             if(projectSnap.hasData){
-              print('---projectSnap.Data-length-${projectSnap.data.length}---');
-              return Container(color: const Color(0xFFFFE306));
+              //print('---projectSnap.Data-length-${projectSnap.data.length}---');
+              List<DeliveryAddressData> dataList =projectSnap.data;
+              print('---DeliveryAddressData----: ${dataList.length}');
+              //return Container(color: const Color(0xFFFFE306));
+              return Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: dataList.length,
+                  itemBuilder: (context, index) {
+                    DeliveryAddressData area = dataList[index];
 
+                    return new Card(
+                      child: Column(
+                        children: <Widget>[
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+                              child: Text(area.firstName,
+                                style: TextStyle(fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                    fontSize: 20.0),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+                            child: Row(
+                              children: <Widget>[
+                                new Icon(
+                                  Icons.phone, color: Colors.grey,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                                  child: Text(area.mobile),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+                            child: Row(
+                              children: <Widget>[
+                                new Icon(
+                                  Icons.location_on, color: Colors.grey,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                                  child: Text(area.address),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(5, 10, 5, 5),
+                            child: Row(
+                              children: <Widget>[
+                                new Icon(
+                                  Icons.email, color: Colors.grey,
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                                  child: Text(area.email),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Divider(color: Colors.grey, thickness: 1.0),
+
+                        ],
+                      ),
+                    );
+
+                  },
+                ),
+              );
             }else {
-              print('-------CircularProgressIndicator----------');
+              //print('-------CircularProgressIndicator----------');
               return Center(
                 child: CircularProgressIndicator(
                     backgroundColor: Colors.black26,
                     valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
               );
             }
-
           }
         },
     );

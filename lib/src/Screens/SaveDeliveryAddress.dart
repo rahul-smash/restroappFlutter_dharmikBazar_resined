@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
+import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
@@ -26,7 +27,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
           centerTitle: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context, false),
+            onPressed: () => Navigator.pop(context, AppConstant.Refresh),
           )),
       body: Column(
         children: <Widget>[
