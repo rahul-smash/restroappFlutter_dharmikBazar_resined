@@ -173,6 +173,27 @@ class DeliveryAddressListState extends State<DeliveryAddressList>{
                             ),
                           ),
                           Divider(color: Colors.grey, thickness: 1.0),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+                            child: new Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Flexible(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: new Text("Edit Address"),
+                                    ),
+                                ),
+                                Container(color: Colors.grey, height: 30, width: 1,),
+                                Flexible(
+                                    child: Align(
+                                      alignment: Alignment.center,
+                                      child: new Text("Remove Address"),
+                                    ),
+                                ),
+                              ],
+                            ),
+                          ),
 
                         ],
                       ),
