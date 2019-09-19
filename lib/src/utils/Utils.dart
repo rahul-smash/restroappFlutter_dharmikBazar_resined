@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:device_id/device_id.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -72,6 +74,11 @@ class Utils{
     if(pr != null && pr.isShowing()){
       pr.dismiss();
     }
+  }
+
+  static double roundOffPrice(double val, int places){
+    double mod = pow(10.0, places);
+    return ((val * mod).round().toDouble() / mod);
   }
 
 }

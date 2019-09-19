@@ -127,7 +127,7 @@ class _ListTileItemState extends State<ListTileItem> {
           Text("\$${widget.cartProductData.discount}",
               style: TextStyle(decoration: TextDecoration.lineThrough)),
           Text(" "),
-          Text("${widget.cartProductData.price}"),
+          Text("\$${widget.cartProductData.price}"),
         ],
       );
     }

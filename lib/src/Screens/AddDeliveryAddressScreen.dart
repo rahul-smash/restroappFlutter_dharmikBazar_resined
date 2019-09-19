@@ -7,6 +7,8 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import 'ConfirmOrderScreen.dart';
+
 class AddDeliveryAddress extends StatefulWidget {
 
   _AddDeliveryAddressState addressState = new _AddDeliveryAddressState();
@@ -40,11 +42,10 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
               onTap: () {
                 //print("on click message");
                 goToNextScreen(context,false,null).then((value){
-                   print("-------on activity results--------");
+                   //print("-------on activity results--------");
                    if(value == AppConstant.Refresh){
-                     print("-------Refresh View--------");
+                     //print("-------Refresh View--------");
                      setState(() {
-
                      });
                    }
                 });
@@ -82,6 +83,7 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                   List<DeliveryAddressData> dataList =projectSnap.data;
                   //print('---DeliveryAddressData----: ${dataList.length}');
                   //this goes in our State class as a global variable
+
                   return Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
@@ -91,6 +93,7 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                         bool isChecked;
                         if(widget.selectedIndex == index){
                           isChecked = true;
+                          proceedBottomBar.state.checkForDeliverAdresses(dataList.length,area);
                         }else{
                           isChecked = false;
                         }
@@ -297,15 +300,34 @@ class ProceedBottomBar extends StatefulWidget {
 }
 
 class _ProceedBottomBarState extends State<ProceedBottomBar> {
+
+  int mCount = 0;
+  DeliveryAddressData mArea;
+  checkForDeliverAdresses(int count,DeliveryAddressData area){
+    this.mCount = count;
+    this.mArea = area;
+  }
+
   @override
   Widget build(BuildContext context) {
+
     // TODO: implement build
     return Container(
       height: 50.0,
       color: Colors.deepOrange,
       child: InkWell(
         onTap: () {
-          print("on click message");
+          print("on click message mCount = ${mCount} and address is = ${mArea.address}");
+
+          if(mCount == 0){
+
+            Utils.showToast("Please select delivery address", false);
+          }else{
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ConfirmOrder(mArea)),
+            );
+          }
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
