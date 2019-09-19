@@ -93,7 +93,7 @@ class _ProductsListViewState extends State<ProductsListView> {
 Widget getProductsWidget(CategoriesData categoriesData,String catId, TotalPriceBottomBar bottomBar) {
 
   return FutureBuilder(
-    future: ApiController.getSubCategoryProducts(categoriesData.id,catId),
+    future: ApiController.getSubCategoryProducts(catId),
     builder: (context, projectSnap) {
       if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
         //print('project snapshot data is: ${projectSnap.data}');

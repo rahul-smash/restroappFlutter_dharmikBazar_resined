@@ -31,6 +31,7 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
   Widget build(BuildContext context) {
 
     return Scaffold(
+      resizeToAvoidBottomInset: false, // set it to false
       appBar: AppBar(
           title: Text("Confirm Order"),
           centerTitle: true,
@@ -38,57 +39,60 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
             icon: Icon(Icons.arrow_back),
             onPressed: () => Navigator.pop(context, false),
           )),
-      body: Column(
-        children: <Widget>[
-          Divider(color: Colors.white, height: 2.0),
-          Container(
-            child: InkWell(
-              onTap: () {
-                print("on click message");
-
-              },
-              child: FutureBuilder(
-                future: databaseHelper.getCartItemList(),
-                builder: (context, projectSnap) {
-                  if (projectSnap.connectionState == ConnectionState.none &&
-                      projectSnap.hasData == null) {
-                    //print('project snapshot data is: ${projectSnap.data}');
-                    return Container(color: const Color(0xFFFFE306));
-                  } else {
-                    if (projectSnap.hasData) {
-                      //print('---projectSnap.Data-length-${projectSnap.data.length}---');
-                      return ListView.separated(
-                        separatorBuilder: (BuildContext context, int index) => Divider(),
-                        shrinkWrap: true,
-                        //Your Column doesn't know how much height it will take. use this
-                        itemCount: projectSnap.data.length,
-                        itemBuilder: (context, index) {
-                          CartProductData cartProductData =
-                          projectSnap.data[index];
-                          //print('-------ListView.builder-----${index}');
-                          return Column(
-                            children: <Widget>[
-                              new ListTileItem(cartProductData, proceedBottomBar),
-                            ],
+      body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Divider(color: Colors.white, height: 2.0),
+              Container(
+                child: InkWell(
+                  onTap: () {
+                    print("on click message");
+                  },
+                  child: FutureBuilder(
+                    future: databaseHelper.getCartItemList(),
+                    builder: (context, projectSnap) {
+                      if (projectSnap.connectionState == ConnectionState.none &&
+                          projectSnap.hasData == null) {
+                        //print('project snapshot data is: ${projectSnap.data}');
+                        return Container(color: const Color(0xFFFFE306));
+                      } else {
+                        if (projectSnap.hasData) {
+                          //print('---projectSnap.Data-length-${projectSnap.data.length}---');
+                          return ListView.separated(
+                            separatorBuilder: (BuildContext context, int index) => Divider(),
+                            shrinkWrap: true,
+                            primary: false,
+                            //Your Column doesn't know how much height it will take. use this
+                            itemCount: projectSnap.data.length,
+                            itemBuilder: (context, index) {
+                              CartProductData cartProductData =
+                              projectSnap.data[index];
+                              //print('-------ListView.builder-----${index}');
+                              return Column(
+                                children: <Widget>[
+                                  new ListTileItem(cartProductData, proceedBottomBar),
+                                ],
+                              );
+                            },
                           );
-                        },
-                      );
-                    } else {
-                      //print('-------CircularProgressIndicator----------');
-                      return Center(
-                        child: CircularProgressIndicator(
-                            backgroundColor: Colors.black26,
-                            valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.black26)),
-                      );
-                    }
-                  }
-                },
+                        } else {
+                          //print('-------CircularProgressIndicator----------');
+                          return Center(
+                            child: CircularProgressIndicator(
+                                backgroundColor: Colors.black26,
+                                valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.black26)),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          )
       ),
+      //body: ,
       bottomNavigationBar: proceedBottomBar,
     );
   }

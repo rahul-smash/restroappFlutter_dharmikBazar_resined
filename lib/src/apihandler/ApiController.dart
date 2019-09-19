@@ -182,12 +182,14 @@ class ApiController{
     return categories.data;
   }
 
-  static Future<List<Product>> getSubCategoryProducts(String storeId,String catId ) async {
-    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/getSubCategoryProducts/${catId}';
-    print('$storeId , $versionApi');
+  static Future<List<Product>> getSubCategoryProducts(String catId ) async {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
     String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+
+    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/getSubCategoryProducts/${catId}';
+    print('$storeId , $versionApi');
 
     FormData formData = new FormData.from(
         {"device_id": deviceId, "device_token":"", "user_id":"", "platform":"android"});
