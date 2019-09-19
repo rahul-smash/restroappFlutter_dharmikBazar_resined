@@ -10,7 +10,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 class AddDeliveryAddress extends StatefulWidget {
 
   _AddDeliveryAddressState addressState = new _AddDeliveryAddressState();
-
+  int selectedIndex = 0;
   @override
   _AddDeliveryAddressState createState() => addressState;
 }
@@ -81,13 +81,21 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                   //print('---projectSnap.Data-length-${projectSnap.data.length}---');
                   List<DeliveryAddressData> dataList =projectSnap.data;
                   //print('---DeliveryAddressData----: ${dataList.length}');
+                  //this goes in our State class as a global variable
                   return Expanded(
                     child: ListView.builder(
                       shrinkWrap: true,
                       itemCount: dataList.length,
                       itemBuilder: (context, index) {
                         DeliveryAddressData area = dataList[index];
-
+                        bool isChecked;
+                        if(widget.selectedIndex == index){
+                          isChecked = true;
+                        }else{
+                          isChecked = false;
+                        }
+                        //print("-----selectedIndex of postion---- = ${widget.selectedIndex}----------");
+                        //print("-----index of postion = ${index} for value is ${isChecked}----");
                         return new Card(
                           child: Column(
                             children: <Widget>[
@@ -95,10 +103,27 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                                 alignment: Alignment.centerLeft,
                                 child: Container(
                                   padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
-                                  child: Text(area.firstName,
-                                    style: TextStyle(fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                        fontSize: 20.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: <Widget>[
+                                      Text(area.firstName,
+                                        style: TextStyle(fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                            fontSize: 20.0),
+                                      ),
+                                      Checkbox(
+                                        value: isChecked,
+                                        onChanged: (value) {
+                                          //print("---onChanged ${value} of postion = ${index}---");
+                                          //isChecked = value;
+                                          setState(() {
+                                            widget.selectedIndex = index;
+                                            //print("----selectedIndex is ${widget.selectedIndex}");
+                                          });
+
+                                          },
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -123,10 +148,13 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                                     new Icon(
                                       Icons.location_on, color: Colors.grey,
                                     ),
-                                    Padding(
-                                      padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                                      child: Text(area.address),
+                                    Flexible(
+                                        child:Padding(
+                                          padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                                          child: Text(area.address),
+                                        ),
                                     ),
+
                                   ],
                                 ),
                               ),
@@ -157,11 +185,11 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                                           child: new Text("Edit Address"),
                                         ),
                                         onTap: (){
-                                          print("onTap Edit Address");
+                                          //print("onTap Edit Address");
                                           goToNextScreen(context,true,area).then((value){
                                             print("-------on activity results--------");
                                             if(value == AppConstant.Refresh){
-                                              print("-------Refresh View--------");
+                                              //print("-------Refresh View--------");
                                               setState(() {
 
                                               });
