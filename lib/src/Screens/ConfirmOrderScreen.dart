@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:grouped_buttons/grouped_buttons.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -169,7 +170,7 @@ class _ListTileItemState extends State<ListTileItem> {
 
 class ProceedBottomBar extends StatefulWidget {
   final _ProceedBottomBarState state = new _ProceedBottomBarState();
-
+  String _picked = "Cash on Delivery";
   @override
   _ProceedBottomBarState createState() => state;
 }
@@ -178,6 +179,10 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
 
   int mCount = 0;
   DeliveryAddressData mArea;
+  DatabaseHelper databaseHelper = new DatabaseHelper();
+  double totalPrice = 0.00;
+  bool firstTime = false;
+
   checkForDeliverAdresses(int count,DeliveryAddressData area){
     this.mCount = count;
     this.mArea = area;
@@ -186,26 +191,94 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
   @override
   Widget build(BuildContext context) {
 
-    // TODO: implement build
-    return Container(
-      height: 50.0,
-      color: Colors.deepOrange,
-      child: InkWell(
-        onTap: () {
-          print("on click message mCount = ${mCount} and address is = ${mArea.address}");
+    if (firstTime == false) {
+      databaseHelper.getTotalPrice().then((mtotalPrice) {
+        firstTime = true;
+        setState(() {
+          totalPrice = mtotalPrice;
+        });
+      });
+    }
 
-        },
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              "Confirm Order",
-              style: TextStyle(color: Colors.white, fontSize: 20.0),
-            ),
-          ],
+    return Wrap(
+      children: <Widget>[
+        Container(
+          color: Colors.white,
+          child: Column(
+            children: <Widget>[
+
+              RadioButtonGroup(
+                picked: widget._picked,
+                  labels: <String>[
+                    "Cash on Delivery",
+                    "Online Payment",
+                  ],
+                onSelected: (String selected) => setState((){
+                  widget._picked = selected;
+                }),
+              ),
+
+              Divider(color: Colors.black, thickness: 1.0,),
+
+              Padding(
+                padding: EdgeInsets.fromLTRB(15, 8, 15, 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Flexible(
+                      child: InkWell(
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: new Text("Total",
+                              style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      child: InkWell(
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: new Text("\$${totalPrice}",
+                              style: TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  " *Tax extra if applicable.",
+                  style: TextStyle(color: Colors.black,fontSize: 16),
+                ),
+              ),
+
+              Container(
+                height: 45.0,
+                color: Colors.deepOrange,
+                child: InkWell(
+                  onTap: () {
+                    print("on click message mCount = ${mCount} and address is = ${mArea.address}");
+
+                  },
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "Confirm Order",
+                        style: TextStyle(color: Colors.white, fontSize: 20.0),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
-      ),
+      ],
     );
   }
 }
