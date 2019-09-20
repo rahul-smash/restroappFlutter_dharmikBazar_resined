@@ -217,22 +217,28 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
           child: Column(
             children: <Widget>[
               // This goes to the build method
+              Container(
+                height: 10,
+              ),
 
               new Row(
                 children: <Widget>[
                   new Flexible(
-                    child: new Container(
-                      width: 180.0,
-                      height: 40.0,
-                      child: TextField(
-                        textAlign: TextAlign.center,
-                        //controller: _textFieldController,
-                        decoration: InputDecoration(
-                          //Add th Hint text here.
-                          contentPadding: EdgeInsets.all(10.0),
-                          hintText: "Coupon code here..",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(5.0),
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                      child: new Container(
+                        width: 160.0,
+                        height: 40.0,
+                        child: TextField(
+                          textAlign: TextAlign.center,
+                          //controller: _textFieldController,
+                          decoration: InputDecoration(
+                            //Add th Hint text here.
+                            contentPadding: EdgeInsets.all(10.0),
+                            hintText: "Coupon code here..",
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(5.0),
+                            ),
                           ),
                         ),
                       ),
