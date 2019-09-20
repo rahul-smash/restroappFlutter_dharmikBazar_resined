@@ -141,7 +141,6 @@ class _ListTileItemState extends State<ListTileItem> {
         ],
       );
     }
-
     try {
       itemTotalPrice = int.parse(widget.cartProductData.quantity) * double.parse(widget.cartProductData.price);
     } catch (e) {
@@ -174,7 +173,7 @@ class _ListTileItemState extends State<ListTileItem> {
 
 class ProceedBottomBar extends StatefulWidget {
   final _ProceedBottomBarState state = new _ProceedBottomBarState();
-  String _picked = "Cash on Delivery";
+  int selectedRadio= 0;
   @override
   _ProceedBottomBarState createState() => state;
 }
@@ -190,6 +189,13 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
   checkForDeliverAdresses(int count,DeliveryAddressData area){
     this.mCount = count;
     this.mArea = area;
+  }
+
+  // Changes the selected value on 'onChanged' click on each radio button
+  setSelectedRadio(int val) {
+    setState(() {
+      widget.selectedRadio = val;
+    });
   }
 
   @override
@@ -210,22 +216,79 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
           color: Colors.white,
           child: Column(
             children: <Widget>[
+              // This goes to the build method
 
-              RadioButtonGroup(
-                picked: widget._picked,
-                  labels: <String>[
-                    "Cash on Delivery",
-                    "Online Payment",
-                  ],
-                onSelected: (String selected) => setState((){
-                  widget._picked = selected;
-                }),
+              new Row(
+                children: <Widget>[
+                  new Flexible(
+                    child: new Container(
+                      width: 180.0,
+                      height: 40.0,
+                      child: TextField(
+                        textAlign: TextAlign.center,
+                        //controller: _textFieldController,
+                        decoration: InputDecoration(
+                          //Add th Hint text here.
+                          contentPadding: EdgeInsets.all(10.0),
+                          hintText: "Coupon code here..",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 120.0,
+                    height: 40.0,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                      child: new RaisedButton(
+                        padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                        textColor: Colors.white,
+                        color: Colors.blue,
+                        onPressed: () {
+                          print("onPressed");
+                        },
+                        child: new Text("Apply Coupon"),
+                      ),
+                    ),
+                  ),
+                  Text("Available Offers", textAlign: TextAlign.center,style: TextStyle(color: Colors.blue))
+                ],
+              ),
+
+              Row(
+                children: <Widget>[
+                  Radio(
+                    value: 1,
+                    groupValue: widget.selectedRadio,
+                    onChanged: (val) {
+                      //print("Radio $val");
+                      setSelectedRadio(val);
+                    },
+                  ),
+                  new Text(
+                    'Cash on Delivery',
+                  ),
+                  Radio(
+                    value: 2,
+                    groupValue: widget.selectedRadio,
+                    onChanged: (val) {
+                      //print("Radio $val");
+                      setSelectedRadio(val);
+                    },
+                  ),
+                  new Text(
+                    'Online Payment'
+                  ),
+                ],
               ),
 
               Divider(color: Colors.black, thickness: 1.0,),
 
               Padding(
-                padding: EdgeInsets.fromLTRB(15, 8, 15, 8),
+                padding: EdgeInsets.fromLTRB(15, 0, 15, 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
