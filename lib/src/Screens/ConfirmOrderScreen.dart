@@ -7,22 +7,22 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/StoreOffersResponse.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ConfirmOrder extends StatefulWidget {
 
-  _ConfirmOrderState addressState = new _ConfirmOrderState();
-
   DeliveryAddressData mArea;
 
   ConfirmOrder(this.mArea);
 
+  ConfirmOrderState addressState = new ConfirmOrderState();
   @override
-  _ConfirmOrderState createState() => addressState;
+  ConfirmOrderState createState() => addressState;
 }
 
-class _ConfirmOrderState extends State<ConfirmOrder> {
+class ConfirmOrderState extends State<ConfirmOrder> {
 
   ProceedBottomBar proceedBottomBar = new ProceedBottomBar();
   DatabaseHelper databaseHelper = new DatabaseHelper();
@@ -58,6 +58,7 @@ class _ConfirmOrderState extends State<ConfirmOrder> {
                       } else {
                         if (projectSnap.hasData) {
                           //print('---projectSnap.Data-length-${projectSnap.data.length}---');
+                          proceedBottomBar.state.checkForDeliverAdresses(projectSnap.data.length, widget.mArea);
                           return ListView.separated(
                             separatorBuilder: (BuildContext context, int index) => Divider(),
                             shrinkWrap: true,
@@ -174,6 +175,7 @@ class _ListTileItemState extends State<ListTileItem> {
 class ProceedBottomBar extends StatefulWidget {
   final _ProceedBottomBarState state = new _ProceedBottomBarState();
   int selectedRadio= 0;
+
   @override
   _ProceedBottomBarState createState() => state;
 }
@@ -244,6 +246,7 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                       ),
                     ),
                   ),
+
                   Container(
                     width: 120.0,
                     height: 40.0,
@@ -255,12 +258,27 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                         color: Colors.blue,
                         onPressed: () {
                           print("onPressed");
+
                         },
                         child: new Text("Apply Coupon"),
                       ),
                     ),
                   ),
-                  Text("Available Offers", textAlign: TextAlign.center,style: TextStyle(color: Colors.blue))
+
+                  InkWell(
+                    onTap: (){
+                      AvailableOffersDialog dialog = new AvailableOffersDialog(mArea);
+                      showDialog(context: context,
+                        builder: (BuildContext context) => dialog,
+                      ).then((_) async {
+                        setState((){
+                          print("--------------showDialog setState------------------");
+
+                        });
+                      });
+                    },
+                    child:Text("Available Offers", textAlign: TextAlign.center,style: TextStyle(color: Colors.blue)) ,
+                  ),
                 ],
               ),
 
@@ -354,4 +372,138 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
       ],
     );
   }
+}
+
+class AvailableOffersDialog extends StatefulWidget{
+
+  DeliveryAddressData area;
+
+  AvailableOffersState state = new AvailableOffersState();
+
+  AvailableOffersDialog(this.area);
+
+  @override
+  AvailableOffersState createState() => state;
+
+}
+
+class AvailableOffersState extends State<AvailableOffersDialog> {
+
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Consts.padding),
+      ),
+      elevation: 0.0,
+      //backgroundColor: Colors.transparent,
+      //child: dialogContent(context),
+      child: FutureBuilder(
+        future: ApiController.storeOffersApiRequest(widget.area.areaId),
+        builder: (context, projectSnap){
+          if (projectSnap.connectionState == ConnectionState.none && projectSnap.hasData == null) {
+            //print('project snapshot data is: ${projectSnap.data}');
+            return Container(color: const Color(0xFFFFE306));
+          }else{
+            if(projectSnap.hasData){
+              //print('---projectSnap.Data-length-${projectSnap.data.length}---');
+              //return Container(color: const Color(0xFFFFE306));
+              List<OffersData> data  = projectSnap.data;
+              return dialogContent(context,data);
+            }else {
+              //print('-------CircularProgressIndicator----------');
+              return Center(
+                child: CircularProgressIndicator(
+                    backgroundColor: Colors.black26,
+                    valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
+              );
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  Widget dialogContent(BuildContext context, List<OffersData> areaList) {
+
+    return Container(
+      decoration: new BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(Consts.padding),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            offset: const Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Container(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Text(
+                    "Select Coupon",
+                    style: TextStyle(color: Colors.black, fontSize: 20.0),
+                  ),
+                ],
+              ),
+            ),
+
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: areaList.length,
+                itemBuilder: (context, index) {
+                  OffersData offer = areaList[index];
+                  return ListTile(
+                    onTap: (){
+                      //print(offer.couponCode);
+                      //selectedArea = area;
+                      Navigator.pop(context,true);
+                      /*setState(() {
+                        print("dialog area list click");
+                      });*/
+                    },
+                    title: Text(offer.couponCode,
+                      style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black),),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text("Min Order ${offer.minimumOrderAmount}"),
+                      ],
+                    ),
+                    trailing: Container(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                        child: new RaisedButton(
+                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                          textColor: Colors.white,
+                          color: Colors.blue,
+                          onPressed: () {
+                            print("onPressed");
+
+                          },
+                          child: new Text("Apply"),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+
 }

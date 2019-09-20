@@ -8,6 +8,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/RegisterUserData.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/models/StoreData.dart';
+import 'package:restroapp/src/models/StoreOffersResponse.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
 import 'package:restroapp/src/models/store_list.dart';
 import 'dart:convert';
@@ -348,6 +349,34 @@ class ApiController{
       print(e);
     }
     return "";
+  }
+
+  static Future<List<OffersData>> storeOffersApiRequest(String area_id) async {
+    List<OffersData> data = new List();
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String storeId = prefs.getString(AppConstant.STORE_ID);
+      String userId = prefs.getString(AppConstant.USER_ID);
+      //store_id=1&user_id=424&area_id=1&order_facility=Delivery
+      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/storeOffers';
+      print('$deliveryAreas , $storeId');
+
+      FormData formData = new FormData.from({"store_id": storeId, "user_id":userId,
+        "area_id": area_id,"order_facility": "Delivery"});
+
+      Dio dio = new Dio();
+      Response response = await dio.post(deliveryAreas, data: formData,
+          options: new Options( contentType: ContentType.parse("application/json")));
+      print(response.data);
+
+      StoreOffersResponse storeData = StoreOffersResponse.fromJson(response.data);
+      //Utils.showToast(storeData.message, false);
+      data = storeData.data;
+
+    } catch (e) {
+      print(e);
+    }
+    return data;
   }
 
 }
