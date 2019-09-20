@@ -32,7 +32,7 @@ class Data {
   String total;
   double itemSubTotal;
   int tax;
-  String discount;
+  //String discount;
   String shipping;
   int fixedTaxAmount;
   List<dynamic> taxDetail;
@@ -43,7 +43,7 @@ class Data {
     this.total,
     this.itemSubTotal,
     this.tax,
-    this.discount,
+    //this.discount,
     this.shipping,
     this.fixedTaxAmount,
     this.taxDetail,
@@ -55,7 +55,7 @@ class Data {
     total: json["total"],
     itemSubTotal: json["item_sub_total"].toDouble(),
     tax: json["tax"],
-    discount: json["discount"],
+    //discount: json["discount"],
     shipping: json["shipping"],
     fixedTaxAmount: json["fixed_tax_amount"],
     taxDetail: List<dynamic>.from(json["tax_detail"].map((x) => x)),
@@ -67,7 +67,7 @@ class Data {
     "total": total,
     "item_sub_total": itemSubTotal,
     "tax": tax,
-    "discount": discount,
+    //"discount": discount,
     "shipping": shipping,
     "fixed_tax_amount": fixedTaxAmount,
     "tax_detail": List<dynamic>.from(taxDetail.map((x) => x)),

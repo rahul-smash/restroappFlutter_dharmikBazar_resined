@@ -272,8 +272,26 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                         textColor: Colors.white,
                         color: Colors.blue,
                         onPressed: () {
-                          print("onPressed");
+                          print("onPressed ${widget.applyCouponText}");
+                          if(widget.applyCouponText == "Remove Coupon"){
 
+                            Utils.showProgressDialog(context);
+                            DatabaseHelper databaseHelper = new DatabaseHelper();
+
+                            databaseHelper.getCartItemsListToJson().then((json){
+
+                              ApiController.multipleTaxCalculationRequest("0".toString(),
+                                  "0", "0.00", "0", json).then((response){
+                                    print("Calculation ${response.data.total}");
+                                    Utils.hideProgressDialog(context);
+                                    setState(() {
+                                      totalPrice = double.parse(response.data.total);;
+                                      widget.applyCouponText = "Apply Coupon";
+                                      widget.couponCodeValue = "Coupon code here..";
+                                    });
+                              });
+                            });
+                          }
                         },
                         child: new Text("${widget.applyCouponText}",softWrap: true),
                       ),
