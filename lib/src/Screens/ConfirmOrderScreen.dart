@@ -187,6 +187,8 @@ class _ListTileItemState extends State<ListTileItem> {
 class ProceedBottomBar extends StatefulWidget {
   final _ProceedBottomBarState state = new _ProceedBottomBarState();
   int selectedRadio= 0;
+  String applyCouponText = "Apply Coupon";
+  String couponCodeValue = "Coupon code here..";
 
   @override
   _ProceedBottomBarState createState() => state;
@@ -244,12 +246,13 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                         width: 160.0,
                         height: 40.0,
                         child: TextField(
+                          readOnly: true,
                           textAlign: TextAlign.center,
                           //controller: _textFieldController,
                           decoration: InputDecoration(
                             //Add th Hint text here.
                             contentPadding: EdgeInsets.all(10.0),
-                            hintText: "Coupon code here..",
+                            hintText: "${widget.couponCodeValue}",
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(5.0),
                             ),
@@ -260,7 +263,7 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                   ),
 
                   Container(
-                    width: 120.0,
+                    width: 130.0,
                     height: 40.0,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
@@ -272,7 +275,7 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                           print("onPressed");
 
                         },
-                        child: new Text("Apply Coupon"),
+                        child: new Text("${widget.applyCouponText}",softWrap: true),
                       ),
                     ),
                   ),
@@ -287,6 +290,8 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                           print("--------------showDialog setState-----${dialog.totalPrice}-------------");
                           if(dialog.totalPrice != 0.0){
                             totalPrice = dialog.totalPrice;
+                            widget.applyCouponText = dialog.applyCouponText;
+                            widget.couponCodeValue =dialog.couponCodeValue;
                           }
                         });
                       });
@@ -393,6 +398,9 @@ class AvailableOffersDialog extends StatefulWidget{
   double totalPrice = 0.0;
   DeliveryAddressData area;
   int selectedRadio;
+  String applyCouponText = "Apply Coupon";
+  String couponCodeValue = "Coupon code here..";
+
   AvailableOffersState state = new AvailableOffersState();
 
   AvailableOffersDialog(this.area, this.selectedRadio);
@@ -483,17 +491,16 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                       Utils.showProgressDialog(context);
                                       DatabaseHelper databaseHelper = new DatabaseHelper();
 
-                                      databaseHelper.getCartItemsListToJson()
-                                          .then((json) {
-                                        ApiController.validateOfferApiRequest(
-                                            offer, widget.selectedRadio, json)
-                                            .then((response) {
-                                          ApiController
-                                              .multipleTaxCalculationRequest(
-                                              response.discountAmount
-                                                  .toString(),
-                                              "0", "0.00", "0", json).then((
-                                              response) {
+                                      databaseHelper.getCartItemsListToJson().then((json) {
+
+                                        ApiController.validateOfferApiRequest(offer, widget.selectedRadio, json).then((response) {
+
+                                          widget.applyCouponText = "Remove Coupon";
+                                          widget.couponCodeValue = response.data.couponCode;
+
+                                          ApiController.multipleTaxCalculationRequest(
+                                              response.discountAmount.toString(),
+                                              "0", "0.00", "0", json).then((response) {
                                             widget.totalPrice = double.parse(
                                                 response.data.total);
                                             Utils.hideProgressDialog(context);

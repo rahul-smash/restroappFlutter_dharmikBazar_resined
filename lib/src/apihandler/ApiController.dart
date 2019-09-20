@@ -435,8 +435,8 @@ class ApiController{
       Dio dio = new Dio();
       Response response = await dio.post(deliveryAreas, data: formData,
           options: new Options(contentType: ContentType.parse("application/json")));
-      print("-------multiple_tax_calculation--${response.statusCode}-${response.statusMessage}-");
-      print("--headers--${response.headers}");
+      //print("-------multiple_tax_calculation--${response.statusCode}-${response.statusMessage}-");
+      //print("--headers--${response.headers}");
       print("--TaxCalculation--${response.data}");
       TaxCalulationResponse storeData = TaxCalulationResponse.fromJson(response.data);
       //Utils.showToast(storeData.message, false);
