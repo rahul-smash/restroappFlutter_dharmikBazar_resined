@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:path/path.dart';
@@ -251,6 +252,37 @@ class DatabaseHelper {
       print("-empty cart-in db--");
     }
     return cartList;
+  }
+
+  Future<String> getCartItemsListToJson() async {
+    List<CartProductData> cartList = new List();
+    //database connection
+    var dbClient = await db;
+    List<String> columnsToSelect = [MRP_PRICE,PRICE,DISCOUNT,QUANTITY,IS_TAX_ENABLE,
+      Product_Name,VARIENT_ID,WEIGHT,PRODUCT_ID];
+    List<Map> resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
+    // print the results
+    if(resultList != null && resultList.isNotEmpty){
+      print("---result.length--- ${resultList.length}");
+      resultList.forEach((row){
+        CartProductData cartProductData = new CartProductData();
+        cartProductData.price = row[PRICE];
+        cartProductData.quantity = row[QUANTITY];
+        cartProductData.variant_id = row[VARIENT_ID];
+        cartProductData.product_id = row[PRODUCT_ID];
+        cartProductData.isTaxEnable = row[IS_TAX_ENABLE];
+        cartList.add(cartProductData);
+
+      });
+    }else{
+      print("-empty cart-in db--");
+    }
+    List jsonList = CartProductData.encondeToJson(cartList);
+    //print("jsonList: ${jsonList}");
+    String encodedDoughnut = jsonEncode(jsonList);
+    print("encodedDoughnut: ${encodedDoughnut}");
+
+    return encodedDoughnut;
   }
 
   double roundOffPrice(double val, int places){

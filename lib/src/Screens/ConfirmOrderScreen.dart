@@ -14,6 +14,8 @@ import 'package:restroapp/src/utils/Utils.dart';
 class ConfirmOrder extends StatefulWidget {
 
   DeliveryAddressData mArea;
+  bool runOnlyOnce = false;
+  double fixed_discount_amount = 0.0;
 
   ConfirmOrder(this.mArea);
 
@@ -29,6 +31,16 @@ class ConfirmOrderState extends State<ConfirmOrder> {
 
   @override
   Widget build(BuildContext context) {
+
+    /*if(widget.runOnlyOnce == false){
+      DatabaseHelper databaseHelper = new DatabaseHelper();
+      databaseHelper.getCartItemsListToJson().then((json){
+        ApiController.multipleTaxCalculationRequest(widget.fixed_discount_amount.toString(),
+            "0", "0.00", "0", json).then((response){
+          widget.runOnlyOnce = true;
+        });
+      });
+    }*/
 
     return Scaffold(
       resizeToAvoidBottomInset: false, // set it to false
@@ -267,13 +279,15 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
 
                   InkWell(
                     onTap: (){
-                      AvailableOffersDialog dialog = new AvailableOffersDialog(mArea);
+                      AvailableOffersDialog dialog = new AvailableOffersDialog(mArea,widget.selectedRadio);
                       showDialog(context: context,
                         builder: (BuildContext context) => dialog,
                       ).then((_) async {
                         setState((){
-                          print("--------------showDialog setState------------------");
-
+                          print("--------------showDialog setState-----${dialog.totalPrice}-------------");
+                          if(dialog.totalPrice != 0.0){
+                            totalPrice = dialog.totalPrice;
+                          }
                         });
                       });
                     },
@@ -285,7 +299,7 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
               Row(
                 children: <Widget>[
                   Radio(
-                    value: 1,
+                    value: 0,
                     groupValue: widget.selectedRadio,
                     onChanged: (val) {
                       //print("Radio $val");
@@ -296,7 +310,7 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                     'Cash on Delivery',
                   ),
                   Radio(
-                    value: 2,
+                    value: 1,
                     groupValue: widget.selectedRadio,
                     onChanged: (val) {
                       //print("Radio $val");
@@ -376,11 +390,12 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
 
 class AvailableOffersDialog extends StatefulWidget{
 
+  double totalPrice = 0.0;
   DeliveryAddressData area;
-
+  int selectedRadio;
   AvailableOffersState state = new AvailableOffersState();
 
-  AvailableOffersDialog(this.area);
+  AvailableOffersDialog(this.area, this.selectedRadio);
 
   @override
   AvailableOffersState createState() => state;
@@ -409,8 +424,97 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
             if(projectSnap.hasData){
               //print('---projectSnap.Data-length-${projectSnap.data.length}---');
               //return Container(color: const Color(0xFFFFE306));
-              List<OffersData> data  = projectSnap.data;
-              return dialogContent(context,data);
+              List<OffersData> areaList  = projectSnap.data;
+              //return dialogContent(context,areaList,widget.selectedRadio);
+              return Container(
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.rectangle,
+                  borderRadius: BorderRadius.circular(Consts.padding),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 10.0,
+                      offset: const Offset(0.0, 10.0),
+                    ),
+                  ],
+                ),
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text(
+                              "Select Coupon",
+                              style: TextStyle(color: Colors.black, fontSize: 20.0),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: areaList.length,
+                          itemBuilder: (context, index) {
+                            OffersData offer = areaList[index];
+                            return ListTile(
+                              title: Text(offer.couponCode,
+                                style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black),),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text("Min Order ${offer.minimumOrderAmount}"),
+                                ],
+                              ),
+                              trailing: Container(
+                                child: Padding(
+                                  padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                  child: new RaisedButton(
+                                    padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                    textColor: Colors.white,
+                                    color: Colors.blue,
+                                    onPressed: () {
+                                      print("onPressed");
+                                      Utils.showProgressDialog(context);
+                                      DatabaseHelper databaseHelper = new DatabaseHelper();
+
+                                      databaseHelper.getCartItemsListToJson()
+                                          .then((json) {
+                                        ApiController.validateOfferApiRequest(
+                                            offer, widget.selectedRadio, json)
+                                            .then((response) {
+                                          ApiController
+                                              .multipleTaxCalculationRequest(
+                                              response.discountAmount
+                                                  .toString(),
+                                              "0", "0.00", "0", json).then((
+                                              response) {
+                                            widget.totalPrice = double.parse(
+                                                response.data.total);
+                                            Utils.hideProgressDialog(context);
+                                            Navigator.pop(context, true);
+                                          });
+                                        });
+                                      });
+
+                                    },
+                                    child: new Text("Apply"),
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }else {
               //print('-------CircularProgressIndicator----------');
               return Center(
@@ -421,86 +525,6 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
             }
           }
         },
-      ),
-    );
-  }
-
-  Widget dialogContent(BuildContext context, List<OffersData> areaList) {
-
-    return Container(
-      decoration: new BoxDecoration(
-        color: Colors.white,
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(Consts.padding),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10.0,
-            offset: const Offset(0.0, 10.0),
-          ),
-        ],
-      ),
-      child: Container(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Select Coupon",
-                    style: TextStyle(color: Colors.black, fontSize: 20.0),
-                  ),
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: areaList.length,
-                itemBuilder: (context, index) {
-                  OffersData offer = areaList[index];
-                  return ListTile(
-                    onTap: (){
-                      //print(offer.couponCode);
-                      //selectedArea = area;
-                      Navigator.pop(context,true);
-                      /*setState(() {
-                        print("dialog area list click");
-                      });*/
-                    },
-                    title: Text(offer.couponCode,
-                      style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black),),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text("Min Order ${offer.minimumOrderAmount}"),
-                      ],
-                    ),
-                    trailing: Container(
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                        child: new RaisedButton(
-                          padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                          textColor: Colors.white,
-                          color: Colors.blue,
-                          onPressed: () {
-                            print("onPressed");
-
-                          },
-                          child: new Text("Apply"),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

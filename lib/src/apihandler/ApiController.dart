@@ -3,6 +3,7 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ApiErrorResponse.dart';
+import 'package:restroapp/src/models/CartData.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/RegisterUserData.dart';
@@ -10,6 +11,8 @@ import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/models/StoreData.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
 import 'package:restroapp/src/models/SubCategories.dart';
+import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/store_list.dart';
 import 'dart:convert';
 import 'package:dio/dio.dart';
@@ -156,7 +159,7 @@ class ApiController{
     print('$storeId , $categoriesUrl');
 
     Response response = await Dio().get(categoriesUrl);
-    print(response);
+    //print(response);
     Categories categories = Categories.fromJson(response.data);
     print("-------Categories.length ---${categories.data.length}");
 
@@ -198,7 +201,7 @@ class ApiController{
     Response response = await dio.post(versionApi, data: formData,
         options: new Options(
             contentType: ContentType.parse("application/json")));
-    print(response.data.toString());
+    //print(response.data.toString());
     SubCategories subCategories = SubCategories.fromJson(response.data);
     //print("-------subCategories.length ---${subCategories.data.length}");
     if(subCategories.success){
@@ -238,7 +241,7 @@ class ApiController{
     Response response = await Dio().get(deliveryAreas);
     print(response.data.toString());
     StoreAreaData storeAreaData = StoreAreaData.fromJson(response.data);
-    print("-------store.success ---${storeAreaData.success}");
+    //print("-------store.success ---${storeAreaData.success}");
     areaList = storeAreaData.data;
     return areaList;
   }
@@ -255,7 +258,7 @@ class ApiController{
     Dio dio = new Dio();
     Response response = await dio.post(deliveryAreas, data: formData,
         options: new Options( contentType: ContentType.parse("application/json")));
-    print(response.data.toString());
+    //print(response.data.toString());
     DeliveryAddressResponse deliveryAddressResponse = DeliveryAddressResponse.fromJson(response.data);
     //print("--DeliveryAddressResponse---${deliveryAddressResponse.success}");
     dataList = deliveryAddressResponse.data;
@@ -304,7 +307,7 @@ class ApiController{
       Dio dio = new Dio();
       Response response = await dio.post(deliveryAreas, data: formData,
               options: new Options( contentType: ContentType.parse("application/json")));
-      print(response.data.toString());
+      //print(response.data.toString());
 
       ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
       Utils.showToast(storeData.message, false);
@@ -340,7 +343,7 @@ class ApiController{
       Dio dio = new Dio();
       Response response = await dio.post(deliveryAreas, data: formData,
           options: new Options( contentType: ContentType.parse("application/json")));
-      print(response.data);
+      //print(response.data);
 
       ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
       Utils.showToast(storeData.message, false);
@@ -378,5 +381,71 @@ class ApiController{
     }
     return data;
   }
+
+  static Future<ValidateCouponsResponse> validateOfferApiRequest(OffersData offer,int area_id, String json) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String device_id = prefs.getString(AppConstant.DEVICE_ID);
+      String userId = prefs.getString(AppConstant.USER_ID);
+      String storeId = prefs.getString(AppConstant.STORE_ID);
+      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/validateAllCoupons';
+      print('$userId , $deliveryAreas');
+      String payment_method="";
+      if(area_id == 0){
+        payment_method="2";
+      }else{
+        payment_method="3";
+      }
+
+      FormData formData = new FormData.from({"coupon_code": offer.couponCode, "device_id":device_id,
+        "user_id": userId,"device_token": "","orders": "${json}",
+        "platform": "android","payment_method": payment_method});
+
+      Dio dio = new Dio();
+      Response response = await dio.post(deliveryAreas, data: formData,
+          options: new Options( contentType: ContentType.parse("application/json")));
+      print(response.data);
+
+      ValidateCouponsResponse storeData = ValidateCouponsResponse.fromJson(response.data);
+      Utils.showToast(storeData.message, false);
+      return storeData;
+
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<TaxCalulationResponse> multipleTaxCalculationRequest(String fixed_discount_amount,
+      String tax, String shipping,String discount,String json) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String device_id = prefs.getString(AppConstant.DEVICE_ID);
+      String userId = prefs.getString(AppConstant.USER_ID);
+      String storeId = prefs.getString(AppConstant.STORE_ID);
+      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/multiple_tax_calculation';
+      print('$userId , $deliveryAreas');
+
+      FormData formData = new FormData.from({"fixed_discount_amount":fixed_discount_amount,
+        "device_id":device_id,
+        "tax":tax,
+        "shipping": shipping,
+        "discount":discount,
+        "order_detail": '${json.toString()}'});
+
+      Dio dio = new Dio();
+      Response response = await dio.post(deliveryAreas, data: formData,
+          options: new Options(contentType: ContentType.parse("application/json")));
+      print("-------multiple_tax_calculation--${response.statusCode}-${response.statusMessage}-");
+      print("--headers--${response.headers}");
+      print("--TaxCalculation--${response.data}");
+      TaxCalulationResponse storeData = TaxCalulationResponse.fromJson(response.data);
+      //Utils.showToast(storeData.message, false);
+      return storeData;
+    } catch (e) {
+      print("---Exception----multiple_tax_calculation--${e.toString()}--");
+      print(e);
+    }
+  }
+
 
 }

@@ -65,4 +65,22 @@ class CartProductData {
     _isTaxEnable = value;
   }
 
+  Map<String,dynamic> toJson(){
+    return {
+      "isTaxEnable": this.isTaxEnable,
+      "price": this.price,
+      "product_id": this.product_id,
+      "quantity": this.quantity,
+      "variant_id": this.variant_id
+    };
+  }
+
+  static List encondeToJson(List<CartProductData>list){
+    List jsonList = List();
+    list.map((item)=>
+        jsonList.add(item.toJson())
+    ).toList();
+    return jsonList;
+  }
+
 }
