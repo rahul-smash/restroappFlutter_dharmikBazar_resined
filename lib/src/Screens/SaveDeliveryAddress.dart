@@ -5,6 +5,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+//import 'package:location/location.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
 
@@ -24,6 +25,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   TextEditingController addressController = new TextEditingController();
   TextEditingController zipCodeController = new TextEditingController();
   bool runForFirstOnly = false;
+  //var location = new Location();
+  //Map<String, double> userLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -110,6 +113,33 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
             ),
           ),
           Divider(color: Colors.grey, height: 2.0),
+
+          Padding(
+            padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
+            child: InkWell(
+              onTap: (){
+                /*_getLocation().then((value) {
+                  setState(() {
+                    userLocation = value;
+                    print("latitude = ${userLocation["latitude"].toString()} "
+                        "AND longitude= ${userLocation["longitude"].toString()}");
+                  });
+                });*/
+              },
+              child: Column(
+                children: <Widget>[
+                  Align(
+                    alignment: Alignment.topLeft,
+                    child: new Text(
+                      "Current Location:",
+                      style: TextStyle(color: Colors.black, fontSize: 17.0),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
           Padding(
             padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
             child: InkWell(
@@ -245,6 +275,16 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       ),
     );
   }
+
+  /*Future<Map<String, double>> _getLocation() async {
+    var currentLocation = <String, double>{};
+    try {
+      currentLocation = await location.getLocation();
+    } catch (e) {
+      currentLocation = null;
+    }
+    return currentLocation;
+  }*/
 }
 
 class AreaCustomDialog extends StatefulWidget {
