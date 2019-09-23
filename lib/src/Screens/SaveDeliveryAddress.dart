@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geocoder/geocoder.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
@@ -25,8 +27,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   TextEditingController addressController = new TextEditingController();
   TextEditingController zipCodeController = new TextEditingController();
   bool runForFirstOnly = false;
-  //var location = new Location();
-  //Map<String, double> userLocation;
+  String address ="";
 
   @override
   Widget build(BuildContext context) {
@@ -118,13 +119,14 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
             padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
             child: InkWell(
               onTap: (){
-                /*_getLocation().then((value) {
+                getLocation().then((value) {
                   setState(() {
-                    userLocation = value;
-                    print("latitude = ${userLocation["latitude"].toString()} "
-                        "AND longitude= ${userLocation["longitude"].toString()}");
+                    address = value;
+                    print("---ADDRESS--- = ${address}");
+                    addressController.text = address;
                   });
-                });*/
+                });
+
               },
               child: Column(
                 children: <Widget>[
@@ -276,15 +278,16 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
     );
   }
 
-  /*Future<Map<String, double>> _getLocation() async {
-    var currentLocation = <String, double>{};
-    try {
-      currentLocation = await location.getLocation();
-    } catch (e) {
-      currentLocation = null;
-    }
-    return currentLocation;
-  }*/
+  Future<String> getLocation() async {
+    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    //print(position);
+    final coordinates = new Coordinates(position.latitude, position.longitude);
+    var addresses = await Geocoder.local.findAddressesFromCoordinates( coordinates);
+    var first = addresses.first;
+    //print("${first.featureName} : ${first.addressLine}");
+    //print(' ${first.locality}, ${first.adminArea},${first.subLocality}, ${first.subAdminArea},${first.addressLine}, ${first.featureName},${first.thoroughfare}, ${first.subThoroughfare}');
+    return first.addressLine;
+  }
 }
 
 class AreaCustomDialog extends StatefulWidget {

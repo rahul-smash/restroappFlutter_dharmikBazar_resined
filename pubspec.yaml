@@ -36,7 +36,8 @@ dependencies:
   progress_dialog: ^1.2.0
   connectivity: ^0.4.2
   grouped_buttons: ^1.0.4
-  #location: ^1.4.1
+  geocoder: ^0.2.1
+  geolocator: ^4.0.3
 
 dev_dependencies:
   flutter_test:
