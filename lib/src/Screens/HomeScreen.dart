@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/LoginScreen.dart';
+import 'package:restroapp/src/Screens/MyCartScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -102,6 +103,14 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
       setState(() {
         _currentIndex = index;
         print("_currentIndex ${_currentIndex}");
+        if(_currentIndex == 0){
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MyCart(context)),
+          );
+        }
+
       });
     }
 

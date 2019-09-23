@@ -243,7 +243,7 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
                       child: new Container(
-                        width: 160.0,
+                        width: 155.0,
                         height: 40.0,
                         child: TextField(
                           readOnly: true,
@@ -389,6 +389,15 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                 child: InkWell(
                   onTap: () {
                     print("on click message mCount = ${mCount} and address is = ${mArea.address}");
+
+                    Utils.isNetworkAvailable().then((isNetworkAvailable){
+                      if(isNetworkAvailable == true){
+
+                        print("----NetworkAvailable == true-----");
+                      }else{
+                        Utils.showToast(AppConstant.N0_INTERNET, false);
+                      }
+                    });
 
                   },
                   child: Row(

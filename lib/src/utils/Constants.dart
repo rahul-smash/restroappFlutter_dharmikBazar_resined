@@ -1,5 +1,7 @@
 class AppConstant{
 
+  static final String N0_INTERNET = "No intenet connection";
+
   static final String DEVICE_ID = "DEVICE_ID";
   static final String STORE_ID = "STORE_ID";
   static final String USER_ID = "USER_ID";

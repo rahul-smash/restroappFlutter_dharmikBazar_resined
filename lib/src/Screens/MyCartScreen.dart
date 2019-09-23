@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/AddDeliveryAddressScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CartData.dart';
 import 'package:restroapp/src/utils/Constants.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class MyCart extends StatelessWidget {
 
@@ -296,10 +298,16 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
           Divider(color: Colors.white, thickness: 2.0,),
           InkWell(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
-              );
+              SharedPrefs.checkUserLogin().then((checkUserLogin){
+                if(checkUserLogin == true){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
+                  );
+                }else{
+                  Utils.showToast("Please login to proceed further", false);
+                }
+              });
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
