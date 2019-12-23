@@ -393,7 +393,9 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                     Utils.isNetworkAvailable().then((isNetworkAvailable){
                       if(isNetworkAvailable == true){
 
-                        print("----NetworkAvailable == true-----");
+                        print("----NetworkAvailable == true-----ConfirmOrder_Pending");
+
+
                       }else{
                         Utils.showToast(AppConstant.N0_INTERNET, false);
                       }

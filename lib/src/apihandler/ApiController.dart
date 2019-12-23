@@ -3,9 +3,11 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ApiErrorResponse.dart';
+import 'package:restroapp/src/models/BookNowData.dart';
 import 'package:restroapp/src/models/CartData.dart';
 import 'package:restroapp/src/models/Categories.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/ProfileData.dart';
 import 'package:restroapp/src/models/RegisterUserData.dart';
 import 'package:restroapp/src/models/StoreAreasData.dart';
 import 'package:restroapp/src/models/StoreData.dart';
@@ -150,6 +152,10 @@ class ApiController{
         contentType: ContentType.parse("application/json")));
     print(response.data);
     StoreData storeData = StoreData.fromJson(response.data);
+    SharedPrefs.storeSharedValue(AppConstant.LAT, storeData.store.lat);
+    SharedPrefs.storeSharedValue(AppConstant.LNG, storeData.store.lng);
+
+    SharedPrefs.storeSharedValue(AppConstant.ABOUT_US, storeData.store.aboutUs);
     print("-------store.success ---${storeData.success}");
     return storeData;
   }
@@ -449,4 +455,131 @@ class ApiController{
   }
 
 
+  static Future<ProfileData> profileRequest(String full_name,String emailId,String phoneNumber) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
+    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+    String userId = prefs.getString(AppConstant.USER_ID);
+    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/updateProfile';
+    print('$versionApi , $storeId');
+
+    FormData formData = new FormData.from(
+        {"full_name": full_name,
+          "email":emailId,
+          "user_id":userId,
+          "device_id":deviceId,
+          "device_token":"",
+          "platform":"android"
+        }
+    );
+    Dio dio = new Dio();
+    Response response = await dio.post(versionApi, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    try {
+      print(response.data);
+      ProfileData profileData = ProfileData.fromJson(response.data);
+      print("----updateProfile--- ---${profileData.success}");
+
+      if(profileData != null && profileData.success){
+      //  SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
+        //SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
+      //  SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
+       // SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
+       // SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
+       // SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
+      //  SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
+        Utils.showToast("Profile Saved Successfully", true);
+      }
+      return profileData;
+
+    } catch (e) {
+      print(e);
+      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
+      print("-login-.ApiErrorResponse ---${storeData.success}");
+      Utils.showToast(storeData.message, true);
+      return null;
+    }
+    //{success: false, message: User already exist.}
+  }
+
+  static Future<List<OffersData>> storeOffersApiRequest_() async {
+    List<OffersData> data = new List();
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String storeId = prefs.getString(AppConstant.STORE_ID);
+      String userId = prefs.getString(AppConstant.USER_ID);
+      //store_id=1&user_id=424&area_id=1&order_facility=Delivery
+      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/storeOffers';
+      print('$deliveryAreas , $storeId');
+
+      FormData formData = new FormData.from({"store_id": storeId, "user_id":userId,
+      "order_facility": "Delivery"});
+
+      Dio dio = new Dio();
+      Response response = await dio.post(deliveryAreas, data: formData,
+          options: new Options( contentType: ContentType.parse("application/json")));
+      print(response.data);
+
+      StoreOffersResponse storeData = StoreOffersResponse.fromJson(response.data);
+      //Utils.showToast(storeData.message, false);
+      data = storeData.data;
+
+    } catch (e) {
+      print(e);
+    }
+    return data;
+  }
+
+
+  static Future<BookNowData> setStoreQuery(String full_name,String phoneNumber,String city,
+      String email,String dateAndTime,String messageText) async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String storeId = prefs.getString(AppConstant.STORE_ID);
+    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+    String userId = prefs.getString(AppConstant.USER_ID);
+    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/setStoreQuery';
+    print('$versionApi , $storeId');
+
+    FormData formData = new FormData.from(
+        {"store_id": full_name,
+          "device_id":deviceId,
+          "device_token":userId,
+          "platform":deviceId,
+          "user_id":userId,
+          "query":"android"
+        }
+    );
+    Dio dio = new Dio();
+    Response response = await dio.post(versionApi, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    try {
+      print(response.data);
+      BookNowData bookData = BookNowData.fromJson(response.data);
+      print("----updateProfile--- ---${bookData.success}");
+
+      if(bookData != null && bookData.success){
+        //  SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
+        //SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
+        //  SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
+        // SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
+        // SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
+        // SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
+        //  SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
+        Utils.showToast("Profile Saved Successfully", true);
+      }
+      return bookData;
+
+    } catch (e) {
+      print(e);
+      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
+      print("-login-.ApiErrorResponse ---${storeData.success}");
+      Utils.showToast(storeData.message, true);
+      return null;
+    }
+    //{success: false, message: User already exist.}
+  }
 }

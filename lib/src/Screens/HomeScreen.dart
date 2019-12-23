@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/AboutScreen.dart';
+import 'package:restroapp/src/Screens/AddDeliveryAddressScreen.dart';
+import 'package:restroapp/src/Screens/BookNowScreen.dart';
+import 'package:restroapp/src/Screens/ContactScreen.dart';
 import 'package:restroapp/src/Screens/LoginScreen.dart';
 import 'package:restroapp/src/Screens/MyCartScreen.dart';
+import 'package:restroapp/src/Screens/OfferScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -11,6 +16,9 @@ import 'package:restroapp/src/ui/CategoriesView.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'ProfileScreen.dart';
+import 'RegisterScreen.dart';
 
 class HomeScreen extends StatelessWidget {
 
@@ -110,7 +118,28 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
             MaterialPageRoute(builder: (context) => MyCart(context)),
           );
         }
+        if(_currentIndex == 1){
 
+          print('_offers------');
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) => OfferScreen(context)),
+          );
+          /*Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => OfferScreen()),
+          );*/
+        }
+        if(_currentIndex == 2){
+
+          print('_offers------');
+        }
+        if(_currentIndex == 3) {
+          print('_contact------');
+
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ContactScreen(context)),
+          );
+        }
       });
     }
 
@@ -236,7 +265,13 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
               leading: Icon(Icons.account_circle),
               title: Text('My Profile'),
               onTap: () {
+                print('My Profile----');
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen()),
+                );
+              //  Navigator.pop(context);
               },
             ),
             ListTile(
@@ -244,6 +279,11 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
               title: Text('Delivery Address'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
+                );
+
               },
             ),
             ListTile(
@@ -257,7 +297,15 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
               leading: Icon(Icons.assignment),
               title: Text('Book Now'),
               onTap: () {
+                print('--Book_Now--');
+
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => BookNowScreen(context)),
+                );
+
+               // Navigator.pop(context);
               },
             ),
             ListTile(
@@ -271,7 +319,12 @@ class _StoreListWithSearch extends State<HomeScreenUI> {
               leading: Icon(Icons.account_box),
               title: Text('About Us'),
               onTap: () {
+               // Navigator.pop(context);
                 Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutScreen(context)),
+                );
               },
             ),
             ListTile(

@@ -45,7 +45,6 @@ class CardviewState extends State<Cardview> {
                   title: Text('${store.store_name}:'),
                   subtitle: Text('${store.country}'),
                   onTap: () {
-                    //print("----onCardTapped-${store.id}");
                     onCardTapped(store.id);
                     //Go to the next screen with Navigator.push
                   },

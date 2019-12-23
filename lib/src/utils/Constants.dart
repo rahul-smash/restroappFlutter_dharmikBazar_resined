@@ -17,4 +17,8 @@ class AppConstant{
   static final String NOT_Refresh = "not_refresh_view";
   static final String ADD = "ADD";
   static final String EDIT = "EDIT";
+  static final String LAT = "lat";
+  static final String LNG = "lng";
+  static final String ABOUT_US = "about_us";
+// static final String IS_REFERNCE_FN_ENABLE = "IS_REFERNCE_FN_ENABLE";
 }
