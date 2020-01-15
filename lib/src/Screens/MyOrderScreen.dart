@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/OrderDetailScreen/OrderView.dart';
 import 'package:restroapp/src/Screens/OfferDetailScreen.dart';
 import 'package:restroapp/src/Screens/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
+import 'package:restroapp/src/models/orderHistory/GetOrderHistory.dart';
+import 'package:restroapp/src/ui/CardOrderHistoryItems.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 /*class OfferScreen extends StatefulWidget {
@@ -41,20 +44,20 @@ class _offerScreen extends State<OfferScreen> {
   AvailableOffersState createState() => state;
 
 }*/
-class OfferScreen extends StatefulWidget {
-  OfferScreen(BuildContext context);
+class MyOrderScreen extends StatefulWidget {
+  MyOrderScreen(BuildContext context);
 
   @override
-  _offerScreen createState() => new _offerScreen();
+  _MyOrderScreen createState() => new _MyOrderScreen();
 }
 
-class _offerScreen extends State<OfferScreen> {
+class _MyOrderScreen extends State<MyOrderScreen> {
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
     return new Scaffold(
       appBar: AppBar(
-        title: new Text('Offer'),
+        title: new Text('Order History'),
         centerTitle: true,
       ),
       /* shape: RoundedRectangleBorder(
@@ -65,7 +68,7 @@ class _offerScreen extends State<OfferScreen> {
 
   Widget projectWidget() {
     return FutureBuilder(
-      future: ApiController.storeOffersApiRequest_(),
+      future: ApiController.getOrderHistory(),
       builder: (context, projectSnap) {
         if (projectSnap.connectionState == ConnectionState.none &&
             projectSnap.hasData == null) {
@@ -76,10 +79,14 @@ class _offerScreen extends State<OfferScreen> {
 
             //print('---projectSnap.Data-length-${projectSnap.data.length}---');
             //return Container(color: const Color(0xFFFFE306));
-            List<OffersData> areaList = projectSnap.data;
+            List<OrderData> areaList = projectSnap.data;
+            print('---reaList.length-${areaList.length}---');
+            //print(${areaList.length});
             //return dialogContent(context,areaList,widget.selectedRadio);
+
+
             return Container(
-             /* decoration: new BoxDecoration(
+               decoration: new BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.rectangle,
                 boxShadow: [
@@ -89,10 +96,11 @@ class _offerScreen extends State<OfferScreen> {
                     offset: const Offset(0.0, 10.0),
                   ),
                 ],
-              ),*/
+              ),
               child: Container(
                 child: Column(
                   children: <Widget>[
+
 
                     Expanded(
                       child: ListView.separated(
@@ -101,24 +109,22 @@ class _offerScreen extends State<OfferScreen> {
                         separatorBuilder: (context, index) =>
                             Divider(height: 2.0, color: Colors.black),
                         itemBuilder: (context, index) {
-                          OffersData offer = areaList[index];
-                          return ListTile(
+
+                          OrderData orderHistoryData = areaList[index];
+                          print('--------@@OrderData-------'+orderHistoryData.orderId);
+
+                          //print('index: ${index}');
+                          return CardOrderHistoryItems(orderHistoryData);////////////////////////////////////
+                      /*    return ListTile(
+
                             title: Text(
-                              offer.discount + " Off ",
+                             "Order Number :" +orderHistoryData.orderId,
                               style: TextStyle(
+
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(" code : ${offer.couponCode}",
-                                    style: new TextStyle(
-                                      color: Colors.blue[4050],
-                                      fontSize: 20.0,
-                                      /*fontWeight: FontWeight.w900*/
-                                    )),
-                              ],
+                                  color: Colors.black,
+                                fontSize: 15.0
+                              ),
                             ),
                             trailing: Container(
                               child: GestureDetector(
@@ -127,16 +133,23 @@ class _offerScreen extends State<OfferScreen> {
                                   print('_offers------');
                                   Route route = MaterialPageRoute(
                                       builder: (context) =>
-                                          OfferDetailScreen(offer));
+                                          OrderView(orderHistoryData));
                                   Navigator.pushReplacement(context, route);
                                 },
                                 child: Container(
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(20.0),
-                                    child: Image.asset('images/arrow_right.png',
-                                        width: 30.0, height: 30.0),
 
-                                  ),
+                                  child: new FlatButton( onPressed: () {
+                                    *//*Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ContactScreen()),
+                    );*//*
+
+                                  }, child: new Text(
+                                    "View",
+                                    style: new TextStyle(color: Colors.redAccent),
+                                  )),
+
+
 
 
                                 ),
@@ -145,8 +158,30 @@ class _offerScreen extends State<OfferScreen> {
 
                             ),
 
-                          );
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text("Order date : ${orderHistoryData.orderDate}",
+                                    style: new TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15.0,
+                                      fontWeight: FontWeight.w900
+                                    )
 
+                                ),
+
+                                Text("Order Price: ${orderHistoryData.total}",
+                                    style: new TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 15.0,
+
+                                      fontWeight: FontWeight.w900
+                                    )),
+                              ],
+                            ),
+
+
+                          );*/
                         },
                       ),
 

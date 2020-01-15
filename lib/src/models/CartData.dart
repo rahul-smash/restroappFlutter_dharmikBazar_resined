@@ -9,7 +9,13 @@ class CartProductData {
   String _discount = "";
   String _quantity = "";
   String _isTaxEnable = "";
+  String _isunit_type = "";
 
+  String get isunit_type => _isunit_type;
+
+  set isunit_type(String value) {
+    _isunit_type = value;
+  }
 
   String get product_name => _product_name;
 
@@ -71,7 +77,11 @@ class CartProductData {
       "price": this.price,
       "product_id": this.product_id,
       "quantity": this.quantity,
-      "variant_id": this.variant_id
+      "variant_id": this.variant_id,
+      "product_name": this.product_name,
+      "weight": this._weight,
+      "mrp_price":this._mrp_price,
+      "unit_type":this._isunit_type,
     };
   }
 

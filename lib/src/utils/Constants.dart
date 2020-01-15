@@ -20,5 +20,14 @@ class AppConstant{
   static final String LAT = "lat";
   static final String LNG = "lng";
   static final String ABOUT_US = "about_us";
+  static final String DISCOUNT = "discount";
+  static final String TOTAL = "total";
+  static final String TAX = "tax";
+  static final String PAYMENT_MTHOD = "payment_method";
+
+  static final String AndroidShareLink = "android_share_link";
+
+  static final String COUPONCODE = "COUPONCODE";
+
 // static final String IS_REFERNCE_FN_ENABLE = "IS_REFERNCE_FN_ENABLE";
 }

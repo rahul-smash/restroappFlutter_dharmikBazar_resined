@@ -102,13 +102,17 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                         return new Card(
                           child: Column(
                             children: <Widget>[
+
                               Align(
                                 alignment: Alignment.centerLeft,
                                 child: Container(
                                   padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
                                   child: Row(
+
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
                                     children: <Widget>[
+
                                       Text(area.firstName,
                                         style: TextStyle(fontWeight: FontWeight.bold,
                                             color: Colors.black,
@@ -225,6 +229,7 @@ class _AddDeliveryAddressState extends State<AddDeliveryAddress> {
                                                         Navigator.of(context).pop();
 
                                                         Utils.showProgressDialog(context);
+
                                                         ApiController.deleteDeliveryAddressApiRequest(area.id).then((value){
 
                                                           Utils.hideProgressDialog(context);

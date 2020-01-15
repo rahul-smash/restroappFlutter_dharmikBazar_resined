@@ -14,7 +14,7 @@ description: A new Flutter application.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -42,6 +42,7 @@ dependencies:
   flutter_cupertino_date_picker: ^1.0.12
   webview_flutter: ^0.3.14+1
   flutter_html: ^0.8.2
+  flutter_share: 1.0.2+1
 dev_dependencies:
   flutter_test:
     sdk: flutter

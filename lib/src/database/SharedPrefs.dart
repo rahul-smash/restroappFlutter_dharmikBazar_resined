@@ -7,7 +7,10 @@ class SharedPrefs {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value);
   }
-
+  /*static Future storeSharedValueDouble(String key, double value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setDouble(key, value);
+  }*/
   static Future clearSharedPrefsValue(String key) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.remove(key);

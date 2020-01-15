@@ -195,6 +195,7 @@ class _ListTileItemState extends State<ListTileItem> {
     String productQuantity = quantity.toString();
     String isTaxEnable = subCatProducts.isTaxEnable;
     String title = subCatProducts.product_name;
+    String isunit_type=subCatProducts.isunit_type;
     var mId = int.parse(id);
     // row to insert
     Map<String, dynamic> row = {
@@ -208,6 +209,7 @@ class _ListTileItemState extends State<ListTileItem> {
       DatabaseHelper.QUANTITY: productQuantity,
       DatabaseHelper.IS_TAX_ENABLE: isTaxEnable,
       DatabaseHelper.Product_Name: title,
+      DatabaseHelper.UNIT_TYPE:isunit_type
     };
 
     databaseHelper
