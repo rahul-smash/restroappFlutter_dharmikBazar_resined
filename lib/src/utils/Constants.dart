@@ -5,6 +5,7 @@ class AppConstant{
   static final String DEVICE_ID = "DEVICE_ID";
   static final String STORE_ID = "STORE_ID";
   static final String USER_ID = "USER_ID";
+  static final String TAX_RATE = "TAX_RATE";
   static final String USER_NAME = "USER_NAME";
   static final String USER_EMAIL = "USER_EMAIL";
   static final String USER_PHONE = "USER_PHONE";

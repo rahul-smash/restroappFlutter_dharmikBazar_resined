@@ -129,7 +129,7 @@ class ApiController{
     request.add(utf8.encode(json.encode(jsonMap)));
     HttpClientResponse response = await request.close();
     String reply = await response.transform(utf8.decoder).join();
-    //print(reply);
+    print(reply);
     //print("API response $reply");
     httpClient.close();
     final parsed = json.decode(reply);
@@ -151,6 +151,9 @@ class ApiController{
     print(response.data);
     StoreData storeData = StoreData.fromJson(response.data);
     print("-------store.success ---${storeData.success}");
+
+    SharedPrefs.storeSharedValue(AppConstant.TAX_RATE, storeData.store.taxRate);
+
     return storeData;
   }
 
@@ -444,6 +447,60 @@ class ApiController{
       return storeData;
     } catch (e) {
       print("---Exception----multiple_tax_calculation--${e.toString()}--");
+      print(e);
+    }
+  }
+
+  static Future<TaxCalulationResponse> placeOrderApiRequest(String shipping_charges,
+      String note, String calculated_tax_detail,String coupon_code,
+      String user_address,String store_fixed_tax_detail,String store_tax_rate_detail,
+      String tax, String total,String checkout,int payment_method,
+      String json) async {
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String device_id = prefs.getString(AppConstant.DEVICE_ID);
+      String userId = prefs.getString(AppConstant.USER_ID);
+      String storeId = prefs.getString(AppConstant.STORE_ID);
+      String taxRate = prefs.getString(AppConstant.TAX_RATE);
+      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/multiple_tax_calculation';
+      print('$userId , $deliveryAreas');
+
+      String payment_methods ="";
+      if(payment_method == 0){
+        payment_methods="2";
+      }else{
+        payment_methods="3";
+      }
+
+      FormData formData = new FormData.from({
+        "shipping_charges":shipping_charges,
+        "note":note,
+        "calculated_tax_detail":calculated_tax_detail,
+        "coupon_code":coupon_code,
+        "user_address":user_address,
+        "store_fixed_tax_detail":store_fixed_tax_detail,
+        "tax":tax,
+        "store_tax_rate_detail":store_tax_rate_detail,
+        "store_tax_rate_detail":store_tax_rate_detail,
+        "store_tax_rate_detail":store_tax_rate_detail,
+        "store_tax_rate_detail":store_tax_rate_detail,
+        "platform":"android",
+        "tax_rate":taxRate,
+        "total":total,
+        "user_id":userId,
+        "device_token":userId,
+        "user_address_id":userId,
+        "checkout":checkout,
+        "payment_method":payment_methods,
+        "discount":payment_method,
+        "device_id":device_id,
+        "order_detail": '${json.toString()}'
+      });
+
+
+      //return storeData;
+    } catch (e) {
+      print("---Exception----${e.toString()}--");
       print(e);
     }
   }

@@ -8,6 +8,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
+import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/Constants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
@@ -189,6 +190,7 @@ class ProceedBottomBar extends StatefulWidget {
   int selectedRadio= 0;
   String applyCouponText = "Apply Coupon";
   String couponCodeValue = "Coupon code here..";
+  TaxCalulationResponse taxCalulationResponseData = null;
 
   @override
   _ProceedBottomBarState createState() => state;
@@ -309,7 +311,8 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                           if(dialog.totalPrice != 0.0){
                             totalPrice = dialog.totalPrice;
                             widget.applyCouponText = dialog.applyCouponText;
-                            widget.couponCodeValue =dialog.couponCodeValue;
+                            widget.couponCodeValue = dialog.couponCodeValue;
+                            widget.taxCalulationResponseData = dialog.taxCalulationResponseData;
                           }
                         });
                       });
@@ -394,6 +397,30 @@ class _ProceedBottomBarState extends State<ProceedBottomBar> {
                       if(isNetworkAvailable == true){
 
                         print("----NetworkAvailable == true-----");
+
+                        if(widget.taxCalulationResponseData !=null){
+
+                          String coupon_code = "";
+                          if(widget.applyCouponText == "Remove Coupon"){
+                            coupon_code = widget.couponCodeValue;
+
+                          }
+
+                          DatabaseHelper databaseHelper = new DatabaseHelper();
+                          databaseHelper.getCartItemsListToJson().then((json){
+                            ApiController.placeOrderApiRequest(widget.taxCalulationResponseData.data.shipping,
+                                "","", coupon_code, mArea.address, "", "",
+                                widget.taxCalulationResponseData.data.tax.toString(),
+                                widget.taxCalulationResponseData.data.total,
+                                widget.taxCalulationResponseData.data.itemSubTotal.toString(),
+                                widget.selectedRadio,
+                                json);
+                          });
+
+                        }else{
+                          print("----.taxCalulationResponseData NULL----");
+                        }
+
                       }else{
                         Utils.showToast(AppConstant.N0_INTERNET, false);
                       }
@@ -427,6 +454,7 @@ class AvailableOffersDialog extends StatefulWidget{
   int selectedRadio;
   String applyCouponText = "Apply Coupon";
   String couponCodeValue = "Coupon code here..";
+  TaxCalulationResponse taxCalulationResponseData = null;
 
   AvailableOffersState state = new AvailableOffersState();
 
@@ -528,6 +556,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                           ApiController.multipleTaxCalculationRequest(
                                               response.discountAmount.toString(),
                                               "0", "0.00", "0", json).then((response) {
+                                                widget.taxCalulationResponseData = response;
                                             widget.totalPrice = double.parse(
                                                 response.data.total);
                                             Utils.hideProgressDialog(context);
