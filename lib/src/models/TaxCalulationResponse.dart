@@ -1,76 +1,81 @@
-import 'dart:convert';
-
-TaxCalulationResponse taxCalulationResponseFromJson(String str) => TaxCalulationResponse.fromJson(json.decode(str));
-
-String taxCalulationResponseToJson(TaxCalulationResponse data) => json.encode(data.toJson());
-class TaxCalulationResponse {
+class TaxCalculationResponse {
   bool success;
-  Data data;
+  TaxCalculationModel taxCalculation;
 
-  TaxCalulationResponse({this.success, this.data});
+  TaxCalculationResponse({this.success, this.taxCalculation});
 
-  TaxCalulationResponse.fromJson(Map<String, dynamic> json) {
+  TaxCalculationResponse.fromJson(
+      String couponCode, Map<String, dynamic> json) {
     success = json['success'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    taxCalculation = json['data'] != null
+        ? TaxCalculationModel.fromJson(couponCode, json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
-    if (this.data != null) {
-      data['data'] = this.data.toJson();
+    if (this.taxCalculation != null) {
+      data['data'] = this.taxCalculation.toJson();
     }
     return data;
   }
 }
 
-class Data {
+class TaxCalculationModel {
   String total;
   double itemSubTotal;
   double tax;
   String discount;
   String shipping;
+  String couponCode;
   int fixedTaxAmount;
   List<TaxDetail> taxDetail;
   List<TaxLabel> taxLabel;
   List<FixedTax> fixedTax;
 
-  Data(
+  TaxCalculationModel(
       {this.total,
-        this.itemSubTotal,
-        this.tax,
-        this.discount,
-        this.shipping,
-        this.fixedTaxAmount,
-        this.taxDetail,
-        this.taxLabel,
-        this.fixedTax});
+      this.itemSubTotal,
+      this.tax,
+      this.discount,
+      this.shipping,
+      this.couponCode,
+      this.fixedTaxAmount,
+      this.taxDetail,
+      this.taxLabel,
+      this.fixedTax});
 
-  Data.fromJson(Map<String, dynamic> json) {
-    total = json['total'];
-    itemSubTotal = json['item_sub_total'];
-    tax = json['tax'];
-    discount = json['discount'];
-    shipping = json['shipping'];
-    fixedTaxAmount = json['fixed_tax_amount'];
+  factory TaxCalculationModel.fromJson(
+      String couponCode, Map<String, dynamic> json) {
+    TaxCalculationModel model = TaxCalculationModel();
+
+    model.total = json['total'];
+    model.itemSubTotal = json['item_sub_total'];
+    model.tax = json['tax'];
+    model.discount = json['discount'].toString();
+    model.shipping = json['shipping'];
+    model.couponCode = couponCode;
+    model.fixedTaxAmount = json['fixed_tax_amount'];
     if (json['tax_detail'] != null) {
-      taxDetail = new List<TaxDetail>();
+      model.taxDetail = new List<TaxDetail>();
       json['tax_detail'].forEach((v) {
-        taxDetail.add(new TaxDetail.fromJson(v));
+        model.taxDetail.add(new TaxDetail.fromJson(v));
       });
     }
     if (json['tax_label'] != null) {
-      taxLabel = new List<TaxLabel>();
+      model.taxLabel = new List<TaxLabel>();
       json['tax_label'].forEach((v) {
-        taxLabel.add(new TaxLabel.fromJson(v));
+        model.taxLabel.add(new TaxLabel.fromJson(v));
       });
     }
     if (json['fixed_Tax'] != null) {
-      fixedTax = new List<FixedTax>();
+      model.fixedTax = new List<FixedTax>();
       json['fixed_Tax'].forEach((v) {
-        fixedTax.add(new FixedTax.fromJson(v));
+        model.fixedTax.add(new FixedTax.fromJson(v));
       });
     }
+    return model;
   }
 
   Map<String, dynamic> toJson() {
@@ -144,10 +149,10 @@ class FixedTax {
 
   FixedTax(
       {this.sort,
-        this.fixedTaxLabel,
-        this.fixedTaxAmount,
-        this.isTaxEnable,
-        this.isDiscountApplicable});
+      this.fixedTaxLabel,
+      this.fixedTaxAmount,
+      this.isTaxEnable,
+      this.isDiscountApplicable});
 
   FixedTax.fromJson(Map<String, dynamic> json) {
     sort = json['sort'];
@@ -167,87 +172,3 @@ class FixedTax {
     return data;
   }
 }
-
-
-
-
-
-/*
-// To parse this JSON data, do
-//
-//     final taxCalulationResponse = taxCalulationResponseFromJson(jsonString);
-
-import 'dart:convert';
-
-TaxCalulationResponse taxCalulationResponseFromJson(String str) => TaxCalulationResponse.fromJson(json.decode(str));
-
-String taxCalulationResponseToJson(TaxCalulationResponse data) => json.encode(data.toJson());
-
-class TaxCalulationResponse {
-  bool success;
-  Data data;
-
-  TaxCalulationResponse({
-    this.success,
-    this.data,
-  });
-
-  factory TaxCalulationResponse.fromJson(Map<String, dynamic> json) => TaxCalulationResponse(
-    success: json["success"],
-    data: Data.fromJson(json["data"]),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "success": success,
-    "data": data.toJson(),
-  };
-}
-
-class Data {
-  String total;
-  double itemSubTotal;
-  int tax;
-  //String discount;
-  String shipping;
-  int fixedTaxAmount;
-  List<dynamic> taxDetail;
-  List<dynamic> taxLabel;
-  List<dynamic> fixedTax;
-
-  Data({
-    this.total,
-    this.itemSubTotal,
-    this.tax,
-    //this.discount,
-    this.shipping,
-    this.fixedTaxAmount,
-    this.taxDetail,
-    this.taxLabel,
-    this.fixedTax,
-  });
-
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-    total: json["total"],
-    itemSubTotal: json["item_sub_total"].toDouble(),
-    tax: json["tax"],
-    //discount: json["discount"],
-    shipping: json["shipping"],
-    fixedTaxAmount: json["fixed_tax_amount"],
-    taxDetail: List<dynamic>.from(json["tax_detail"].map((x) => x)),
-    taxLabel: List<dynamic>.from(json["tax_label"].map((x) => x)),
-    fixedTax: List<dynamic>.from(json["fixed_Tax"].map((x) => x)),
-  );
-
-  Map<String, dynamic> toJson() => {
-    "total": total,
-    "item_sub_total": itemSubTotal,
-    "tax": tax,
-    //"discount": discount,
-    "shipping": shipping,
-    "fixed_tax_amount": fixedTaxAmount,
-    "tax_detail": List<dynamic>.from(taxDetail.map((x) => x)),
-    "tax_label": List<dynamic>.from(taxLabel.map((x) => x)),
-    "fixed_Tax": List<dynamic>.from(fixedTax.map((x) => x)),
-  };
-}
-*/

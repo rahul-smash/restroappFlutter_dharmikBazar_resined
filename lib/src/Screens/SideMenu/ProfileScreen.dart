@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
-  _ProfileScreen createState() => new _ProfileScreen();
+  _ProfileState createState() => new _ProfileState();
 }
 
-class _ProfileScreen extends State<ProfileScreen> {
+class _ProfileState extends State<ProfileScreen> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
+  UserModel user;
+
   final nameController = new TextEditingController();
   final emailController = new TextEditingController();
   final phoneController = new TextEditingController();
@@ -18,11 +21,11 @@ class _ProfileScreen extends State<ProfileScreen> {
   @override
   initState() {
     super.initState();
-    _initProfileData();
+    getProfileData();
   }
 
-  _initProfileData() async {
-    UserModel user = await SharedPrefs.getUser();
+  getProfileData() async {
+    user = await SharedPrefs.getUser();
     setState(() {
       nameController.text = user.fullName;
       emailController.text = user.email;
@@ -61,7 +64,7 @@ class _ProfileScreen extends State<ProfileScreen> {
                       //
                       // Set the text of your controller to
                       // to the next value.
-                      onChanged: (v) => nameController.text = v,
+                      //onChanged: (v) => nameController.text = v,
                       decoration: InputDecoration(
                         labelText: 'Name',
                       )),
@@ -69,15 +72,8 @@ class _ProfileScreen extends State<ProfileScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: TextField(
-                      // Tell your textfield which controller it owns
                       controller: emailController,
-                      // Every single time the text changes in a
-                      // TextField, this onChanged callback is called
-                      // and it passes in the value.
-                      //
-                      // Set the text of your controller to
-                      // to the next value.
-                      onChanged: (v) => emailController.text = v,
+                     // onChanged: (v) => emailController.text = v,
                       decoration: InputDecoration(
                         labelText: 'EmailId',
                       )),
@@ -85,15 +81,8 @@ class _ProfileScreen extends State<ProfileScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: TextField(
-                      // Tell your textfield which controller it owns
                       controller: phoneController,
-                      // Every single time the text changes in a
-                      // TextField, this onChanged callback is called
-                      // and it passes in the value.
-                      //
-                      // Set the text of your controller to
-                      // to the next value.
-                      onChanged: (v) => phoneController.text = v,
+                     // onChanged: (v) => phoneController.text = v,
                       decoration: InputDecoration(
                         labelText: 'PhoneNumber',
                       )),
@@ -103,26 +92,21 @@ class _ProfileScreen extends State<ProfileScreen> {
                 ),
                 new Container(
                   height: 40.0,
-                  child: InkWell(
-                    onTap: () {
-                      print("on click message");
-                    },
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        new RaisedButton(
-                          child: const Text(
-                            'Submit',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          onPressed: _submitForm,
-                          color: Colors.deepOrange,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      new RaisedButton(
+                        child: const Text(
+                          'Save',
+                          style: TextStyle(color: Colors.white),
                         ),
-                      ],
-                    ),
+                        onPressed: _submitForm,
+                        color: appTheme,
+                      ),
+                    ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -142,25 +126,18 @@ class _ProfileScreen extends State<ProfileScreen> {
     if (!form.validate()) {
     } else {
       form.save();
-      ProgressDialog pr;
-      //For normal dialog
-      pr = new ProgressDialog(context,
-          type: ProgressDialogType.Normal,
-          isDismissible: false,
-          showLogs: false);
-      pr.show();
-
-      ApiController.profileRequest(
+      Utils.showProgressDialog(context);
+      ApiController.updateProfileRequest(
               nameController.text, emailController.text, phoneController.text)
           .then((response) {
-        print('--------Profile to back end.--------..');
-        if (response != null) {
-          print("${response.message}");
-          if (response.success) {
-            Navigator.pop(context);
-          }
+        Utils.hideProgressDialog(context);
+        if (response.success) {
+              user.fullName =  nameController.text;
+              user.email =  emailController.text;
+              user.phone =  phoneController.text;
+              SharedPrefs.saveUser(user);
+              Navigator.pop(context);
         }
-        pr.hide();
       });
     }
   }

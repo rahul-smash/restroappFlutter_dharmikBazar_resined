@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:restroapp/src/Screens/ContactScreen.dart';
-import 'package:restroapp/src/Screens/MyCartScreen.dart';
-import 'package:restroapp/src/Screens/MyOrderScreen.dart';
-import 'package:restroapp/src/Screens/OfferScreen.dart';
-import 'package:restroapp/src/Screens/SideMenu.dart';
+import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
+import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
+import 'package:restroapp/src/Screens/Offers/OfferScreen.dart';
+import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/ui/CategoryView.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
@@ -28,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<String> imgList = [];
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
-  String userName;
+  UserModel user;
 
   _HomeScreenState(this.store);
 
@@ -38,14 +41,15 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       if (store.banners.isEmpty) {
         imgList = [
-          AppConstant.PLACEHOLDER,
-          AppConstant.PLACEHOLDER,
-          AppConstant.PLACEHOLDER
+          AppConstant.placeholderImageUrl,
+          AppConstant.placeholderImageUrl,
+          AppConstant.placeholderImageUrl
         ];
       } else {
         for (var i = 0; i < store.banners.length; i++) {
           String imageUrl = store.banners[i].image;
-          imgList.add(imageUrl.isEmpty ? AppConstant.PLACEHOLDER : imageUrl);
+          imgList.add(
+              imageUrl.isEmpty ? AppConstant.placeholderImageUrl : imageUrl);
         }
       }
     } catch (e) {
@@ -61,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(store.storeName),
         centerTitle: true,
         leading: new IconButton(
-          icon: new Icon(Icons.menu),
+          icon: Image.asset('images/hamburger.png', width: 25),
           onPressed: _handleDrawer,
         ),
       ),
@@ -82,13 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Container(
                           padding:
                               const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
-                          decoration: BoxDecoration(
-                            border: new Border.all(color: Colors.deepOrange),
-                            image: DecorationImage(
-                              image: AssetImage("images/categories_bg.png"),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
+                          color: Colors.white,
                           child: GridView.count(
                               crossAxisCount: 2,
                               childAspectRatio: 1.3,
@@ -117,7 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: SideMenuScreen(store, userName),
+      drawer: SideMenuScreen(store, user == null ? null : user.fullName),
       bottomNavigationBar: addBottomBar(),
     );
   }
@@ -125,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget addBanners() {
     return CarouselSlider(
       viewportFraction: 0.9,
-      aspectRatio: 2.0,
+      aspectRatio: 1.7,
       autoPlay: true,
       enlargeCenterPage: false,
       items: imgList.map(
@@ -150,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return BottomNavigationBar(
       currentIndex: _currentIndex,
       // new
-      backgroundColor: Colors.red,
+      backgroundColor: appTheme,
       type: BottomNavigationBarType.fixed,
       onTap: onTabTapped,
       // new
@@ -158,20 +156,20 @@ class _HomeScreenState extends State<HomeScreen> {
         new BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart, color: Colors.white),
             title: Text('Cart', style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.red),
+            backgroundColor: appTheme),
         new BottomNavigationBarItem(
           icon: Icon(Icons.local_offer, color: Colors.white),
           title: Text('Offers', style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.red,
+          backgroundColor: appTheme,
         ),
         new BottomNavigationBarItem(
             icon: Icon(Icons.history, color: Colors.white),
             title: Text('History', style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.red),
+            backgroundColor: appTheme),
         new BottomNavigationBarItem(
             icon: Icon(Icons.contact_mail, color: Colors.white),
             title: Text('Contact', style: TextStyle(color: Colors.white)),
-            backgroundColor: Colors.red)
+            backgroundColor: appTheme)
       ],
     );
   }
@@ -182,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (_currentIndex == 0) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => MyCart(context)),
+          MaterialPageRoute(builder: (context) => MyCartScreen(() {})),
         );
       }
       if (_currentIndex == 1) {
@@ -192,10 +190,14 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
       if (_currentIndex == 2) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
-        );
+        if (AppConstant.isLoggedIn) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+          );
+        } else {
+          Utils.showLoginDialog(context);
+        }
       }
       if (_currentIndex == 3) {
         Navigator.push(
@@ -208,10 +210,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _handleDrawer() async {
     _key.currentState.openDrawer();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      userName = prefs.getString(AppConstant.USER_NAME);
-    });
+    if (AppConstant.isLoggedIn) {
+      user = await SharedPrefs.getUser();
+      setState(() {});
+    }
   }
 }

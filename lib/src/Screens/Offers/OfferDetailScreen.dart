@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
 
-
 class OfferDetailScreen extends StatefulWidget {
-  OffersData storeData;
+  OfferModel offer;
 
-  OfferDetailScreen(this.storeData);
+  OfferDetailScreen(this.offer);
 
   @override
   State<StatefulWidget> createState() {
     print("---------OfferDetailScreen---------");
 
-    return _offerDetailScreen(storeData);
+    return _offerDetailScreen(offer);
   }
 }
 
 class _offerDetailScreen extends State<OfferDetailScreen> {
-  OffersData offersData;
+  OfferModel offer;
 
-  _offerDetailScreen(this.offersData);
+  _offerDetailScreen(this.offer);
 
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-          title: new Text(offersData.couponCode),
+          title: new Text(offer.couponCode),
           centerTitle: true,
         ),
         body: Form(
@@ -51,36 +50,36 @@ class _offerDetailScreen extends State<OfferDetailScreen> {
                 padding: const EdgeInsets.only(top: 10),
                 child: Text(
                     'Valid From :' +
-                        offersData.validFrom +
+                        offer.validFrom +
                         'to' +
-                        offersData.validTo,
+                        offer.validTo,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 10),
-                child: Text('Usage Limit :' + offersData.usageLimit,
-                    style: TextStyle(fontSize: 18, color: Colors.black)),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text(
-                    'Minimum Order Amount :' + offersData.minimumOrderAmount,
-                    style: TextStyle(fontSize: 18, color: Colors.black)),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text('Discount :' + offersData.discount,
-                    style: TextStyle(fontSize: 18, color: Colors.black)),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text('Coupon Code :' + offersData.couponCode,
+                child: Text('Usage Limit :' + offer.usageLimit,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 10),
                 child: Text(
-                    'Terms n Condition :' + offersData.offerTermCondition,
+                    'Minimum Order Amount :' + offer.minimumOrderAmount,
+                    style: TextStyle(fontSize: 18, color: Colors.black)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text('Discount :' + offer.discount,
+                    style: TextStyle(fontSize: 18, color: Colors.black)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text('Coupon Code :' + offer.couponCode,
+                    style: TextStyle(fontSize: 18, color: Colors.black)),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Text(
+                    'Terms n Condition :' + offer.offerTermCondition,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               /*new Divider(
@@ -90,10 +89,7 @@ class _offerDetailScreen extends State<OfferDetailScreen> {
             ]),
           ),
         ]),
-
       ),
-
     );
-    ;
   }
 }

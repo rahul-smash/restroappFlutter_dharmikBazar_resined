@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
-import 'package:restroapp/src/Screens/SideMenu/AddDeliveryAddressScreen.dart';
-import 'package:restroapp/src/Screens/BookNowScreen.dart';
+import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
+import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginScreen.dart';
-import 'package:restroapp/src/Screens/SideMenu/MyOrderScreen.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
-import '../SideMenu/ProfileScreen.dart';
+import 'ProfileScreen.dart';
 
 class SideMenuScreen extends StatelessWidget {
   final StoreModel store;
@@ -19,50 +19,79 @@ class SideMenuScreen extends StatelessWidget {
   SideMenuScreen(this.store, this.userName);
 
   final _drawerItems = [
-    DrawerChildItem('Home', Icon(Icons.home)),
-    DrawerChildItem('My Profile', Icon(Icons.account_circle)),
-    DrawerChildItem('Delivery Address', Icon(Icons.location_on)),
-    DrawerChildItem('My Orders', Icon(Icons.shopping_cart)),
-    DrawerChildItem('Book Now', Icon(Icons.assignment)),
-    DrawerChildItem('My Favorites', Icon(Icons.favorite)),
-    DrawerChildItem('About Us', Icon(Icons.account_box)),
-    DrawerChildItem('Refer & Earn', Icon(Icons.share)),
-    DrawerChildItem('Login', Icon(Icons.exit_to_app)),
+    DrawerChildItem('Home', "images/home.png"),
+    DrawerChildItem('My Profile', "images/myprofile.png"),
+    DrawerChildItem('Delivery Address', "images/deliveryaddress.png"),
+    DrawerChildItem('My Orders', "images/my_order.png"),
+    DrawerChildItem('Book Now', "images/booknow.png"),
+    DrawerChildItem('My Favorites', "images/myfav.png"),
+    DrawerChildItem('About Us', "images/about.png"),
+    DrawerChildItem('Refer & Earn', "images/refer.png"),
+    DrawerChildItem('Login', "images/sign_in.png"),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-      child: ListView.builder(
-          padding: EdgeInsets.zero,
-          itemCount: _drawerItems.length + 1,
-          itemBuilder: (BuildContext context, int index) {
-            return (index == 0
-                ? UserAccountsDrawerHeader(
-                    decoration: BoxDecoration(
-                      color: Colors.black,
-                    ),
-                    accountName: Text('Welcome'),
-                    accountEmail: Text(userName ?? ''),
-                    currentAccountPicture:
-                        Image.asset("images/ic_launcher.png"),
-                  )
-                : createDrawerItem(index - 1, context));
-          }),
-    );
+    return Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: Color(0xff151515),
+        ),
+        child: Drawer(
+          child: ListView.builder(
+              padding: EdgeInsets.zero,
+              itemCount: _drawerItems.length + 1,
+              itemBuilder: (BuildContext context, int index) {
+                return (index == 0
+                    ? createHeaderInfoItem()
+                    : createDrawerItem(index - 1, context));
+              }),
+        ));
+  }
+
+  Widget createHeaderInfoItem() {
+    return Container(
+        color: Colors.black,
+        child: Padding(
+            padding: EdgeInsets.only(left: 35, top: 40, bottom: 30),
+            child: Row(children: [
+              Image.asset("images/app_icon.png"),
+              SizedBox(width: 10),
+              Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text('Welcome',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
+                    SizedBox(height: 5),
+                    Text(userName ?? '',
+                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                  ])
+            ])));
   }
 
   Widget createDrawerItem(int index, BuildContext context) {
     var item = _drawerItems[index];
-    return ListTile(
-      leading: item.icon,
-      title: index == _drawerItems.length - 1
-          ? Text(userName == null ? 'Login' : 'Logout')
-          : Text(item.title),
-      onTap: () {
-        _openPageForIndex(index, context);
-      },
-    );
+    return Padding(
+        padding: EdgeInsets.only(left: 20),
+        child: ListTile(
+          leading: Image.asset(
+              index == _drawerItems.length - 1
+                  ? userName == null
+                      ? 'images/sign_in.png'
+                      : 'images/sign_out.png'
+                  : item.icon,
+              width: 30),
+          title: index == _drawerItems.length - 1
+              ? Text(userName == null ? 'Login' : 'Logout',
+                  style: TextStyle(color: Color(0xff6A6A6A), fontSize: 15))
+              : Text(item.title,
+                  style: TextStyle(color: Color(0xff6A6A6A), fontSize: 15)),
+          onTap: () {
+            _openPageForIndex(index, context);
+          },
+        ));
   }
 
   _openPageForIndex(int pos, BuildContext context) {
@@ -71,25 +100,37 @@ class SideMenuScreen extends StatelessWidget {
         Navigator.pop(context);
         break;
       case 1:
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
-        );
+        if (AppConstant.isLoggedIn) {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ProfileScreen()),
+          );
+        } else {
+          Utils.showLoginDialog(context);
+        }
         break;
       case 2:
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
-        );
+        if (AppConstant.isLoggedIn) {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DeliveryAddressList(false)),
+          );
+        } else {
+          Utils.showLoginDialog(context);
+        }
         break;
       case 3:
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
-        );
+        if (AppConstant.isLoggedIn) {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+          );
+        } else {
+          Utils.showLoginDialog(context);
+        }
         break;
       case 4:
         Navigator.pop(context);
@@ -160,12 +201,12 @@ class SideMenuScreen extends StatelessWidget {
       SharedPreferences preferences = await SharedPreferences.getInstance();
       preferences.clear().then((status) {
         if (status == true) {
+          AppConstant.isLoggedIn = false;
           DatabaseHelper databaseHelper = new DatabaseHelper();
           databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
           databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
           databaseHelper.deleteTable(DatabaseHelper.Products_Table);
           databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-
           Utils.showToast(AppConstant.logoutSuccess, true);
         }
       });
@@ -187,6 +228,6 @@ class SideMenuScreen extends StatelessWidget {
 
 class DrawerChildItem {
   String title;
-  Icon icon;
+  String icon;
   DrawerChildItem(this.title, this.icon);
 }

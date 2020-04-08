@@ -1,38 +1,43 @@
-// To parse this JSON data, do
-//
-//     final registerUser = registerUserFromJson(jsonString);
-
-import 'dart:convert';
-
-RegisterUser registerUserFromJson(String str) => RegisterUser.fromJson(json.decode(str));
-
-String registerUserToJson(RegisterUser data) => json.encode(data.toJson());
-
-class RegisterUser {
+class ResponseModel {
   bool success;
-  Data data;
   String message;
 
-  RegisterUser({
+  ResponseModel({
     this.success,
-    this.data,
     this.message,
   });
 
-  factory RegisterUser.fromJson(Map<String, dynamic> json) => RegisterUser(
-    success: json["success"],
-    data: Data.fromJson(json["data"]),
-    message: json["message"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "success": success,
-    "data": data.toJson(),
-    "message": message,
-  };
+  factory ResponseModel.fromJson(Map<String, dynamic> json) => ResponseModel(
+        success: json["success"],
+        message: json["message"],
+      );
 }
 
-class Data {
+class UserResponse {
+  bool success;
+  String message;
+  UserModel user;
+
+  UserResponse({
+    this.success,
+    this.user,
+    this.message,
+  });
+
+  factory UserResponse.fromJson(Map<String, dynamic> json) => UserResponse(
+        success: json["success"],
+        user: json["data"] == null ? null : UserModel.fromJson(json["data"]),
+        message: json["message"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "success": success,
+        "data": user.toJson(),
+        "message": message,
+      };
+}
+
+class UserModel {
   String id;
   String onDuty;
   String lat;
@@ -55,7 +60,7 @@ class Data {
   bool blDeviceIdUnique;
   bool isRefererFnEnable;
 
-  Data({
+  UserModel({
     this.id,
     this.onDuty,
     this.lat,
@@ -79,51 +84,51 @@ class Data {
     this.isRefererFnEnable,
   });
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
-    id: json["id"],
-    onDuty: json["on_duty"],
-    lat: json["lat"],
-    lng: json["lng"],
-    fullName: json["full_name"],
-    fbId: json["fb_id"],
-    email: json["email"],
-    decodedPassword: json["decoded_password"],
-    phone: json["phone"],
-    profileImage: json["profile_image"],
-    otpVerify: json["otp_verify"],
-    userReferCode: json["user_refer_code"],
-    status: json["status"],
-    loginStatus: json["login_status"],
-    deviceId: json["device_id"],
-    deviceToken: json["device_token"],
-    platform: json["platform"],
-    verificationCode: json["verification_code"],
-    verificationCodeStatus: json["verification_code_status"],
-    blDeviceIdUnique: json["bl_device_id_unique"],
-    isRefererFnEnable: json["is_referer_fn_enable"],
-  );
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+        id: json["id"],
+        onDuty: json["on_duty"],
+        lat: json["lat"],
+        lng: json["lng"],
+        fullName: json["full_name"],
+        fbId: json["fb_id"],
+        email: json["email"],
+        decodedPassword: json["decoded_password"],
+        phone: json["phone"],
+        profileImage: json["profile_image"],
+        otpVerify: json["otp_verify"],
+        userReferCode: json["user_refer_code"],
+        status: json["status"],
+        loginStatus: json["login_status"],
+        deviceId: json["device_id"],
+        deviceToken: json["device_token"],
+        platform: json["platform"],
+        verificationCode: json["verification_code"],
+        verificationCodeStatus: json["verification_code_status"],
+        blDeviceIdUnique: json["bl_device_id_unique"],
+        isRefererFnEnable: json["is_referer_fn_enable"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "on_duty": onDuty,
-    "lat": lat,
-    "lng": lng,
-    "full_name": fullName,
-    "fb_id": fbId,
-    "email": email,
-    "decoded_password": decodedPassword,
-    "phone": phone,
-    "profile_image": profileImage,
-    "otp_verify": otpVerify,
-    "user_refer_code": userReferCode,
-    "status": status,
-    "login_status": loginStatus,
-    "device_id": deviceId,
-    "device_token": deviceToken,
-    "platform": platform,
-    "verification_code": verificationCode,
-    "verification_code_status": verificationCodeStatus,
-    "bl_device_id_unique": blDeviceIdUnique,
-    "is_referer_fn_enable": isRefererFnEnable,
-  };
+        "id": id,
+        "on_duty": onDuty,
+        "lat": lat,
+        "lng": lng,
+        "full_name": fullName,
+        "fb_id": fbId,
+        "email": email,
+        "decoded_password": decodedPassword,
+        "phone": phone,
+        "profile_image": profileImage,
+        "otp_verify": otpVerify,
+        "user_refer_code": userReferCode,
+        "status": status,
+        "login_status": loginStatus,
+        "device_id": deviceId,
+        "device_token": deviceToken,
+        "platform": platform,
+        "verification_code": verificationCode,
+        "verification_code_status": verificationCodeStatus,
+        "bl_device_id_unique": blDeviceIdUnique,
+        "is_referer_fn_enable": isRefererFnEnable,
+      };
 }

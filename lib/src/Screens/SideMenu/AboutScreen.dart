@@ -1,23 +1,32 @@
-import 'dart:async';
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:restroapp/src/utils/AppConstants.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 
 class AboutScreen extends StatefulWidget {
   AboutScreen(BuildContext context);
 
   @override
   State<StatefulWidget> createState() {
-    print("---------AboutScreen---------");
-
-    return _aboutScreen();
+    return _AboutScreenState();
   }
 }
 
-class _aboutScreen extends State<AboutScreen> {
+class _AboutScreenState extends State<AboutScreen> {
   String aboutUs;
+
+  @override
+  void initState() {
+    super.initState();
+    _aboutUsData();
+  }
+
+  _aboutUsData() async {
+    StoreModel store = await SharedPrefs.getStore();
+    setState(() {
+      aboutUs = store.aboutUs;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,40 +37,14 @@ class _aboutScreen extends State<AboutScreen> {
       ),
       body: new Container(
         child: SingleChildScrollView(
-          child: Html(
-            data: aboutUs,
-            padding: EdgeInsets.all(3.0),
-          ),
+          child: aboutUs == null
+              ? Container()
+              : Html(
+                  data: aboutUs,
+                  padding: EdgeInsets.all(10.0),
+                ),
         ),
       ),
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _aboutUsData();
-  }
-
-  _aboutUsData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      ///DO MY Logic CALLS
-      aboutUs = prefs.getString(AppConstant.ABOUT_US);
-      print('--@@aboutUs' + aboutUs);
-    });
-  }
-
-  Future<void> loadHtmlFromAssets(String filename, controller) async {
- //   String fileText = await rootBundle.loadString(filename);
-    controller
-        .loadUrl(
-            Uri.dataFromString('<html><body>hello world</body></html>',
-                    mimeType: 'text/html')
-                .toString(),
-            mimeType: 'text/html',
-            encoding: Encoding.getByName('utf-8'))
-        .toString();
   }
 }

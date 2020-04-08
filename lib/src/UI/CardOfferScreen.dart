@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:restroapp/src/Screens/HomeScreen.dart';
-import 'package:restroapp/src/apihandler/ApiController.dart';
-import 'package:restroapp/src/database/SharedPrefs.dart';
-import 'package:restroapp/src/models/StoreData.dart';
-import 'package:restroapp/src/models/offer/GetOfferData.dart';
-import 'package:restroapp/src/models/store_list.dart';
-import 'package:restroapp/src/utils/Constants.dart';
-import 'package:restroapp/src/utils/Utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:restroapp/src/models/StoreOffersResponse.dart';
 
 class CardOfferScreen extends StatefulWidget {
 
-  GetOfferData store;
+  StoreOffersResponse store;
 
   CardOfferScreen(this.store);
 
@@ -22,8 +14,7 @@ class CardOfferScreen extends StatefulWidget {
 }
 
 class CardOfferScreen_ extends State<CardOfferScreen> {
-
-  GetOfferData store;
+  StoreOffersResponse store;
   String renderUrl;
 
   CardOfferScreen_(this.store);

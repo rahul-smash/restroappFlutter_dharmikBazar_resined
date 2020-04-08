@@ -1,20 +1,3 @@
-class StoreListResponse {
-  bool success;
-  List<StoreModel> stores;
-
-  StoreListResponse({
-    this.success,
-    this.stores,
-  });
-
-  factory StoreListResponse.fromJson(Map<String, dynamic> json) =>
-      new StoreListResponse(
-        success: json["success"],
-        stores: List<StoreModel>.from(
-            json["data"].map((x) => StoreModel.fromJson(x))),
-      );
-}
-
 class StoreResponse {
   bool success;
   StoreModel store;
@@ -39,9 +22,12 @@ class StoreResponse {
 class StoreModel {
   String id;
   String storeName;
-  String country;
+  String location;
+  String city;
+  String state;
   String lat;
   String lng;
+  String contactNumber;
   String aboutUs;
   String androidShareLink;
   String storeLogo;
@@ -50,9 +36,12 @@ class StoreModel {
   StoreModel({
     this.id,
     this.storeName,
-    this.country,
+    this.location,
+    this.city,
+    this.state,
     this.lat,
     this.lng,
+    this.contactNumber,
     this.aboutUs,
     this.androidShareLink,
     this.storeLogo,
@@ -62,9 +51,12 @@ class StoreModel {
   factory StoreModel.fromJson(Map<String, dynamic> json) => new StoreModel(
         id: json["id"],
         storeName: json["store_name"],
-        country: json["country"],
+        location: json["location"],
+        city: json["city"],
+        state: json["state"],
         lat: json["lat"],
         lng: json["lng"],
+        contactNumber: json["contact_number"],
         aboutUs: json["about_us"],
         androidShareLink: json["android_share_link"],
         storeLogo: json["store_logo"],
@@ -76,9 +68,12 @@ class StoreModel {
   Map<String, dynamic> toJson() => {
         "id": id,
         "store_name": storeName,
-        "country": country,
+        "location": location,
+        "city": city,
+        "state": state,
         "lat": lat,
         "lng": lng,
+        "contact_number": contactNumber,
         "about_us": aboutUs,
         "android_share_link": androidShareLink,
         "store_logo": storeLogo,
@@ -142,75 +137,6 @@ class Banner {
         "image": image,
         "link_to": linkTo,
         "page_id": pageId,
-        "status": status,
-      };
-}
-
-class ForceDownload {
-  String iosAppVersion;
-  String androidAppVerison;
-  String windowAppVersion;
-  String forceDownload;
-  String forceDownloadMessage;
-
-  ForceDownload({
-    this.iosAppVersion,
-    this.androidAppVerison,
-    this.windowAppVersion,
-    this.forceDownload,
-    this.forceDownloadMessage,
-  });
-
-  factory ForceDownload.fromJson(Map<String, dynamic> json) =>
-      new ForceDownload(
-        iosAppVersion: json["ios_app_version"],
-        androidAppVerison: json["android_app_verison"],
-        windowAppVersion: json["window_app_version"],
-        forceDownload: json["force_download"],
-        forceDownloadMessage: json["force_download_message"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "ios_app_version": iosAppVersion,
-        "android_app_verison": androidAppVerison,
-        "window_app_version": windowAppVersion,
-        "force_download": forceDownload,
-        "force_download_message": forceDownloadMessage,
-      };
-}
-
-class Geofencing {
-  String id;
-  String message;
-  String lat;
-  String lng;
-  String radius;
-  String status;
-
-  Geofencing({
-    this.id,
-    this.message,
-    this.lat,
-    this.lng,
-    this.radius,
-    this.status,
-  });
-
-  factory Geofencing.fromJson(Map<String, dynamic> json) => new Geofencing(
-        id: json["id"],
-        message: json["message"],
-        lat: json["lat"],
-        lng: json["lng"],
-        radius: json["radius"],
-        status: json["status"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "message": message,
-        "lat": lat,
-        "lng": lng,
-        "radius": radius,
         "status": status,
       };
 }

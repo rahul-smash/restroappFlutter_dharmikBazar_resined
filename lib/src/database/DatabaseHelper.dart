@@ -3,9 +3,8 @@ import 'dart:io';
 import 'dart:math';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:restroapp/src/models/CartData.dart';
-import 'package:restroapp/src/models/Categories.dart';
-import 'package:restroapp/src/models/SubCategories.dart';
+import 'package:restroapp/src/models/CategoryResponseModel.dart';
+import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
@@ -33,6 +32,12 @@ class DatabaseHelper {
   static final String IS_TAX_ENABLE = "isTaxEnable";
   static final String Product_Name = "product_name";
   static final String UNIT_TYPE = "unit_type";
+  static final String nutrient = "nutrient";
+  static final String description = "description";
+  static final String imageType = "imageType";
+  static final String imageUrl = "imageUrl";
+  static final String image_100_80 = "image_100_80";
+  static final String image_300_200 = "image_300_200";
 
   Future<Database> get db async {
     if (_db != null) return _db;
@@ -84,6 +89,7 @@ class DatabaseHelper {
         "nutrient TEXT, "
         "description TEXT, "
         "image TEXT, "
+        "imageType TEXT, "
         "imageUrl TEXT, "
         "showPrice TEXT, "
         "isTaxEnable TEXT, "
@@ -102,6 +108,10 @@ class DatabaseHelper {
     await db.execute("CREATE TABLE ${CART_Table}("
         "id INTEGER PRIMARY KEY, "
         "product_name TEXT, "
+        "nutrient TEXT, "
+        "description TEXT, "
+        "imageType TEXT, "
+        "imageUrl TEXT, "
         "variant_id TEXT, "
         "product_id TEXT, "
         "weight TEXT, "
@@ -110,13 +120,15 @@ class DatabaseHelper {
         "discount TEXT, "
         "quantity TEXT, "
         "isTaxEnable TEXT, "
+        "image_100_80 TEXT, "
+        "image_300_200 TEXT, "
         "unit_type TEXT"
         ")");
   }
 
-  Future<int> saveCategories(CategoriesData categories) async {
+  Future<int> saveCategories(CategoryModel categoryModel) async {
     var dbClient = await db;
-    int res = await dbClient.insert(Categories_Table, categories.toMap());
+    int res = await dbClient.insert(Categories_Table, categoryModel.toMap());
     return res;
   }
 
@@ -128,13 +140,13 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<int> saveProducts(Product products, String favorite, String mrp_price,
-      String price, String discount, String var_id) async {
-    var dbClient = await db;
-    int res = await dbClient.insert(Products_Table,
-        products.toMap(favorite, mrp_price, price, discount, var_id));
-    return res;
-  }
+//  Future<int> saveProducts(Product products, String favorite, String mrp_price,
+//      String price, String discount, String var_id) async {
+//    var dbClient = await db;
+//    int res = await dbClient.insert(Products_Table,
+//        products.toMap(favorite, mrp_price, price, discount, var_id));
+//    return res;
+//  }
 
   Future<int> addProductToCart(Map<String, dynamic> row) async {
     var dbClient = await db;
@@ -148,15 +160,6 @@ class DatabaseHelper {
 
     return dbClient
         .update(CART_Table, row, where: "${ID} = ?", whereArgs: [product_id]);
-  }
-
-  Future<int> checkProductsExist(String table, String category_id) async {
-    //database connection
-    var dbClient = await db;
-    List<Map> list = await dbClient
-        .rawQuery('SELECT * from $table where category_ids = $category_id');
-    int count = list.length;
-    return count;
   }
 
   Future<String> getProductQuantitiy(int product_id) async {
@@ -226,12 +229,10 @@ class DatabaseHelper {
   /*
     this method will get all the data from cart table
   * */
-  Future<List<CartProductData>> getCartItemList() async {
-    List<CartProductData> cartList = new List();
-    //database connection
+  Future<List<Product>> getCartItemList() async {
+    List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
-      UNIT_TYPE,
       MRP_PRICE,
       PRICE,
       DISCOUNT,
@@ -239,25 +240,40 @@ class DatabaseHelper {
       Product_Name,
       VARIENT_ID,
       WEIGHT,
-      PRODUCT_ID
+      PRODUCT_ID,
+      UNIT_TYPE,
+      IS_TAX_ENABLE,
+      nutrient,
+      description,
+      imageType,
+      imageUrl,
+      image_100_80,
+      image_300_200
     ];
+
     List<Map> resultList =
         await dbClient.query(CART_Table, columns: columnsToSelect);
-    // print the results
     if (resultList != null && resultList.isNotEmpty) {
-      print("---result.length--- ${resultList.length}");
       resultList.forEach((row) {
-        CartProductData cartProductData = new CartProductData();
-        cartProductData.mrp_price = row[MRP_PRICE];
-        cartProductData.price = row[PRICE];
-        cartProductData.discount = row[DISCOUNT];
-        cartProductData.quantity = row[QUANTITY];
-        cartProductData.product_name = row[Product_Name];
-        cartProductData.variant_id = row[VARIENT_ID];
-        cartProductData.weight = row[WEIGHT];
-        cartProductData.product_id = row[PRODUCT_ID];
-        cartProductData.isunit_type = row[UNIT_TYPE]?? '';;
-        cartList.add(cartProductData);
+        Product product = new Product();
+        product.mrpPrice = row[MRP_PRICE];
+        product.price = row[PRICE];
+        product.discount = row[DISCOUNT];
+        product.quantity = row[QUANTITY];
+        product.title = row[Product_Name];
+        product.variantId = row[VARIENT_ID];
+        product.weight = row[WEIGHT];
+        product.id = row[PRODUCT_ID];
+        product.isUnitType = row[UNIT_TYPE] ?? '';
+        product.isTaxEnable = row[IS_TAX_ENABLE] ?? '0';
+        product.nutrient = row[nutrient];
+        product.description = row[description];
+        product.imageType = row[imageType];
+        product.imageUrl = row[imageUrl];
+        product.image10080 = row[image_100_80];
+        product.image300200 = row[image_300_200];
+
+        cartList.add(product);
       });
     } else {
       print("-empty cart-in db--");
@@ -266,47 +282,9 @@ class DatabaseHelper {
   }
 
   Future<String> getCartItemsListToJson() async {
-    List<CartProductData> cartList = new List();
-    //database connection
-    var dbClient = await db;
-    List<String> columnsToSelect = [
-      UNIT_TYPE,
-      MRP_PRICE,
-      PRICE,
-      DISCOUNT,
-      QUANTITY,
-      IS_TAX_ENABLE,
-      Product_Name,
-      VARIENT_ID,
-      WEIGHT,
-      PRODUCT_ID
-    ];
-    List<Map> resultList =
-        await dbClient.query(CART_Table, columns: columnsToSelect);
-    // print the results
-    if (resultList != null && resultList.isNotEmpty) {
-      print("---result.length--- ${resultList.length}");
-      resultList.forEach((row) {
-        CartProductData cartProductData = new CartProductData();
-        cartProductData.price = row[PRICE];
-        cartProductData.quantity = row[QUANTITY];
-        cartProductData.variant_id = row[VARIENT_ID];
-        cartProductData.product_id = row[PRODUCT_ID];
-        cartProductData.isTaxEnable = row[IS_TAX_ENABLE];
-        cartProductData.product_name = row[Product_Name];
-        cartProductData.weight = row[WEIGHT];
-        cartProductData.mrp_price = row[MRP_PRICE];
-        cartProductData.isunit_type = row[UNIT_TYPE]?? '';;
-        cartList.add(cartProductData);
-      });
-    } else {
-      print("-empty cart-in db--");
-    }
-    List jsonList = CartProductData.encondeToJson(cartList);
-    //print("jsonList: ${jsonList}");
+    List<Product> productCartList = await getCartItemList();
+    List jsonList = Product.encodeToJson(productCartList);
     String encodedDoughnut = jsonEncode(jsonList);
-    print("encodedDoughnut: ${encodedDoughnut}");
-
     return encodedDoughnut;
   }
 

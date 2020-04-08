@@ -1,34 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/Utils.dart';
+import 'dart:convert';
 
 class BookNowScreen extends StatefulWidget {
   BookNowScreen(BuildContext context);
 
   @override
   State<StatefulWidget> createState() {
-    print("---------BookNowScreen---------");
-
-    return _bookNowScreen();
+    return BookNowState();
   }
 }
 
-class _bookNowScreen extends State<BookNowScreen> {
+class BookNowState extends State<BookNowScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-  bool _validate = false;
-
-  final name_Controller = new TextEditingController();
-  final mobile_Controller = new TextEditingController();
-  final city_Controller = new TextEditingController();
-  final email_Controller = new TextEditingController();
-  final dateTime_Controller = new TextEditingController();
-  final messageBox_contrller = new TextEditingController();
-  BookNowData_ bookNowData=new BookNowData_();
-  @override
-
+  BookNowModel model = BookNowModel();
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +28,6 @@ class _bookNowScreen extends State<BookNowScreen> {
         centerTitle: true,
       ),
       body: Container(
-
         child: new SafeArea(
           top: false,
           bottom: false,
@@ -57,7 +45,7 @@ class _bookNowScreen extends State<BookNowScreen> {
                     inputFormatters: [new LengthLimitingTextInputFormatter(30)],
                     validator: (val) => val.isEmpty ? 'Name is required' : null,
                     onSaved: (val) {
-                      bookNowData._name = val;
+                      model.name = val;
                     },
                   ),
                   new TextFormField(
@@ -66,12 +54,13 @@ class _bookNowScreen extends State<BookNowScreen> {
                       labelText: 'Phone',
                     ),
                     keyboardType: TextInputType.phone,
-                    validator: (val) => val.isEmpty ? 'Phone is required' : null,
+                    validator: (val) =>
+                        val.isEmpty ? 'Phone is required' : null,
                     inputFormatters: [
                       WhitelistingTextInputFormatter.digitsOnly,
                     ],
                     onSaved: (val) {
-                      bookNowData._phoneBumber = val;
+                      model.phoneNumber = val;
                     },
                   ),
                   new TextFormField(
@@ -84,7 +73,7 @@ class _bookNowScreen extends State<BookNowScreen> {
                         ? null
                         : 'Please enter a valid email address',
                     onSaved: (val) {
-                      bookNowData._email = val;
+                      model.email = val;
                     },
                   ),
                   new TextFormField(
@@ -95,13 +84,10 @@ class _bookNowScreen extends State<BookNowScreen> {
                     keyboardType: TextInputType.visiblePassword,
                     validator: (val) => val.isEmpty ? 'City is required' : null,
                     onSaved: (val) {
-                      bookNowData._city = val;
+                      model.city = val;
                     },
                   ),
-
-
-
-             new TextFormField(
+                  new TextFormField(
                     decoration: const InputDecoration(
                       hintText: ' Type Message here',
                       labelText: 'enter Message here',
@@ -109,7 +95,7 @@ class _bookNowScreen extends State<BookNowScreen> {
                     keyboardType: TextInputType.visiblePassword,
                     validator: (val) => val.isEmpty ? 'enter message' : null,
                     onSaved: (val) {
-                      bookNowData.message = val;
+                      model.message = val;
                     },
                   ),
                   new Container(
@@ -126,7 +112,10 @@ class _bookNowScreen extends State<BookNowScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
                           new RaisedButton(
-                            child: const Text('Submit',style: TextStyle(color: Colors.white),),
+                            child: const Text(
+                              'Submit',
+                              style: TextStyle(color: Colors.white),
+                            ),
                             onPressed: _submitForm,
                             color: appTheme,
                           ),
@@ -141,86 +130,43 @@ class _bookNowScreen extends State<BookNowScreen> {
     );
   }
 
-
   bool isValidEmail(String input) {
-    final RegExp regex = new RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
+    final RegExp regex = new RegExp(
+        r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
     return regex.hasMatch(input);
   }
-
-
 
   void _submitForm() {
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
     } else {
       form.save();
-      ProgressDialog pr;
-      //For normal dialog
-      pr = new ProgressDialog(context,
-          type: ProgressDialogType.Normal,
-          isDismissible: false,
-          showLogs: false);
-      pr.show();
+      Utils.showProgressDialog(context);
 
-       ApiController.setStoreQuery(bookNowData._name, bookNowData._email,bookNowData._phoneBumber,
-         bookNowData._city, bookNowData._dateTime,bookNowData._message).then((response){
-        print('--------BookNowData--------..');
-        if(response != null){
-          print("${response.message}");
-          if(response.success){
-            Navigator.pop(context);
-          }
+      String queryString = json.encode({
+        "name": model.name,
+        "email": model.email,
+        "mobile": model.phoneNumber,
+        "city": model.city,
+        "datetime": "30-03-2020 15:36:00",
+        "message": model.message
+      });
+
+      ApiController.setStoreQuery(queryString).then((response) {
+        Utils.hideProgressDialog(context);
+        if (response.success) {
+          Navigator.pop(context);
         }
-        pr.hide();
       });
     }
   }
-
 }
 
-class BookNowData_ {
-  String _name = "";
-  String _email = '';
-  String _phoneBumber = '';
-  String _city = '';
-  String _dateTime = '';
-  String _message = '';
-
-  String get name => _name;
-
-  set name(String value) {
-    _name = value;
-  }
-
-
-  String get email => _email;
-
-  set email(String value) {
-    _email = value;
-  }
-
-  String get phoneBumber => _phoneBumber;
-
-  set phoneBumber(String value) {
-    _phoneBumber = value;
-  }
-
-  String get city => _city;
-
-  set city(String value) {
-    _city = value;
-  }
-
-  String get dateTime => _dateTime;
-
-  set dateTime(String value) {
-    _dateTime = value;
-  }
-
-  String get message => _message;
-
-  set message(String value) {
-    _message = value;
-  }
-
+class BookNowModel {
+  String name = '';
+  String email = '';
+  String phoneNumber = '';
+  String city = '';
+  String dateTime = '';
+  String message = '';
 }

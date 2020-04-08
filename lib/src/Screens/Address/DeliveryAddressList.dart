@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:restroapp/src/Screens/SideMenu/SaveDeliveryAddress.dart';
+import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -9,6 +9,9 @@ import 'package:restroapp/src/utils/Utils.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
 class DeliveryAddressList extends StatefulWidget {
+  final bool showProceedBar;
+  DeliveryAddressList(this.showProceedBar);
+
   @override
   _AddDeliveryAddressState createState() => _AddDeliveryAddressState();
 }
@@ -24,7 +27,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           title: Text("Delivery Addresses"),
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
+            icon: Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.pop(context, false),
           )),
       body: Column(
@@ -34,7 +37,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           addAddressList()
         ],
       ),
-      bottomNavigationBar: addProceedBar(),
+      bottomNavigationBar: widget.showProceedBar ? addProceedBar() : Container(height: 5),
     );
   }
 
@@ -114,88 +117,49 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   Widget addAddressCard(DeliveryAddressData area, int index) {
     return Card(
-      child: Column(
-        children: <Widget>[
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-              padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
+      child: Padding(
+          padding: EdgeInsets.only(top: 10, left: 6),
+          child: Column(children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text(
                     area.firstName,
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
-                        fontSize: 20.0),
+                        fontSize: 16.0),
                   ),
-                  Checkbox(
-                    value: selectedIndex == index,
-                    onChanged: (value) {
-                      setState(() {
-                        selectedIndex = index;
-                      });
-                    },
-                  ),
+                  addAddressInfoRow(Icons.phone, area.mobile),
+                  addAddressInfoRow(Icons.location_on, area.address),
+                  addAddressInfoRow(Icons.email, area.email),
                 ],
               ),
-            ),
-          ),
-          addAddressInfoRow(Icons.phone, area.mobile),
-          addAddressInfoRow(Icons.location_on, area.address),
-          addAddressInfoRow(Icons.email, area.email),
-          Divider(color: Colors.grey, thickness: 1.0),
-          Padding(
-            padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
-            child: new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Flexible(
-                  child: InkWell(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: new Text("Edit Address"),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                SaveDeliveryAddress(area, () {
-                              setState(() {});
-                            }),
-                            fullscreenDialog: true,
-                          ));
-                    },
-                  ),
-                ),
-                Container(
-                  color: Colors.grey,
-                  height: 30,
-                  width: 1,
-                ),
-                Flexible(
-                    child: InkWell(
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: new Text("Remove Address"),
-                  ),
-                  onTap: () {
-                    showDialogForDelete(area);
-                  },
-                )),
-              ],
-            ),
-          ),
-        ],
-      ),
+              Container(
+                child: Transform.scale(
+                    scale: 1.5,
+                    child: Checkbox(
+                      activeColor: Color(0xFFE0E0E0),
+                      checkColor: Colors.green,
+                      value: selectedIndex == index,
+                      onChanged: (value) {
+                        setState(() {
+                          selectedIndex = index;
+                        });
+                      },
+                    )),
+              )
+            ]),
+            Divider(color: Color(0xFFBDBDBD), thickness: 1.0),
+            addOperationBar(area)
+          ])),
     );
   }
 
   Widget addAddressInfoRow(IconData icon, String info) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(5, 10, 5, 0),
+      padding: EdgeInsets.fromLTRB(0, 10, 5, 0),
       child: Row(
         children: <Widget>[
           new Icon(
@@ -204,8 +168,57 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-            child: Text(info),
+            child: Text(info, style: TextStyle(color: infoLabel)),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget addOperationBar(DeliveryAddressData area) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+      child: new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Flexible(
+            child: InkWell(
+              child: Align(
+                alignment: Alignment.center,
+                child: new Text("Edit Address",
+                    style: TextStyle(
+                        color: infoLabel, fontWeight: FontWeight.w500)),
+              ),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) =>
+                          SaveDeliveryAddress(area, () {
+                        setState(() {});
+                      }),
+                      fullscreenDialog: true,
+                    ));
+              },
+            ),
+          ),
+          Container(
+            color: Colors.grey,
+            height: 30,
+            width: 1,
+          ),
+          Flexible(
+              child: InkWell(
+            child: Align(
+              alignment: Alignment.center,
+              child: new Text("Remove Address",
+                  style: TextStyle(
+                      color: infoLabel, fontWeight: FontWeight.w500)),
+            ),
+            onTap: () {
+              showDialogForDelete(area);
+            },
+          )),
         ],
       ),
     );

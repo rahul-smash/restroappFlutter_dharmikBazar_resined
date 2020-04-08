@@ -6,6 +6,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
@@ -44,24 +45,26 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
             title: Text('Delivery Addresses'),
             centerTitle: true,
             leading: IconButton(
-              icon: Icon(Icons.arrow_back),
+              icon: Icon(Icons.arrow_back_ios),
               onPressed: () => Navigator.pop(context),
             )),
-        body: SingleChildScrollView(
-          child: GestureDetector(
-              onTap: () {
-                FocusScope.of(context).requestFocus(FocusNode());
-              },
+        body: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+          child: SingleChildScrollView(
               child: Padding(
                   padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      SizedBox(height: 10),
+                      SizedBox(height: 20),
                       Align(
                         alignment: Alignment.center,
                         child: new Text(
-                          "Add Address",
+                          widget.selectedAddress != null
+                              ? "Edit Address"
+                              : "Add Address",
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
@@ -71,7 +74,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       SizedBox(height: 50),
                       Text(
                         "Area",
-                        style: TextStyle(color: Colors.black, fontSize: 17.0),
+                        style: TextStyle(color: infoLabel, fontSize: 17.0),
                       ),
                       Padding(
                           padding: EdgeInsets.fromLTRB(0, 20, 0, 5),
@@ -81,40 +84,26 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 context: context,
                                 builder: (BuildContext context) =>
                                     AreaOptionDialog((area) {
-                                      setState(() {
-                                        selectedArea = area;
-                                      });
+                                  setState(() {
+                                    selectedArea = area;
+                                  });
                                 }),
                               );
                             },
-                            child: Text(
-                              selectedArea != null
-                                  ? selectedArea.areaName
-                                  : "Select",
-                              style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 20.0,
-                              ),
-                            ),
+                            child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text(
+                                  selectedArea != null
+                                      ? selectedArea.areaName
+                                      : "Select",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20.0,
+                                  ),
+                                )),
                           )),
                       Divider(color: Colors.grey, height: 2.0),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
-                        child: InkWell(
-                          onTap: () {
-                            getLocation().then((value) {
-                              setState(() {
-                                addressController.text = value;
-                              });
-                            });
-                          },
-                          child: Text(
-                            "Get Current Location",
-                            style:
-                                TextStyle(color: Colors.black, fontSize: 17.0),
-                          ),
-                        ),
-                      ),
+                      SizedBox(height: 20),
                       Container(
                         color: Colors.grey[200],
                         height: 100.0,
@@ -129,14 +118,14 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               focusedBorder: InputBorder.none,
                               contentPadding: EdgeInsets.only(
                                   left: 5, bottom: 5, top: 5, right: 5),
-                              hintText: 'Enter Complete Address'),
+                              hintText: AppConstant.enterAddress),
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(
                           "Zip/Postal Code:",
-                          style: TextStyle(color: Colors.black, fontSize: 17.0),
+                          style: TextStyle(color: infoLabel, fontSize: 17.0),
                         ),
                       ),
                       Padding(
@@ -166,16 +155,17 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 side: BorderSide(color: appTheme)),
                             onPressed: () {
                               if (selectedArea == null) {
-                                Utils.showToast("Please select area", false);
+                                Utils.showToast(AppConstant.selectArea, false);
                               } else if (addressController.text
                                   .trim()
                                   .isEmpty) {
                                 Utils.showToast(
-                                    "Enter complete address", false);
+                                    AppConstant.pleaseEnterAddress, false);
                               } else if (zipCodeController.text
                                   .trim()
                                   .isEmpty) {
-                                Utils.showToast("Enter zipcode", false);
+                                Utils.showToast(
+                                    AppConstant.enterZipCode, false);
                               } else {
                                 // edit and save api
                                 Utils.showProgressDialog(context);
@@ -202,7 +192,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                             color: appTheme,
                             padding: EdgeInsets.all(5.0),
                             textColor: Colors.white,
-                            child: Text("Done", style: TextStyle(fontSize: 20, fontFamily: 'DIN')),
+                            child: Text("Done"),
                           ),
                         ),
                       ),
@@ -280,40 +270,51 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
           ),
         ],
       ),
-      child: Container(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+      child: Column(
+        children: <Widget>[
+          Container(
+              height: 40,
+              color: appTheme,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    "Select Area",
-                    style: TextStyle(color: Colors.black, fontSize: 20.0),
-                  ),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(width: 35.0),
+                  Text("Area",
+                      style: TextStyle(color: Colors.white, fontSize: 20.0)),
+                  IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  )
                 ],
-              ),
-            ),
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: areaList.length,
-                itemBuilder: (context, index) {
-                  StoreArea area = areaList[index];
-                  return ListTile(
+              )),
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: areaList.length,
+              itemBuilder: (context, index) {
+                StoreArea area = areaList[index];
+                return InkWell(
                     onTap: () {
                       widget.callback(area);
                       Navigator.pop(context, true);
                     },
-                    title: Text(area.areaName),
-                  );
-                },
-              ),
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        border: Border(
+                            bottom:
+                                BorderSide(width: 1.0, color: Colors.black)),
+                        color: Colors.white,
+                      ),
+                      child: Center(child: Text(area.areaName)),
+                    ));
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

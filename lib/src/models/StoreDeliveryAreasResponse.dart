@@ -1,81 +1,43 @@
-// To parse this JSON data, do
-//
-//     final storeAreaData = storeAreaDataFromJson(jsonString);
-
-import 'dart:convert';
-
-StoreAreaData storeAreaDataFromJson(String str) => StoreAreaData.fromJson(json.decode(str));
-
-String storeAreaDataToJson(StoreAreaData data) => json.encode(data.toJson());
-
-class StoreAreaData {
+class StoreDeliveryAreasResponse {
   bool success;
-  List<Area> data;
+  List<StoreArea> areas;
 
-  StoreAreaData({
+  StoreDeliveryAreasResponse({
     this.success,
-    this.data,
+    this.areas,
   });
 
-  factory StoreAreaData.fromJson(Map<String, dynamic> json) => StoreAreaData(
-    success: json["success"],
-    data: List<Area>.from(json["data"].map((x) => Area.fromJson(x))),
-  );
+  factory StoreDeliveryAreasResponse.fromJson(Map<String, dynamic> json) =>
+      StoreDeliveryAreasResponse(
+        success: json["success"],
+        areas: json["data"] == null
+            ? null
+            : List<StoreArea>.from(
+                json["data"].map((x) => StoreArea.fromJson(x))),
+      );
 
   Map<String, dynamic> toJson() => {
-    "success": success,
-    "data": List<dynamic>.from(data.map((x) => x.toJson())),
-  };
+        "success": success,
+        "data": List<dynamic>.from(areas.map((x) => x.toJson())),
+      };
 }
 
-class Area {
+class StoreArea {
   String id;
-  String cityId;
-  String storeId;
-  String minOrder;
-  String charges;
-  String note;
-  bool notAllow;
-  String radius;
-  String area;
-  String typeName;
+  String areaName;
 
-  Area({
+  StoreArea({
     this.id,
-    this.cityId,
-    this.storeId,
-    this.minOrder,
-    this.charges,
-    this.note,
-    this.notAllow,
-    this.radius,
-    this.area,
-    this.typeName,
+    this.areaName,
   });
 
-  factory Area.fromJson(Map<String, dynamic> json) => Area(
-    id: json["id"],
-    cityId: json["city_id"],
-    storeId: json["store_id"],
-    minOrder: json["min_order"],
-    charges: json["charges"],
-    note: json["note"],
-    notAllow: json["not_allow"],
-    radius: json["radius"],
-    area: json["area"],
-    typeName: json["typeName"],
-  );
+  factory StoreArea.fromJson(Map<String, dynamic> json) => StoreArea(
+        id: json["id"],
+        areaName: json["area"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "city_id": cityId,
-    "store_id": storeId,
-    "min_order": minOrder,
-    "charges": charges,
-    "note": note,
-    "not_allow": notAllow,
-    "radius": radius,
-    "area": area,
-    "typeName": typeName,
-  };
+        "id": id,
+        "area": areaName,
+      };
 }

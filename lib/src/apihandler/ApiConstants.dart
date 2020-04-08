@@ -1,14 +1,24 @@
 class ApiConstants{
+  static String baseUrl = 'https://app.restroapp.com/storeId/api_v5/';
 
-  static String storeList = 'https://app.restroapp.com/1/api_v5/storeList';
+  static String storeList = 'storeList';
+  static String version = 'version';
 
-  static String getCategories = 'https://app.restroapp.com/1/api_v5/getCategories';
+  static String getCategories = 'getCategories';
+  static String getProducts = 'getSubCategoryProducts/';
 
+  static String getAddress = 'deliveryAddress';
+  static String getAddressArea = 'deliveryAreas/Area';
+  static String storeOffers = 'storeOffers';
+  static String validateCoupon = 'validateAllCoupons';
+  static String multipleTaxCalculation = 'multiple_tax_calculation';
 
-  /*https://app.restroapp.com/1/api_v5/getSubCategoryProducts/418
-  device_id:abaf785580c22722
-  user_id:
-  device_token:fV2QVZi3Y0o%3AAPA91bFsOUUX0HnVMPJdTG8UGTk02ZPAFMhsu9Q9T_hLtCz5VQNGp-ILLyQThPzUK9CdzDwvZV64LaWBw14lQ2yuHAzSUaEInrxEOt3Oh8IEzL_iInKuX16Q6LGlgMeXu4IT2GYFGzQC
-  platform:android*/
+  static String placeOrder = 'placeOrder';
+  static String setStoreQuery = 'setStoreQuery';
+  static String orderHistory = 'orderHistory';
 
+  static String login = 'userLogin';
+  static String signUp = 'userSignup';
+  static String forgetPassword = 'forgetPassword';
+  static String updateProfile = 'updateProfile';
 }

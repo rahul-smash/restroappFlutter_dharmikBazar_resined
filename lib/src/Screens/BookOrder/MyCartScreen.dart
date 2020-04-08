@@ -1,26 +1,26 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/UI/CartBottomView.dart';
+import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
-import 'package:restroapp/src/models/CartData.dart';
-import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/models/SubCategoryResponse.dart';
 
-class MyCart extends StatelessWidget {
-
-  ProceedBottomBar proceedBottomBar = new ProceedBottomBar();
-  DatabaseHelper databaseHelper = new DatabaseHelper();
-
-  MyCart(BuildContext context);
+class MyCartScreen extends StatelessWidget {
+  final VoidCallback callback;
+  final CartTotalPriceBottomBar bottomBar =
+      CartTotalPriceBottomBar(ParentInfo.cartList);
+  final DatabaseHelper databaseHelper = new DatabaseHelper();
+  MyCartScreen(this.callback);
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
-          title: Text("My Cart"),
+          title: Text("MY CART"),
           centerTitle: true,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context, AppConstant.Refresh),
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.pop(context),
           )),
       body: WillPopScope(
           child: Column(
@@ -31,33 +31,25 @@ class MyCart extends StatelessWidget {
                 builder: (context, projectSnap) {
                   if (projectSnap.connectionState == ConnectionState.none &&
                       projectSnap.hasData == null) {
-                    //print('project snapshot data is: ${projectSnap.data}');
-                    return Container(color: const Color(0xFFFFE306));
+                    return Container();
                   } else {
                     if (projectSnap.hasData) {
-                      //print('---projectSnap.Data-length-${projectSnap.data.length}---');
                       return ListView.builder(
                         shrinkWrap: true,
-                        //Your Column doesn't know how much height it will take. use this
                         itemCount: projectSnap.data.length,
                         itemBuilder: (context, index) {
-                          CartProductData cartProductData =
-                          projectSnap.data[index];
-                          //print('-------ListView.builder-----${index}');
-                          return Column(
-                            children: <Widget>[
-                              new ListTileItem(cartProductData, proceedBottomBar),
-                            ],
-                          );
+                          Product product = projectSnap.data[index];
+                          return ProductTileItem(product, () {
+                            bottomBar.state.updateTotalPrice();
+                          });
                         },
                       );
                     } else {
-                      //print('-------CircularProgressIndicator----------');
                       return Center(
                         child: CircularProgressIndicator(
                             backgroundColor: Colors.black26,
                             valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.black26)),
+                                AlwaysStoppedAnimation<Color>(Colors.black26)),
                       );
                     }
                   }
@@ -66,259 +58,10 @@ class MyCart extends StatelessWidget {
             ],
           ),
           onWillPop: () async {
-            //Future.value(false);
-            //return a `Future` with false value so this route cant be popped or closed.
-            Navigator.pop(context, AppConstant.Refresh);
-            //print("WillPopScope");
+            Navigator.pop(context);
             return new Future(() => false);
           }),
-      bottomNavigationBar: proceedBottomBar,
-    );
-  }
-}
-
-//============================Cart List Item widget=====================================
-class ListTileItem extends StatefulWidget {
-  CartProductData cartProductData;
-  ProceedBottomBar proceedBottomBar;
-
-  ListTileItem(this.cartProductData, this.proceedBottomBar);
-
-  @override
-  _ListTileItemState createState() => new _ListTileItemState(proceedBottomBar);
-}
-
-//============================Cart List Item State=====================================
-class _ListTileItemState extends State<ListTileItem> {
-  ProceedBottomBar bottomBar;
-  int counter = 0;
-  DatabaseHelper databaseHelper = new DatabaseHelper();
-
-  _ListTileItemState(this.bottomBar);
-
-  @override
-  initState() {
-    super.initState();
-    //print("---initState product_id---${widget.cartProductData.product_id}-");
-    databaseHelper
-        .getProductQuantitiy(int.parse(widget.cartProductData.product_id))
-        .then((count) {
-      //print("---getProductQuantitiy---${count}");
-      counter = int.parse(count);
-      setState(() {});
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    //print("---_Widget build--${widget.subCatProducts.title}-and discount-${widget.subCatProducts.variants[0].discount}");
-    Row row;
-    String discount = widget.cartProductData.discount;
-    if (discount == "0.00" || discount == "0" || discount == "0.0") {
-      row = new Row(
-        children: <Widget>[
-          Text("\$${widget.cartProductData.price}"),
-        ],
-      );
-    } else {
-      row = new Row(
-        children: <Widget>[
-          Text("\$${widget.cartProductData.discount}",
-              style: TextStyle(decoration: TextDecoration.lineThrough)),
-          Text(" "),
-          Text("\$${widget.cartProductData.price}"),
-        ],
-      );
-    }
-
-    return new ListTile(
-      title: new Text(widget.cartProductData.product_name,
-          style: new TextStyle(
-              fontWeight: FontWeight.w500,
-              fontSize: 20.0,
-              color: Colors.deepOrange)),
-      //subtitle: new Text("\$${widget.subCatProducts.variants[0].price}"),
-      subtitle: row,
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          counter != 0
-              ? IconButton(
-                  icon: new Icon(Icons.remove),
-                  //onPressed: ()=> setState(()=> counter--),
-                  onPressed: () {
-                    setState(() => counter--);
-                    //print("--remove-onPressed-${counter}--");
-                    if (counter == 0) {
-                      // delete from cart table
-                      removeFromCartTable(widget.cartProductData.product_id);
-                    } else {
-                      // insert/update to cart table
-                      insertInCartTable(widget.cartProductData, counter);
-                    }
-                  },
-                )
-              : new Container(),
-          Text("${counter}"),
-          IconButton(
-            icon: Icon(Icons.add),
-            highlightColor: Colors.black,
-            onPressed: () {
-              setState(() => counter++);
-              //print("--add-onPressed-${counter}--");
-              if (counter == 0) {
-                // delete from cart table
-                removeFromCartTable(widget.cartProductData.product_id);
-              } else {
-                // insert/update to cart table
-                insertInCartTable(widget.cartProductData, counter);
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void insertInCartTable(CartProductData subCatProducts, int quantity) {
-    //print("--insertInCartTable-${counter}--");
-    String id = subCatProducts.product_id;
-    String variantsId = subCatProducts.variant_id;
-    String productId = subCatProducts.product_id;
-    String weight = subCatProducts.weight;
-    String mrp_price = subCatProducts.mrp_price;
-    String price = subCatProducts.price;
-    String discount = subCatProducts.discount;
-    String productQuantity = quantity.toString();
-    String isTaxEnable = subCatProducts.isTaxEnable;
-    String title = subCatProducts.product_name;
-    String isunit_type=subCatProducts.isunit_type;
-    var mId = int.parse(id);
-    // row to insert
-    Map<String, dynamic> row = {
-      DatabaseHelper.ID: mId,
-      DatabaseHelper.VARIENT_ID: variantsId,
-      DatabaseHelper.PRODUCT_ID: productId,
-      DatabaseHelper.WEIGHT: weight,
-      DatabaseHelper.MRP_PRICE: mrp_price,
-      DatabaseHelper.PRICE: price,
-      DatabaseHelper.DISCOUNT: discount,
-      DatabaseHelper.QUANTITY: productQuantity,
-      DatabaseHelper.IS_TAX_ENABLE: isTaxEnable,
-      DatabaseHelper.Product_Name: title,
-      DatabaseHelper.UNIT_TYPE:isunit_type
-    };
-
-    databaseHelper
-        .checkIfProductsExistInCart(DatabaseHelper.CART_Table, mId)
-        .then((count) {
-      //print("------checkProductsExist-----${count}");
-      if (count == 0) {
-        //print("------Products NOT ExistInCart-----${count}");
-        databaseHelper.addProductToCart(row).then((count) {
-          //print("--addProductToCart-${count}--");
-          bottomBar.state.updateTotalPrice();
-          //Utils.showToast("Product added in Cart", false);
-        });
-      } else {
-        //Utils.showToast("Product already Exist in Cart", false);
-        databaseHelper.updateProductInCart(row, mId).then((count) {
-          //print("-----updateProductInCart----${count}--");
-          bottomBar.state.updateTotalPrice();
-        });
-      }
-    });
-  }
-
-  void removeFromCartTable(String product_id) {
-    //print("--removeFromCartTable-${counter}--");
-    try {
-      databaseHelper
-          .delete(DatabaseHelper.CART_Table, int.parse(product_id))
-          .then((count) {
-        bottomBar.state.updateTotalPrice();
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-}
-
-class ProceedBottomBar extends StatefulWidget {
-  final _ProceedBottomBarState state = new _ProceedBottomBarState();
-
-  @override
-  _ProceedBottomBarState createState() => state;
-}
-
-class _ProceedBottomBarState extends State<ProceedBottomBar> {
-  double totalPrice = 0.00;
-  DatabaseHelper databaseHelper = new DatabaseHelper();
-  bool firstTime = false;
-
-  updateTotalPrice() {
-    databaseHelper.getTotalPrice().then((mtotalPrice) {
-      setState(() {
-        totalPrice = mtotalPrice;
-      });
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (firstTime == false) {
-      databaseHelper.getTotalPrice().then((mtotalPrice) {
-        firstTime = true;
-        setState(() {
-          totalPrice = mtotalPrice;
-        });
-      });
-    }
-
-    return Container(
-      height: 80.0,
-      color: Colors.deepOrange,
-      child: Column(
-        children: <Widget>[
-          InkWell(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(15, 8, 15, 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text("Total", style: TextStyle(color: Colors.white, fontSize: 20.0),),
-                  Text("\$${databaseHelper.roundOffPrice(totalPrice, 2)}",style: TextStyle(color: Colors.white, fontSize: 20.0),),
-                ],
-              ),
-            ),
-          ),
-          Divider(color: Colors.white, thickness: 2.0,),
-          InkWell(
-            onTap: () {
-//              SharedPrefs.checkUserLogin().then((checkUserLogin){
-//                if(checkUserLogin == true){
-//                  Navigator.push(
-//                    context,
-//                    MaterialPageRoute(builder: (context) => AddDeliveryAddress()),
-//                  );
-//                }else{
-//                  Utils.showToast("Please login to proceed further", false);
-//                }
-//              });
-            },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Text(
-                  "Place Order",
-                  style: TextStyle(color: Colors.white, fontSize: 20.0),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      bottomNavigationBar: bottomBar,
     );
   }
 }
