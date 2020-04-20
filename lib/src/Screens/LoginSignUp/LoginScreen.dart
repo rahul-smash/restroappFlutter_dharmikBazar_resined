@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
 import 'package:restroapp/src/UI/SocialLoginTabs.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -9,11 +10,15 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class LoginScreen extends StatefulWidget {
+  String menu;
+  LoginScreen(this.menu);
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginScreenState createState() => _LoginScreenState(menu);
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  String menu;
+  _LoginScreenState(this.menu);
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -131,17 +136,47 @@ class _LoginScreenState extends State<LoginScreen> {
             obscureText: true,
           ),
           SizedBox(height: 15),
-          Align(
+
+          MaterialButton(
+            onPressed: () {
+              print('@@ForgotPassword--clcik');
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ForgotPasswordScreen(menu)),
+                //    MaterialPageRoute(builder: (context) => LoginScreen()),
+              );
+            },
+            textColor: Colors.white,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                'Forgot password?',
+                style: TextStyle(
+                  fontFamily: 'Medium',
+                  fontSize: 14,
+                  color: colorBlueText,
+
+                ),
+
+              ),
+            ),
+          ),
+        /*  Align(
+
             child: Text(
               'Forgot password?',
               style: TextStyle(
                 fontFamily: 'Medium',
                 fontSize: 14,
                 color: colorBlueText,
+
               ),
+
             ),
+
             alignment: Alignment.centerRight,
-          ),
+          ),*/
+
           SizedBox(height: 10),
         ],
       ),
@@ -239,4 +274,6 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     });
   }
+
+
 }

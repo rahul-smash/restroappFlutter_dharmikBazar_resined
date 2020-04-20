@@ -46,5 +46,12 @@ class AppConstant {
   static final String enterOtp = "Please enter otp number";
 
 
+  static final String enterEmailAddress = "Please enter Email number";
+
+
+  static final String entertxForgotPssword = "Please enter your registered email id and we will email you the password.";
+
+
+  static final String txtSendEmail = "SEND EMAIL";
 
 }

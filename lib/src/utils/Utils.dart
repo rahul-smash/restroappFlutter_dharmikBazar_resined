@@ -52,8 +52,8 @@ class Utils {
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  //    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  MaterialPageRoute(builder: (context) => LoginMobileScreen("cart")),
+                     MaterialPageRoute(builder: (context) => LoginScreen("cart")),
+                //  MaterialPageRoute(builder: (context) => LoginMobileScreen("cart")),
                 );
               },
             ),

@@ -1,4 +1,5 @@
 
+import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
@@ -17,6 +18,7 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -126,7 +128,7 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> forgotPasswordApiRequest(String email) async {
+  static Future<GetForgotPwdData> forgotPasswordApiRequest(ForgotPasswordData forgotPasswordData) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -137,18 +139,18 @@ class ApiController {
 
     try {
       request.fields.addAll({
-        "email_id": email,
-        "device_id": deviceId,
+        "email_id": forgotPasswordData.email,
+   /*     "device_id": deviceId,
         "device_token": "",
-        "platform": Platform.isIOS ? "IOS" : "Android"
+        "platform": Platform.isIOS ? "IOS" : "Android"*/
       });
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
-      UserResponse userResponse = UserResponse.fromJson(parsed);
-      Utils.showToast(userResponse.message, true);
+      GetForgotPwdData userResponse = GetForgotPwdData.fromJson(parsed);
+      //Utils.showToast(userResponse.message, true);
       return userResponse;
     } catch (e) {
       Utils.showToast(e.toString(), true);
@@ -662,4 +664,7 @@ class ApiController {
       return null;
     }
   }
+
+
+
 }

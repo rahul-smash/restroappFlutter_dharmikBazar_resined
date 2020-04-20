@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
@@ -161,8 +162,8 @@ class SideMenuScreen extends StatelessWidget {
           Navigator.pop(context);
           Navigator.push(
             context,
-//            MaterialPageRoute(builder: (context) => LoginScreen()),
-            MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+           MaterialPageRoute(builder: (context) => LoginScreen("menu")),
+           // MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
 
           );
         }
