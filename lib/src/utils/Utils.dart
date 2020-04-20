@@ -83,7 +83,7 @@ class Utils {
   static void showProgressDialog(BuildContext context) {
     //For normal dialog
     if (pr != null && pr.isShowing()) {
-      pr.dismiss();
+      pr.hide();
     }
     pr = new ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
@@ -93,7 +93,7 @@ class Utils {
   static void hideProgressDialog(BuildContext context) {
     //For normal dialog
     if (pr != null && pr.isShowing()) {
-      pr.dismiss();
+      pr.hide();
     }
   }
 
