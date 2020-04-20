@@ -1,183 +1,179 @@
-import 'dart:io';
-import 'package:progress_dialog/progress_dialog.dart';
+
+import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
+import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
-import 'package:restroapp/src/models/ApiErrorResponse.dart';
-import 'package:restroapp/src/models/CartData.dart';
-import 'package:restroapp/src/models/Categories.dart';
+import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
-import 'package:restroapp/src/models/RegisterUserData.dart';
-import 'package:restroapp/src/models/StoreAreasData.dart';
-import 'package:restroapp/src/models/StoreData.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
-import 'package:restroapp/src/models/SubCategories.dart';
+import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
-import 'package:restroapp/src/models/store_list.dart';
-import 'dart:convert';
-import 'package:dio/dio.dart';
-import 'package:restroapp/src/utils/Constants.dart';
+import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:http/http.dart' as http;
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:io';
 
-class ApiController{
 
-  static Future<RegisterUser> registerApiRequest(String full_name,String password,String phone,String email) async {
-
+class ApiController {
+  static Future<StoreResponse> versionApiRequest(String storeId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String storeId = prefs.getString(AppConstant.STORE_ID);
-    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
+        ApiConstants.version;
 
-    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/userSignup';
-    print('$versionApi , $storeId');
-
-    FormData formData = new FormData.from(
-        {"full_name": full_name,
-          "password":password,
-          "device_id":deviceId,
-          "device_token":"",
-          "phone":phone,
-          "email":email,
-          "platform":"android"
-        }
-    );
-    Dio dio = new Dio();
-    Response response = await dio.post(versionApi, data: formData,
-        options: new Options(
-            contentType: ContentType.parse("application/json")));
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
-      print(response.data);
-      RegisterUser registerUser = RegisterUser.fromJson(response.data);
-      print("-------store.success ---${registerUser.success}");
+      request.fields.addAll({
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
 
-      if(registerUser != null && registerUser.success){
-        SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
-        SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
-        SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
-        SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
-        SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
-        SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
-        SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
-        Utils.showToast(registerUser.message, true);
-      }
-      return registerUser;
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
 
+      final parsed = json.decode(respStr);
+      StoreResponse storeData = StoreResponse.fromJson(parsed);
+      SharedPrefs.saveStore(storeData.store);
+      return storeData;
     } catch (e) {
-      print(e);
-      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
-      print("--.ApiErrorResponse ---${storeData.success}");
-      Utils.showToast(storeData.message, true);
+      Utils.showToast(e.toString(), true);
       return null;
     }
-    //{success: false, message: User already exist.}
   }
 
-  static Future<RegisterUser> loginApiRequest(String full_name,String password) async {
-
+  static Future<UserResponse> registerApiRequest(UserData user) async {
+    StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String storeId = prefs.getString(AppConstant.STORE_ID);
-    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+    String deviceId = prefs.getString(AppConstant.deviceId);
 
-    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/userLogin';
-    print('$versionApi , $storeId');
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.signUp;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
 
-    FormData formData = new FormData.from(
-        {"email": full_name,
-          "password":password,
-          "device_id":deviceId,
-          "device_token":"",
-          "platform":"android"
-        }
-    );
-    Dio dio = new Dio();
-    Response response = await dio.post(versionApi, data: formData,
-        options: new Options(
-            contentType: ContentType.parse("application/json")));
     try {
-      print(response.data);
-      RegisterUser registerUser = RegisterUser.fromJson(response.data);
-      print("----login---store.success ---${registerUser.success}");
+      request.fields.addAll({
+        "full_name": user.name,
+        "phone": user.phone,
+        "email": user.email,
+        "password": user.password,
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
 
-      if(registerUser != null && registerUser.success){
-        SharedPrefs.storeSharedValue(AppConstant.USER_ID, registerUser.data.id);
-        SharedPrefs.storeSharedValue(AppConstant.USER_NAME, registerUser.data.fullName);
-        SharedPrefs.storeSharedValue(AppConstant.USER_EMAIL, registerUser.data.email);
-        SharedPrefs.storeSharedValue(AppConstant.Profile_Image, registerUser.data.profileImage);
-        SharedPrefs.storeSharedValue(AppConstant.OTP_VERIFY, registerUser.data.otpVerify);
-        SharedPrefs.storeSharedValue(AppConstant.USER_PHONE, registerUser.data.phone);
-        SharedPrefs.storeSharedValue(AppConstant.User_Refer_Code, registerUser.data.userReferCode);
-        Utils.showToast("You have log in successfully", true);
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+
+      final parsed = json.decode(respStr);
+      UserResponse userResponse = UserResponse.fromJson(parsed);
+      if (userResponse.success) {
+        SharedPrefs.setUserLoggedIn(true);
+        SharedPrefs.saveUser(userResponse.user);
       }
-      return registerUser;
-
+      Utils.showToast(userResponse.message, true);
+      return userResponse;
     } catch (e) {
-      print(e);
-      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
-      print("-login-.ApiErrorResponse ---${storeData.success}");
-      Utils.showToast(storeData.message, true);
+      Utils.showToast(e.toString(), true);
       return null;
     }
-    //{success: false, message: User already exist.}
   }
 
-  static Future<List<StoreListModel>> storeListRequest(String url, Map jsonMap) async {
-    //print('$url , $jsonMap');
-    HttpClient httpClient = new HttpClient();
-    HttpClientRequest request = await httpClient.postUrl(Uri.parse(url));
-    request.headers.set('content-type', 'application/json');
-    request.add(utf8.encode(json.encode(jsonMap)));
-    HttpClientResponse response = await request.close();
-    String reply = await response.transform(utf8.decoder).join();
-    print(reply);
-    //print("API response $reply");
-    httpClient.close();
-    final parsed = json.decode(reply);
-    List<StoreListModel> storelist = (parsed["data"] as List).map<StoreListModel>((json) => new StoreListModel.fromJson(json)).toList();
-    //print(" storelist ${storelist.length}");
-    return storelist;
+  static Future<UserResponse> loginApiRequest(
+      String username, String password) async {
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.login;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "email": username,
+        "password": password,
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+
+      final parsed = json.decode(respStr);
+      UserResponse userResponse = UserResponse.fromJson(parsed);
+      if (userResponse.success) {
+        SharedPrefs.setUserLoggedIn(true);
+        SharedPrefs.saveUser(userResponse.user);
+      }
+      Utils.showToast(userResponse.message ?? "User loggedin successfully", true);
+      return userResponse;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
   }
 
-  static Future<StoreData> versionApiRequest(String storeId, String deviceId) async {
-    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/version';
-    print('$versionApi , $storeId');
+  static Future<UserResponse> forgotPasswordApiRequest(String email) async {
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
 
-    FormData formData = new FormData.from(
-        {"device_id": deviceId, "device_token":"", "platform":"android"});
-    Dio dio = new Dio();
-    Response response = await dio.post(versionApi, data: formData,
-        options: new Options(
-        contentType: ContentType.parse("application/json")));
-    print(response.data);
-    StoreData storeData = StoreData.fromJson(response.data);
-    print("-------store.success ---${storeData.success}");
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.forgetPassword;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
 
-    SharedPrefs.storeSharedValue(AppConstant.TAX_RATE, storeData.store.taxRate);
+    try {
+      request.fields.addAll({
+        "email_id": email,
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
 
-    return storeData;
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+
+      final parsed = json.decode(respStr);
+      UserResponse userResponse = UserResponse.fromJson(parsed);
+      Utils.showToast(userResponse.message, true);
+      return userResponse;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
   }
 
-  static Future<List<CategoriesData>> getCategoriesApiRequest(String storeId) async {
-    String categoriesUrl = "https://app.restroapp.com/${storeId}/api_v5/getCategories";
-    print('$storeId , $categoriesUrl');
+  static Future<CategoryResponse> getCategoriesApiRequest(
+      String storeId) async {
+    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
+        ApiConstants.getCategories;
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
 
-    Response response = await Dio().get(categoriesUrl);
-    //print(response);
-    Categories categories = Categories.fromJson(response.data);
-    print("-------Categories.length ---${categories.data.length}");
+    final response = await request.send();
+    final respStr = await response.stream.bytesToString();
 
+    final parsed = json.decode(respStr);
+    CategoryResponse categoryResponse = CategoryResponse.fromJson(parsed);
     try {
       DatabaseHelper databaseHelper = new DatabaseHelper();
-      databaseHelper.getCount(DatabaseHelper.Categories_Table).then((count){
-        print("---Categories-getCount------${count}");
-        if(count == 0){
-          for (int i = 0; i< categories.data.length; i++) {
-            databaseHelper.saveCategories(categories.data[i]);
-            String cat_id = categories.data[i].id;
-
-            if(categories.data[i].subCategory != null){
-              for (int j = 0; j< categories.data[i].subCategory.length; j++) {
-                databaseHelper.saveSubCategories(categories.data[i].subCategory[j],cat_id);
+      databaseHelper.getCount(DatabaseHelper.Categories_Table).then((count) {
+        if (count == 0) {
+          for (int i = 0; i < categoryResponse.categories.length; i++) {
+            CategoryModel model = categoryResponse.categories[i];
+            databaseHelper.saveCategories(model);
+            if (model.subCategory != null) {
+              for (int j = 0; j < model.subCategory.length; j++) {
+                databaseHelper.saveSubCategories(
+                    model.subCategory[j], model.id);
               }
             }
           }
@@ -186,324 +182,403 @@ class ApiController{
     } catch (e) {
       print(e);
     }
-    return categories.data;
+    return categoryResponse;
   }
 
-  static Future<List<Product>> getSubCategoryProducts(String catId ) async {
-
+  static Future<SubCategoryResponse> getSubCategoryProducts(
+      String subCategoryId) async {
+    StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String storeId = prefs.getString(AppConstant.STORE_ID);
-    String deviceId = prefs.getString(AppConstant.DEVICE_ID);
+    String deviceId = prefs.getString(AppConstant.deviceId);
 
-    String versionApi = 'https://app.restroapp.com/${storeId}/api_v5/getSubCategoryProducts/${catId}';
-    print('$storeId , $versionApi');
-
-    FormData formData = new FormData.from(
-        {"device_id": deviceId, "device_token":"", "user_id":"", "platform":"android"});
-    Dio dio = new Dio();
-    Response response = await dio.post(versionApi, data: formData,
-        options: new Options(
-            contentType: ContentType.parse("application/json")));
-    //print(response.data.toString());
-    SubCategories subCategories = SubCategories.fromJson(response.data);
-    //print("-------subCategories.length ---${subCategories.data.length}");
-    if(subCategories.success){
-
-    }else{
-      Utils.showToast("No data found", false);
-    }
-
-    List<Product> subProductList = subCategories.data[0].products;
-    //print("--1-----ProductList ---${subProductList.length}");
-
-    DatabaseHelper databaseHelper = new DatabaseHelper();
-    for(int i = 0; i < subProductList.length; i++){
-      //print("-------Product-title ---${subProductList[i].title}");
-      databaseHelper.checkProductsExist(DatabaseHelper.Products_Table, subProductList[i].categoryIds).then((count){
-        //print("------checkProductsExist-----${count}");
-        if(count == 0){
-          databaseHelper.saveProducts(subProductList[i],DatabaseHelper.Favorite,
-              subProductList[i].variants[0].mrpPrice,
-              subProductList[i].variants[0].price, subProductList[i].variants[0].discount
-              ,subProductList[i].variants[0].id);
-        }
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getProducts +
+        subCategoryId;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "user_id": "",
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android"
       });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+
+      final parsed = json.decode(respStr);
+      SubCategoryResponse subCategoryResponse =
+          SubCategoryResponse.fromJson(parsed);
+      return subCategoryResponse;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
     }
-    //print("----2---ProductList ---${subProductList.length}");
-    return subProductList;
   }
 
-  static Future<List<Area>> deliveryAreasRequest() async {
-    List<Area> areaList = new List();
+  static Future<DeliveryAddressResponse> getAddressApiRequest() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getAddress;
+
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "method": "GET",
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+      DeliveryAddressResponse deliveryAddressResponse =
+          DeliveryAddressResponse.fromJson(parsed);
+      return deliveryAddressResponse;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<StoreDeliveryAreasResponse> getDeliveryArea() async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getAddressArea;
+
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+    try {
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+      StoreDeliveryAreasResponse storeArea =
+          StoreDeliveryAreasResponse.fromJson(parsed);
+      return storeArea;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<DeliveryAddressResponse> saveDeliveryAddressApiRequest(
+      String method,
+      String zipCode,
+      String address,
+      String areaId,
+      String areaName,
+      String addressId) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getAddress;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "method": method,
+        "user_id": user.id,
+        "zipcode": zipCode,
+        "country": "",
+        "address": address,
+        "city": "",
+        "area_name": areaName,
+        "mobile": user.phone,
+        "state": "",
+        "area_id": areaId,
+        "first_name": user.fullName,
+        "email": user.email
+      });
+
+      if (addressId != null) {
+        request.fields["address_id"] = addressId;
+      }
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      DeliveryAddressResponse res = DeliveryAddressResponse.fromJson(parsed);
+      return res;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<DeliveryAddressResponse> deleteDeliveryAddressApiRequest(
+      String addressId) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String storeId = prefs.getString(AppConstant.STORE_ID);
+    String deviceId = prefs.getString(AppConstant.deviceId);
 
-    String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAreas/Area';
-    print('$deliveryAreas , $storeId');
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getAddress;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
 
-    Response response = await Dio().get(deliveryAreas);
-    print(response.data.toString());
-    StoreAreaData storeAreaData = StoreAreaData.fromJson(response.data);
-    //print("-------store.success ---${storeAreaData.success}");
-    areaList = storeAreaData.data;
-    return areaList;
+    try {
+      request.fields.addAll({
+        "method": "DELETE",
+        "device_id": deviceId,
+        "user_id": user.id,
+        "address_id": addressId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      DeliveryAddressResponse res = DeliveryAddressResponse.fromJson(parsed);
+      return res;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
   }
 
-  static Future<List<DeliveryAddressData>> deliveryAddressApiRequest() async {
-    List<DeliveryAddressData> dataList = new List();
+  static Future<StoreOffersResponse> storeOffersApiRequest(
+      String areaId) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.storeOffers;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "store_id": store.id,
+        "user_id": user.id,
+        "order_facility": "Delivery"
+      });
+
+      if (areaId != null) {
+        request.fields["area_id"] = areaId;
+      }
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      StoreOffersResponse res = StoreOffersResponse.fromJson(parsed);
+      return res;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<ValidateCouponResponse> validateOfferApiRequest(
+      String couponCode, String paymentMode, String orderJson) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String storeId = prefs.getString(AppConstant.STORE_ID);
-    String userId = prefs.getString(AppConstant.USER_ID);
-    String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAddress';
-    print('$deliveryAreas , $storeId');
+    String deviceId = prefs.getString(AppConstant.deviceId);
 
-    FormData formData = new FormData.from({"method": "GET", "user_id":userId});
-    Dio dio = new Dio();
-    Response response = await dio.post(deliveryAreas, data: formData,
-        options: new Options( contentType: ContentType.parse("application/json")));
-    //print(response.data.toString());
-    DeliveryAddressResponse deliveryAddressResponse = DeliveryAddressResponse.fromJson(response.data);
-    //print("--DeliveryAddressResponse---${deliveryAddressResponse.success}");
-    dataList = deliveryAddressResponse.data;
-    if(deliveryAddressResponse.success){
-      if(deliveryAddressResponse.data.isEmpty){
-        Utils.showToast("No address found!", false);
-      }
-    }else{
-      //Utils.showToast("No data found!", false);
-    }
-    return dataList;
-  }
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.validateCoupon;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
 
-  static Future<String> saveDeliveryAddressApiRequest(String method,
-      String zipcode,String address,String area_id,String area_name,String address_id) async {
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String storeId = prefs.getString(AppConstant.STORE_ID);
-      String userId = prefs.getString(AppConstant.USER_ID);
-      String mobile = prefs.getString(AppConstant.USER_PHONE);
-      String first_name = prefs.getString(AppConstant.USER_NAME);
-      String email = prefs.getString(AppConstant.USER_EMAIL);
+      request.fields.addAll({
+        "coupon_code": couponCode,
+        "device_id": deviceId,
+        "user_id": user.id,
+        "device_token": "",
+        "orders": "$orderJson",
+        "payment_method": paymentMode,
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
 
-      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAddress';
-      print('$method , $deliveryAreas');
-      FormData formData;
-      if(method == AppConstant.EDIT){
-        formData = new FormData.from(
-            {
-              "method": method, "user_id":userId,"address_id":address_id,
-              "zipcode": zipcode, "country":"","address": address, "city":"" ,"area_name":area_name,
-              "mobile":mobile,"state":"","area_id":area_id,"first_name":first_name,"email":email
-            }
-        );
-      }else{
-        formData = new FormData.from(
-            {
-              "method": method, "user_id":userId,
-              "zipcode": zipcode, "country":"","address": address, "city":"" ,"area_name":area_name,
-              "mobile":mobile,"state":"","area_id":area_id,"first_name":first_name,"email":email
-            }
-        );
-      }
-
-      //print(formData.toString());
-      Dio dio = new Dio();
-      Response response = await dio.post(deliveryAreas, data: formData,
-              options: new Options( contentType: ContentType.parse("application/json")));
-      //print(response.data.toString());
-
-      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
-      Utils.showToast(storeData.message, false);
-
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+      ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
+      return model;
     } catch (e) {
-      print(e);
-    }
-    return "";
-  }
-
-  /*======================================
-  https://app.restroapp.com/1/api_v5/deliveryAddress
-  device_id=abaf785580c22722&
-  method=DELETE&
-  user_id=396
-  &device_token=e7RIye653Cg%3AAPA91bGiSiG_TK1WYTWpulosswo6KtYU6ghbvjDDAQMt9b94zuWl_OUfTeGqsevVnw6oZmKZxiu2siot-9Sg8y-fuOQfDBc0NCfbjH_f66rAYHoqpwkVIJ0prVXY3-AS1vZX3yzkhFNJ&
-  address_id=143&
-  platform=android
-*/
-  static Future<String> deleteDeliveryAddressApiRequest(String address_id) async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String storeId = prefs.getString(AppConstant.STORE_ID);
-      String userId = prefs.getString(AppConstant.USER_ID);
-      String device_id = prefs.getString(AppConstant.DEVICE_ID);
-
-      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/deliveryAddress';
-      print('$deliveryAreas , $storeId');
-
-      FormData formData = new FormData.from({"method": "DELETE", "device_id":device_id,
-        "user_id": userId, "device_token":"","address_id": address_id,"platform":"android"});
-
-      Dio dio = new Dio();
-      Response response = await dio.post(deliveryAreas, data: formData,
-          options: new Options( contentType: ContentType.parse("application/json")));
-      //print(response.data);
-
-      ApiErrorResponse storeData = ApiErrorResponse.fromJson(response.data);
-      Utils.showToast(storeData.message, false);
-
-    } catch (e) {
-      print(e);
-    }
-    return "";
-  }
-
-  static Future<List<OffersData>> storeOffersApiRequest(String area_id) async {
-    List<OffersData> data = new List();
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String storeId = prefs.getString(AppConstant.STORE_ID);
-      String userId = prefs.getString(AppConstant.USER_ID);
-      //store_id=1&user_id=424&area_id=1&order_facility=Delivery
-      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/storeOffers';
-      print('$deliveryAreas , $storeId');
-
-      FormData formData = new FormData.from({"store_id": storeId, "user_id":userId,
-        "area_id": area_id,"order_facility": "Delivery"});
-
-      Dio dio = new Dio();
-      Response response = await dio.post(deliveryAreas, data: formData,
-          options: new Options( contentType: ContentType.parse("application/json")));
-      print(response.data);
-
-      StoreOffersResponse storeData = StoreOffersResponse.fromJson(response.data);
-      //Utils.showToast(storeData.message, false);
-      data = storeData.data;
-
-    } catch (e) {
-      print(e);
-    }
-    return data;
-  }
-
-  static Future<ValidateCouponsResponse> validateOfferApiRequest(OffersData offer,int area_id, String json) async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String device_id = prefs.getString(AppConstant.DEVICE_ID);
-      String userId = prefs.getString(AppConstant.USER_ID);
-      String storeId = prefs.getString(AppConstant.STORE_ID);
-      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/validateAllCoupons';
-      print('$userId , $deliveryAreas');
-      String payment_method="";
-      if(area_id == 0){
-        payment_method="2";
-      }else{
-        payment_method="3";
-      }
-
-      FormData formData = new FormData.from({"coupon_code": offer.couponCode, "device_id":device_id,
-        "user_id": userId,"device_token": "","orders": "${json}",
-        "platform": "android","payment_method": payment_method});
-
-      Dio dio = new Dio();
-      Response response = await dio.post(deliveryAreas, data: formData,
-          options: new Options( contentType: ContentType.parse("application/json")));
-      print(response.data);
-
-      ValidateCouponsResponse storeData = ValidateCouponsResponse.fromJson(response.data);
-      Utils.showToast(storeData.message, false);
-      return storeData;
-
-    } catch (e) {
-      print(e);
+      Utils.showToast(e.toString(), true);
+      return null;
     }
   }
 
-  static Future<TaxCalulationResponse> multipleTaxCalculationRequest(String fixed_discount_amount,
-      String tax, String shipping,String discount,String jsonn) async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String device_id = prefs.getString(AppConstant.DEVICE_ID);
-      String userId = prefs.getString(AppConstant.USER_ID);
-      String storeId = prefs.getString(AppConstant.STORE_ID);
-      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/multiple_tax_calculation';
-      print('$userId , $deliveryAreas');
+  static Future<TaxCalculationResponse> multipleTaxCalculationRequest(
+      String couponCode,
+      String discount,
+      String shipping,
+      String orderJson) async {
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
 
-      FormData formData = new FormData.from({"fixed_discount_amount":fixed_discount_amount,
-        "device_id":device_id,
-        "tax":tax,
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.multipleTaxCalculation;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "fixed_discount_amount": "0",
+        "tax": "0",
+        "discount": discount,
         "shipping": shipping,
-        "discount":discount,
-        "order_detail": '${jsonn.toString()}'});
-
-      Dio dio = new Dio();
-      Response response = await dio.post(deliveryAreas, data: formData,
-          options: new Options(contentType: ContentType.parse("application/json")));
-      //print("-------multiple_tax_calculation--${response.statusCode}-${response.statusMessage}-");
-      //print("--headers--${response.headers}");
-      //print("--TaxCalculation--${response.data}");
-      print("------Json------ ${json.encode(response.data)}");
-      TaxCalulationResponse storeData = TaxCalulationResponse.fromJson(response.data);
-      //Utils.showToast(storeData.message, false);
-      return storeData;
-    } catch (e) {
-      print("---Exception----multiple_tax_calculation--${e.toString()}--");
-      print(e);
-    }
-  }
-
-  static Future<TaxCalulationResponse> placeOrderApiRequest(String shipping_charges,
-      String note, String calculated_tax_detail,String coupon_code,
-      String user_address,String store_fixed_tax_detail,String store_tax_rate_detail,
-      String tax, String total,String checkout,int payment_method,
-      String json) async {
-    try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String device_id = prefs.getString(AppConstant.DEVICE_ID);
-      String userId = prefs.getString(AppConstant.USER_ID);
-      String storeId = prefs.getString(AppConstant.STORE_ID);
-      String taxRate = prefs.getString(AppConstant.TAX_RATE);
-      String deliveryAreas = 'https://app.restroapp.com/${storeId}/api_v5/multiple_tax_calculation';
-      print('$userId , $deliveryAreas');
-
-      String payment_methods ="";
-      if(payment_method == 0){
-        payment_methods="2";
-      }else{
-        payment_methods="3";
-      }
-
-      FormData formData = new FormData.from({
-        "shipping_charges":shipping_charges,
-        "note":note,
-        "calculated_tax_detail":calculated_tax_detail,
-        "coupon_code":coupon_code,
-        "user_address":user_address,
-        "store_fixed_tax_detail":store_fixed_tax_detail,
-        "tax":tax,
-        "store_tax_rate_detail":store_tax_rate_detail,
-        "store_tax_rate_detail":store_tax_rate_detail,
-        "store_tax_rate_detail":store_tax_rate_detail,
-        "store_tax_rate_detail":store_tax_rate_detail,
-        "platform":"android",
-        "tax_rate":taxRate,
-        "total":total,
-        "user_id":userId,
-        "device_token":userId,
-        "user_address_id":userId,
-        "checkout":checkout,
-        "payment_method":payment_methods,
-        "discount":payment_method,
-        "device_id":device_id,
-        "order_detail": '${json.toString()}'
+        "order_detail": orderJson,
+        "device_id": deviceId,
       });
 
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
 
-      //return storeData;
+      TaxCalculationResponse model =
+          TaxCalculationResponse.fromJson(couponCode, parsed);
+      return model;
     } catch (e) {
-      print("---Exception----${e.toString()}--");
-      print(e);
+      Utils.showToast(e.toString(), true);
+      return null;
     }
   }
 
+  static Future<ResponseModel> placeOrderRequest(
+      String note,
+      String totalPrice,
+      String paymentMethod,
+      TaxCalculationModel taxModel,
+      DeliveryAddressData address,
+      String orderJson) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
 
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.placeOrder;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "shipping_charges": "0",
+        "note": note,
+        "calculated_tax_detail": "",
+        "coupon_code": taxModel == null ? "" : taxModel.couponCode,
+        "device_id": deviceId,
+        "user_address": address.address,
+        "store_fixed_tax_detail": "",
+        "tax": taxModel == null ? "0" : taxModel.tax,
+        "store_tax_rate_detail": "",
+        "platform": Platform.isIOS ? "IOS" : "Android",
+        "tax_rate": "0",
+        "total": taxModel == null ? totalPrice : taxModel.total,
+        "user_id": user.id,
+        "device_token": "",
+        "user_address_id": address.id,
+        "orders": orderJson,
+        "checkout": totalPrice,
+        "payment_method": paymentMethod == "2" ? "COD" : "Online Payment",
+        "discount": taxModel == null ? "" : taxModel.discount,
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      ResponseModel model = ResponseModel.fromJson(parsed);
+      return model;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<UserResponse> updateProfileRequest(
+      String fullName, String emailId, String phoneNumber) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.updateProfile;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "full_name": fullName,
+        "email": emailId,
+        "user_id": user.id,
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      UserResponse model = UserResponse.fromJson(parsed);
+      return model;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<ResponseModel> setStoreQuery(String queryString) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.setStoreQuery;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "store_id": store.id,
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android",
+        "user_id": user.id,
+        "query": queryString
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      ResponseModel resModel = ResponseModel.fromJson(parsed);
+      return resModel;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<GetOrderHistory> getOrderHistory() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.orderHistory;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
+      return getOrderHistory;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
 }

@@ -15,7 +15,9 @@
         android:name="io.flutter.app.FlutterApplication"
         android:label="restroapp"
         android:icon="@mipmap/ic_launcher">
-
+        <!-- Add the following entry, with your API key -->
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCwKXvgsBElyhqwj03ro9e-Lnu3fmRmpJI"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
@@ -37,7 +39,15 @@
 
 
         </activity>
-
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
     </application>
 
 </manifest>

@@ -14,31 +14,28 @@ description: A new Flutter application.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.2.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
-  http: ^0.12.0
-  dio: 2.1.13  #latest version
-  device_id: ^0.2.0
-  shared_preferences: ^0.4.2
-  fluttertoast: ^3.1.0
-  carousel_slider: ^1.3.0
-  circular_profile_avatar: ^0.2.0
-  sqflite: ^1.1.6
-  font_awesome_flutter: ^8.4.0
-  progress_dialog: ^1.2.0
+  device_info: ^0.4.2+1
   connectivity: ^0.4.2
-  grouped_buttons: ^1.0.4
+  progress_dialog: ^1.2.0
+  http: ^0.12.0+3
+  fluttertoast: ^3.1.0
+  shared_preferences: ^0.4.2
+  path_provider: ^1.6.5
+  sqflite: ^1.3.0
+  carousel_slider: ^1.3.0
+  font_awesome_flutter: ^8.4.0
   geocoder: ^0.2.1
   geolocator: ^4.0.3
-
+  google_maps_flutter: ^0.5.12
+  flutter_html: ^0.8.2
+  flutter_share: 1.0.2+1
+  url_launcher: ^5.4.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -57,17 +54,25 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - images/about.png
+    - images/app_icon.png
+    - images/home.png
+    - images/deliveryaddress.png
+    - images/my_order.png
+    - images/myfav.png
+    - images/myprofile.png
+    - images/refer.png
+    - images/booknow.png
     - images/download.jpeg
-    - images/categories_bg.png
     - images/theme35.png
-    - images/logo_1.png
-    - images/logo_2.png
-    - images/bg.png
-    - images/bottom_bg.png
     - images/loginbackground.png
     - images/logo.png
     - images/offer_bg.png
-    - images/ic_launcher.png
+    - images/arrow_right.png
+    - images/placeholder.png
+    - images/sign_in.png
+    - images/sign_out.png
+    - images/hamburger.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
