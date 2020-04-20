@@ -14,6 +14,7 @@ import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
@@ -27,7 +28,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final StoreModel store;
-
+  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   List<String> imgList = [];
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
@@ -38,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    initFirebase();
     try {
       if (store.banners.isEmpty) {
         imgList = [
@@ -214,5 +216,38 @@ class _HomeScreenState extends State<HomeScreen> {
       user = await SharedPrefs.getUser();
       setState(() {});
     }
+  }
+
+  void initFirebase() {
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        try {
+          print("------onMessage: $message");
+          String title = message['notification']['title'];
+          String body = message['notification']['body'];
+        } catch (e) {
+          print(e);
+        }
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        //print("onLaunch: $message");
+
+      },
+      onResume: (Map<String, dynamic> message) async {
+        //print("onResume: $message");
+
+      },
+    );
+
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.getToken().then((token){
+      print("----token---- ${token}");
+      try {
+
+      } catch (e) {
+        print(e);
+      }
+    });
   }
 }
