@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
-import 'package:restroapp/src/Screens/LoginSignUp/LoginScreen.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -174,10 +175,22 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           _showDialog(context);
         } else {
           Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
-          );
+          SharedPrefs.getStore().then((storeData){
+            StoreModel model = storeData;
+            print("---internationalOtp--${model.internationalOtp}");
+            //User Login with Mobile and OTP = 0
+            if(model.internationalOtp == "0"){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+              );
+            }else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+              );
+            }
+          });
         }
         break;
     }

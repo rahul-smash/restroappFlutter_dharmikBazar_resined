@@ -4,7 +4,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
-import 'package:restroapp/src/Screens/LoginSignUp/LoginScreen.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 
@@ -50,11 +52,22 @@ class Utils {
               child: new Text("YES"),
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.push(
-                  context,
-                  //    MaterialPageRoute(builder: (context) => LoginScreen()),
-                  MaterialPageRoute(builder: (context) => LoginMobileScreen("cart")),
-                );
+                SharedPrefs.getStore().then((storeData){
+                  StoreModel model = storeData;
+                  //print("---internationalOtp--${model.internationalOtp}");
+                  //User Login with Mobile and OTP
+                  if(model.internationalOtp == "0"){
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+                    );
+                  }else{
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+                    );
+                  }
+                });
               },
             ),
             FlatButton(

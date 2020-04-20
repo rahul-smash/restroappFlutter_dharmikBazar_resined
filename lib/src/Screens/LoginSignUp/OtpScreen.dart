@@ -153,8 +153,8 @@ class _OtpScreen extends State<OtpScreen> {
   }
 
   void onSkipButtonPressed() {
-    print('@@MENUGET'+widget.menu);
-    print('--periodic===  $_start');
+    //print('@@MENUGET'+widget.menu);
+    //print('--periodic===  $_start');
     if(_start == 0){
       // user clicked on skip button
       print('--skip=button==');

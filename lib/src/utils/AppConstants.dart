@@ -41,10 +41,17 @@ class AppConstant {
 
 
 
-  static final String txt_OTP = "Please enter your One Time Password.We \n have sent the same to your number.";
+  static final String txt_OTP = "Please enter your One Time Password.We\nhave sent the same to your number.";
 
   static final String enterOtp = "Please enter otp number";
 
 
+  static final String enterEmailAddress = "Please enter a valid Email address";
+
+
+  static final String entertxForgotPssword = "Please enter your registered email id and we will email you the password.";
+
+
+  static final String txtSendEmail = "SEND EMAIL";
 
 }

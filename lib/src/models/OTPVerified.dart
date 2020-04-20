@@ -1,21 +1,25 @@
-class OTPVerified {
+import 'dart:convert';
+
+OtpVerified otpVerifiedFromJson(String str) => OtpVerified.fromJson(json.decode(str));
+
+String otpVerifiedToJson(OtpVerified data) => json.encode(data.toJson());
+
+class OtpVerified {
   bool success;
   String message;
-  String data;
 
-  OTPVerified({this.success, this.message, this.data});
+  OtpVerified({
+    this.success,
+    this.message,
+  });
 
-  OTPVerified.fromJson(Map<String, dynamic> json) {
-    success = json['success'];
-    message = json['message'];
-    data = json['data'];
-  }
+  factory OtpVerified.fromJson(Map<String, dynamic> json) => OtpVerified(
+    success: json["success"],
+    message: json["message"],
+  );
 
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['success'] = this.success;
-    data['message'] = this.message;
-    data['data'] = this.data;
-    return data;
-  }
+  Map<String, dynamic> toJson() => {
+    "success": success,
+    "message": message,
+  };
 }

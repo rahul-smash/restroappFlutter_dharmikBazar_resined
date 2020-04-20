@@ -69,17 +69,17 @@ class SharedPrefs {
     var user = UserModelMobile.fromJson(userMap);
     return user;
   }
-  static void saveUserOTP(OTPVerified model) async {
+  static void saveUserOTP(OtpVerified model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     dynamic userResponse = model.toJson();
     String jsonString = jsonEncode(userResponse);
     sharedUser.setString('data', jsonString);
   }
 
-  static Future<OTPVerified> getUserOTP() async {
+  static Future<OtpVerified> getUserOTP() async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     Map<String, dynamic> userMap = json.decode(sharedUser.getString('data'));
-    var user = OTPVerified.fromJson(userMap);
+    var user = OtpVerified.fromJson(userMap);
     return user;
   }
 }

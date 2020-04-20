@@ -117,12 +117,12 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
               .then((response) {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
-              if(response.userExists==1||otpSkip == "yes"){
-                print('@@NotOTP__Screen');
+              if(response.userExists == 1|| otpSkip == "yes"){
+                //print('@@NotOTP__Screen');
                 Navigator.pop(context);
 
               }else{
-                print('@@NOTP__Screen');
+                //print('@@NOTP__Screen');
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => OtpScreen(menu)),
