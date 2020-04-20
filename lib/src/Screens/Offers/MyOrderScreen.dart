@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/UI/CardOrderHistoryItems.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
-import 'package:restroapp/src/ui/CardOrderHistoryItems.dart';
 
 class MyOrderScreen extends StatefulWidget {
   MyOrderScreen(BuildContext context);

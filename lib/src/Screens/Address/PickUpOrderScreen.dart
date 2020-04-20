@@ -2,24 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
 import 'package:restroapp/src/UI/SocialLoginTabs.dart';
-import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:flutter/gestures.dart';
-import 'package:restroapp/src/utils/AppConstants.dart';
-import 'package:restroapp/src/utils/Utils.dart';
 
-class LoginScreen extends StatefulWidget {
+
+class PickUpOrderScreen extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _PickUpOrderScreen createState() => _PickUpOrderScreen();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+class _PickUpOrderScreen extends State<PickUpOrderScreen> {
+  final cityController = TextEditingController();
+  final areaController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: new AppBar(
+        centerTitle:true ,
+        title: new Text('Place Order',style: new TextStyle(
+          color: Colors.white,
+
+        ),),
+      ),
       resizeToAvoidBottomPadding: false,
       backgroundColor: Colors.white,
       body: Container(
@@ -28,27 +33,25 @@ class _LoginScreenState extends State<LoginScreen> {
           children: <Widget>[
             Stack(
               fit: StackFit.loose,
-              children: [addPageHeader(), addLoginFields()],
+              children: [ addLoginFields()],
             ),
-            addLoginButton(),
             SocialLoginTabs(),
-            addSignUpButton()
           ],
         ),
       ),
     );
   }
 
-  Widget addPageHeader() {
+/*  Widget addPageHeader() {
     return Container(
       height: 250,
       width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
+    *//*  decoration: BoxDecoration(
         image: DecorationImage(
           image: AssetImage('images/loginbackground.png'),
           fit: BoxFit.cover,
         ),
-      ),
+      ),*//*
       child: Center(
         child: SizedBox(
           child: Image.asset('images/logo.png'),
@@ -57,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
+  }*/
 
   Widget addLoginFields() {
     return Container(
@@ -81,14 +84,6 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(
-            'Login',
-            style: TextStyle(
-              fontFamily: 'Bold',
-              fontSize: 24,
-              color: colorText,
-            ),
-          ),
           SizedBox(height: 10),
           TextFormField(
             style: TextStyle(
@@ -98,15 +93,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(0),
-              labelText: 'Username',
+              labelText: 'Select your city',
               labelStyle: TextStyle(
                 fontFamily: 'Medium',
                 color: colorText,
                 fontSize: 14,
               ),
             ),
-            inputFormatters: [new LengthLimitingTextInputFormatter(30)],
-            controller: _usernameController,
+            controller: cityController,
           ),
           SizedBox(
             height: 10,
@@ -119,66 +113,24 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             decoration: InputDecoration(
               contentPadding: EdgeInsets.all(0),
-              labelText: 'Password',
+              labelText: 'Select your area',
               labelStyle: TextStyle(
                 fontFamily: 'Medium',
                 color: colorText,
                 fontSize: 14,
               ),
             ),
-            keyboardType: TextInputType.visiblePassword,
-            controller: _passwordController,
+            keyboardType: TextInputType.text,
+            controller: areaController,
             obscureText: true,
           ),
           SizedBox(height: 15),
-          Align(
-            child: Text(
-              'Forgot password?',
-              style: TextStyle(
-                fontFamily: 'Medium',
-                fontSize: 14,
-                color: colorBlueText,
-              ),
-            ),
-            alignment: Alignment.centerRight,
-          ),
           SizedBox(height: 10),
         ],
       ),
     );
   }
 
-  Widget addLoginButton() {
-    return InkWell(
-      onTap: () {
-        _performLogin();
-      },
-      child: Padding(
-        padding: const EdgeInsets.only(right: 16),
-        child: Align(
-          alignment: Alignment.center,
-          child: Container(
-            color: appTheme,
-            padding: EdgeInsets.symmetric(
-              vertical: 15,
-            ),
-            width: 200,
-            margin: EdgeInsets.only(top: 20),
-            child: Center(
-              child: Text(
-                'LOGIN',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontFamily: 'Bold',
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 
   Widget addSignUpButton() {
     return Expanded(
@@ -216,27 +168,5 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _performLogin() {
-    String username = _usernameController.text.trim();
-    String password = _passwordController.text.trim();
-    Utils.isNetworkAvailable().then((isNetworkAvailable) async {
-      if(isNetworkAvailable) {
-        if (username.isEmpty) {
-          Utils.showToast(AppConstant.enterUsername, true);
-        } else if (password.isEmpty) {
-          Utils.showToast(AppConstant.enterPassword, true);
-        } else {
-          Utils.showProgressDialog(context);
-          ApiController.loginApiRequest(username, password).then((response) {
-            Utils.hideProgressDialog(context);
-            if (response != null && response.success) {
-              Navigator.pop(context);
-            }
-          });
-        }
-      } else {
-        Utils.showToast(AppConstant.noInternet, true);
-      }
-    });
-  }
+
 }

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
-import 'package:restroapp/src/Screens/LoginSignUp/LoginScreen.dart';
-import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
 import 'ProfileScreen.dart';
@@ -18,6 +19,7 @@ class SideMenuScreen extends StatelessWidget {
   final String userName;
   SideMenuScreen(this.store, this.userName);
 
+  String text = 'menu';
   final _drawerItems = [
     DrawerChildItem('Home', "images/home.png"),
     DrawerChildItem('My Profile', "images/myprofile.png"),
@@ -34,7 +36,7 @@ class SideMenuScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Theme(
         data: Theme.of(context).copyWith(
-          canvasColor: Color(0xff151515),
+          canvasColor:appTheme,
         ),
         child: Drawer(
           child: ListView.builder(
@@ -50,7 +52,7 @@ class SideMenuScreen extends StatelessWidget {
 
   Widget createHeaderInfoItem() {
     return Container(
-        color: Colors.black,
+        color:Color(0xFFFDA704),
         child: Padding(
             padding: EdgeInsets.only(left: 35, top: 40, bottom: 30),
             child: Row(children: [
@@ -79,15 +81,15 @@ class SideMenuScreen extends StatelessWidget {
           leading: Image.asset(
               index == _drawerItems.length - 1
                   ? userName == null
-                      ? 'images/sign_in.png'
-                      : 'images/sign_out.png'
+                  ? 'images/sign_in.png'
+                  : 'images/sign_out.png'
                   : item.icon,
               width: 30),
           title: index == _drawerItems.length - 1
               ? Text(userName == null ? 'Login' : 'Logout',
-                  style: TextStyle(color: Color(0xff6A6A6A), fontSize: 15))
+              style: TextStyle(color:Colors.white, fontSize: 15))
               : Text(item.title,
-                  style: TextStyle(color: Color(0xff6A6A6A), fontSize: 15)),
+              style: TextStyle(color: Colors.white, fontSize: 15)),
           onTap: () {
             _openPageForIndex(index, context);
           },
@@ -159,7 +161,9 @@ class SideMenuScreen extends StatelessWidget {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => LoginScreen()),
+//            MaterialPageRoute(builder: (context) => LoginScreen()),
+            MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+
           );
         }
         break;
@@ -198,18 +202,14 @@ class SideMenuScreen extends StatelessWidget {
 
   Future logout(BuildContext context) async {
     try {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-      preferences.clear().then((status) {
-        if (status == true) {
-          AppConstant.isLoggedIn = false;
-          DatabaseHelper databaseHelper = new DatabaseHelper();
-          databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
-          databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
-          databaseHelper.deleteTable(DatabaseHelper.Products_Table);
-          databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-          Utils.showToast(AppConstant.logoutSuccess, true);
-        }
-      });
+      SharedPrefs.removeUser();
+      SharedPrefs.setUserLoggedIn(false);
+      DatabaseHelper databaseHelper = new DatabaseHelper();
+      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+      Utils.showToast(AppConstant.logoutSuccess, true);
       //Pop Drawer
       Navigator.pop(context);
     } catch (e) {

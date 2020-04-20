@@ -1,3 +1,5 @@
+import 'package:restroapp/src/models/MobileVerified.dart';
+import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -34,6 +36,11 @@ class SharedPrefs {
     return user;
   }
 
+  static void removeUser() async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    sharedUser.remove('user');
+  }
+
   static void setUserLoggedIn(bool loggedIn) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     sharedUser.setBool('isLoggedIn', loggedIn);
@@ -49,9 +56,30 @@ class SharedPrefs {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value);
   }
+  static void saveUserMobile(UserModelMobile model) async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    dynamic userResponse = model.toJson();
+    String jsonString = jsonEncode(userResponse);
+    sharedUser.setString('user', jsonString);
+  }
 
-  static Future clearSharedPrefsValue(String key) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove(key);
+  static Future<UserModelMobile> getUserMobile() async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    Map<String, dynamic> userMap = json.decode(sharedUser.getString('user'));
+    var user = UserModelMobile.fromJson(userMap);
+    return user;
+  }
+  static void saveUserOTP(OTPVerified model) async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    dynamic userResponse = model.toJson();
+    String jsonString = jsonEncode(userResponse);
+    sharedUser.setString('data', jsonString);
+  }
+
+  static Future<OTPVerified> getUserOTP() async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    Map<String, dynamic> userMap = json.decode(sharedUser.getString('data'));
+    var user = OTPVerified.fromJson(userMap);
+    return user;
   }
 }
