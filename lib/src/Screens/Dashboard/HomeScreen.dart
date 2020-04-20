@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
@@ -117,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: SideMenuScreen(store, user == null ? null : user.fullName),
+      drawer: NavDrawerMenu(store, user == null ? null : user.fullName),
       bottomNavigationBar: addBottomBar(),
     );
   }
@@ -211,10 +212,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _handleDrawer() async {
-    _key.currentState.openDrawer();
-    if (AppConstant.isLoggedIn) {
-      user = await SharedPrefs.getUser();
-      setState(() {});
+    try {
+      _key.currentState.openDrawer();
+      print("------_handleDrawer-------");
+      if (AppConstant.isLoggedIn) {
+            user = await SharedPrefs.getUser();
+            //if(user != null)
+            setState(() {});
+          }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -225,6 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
           print("------onMessage: $message");
           String title = message['notification']['title'];
           String body = message['notification']['body'];
+          showNotification(title,body,message);
         } catch (e) {
           print(e);
         }
@@ -249,5 +257,36 @@ class _HomeScreenState extends State<HomeScreen> {
         print(e);
       }
     });
+  }
+
+  Future showNotification(String title,String body, Map<String, dynamic> message) async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+
+    var initializationSettingsAndroid =
+    AndroidInitializationSettings('ic_notification');
+    var initializationSettingsIOS = IOSInitializationSettings(
+        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'restroapp', 'restroapp', 'restroapp app',
+        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0, title, body, platformChannelSpecifics,
+        payload: 'item x');
+
+  }
+  Future<void> onSelectNotification(String payload) async {
+    debugPrint('onSelectNotification : ');
+  }
+  Future<void> onDidReceiveLocalNotification(int id, String title,
+      String body, String payload) async {
+    debugPrint('onDidReceiveLocalNotification : ');
   }
 }

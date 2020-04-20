@@ -109,15 +109,16 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
+      print(parsed);
       UserResponse userResponse = UserResponse.fromJson(parsed);
       if (userResponse.success) {
         SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUser(userResponse.user);
       }
-      Utils.showToast(userResponse.message ?? "User loggedin successfully", true);
+      //Utils.showToast(userResponse.message ?? "User loggedin successfully", true);
       return userResponse;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }
@@ -147,7 +148,7 @@ class ApiController {
       Utils.showToast(userResponse.message, true);
       return userResponse;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }
