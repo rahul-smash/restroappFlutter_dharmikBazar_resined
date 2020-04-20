@@ -30,4 +30,21 @@ class AppConstant {
   static final String selectArea = 'Please select area';
   static final String pleaseEnterAddress = "Enter complete address";
   static final String enterZipCode = "Enter zipcode";
+
+  static final String txt_mobile = "Please enter your Mobile No. to proceed further";
+  static final String txt_Submit = "Submit";
+  static final String pleaseFullname = "Enter FullName";
+
+  static final String delivrey = "Delievery";
+  static final String pickup = "PickUP";
+  static final String dine = "dine";
+
+
+
+  static final String txt_OTP = "Please enter your One Time Password.We \n have sent the same to your number.";
+
+  static final String enterOtp = "Please enter otp number";
+
+
+
 }

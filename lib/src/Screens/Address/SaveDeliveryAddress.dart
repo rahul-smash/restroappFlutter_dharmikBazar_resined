@@ -23,6 +23,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   StoreArea selectedArea;
   TextEditingController addressController = new TextEditingController();
   TextEditingController zipCodeController = new TextEditingController();
+  TextEditingController fullnameController = new TextEditingController();
 
   @override
   void initState() {
@@ -42,7 +43,10 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-            title: Text('Delivery Addresses'),
+            title: Text('Delivery Addresses',style: new TextStyle(
+              color: Colors.white,
+            ),),
+
             centerTitle: true,
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios),
@@ -84,10 +88,10 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 context: context,
                                 builder: (BuildContext context) =>
                                     AreaOptionDialog((area) {
-                                  setState(() {
-                                    selectedArea = area;
-                                  });
-                                }),
+                                      setState(() {
+                                        selectedArea = area;
+                                      });
+                                    }),
                               );
                             },
                             child: Container(
@@ -119,6 +123,27 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               contentPadding: EdgeInsets.only(
                                   left: 5, bottom: 5, top: 5, right: 5),
                               hintText: AppConstant.enterAddress),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text(
+                          "Full Name:",
+                          style: TextStyle(color: infoLabel, fontSize: 17.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 5),
+                        child: Container(
+                          child: new TextField(
+                            controller: fullnameController,
+                            keyboardType: TextInputType.multiline,
+                            decoration: new InputDecoration(
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                    left: 0, bottom: 0, top: 0, right: 0)),
+                          ),
                         ),
                       ),
                       Padding(
@@ -161,27 +186,36 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                   .isEmpty) {
                                 Utils.showToast(
                                     AppConstant.pleaseEnterAddress, false);
-                              } else if (zipCodeController.text
+                              } else if (fullnameController.text
+                                  .trim()
+                                  .isEmpty) {
+                                Utils.showToast(
+                                    AppConstant.pleaseFullname, false);
+                              }
+                              else if (zipCodeController.text
                                   .trim()
                                   .isEmpty) {
                                 Utils.showToast(
                                     AppConstant.enterZipCode, false);
                               } else {
                                 // edit and save api
+
                                 Utils.showProgressDialog(context);
                                 ApiController.saveDeliveryAddressApiRequest(
-                                        widget.selectedAddress == null
-                                            ? "ADD"
-                                            : "EDIT",
-                                        zipCodeController.text,
-                                        addressController.text,
-                                        selectedArea.id,
-                                        selectedArea.areaName,
-                                        widget.selectedAddress == null
-                                            ? null
-                                            : widget.selectedAddress.id)
+                                    widget.selectedAddress == null
+                                        ? "ADD"
+                                        : "EDIT",
+                                    zipCodeController.text,
+                                    addressController.text,
+                                    selectedArea.id,
+                                    selectedArea.areaName,
+                                    widget.selectedAddress == null
+                                        ? null
+                                        : widget.selectedAddress.id,
+                                    fullnameController.text)
                                     .then((response) {
                                   Utils.hideProgressDialog(context);
+                                  print('@@REsonsesss'+response.toString());
                                   if (response != null && response.success) {
                                     widget.callback();
                                     Navigator.pop(context);
@@ -206,7 +240,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     final coordinates = new Coordinates(position.latitude, position.longitude);
     var addresses =
-        await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    await Geocoder.local.findAddressesFromCoordinates(coordinates);
     var first = addresses.first;
     return first.addressLine;
   }
@@ -306,7 +340,7 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
                       decoration: BoxDecoration(
                         border: Border(
                             bottom:
-                                BorderSide(width: 1.0, color: Colors.black)),
+                            BorderSide(width: 1.0, color: Colors.black)),
                         color: Colors.white,
                       ),
                       child: Center(child: Text(area.areaName)),

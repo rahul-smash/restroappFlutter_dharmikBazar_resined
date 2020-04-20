@@ -1,10 +1,14 @@
 
+import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
 import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/MobileVerified.dart';
+import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -268,7 +272,8 @@ class ApiController {
       String address,
       String areaId,
       String areaName,
-      String addressId) async {
+      String addressId,
+      String fullname) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
@@ -288,13 +293,17 @@ class ApiController {
         "mobile": user.phone,
         "state": "",
         "area_id": areaId,
-        "first_name": user.fullName,
+        "first_name": fullname,
+        //  "first_name": "abc",
+
         "email": user.email
       });
 
       if (addressId != null) {
         request.fields["address_id"] = addressId;
       }
+      print(
+          '@@saveDeliveryAddressApiRequest' + url + request.fields.toString());
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
@@ -579,6 +588,80 @@ class ApiController {
       return getOrderHistory;
     } catch (e) {
       Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<MobileVerified> mobileVerification(LoginMobile loginData ) async {
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.mobileVerification;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "phone": loginData.phone,
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+      print('@@mobileVerification' + url + request.fields.toString());
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+      print('--response===  $parsed');
+      MobileVerified userResponse = MobileVerified.fromJson(parsed);
+      if (userResponse.success) {
+        SharedPrefs.setUserLoggedIn(true);
+        SharedPrefs.saveUserMobile(userResponse.user);
+      }
+      return userResponse;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('catch'+e.toString());
+      return null;
+    }
+  }
+
+  static Future<OTPVerified> otpVerified(OTPData otpData) async {
+    UserModelMobile userMobile = await SharedPrefs.getUserMobile();
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.otp;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+
+    try {
+      request.fields.addAll({
+        "phone": userMobile.phone,
+        "otp": otpData.otp,
+        "device_id": deviceId,
+        "device_token": "",
+        "platform": Platform.isIOS ? "IOS" : "android"
+      });
+      print('@@url' + url);
+      print('@@fields' +request.fields.toString());
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+      print('response'+parsed);
+
+      OTPVerified userResponse = OTPVerified.fromJson(parsed);
+      if (userResponse.success) {
+        SharedPrefs.setUserLoggedIn(true);
+        SharedPrefs.saveUserOTP(userResponse);
+      }
+      return userResponse;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('catch'+e.toString());
       return null;
     }
   }

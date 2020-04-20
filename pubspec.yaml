@@ -22,7 +22,7 @@ dependencies:
 
   device_info: ^0.4.2+1
   connectivity: ^0.4.2
-  progress_dialog: ^1.2.0
+  progress_dialog: ^1.2.2
   http: ^0.12.0+3
   fluttertoast: ^3.1.0
   shared_preferences: ^0.4.2
@@ -76,7 +76,21 @@ flutter:
     - images/sign_in.png
     - images/sign_out.png
     - images/hamburger.png
-
+    - images/home_basket.png
+    - images/home_contact.png
+    - images/home_offers.png
+    - images/home_order.png
+    - images/splsah.png
+    - images/home_history.png
+    - images/btn_background.png
+    - images/home_categories.png
+    - images/shadow.png
+    - images/home_order.png
+    - images/pickup.png
+    - images/deliver.png
+    - images/dining.png
+    - images/button_delivery_on.png
+    - images/button_pickup_on.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 
