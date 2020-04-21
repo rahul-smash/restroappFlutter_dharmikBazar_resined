@@ -214,7 +214,7 @@ class _HomeScreenState extends State<HomeScreen> {
   _handleDrawer() async {
     try {
       _key.currentState.openDrawer();
-      print("------_handleDrawer-------");
+      //print("------_handleDrawer-------");
       if (AppConstant.isLoggedIn) {
             user = await SharedPrefs.getUser();
             //if(user != null)
@@ -252,7 +252,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _firebaseMessaging.getToken().then((token){
       print("----token---- ${token}");
       try {
-
+        SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
       } catch (e) {
         print(e);
       }

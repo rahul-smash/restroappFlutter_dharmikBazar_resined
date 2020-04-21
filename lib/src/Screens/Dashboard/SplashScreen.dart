@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -13,6 +16,13 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Timer _timer;
+  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+
+  @override
+  void initState() {
+    super.initState();
+    getdeviceToken();
+  }
 
   openHomePage(StoreModel store) {
     _timer = new Timer(const Duration(seconds: 1), () {
@@ -55,6 +65,19 @@ class _SplashScreenState extends State<SplashScreen> {
         },
       ),
     );
+  }
+
+  void getdeviceToken() {
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.getToken().then((token){
+      print("----token---- ${token}");
+      try {
+        SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
+      } catch (e) {
+        print(e);
+      }
+    });
   }
 }
 

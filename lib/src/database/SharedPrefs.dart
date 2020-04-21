@@ -52,10 +52,13 @@ class SharedPrefs {
     return sharedUser.getBool('isLoggedIn') ?? false;
   }
 
+
   static Future storeSharedValue(String key, String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value);
   }
+
+
   static void saveUserMobile(UserModelMobile model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     dynamic userResponse = model.toJson();
