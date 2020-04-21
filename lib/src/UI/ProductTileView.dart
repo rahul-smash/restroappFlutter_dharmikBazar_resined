@@ -22,11 +22,17 @@ class _ProductTileItemState extends State<ProductTileItem> {
   @override
   initState() {
     super.initState();
-    databaseHelper
-        .getProductQuantitiy(int.parse(widget.product.id))
-        .then((count) {
+    databaseHelper.getProductQuantitiy(int.parse(widget.product.id)).then((count) {
       counter = int.parse(count);
       setState(() {});
+    });
+
+    databaseHelper.checkProductFavValue(int.parse(widget.product.id)).then((favValue){
+      //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
+      setState(() {
+        widget.product.isFav = favValue;
+        //print("-isFav-${widget.product.isFav}");
+      });
     });
   }
 
@@ -34,8 +40,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
   Widget build(BuildContext context) {
     String discount = widget.product.discount.toString();
     String imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
-
-    print("------------ Widget build----------");
 
     return Column(children: [
       Padding(

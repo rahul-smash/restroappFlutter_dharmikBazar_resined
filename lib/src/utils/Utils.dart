@@ -117,7 +117,7 @@ class Utils {
 
   static showFavIcon(String isFav) {
     Icon favIcon;
-    print("-showFavIcon- ${isFav}");
+    //print("-showFavIcon- ${isFav}");
     if(isFav == null || isFav == "null" || isFav == "1"){
       favIcon = Icon(Icons.favorite);
     }else if(isFav == "0"){

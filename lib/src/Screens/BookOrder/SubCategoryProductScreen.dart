@@ -5,6 +5,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class SubCategoryProductScreen extends StatelessWidget {
   final CategoryModel categoryModel;
@@ -55,8 +56,13 @@ class SubCategoryProductScreen extends StatelessWidget {
         } else {
           if (projectSnap.hasData) {
             SubCategoryResponse response = projectSnap.data;
+            if (response.success != null && !response.success) {
+              Utils.showToast("No data found!", true);
+            }
             if (response.success) {
+
               SubCategoryModel subCategory = response.subCategories.first;
+
               return ListView.builder(
                 itemCount: subCategory.products.length,
                 itemBuilder: (context, index) {
@@ -66,6 +72,7 @@ class SubCategoryProductScreen extends StatelessWidget {
                   });
                 },
               );
+
             } else {
               return Container();
             }
