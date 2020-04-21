@@ -240,12 +240,16 @@ class ApiController {
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       DeliveryAddressResponse deliveryAddressResponse =
-          DeliveryAddressResponse.fromJson(parsed);
+      DeliveryAddressResponse.fromJson(parsed);
+      //print("----respStr---${deliveryAddressResponse.success}");
       return deliveryAddressResponse;
+
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }

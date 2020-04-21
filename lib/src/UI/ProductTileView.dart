@@ -42,13 +42,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
               children: <Widget>[
                 Flexible(
                     child: Row(
-                  children: [
-                    SizedBox(width: 10),
-                    Image.asset("images/myfav.png", width: 25),
-                    addVegNonVegOption(),
-                    imageUrl == ""
-                        ? Container()
-                        : Padding(
+                      children: [
+                        SizedBox(width: 10),
+                        Image.asset("images/myfav.png", width: 25),
+                        addVegNonVegOption(),
+                        imageUrl == ""
+                            ? Container()
+                            : Padding(
                             padding: EdgeInsets.only(right: 10),
                             child: Container(
                               width: 60.0,
@@ -65,123 +65,126 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                 ),
                               ),
                             )),
-                    Flexible(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(widget.product.title,
-                            overflow: TextOverflow.ellipsis,
-                            style: new TextStyle(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 18.0,
-                              color: appTheme,
+                        Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(widget.product.title,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: new TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18.0,
+                                      color: appTheme,
+                                    )),
+                                (discount == "0.00" ||
+                                    discount == "0" ||
+                                    discount == "0.0")
+                                    ? Text("\$${widget.product.price}")
+                                    : Row(
+                                  children: <Widget>[
+                                    Text("\$${widget.product.discount}",
+                                        style: TextStyle(
+                                            decoration:
+                                            TextDecoration.lineThrough)),
+                                    Text(" "),
+                                    Text("\$${widget.product.price}"),
+                                  ],
+                                )
+                              ],
                             )),
-                        (discount == "0.00" ||
-                                discount == "0" ||
-                                discount == "0.0")
-                            ? Text("\$${widget.product.price}")
-                            : Row(
-                                children: <Widget>[
-                                  Text("\$${widget.product.discount}",
-                                      style: TextStyle(
-                                          decoration:
-                                              TextDecoration.lineThrough)),
-                                  Text(" "),
-                                  Text("\$${widget.product.price}"),
-                                ],
-                              )
                       ],
                     )),
-                  ],
-                )),
                 addPlusMinusView()
               ])),
       Container(
           height: 1,
-          width: MediaQuery.of(context).size.width,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           color: Color(0xFFBDBDBD))
     ]);
   }
 
   Widget addVegNonVegOption() {
     Color foodOption =
-        widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
+    widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
     return Padding(
       padding: EdgeInsets.only(left: 7, right: 7),
       child: widget.product.nutrient == "None"
           ? Container()
           : Container(
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                border: new Border.all(
-                  color: foodOption,
-                  width: 1.0,
-                ),
-              ),
-              width: 16,
-              height: 16,
-              child: Padding(
-                padding: EdgeInsets.all(3),
-                child: Container(
-                    decoration: new BoxDecoration(
+          decoration: new BoxDecoration(
+            color: Colors.white,
+            border: new Border.all(
+              color: foodOption,
+              width: 1.0,
+            ),
+          ),
+          width: 16,
+          height: 16,
+          child: Padding(
+            padding: EdgeInsets.all(3),
+            child: Container(
+                decoration: new BoxDecoration(
                   color: foodOption,
                   borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
                 )),
-              )),
+          )),
     );
   }
 
   Widget addPlusMinusView() {
     return Container(
         child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: <Widget>[
-        Container(
-          padding: const EdgeInsets.all(0.0),
-          width: 30.0, // you can adjust the width as you need
-          child: GestureDetector(onTap: () {
-            if (counter != 0) {
-              setState(() => counter--);
-              if (counter == 0) {
-                // delete from cart table
-                removeFromCartTable(widget.product.id);
-              } else {
-                // insert/update to cart table
-                insertInCartTable(widget.product, counter);
-              }
-              widget.callback();
-            }
-          }, child: Icon(Icons.remove, color: Colors.grey, size: 20)),
-        ),
-        Container(
-          width: 40.0,
-          height: 24.0,
-          decoration: new BoxDecoration(
-            color: Colors.white,
-            borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
-            border: new Border.all(
-              color: Color(0xFFBDBDBD),
-              width: 1.0,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(0.0),
+              width: 30.0, // you can adjust the width as you need
+              child: GestureDetector(onTap: () {
+                if (counter != 0) {
+                  setState(() => counter--);
+                  if (counter == 0) {
+                    // delete from cart table
+                    removeFromCartTable(widget.product.id);
+                  } else {
+                    // insert/update to cart table
+                    insertInCartTable(widget.product, counter);
+                  }
+                  widget.callback();
+                }
+              }, child: Icon(Icons.remove, color: Colors.grey, size: 20)),
             ),
-          ),
-          child: Center(child: Text("$counter")),
-        ),
-        Container(
-          padding: const EdgeInsets.all(0.0),
-          width: 30.0, // you can adjust the width as you need
-          child: GestureDetector(onTap: () {
-            setState(() => counter++);
-            if (counter == 0) {
-              // delete from cart table
-              removeFromCartTable(widget.product.id);
-            } else {
-              // insert/update to cart table
-              insertInCartTable(widget.product, counter);
-            }
-          }, child: Icon(Icons.add, color: Colors.grey, size: 20)),
-        ),
-      ],
-    ));
+            Container(
+              width: 40.0,
+              height: 24.0,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
+                border: new Border.all(
+                  color: Color(0xFFBDBDBD),
+                  width: 1.0,
+                ),
+              ),
+              child: Center(child: Text("$counter")),
+            ),
+            Container(
+              padding: const EdgeInsets.all(0.0),
+              width: 30.0, // you can adjust the width as you need
+              child: GestureDetector(onTap: () {
+                setState(() => counter++);
+                if (counter == 0) {
+                  // delete from cart table
+                  removeFromCartTable(widget.product.id);
+                } else {
+                  // insert/update to cart table
+                  insertInCartTable(widget.product, counter);
+                }
+              }, child: Icon(Icons.add, color: Colors.grey, size: 20)),
+            ),
+          ],
+        ));
   }
 
   void insertInCartTable(Product product, int quantity) {
