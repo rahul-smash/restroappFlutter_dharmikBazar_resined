@@ -114,4 +114,15 @@ class Utils {
     double mod = pow(10.0, places);
     return ((val * mod).round().toDouble() / mod);
   }
+
+  static showFavIcon(String isFav) {
+    Icon favIcon;
+    print("-showFavIcon- ${isFav}");
+    if(isFav == null || isFav == "null" || isFav == "1"){
+      favIcon = Icon(Icons.favorite);
+    }else if(isFav == "0"){
+      favIcon = Icon(Icons.favorite_border);
+    }
+    return favIcon;
+  }
 }

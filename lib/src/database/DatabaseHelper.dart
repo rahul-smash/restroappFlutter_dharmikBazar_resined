@@ -29,6 +29,7 @@ class DatabaseHelper {
   static final String PRICE = "price";
   static final String DISCOUNT = "discount";
   static final String QUANTITY = "quantity";
+  static final String isFavorite = "isfavorite";
   static final String IS_TAX_ENABLE = "isTaxEnable";
   static final String Product_Name = "product_name";
   static final String UNIT_TYPE = "unit_type";
@@ -130,12 +131,41 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<int> updateProductInCart(
-      Map<String, dynamic> row, int product_id) async {
+  Future<String> checkProductFavValue(int product_id) async {
+    String count = "0";
+    //database connection
     var dbClient = await db;
+    // get single row
+    List<String> columnsToSelect = [isFavorite];
+    String whereClause = '${DatabaseHelper.ID} = ?';
+    List<dynamic> whereArguments = [product_id];
+    List<Map> result = await dbClient.query(CART_Table,
+        columns: columnsToSelect,
+        where: whereClause,
+        whereArgs: whereArguments);
+    // print the results
+    if (result != null && result.isNotEmpty) {
+      print("---result.length--- ${result.length}");
+      result.forEach((row) {
+        print("-1-isfavorite--- ${row['isfavorite']}");
+        count = row[isFavorite];
+        //return count;
+      });
+    } else {
+      print("-X-isfavorite--- return 0");
+      return count;
+      count = "0";
+    }
+    return count;
+  }
 
-    return dbClient
-        .update(CART_Table, row, where: "${ID} = ?", whereArgs: [product_id]);
+  Future<int> updateProductInCart(Map<String, dynamic> row, int product_id) async {
+    var dbClient = await db;
+    return dbClient.update(CART_Table,
+        row,
+        where: "${ID} = ?",
+        whereArgs: [product_id]
+    );
   }
 
   Future<String> getProductQuantitiy(int product_id) async {
@@ -212,6 +242,7 @@ class DatabaseHelper {
       MRP_PRICE,
       PRICE,
       DISCOUNT,
+      isFavorite,
       QUANTITY,
       Product_Name,
       VARIENT_ID,
@@ -234,6 +265,7 @@ class DatabaseHelper {
         Product product = new Product();
         product.mrpPrice = row[MRP_PRICE];
         product.price = row[PRICE];
+        product.isFav = row[isFavorite];
         product.discount = row[DISCOUNT];
         product.quantity = row[QUANTITY];
         product.title = row[Product_Name];

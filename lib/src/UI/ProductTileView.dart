@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class ProductTileItem extends StatefulWidget {
   final Product product;
@@ -31,9 +33,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
   @override
   Widget build(BuildContext context) {
     String discount = widget.product.discount.toString();
-    String imageUrl = widget.product.imageType == "0"
-        ? widget.product.image10080
-        : widget.product.imageUrl;
+    String imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
+
+    print("------------ Widget build----------");
+
     return Column(children: [
       Padding(
           padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -44,7 +47,37 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     child: Row(
                       children: [
                         SizedBox(width: 10),
-                        Image.asset("images/myfav.png", width: 25),
+                        InkWell(
+                          onTap: () async {
+                            String count = await databaseHelper.checkProductFavValue(int.parse(widget.product.id));
+                            print("--ProductFavValue-- ${count}");
+                            Product product = widget.product;
+                            if(count == null || count =="null"){
+                              print("-if- ${count}");
+                              product.isFav = "1";
+                            }else if(count == "1"){
+                              product.isFav = "0";
+                            }else if(count == "0"){
+                              product.isFav = "1";
+                            }
+                            if(product.isFav == "1"){
+                              Utils.showToast(AppConstant.favsAdded, true);
+                            }else{
+                              Utils.showToast(AppConstant.favsRemoved, true);
+                            }
+                            Map<String, dynamic> row = {
+                              DatabaseHelper.isFavorite: product.isFav,
+                            };
+                            int updatedRow = await databaseHelper.updateProductInCart(row, int.parse(widget.product.id));
+                            print("--updatedRow-- ${updatedRow}");
+                            widget.callback();
+                            setState(() {
+
+                            });
+                          },
+                          child: Utils.showFavIcon(widget.product.isFav),
+                          //child: Image.asset("images/myfav.png", width: 25),
+                        ),
                         addVegNonVegOption(),
                         imageUrl == ""
                             ? Container()
@@ -195,6 +228,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       DatabaseHelper.VARIENT_ID: product.variantId,
       DatabaseHelper.PRODUCT_ID: product.id,
       DatabaseHelper.WEIGHT: product.weight,
+      DatabaseHelper.isFavorite: product.isFav,
       DatabaseHelper.MRP_PRICE: product.mrpPrice,
       DatabaseHelper.PRICE: product.price,
       DatabaseHelper.DISCOUNT: product.discount,

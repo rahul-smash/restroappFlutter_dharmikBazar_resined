@@ -59,4 +59,8 @@ class AppConstant {
   static final String app_VERISON = "APP_VERISON";
   static final String old_appverion = "APP_VERISON";
 
+
+  static final String favsAdded = "Added to favourites";
+  static final String favsRemoved = "Removed from favourites";
+
 }
