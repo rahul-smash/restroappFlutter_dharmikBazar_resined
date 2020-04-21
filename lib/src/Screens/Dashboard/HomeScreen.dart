@@ -197,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (_currentIndex == 1) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => OfferScreen(context)),
+          MaterialPageRoute(builder: (context) => MyOfferScreen(context)),
         );
       }
       if (_currentIndex == 2) {

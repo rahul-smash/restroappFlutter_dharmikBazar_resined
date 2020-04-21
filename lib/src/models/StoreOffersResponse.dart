@@ -26,44 +26,73 @@ class StoreOffersResponse {
 
 class OfferModel {
   String id;
+  String storeId;
+  String name;
   String couponCode;
   String discount;
   String usageLimit;
   String minimumOrderAmount;
+  String orderFacilities;
+  String offerNotification;
   String validFrom;
   String validTo;
   String offerTermCondition;
+  String image;
+  String image10080;
+  String image300200;
 
-  OfferModel({
-    this.id,
-    this.couponCode,
-    this.discount,
-    this.usageLimit,
-    this.minimumOrderAmount,
-    this.validFrom,
-    this.validTo,
-    this.offerTermCondition,
-  });
+  OfferModel(
+      {this.id,
+        this.storeId,
+        this.name,
+        this.couponCode,
+        this.discount,
+        this.usageLimit,
+        this.minimumOrderAmount,
+        this.orderFacilities,
+        this.offerNotification,
+        this.validFrom,
+        this.validTo,
+        this.offerTermCondition,
+        this.image,
+        this.image10080,
+        this.image300200});
 
-  factory OfferModel.fromJson(Map<String, dynamic> json) => OfferModel(
-        id: json["id"],
-        couponCode: json["coupon_code"],
-        discount: json["discount"],
-        usageLimit: json["usage_limit"],
-        minimumOrderAmount: json["minimum_order_amount"],
-        validFrom: json["valid_from"],
-        validTo: json["valid_to"],
-        offerTermCondition: json["offer_term_condition"],
-      );
+  OfferModel.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    storeId = json['store_id'];
+    name = json['name'];
+    couponCode = json['coupon_code'];
+    discount = json['discount'];
+    usageLimit = json['usage_limit'];
+    minimumOrderAmount = json['minimum_order_amount'];
+    orderFacilities = json['order_facilities'];
+    offerNotification = json['offer_notification'];
+    validFrom = json['valid_from'];
+    validTo = json['valid_to'];
+    offerTermCondition = json['offer_term_condition'];
+    image = json['image'];
+    image10080 = json['image_100_80'];
+    image300200 = json['image_300_200'];
+  }
 
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "coupon_code": couponCode,
-        "discount": discount,
-        "usage_limit": usageLimit,
-        "minimum_order_amount": minimumOrderAmount,
-        "valid_from": validFrom,
-        "valid_to": validTo,
-        "offer_term_condition": offerTermCondition,
-      };
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['store_id'] = this.storeId;
+    data['name'] = this.name;
+    data['coupon_code'] = this.couponCode;
+    data['discount'] = this.discount;
+    data['usage_limit'] = this.usageLimit;
+    data['minimum_order_amount'] = this.minimumOrderAmount;
+    data['order_facilities'] = this.orderFacilities;
+    data['offer_notification'] = this.offerNotification;
+    data['valid_from'] = this.validFrom;
+    data['valid_to'] = this.validTo;
+    data['offer_term_condition'] = this.offerTermCondition;
+    data['image'] = this.image;
+    data['image_100_80'] = this.image10080;
+    data['image_300_200'] = this.image300200;
+    return data;
+  }
 }
