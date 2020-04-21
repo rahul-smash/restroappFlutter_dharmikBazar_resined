@@ -10,6 +10,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CartTotalPriceBottomBar extends StatefulWidget {
 
@@ -35,11 +36,16 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
     updateTotalPrice();
   }
   void getAddresKey() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     store = await SharedPrefs.getStore();
+   /* SharedPrefs.storeSharedValue(
+        AppConstant.app_OLD_VERISON, store.version);
+*/
     setState(() {
       pickupfacility = store.pickupFacility;
       delieveryAdress=store.deliveryFacility;
-      print('@@HomeModel   '+pickupfacility+'  Delievery'+delieveryAdress);
+
+   //   print('@@HomeModel   '+pickupfacility+'  Delievery'+delieveryAdress+prefs.getString(AppConstant.app_OLD_VERISON));
     });
   }
   updateTotalPrice() {

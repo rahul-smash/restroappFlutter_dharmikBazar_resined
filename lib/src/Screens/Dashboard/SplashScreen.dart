@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -16,12 +17,18 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Timer _timer;
+  String appName = "";
+  String appID = "";
+  String version = "";
+  String buildNumber = "";
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
 
   @override
   void initState() {
     super.initState();
     getdeviceToken();
+    getAppInfo();
+
   }
 
   openHomePage(StoreModel store) {
@@ -30,6 +37,19 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
+  void getAppInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      appName = packageInfo.appName;
+      appID = packageInfo.packageName;
+      version = packageInfo.version;
+      buildNumber = packageInfo.buildNumber;
+      SharedPrefs.storeSharedValue(
+          AppConstant.old_appverion, version);
+
+      print('@@_____'+version+""+appName);
+    });
+  }
   @override
   void dispose() {
     super.dispose();
