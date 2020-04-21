@@ -13,6 +13,7 @@ class CategoryView extends StatelessWidget {
       children: <Widget>[
         GestureDetector(
           onTap: () {
+
             if (categoryModel != null && categoryModel.subCategory.isNotEmpty) {
               Navigator.push(
                 context,
