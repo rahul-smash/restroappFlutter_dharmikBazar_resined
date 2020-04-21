@@ -13,20 +13,22 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class OtpScreen extends StatefulWidget {
+
   String menu;
   OtpScreen(this.menu);
+
   @override
-  _OtpScreen createState() => _OtpScreen(this.menu);
+  _OtpScreen createState() => _OtpScreen();
 }
 
 class _OtpScreen extends State<OtpScreen> {
-  String menu;
-  _OtpScreen(this.menu);
+
+
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   OTPData otpModel = new OTPData();
   final phoneController = new TextEditingController();
   Timer _timer;
-  int _start = 20;
+  int _start = 40;
 
   StoreModel store;
   String otpSkip,pickupfacility,delieveryAdress;
@@ -35,8 +37,17 @@ class _OtpScreen extends State<OtpScreen> {
     super.initState();
     startTimer();
     getAddresKey();
-
   }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    if(_timer != null){
+      _timer.cancel();
+    }
+  }
+
   void getAddresKey() async {
     store = await SharedPrefs.getStore();
     setState(() {
@@ -47,6 +58,7 @@ class _OtpScreen extends State<OtpScreen> {
   }
   @override
   Widget build(BuildContext context) {
+
     return new Scaffold(
       appBar: new AppBar(
         centerTitle: true,
@@ -63,10 +75,9 @@ class _OtpScreen extends State<OtpScreen> {
               child: new ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 children: <Widget>[
-                  new Container(
-
+                  Container(
                       padding: const EdgeInsets.only(top: 40.0),
-                      margin: const EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 5.0),
+                      margin: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
                       child: new Text(
                         AppConstant.txt_OTP,
                         style: new TextStyle(
@@ -74,8 +85,7 @@ class _OtpScreen extends State<OtpScreen> {
                           color: Colors.black,
                         ),
                       )),
-                  new TextFormField(
-                    //    controller: phoneController,
+                  TextFormField(
                     decoration: const InputDecoration(
                       hintText: 'Enter OTP Number',
                       labelText: 'Enter OTP Number',
@@ -90,112 +100,69 @@ class _OtpScreen extends State<OtpScreen> {
                       otpModel.otp = val;
                     },
                   ),
-                  GestureDetector(
-                    child: new Container(
-                      padding: const EdgeInsets.all(10.0),
-                      child: new Row(
-
-                        children: [
-
-                          // First child in the Row for the name and the
-                          new Expanded(
-
-                            // Name and Address are in the same column
-                            child: new Row(
-
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                new Container(
-                                    padding: const EdgeInsets.only(
-                                        left: 40.0, top: 10.0, right: 10.0),
-                                    child: new RaisedButton(
-                                      color: appTheme,
-                                      textColor: Colors.white,
-                                      child: Text("$_start"+" sec",style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                      ),
-                                      onPressed: _otpForm,
-                                    )),
-
-                                // Code to create the view for name.
-                                new Container(
-                                    padding: const EdgeInsets.only(
-                                        left: 10.0, top: 10.0, right: 40.0),
-                                    child: new RaisedButton(
-                                      color: appTheme,
-                                      textColor: Colors.white,
-                                      child: const Text('Submit',style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                      ),
-                                      onPressed: _otpForm,
-                                    )),
-
-
-                              ],
+                  Row(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                          padding: EdgeInsets.only( left: 0.0, top: 10.0, right: 20.0),
+                          child: new RaisedButton(
+                            color: appTheme,
+                            textColor: Colors.white,
+                            child: Text(_start != 0 ? "${_start} sec" : "Skip",style: TextStyle(
+                              color: Colors.white,
                             ),
-                          ),
-                        ],
+                            ),
+                            onPressed: onSkipButtonPressed,
+                          )),
+                      Container(
+                          padding: EdgeInsets.only( left: 20.0, top: 10.0, right: 0.0),
+                          child: new RaisedButton(
+                            color: appTheme,
+                            textColor: Colors.white,
+                            child: const Text('Submit',style: TextStyle(
+                              color: Colors.white,
+                            ),
+                            ),
+                            onPressed: onSubmitClicked,
+                          )
                       ),
-                    ),
+                    ],
                   ),
-
-
-                  /*new Container(
-                      padding: const EdgeInsets.only(
-                          left: 40.0, top: 20.0, right: 40.0),
-                      child: new RaisedButton(
-                        color: appTheme,
-                        textColor: Colors.white,
-                        child: const Text('Submit',style: TextStyle(
-                          color: Colors.white,
-                        ),
-                        ),
-                        onPressed: _otpForm,
-                      )),*/
-
-                  /*   new Container(
-                      padding: const EdgeInsets.only(
-                          left: 40.0, top: 20.0, right: 40.0),
-                      child: new RaisedButton(
-                        color: appTheme,
-                        textColor: Colors.white,
-                        child:  Text("$_start"+" sec",style: TextStyle(
-                          color: Colors.white,
-                        ),
-
-                        ),
-
-                      //  onPressed: _otpForm,
-                      )),*/
                 ],
               ))),
     );
   }
 
 
-
   void startTimer() {
     const oneSec = const Duration(seconds: 1);
-    _timer = new Timer.periodic(
-      oneSec,
-          (Timer timer) => setState(
-            () {
-          if (_start < 1) {
-            timer.cancel();
+    _timer = new Timer.periodic(oneSec,
+          (Timer timer) {
+            //print('--periodic===  $_start');
+        setState(
+              () {
+            if (_start < 1) {
+              timer.cancel();
+            } else {
+              _start = _start - 1;
+            }
+          },
 
-          } else {
-            _start = _start - 1;
-          }
-        },
-      ),
+        );
+      },
     );
   }
 
-  void _otpForm() {
-    print('@@MENUGET'+menu);
+  void onSkipButtonPressed() {
+    //print('@@MENUGET'+widget.menu);
+    //print('--periodic===  $_start');
+    if(_start == 0){
+      // user clicked on skip button
+      print('--skip=button==');
+      proceedtoActivity();
+    }
+  }
 
+  void onSubmitClicked(){
     final FormState form = _formKey.currentState;
     if (form.validate()) {
       form.save(); //This invokes each onSaved event
@@ -206,10 +173,14 @@ class _OtpScreen extends State<OtpScreen> {
               .then((response) {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
-              print('@@----object+'+response.success.toString());
+              //print('@@----object+'+response.success.toString());
               Utils.showToast(response.message, true);
               //Navigator.pop(context);
               proceedtoActivity();
+            }else{
+              if (response != null) {
+                Utils.showToast(response.message, true);
+              }
             }
           });
         } else {
@@ -220,8 +191,8 @@ class _OtpScreen extends State<OtpScreen> {
   }
 
   void proceedtoActivity() {
-    print('@@MENUGET'+menu);
-    if (menu==("menu")) {
+    print('@@MENUGET'+widget.menu);
+    if (widget.menu == ("menu")) {
       //  if (isNameExist && isEmailExist) {
       //           showAlertDialogForLogin(getActivity(), "Sucess", "You have login successfully. Please continue.");
       Navigator.push(
@@ -269,8 +240,6 @@ class _OtpScreen extends State<OtpScreen> {
       }*/
     //  }
   }
-
-
 
 }
 

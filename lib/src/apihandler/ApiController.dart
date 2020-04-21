@@ -31,6 +31,7 @@ class ApiController {
   static Future<StoreResponse> versionApiRequest(String storeId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.version;
 
@@ -38,7 +39,7 @@ class ApiController {
     try {
       request.fields.addAll({
         "device_id": deviceId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -59,7 +60,7 @@ class ApiController {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.signUp;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -71,7 +72,7 @@ class ApiController {
         "email": user.email,
         "password": user.password,
         "device_id": deviceId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -97,7 +98,7 @@ class ApiController {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.login;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -107,7 +108,7 @@ class ApiController {
         "email": username,
         "password": password,
         "device_id": deviceId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -115,15 +116,16 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
+      print(parsed);
       UserResponse userResponse = UserResponse.fromJson(parsed);
       if (userResponse.success) {
         SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUser(userResponse.user);
       }
-      Utils.showToast(userResponse.message ?? "User loggedin successfully", true);
+      //Utils.showToast(userResponse.message ?? "User loggedin successfully", true);
       return userResponse;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }
@@ -153,7 +155,7 @@ class ApiController {
       //Utils.showToast(userResponse.message, true);
       return userResponse;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }
@@ -196,7 +198,7 @@ class ApiController {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getProducts +
         subCategoryId;
@@ -205,7 +207,7 @@ class ApiController {
       request.fields.addAll({
         "user_id": "",
         "device_id": deviceId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -324,7 +326,7 @@ class ApiController {
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getAddress;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -335,7 +337,7 @@ class ApiController {
         "device_id": deviceId,
         "user_id": user.id,
         "address_id": addressId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -389,7 +391,7 @@ class ApiController {
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.validateCoupon;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -399,7 +401,7 @@ class ApiController {
         "coupon_code": couponCode,
         "device_id": deviceId,
         "user_id": user.id,
-        "device_token": "",
+        "device_token": deviceToken,
         "orders": "$orderJson",
         "payment_method": paymentMode,
         "platform": Platform.isIOS ? "IOS" : "Android"
@@ -463,7 +465,7 @@ class ApiController {
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.placeOrder;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -483,7 +485,7 @@ class ApiController {
         "tax_rate": "0",
         "total": taxModel == null ? totalPrice : taxModel.total,
         "user_id": user.id,
-        "device_token": "",
+        "device_token": deviceToken,
         "user_address_id": address.id,
         "orders": orderJson,
         "checkout": totalPrice,
@@ -509,7 +511,7 @@ class ApiController {
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.updateProfile;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -520,7 +522,7 @@ class ApiController {
         "email": emailId,
         "user_id": user.id,
         "device_id": deviceId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -541,7 +543,7 @@ class ApiController {
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.setStoreQuery;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -550,7 +552,7 @@ class ApiController {
       request.fields.addAll({
         "store_id": store.id,
         "device_id": deviceId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android",
         "user_id": user.id,
         "query": queryString
@@ -597,7 +599,7 @@ class ApiController {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.mobileVerification;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -606,7 +608,7 @@ class ApiController {
       request.fields.addAll({
         "phone": loginData.phone,
         "device_id": deviceId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
       print('@@mobileVerification' + url + request.fields.toString());
@@ -614,7 +616,7 @@ class ApiController {
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
-
+      print('--response===  $parsed');
       MobileVerified userResponse = MobileVerified.fromJson(parsed);
       if (userResponse.success) {
         SharedPrefs.setUserLoggedIn(true);
@@ -622,17 +624,18 @@ class ApiController {
       }
       return userResponse;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
+      print('catch'+e.toString());
       return null;
     }
   }
 
-  static Future<OTPVerified> otpVerified(OTPData otpData) async {
+  static Future<OtpVerified> otpVerified(OTPData otpData) async {
     UserModelMobile userMobile = await SharedPrefs.getUserMobile();
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
-
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.otp;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
@@ -643,24 +646,25 @@ class ApiController {
         "phone": userMobile.phone,
         "otp": otpData.otp,
         "device_id": deviceId,
-        "device_token": "",
+        "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "android"
       });
-      print('@@otpVerified' + url + request.fields.toString());
-
+      print('@@url' + url);
+      print('@@fields' +request.fields.toString());
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print('response'+respStr);
       final parsed = json.decode(respStr);
 
-      OTPVerified userResponse = OTPVerified.fromJson(parsed);
-      print('@@userresponses'+userResponse.data);
+      OtpVerified userResponse = OtpVerified.fromJson(parsed);
       if (userResponse.success) {
         SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUserOTP(userResponse);
       }
       return userResponse;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
+      print('catch'+e.toString());
       return null;
     }
   }

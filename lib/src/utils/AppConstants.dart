@@ -2,6 +2,7 @@ class AppConstant {
   static bool isLoggedIn = false;
 
   static final String deviceId = "DEVICE_ID";
+  static final String deviceToken = "device_token";
   static final String placeholderImageUrl =
       "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?v=1530129081";
 
@@ -41,12 +42,12 @@ class AppConstant {
 
 
 
-  static final String txt_OTP = "Please enter your One Time Password.We \n have sent the same to your number.";
+  static final String txt_OTP = "Please enter your One Time Password.We\nhave sent the same to your number.";
 
   static final String enterOtp = "Please enter otp number";
 
 
-  static final String enterEmailAddress = "Please enter Email number";
+  static final String enterEmailAddress = "Please enter a valid Email address";
 
 
   static final String entertxForgotPssword = "Please enter your registered email id and we will email you the password.";

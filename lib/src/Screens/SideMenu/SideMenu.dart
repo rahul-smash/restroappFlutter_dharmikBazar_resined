@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
-import 'package:restroapp/src/Screens/LoginSignUp/LoginScreen.dart';
-import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
-import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
 import 'ProfileScreen.dart';
 
-class SideMenuScreen extends StatelessWidget {
+class NavDrawerMenu extends StatefulWidget {
+
   final StoreModel store;
   final String userName;
-  SideMenuScreen(this.store, this.userName);
+  NavDrawerMenu(this.store, this.userName);
 
-  String text = 'menu';
+  @override
+  _NavDrawerMenuState createState() {
+    return _NavDrawerMenuState();
+  }
+}
+
+class _NavDrawerMenuState extends State<NavDrawerMenu> {
+
+  _NavDrawerMenuState();
+
   final _drawerItems = [
     DrawerChildItem('Home', "images/home.png"),
     DrawerChildItem('My Profile', "images/myprofile.png"),
@@ -34,10 +44,15 @@ class SideMenuScreen extends StatelessWidget {
   ];
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Theme(
         data: Theme.of(context).copyWith(
-          canvasColor:appTheme,
+          canvasColor: Color(0xff151515),
         ),
         child: Drawer(
           child: ListView.builder(
@@ -53,7 +68,7 @@ class SideMenuScreen extends StatelessWidget {
 
   Widget createHeaderInfoItem() {
     return Container(
-        color:Color(0xFFFDA704),
+        color: Colors.black,
         child: Padding(
             padding: EdgeInsets.only(left: 35, top: 40, bottom: 30),
             child: Row(children: [
@@ -68,7 +83,7 @@ class SideMenuScreen extends StatelessWidget {
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
                     SizedBox(height: 5),
-                    Text(userName ?? '',
+                    Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
                         style: TextStyle(color: Colors.white, fontSize: 15)),
                   ])
             ])));
@@ -81,16 +96,16 @@ class SideMenuScreen extends StatelessWidget {
         child: ListTile(
           leading: Image.asset(
               index == _drawerItems.length - 1
-                  ? userName == null
+                  ? AppConstant.isLoggedIn == false
                   ? 'images/sign_in.png'
                   : 'images/sign_out.png'
                   : item.icon,
               width: 30),
           title: index == _drawerItems.length - 1
-              ? Text(userName == null ? 'Login' : 'Logout',
-              style: TextStyle(color:Colors.white, fontSize: 15))
+              ? Text(AppConstant.isLoggedIn == false ? 'Login' : 'Logout',
+              style: TextStyle(color: Color(0xff6A6A6A), fontSize: 15))
               : Text(item.title,
-              style: TextStyle(color: Colors.white, fontSize: 15)),
+              style: TextStyle(color: Color(0xff6A6A6A), fontSize: 15)),
           onTap: () {
             _openPageForIndex(index, context);
           },
@@ -156,16 +171,26 @@ class SideMenuScreen extends StatelessWidget {
         share();
         break;
       case 8:
-        if (userName != null) {
+        if (AppConstant.isLoggedIn) {
           _showDialog(context);
         } else {
           Navigator.pop(context);
-          Navigator.push(
-            context,
-           MaterialPageRoute(builder: (context) => LoginScreen("menu")),
-           // MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
-
-          );
+          SharedPrefs.getStore().then((storeData){
+            StoreModel model = storeData;
+            print("---internationalOtp--${model.internationalOtp}");
+            //User Login with Mobile and OTP = 0
+            if(model.internationalOtp == "0"){
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+              );
+            }else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+              );
+            }
+          });
         }
         break;
     }
@@ -203,14 +228,25 @@ class SideMenuScreen extends StatelessWidget {
 
   Future logout(BuildContext context) async {
     try {
-      SharedPrefs.removeUser();
+
       SharedPrefs.setUserLoggedIn(false);
+      AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Products_Table);
       databaseHelper.deleteTable(DatabaseHelper.CART_Table);
       Utils.showToast(AppConstant.logoutSuccess, true);
+
+      setState(() {
+        widget.userName == null;
+      });
+      /*SharedPreferences preferences = await SharedPreferences.getInstance();
+      preferences.clear().then((status) {
+        if (status == true) {
+
+        }
+      });*/
       //Pop Drawer
       Navigator.pop(context);
     } catch (e) {
@@ -221,11 +257,13 @@ class SideMenuScreen extends StatelessWidget {
   Future<void> share() async {
     await FlutterShare.share(
         title: 'Kindly download',
-        text: 'Kindly download' + store.storeName + 'app from',
-        linkUrl: store.androidShareLink,
+        text: 'Kindly download' + widget.store.storeName + 'app from',
+        linkUrl: widget.store.androidShareLink,
         chooserTitle: 'Refer & Earn');
   }
 }
+
+
 
 class DrawerChildItem {
   String title;

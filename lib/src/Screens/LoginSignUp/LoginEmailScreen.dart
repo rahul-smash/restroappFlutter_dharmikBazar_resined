@@ -9,16 +9,18 @@ import 'package:flutter/gestures.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginEmailScreen extends StatefulWidget {
+
   String menu;
-  LoginScreen(this.menu);
+  LoginEmailScreen(this.menu);
+
   @override
-  _LoginScreenState createState() => _LoginScreenState(menu);
+  _LoginEmailScreenState createState() => _LoginEmailScreenState(menu);
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginEmailScreenState extends State<LoginEmailScreen> {
   String menu;
-  _LoginScreenState(this.menu);
+  _LoginEmailScreenState(this.menu);
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -266,6 +268,9 @@ class _LoginScreenState extends State<LoginScreen> {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
               Navigator.pop(context);
+              Utils.showToast(response.message, true);
+            }else{
+              Utils.showToast(response.message, true);
             }
           });
         }

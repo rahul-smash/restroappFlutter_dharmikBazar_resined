@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
@@ -16,7 +17,9 @@ import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:restroapp/src/utils/version_check.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
@@ -29,8 +32,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  StoreModel store;
 
+  StoreModel store;
+  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   List<String> imgList = [];
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
@@ -42,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    initFirebase();
     try {
       if (store.banners.isEmpty) {
         imgList = [
@@ -68,7 +73,9 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       String pickupfacility = store.pickupFacility;
       String delieveryAdress=store.deliveryFacility;
-      try {
+
+      versionCheck(context);
+   /*   try {
         if (store.forceDownload.isEmpty) {
           print('@@HomeModel   '+pickupfacility+'  Delievery'+androidAPPversion);
 
@@ -95,12 +102,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 print('@@oldversion'+oldVerision);
 
               }else{
-                /* DatabaseHelper databaseHelper = new DatabaseHelper();
+                *//* DatabaseHelper databaseHelper = new DatabaseHelper();
 
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Products_Table);
-      databaseHelper.deleteTable(DatabaseHelper.CART_Table);*/
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);*//*
 
               }
 
@@ -109,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
       } catch (e) {
         print(e);
       }
-      checkForAppVersion();
+      checkForAppVersion();*/
 
 
     });
@@ -242,7 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: SideMenuScreen(store, user == null ? null : user.fullName),
+      drawer: NavDrawerMenu(store, user == null ? null : user.fullName),
       bottomNavigationBar: addBottomBar(),
     );
   }
@@ -336,10 +343,81 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _handleDrawer() async {
-    _key.currentState.openDrawer();
-    if (AppConstant.isLoggedIn) {
-      user = await SharedPrefs.getUser();
-      setState(() {});
+    try {
+      _key.currentState.openDrawer();
+      //print("------_handleDrawer-------");
+      if (AppConstant.isLoggedIn) {
+            user = await SharedPrefs.getUser();
+            //if(user != null)
+            setState(() {});
+          }
+    } catch (e) {
+      print(e);
     }
+  }
+
+  void initFirebase() {
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        try {
+          print("------onMessage: $message");
+          String title = message['notification']['title'];
+          String body = message['notification']['body'];
+          showNotification(title,body,message);
+        } catch (e) {
+          print(e);
+        }
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        //print("onLaunch: $message");
+
+      },
+      onResume: (Map<String, dynamic> message) async {
+        //print("onResume: $message");
+
+      },
+    );
+
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.getToken().then((token){
+      print("----token---- ${token}");
+      try {
+        SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
+      } catch (e) {
+        print(e);
+      }
+    });
+  }
+
+  Future showNotification(String title,String body, Map<String, dynamic> message) async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+
+    var initializationSettingsAndroid =
+    AndroidInitializationSettings('ic_notification');
+    var initializationSettingsIOS = IOSInitializationSettings(
+        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'restroapp', 'restroapp', 'restroapp app',
+        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+        0, title, body, platformChannelSpecifics,
+        payload: 'item x');
+
+  }
+  Future<void> onSelectNotification(String payload) async {
+    debugPrint('onSelectNotification : ');
+  }
+  Future<void> onDidReceiveLocalNotification(int id, String title,
+      String body, String payload) async {
+    debugPrint('onDidReceiveLocalNotification : ');
   }
 }

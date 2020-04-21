@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -20,17 +21,22 @@ class _SplashScreenState extends State<SplashScreen> {
   String appID = "";
   String version = "";
   String buildNumber = "";
+  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+
+  @override
+  void initState() {
+    super.initState();
+    getdeviceToken();
+    getAppInfo();
+
+  }
+
   openHomePage(StoreModel store) {
     _timer = new Timer(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(CustomPageRoute(HomeScreen(store)));
     });
   }
-@override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    getAppInfo();
-  }
+
   void getAppInfo() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
@@ -79,6 +85,19 @@ class _SplashScreenState extends State<SplashScreen> {
         },
       ),
     );
+  }
+
+  void getdeviceToken() {
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+    _firebaseMessaging.getToken().then((token){
+      print("----token---- ${token}");
+      try {
+        SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
+      } catch (e) {
+        print(e);
+      }
+    });
   }
 }
 

@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "771670170221",
+    "firebase_url": "https://flutter-valueappz.firebaseio.com",
+    "project_id": "flutter-valueappz",
+    "storage_bucket": "flutter-valueappz.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:2dc87b90ce47f10135fd64",
+        "android_client_info": {
+          "package_name": "com.signity.restroapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

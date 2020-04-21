@@ -52,10 +52,13 @@ class SharedPrefs {
     return sharedUser.getBool('isLoggedIn') ?? false;
   }
 
+
   static Future storeSharedValue(String key, String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value);
   }
+
+
   static void saveUserMobile(UserModelMobile model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     dynamic userResponse = model.toJson();
@@ -69,17 +72,17 @@ class SharedPrefs {
     var user = UserModelMobile.fromJson(userMap);
     return user;
   }
-  static void saveUserOTP(OTPVerified model) async {
+  static void saveUserOTP(OtpVerified model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     dynamic userResponse = model.toJson();
     String jsonString = jsonEncode(userResponse);
     sharedUser.setString('data', jsonString);
   }
 
-  static Future<OTPVerified> getUserOTP() async {
+  static Future<OtpVerified> getUserOTP() async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     Map<String, dynamic> userMap = json.decode(sharedUser.getString('data'));
-    var user = OTPVerified.fromJson(userMap);
+    var user = OtpVerified.fromJson(userMap);
     return user;
   }
 }

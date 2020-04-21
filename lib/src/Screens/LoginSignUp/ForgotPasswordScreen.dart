@@ -13,20 +13,19 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
+
   String menu;
   ForgotPasswordScreen(this.menu);
+
   @override
-  _ForgotPasswordScreen createState() => _ForgotPasswordScreen(this.menu);
+  _ForgotPasswordScreen createState() => _ForgotPasswordScreen();
 }
 
 class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
-  String menu;
-  _ForgotPasswordScreen(this.menu);
+
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   ForgotPasswordData forgotPwddData = new ForgotPasswordData();
   final emailController = new TextEditingController();
-  Timer _timer;
-  int _start = 20;
 
   StoreModel store;
   String otpSkip,pickupfacility,delieveryAdress;
@@ -54,9 +53,8 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 children: <Widget>[
                   new Container(
-
                       padding: const EdgeInsets.only(top: 40.0),
-                      margin: const EdgeInsets.fromLTRB(20.0, 10.0, 5.0, 5.0),
+                      margin: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
                       child: new Text(
                         AppConstant.entertxForgotPssword,
                         style: new TextStyle(
@@ -82,18 +80,13 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                     child: new Container(
                       padding: const EdgeInsets.all(10.0),
                       child: new Row(
-
                         children: [
-
                           // First child in the Row for the name and the
                           new Expanded(
-
                             // Name and Address are in the same column
                             child: new Column(
-
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-
                                 // Code to create the view for name.
                                 new Container(
                                     padding: const EdgeInsets.only(
@@ -107,8 +100,6 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                                       ),
                                       onPressed: _forgotPassword,
                                     )),
-
-
                               ],
                             ),
                           ),
@@ -116,35 +107,6 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                       ),
                     ),
                   ),
-
-
-                  /*new Container(
-                      padding: const EdgeInsets.only(
-                          left: 40.0, top: 20.0, right: 40.0),
-                      child: new RaisedButton(
-                        color: appTheme,
-                        textColor: Colors.white,
-                        child: const Text('Submit',style: TextStyle(
-                          color: Colors.white,
-                        ),
-                        ),
-                        onPressed: _otpForm,
-                      )),*/
-
-                  /*   new Container(
-                      padding: const EdgeInsets.only(
-                          left: 40.0, top: 20.0, right: 40.0),
-                      child: new RaisedButton(
-                        color: appTheme,
-                        textColor: Colors.white,
-                        child:  Text("$_start"+" sec",style: TextStyle(
-                          color: Colors.white,
-                        ),
-
-                        ),
-
-                      //  onPressed: _otpForm,
-                      )),*/
                 ],
               ))),
     );
@@ -154,7 +116,7 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
 
 
   void _forgotPassword() {
-    print('@@MENUGET'+menu);
+    print('@@_forgotPassword');
 
     final FormState form = _formKey.currentState;
     if (form.validate()) {
@@ -183,7 +145,6 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return object of type Dialog
         return AlertDialog(
           title: new Text("Success"),
           content: new Text(message),
@@ -200,14 +161,9 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
       },
     );
   }
-
-
-
 }
 
-
 class ForgotPasswordData {
-
   String email;
 }
 
