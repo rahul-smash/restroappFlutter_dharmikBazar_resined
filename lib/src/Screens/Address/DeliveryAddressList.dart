@@ -9,6 +9,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
 class DeliveryAddressList extends StatefulWidget {
+
   final bool showProceedBar;
   DeliveryAddressList(this.showProceedBar);
 
@@ -17,6 +18,7 @@ class DeliveryAddressList extends StatefulWidget {
 }
 
 class _AddDeliveryAddressState extends State<DeliveryAddressList> {
+
   int selectedIndex = 0;
   List<DeliveryAddressData> addressList = [];
 
