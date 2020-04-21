@@ -673,6 +673,25 @@ class ApiController {
     }
   }
 
+  static Future<StoreOffersResponse> myOffersApiRequest() async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.storeOffers;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    print('@@myOffersApiRequest' + url);
+
+    try {
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      StoreOffersResponse res = StoreOffersResponse.fromJson(parsed);
+      return res;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
 
 
 }

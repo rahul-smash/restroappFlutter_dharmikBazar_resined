@@ -58,5 +58,20 @@ class AppConstant {
 
   static final String app_VERISON = "APP_VERISON";
   static final String old_appverion = "APP_VERISON";
+  static final String txt_offers = "Offers";
+
+  static final String txt_valid_form = 'Valid From :';
+  static final String txt_usage_Limit = 'Usage Limit :';
+
+  static final String txt_minimum_Amount = 'Minimum Order Amount :';
+
+  static final String txt_Discount = 'Discount :';
+
+  static final String txt_Coupon = 'Coupon Code :';
+
+  static final String txt_terms_condition = 'Terms n Condition :';
+
+
+
 
 }

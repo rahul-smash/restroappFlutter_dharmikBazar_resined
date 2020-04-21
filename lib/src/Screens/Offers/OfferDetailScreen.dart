@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 
 class OfferDetailScreen extends StatefulWidget {
-  OfferModel offer;
+  final OfferModel offer;
 
   OfferDetailScreen(this.offer);
 
   @override
   State<StatefulWidget> createState() {
-    print("---------OfferDetailScreen---------");
-
     return _offerDetailScreen(offer);
   }
 }
@@ -23,7 +22,12 @@ class _offerDetailScreen extends State<OfferDetailScreen> {
   Widget build(BuildContext context) {
     return new Scaffold(
         appBar: AppBar(
-          title: new Text(offer.couponCode),
+          title: new Text(
+            offer.couponCode,
+            style: new TextStyle(
+              color: Colors.white,
+            ),
+          ),
           centerTitle: true,
         ),
         body: Form(
@@ -36,50 +40,53 @@ class _offerDetailScreen extends State<OfferDetailScreen> {
       child: SingleChildScrollView(
         child: Column(children: <Widget>[
           new Container(
+            margin: const EdgeInsets.fromLTRB(30.0, 20.0, 30.0, 10.0),
             alignment: Alignment.center,
             child: new Image.asset(
-              'images/placeholder.png',
-              alignment: Alignment.topCenter,
-              fit: BoxFit.fitWidth,
+              'images/app_icon.png',
+              alignment: Alignment.center,
+              fit: BoxFit.fill,
+              width: 200.0,
+              height: 200.0,
             ),
           ),
           Padding(
             padding: const EdgeInsetsDirectional.only(),
             child: Column(children: [
               Padding(
-                padding: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 12),
                 child: Text(
-                    'Valid From :' +
+                    AppConstant.txt_valid_form +
                         offer.validFrom +
-                        'to' +
+                        ' to ' +
                         offer.validTo,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text('Usage Limit :' + offer.usageLimit,
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(AppConstant.txt_usage_Limit + offer.usageLimit,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 12),
                 child: Text(
-                    'Minimum Order Amount :' + offer.minimumOrderAmount,
+                    AppConstant.txt_minimum_Amount + offer.minimumOrderAmount,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text('Discount :' + offer.discount,
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(AppConstant.txt_Discount + offer.discount,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: Text('Coupon Code :' + offer.couponCode,
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(AppConstant.txt_Coupon + offer.couponCode,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 12),
                 child: Text(
-                    'Terms n Condition :' + offer.offerTermCondition,
+                    AppConstant.txt_terms_condition + offer.offerTermCondition,
                     style: TextStyle(fontSize: 18, color: Colors.black)),
               ),
               /*new Divider(
