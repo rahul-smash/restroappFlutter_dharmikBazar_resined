@@ -271,6 +271,9 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
           } else {
             if (projectSnap.hasData) {
               StoreDeliveryAreasResponse response = projectSnap.data;
+              if(response != null && !response.success){
+                Utils.showToast(response.message, false);
+              }
               if (response.success) {
                 List<StoreArea> areas = response.areas;
                 return dialogContent(context, areas);

@@ -55,7 +55,8 @@ class MyOfferScreenState extends State<MyOfferScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text(
-                                        "Min Order ${offer.minimumOrderAmount}"),
+                                        AppConstant.txt_code+" ${offer.couponCode}", style: TextStyle(color: Colors.black
+                                    )),
                                   ],
                                 ),
                                 trailing: Wrap(

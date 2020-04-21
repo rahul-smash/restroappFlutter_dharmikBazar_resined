@@ -30,7 +30,7 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
       pickupfacility = store.pickupFacility;
       delieveryAdress = store.deliveryFacility;
       //String dine=store.
-      print('@@HomeModel   '+pickupfacility+'  Delievery'+delieveryAdress);
+      print('@@OrderSelectionScreen   '+pickupfacility+'  Delievery'+delieveryAdress);
     });
   }
 
@@ -48,6 +48,7 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
             child:  GestureDetector(
               onTap: () {
                 print('@@CartBottomView----'+"DeliveryScreen");
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -92,6 +93,7 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
             child:  GestureDetector(
               onTap: () {
                 print('@@CartBottomView----'+"PickUPActivy");
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(

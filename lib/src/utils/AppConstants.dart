@@ -72,6 +72,7 @@ class AppConstant {
   static final String txt_terms_condition = 'Terms n Condition :';
 
 
+  static final String txt_code = 'Code :';
 
 
 }

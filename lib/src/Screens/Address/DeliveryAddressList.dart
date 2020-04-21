@@ -90,6 +90,12 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         } else {
           if (projectSnap.hasData) {
             DeliveryAddressResponse response = projectSnap.data;
+            if(response != null && !response.success){
+              Utils.showToast(response.message, false);
+            }
+            if(response != null && response.data.isEmpty){
+              Utils.showToast("No Delivery Address found!", false);
+            }
             if (response.success) {
               addressList = response.data;
               return Expanded(
