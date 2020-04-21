@@ -16,7 +16,7 @@ class DatabaseHelper {
   // Database table names
   static final String Categories_Table = "categories";
   static final String Sub_Categories_Table = "sub_categories";
-  static final String Products_Table = "products";
+  //static final String Products_Table = "products";
   static final String CART_Table = "cart";
 
   // Database Columns
@@ -80,34 +80,10 @@ class DatabaseHelper {
         "deleted TEXT, "
         "sort TEXT"
         ")");
-    await db.execute("CREATE TABLE ${Products_Table}("
-        "id INTEGER PRIMARY KEY, "
-        "store_id TEXT, "
-        "category_ids TEXT, "
-        "title TEXT, "
-        "brand TEXT, "
-        "nutrient TEXT, "
-        "description TEXT, "
-        "image TEXT, "
-        "imageType TEXT, "
-        "imageUrl TEXT, "
-        "showPrice TEXT, "
-        "isTaxEnable TEXT, "
-        "gstTaxType TEXT, "
-        "gstTaxRate TEXT, "
-        "status TEXT, "
-        "sort TEXT, "
-        "favorite TEXT, "
-        "image_100_80 TEXT, "
-        "image_300_200 TEXT, "
-        "variants_mrp_price TEXT, "
-        "variants_price TEXT, "
-        "variants_discount TEXT, "
-        "variants_id TEXT "
-        ")");
     await db.execute("CREATE TABLE ${CART_Table}("
         "id INTEGER PRIMARY KEY, "
         "product_name TEXT, "
+        "isfavorite TEXT, "
         "nutrient TEXT, "
         "description TEXT, "
         "imageType TEXT, "

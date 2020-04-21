@@ -83,6 +83,7 @@ class Product {
   String storeId;
   String categoryIds;
   String title;
+  String isFav;
   String brand;
   String nutrient;
   String description;
@@ -113,6 +114,7 @@ class Product {
     this.storeId,
     this.categoryIds,
     this.title,
+    this.isFav,
     this.brand,
     this.nutrient,
     this.description,
@@ -139,6 +141,7 @@ class Product {
   factory Product.fromJson(Map<String, dynamic> json) {
     Product product = Product();
     product.id = json["id"];
+    product.isFav = json["fav"];
     product.storeId = json["store_id"];
     product.categoryIds = json["category_ids"];
     product.title = json["title"];
@@ -172,6 +175,7 @@ class Product {
 
   Map<String, dynamic> toJson() => {
         "id": id,
+        "isFav": isFav,
         "store_id": storeId,
         "category_ids": categoryIds,
         "title": title,

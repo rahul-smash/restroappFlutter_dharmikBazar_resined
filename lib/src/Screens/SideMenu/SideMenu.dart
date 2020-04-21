@@ -234,7 +234,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
-      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      //databaseHelper.deleteTable(DatabaseHelper.Products_Table);
       databaseHelper.deleteTable(DatabaseHelper.CART_Table);
       Utils.showToast(AppConstant.logoutSuccess, true);
 

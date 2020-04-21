@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
   UserModel user;
-  String androidAPPversion,ios_app_version,force_download,force_downloads,force_download_message;
 
   _HomeScreenState(this.store);
 
@@ -106,7 +105,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               shrinkWrap: true,
                               children: response.categories
                                   .map((CategoryModel model) {
-                                return GridTile(child: CategoryView(model));
+                                return GridTile(
+                                    child: CategoryView(model)
+                                );
                               }).toList()),
                         );
                       } else {

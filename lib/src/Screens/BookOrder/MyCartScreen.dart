@@ -6,10 +6,11 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 
 class MyCartScreen extends StatelessWidget {
+
   final VoidCallback callback;
-  final CartTotalPriceBottomBar bottomBar =
-      CartTotalPriceBottomBar(ParentInfo.cartList);
+  final CartTotalPriceBottomBar bottomBar = CartTotalPriceBottomBar(ParentInfo.cartList);
   final DatabaseHelper databaseHelper = new DatabaseHelper();
+
   MyCartScreen(this.callback);
 
   @override
@@ -34,15 +35,17 @@ class MyCartScreen extends StatelessWidget {
                     return Container();
                   } else {
                     if (projectSnap.hasData) {
-                      return ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: projectSnap.data.length,
-                        itemBuilder: (context, index) {
-                          Product product = projectSnap.data[index];
-                          return ProductTileItem(product, () {
-                            bottomBar.state.updateTotalPrice();
-                          });
-                        },
+                      return Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: projectSnap.data.length,
+                          itemBuilder: (context, index) {
+                            Product product = projectSnap.data[index];
+                            return ProductTileItem(product, () {
+                              bottomBar.state.updateTotalPrice();
+                            });
+                          },
+                        ),
                       );
                     } else {
                       return Center(
