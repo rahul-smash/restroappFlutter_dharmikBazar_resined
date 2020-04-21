@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -13,13 +16,34 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> {
   Timer _timer;
-
+  String appName = "";
+  String appID = "";
+  String version = "";
+  String buildNumber = "";
   openHomePage(StoreModel store) {
     _timer = new Timer(const Duration(seconds: 1), () {
       Navigator.of(context).pushReplacement(CustomPageRoute(HomeScreen(store)));
     });
   }
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getAppInfo();
+  }
+  void getAppInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      appName = packageInfo.appName;
+      appID = packageInfo.packageName;
+      version = packageInfo.version;
+      buildNumber = packageInfo.buildNumber;
+      SharedPrefs.storeSharedValue(
+          AppConstant.old_appverion, version);
 
+      print('@@_____'+version+""+appName);
+    });
+  }
   @override
   void dispose() {
     super.dispose();

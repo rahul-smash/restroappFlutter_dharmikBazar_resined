@@ -53,5 +53,9 @@ class AppConstant {
 
 
   static final String txtSendEmail = "SEND EMAIL";
+  static final String app_OLD_VERISON = "APP_OLD_VERISON";
+
+  static final String app_VERISON = "APP_VERISON";
+  static final String old_appverion = "APP_VERISON";
 
 }

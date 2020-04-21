@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
@@ -6,6 +7,7 @@ import 'package:restroapp/src/Screens/Offers/OfferScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
 import 'package:restroapp/src/UI/CategoryView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -14,6 +16,7 @@ import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
@@ -26,12 +29,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final StoreModel store;
+  StoreModel store;
 
   List<String> imgList = [];
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
   UserModel user;
+  String androidAPPversion,ios_app_version,force_download,force_downloads,force_download_message;
 
   _HomeScreenState(this.store);
 
@@ -55,6 +59,129 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     }
+    getAddresKey();
+  }
+  void getAddresKey() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    //String deviceId = prefs.getString(AppConstant.deviceId);
+    store = await SharedPrefs.getStore();
+    setState(() {
+      String pickupfacility = store.pickupFacility;
+      String delieveryAdress=store.deliveryFacility;
+      try {
+        if (store.forceDownload.isEmpty) {
+          print('@@HomeModel   '+pickupfacility+'  Delievery'+androidAPPversion);
+
+
+        } else {
+            for (var i = 0; i < store.forceDownload.length; i++) {
+              androidAPPversion = store.forceDownload[i].androidAppVerison;
+              ios_app_version = store.forceDownload[i].iosAppVersion;
+              force_downloads = store.forceDownload[i].forceDownload;
+              force_download_message = store.forceDownload[i].forceDownloadMessage;
+              print('@@HomeModel   '+pickupfacility+'  Delievery'+androidAPPversion);
+
+              String oldVerision = prefs.getString(AppConstant.old_appverion);
+              print('@@oldversion'+oldVerision);
+              if (oldVerision=="") {
+                SharedPrefs.storeSharedValue( AppConstant.app_OLD_VERISON, store.version);
+              }
+
+              oldVerision = prefs.getString(AppConstant.app_OLD_VERISON);
+
+              String appVersion = store.version;
+
+              if(appVersion==oldVerision){
+                print('@@oldversion'+oldVerision);
+
+              }else{
+                /* DatabaseHelper databaseHelper = new DatabaseHelper();
+
+      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);*/
+
+              }
+
+            }
+        }
+      } catch (e) {
+        print(e);
+      }
+      checkForAppVersion();
+
+
+    });
+  }
+   void checkForAppVersion(/*ForceDownload forceDownloadModel*/) async {
+
+     SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+
+    String appVersionName =prefs.getString(AppConstant.old_appverion);
+
+     try {
+       if (store.forceDownload.isEmpty) {
+
+
+       } else {
+         for (var i = 0; i < store.forceDownload.length; i++) {
+           androidAPPversion = store.forceDownload[i].androidAppVerison;
+           ios_app_version = store.forceDownload[i].iosAppVersion;
+           force_downloads = store.forceDownload[i].forceDownload;
+           force_download_message = store.forceDownload[i].forceDownloadMessage;
+           print('@@HomeModel   '+ios_app_version+'  Delievery'+androidAPPversion);
+           String version = androidAPPversion != null ?
+           ios_app_version : "";
+           if(version==""){
+
+           }else{
+
+             try {
+               var appVersion = double.tryParse(version);
+               var appVersionSystem = double.tryParse(appVersionName);
+               // double appVersionSystem = Double.parseDouble(appVersionName);
+               if (appVersion > appVersionSystem) {
+                 print('@@enetr method: ');
+
+                 //      openDialogForVersion(forceDownloadModel);
+               }
+             }  catch(e) {
+               print('error caught: $e');
+             }
+
+           }
+
+         }
+       }
+     } catch (e) {
+       print(e);
+     }
+
+
+    /* if (forceDownloadModel != null) {
+            PrefManager prefManager = new PrefManager(MainActivity.this);
+            String appVersion = prefManager.getAppVersion();
+            if (appVersion.isEmpty()) {
+                String version = forceDownloadModel.getAndroidAppVerison() != null ?
+                        forceDownloadModel.getAndroidAppVerison() : "";
+                if (!version.isEmpty()) {
+                    prefManager.setAppVersion(version);
+                }
+            } else {
+                String version = forceDownloadModel.getAndroidAppVerison() != null ?
+                        forceDownloadModel.getAndroidAppVerison() : "";
+                if (!version.isEmpty()) {
+                    if (!appVersion.equalsIgnoreCase(version)) {
+                        openDialogForVersion(forceDownloadModel);
+                    } else {
+                        prefManager.setAppVersion(version);
+                    }
+                }
+            }
+        }*/
   }
 
   @override
