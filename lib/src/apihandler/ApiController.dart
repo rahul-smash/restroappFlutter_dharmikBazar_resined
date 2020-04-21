@@ -263,12 +263,14 @@ class ApiController {
     try {
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print("----url---${url}");
+      print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
-      StoreDeliveryAreasResponse storeArea =
-          StoreDeliveryAreasResponse.fromJson(parsed);
+      StoreDeliveryAreasResponse storeArea = StoreDeliveryAreasResponse.fromJson(parsed);
       return storeArea;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }

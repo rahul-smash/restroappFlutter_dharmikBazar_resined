@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     return new Scaffold(
       body: FutureBuilder(
-        future: ApiController.versionApiRequest("1"),
+        future: ApiController.versionApiRequest("7"),
         builder: (context, projectSnap) {
           if (projectSnap.connectionState == ConnectionState.none &&
               projectSnap.hasData == null) {
