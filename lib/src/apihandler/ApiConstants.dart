@@ -9,6 +9,8 @@ class ApiConstants{
 
   static String getAddress = 'deliveryAddress';
   static String getAddressArea = 'deliveryAreas/Area';
+  static String getStorePickupAddress = 'storePickupAddress';
+
   static String storeOffers = 'storeOffers';
   static String validateCoupon = 'validateAllCoupons';
   static String multipleTaxCalculation = 'multiple_tax_calculation';

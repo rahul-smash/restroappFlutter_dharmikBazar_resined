@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
 class OrderSelectionScreen extends StatefulWidget {
@@ -93,12 +95,21 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
             child:  GestureDetector(
               onTap: () {
                 print('@@CartBottomView----'+"PickUPActivy");
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => PickUpOrderScreen()),
-                );
+                ApiController.getStorePickupAddress().then((response){
+
+                  PickUpModel storeArea = response;
+                  print('---PickUpModel---${storeArea.data.length}--');
+
+                  /*Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PickUpOrderScreen()),
+                  );*/
+
+
+                });
+
               },
               child: new Container(
                 margin: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),

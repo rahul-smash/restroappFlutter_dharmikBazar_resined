@@ -10,6 +10,7 @@ import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -267,6 +268,27 @@ class ApiController {
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       StoreDeliveryAreasResponse storeArea = StoreDeliveryAreasResponse.fromJson(parsed);
+      return storeArea;
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<PickUpModel> getStorePickupAddress() async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getStorePickupAddress;
+
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+    try {
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      print("----url---${url}");
+      print("----respStr---${respStr}");
+      final parsed = json.decode(respStr);
+      PickUpModel storeArea = PickUpModel.fromJson(parsed);
       return storeArea;
     } catch (e) {
       print("----catch---${e.toString()}");
