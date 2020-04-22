@@ -130,28 +130,30 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: addBottomBar(),
     );
   }
-
   Widget addBanners() {
-    return CarouselSlider(
-      viewportFraction: 0.9,
-      aspectRatio: 1.7,
-      autoPlay: true,
-      enlargeCenterPage: false,
-      items: imgList.map(
-        (url) {
-          return Container(
-            margin: EdgeInsets.all(0.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.all(Radius.circular(0.0)),
-              child: Image.network(
-                url,
-                fit: BoxFit.cover,
-                width: 1000.0,
-              ),
-            ),
-          );
-        },
-      ).toList(),
+    return Stack(
+      children: <Widget>[
+        CarouselSlider(
+          viewportFraction: 0.9,
+          aspectRatio: 1.7,
+          autoPlay: true,
+          enlargeCenterPage: false,
+          items: imgList.map((url) {
+              return Container(
+                margin: EdgeInsets.all(0.0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.all(Radius.circular(0.0)),
+                  child: Image.network(
+                    url,
+                    fit: BoxFit.cover,
+                    width: 1000.0,
+                  ),
+                ),
+              );
+            },
+          ).toList(),
+        ),
+      ],
     );
   }
 
