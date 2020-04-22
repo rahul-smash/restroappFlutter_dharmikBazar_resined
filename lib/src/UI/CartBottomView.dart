@@ -43,7 +43,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
 */
     setState(() {
       pickupfacility = store.pickupFacility;
-      delieveryAdress=store.deliveryFacility;
+      delieveryAdress = store.deliveryFacility;
 
    //   print('@@HomeModel   '+pickupfacility+'  Delievery'+delieveryAdress+prefs.getString(AppConstant.app_OLD_VERISON));
     });
@@ -150,23 +150,22 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
             thickness: 2.0,
           ),
           InkWell(
-            onTap: () {
+            onTap: () async {
               if (AppConstant.isLoggedIn) {
                 if (totalPrice == 0.0) {
                   Utils.showToast(AppConstant.addItems, false);
                 } else {
+
+                  store = await SharedPrefs.getStore();
+                  pickupfacility = store.pickupFacility;
+                  delieveryAdress = store.deliveryFacility;
+
+                  //print('---------${pickupfacility} and ${delieveryAdress}--------');
                   showDialog(
                     context: context,
-                    builder: (BuildContext context) => OrderSelectionScreen(
-                    ),
+                    builder: (BuildContext context) => OrderSelectionScreen(pickupfacility,delieveryAdress),
                   );
-                  //Here comment ocde-----
-                  print('OderType code Commented in screenCardBottomView');
-                  /*    Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => DeliveryAddressList(true)),
-                  );*/
+
                 }
               } else {
                 Utils.showLoginDialog(context);

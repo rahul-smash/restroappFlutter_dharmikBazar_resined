@@ -11,31 +11,47 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class OrderSelectionScreen extends StatefulWidget {
 
+  String pickupfacility,  delieveryAdress;
+  OrderSelectionScreen(this.pickupfacility, this.delieveryAdress);
+
   @override
   _OrderSelectionScreen createState() => _OrderSelectionScreen();
 }
 
 class _OrderSelectionScreen extends State<OrderSelectionScreen> {
+
   DatabaseHelper databaseHelper = new DatabaseHelper();
-
   StoreModel store;
-  String pickupfacility,delieveryAdress;
-
+  bool pickUpFacility,delieveryAddress;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getAddresKey();
-  }
-  void getAddresKey() async {
-    store = await SharedPrefs.getStore();
-    setState(() {
-      pickupfacility = store.pickupFacility;
-      delieveryAdress = store.deliveryFacility;
-      //String dine=store.
-      print('@@OrderSelectionScreen   '+pickupfacility+'  Delievery'+delieveryAdress);
-    });
+
+    if(widget.pickupfacility == "1" && widget.delieveryAdress == "1"){
+      pickUpFacility = true;
+      delieveryAddress = true;
+    }else{
+
+      if(widget.pickupfacility == "1"){
+        pickUpFacility = true;
+      }
+      if(widget.pickupfacility == "0"){
+        pickUpFacility = false;
+      }
+      if(widget.delieveryAdress == "1"){
+        delieveryAddress = true;
+      }
+      if(widget.delieveryAdress == "0"){
+        delieveryAddress = false;
+      }
+
+      if(widget.pickupfacility == "0" && widget.delieveryAdress == "0"){
+        pickUpFacility = false;
+        delieveryAddress = true;
+      }
+
+    }
   }
 
   @override
@@ -48,7 +64,7 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
         backgroundColor: Colors.transparent,
         child: ListView(children: <Widget>[
           Visibility(
-            visible: true,
+            visible: delieveryAddress,
             child:  GestureDetector(
               onTap: () {
                 print('@@CartBottomView----'+"DeliveryScreen");
@@ -93,7 +109,7 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
               ),
             ),),
           Visibility(
-            visible: true,
+            visible: pickUpFacility,
             child:  GestureDetector(
               onTap: () {
                 print('@@CartBottomView----'+"PickUPActivy");
@@ -158,65 +174,6 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                 ),
               ),
             ),),
-          Visibility(
-            visible: false,
-            child: GestureDetector(
-              onTap: () {
-                print('@@CartBottomView----'+"DineIn");
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DeliveryAddressList(true)),
-                );
-              },
-              child: new Container(
-                padding: const EdgeInsets.all(10.0),
-                child: new Row(
-                  children: [
-                    // First child in the Row for the name and the
-                    new Expanded(
-                      // Name and Address are in the same column
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Code to create the view for name.
-                          new Container(
-                            margin: const EdgeInsets.fromLTRB(10.0, 10.0, 20.0, 10.0),
-
-                            height: 100.0,
-                            width: 100.0,
-                            decoration: new BoxDecoration(
-                              image: DecorationImage(
-                                image: new AssetImage(
-                                  'images/dining.png',
-                                ),
-                                fit: BoxFit.fill,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-
-                          /* new Container(
-                          padding: const EdgeInsets.only(bottom: 10.0),
-                          child: new Text(
-                            AppConstant.dine,
-                            style: new TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-
-                        ),*/
-                          // Code to create the view for address.
-
-                        ],
-                      ),
-                    ),
-                    // Icon to indicate the phone number.
-                  ],
-                ),
-              ),
-            ),)
         ]));
 
     /* child: addBottomBar());*/
