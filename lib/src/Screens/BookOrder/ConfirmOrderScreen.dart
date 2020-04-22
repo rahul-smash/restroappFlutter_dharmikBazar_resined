@@ -12,10 +12,12 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
 
+  bool isComingFromPickUpScreen;
   final DeliveryAddressData address;
   final String paymentMode; // 2 = COD, 3 = Online Payment
+  String areaId;
 
-  ConfirmOrderScreen(this.address, this.paymentMode);
+  ConfirmOrderScreen(this.address, this.paymentMode,this.isComingFromPickUpScreen,this.areaId);
 
   @override
   ConfirmOrderState createState() => ConfirmOrderState();
@@ -229,10 +231,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AvailableOffersDialog(
-                      widget.address, widget.paymentMode, (model) {
-                    setState(() {
-                      taxModel = model;
-                    });
+                      widget.address, widget.paymentMode ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
+                        setState(() {
+                          taxModel = model;
+                        });
                   }),
                 );
               },
@@ -288,7 +290,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         Utils.showProgressDialog(context);
         databaseHelper.getCartItemsListToJson().then((json) {
           ApiController.placeOrderRequest(noteController.text, totalPrice.toString(),
-                  widget.paymentMode, taxModel, widget.address, json)
+                  widget.paymentMode, taxModel, widget.address, json ,
+              widget.isComingFromPickUpScreen,widget.areaId)
               .then((response) {
             Utils.hideProgressDialog(context);
             showDialog(

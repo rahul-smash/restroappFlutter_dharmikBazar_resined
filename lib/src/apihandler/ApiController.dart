@@ -434,13 +434,16 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
+      print("----url---${url}");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
       return model;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      print("----respStr---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }
@@ -457,7 +460,7 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.multipleTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    print("----url---${url}");
     try {
       request.fields.addAll({
         "fixed_discount_amount": "0",
@@ -470,13 +473,14 @@ class ApiController {
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
 
-      TaxCalculationResponse model =
-          TaxCalculationResponse.fromJson(couponCode, parsed);
+      TaxCalculationResponse model = TaxCalculationResponse.fromJson(couponCode, parsed);
       return model;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      print("----respStr---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }
@@ -487,7 +491,8 @@ class ApiController {
       String paymentMethod,
       TaxCalculationModel taxModel,
       DeliveryAddressData address,
-      String orderJson) async {
+      String orderJson, bool isComingFromPickUpScreen, String areaId) async {
+
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -504,7 +509,7 @@ class ApiController {
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : taxModel.couponCode,
         "device_id": deviceId,
-        "user_address": address.address,
+        "user_address": isComingFromPickUpScreen == true ? areaId : address.address,
         "store_fixed_tax_detail": "",
         "tax": taxModel == null ? "0" : taxModel.tax,
         "store_tax_rate_detail": "",
@@ -513,13 +518,14 @@ class ApiController {
         "total": taxModel == null ? totalPrice : taxModel.total,
         "user_id": user.id,
         "device_token": deviceToken,
-        "user_address_id": address.id,
+        "user_address_id": isComingFromPickUpScreen == true ? areaId : address.address,
         "orders": orderJson,
         "checkout": totalPrice,
         "payment_method": paymentMethod == "2" ? "COD" : "Online Payment",
         "discount": taxModel == null ? "" : taxModel.discount,
       });
-
+      print("----${url}--");
+      print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
@@ -527,7 +533,8 @@ class ApiController {
       ResponseModel model = ResponseModel.fromJson(parsed);
       return model;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      print("--fields--${e.toString()}--");
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }

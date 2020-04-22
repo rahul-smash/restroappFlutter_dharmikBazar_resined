@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:restroapp/src/Screens/BookOrder/ConfirmOrderScreen.dart';
+import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
@@ -88,7 +90,12 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
       bottomNavigationBar: BottomAppBar(
         child: InkWell(
           onTap: (){
-
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      ConfirmOrderScreen(null, "2",true, widget.areaObject.areaId)),
+            );
           },
           child: Container(
             height: 40,

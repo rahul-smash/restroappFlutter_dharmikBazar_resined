@@ -12,7 +12,11 @@ class AvailableOffersDialog extends StatefulWidget {
   final DeliveryAddressData address;
   final String paymentMode; // 2 = COD, 3 = Online Payment
   final Function(TaxCalculationModel) callback;
-  AvailableOffersDialog(this.address, this.paymentMode, this.callback);
+  bool isComingFromPickUpScreen;
+  String areaId;
+
+  AvailableOffersDialog(this.address, this.paymentMode,
+      this.isComingFromPickUpScreen , this. areaId,this.callback);
 
   @override
   AvailableOffersState createState() => AvailableOffersState();
@@ -20,6 +24,13 @@ class AvailableOffersDialog extends StatefulWidget {
 
 class AvailableOffersState extends State<AvailableOffersDialog> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
+  String area_id_value;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    area_id_value = widget.isComingFromPickUpScreen ? widget.areaId : widget.address.areaId;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,8 +63,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                         style: TextStyle(color: Colors.white, fontSize: 18.0)),
                   )),
               FutureBuilder(
-                future:
-                    ApiController.storeOffersApiRequest(widget.address.areaId),
+                future:ApiController.storeOffersApiRequest(area_id_value),
                 builder: (context, projectSnap) {
                   if (projectSnap.connectionState == ConnectionState.none &&
                       projectSnap.hasData == null) {
@@ -72,33 +82,24 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                               return ListTile(
                                 title: Text(
                                   offer.couponCode,
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
+                                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
                                 ),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text(
-                                        "Min Order ${offer.minimumOrderAmount}"),
+                                    Text("Min Order ${offer.minimumOrderAmount}"),
                                   ],
                                 ),
                                 trailing: Container(
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                    padding:EdgeInsets.fromLTRB(5, 0, 5, 0),
                                     child: new RaisedButton(
-                                      padding:
-                                          const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                      textColor: Colors.white,
-                                      color: appTheme,
+                                      padding:EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                      textColor: Colors.white,color: appTheme,
                                       onPressed: () {
                                         Utils.showProgressDialog(context);
-                                        databaseHelper
-                                            .getCartItemsListToJson()
-                                            .then((json) {
-                                          validateCouponApi(
-                                              offer.couponCode, json);
+                                        databaseHelper.getCartItemsListToJson().then((json) {
+                                          validateCouponApi(offer.couponCode, json);
                                         });
                                       },
                                       child: new Text("Apply"),
@@ -137,11 +138,12 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
   }
 
   void validateCouponApi(String couponCode, String json) {
+    print("----couponCode-----=>${couponCode}");
     ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json)
         .then((validCouponModel) {
-      if (validCouponModel.success) {
-        ApiController.multipleTaxCalculationRequest(couponCode,
-                validCouponModel.discountAmount, "0", json)
+      if (validCouponModel != null &&validCouponModel.success) {
+
+        ApiController.multipleTaxCalculationRequest(couponCode,validCouponModel.discountAmount, "0", json)
             .then((response) async {
           Utils.hideProgressDialog(context);
           if (response.success) {

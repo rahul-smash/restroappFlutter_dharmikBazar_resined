@@ -245,7 +245,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      ConfirmOrderScreen(addressList[selectedIndex], "2")),
+                      ConfirmOrderScreen(addressList[selectedIndex], "2",false,"")),
             );
           }
         },
