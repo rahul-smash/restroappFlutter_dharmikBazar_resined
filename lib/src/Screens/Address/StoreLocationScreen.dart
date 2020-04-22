@@ -8,10 +8,9 @@ import 'package:restroapp/src/utils/BaseState.dart';
 
 class StoreLocationScreen extends StatefulWidget {
 
-  Datum cityObject;
   Area areaObject;
 
-  StoreLocationScreen(this.cityObject, this.areaObject);
+  StoreLocationScreen(this.areaObject);
 
   @override
   _StoreLocationScreenState createState() {
@@ -90,6 +89,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
       bottomNavigationBar: BottomAppBar(
         child: InkWell(
           onTap: (){
+            Navigator.pop(context);
             Navigator.push(
               context,
               MaterialPageRoute(

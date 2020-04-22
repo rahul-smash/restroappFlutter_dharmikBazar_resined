@@ -86,7 +86,6 @@ class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
                             onTap: () async {
                               areaObject = await DialogUtils.displayAreaDialog(context,"Select Area", cityObject);
                               setState(() {
-
                               });
                             },
                             child: Container(
@@ -113,7 +112,7 @@ class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => StoreLocationScreen(cityObject,areaObject)),
+                    builder: (context) => StoreLocationScreen(areaObject)),
               );
             }else{
               Utils.showToast("Please select City and Area", true);

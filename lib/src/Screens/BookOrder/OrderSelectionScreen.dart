@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
+import 'package:restroapp/src/Screens/Address/StoreLocationScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -101,12 +102,24 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                   Utils.hideProgressDialog(context);
                   PickUpModel storeArea = response;
                   print('---PickUpModel---${storeArea.data.length}--');
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PickUpOrderScreen(storeArea)),
-                  );
+                  if(storeArea != null){
+                    if(storeArea.data.length == 1 && storeArea.data[0].area.length == 1){
+                      Area areaObject = storeArea.data[0].area[0];
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StoreLocationScreen(areaObject)),
+                      );
+
+                    }else{
+                      Navigator.pop(context);
+                      Navigator.push(context,
+                        MaterialPageRoute(
+                            builder: (context) => PickUpOrderScreen(storeArea)),
+                      );
+                    }
+                  }
                 });
               },
               child: new Container(
@@ -204,7 +217,6 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                 ),
               ),
             ),)
-
         ]));
 
     /* child: addBottomBar());*/
