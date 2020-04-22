@@ -23,7 +23,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
   String lat = "0", lng = "0";
   GoogleMapController mapController;
   Set<Marker> markers = Set();
-  LatLng center ;
+  LatLng center;
 
   @override
   void initState() {
