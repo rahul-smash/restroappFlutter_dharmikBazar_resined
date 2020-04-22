@@ -1,4 +1,3 @@
-
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
@@ -26,7 +25,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:io';
-
 
 class ApiController {
   static Future<StoreResponse> versionApiRequest(String storeId) async {
@@ -131,7 +129,8 @@ class ApiController {
     }
   }
 
-  static Future<GetForgotPwdData> forgotPasswordApiRequest(ForgotPasswordData forgotPasswordData) async {
+  static Future<GetForgotPwdData> forgotPasswordApiRequest(
+      ForgotPasswordData forgotPasswordData) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -143,7 +142,7 @@ class ApiController {
     try {
       request.fields.addAll({
         "email_id": forgotPasswordData.email,
-   /*     "device_id": deviceId,
+        /*     "device_id": deviceId,
         "device_token": "",
         "platform": Platform.isIOS ? "IOS" : "Android"*/
       });
@@ -211,7 +210,7 @@ class ApiController {
         "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
-
+      print('@@getSubCategoryProducts' + url + "" + request.toString());
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
 
@@ -244,10 +243,9 @@ class ApiController {
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       DeliveryAddressResponse deliveryAddressResponse =
-      DeliveryAddressResponse.fromJson(parsed);
+          DeliveryAddressResponse.fromJson(parsed);
       //print("----respStr---${deliveryAddressResponse.success}");
       return deliveryAddressResponse;
-
     } catch (e) {
       print("----catch---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -267,7 +265,8 @@ class ApiController {
       print("----url---${url}");
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
-      StoreDeliveryAreasResponse storeArea = StoreDeliveryAreasResponse.fromJson(parsed);
+      StoreDeliveryAreasResponse storeArea =
+          StoreDeliveryAreasResponse.fromJson(parsed);
       return storeArea;
     } catch (e) {
       print("----catch---${e.toString()}");
@@ -623,7 +622,8 @@ class ApiController {
     }
   }
 
-  static Future<MobileVerified> mobileVerification(LoginMobile loginData ) async {
+  static Future<MobileVerified> mobileVerification(
+      LoginMobile loginData) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -653,7 +653,7 @@ class ApiController {
       return userResponse;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
-      print('catch'+e.toString());
+      print('catch' + e.toString());
       return null;
     }
   }
@@ -664,10 +664,9 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.otp;
+    var url =
+        ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.otp;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
 
     try {
       request.fields.addAll({
@@ -678,10 +677,10 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "android"
       });
       print('@@url' + url);
-      print('@@fields' +request.fields.toString());
+      print('@@fields' + request.fields.toString());
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
-      print('response'+respStr);
+      print('response' + respStr);
       final parsed = json.decode(respStr);
 
       OtpVerified userResponse = OtpVerified.fromJson(parsed);
@@ -692,7 +691,7 @@ class ApiController {
       return userResponse;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
-      print('catch'+e.toString());
+      print('catch' + e.toString());
       return null;
     }
   }
@@ -716,6 +715,4 @@ class ApiController {
       return null;
     }
   }
-
-
 }

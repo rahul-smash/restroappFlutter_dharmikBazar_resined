@@ -144,8 +144,11 @@ class _ProductTileItemState extends State<ProductTileItem> {
   }
 
   Widget addVegNonVegOption() {
+
     Color foodOption =
     widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
+    print('@@product_nutrient'+widget.product.nutrient);
+
     return Padding(
       padding: EdgeInsets.only(left: 7, right: 7),
       child: widget.product.nutrient == "None"
