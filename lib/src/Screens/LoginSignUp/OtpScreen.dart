@@ -194,51 +194,16 @@ class _OtpScreen extends State<OtpScreen> {
     print('@@MENUGET'+widget.menu);
     if (widget.menu == ("menu")) {
       //  if (isNameExist && isEmailExist) {
-      //           showAlertDialogForLogin(getActivity(), "Sucess", "You have login successfully. Please continue.");
+      //showAlertDialogForLogin(getActivity(), "Sucess", "You have login successfully. Please continue.");
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen(store)),
       );
       /*  } else {
         proceedToEmail(from);
-      }
-*/
-    }
-    //else if (from.equals("shop_cart")) {
-    // if (isNameExist && isEmailExist) {
-    else{  if(delieveryAdress==("1") && pickupfacility==("1")){
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => DeliveryAddressList(false)),
-      );
-    }
-    else if(delieveryAdress==("1") && pickupfacility==("0")){
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PickUpOrderScreen()),
-      );
-    }
-    else if(delieveryAdress==("0") && pickupfacility==("1")){
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PickUpOrderScreen()),
-      );
-    }
-    else {
-      // intentDelivery = new Intent(getActivity(), DeliveryActivity.class);
-    }
-
-    }
-
-    /*    intentDelivery.putExtra(AppConstant.FROM, "shop_cart");
-        startActivity(intentDelivery);
-        getActivity().finish();
-        AnimUtil.slideFromRightAnim(getActivity());*/
-    //}
-    /* else {
-        proceedToEmail(from);
       }*/
-    //  }
+    }
+
   }
 
 }

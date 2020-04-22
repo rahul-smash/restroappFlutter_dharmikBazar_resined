@@ -6,6 +6,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class OrderSelectionScreen extends StatefulWidget {
 
@@ -95,21 +96,18 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
             child:  GestureDetector(
               onTap: () {
                 print('@@CartBottomView----'+"PickUPActivy");
+                Utils.showProgressDialog(context);
                 ApiController.getStorePickupAddress().then((response){
-
+                  Utils.hideProgressDialog(context);
                   PickUpModel storeArea = response;
                   print('---PickUpModel---${storeArea.data.length}--');
-
-                  /*Navigator.pop(context);
+                  Navigator.pop(context);
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) => PickUpOrderScreen()),
-                  );*/
-
-
+                        builder: (context) => PickUpOrderScreen(storeArea)),
+                  );
                 });
-
               },
               child: new Container(
                 margin: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),

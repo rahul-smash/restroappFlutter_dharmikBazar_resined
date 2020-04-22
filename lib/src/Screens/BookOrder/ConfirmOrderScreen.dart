@@ -11,8 +11,10 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
+
   final DeliveryAddressData address;
   final String paymentMode; // 2 = COD, 3 = Online Payment
+
   ConfirmOrderScreen(this.address, this.paymentMode);
 
   @override

@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
-import 'package:restroapp/src/UI/SocialLoginTabs.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
-import 'package:flutter/gestures.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
+import 'StoreLocationScreen.dart';
 
 class PickUpOrderScreen extends StatefulWidget {
+
+  PickUpModel storeArea;
+  PickUpOrderScreen(this.storeArea);
+
   @override
   _PickUpOrderScreen createState() => _PickUpOrderScreen();
 }
 
 class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
+
+  Datum cityObject;
+  Area areaObject;
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +57,16 @@ class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
                         Padding(
                           padding: EdgeInsets.fromLTRB(10, 5, 0, 5),
                           child: InkWell(
-                            onTap: () {
+                            onTap: () async {
+                              cityObject = await DialogUtils.displayCityDialog(context,
+                                  "Select City",
+                                  widget.storeArea);
+                              setState(() {
+                              });
+                              print("--object->---${cityObject.city.city}-");
                             },
                             child: Container(
-                              child: Text("City",
+                              child: Text(cityObject == null ? "City" : "${cityObject.city.city}",
                                 style: TextStyle( color: Colors.black, fontSize: 20.0, ),
                               ),
                             ),
@@ -69,10 +83,14 @@ class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
                         Padding(
                           padding: EdgeInsets.fromLTRB(10, 5, 0, 5),
                           child: InkWell(
-                            onTap: () {
+                            onTap: () async {
+                              areaObject = await DialogUtils.displayAreaDialog(context,"Select Area", cityObject);
+                              setState(() {
+
+                              });
                             },
                             child: Container(
-                              child: Text("Area",
+                              child: Text(areaObject == null ? "Area" : areaObject.areaName,
                                 style: TextStyle( color: Colors.black, fontSize: 20.0, ),
                               ),
                             ),
@@ -86,6 +104,36 @@ class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
             ),
 
           ],
+        ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: InkWell(
+          onTap: (){
+            if(cityObject != null && areaObject != null){
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => StoreLocationScreen(cityObject,areaObject)),
+              );
+            }else{
+              Utils.showToast("Please select City and Area", true);
+            }
+          },
+          child: Container(
+            height: 40,
+            color: appTheme,
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.only(left: 0.0),
+                child: RichText(
+                  text: TextSpan(
+                    text: "Proceed",
+                    style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );

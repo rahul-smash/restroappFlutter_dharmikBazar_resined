@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 
 class DialogUtils {
 
@@ -36,6 +37,106 @@ class DialogUtils {
                 },
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  static Future<Datum> displayCityDialog(BuildContext context,String title,PickUpModel storeArea) async {
+
+    return await showDialog<Datum>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            title: Text(title,textAlign: TextAlign.center,),
+            content: Container(
+              width: double.maxFinite,
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: storeArea.data.length,
+                      itemBuilder: (context, index) {
+                        Datum areaObject = storeArea.data[index];
+                        return InkWell(
+                            onTap: () {
+                              Navigator.pop(context, areaObject);
+                            },
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                border: Border(
+                                    bottom:
+                                    BorderSide(width: 1.0, color: Colors.black)),
+                                color: Colors.white,
+                              ),
+                              child: Center(child: Text(areaObject.city.city)),
+                            ));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
+  static Future<Area> displayAreaDialog(BuildContext context,String title,Datum cityObject) async {
+
+    return await showDialog<Area>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            title: Text(title,textAlign: TextAlign.center,),
+            content: Container(
+              width: double.maxFinite,
+              child: Column(
+                children: <Widget>[
+                  Expanded(
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: cityObject.area.length,
+                      itemBuilder: (context, index) {
+                        Area object = cityObject.area[index];
+                        return InkWell(
+                            onTap: () {
+                              Navigator.pop(context, object);
+                            },
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                border: Border(
+                                    bottom:
+                                    BorderSide(width: 1.0, color: Colors.black)),
+                                color: Colors.white,
+                              ),
+                              child: Center(child: Text(object.areaName)),
+                            ));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         );
       },

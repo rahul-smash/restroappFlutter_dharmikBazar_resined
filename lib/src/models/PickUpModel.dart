@@ -50,7 +50,8 @@ class Datum {
 
 class Area {
   String areaId;
-  String ispickupAdd;
+  String areaName;
+  String pickupAdd;
   String pickupPhone;
   String pickupEmail;
   String pickupLat;
@@ -64,7 +65,8 @@ class Area {
 
   Area({
     this.areaId,
-    this.ispickupAdd,
+    this.areaName,
+    this.pickupAdd,
     this.pickupPhone,
     this.pickupEmail,
     this.pickupLat,
@@ -79,7 +81,8 @@ class Area {
 
   factory Area.fromJson(Map<String, dynamic> json) => Area(
     areaId: json["area_id"],
-    ispickupAdd: json["ispickup_add"],
+    areaName: json["area_name"],
+    pickupAdd: json["pickup_add"],
     pickupPhone: json["pickup_phone"],
     pickupEmail: json["pickup_email"],
     pickupLat: json["pickup_lat"],
@@ -94,7 +97,8 @@ class Area {
 
   Map<String, dynamic> toJson() => {
     "area_id": areaId,
-    "ispickup_add": ispickupAdd,
+    "area_name": areaName,
+    "pickup_add": pickupAdd,
     "pickup_phone": pickupPhone,
     "pickup_email": pickupEmail,
     "pickup_lat": pickupLat,
