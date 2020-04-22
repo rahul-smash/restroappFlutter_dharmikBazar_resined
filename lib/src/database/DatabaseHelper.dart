@@ -176,6 +176,7 @@ class DatabaseHelper {
     List<String> columnsToSelect = [QUANTITY];
     String whereClause = '${DatabaseHelper.ID} = ?';
     List<dynamic> whereArguments = [product_id];
+
     List<Map> result = await dbClient.query(CART_Table,
         columns: columnsToSelect,
         where: whereClause,
@@ -210,7 +211,9 @@ class DatabaseHelper {
     // print the results
     if (resultList != null && resultList.isNotEmpty) {
       print("---result.length--- ${resultList.length}");
-      resultList.forEach((row) => print(row));
+      resultList.forEach((row) {
+        //print(row);
+      });
       String price = "0";
       String quantity = "0";
       resultList.forEach((row) {
@@ -239,23 +242,9 @@ class DatabaseHelper {
     List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
-      MRP_PRICE,
-      PRICE,
-      DISCOUNT,
-      isFavorite,
-      QUANTITY,
-      Product_Name,
-      VARIENT_ID,
-      WEIGHT,
-      PRODUCT_ID,
-      UNIT_TYPE,
-      IS_TAX_ENABLE,
-      nutrient,
-      description,
-      imageType,
-      imageUrl,
-      image_100_80,
-      image_300_200
+      MRP_PRICE,PRICE,DISCOUNT,isFavorite,QUANTITY,Product_Name,
+      VARIENT_ID,WEIGHT,PRODUCT_ID,UNIT_TYPE,IS_TAX_ENABLE,nutrient,
+      description,imageType,imageUrl,image_100_80,image_300_200
     ];
 
     List<Map> resultList =
@@ -286,6 +275,52 @@ class DatabaseHelper {
     } else {
       print("-empty cart-in db--");
     }
+    return cartList;
+  }
+
+
+  Future<List<Product>> getFavouritesList() async {
+    List<Product> cartList = new List();
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      MRP_PRICE,PRICE,DISCOUNT,isFavorite,QUANTITY,Product_Name,
+      VARIENT_ID,WEIGHT,PRODUCT_ID,UNIT_TYPE,IS_TAX_ENABLE,nutrient,
+      description,imageType,imageUrl,image_100_80,image_300_200
+    ];
+
+    String whereClause = '${DatabaseHelper.isFavorite} = 1';
+
+    List<Map> resultList =
+    await dbClient.query(CART_Table, columns: columnsToSelect, where: whereClause);
+
+    if (resultList != null && resultList.isNotEmpty) {
+
+      resultList.forEach((row) {
+        Product product = new Product();
+        product.mrpPrice = row[MRP_PRICE];
+        product.price = row[PRICE];
+        product.isFav = row[isFavorite];
+        product.discount = row[DISCOUNT];
+        product.quantity = row[QUANTITY];
+        product.title = row[Product_Name];
+        product.variantId = row[VARIENT_ID];
+        product.weight = row[WEIGHT];
+        product.id = row[PRODUCT_ID];
+        product.isUnitType = row[UNIT_TYPE] ?? '';
+        product.isTaxEnable = row[IS_TAX_ENABLE] ?? '0';
+        product.nutrient = row[nutrient];
+        product.description = row[description];
+        product.imageType = row[imageType];
+        product.imageUrl = row[imageUrl];
+        product.image10080 = row[image_100_80];
+        product.image300200 = row[image_300_200];
+
+        cartList.add(product);
+      });
+    } else {
+      print("-empty cart-in db--");
+    }
+    print("---List.length===>${cartList.length}--");
     return cartList;
   }
 
