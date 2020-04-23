@@ -157,6 +157,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
   }
 
   Future<void> getLocation() async {
+    Utils.showToast("Getting your location...", true);
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     final coordinates = new Coordinates(position.latitude, position.longitude);
