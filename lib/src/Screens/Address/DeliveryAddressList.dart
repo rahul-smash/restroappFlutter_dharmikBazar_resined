@@ -217,7 +217,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               width: (Utils.getDeviceWidth(context)-150),
               child: Text(
                   info,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: infoLabel)
               ),
