@@ -7,6 +7,7 @@ import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/Offers/OfferScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
 import 'package:restroapp/src/UI/CategoryView.dart';
+import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -94,7 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (response.success) {
                         return Container(
                           padding:
-                              const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 0.0),
+                              const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                           color: Colors.white,
                           child: GridView.count(
                               crossAxisCount: 2,

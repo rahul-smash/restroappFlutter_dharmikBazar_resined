@@ -86,6 +86,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
             ),
           ],
         ),
+
       bottomNavigationBar: BottomAppBar(
         child: InkWell(
           onTap: (){

@@ -10,6 +10,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -337,6 +338,9 @@ class ApiController {
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+
+      print("---respStr>---${respStr}");
+
       final parsed = json.decode(respStr);
 
       DeliveryAddressResponse res = DeliveryAddressResponse.fromJson(parsed);
@@ -722,4 +726,25 @@ class ApiController {
       return null;
     }
   }
+
+  static Future<StoreRadiousResponse> storeRadiusApi() async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getStoreRadius;
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+    print('@@storeRadiusApi' + url);
+
+    try {
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+
+      StoreRadiousResponse res = StoreRadiousResponse.fromJson(parsed);
+      return res;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
 }

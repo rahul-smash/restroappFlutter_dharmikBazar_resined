@@ -54,6 +54,8 @@ class _SplashScreenState extends State<SplashScreen> {
   void dispose() {
     super.dispose();
     _timer.cancel();
+    //"delivery_area": "0", normal
+    //"delivery_area": "1", radius
   }
 
   @override

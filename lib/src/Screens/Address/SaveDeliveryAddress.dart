@@ -35,6 +35,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       selectedArea.areaName = widget.selectedAddress.areaName;
       addressController.text = widget.selectedAddress.address;
       zipCodeController.text = widget.selectedAddress.zipCode;
+      fullnameController.text = "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
     }
   }
 
@@ -133,7 +134,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(bottom: 5),
+                        padding: EdgeInsets.only(bottom: 0),
                         child: Container(
                           child: new TextField(
                             controller: fullnameController,
@@ -146,6 +147,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           ),
                         ),
                       ),
+                      Divider(color: Colors.grey, height: 2.0),
                       Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(

@@ -1,8 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
+import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/StoreRadiousResponse.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -48,16 +52,51 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       height: 50.0,
       color: appTheme,
       child: InkWell(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (BuildContext context) =>
-                    new SaveDeliveryAddress(null, () {
-                  setState(() {});
-                }),
-                fullscreenDialog: true,
-              ));
+        onTap: () async {
+          print("----addCreateAddressButton-------");
+
+          StoreModel store = await SharedPrefs.getStore();
+          print("--deliveryArea->--${store.deliveryArea}-------");
+          if(store.deliveryArea == "0"){
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                  new SaveDeliveryAddress(null, () {
+                    setState(() {});
+                  }),
+                  fullscreenDialog: true,
+                ));
+          }else if(store.deliveryArea == "1"){
+            Utils.isNetworkAvailable().then((isConnected){
+              if(isConnected){
+                Utils.showProgressDialog(context);
+                ApiController.storeRadiusApi().then((response){
+
+                  Utils.hideProgressDialog(context);
+                  if(response != null && response.success){
+
+                    StoreRadiousResponse data =response;
+                    print("----StoreRadious----${data.data.length}--");
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DragMarkerMap(data)),
+                    );
+
+                  }else{
+                    Utils.showToast("No data found!", false);
+                  }
+                });
+
+
+              }else{
+                Utils.showToast(AppConstant.noInternet, false);
+              }
+            });
+
+          }
+
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -93,9 +132,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             if(response != null && !response.success){
               Utils.showToast(response.message, false);
             }
-            if(response != null && response.data.isEmpty){
-              Utils.showToast("No Delivery Address found!", false);
-            }
             if (response.success) {
               addressList = response.data;
               return Expanded(
@@ -109,7 +145,11 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 ),
               );
             } else {
-              return Container();
+              return Center(
+                child: Container(
+                  child: Text("No Delivery Address found!"),
+                ),
+              );
             }
           } else {
             return Center(
@@ -128,16 +168,12 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: Padding(
           padding: EdgeInsets.only(top: 10, left: 6),
           child: Column(children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    area.firstName,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontSize: 16.0),
+                  Text( area.firstName,
+                    style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 16.0),
                   ),
                   addAddressInfoRow(Icons.phone, area.mobile),
                   addAddressInfoRow(Icons.location_on, area.address),
@@ -169,14 +205,23 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     return Padding(
       padding: EdgeInsets.fromLTRB(0, 10, 5, 0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          new Icon(
+          Icon(
             icon,
             color: Colors.grey,
           ),
           Padding(
             padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-            child: Text(info, style: TextStyle(color: infoLabel)),
+            child: SizedBox(
+              width: (Utils.getDeviceWidth(context)-150),
+              child: Text(
+                  info,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(color: infoLabel)
+              ),
+            ),
           ),
         ],
       ),

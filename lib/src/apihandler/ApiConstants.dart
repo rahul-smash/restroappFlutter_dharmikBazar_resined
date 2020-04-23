@@ -10,6 +10,7 @@ class ApiConstants{
   static String getAddress = 'deliveryAddress';
   static String getAddressArea = 'deliveryAreas/Area';
   static String getStorePickupAddress = 'storePickupAddress';
+  static String getStoreRadius = 'storeRadius';
 
   static String storeOffers = 'storeOffers';
   static String validateCoupon = 'validateAllCoupons';
