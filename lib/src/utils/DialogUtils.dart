@@ -3,7 +3,7 @@ import 'package:restroapp/src/models/PickUpModel.dart';
 
 class DialogUtils {
 
-  static Future<bool> displayOutdoorShotDialog(BuildContext context,String title
+  static Future<bool> displayDialog(BuildContext context,String title
       ,String body,String buttonText1,String buttonText2) async {
 
     return await showDialog<bool>(

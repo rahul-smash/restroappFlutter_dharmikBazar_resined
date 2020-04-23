@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/BaseState.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -73,6 +75,7 @@ class _SplashScreenState extends State<SplashScreen> {
               if (model.success) {
                 openHomePage(model.store);
                 return Container();
+                //return ForceUpdateAlert();
               } else {
                 return Container();
               }
@@ -102,6 +105,44 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 }
+
+
+class ForceUpdateAlert extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return ForceUpdateAlertState();
+  }
+}
+
+class ForceUpdateAlertState extends BaseState<ForceUpdateAlert>{
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return Scaffold(
+      body: AlertDialog(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(10.0))
+        ),
+        title: Text("Title",textAlign: TextAlign.center,),
+        content: Text("body",textAlign: TextAlign.center,),
+        actions: <Widget>[
+          new FlatButton(
+            child: Text("OK"),
+            textColor: Colors.blue,
+            onPressed: () {
+              SystemNavigator.pop();
+              //Navigator.of(context).pop(true);
+              // true here means you clicked ok
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+
+}
+
 
 class CustomPageRoute<T> extends PageRoute<T> {
   CustomPageRoute(this.child);

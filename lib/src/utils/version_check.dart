@@ -18,6 +18,7 @@ String PLAY_STORE_URL_ios,PLAY_STORE_URL_android;
 const PLAY_STORE_URL =
     'https://play.google.com/store/apps/details?id=com.valueapp.cropcart&hl=en';
 versionCheck(context) async {
+
   StoreModel storeModel;
   PLAY_STORE_URL_ios=storeModel.iphoneShareLink;
   String PLAY_STORE_URL_android =storeModel.androidShareLink;

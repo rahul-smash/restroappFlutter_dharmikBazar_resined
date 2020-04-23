@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  package_info: ^0.4.0+16
+  package_info: ^0.4.0+17
   device_info: ^0.4.2+1
   connectivity: ^0.4.2
   progress_dialog: ^1.2.2
