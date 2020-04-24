@@ -2,11 +2,15 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:restroapp/src/UI/SelectLocation.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
@@ -20,23 +24,37 @@ class SaveDeliveryAddress extends StatefulWidget {
 }
 
 class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
-  StoreArea selectedArea;
+  //StoreArea selectedArea;
+  Area selectedArea;
+  City selectedCity;
   TextEditingController addressController = new TextEditingController();
   TextEditingController zipCodeController = new TextEditingController();
   TextEditingController fullnameController = new TextEditingController();
+  GoogleMapController mapController;
+  String lat = "0", lng = "0";
+  LatLng location = LatLng(0.0, 0.0);
+  Set<Marker> markers = Set();
+  LocationData locationData;
+  Datum dataObject;
 
   @override
   void initState() {
     super.initState();
 
     if (widget.selectedAddress != null) {
-      selectedArea = StoreArea();
-      selectedArea.id = widget.selectedAddress.areaId;
-      selectedArea.areaName = widget.selectedAddress.areaName;
+      selectedCity = City();
+      selectedCity.city = widget.selectedAddress.city;
+      selectedCity.id = widget.selectedAddress.cityId;
+
+      selectedArea = Area();
+      selectedArea.areaId = widget.selectedAddress.areaId;
+      selectedArea.area = widget.selectedAddress.areaName;
       addressController.text = widget.selectedAddress.address;
       zipCodeController.text = widget.selectedAddress.zipCode;
       fullnameController.text = "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
     }
+
+    //getLocation();
   }
 
   @override
@@ -47,7 +65,6 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
             title: Text('Delivery Addresses',style: new TextStyle(
               color: Colors.white,
             ),),
-
             centerTitle: true,
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios),
@@ -76,9 +93,9 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               fontSize: 20.0),
                         ),
                       ),
-                      SizedBox(height: 50),
+                      SizedBox(height: 20),
                       Text(
-                        "Area",
+                        "City",
                         style: TextStyle(color: infoLabel, fontSize: 17.0),
                       ),
                       Padding(
@@ -88,9 +105,10 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               showDialog(
                                 context: context,
                                 builder: (BuildContext context) =>
-                                    AreaOptionDialog((area) {
+                                    CityDialog((area) {
                                       setState(() {
-                                        selectedArea = area;
+                                        dataObject = area;
+                                        selectedCity = dataObject.city;
                                       });
                                     }),
                               );
@@ -98,8 +116,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                             child: Container(
                                 width: MediaQuery.of(context).size.width,
                                 child: Text(
-                                  selectedArea != null
-                                      ? selectedArea.areaName
+                                  selectedCity != null
+                                      ? selectedCity.city
                                       : "Select",
                                   style: TextStyle(
                                     color: Colors.black,
@@ -109,6 +127,65 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           )),
                       Divider(color: Colors.grey, height: 2.0),
                       SizedBox(height: 20),
+                      Text(
+                        "Area",
+                        style: TextStyle(color: infoLabel, fontSize: 17.0),
+                      ),
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(0, 20, 0, 5),
+                          child: InkWell(
+                            onTap: () {
+                              if(dataObject == null){
+                                Utils.showToast("Please select city first!", false);
+                                return ;
+                              }
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    AreaOptionDialog((area) {
+                                      setState(() {
+                                        selectedArea = area;
+                                      });
+                                    },dataObject),
+                              );
+                            },
+                            child: Container(
+                                width: MediaQuery.of(context).size.width,
+                                child: Text(
+                                  selectedArea != null
+                                      ? selectedArea.area
+                                      : "Select",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 20.0,
+                                  ),
+                                )),
+                          )),
+                      Divider(color: Colors.grey, height: 2.0),
+                      SizedBox(height: 20),
+                      InkWell(
+                        onTap: (){
+                          Geolocator().isLocationServiceEnabled().then((value) async {
+                            if(value == true){
+                              var result = await Navigator.push(context, new MaterialPageRoute(
+                                builder: (BuildContext context) => SelectLocationOnMap(),
+                                fullscreenDialog: true,)
+                              );
+                              if(result != null){
+                                locationData = result;
+                                addressController.text = locationData.address;
+                              }
+                            }else{
+                              Utils.showToast("Please turn on gps!", false);
+                            }
+                          });
+                        },
+                        child: Text(
+                          "Select Location - Click here",
+                          style: TextStyle(color: infoLabel, fontSize: 17.0),
+                        ),
+                      ),
+                      SizedBox(height: 10),
                       Container(
                         color: Colors.grey[200],
                         height: 100.0,
@@ -126,6 +203,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               hintText: AppConstant.enterAddress),
                         ),
                       ),
+                      Divider(color: Colors.grey, height: 2.0),
                       Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(
@@ -181,6 +259,12 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 borderRadius: new BorderRadius.circular(25.0),
                                 side: BorderSide(color: appTheme)),
                             onPressed: () {
+
+                              if(selectedCity == null){
+                                Utils.showToast(AppConstant.selectCity, false);
+                                return;
+                              }
+
                               if (selectedArea == null) {
                                 Utils.showToast(AppConstant.selectArea, false);
                               } else if (addressController.text
@@ -202,6 +286,11 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               } else {
                                 // edit and save api
 
+                                if(locationData == null){
+                                  Utils.showToast("Please select location!", false);
+                                  return;
+                                }
+
                                 Utils.showProgressDialog(context);
                                 ApiController.saveDeliveryAddressApiRequest(
                                     widget.selectedAddress == null
@@ -209,12 +298,14 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                         : "EDIT",
                                     zipCodeController.text,
                                     addressController.text,
-                                    selectedArea.id,
-                                    selectedArea.areaName,
+                                    selectedArea.areaId,
+                                    selectedArea.area,
                                     widget.selectedAddress == null
                                         ? null
                                         : widget.selectedAddress.id,
-                                    fullnameController.text)
+                                    fullnameController.text,
+                                    selectedCity.city,
+                                    selectedCity.id,"","")
                                     .then((response) {
                                   Utils.hideProgressDialog(context);
                                   print('@@REsonsesss'+response.toString());
@@ -244,41 +335,75 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
     var addresses =
     await Geocoder.local.findAddressesFromCoordinates(coordinates);
     var first = addresses.first;
+    location = LatLng(position.latitude, position.longitude);
+    markers.addAll([
+      Marker(
+          draggable: true,
+          icon: BitmapDescriptor.defaultMarker,
+          markerId: MarkerId('value'),
+          position: location,
+          onDragEnd: (value){
+            print(value.latitude);
+            print(value.longitude);
+          })]);
+
+    setState(() {
+      mapController.moveCamera(CameraUpdate.newLatLng(location));
+    });
     return first.addressLine;
+  }
+
+
+  void _onCameraMove(CameraPosition position) {
+    CameraPosition newPos = CameraPosition(
+        target: position.target
+    );
+    Marker marker = markers.first;
+
+    setState((){
+      markers.first.copyWith(
+          positionParam: newPos.target
+      );
+    });
   }
 }
 
-class AreaOptionDialog extends StatefulWidget {
-  final Function(StoreArea) callback;
-  AreaOptionDialog(this.callback);
+
+class CityDialog extends StatefulWidget {
+
+  final Function(Datum) callback;
+  CityDialog(this.callback);
 
   @override
-  AreaOptionDialogState createState() => AreaOptionDialogState();
+  CityDialogState createState() => CityDialogState();
 }
 
-class AreaOptionDialogState extends State<AreaOptionDialog> {
+
+class CityDialogState extends BaseState<CityDialog>{
+
   @override
   Widget build(BuildContext context) {
+
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 0.0,
       child: FutureBuilder(
-        future: ApiController.getDeliveryArea(),
+        future: ApiController.getStoreAreaApiRequest(),
         builder: (context, projectSnap) {
           if (projectSnap.connectionState == ConnectionState.none &&
               projectSnap.hasData == null) {
             return Container();
           } else {
             if (projectSnap.hasData) {
-              StoreDeliveryAreasResponse response = projectSnap.data;
+              StoreAreaResponse response = projectSnap.data;
               if(response != null && !response.success){
-                Utils.showToast(response.message, false);
+                Utils.showToast("No data found!", false);
               }
               if (response.success) {
-                List<StoreArea> areas = response.areas;
-                return dialogContent(context, areas);
+                List<Datum> data = response.data;
+                return cityDialogContent(context, data);
               } else {
                 return Container();
               }
@@ -295,7 +420,97 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
     );
   }
 
-  dialogContent(BuildContext context, List<StoreArea> areaList) {
+  Widget cityDialogContent(BuildContext context, List<Datum> data) {
+
+    return Container(
+      decoration: new BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(10.0),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 10.0,
+            offset: const Offset(0.0, 10.0),
+          ),
+        ],
+      ),
+      child: Column(
+        children: <Widget>[
+          Container(
+              height: 40,
+              color: appTheme,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(width: 35.0),
+                  Text("City",
+                      style: TextStyle(color: Colors.white, fontSize: 20.0)),
+                  IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.white,
+                    ),
+                    onPressed: () => Navigator.pop(context),
+                  )
+                ],
+              )),
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: data.length,
+              itemBuilder: (context, index) {
+                Datum area = data[index];
+                return InkWell(
+                    onTap: () {
+                      widget.callback(area);
+                      Navigator.pop(context, true);
+                    },
+                    child: Container(
+                      height: 50,
+                      decoration: BoxDecoration(
+                        border: Border(
+                            bottom:
+                            BorderSide(width: 1.0, color: Colors.black)),
+                        color: Colors.white,
+                      ),
+                      child: Center(child: Text(area.city.city)),
+                    ));
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+}
+
+
+class AreaOptionDialog extends StatefulWidget {
+
+  final Function(Area) callback;
+  Datum dataObject;
+  AreaOptionDialog(this.callback, this.dataObject);
+
+  @override
+  AreaOptionDialogState createState() => AreaOptionDialogState();
+}
+
+class AreaOptionDialogState extends State<AreaOptionDialog> {
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      elevation: 0.0,
+      child: dialogContent(context, widget.dataObject.area),
+    );
+  }
+
+  dialogContent(BuildContext context, List<Area> areaList) {
     return Container(
       decoration: new BoxDecoration(
         color: Colors.white,
@@ -334,7 +549,7 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
               shrinkWrap: true,
               itemCount: areaList.length,
               itemBuilder: (context, index) {
-                StoreArea area = areaList[index];
+                Area area = areaList[index];
                 return InkWell(
                     onTap: () {
                       widget.callback(area);
@@ -348,7 +563,7 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
                             BorderSide(width: 1.0, color: Colors.black)),
                         color: Colors.white,
                       ),
-                      child: Center(child: Text(area.areaName)),
+                      child: Center(child: Text(area.area)),
                     ));
               },
             ),

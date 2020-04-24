@@ -10,6 +10,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
@@ -276,6 +277,29 @@ class ApiController {
     }
   }
 
+
+  static Future<StoreAreaResponse> getStoreAreaApiRequest() async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getStoreArea;
+
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+    try {
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      print("----url---${url}");
+      print("----respStr---${respStr}");
+      final parsed = json.decode(respStr);
+      StoreAreaResponse storeArea =
+      StoreAreaResponse.fromJson(parsed);
+      return storeArea;
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
   static Future<PickUpModel> getStorePickupAddress() async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -304,7 +328,11 @@ class ApiController {
       String areaId,
       String areaName,
       String addressId,
-      String fullname) async {
+      String fullname,
+      String city,
+      String cityId,
+      String lat,
+      String lng) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
@@ -319,14 +347,14 @@ class ApiController {
         "zipcode": zipCode,
         "country": "",
         "address": address,
-        "city": "",
+        "city": "${city}",
         "area_name": areaName,
         "mobile": user.phone,
         "state": "",
+        "lat": "${lat}",
+        "lng": "${lng}",
         "area_id": areaId,
         "first_name": fullname,
-        //  "first_name": "abc",
-
         "email": user.email
       });
 

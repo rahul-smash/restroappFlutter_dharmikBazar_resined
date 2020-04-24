@@ -29,6 +29,7 @@ class AppConstant {
   static final String orderAdded = "Thank you for placing the order. We will confirm your order soon.";
   static final String enterAddress = 'Enter Complete Address';
   static final String selectArea = 'Please select area';
+  static final String selectCity = 'Please select city';
   static final String pleaseEnterAddress = "Enter complete address";
   static final String enterZipCode = "Enter zipcode";
 

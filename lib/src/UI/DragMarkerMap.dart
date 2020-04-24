@@ -30,6 +30,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
   String address;
   String zipCode;
   String cityValue;
+  String cityId;
   bool enableDialog;
   List<Area> areaList;
 
@@ -45,6 +46,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
     cityValue = "Select City: Click here...";
     if(widget.data != null && widget.data.data.length == 1){
       cityValue = "${widget.data.data[0].city.city}";
+      cityId = "${widget.data.data[0].city.id}";
       areaList.addAll(widget.data.data[0].area);
       enableDialog = false;
     }else{
@@ -73,6 +75,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
                   //print("-------onTap----${areaObject.city.city}-----");
                   setState(() {
                     cityValue = "${areaObject.city.city}";
+                    cityId = "${areaObject.city.id}";
                     if(areaList != null && areaList.isNotEmpty){
                       areaList.clear();
                     }
@@ -290,7 +293,9 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
                 area.areaId,
                 area.area,
                 null,
-                user.fullName).then((response) {
+                user.fullName,
+                cityValue,
+                cityId,"${selectedLocation.latitude}","${selectedLocation.longitude}").then((response) {
 
               Utils.hideProgressDialog(context);
               if (response != null && response.success) {

@@ -59,17 +59,23 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
           StoreModel store = await SharedPrefs.getStore();
           print("--deliveryArea->--${store.deliveryArea}-------");
-          if(store.deliveryArea == "0"){
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                  SaveDeliveryAddress(null, () {
-                    setState(() {});
-                  }),
-                  fullscreenDialog: true,
-                ));
-          }else if(store.deliveryArea == "1"){
+          if(store.deliveryArea == "1"){
+
+            Geolocator().isLocationServiceEnabled().then((value){
+              if(value == true){
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) =>
+                        SaveDeliveryAddress(null, () {
+                          setState(() {});
+                        }),
+                      fullscreenDialog: true,
+                    ));
+              }else{
+                Utils.showToast("Please turn on gps!", false);
+              }
+            });
+
+          }else if(store.deliveryArea == "0"){
             Utils.isNetworkAvailable().then((isConnected){
               if(isConnected){
                 Utils.showProgressDialog(context);
