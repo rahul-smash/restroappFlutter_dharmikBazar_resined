@@ -145,4 +145,21 @@ class Utils {
     return MediaQuery.of(context).size.width;
   }
 
+  static Widget getEmptyView(String value){
+
+
+    return  Container(
+      child: Expanded(
+        child: Center(
+          child: Text(value,
+              overflow: TextOverflow.ellipsis,
+              style: new TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 18.0,
+              )),
+        ),
+      ),
+    );
+  }
+
 }

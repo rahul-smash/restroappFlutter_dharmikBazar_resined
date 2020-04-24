@@ -4,6 +4,7 @@ import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class MyCartScreen extends StatelessWidget {
 
@@ -35,18 +36,37 @@ class MyCartScreen extends StatelessWidget {
                     return Container();
                   } else {
                     if (projectSnap.hasData) {
-                      return Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: projectSnap.data.length,
-                          itemBuilder: (context, index) {
-                            Product product = projectSnap.data[index];
-                            return ProductTileItem(product, () {
-                              bottomBar.state.updateTotalPrice();
-                            });
-                          },
-                        ),
-                      );
+
+                      print("--length---${projectSnap.data.length}----");
+
+                      if(projectSnap.data.length == 0){
+
+                        return Container(
+                          child: Expanded(
+                            child: Center(
+                              child: Text("Empty Cart",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: new TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 18.0,
+                                  )),
+                            ),
+                          ),
+                        );
+                      }else{
+                        return Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: projectSnap.data.length,
+                            itemBuilder: (context, index) {
+                              Product product = projectSnap.data[index];
+                              return ProductTileItem(product, () {
+                                bottomBar.state.updateTotalPrice();
+                              });
+                            },
+                          ),
+                        );
+                      }
                     } else {
                       return Center(
                         child: CircularProgressIndicator(

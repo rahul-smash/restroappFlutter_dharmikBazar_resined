@@ -336,7 +336,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       actions: <Widget>[
                         new FlatButton(
                           child: new Text("Ok"),
-                          onPressed: () {
+                          onPressed: () async{
+
+                            await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+
                             Navigator.of(context)
                                 .popUntil((route) => route.isFirst);
                           },

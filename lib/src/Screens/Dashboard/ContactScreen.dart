@@ -3,6 +3,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactScreen extends StatefulWidget {
@@ -38,20 +39,22 @@ class _ContactScreen extends State<ContactScreen> {
         ),
         body: Column(
           children: [
-            Container(
-              height: MediaQuery.of(context).size.height - 250,
-              width: MediaQuery.of(context).size.width,
-              child: GoogleMap(
-                onMapCreated: (GoogleMapController controller) {
-                  mapController = controller;
-                },
-                initialCameraPosition: CameraPosition(
-                    target: LatLng(double.parse(lat), double.parse(lng)),
-                    zoom: 15),
+            Expanded(
+              child: Container(
+                height: MediaQuery.of(context).size.height - 250,
+                width: MediaQuery.of(context).size.width,
+                child: GoogleMap(
+                  onMapCreated: (GoogleMapController controller) {
+                    mapController = controller;
+                  },
+                  initialCameraPosition: CameraPosition(
+                      target: LatLng(double.parse(lat), double.parse(lng)),
+                      zoom: 15),
+                ),
               ),
             ),
             Container(
-                height: 150,
+                height: 120,
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -86,6 +89,9 @@ class _ContactScreen extends State<ContactScreen> {
                         icon: Icon(Icons.phone, size: 40,),
                         onPressed: () {
                           if(store != null) {
+                            if(store.contactNumber != null || store.contactNumber.isEmpty){
+                              Utils.showToast("No Contact Number found!", false);
+                            }
                             launch(store.contactNumber);
                           }
                         },
@@ -93,5 +99,22 @@ class _ContactScreen extends State<ContactScreen> {
                     ]))
           ],
         ));
+  }
+
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  _launchCaller(String call) async {
+    String url = "tel:${call}";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 }

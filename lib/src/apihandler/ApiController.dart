@@ -52,7 +52,8 @@ class ApiController {
       SharedPrefs.saveStore(storeData.store);
       return storeData;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
+      print("---catch--${e.toString()}----");
       return null;
     }
   }

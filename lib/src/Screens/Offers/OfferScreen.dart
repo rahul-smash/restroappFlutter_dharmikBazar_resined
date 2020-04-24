@@ -4,6 +4,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class MyOfferScreen extends StatefulWidget {
   MyOfferScreen(BuildContext context);
@@ -37,50 +38,56 @@ class MyOfferScreenState extends State<MyOfferScreen> {
                       StoreOffersResponse response = projectSnap.data;
                       if (response.success) {
                         List<OfferModel> offerList = response.offers;
-                        return Expanded(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: offerList.length,
-                            itemBuilder: (context, index) {
-                              OfferModel offer = offerList[index];
-                              return ListTile(
-                                title: Text(
-                                  offer.name,
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                        AppConstant.txt_code+" ${offer.couponCode}", style: TextStyle(color: Colors.black
-                                    )),
-                                  ],
-                                ),
-                                trailing: Wrap(
-                                  spacing: 12, // space between two icons
-                                  children: <Widget>[
-                                    Icon(Icons.arrow_right), // icon-2
-                                  ],
-                                ),
+                        if(offerList.isEmpty){
 
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            OfferDetailScreen(offer),
-                                      ));
-                                },
+                          return Utils.getEmptyView("No data found");
+                        }else{
+                          return Expanded(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: offerList.length,
+                              itemBuilder: (context, index) {
+                                OfferModel offer = offerList[index];
+                                return ListTile(
+                                  title: Text(
+                                    offer.name,
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                          AppConstant.txt_code+" ${offer.couponCode}", style: TextStyle(color: Colors.black
+                                      )),
+                                    ],
+                                  ),
+                                  trailing: Wrap(
+                                    spacing: 12, // space between two icons
+                                    children: <Widget>[
+                                      Icon(Icons.arrow_right), // icon-2
+                                    ],
+                                  ),
 
-                              );
-                            },
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              OfferDetailScreen(offer),
+                                        ));
+                                  },
 
-                          ),
+                                );
+                              },
 
-                        );
+                            ),
+
+                          );
+                        }
+
                       } else {
                         return Container();
                       }

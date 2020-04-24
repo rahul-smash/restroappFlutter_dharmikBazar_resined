@@ -16,8 +16,8 @@ import 'package:restroapp/src/utils/Utils.dart';
 class SaveDeliveryAddress extends StatefulWidget {
   final DeliveryAddressData selectedAddress;
   final VoidCallback callback;
-
-  SaveDeliveryAddress(this.selectedAddress, this.callback);
+  String addressValue;
+  SaveDeliveryAddress(this.selectedAddress, this.callback,this.addressValue);
 
   @override
   _SaveDeliveryAddressState createState() => _SaveDeliveryAddressState();
@@ -52,6 +52,12 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       addressController.text = widget.selectedAddress.address;
       zipCodeController.text = widget.selectedAddress.zipCode;
       fullnameController.text = "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
+    }else{
+
+      if(widget.addressValue != null && widget.addressValue.isNotEmpty){
+        addressController.text = widget.addressValue;
+      }
+
     }
 
     //getLocation();
@@ -403,6 +409,8 @@ class CityDialogState extends BaseState<CityDialog>{
               }
               if (response.success) {
                 List<Datum> data = response.data;
+
+                //print("-----");
                 return cityDialogContent(context, data);
               } else {
                 return Container();

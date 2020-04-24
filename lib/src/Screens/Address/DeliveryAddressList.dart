@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -59,23 +61,31 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
           StoreModel store = await SharedPrefs.getStore();
           print("--deliveryArea->--${store.deliveryArea}-------");
-          if(store.deliveryArea == "1"){
+          if(store.deliveryArea == "0"){
 
-            Geolocator().isLocationServiceEnabled().then((value){
+            Geolocator().isLocationServiceEnabled().then((value) async {
               if(value == true){
+                Utils.showToast("Getting your location, please wait..", false);
+                Utils.showProgressDialog(context);
+                String addressValue = await getLocation();
+                if(addressValue == null){
+                  addressValue = "";
+                }
+                Utils.hideProgressDialog(context);
                 Navigator.push(context,
                     MaterialPageRoute(builder: (BuildContext context) =>
                         SaveDeliveryAddress(null, () {
                           setState(() {});
-                        }),
+                        },addressValue),
                       fullscreenDialog: true,
                     ));
+
               }else{
                 Utils.showToast("Please turn on gps!", false);
               }
             });
 
-          }else if(store.deliveryArea == "0"){
+          }else if(store.deliveryArea == "1"){
             Utils.isNetworkAvailable().then((isConnected){
               if(isConnected){
                 Utils.showProgressDialog(context);
@@ -134,6 +144,16 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         ),
       ),
     );
+  }
+
+  Future<String> getLocation() async {
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    final coordinates = new Coordinates(position.latitude, position.longitude);
+    var addresses =
+    await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    var first = addresses.first;
+    return first.addressLine;
   }
 
   Widget addAddressList() {
@@ -266,7 +286,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                       builder: (BuildContext context) =>
                           SaveDeliveryAddress(area, () {
                         setState(() {});
-                      }),
+                      },""),
                       fullscreenDialog: true,
                     ));
               },
