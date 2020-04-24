@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/StoreRadiousResponse.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -13,9 +16,10 @@ import 'package:restroapp/src/utils/Utils.dart';
 class ConfirmOrderScreen extends StatefulWidget {
 
   bool isComingFromPickUpScreen;
-  final DeliveryAddressData address;
-  final String paymentMode; // 2 = COD, 3 = Online Payment
+  DeliveryAddressData address;
+  String paymentMode; // 2 = COD, 3 = Online Payment
   String areaId;
+  double shippingCharges = 0.0;
 
   ConfirmOrderScreen(this.address, this.paymentMode,this.isComingFromPickUpScreen,this.areaId);
 
@@ -28,10 +32,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   double totalPrice = 0.00;
   TaxCalculationModel taxModel;
   TextEditingController noteController = TextEditingController();
+  String shippingCharges = "0";
 
   @override
   void initState() {
     super.initState();
+    try {
+      if(widget.address != null){
+            if(widget.address.areaCharges != null){
+              shippingCharges = widget.address.areaCharges;
+            }
+          }
+    } catch (e) {
+      print(e);
+    }
+
     databaseHelper.getTotalPrice().then((mTotalPrice) {
       setState(() {
         totalPrice = mTotalPrice;
@@ -87,8 +102,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   itemCount: projectSnap.data.length + 1,
                   itemBuilder: (context, index) {
                     return index == projectSnap.data.length
-                        ? addItemPrice()
-                        : addProductCart(projectSnap.data[index]);
+                        ? addItemPrice(): addProductCart(projectSnap.data[index]);
                   },
                 );
               } else {
@@ -142,6 +156,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addItemPrice() {
+
     return Container(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
@@ -157,10 +172,27 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 Text("\$${databaseHelper.roundOffPrice(totalPrice, 2)}",
                     style: TextStyle(color: Colors.black54)),
               ],
-            ))
+            ),
+        ),
+        Visibility(
+          visible: widget.address == null? false : true,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Shipping Charges:", style: TextStyle(color: Colors.black54)),
+                Text("\$${widget.address == null? "0" : widget.address.areaCharges}",
+                    style: TextStyle(color: Colors.black54)),
+              ],
+            ),
+          ),
+        ),
+
       ]),
     );
   }
+
 
   Widget addTotalPrice() {
     return Container(
@@ -174,11 +206,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Total",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(
-                    "\$${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)}",
+                Text("Total",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text("\$${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)+int.parse(shippingCharges)}",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
@@ -186,6 +215,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       ]),
     );
   }
+
 
   Widget addCouponCodeRow() {
     return Padding(
@@ -289,7 +319,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       if (isNetworkAvailable == true) {
         Utils.showProgressDialog(context);
         databaseHelper.getCartItemsListToJson().then((json) {
-          ApiController.placeOrderRequest(noteController.text, totalPrice.toString(),
+          ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
                   widget.paymentMode, taxModel, widget.address, json ,
               widget.isComingFromPickUpScreen,widget.areaId)
               .then((response) {

@@ -489,7 +489,7 @@ class ApiController {
     }
   }
 
-  static Future<ResponseModel> placeOrderRequest(
+  static Future<ResponseModel> placeOrderRequest(String shipping_charges,
       String note,
       String totalPrice,
       String paymentMethod,
@@ -508,7 +508,7 @@ class ApiController {
 
     try {
       request.fields.addAll({
-        "shipping_charges": "0",
+        "shipping_charges": "${shipping_charges}",
         "note": note,
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : taxModel.couponCode,

@@ -160,7 +160,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
     Utils.showToast("Getting your location...", true);
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    final coordinates = new Coordinates(position.latitude, position.longitude);
+   // final coordinates = new Coordinates(position.latitude, position.longitude);
     center = LatLng(position.latitude, position.longitude);
     getAddressFromLocation(position.latitude, position.longitude);
     markers.addAll([
@@ -295,7 +295,9 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
               Utils.hideProgressDialog(context);
               if (response != null && response.success) {
                 Utils.showToast(response.message, false);
-                Navigator.pop(context);
+                //Navigator.pop(context);
+                Navigator.pop(context, area);
+
               }else{
                 if(response != null)
                 Utils.showToast(response.message, false);

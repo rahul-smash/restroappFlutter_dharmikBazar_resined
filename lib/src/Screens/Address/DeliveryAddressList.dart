@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -25,6 +26,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   int selectedIndex = 0;
   List<DeliveryAddressData> addressList = [];
+  Area radiusArea;
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +64,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 context,
                 MaterialPageRoute(
                   builder: (BuildContext context) =>
-                  new SaveDeliveryAddress(null, () {
+                  SaveDeliveryAddress(null, () {
                     setState(() {});
                   }),
                   fullscreenDialog: true,
@@ -71,19 +73,28 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             Utils.isNetworkAvailable().then((isConnected){
               if(isConnected){
                 Utils.showProgressDialog(context);
-                ApiController.storeRadiusApi().then((response){
+                ApiController.storeRadiusApi().then((response) async {
 
                   Utils.hideProgressDialog(context);
                   if(response != null && response.success){
 
                     StoreRadiousResponse data =response;
-                    print("----StoreRadious----${data.data.length}--");
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DragMarkerMap(data)),
-                    );
 
+                    Geolocator().isLocationServiceEnabled().then((isLocationServiceEnabled) async {
+                      print("----isLocationServiceEnabled----${isLocationServiceEnabled}--");
+                      if(isLocationServiceEnabled){
+
+                        var result = await Navigator.push(context, new MaterialPageRoute(
+                          builder: (BuildContext context) => DragMarkerMap(data),
+                          fullscreenDialog: true,)
+                        );
+                        if(result != null){
+                          radiusArea = result;
+                        }
+                      }else{
+                        Utils.showToast("Please turn on gps!", false);
+                      }
+                    });
                   }else{
                     Utils.showToast("No data found!", false);
                   }
