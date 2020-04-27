@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restroapp/src/Screens/BookOrder/ConfirmOrderScreen.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 
 class StoreLocationScreen extends StatefulWidget {
 
@@ -89,14 +92,33 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
 
       bottomNavigationBar: BottomAppBar(
         child: InkWell(
-          onTap: (){
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      ConfirmOrderScreen(null, "2",true, widget.areaObject.areaId)),
-            );
+          onTap: () async {
+
+            StoreModel store = await SharedPrefs.getStore();
+            print("--${store.onlinePayment}-}-");
+            if(store.onlinePayment == "1"){
+              String paymentValue;
+              var result = await DialogUtils.displayPaymentDialog(context, "Select Payment");
+              if(result == true){
+                paymentValue = "3";
+              }else{
+                paymentValue = "2";
+              }
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ConfirmOrderScreen(null, paymentValue,true, widget.areaObject.areaId)),
+              );
+            }else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ConfirmOrderScreen(null, "2",true, widget.areaObject.areaId)),
+              );
+            }
           },
           child: Container(
             height: 40,

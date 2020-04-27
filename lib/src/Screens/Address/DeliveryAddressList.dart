@@ -12,6 +12,7 @@ import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
@@ -319,16 +320,37 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       height: 50.0,
       color: appTheme,
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           if (addressList.length == 0) {
             Utils.showToast(AppConstant.selectAddress, false);
           } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      ConfirmOrderScreen(addressList[selectedIndex], "2",false,"")),
-            );
+
+            StoreModel store = await SharedPrefs.getStore();
+            print("--${store.onlinePayment}-}-");
+            if(store.onlinePayment == "1"){
+              var result = await DialogUtils.displayPaymentDialog(context, "Select Payment");
+              String paymentValue;
+              if(result == true){
+                paymentValue = "3";
+              }else{
+                paymentValue = "2";
+              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ConfirmOrderScreen(addressList[selectedIndex], paymentValue,false,"")),
+              );
+            }else{
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ConfirmOrderScreen(addressList[selectedIndex], "2",false,"")),
+              );
+            }
+
+
           }
         },
         child: Row(

@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -9,6 +12,7 @@ import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -33,10 +37,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   TaxCalculationModel taxModel;
   TextEditingController noteController = TextEditingController();
   String shippingCharges = "0";
+  static const platform = const MethodChannel("razorpay_flutter");
+  Razorpay _razorpay;
 
   @override
   void initState() {
     super.initState();
+
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
     try {
       if(widget.address != null){
             if(widget.address.areaCharges != null){
@@ -52,6 +63,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         totalPrice = mTotalPrice;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
   }
 
   @override
@@ -95,6 +112,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               return Container();
             } else {
               if (projectSnap.hasData) {
+
                 return ListView.separated(
                   separatorBuilder: (BuildContext context, int index) =>
                       Divider(color: Colors.grey, height: 1),
@@ -268,7 +286,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   }),
                 );
               },
-              child: Text("Available Offers",
+              child: Text("Available\nOffers",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       color: Color(0xFF0D47A1),
@@ -279,13 +297,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ));
   }
 
+
   Widget addConfirmOrder() {
     return Container(
       height: 45.0,
       color: appTheme,
       child: InkWell(
         onTap: () {
-          placeOrderApiCall();
+          print("----paymentMod----${widget.paymentMode}--");
+          if(widget.paymentMode == "3"){
+            openCheckout();
+          }else{
+            placeOrderApiCall();
+          }
+
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -312,6 +337,31 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         });
       });
     });
+  }
+
+
+  void openCheckout() async {
+
+    UserModel user = await SharedPrefs.getUser();
+    double price = totalPrice + int.parse(shippingCharges);
+
+    var options = {
+      'key': 'rzp_test_1DP5mmOlF5G5ag',
+      'currency': "INR",
+      'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
+      'name': '${user.fullName}',
+      'description': '${noteController.text}',
+      'prefill': {'contact': '${user.phone}', 'email': '${user.email}'},
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint(e);
+    }
   }
 
   void placeOrderApiCall() {
@@ -352,5 +402,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         Utils.showToast(AppConstant.noInternet, false);
       }
     });
+  }
+
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    Fluttertoast.showToast(
+        msg: "SUCCESS: " + response.paymentId, timeInSecForIos: 4);
+    placeOrderApiCall();
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    Fluttertoast.showToast(
+        msg: "ERROR: " + response.code.toString() + " - " + response.message,
+        timeInSecForIos: 4);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    Fluttertoast.showToast(
+        msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
 
 class DialogUtils {
 
@@ -37,6 +38,53 @@ class DialogUtils {
                 },
               ),
             ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  static Future<bool> displayPaymentDialog(BuildContext context,String title ) async {
+
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            title: Text(title,textAlign: TextAlign.center,),
+            content: Row(
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.all(20),
+                  child: FlatButton(
+                    child: Text('Offline'),
+                    color: appTheme,
+                    textColor: Colors.white,
+                    onPressed: () {
+                      Navigator.pop(context, false);
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(20),
+                  child: FlatButton(
+                    child: Text('Online'),
+                    color: appTheme,
+                    textColor: Colors.white,
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    },
+                  ),
+                )
+              ],
+            ),
           ),
         );
       },
