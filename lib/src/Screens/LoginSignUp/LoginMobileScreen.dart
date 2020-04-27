@@ -128,7 +128,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                 //print('@@NOTP__Screen');
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => OtpScreen(menu)),
+                  MaterialPageRoute(builder: (context) => OtpScreen(menu,response,loginMobile)),
                   //    MaterialPageRoute(builder: (context) => LoginScreen()),
                 );
               }
@@ -138,6 +138,8 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           Utils.showToast(AppConstant.noInternet, true);
         }
       });
+    }else{
+      Utils.showToast("Please enter Mobile number", true);
     }
   }
 }

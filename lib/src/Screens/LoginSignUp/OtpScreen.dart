@@ -7,17 +7,21 @@ import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import 'LoginMobileScreen.dart';
 import 'RegisterScreen.dart';
 
 class OtpScreen extends StatefulWidget {
 
   String menu;
-  OtpScreen(this.menu);
+  MobileVerified response;
+  LoginMobile phone;
+  OtpScreen(this.menu, this.response, this.phone);
 
   @override
   _OtpScreen createState() => _OtpScreen();
@@ -25,10 +29,8 @@ class OtpScreen extends StatefulWidget {
 
 class _OtpScreen extends State<OtpScreen> {
 
-
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   OTPData otpModel = new OTPData();
-  final phoneController = new TextEditingController();
   Timer _timer;
   int _start = 40;
 
@@ -109,7 +111,7 @@ class _OtpScreen extends State<OtpScreen> {
                           child: new RaisedButton(
                             color: appTheme,
                             textColor: Colors.white,
-                            child: Text(_start != 0 ? "${_start} sec" : "Skip",style: TextStyle(
+                            child: Text(_start != 0 ? "${_start} sec" : "Resend OTP",style: TextStyle(
                               color: Colors.white,
                             ),
                             ),
@@ -136,10 +138,11 @@ class _OtpScreen extends State<OtpScreen> {
 
 
   void startTimer() {
+    print('--startTimer===  $_start');
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(oneSec,
           (Timer timer) {
-            //print('--periodic===  $_start');
+            print('--periodic===  $_start');
         setState(
               () {
             if (_start < 1) {
@@ -159,9 +162,29 @@ class _OtpScreen extends State<OtpScreen> {
     //print('--periodic===  $_start');
     if(_start == 0){
       // user clicked on skip button
-      print('--skip=button==');
-      proceedtoActivity();
+      print('--Resend=button==');
+      resendOtpScreen();
     }
+  }
+
+
+  void resendOtpScreen(){
+    Utils.isNetworkAvailable().then((isNetworkAvailable) async {
+      if (isNetworkAvailable) {
+        Utils.showProgressDialog(context);
+        ApiController.mobileVerification(widget.phone) .then((response) {
+          Utils.hideProgressDialog(context);
+          if (response != null && response.success) {
+            Utils.showToast("Otp sent successfully", true);
+            _start = 40;
+            startTimer();
+          }
+        });
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    });
+
   }
 
   void onSubmitClicked(){
@@ -188,6 +211,8 @@ class _OtpScreen extends State<OtpScreen> {
           Utils.showToast(AppConstant.noInternet, true);
         }
       });
+    }else{
+      Utils.showToast("Please enter OTP", true);
     }
   }
 

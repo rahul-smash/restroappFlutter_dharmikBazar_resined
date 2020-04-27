@@ -267,7 +267,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
               Navigator.pop(context);
-              Utils.showToast(response.message, true);
+              Utils.showToast("Login Successfully", true);
             }else{
               Utils.showToast(response.message, true);
             }
