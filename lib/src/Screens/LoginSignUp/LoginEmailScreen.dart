@@ -38,7 +38,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
               children: [addPageHeader(), addLoginFields()],
             ),
             addLoginButton(),
-            SocialLoginTabs(),
+            //SocialLoginTabs(),
             addSignUpButton()
           ],
         ),
@@ -238,11 +238,10 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                         color: appTheme),
                     recognizer: (TapGestureRecognizer()
                       ..onTap = () {
-                        Navigator.pop(context);
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RegisterUser()),
+                              builder: (context) => RegisterUser(false)),
                         );
                       })),
               ],

@@ -38,9 +38,9 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   void getOTPSkip() async {
     store = await SharedPrefs.getStore();
     setState(() {
-      otpSkip= store.otpSkip;
-      String delieveryAdress=store.deliveryFacility;
-      print('@@HomeModel   '+otpSkip+'  Delievery'+delieveryAdress);
+      otpSkip = store.otpSkip;
+      String delieveryAdress=  store.deliveryFacility;
+      print('@@HomeModel   ${otpSkip} and ${delieveryAdress}');
     });
   }
   @override
@@ -113,11 +113,14 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
       Utils.isNetworkAvailable().then((isNetworkAvailable) async {
         if (isNetworkAvailable) {
           Utils.showProgressDialog(context);
-          ApiController.mobileVerification(loginMobile)
-              .then((response) {
+          ApiController.mobileVerification(loginMobile) .then((response) {
+
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
-              if(response.userExists == 1|| otpSkip == "yes"){
+
+              print("=====otpVerify===${response.user.otpVerify}--and--${response.userExists}-----");
+
+              if(response.userExists == 1 || otpSkip == "yes"){
                 //print('@@NotOTP__Screen');
                 Navigator.pop(context);
 

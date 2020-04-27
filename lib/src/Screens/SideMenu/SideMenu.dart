@@ -7,6 +7,7 @@ import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -131,11 +132,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         break;
       case 2:
         if (AppConstant.isLoggedIn) {
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => DeliveryAddressList(false)),
-          );
+          Utils.showProgressDialog(context);
+          ApiController.getAddressApiRequest().then((responses){
+            Utils.hideProgressDialog(context);
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DeliveryAddressList(false,responses)),
+            );
+          });
         } else {
           Utils.showLoginDialog(context);
         }
@@ -239,7 +244,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
-      //databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
       databaseHelper.deleteTable(DatabaseHelper.CART_Table);
       Utils.showToast(AppConstant.logoutSuccess, true);
 

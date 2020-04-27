@@ -27,10 +27,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
       setState(() {});
     });
 
-    databaseHelper.checkProductFavValue(int.parse(widget.product.id)).then((favValue){
+    databaseHelper.checkIfProductsExistInCart(DatabaseHelper.Favorite_Table,int.parse(widget.product.id)).then((favValue){
       //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
       setState(() {
-        widget.product.isFav = favValue;
+        widget.product.isFav = favValue.toString();
         //print("-isFav-${widget.product.isFav}");
       });
     });
@@ -53,30 +53,24 @@ class _ProductTileItemState extends State<ProductTileItem> {
                         SizedBox(width: 10),
                         InkWell(
                           onTap: () async {
-                            String count = await databaseHelper.checkProductFavValue(int.parse(widget.product.id));
+
+                            int  count = await databaseHelper.checkIfProductsExistInCart
+                              (DatabaseHelper.Favorite_Table,int.parse(widget.product.id));
                             print("--ProductFavValue-- ${count}");
                             Product product = widget.product;
-                            if(count == null || count =="null"){
-                              print("-if- ${count}");
-                              product.isFav = "1";
-                            }else if(count == "1"){
+                            if(count == 1){
                               product.isFav = "0";
-                            }else if(count == "0"){
-                              product.isFav = "1";
-                            }
-                            if(product.isFav == "1"){
-                              Utils.showToast(AppConstant.favsAdded, true);
-                            }else{
                               Utils.showToast(AppConstant.favsRemoved, true);
+                              await databaseHelper.delete
+                                (DatabaseHelper.Favorite_Table,int.parse(widget.product.id));
+                            }else if(count == 0){
+                              product.isFav = "1";
+                              Utils.showToast(AppConstant.favsAdded, true);
+                              insertInFavTable(product,counter);
                             }
-                            Map<String, dynamic> row = {
-                              DatabaseHelper.isFavorite: product.isFav,
-                            };
-                            int updatedRow = await databaseHelper.updateProductInCart(row, int.parse(widget.product.id));
-                            print("--updatedRow-- ${updatedRow}");
+                            //print("--product.isFav-- ${product.isFav}");
                             widget.callback();
                             setState(() {
-
                             });
                           },
                           child: Utils.showFavIcon(widget.product.isFav),
@@ -277,4 +271,36 @@ class _ProductTileItemState extends State<ProductTileItem> {
       print(e);
     }
   }
+
+
+
+  void insertInFavTable(Product product, int quantity) {
+    var mId = int.parse(product.id);
+
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID: mId,
+      DatabaseHelper.VARIENT_ID: product.variantId,
+      DatabaseHelper.PRODUCT_ID: product.id,
+      DatabaseHelper.WEIGHT: product.weight,
+      DatabaseHelper.isFavorite: product.isFav,
+      DatabaseHelper.MRP_PRICE: product.mrpPrice,
+      DatabaseHelper.PRICE: product.price,
+      DatabaseHelper.DISCOUNT: product.discount,
+      DatabaseHelper.QUANTITY: quantity.toString(),
+      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+      DatabaseHelper.Product_Name: product.title,
+      DatabaseHelper.UNIT_TYPE: product.isUnitType,
+      DatabaseHelper.nutrient: product.nutrient,
+      DatabaseHelper.description: product.description,
+      DatabaseHelper.imageType: product.imageType,
+      DatabaseHelper.imageUrl: product.imageUrl,
+      DatabaseHelper.image_100_80: product.image10080,
+      DatabaseHelper.image_300_200: product.image300200,
+    };
+
+    databaseHelper.addProductToFavTable(row).then((count) {
+      print("-------count--------${count}-----");
+    });
+  }
+
 }

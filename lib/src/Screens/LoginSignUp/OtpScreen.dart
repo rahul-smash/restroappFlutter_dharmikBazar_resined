@@ -12,6 +12,8 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import 'RegisterScreen.dart';
+
 class OtpScreen extends StatefulWidget {
 
   String menu;
@@ -169,8 +171,7 @@ class _OtpScreen extends State<OtpScreen> {
       Utils.isNetworkAvailable().then((isNetworkAvailable) async {
         if (isNetworkAvailable) {
           Utils.showProgressDialog(context);
-          ApiController.otpVerified(otpModel)
-              .then((response) {
+          ApiController.otpVerified(otpModel).then((response) {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
               //print('@@----object+'+response.success.toString());
@@ -193,12 +194,21 @@ class _OtpScreen extends State<OtpScreen> {
   void proceedtoActivity() {
     print('@@MENUGET'+widget.menu);
     if (widget.menu == ("menu")) {
-      //  if (isNameExist && isEmailExist) {
-      //showAlertDialogForLogin(getActivity(), "Sucess", "You have login successfully. Please continue.");
-      Navigator.push(
+
+      /*Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen(store)),
+      );*/
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => RegisterUser(true)),
       );
+
+      //  if (isNameExist && isEmailExist) {
+      //showAlertDialogForLogin(getActivity(), "Sucess", "You have login successfully. Please continue.");
+
       /*  } else {
         proceedToEmail(from);
       }*/

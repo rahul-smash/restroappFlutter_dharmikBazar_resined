@@ -19,7 +19,8 @@ import '../BookOrder/ConfirmOrderScreen.dart';
 class DeliveryAddressList extends StatefulWidget {
 
   final bool showProceedBar;
-  DeliveryAddressList(this.showProceedBar);
+  DeliveryAddressResponse responsesData;
+  DeliveryAddressList(this.showProceedBar,this.responsesData);
 
   @override
   _AddDeliveryAddressState createState() => _AddDeliveryAddressState();
@@ -32,7 +33,14 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   Area radiusArea;
 
   @override
+  void initState() {
+    super.initState();
+    addressList = widget.responsesData.data;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    print("------Widget build------AddDelivery-${addressList.length}---");
     return Scaffold(
       appBar: AppBar(
           title: Text("Delivery Addresses"),
@@ -76,7 +84,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (BuildContext context) =>
                         SaveDeliveryAddress(null, () {
-                          setState(() {});
+                          print("----SaveDeliveryAddress-------");
+                          getAddressList();
                         },addressValue),
                       fullscreenDialog: true,
                     ));
@@ -107,6 +116,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         );
                         if(result != null){
                           radiusArea = result;
+                          getAddressList();
                         }
                       }else{
                         Utils.showToast("Please turn on gps!", false);
@@ -147,6 +157,17 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     );
   }
 
+  getAddressList(){
+    Utils.showProgressDialog(context);
+    ApiController.getAddressApiRequest().then((responses){
+      Utils.hideProgressDialog(context);
+      DeliveryAddressResponse response = responses;
+      setState(() {
+        addressList = response.data;
+      });
+    });
+  }
+
   Future<String> getLocation() async {
     Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -158,7 +179,27 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   }
 
   Widget addAddressList() {
-    return FutureBuilder(
+    if(addressList.isEmpty){
+      return Center(
+        child: Container(
+          margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
+          child: Text("No Delivery Address found!"),
+        ),
+      );
+    }else{
+      return Expanded(
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: addressList.length,
+          itemBuilder: (context, index) {
+            DeliveryAddressData area = addressList[index];
+            return addAddressCard(area, index);
+          },
+        ),
+      );
+    }
+
+    /*return FutureBuilder(
       future: ApiController.getAddressApiRequest(),
       builder: (context, projectSnap) {
         if (projectSnap.connectionState == ConnectionState.none &&
@@ -167,9 +208,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         } else {
           if (projectSnap.hasData) {
             DeliveryAddressResponse response = projectSnap.data;
-            if(response != null && !response.success){
-              Utils.showToast(response.message, false);
-            }
             if (response.success) {
               addressList = response.data;
               return Expanded(
@@ -198,7 +236,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           }
         }
       },
-    );
+    );*/
   }
 
   Widget addAddressCard(DeliveryAddressData area, int index) {
@@ -284,9 +322,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          SaveDeliveryAddress(area, () {
-                        setState(() {});
+                      builder: (BuildContext context) =>SaveDeliveryAddress(area, () {
+                        print('@@------SaveDeliveryAddress----------');
+                        getAddressList();
                       },""),
                       fullscreenDialog: true,
                     ));
@@ -298,13 +336,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             height: 30,
             width: 1,
           ),
-          Flexible(
-              child: InkWell(
+          Flexible(child: InkWell(
             child: Align(
               alignment: Alignment.center,
-              child: new Text("Remove Address",
-                  style: TextStyle(
-                      color: infoLabel, fontWeight: FontWeight.w500)),
+              child: new Text("Remove Address",style: TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),
             ),
             onTap: () {
               showDialogForDelete(area);
@@ -385,7 +420,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     .then((response) {
                   Utils.hideProgressDialog(context);
                   if (response != null && response.success) {
-                    setState(() {});
+                    getAddressList();
                   }
                 });
               },
@@ -401,4 +436,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       },
     );
   }
+
+
+
 }

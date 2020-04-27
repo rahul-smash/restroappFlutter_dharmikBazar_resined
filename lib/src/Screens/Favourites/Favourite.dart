@@ -42,22 +42,40 @@ class _FavouritesState extends State<Favourites> {
                     return Container();
                   } else {
                     if (projectSnap.hasData) {
-                      return Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: projectSnap.data.length,
-                          itemBuilder: (context, index) {
-                            Product product = projectSnap.data[index];
-                            return ProductTileItem(product, () {
-                              print("-------updateTotalPrice---------");
-                              bottomBar.state.updateTotalPrice();
-                              setState(() {
 
+                      if(projectSnap.data.length == 0){
+
+                        return Container(
+                          child: Expanded(
+                            child: Center(
+                              child: Text("No Favourites found!",
+                                  overflow: TextOverflow.ellipsis,
+                                  style: new TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 18.0,
+                                  )),
+                            ),
+                          ),
+                        );
+                      }else{
+                        return Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount: projectSnap.data.length,
+                            itemBuilder: (context, index) {
+                              Product product = projectSnap.data[index];
+                              return ProductTileItem(product, () {
+                                print("-------updateTotalPrice---------");
+                                bottomBar.state.updateTotalPrice();
+                                setState(() {
+
+                                });
                               });
-                            });
-                          },
-                        ),
-                      );
+                            },
+                          ),
+                        );
+                      }
+
                     } else {
                       return Center(
                         child: CircularProgressIndicator(

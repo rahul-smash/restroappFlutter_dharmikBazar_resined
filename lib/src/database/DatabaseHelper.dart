@@ -16,7 +16,7 @@ class DatabaseHelper {
   // Database table names
   static final String Categories_Table = "categories";
   static final String Sub_Categories_Table = "sub_categories";
-  //static final String Products_Table = "products";
+  static final String Favorite_Table = "favorite";
   static final String CART_Table = "cart";
 
   // Database Columns
@@ -101,6 +101,26 @@ class DatabaseHelper {
         "image_300_200 TEXT, "
         "unit_type TEXT"
         ")");
+    await db.execute("CREATE TABLE ${Favorite_Table}("
+        "id INTEGER PRIMARY KEY, "
+        "product_name TEXT, "
+        "isfavorite TEXT, "
+        "nutrient TEXT, "
+        "description TEXT, "
+        "imageType TEXT, "
+        "imageUrl TEXT, "
+        "variant_id TEXT, "
+        "product_id TEXT, "
+        "weight TEXT, "
+        "mrp_price TEXT, "
+        "price TEXT, "
+        "discount TEXT, "
+        "quantity TEXT, "
+        "isTaxEnable TEXT, "
+        "image_100_80 TEXT, "
+        "image_300_200 TEXT, "
+        "unit_type TEXT"
+        ")");
   }
 
   Future<int> saveCategories(CategoryModel categoryModel) async {
@@ -131,33 +151,13 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<String> checkProductFavValue(int product_id) async {
-    String count = "0";
-    //database connection
+
+  Future<int> addProductToFavTable(Map<String, dynamic> row) async {
     var dbClient = await db;
-    // get single row
-    List<String> columnsToSelect = [isFavorite];
-    String whereClause = '${DatabaseHelper.ID} = ?';
-    List<dynamic> whereArguments = [product_id];
-    List<Map> result = await dbClient.query(CART_Table,
-        columns: columnsToSelect,
-        where: whereClause,
-        whereArgs: whereArguments);
-    // print the results
-    if (result != null && result.isNotEmpty) {
-      print("---result.length--- ${result.length}");
-      result.forEach((row) {
-        print("-1-isfavorite--- ${row['isfavorite']}");
-        count = row[isFavorite];
-        //return count;
-      });
-    } else {
-      print("-X-isfavorite--- return 0");
-      return count;
-      count = "0";
-    }
-    return count;
+    int res = await dbClient.insert(Favorite_Table, row);
+    return res;
   }
+
 
   Future<int> updateProductInCart(Map<String, dynamic> row, int product_id) async {
     var dbClient = await db;
@@ -288,10 +288,10 @@ class DatabaseHelper {
       description,imageType,imageUrl,image_100_80,image_300_200
     ];
 
-    String whereClause = '${DatabaseHelper.isFavorite} = 1';
+    //String whereClause = '${DatabaseHelper.isFavorite} = 1';
 
     List<Map> resultList =
-    await dbClient.query(CART_Table, columns: columnsToSelect, where: whereClause);
+    await dbClient.query(Favorite_Table, columns: columnsToSelect);
 
     if (resultList != null && resultList.isNotEmpty) {
 
@@ -342,6 +342,7 @@ class DatabaseHelper {
     List<Map> list = await dbClient
         .rawQuery('SELECT * from $table where ${ID} = $product_id');
     int count = list.length;
+    print("-checkIfProductsExist-- ${count}");
     return count;
   }
 

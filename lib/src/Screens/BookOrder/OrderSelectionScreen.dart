@@ -5,6 +5,7 @@ import 'package:restroapp/src/Screens/Address/StoreLocationScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -66,13 +67,17 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
           Visibility(
             visible: delieveryAddress,
             child:  GestureDetector(
-              onTap: () {
+              onTap: () async {
                 print('@@CartBottomView----'+"DeliveryScreen");
+                Utils.showProgressDialog(context);
+
+                DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
+                Utils.hideProgressDialog(context);
                 Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DeliveryAddressList(true)),
+                      builder: (context) => DeliveryAddressList(true,deliveryAddressResponse)),
                 );
               },
               child: new Container(
@@ -187,12 +192,16 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             GestureDetector(
-              onTap: () {
+              onTap: () async {
                 print('@@CartBottomView----'+"PickUPActivy");
+                Utils.showProgressDialog(context);
+
+                DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
+                Utils.hideProgressDialog(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DeliveryAddressList(true)),
+                      builder: (context) => DeliveryAddressList(true,deliveryAddressResponse)),
                 );
               },
               child: new Container(
@@ -225,12 +234,16 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
               ),
             ),
             GestureDetector(
-              onTap: () {
+              onTap: () async {
                 print('@@CartBottomView----'+"DelieveryAddressList");
+                Utils.showProgressDialog(context);
+
+                DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
+                Utils.hideProgressDialog(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => DeliveryAddressList(true)),
+                      builder: (context) => DeliveryAddressList(true,deliveryAddressResponse)),
                 );
               },
               child: new Container(

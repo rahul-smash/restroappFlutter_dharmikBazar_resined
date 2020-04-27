@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class RegisterUser extends StatefulWidget {
+
+  bool isComingFromOtpScreen;
+  RegisterUser(this.isComingFromOtpScreen);
+
   @override
   _RegisterUserState createState() => new _RegisterUserState();
 }
@@ -20,6 +27,10 @@ class _RegisterUserState extends State<RegisterUser> {
       appBar: new AppBar(
         title: new Text('Sign Up'),
         centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.pop(context, false),
+          ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -148,10 +159,17 @@ class _RegisterUserState extends State<RegisterUser> {
           if (isNetworkAvailable) {
             Utils.showProgressDialog(context);
             ApiController.registerApiRequest(userData)
-                .then((response) {
+                .then((response) async {
               Utils.hideProgressDialog(context);
               if (response != null && response.success) {
                 Navigator.pop(context);
+                if(widget.isComingFromOtpScreen){
+                  StoreModel store = await SharedPrefs.getStore();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => HomeScreen(store)),
+                  );
+                }
               }
             });
           } else {
