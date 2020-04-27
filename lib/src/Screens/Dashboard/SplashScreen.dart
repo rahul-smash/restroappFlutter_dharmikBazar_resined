@@ -46,10 +46,9 @@ class _SplashScreenState extends State<SplashScreen> {
       appID = packageInfo.packageName;
       version = packageInfo.version;
       buildNumber = packageInfo.buildNumber;
-      SharedPrefs.storeSharedValue(
-          AppConstant.old_appverion, version);
+      SharedPrefs.storeSharedValue(AppConstant.old_appverion, version);
 
-      print('@@_____'+version+""+appName);
+      print('@@_version '+version+" and buildNumber= "+buildNumber);
     });
   }
   @override
@@ -73,9 +72,19 @@ class _SplashScreenState extends State<SplashScreen> {
             if (projectSnap.hasData) {
               StoreResponse model = projectSnap.data;
               if (model.success) {
-                openHomePage(model.store);
-                return Container();
-                //return ForceUpdateAlert();
+                List<ForceDownload> forceDownload = model.store.forceDownload;
+                //print("--androidAppVerison--${forceDownload[0].androidAppVerison} and ${forceDownload[0].forceDownloadMessage}");
+                int index1 = version.lastIndexOf(".");
+                //print("--substring--${version.substring(0,index1)} ");
+                double currentVesrion = double.parse(version.substring(0,index1).trim());
+                double apiVesrion = double.parse(forceDownload[0].androidAppVerison.substring(0,index1).trim());
+                //print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
+                if(apiVesrion > currentVesrion){
+                  return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
+                }else{
+                  openHomePage(model.store);
+                  return Container();
+                }
               } else {
                 return Container();
               }
@@ -108,6 +117,10 @@ class _SplashScreenState extends State<SplashScreen> {
 
 
 class ForceUpdateAlert extends StatefulWidget{
+  String forceDownloadMessage;
+  String appName;
+  ForceUpdateAlert(this.forceDownloadMessage, this.appName);
+
   @override
   State<StatefulWidget> createState() {
     return ForceUpdateAlertState();
@@ -123,8 +136,8 @@ class ForceUpdateAlertState extends BaseState<ForceUpdateAlert>{
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.all(Radius.circular(10.0))
         ),
-        title: Text("Title",textAlign: TextAlign.center,),
-        content: Text("body",textAlign: TextAlign.center,),
+        title: Text("${widget.appName}",textAlign: TextAlign.center,),
+        content: Text("${widget.forceDownloadMessage}",textAlign: TextAlign.center,),
         actions: <Widget>[
           new FlatButton(
             child: Text("OK"),

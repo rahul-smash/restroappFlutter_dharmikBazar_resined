@@ -29,6 +29,10 @@ import 'dart:convert';
 import 'dart:io';
 
 class ApiController {
+  static final int timeout = 18;
+
+
+
   static Future<StoreResponse> versionApiRequest(String storeId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -36,7 +40,11 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.version;
 
+    var headers = {
+      'Content-Type': 'application/json;charset=utf-8;'
+    };
     var request = new http.MultipartRequest("POST", Uri.parse(url));
+    request.headers.addAll(headers);
     try {
       request.fields.addAll({
         "device_id": deviceId,
@@ -53,7 +61,7 @@ class ApiController {
       return storeData;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
-      print("---catch--${e.toString()}----");
+      print("---catch--${e}----");
       return null;
     }
   }
