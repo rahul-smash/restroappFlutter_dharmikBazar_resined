@@ -97,8 +97,8 @@ class _SplashScreenState extends State<SplashScreen> {
               } else {
                 return Center(
                   child: CircularProgressIndicator(
-                      backgroundColor: Colors.black26,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+                      backgroundColor: Colors.black,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white)),
                 );
               }
             }
