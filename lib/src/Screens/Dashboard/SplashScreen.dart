@@ -61,41 +61,49 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      body: FutureBuilder(
-        future: ApiController.versionApiRequest("7"),
-        builder: (context, projectSnap) {
-          if (projectSnap.connectionState == ConnectionState.none &&
-              projectSnap.hasData == null) {
-            return Container();
-          } else {
-            if (projectSnap.hasData) {
-              StoreResponse model = projectSnap.data;
-              if (model.success) {
-                List<ForceDownload> forceDownload = model.store.forceDownload;
-                //print("--androidAppVerison--${forceDownload[0].androidAppVerison} and ${forceDownload[0].forceDownloadMessage}");
-                int index1 = version.lastIndexOf(".");
-                //print("--substring--${version.substring(0,index1)} ");
-                double currentVesrion = double.parse(version.substring(0,index1).trim());
-                double apiVesrion = double.parse(forceDownload[0].androidAppVerison.substring(0,index1).trim());
-                //print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
-                if(apiVesrion > currentVesrion){
-                  return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
-                }else{
-                  openHomePage(model.store);
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/splash.png"),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: FutureBuilder(
+          future: ApiController.versionApiRequest("7"),
+          builder: (context, projectSnap) {
+            if (projectSnap.connectionState == ConnectionState.none &&
+                projectSnap.hasData == null) {
+              return Container();
+            } else {
+              if (projectSnap.hasData) {
+                StoreResponse model = projectSnap.data;
+                if (model.success) {
+                  List<ForceDownload> forceDownload = model.store.forceDownload;
+                  //print("--androidAppVerison--${forceDownload[0].androidAppVerison} and ${forceDownload[0].forceDownloadMessage}");
+                  int index1 = version.lastIndexOf(".");
+                  //print("--substring--${version.substring(0,index1)} ");
+                  double currentVesrion = double.parse(version.substring(0,index1).trim());
+                  double apiVesrion = double.parse(forceDownload[0].androidAppVerison.substring(0,index1).trim());
+                  //print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
+                  if(apiVesrion > currentVesrion){
+                    return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
+                  }else{
+                    openHomePage(model.store);
+                    return Container();
+                  }
+                } else {
                   return Container();
                 }
               } else {
-                return Container();
+                return Center(
+                  child: CircularProgressIndicator(
+                      backgroundColor: Colors.black26,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+                );
               }
-            } else {
-              return Center(
-                child: CircularProgressIndicator(
-                    backgroundColor: Colors.black26,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
-              );
             }
-          }
-        },
+          },
+        ),
       ),
     );
   }

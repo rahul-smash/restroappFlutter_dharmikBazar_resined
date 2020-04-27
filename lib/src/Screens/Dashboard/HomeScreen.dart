@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     initFirebase();
     try {
+      print("-----onlinePayment-----${store.onlinePayment}------");
       if (store.banners.isEmpty) {
         imgList = [
           AppConstant.placeholderImageUrl,
