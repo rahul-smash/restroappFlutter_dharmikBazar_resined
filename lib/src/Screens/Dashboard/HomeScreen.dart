@@ -1,3 +1,4 @@
+import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   StoreModel store;
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
-  List<String> imgList = [];
+  List<NetworkImage> imgList = [];
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
   UserModel user;
@@ -48,18 +49,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     initFirebase();
     try {
-      print("-----onlinePayment-----${store.onlinePayment}------");
+      print("-----store.banners-----${store.banners.length}------");
       if (store.banners.isEmpty) {
         imgList = [
-          AppConstant.placeholderImageUrl,
-          AppConstant.placeholderImageUrl,
-          AppConstant.placeholderImageUrl
+          NetworkImage(AppConstant.placeholderImageUrl),
+          NetworkImage(AppConstant.placeholderImageUrl),
+          NetworkImage(AppConstant.placeholderImageUrl),
         ];
       } else {
         for (var i = 0; i < store.banners.length; i++) {
           String imageUrl = store.banners[i].image;
-          imgList.add(
-              imageUrl.isEmpty ? AppConstant.placeholderImageUrl : imageUrl);
+          imgList.add(NetworkImage(imageUrl.isEmpty ? AppConstant.placeholderImageUrl : imageUrl),);
         }
       }
     } catch (e) {
@@ -135,7 +135,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget addBanners() {
     return Stack(
       children: <Widget>[
-        CarouselSlider(
+        /*CarouselSlider(
           viewportFraction: 0.9,
           aspectRatio: 1.7,
           autoPlay: true,
@@ -150,6 +150,30 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ).toList(),
+        ),*/
+        Center(
+          child: SizedBox(
+            height: 220.0,
+            width: Utils.getDeviceWidth(context),
+            child: Carousel(
+              boxFit: BoxFit.cover,
+              autoplay: false,
+              animationCurve: Curves.fastOutSlowIn,
+              animationDuration: Duration(milliseconds: 1000),
+              dotSize: 6.0,
+              dotIncreasedColor: appTheme,
+              dotBgColor: Colors.transparent,
+              dotPosition: DotPosition.bottomCenter,
+              dotVerticalPadding: 10.0,
+              showIndicator: true,
+              indicatorBgPadding: 7.0,
+              /*images: [
+                NetworkImage('https://cdn-images-1.medium.com/max/2000/1*GqdzzfB_BHorv7V2NV7Jgg.jpeg'),
+                NetworkImage('https://cdn-images-1.medium.com/max/2000/1*wnIEgP1gNMrK5gZU7QS0-A.jpeg'),
+              ],*/
+              images: imgList,
+            ),
+          ),
         ),
       ],
     );
