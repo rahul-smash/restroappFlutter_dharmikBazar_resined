@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -5,11 +7,21 @@ import 'package:restroapp/src/Screens/Dashboard/SplashScreen.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'dart:io';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AppConstant.isLoggedIn = await SharedPrefs.isUserLoggedIn();
+
+  // Set `enableInDevMode` to true to see reports while in debug mode
+  // This is only to be used for confirming that reports are being
+  // submitted as expected. It is not intended to be used for everyday
+  // development.
+  Crashlytics.instance.enableInDevMode = true;
+
+  // Pass all uncaught errors to Crashlytics.
+  FlutterError.onError = Crashlytics.instance.recordFlutterError;
 
   if (Platform.isIOS) {
     IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
@@ -20,7 +32,11 @@ Future<void> main() async {
     SharedPrefs.storeSharedValue(
         AppConstant.deviceId, androidDeviceInfo.androidId);
   }
-  runApp(ValueApp());
+
+  runZoned(() {
+    runApp(ValueApp());
+  }, onError: Crashlytics.instance.recordError);
+
 }
 
 class ValueApp extends StatelessWidget {
