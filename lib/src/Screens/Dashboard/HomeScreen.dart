@@ -142,14 +142,10 @@ class _HomeScreenState extends State<HomeScreen> {
           enlargeCenterPage: false,
           items: imgList.map((url) {
               return Container(
+                width: Utils.getDeviceWidth(context),
                 margin: EdgeInsets.all(0.0),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.all(Radius.circular(0.0)),
-                  child: Image.network(
-                    url,
-                    fit: BoxFit.cover,
-                    width: 1000.0,
-                  ),
+                child: Image.network(url,fit: BoxFit.cover,
+                  width: Utils.getDeviceWidth(context),
                 ),
               );
             },
