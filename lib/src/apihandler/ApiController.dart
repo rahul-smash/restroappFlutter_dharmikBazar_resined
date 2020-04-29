@@ -545,7 +545,7 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.placeOrder;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    print("====${razorpay_order_id}==and ${razorpay_payment_id}===and ${online_method}======");
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
@@ -565,21 +565,18 @@ class ApiController {
         "user_address_id": isComingFromPickUpScreen == true ? areaId : address.address,
         "orders": orderJson,
         "checkout": totalPrice,
-        "payment_method": paymentMethod == "2" ? "COD" : "Online Payment",
+        "payment_method": paymentMethod == "2" ? "COD" : "online",
         "discount": taxModel == null ? "" : taxModel.discount,
-        "razorpay_order_id": razorpay_order_id,
-        "razorpay_payment_id": razorpay_payment_id,
+        "payment_request_id": razorpay_order_id,
+        "payment_id": razorpay_payment_id,
         "online_method": online_method,
       });
-
-       //= razorpay_order_id
-       //= razorpay_payment_id
-        // online_method = razorpay
 
       print("----${url}--");
       print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print("--respStr--${respStr}--");
       final parsed = json.decode(respStr);
 
       ResponseModel model = ResponseModel.fromJson(parsed);
