@@ -418,6 +418,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
+
+    print("----ExternalWalletResponse----${response.walletName}--");
+
     Fluttertoast.showToast(
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);
   }

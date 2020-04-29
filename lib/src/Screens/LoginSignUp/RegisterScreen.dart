@@ -55,7 +55,7 @@ class _RegisterUserState extends State<RegisterUser> {
                     validator: (val) =>
                         val.isEmpty ? AppConstant.enterName : null,
                     onSaved: (val) {
-                      userData.name = val;
+                      userData.name = val.trim();
                     },
                   ),
                   new TextFormField(
@@ -70,7 +70,7 @@ class _RegisterUserState extends State<RegisterUser> {
                       WhitelistingTextInputFormatter.digitsOnly,
                     ],
                     onSaved: (val) {
-                      userData.phone = val;
+                      userData.phone = val.trim();
                     },
                   ),
                   new TextFormField(
@@ -86,7 +86,7 @@ class _RegisterUserState extends State<RegisterUser> {
                             ? null
                             : AppConstant.enterValidEmail,
                     onSaved: (val) {
-                      userData.email = val;
+                      userData.email = val.trim();
                     },
                   ),
                   new TextFormField(
@@ -98,7 +98,7 @@ class _RegisterUserState extends State<RegisterUser> {
                     validator: (val) =>
                         val.isEmpty ? AppConstant.enterPassword : null,
                     onSaved: (val) {
-                      userData.password = val;
+                      userData.password = val.trim();
                     },
                   ),
                   new TextFormField(
@@ -110,7 +110,7 @@ class _RegisterUserState extends State<RegisterUser> {
                     validator: (val) =>
                         val.isEmpty ? AppConstant.enterConfirmPassword : null,
                     onSaved: (val) {
-                      userData.confirmPassword = val;
+                      userData.confirmPassword = val.trim();
                     },
                   ),
                   Container(height: 20.0),
@@ -152,7 +152,7 @@ class _RegisterUserState extends State<RegisterUser> {
     if (form.validate()) {
       form.save(); //This invokes each onSaved event
 
-      if (userData.confirmPassword != userData.password) {
+      if (userData.confirmPassword.trim() != userData.password.trim()) {
         Utils.showToast(AppConstant.passwordMatch, true);
       } else {
         Utils.isNetworkAvailable().then((isNetworkAvailable) async {
