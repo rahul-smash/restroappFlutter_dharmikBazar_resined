@@ -6,10 +6,12 @@ import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
+import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
@@ -532,7 +534,8 @@ class ApiController {
       String paymentMethod,
       TaxCalculationModel taxModel,
       DeliveryAddressData address,
-      String orderJson, bool isComingFromPickUpScreen, String areaId) async {
+      String orderJson, bool isComingFromPickUpScreen, String areaId,
+      String razorpay_order_id,String razorpay_payment_id,String online_method) async {
 
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -564,7 +567,15 @@ class ApiController {
         "checkout": totalPrice,
         "payment_method": paymentMethod == "2" ? "COD" : "Online Payment",
         "discount": taxModel == null ? "" : taxModel.discount,
+        "razorpay_order_id": razorpay_order_id,
+        "razorpay_payment_id": razorpay_payment_id,
+        "online_method": online_method,
       });
+
+       //= razorpay_order_id
+       //= razorpay_payment_id
+        // online_method = razorpay
+
       print("----${url}--");
       print("--fields--${request.fields.toString()}--");
       final response = await request.send();
@@ -774,6 +785,7 @@ class ApiController {
     try {
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+
       final parsed = json.decode(respStr);
 
       StoreRadiousResponse res = StoreRadiousResponse.fromJson(parsed);
@@ -783,5 +795,59 @@ class ApiController {
       return null;
     }
   }
+
+
+  static Future<CreateOrderData> razorpayCreateOrderApi(String amount) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.razorpayCreateOrder;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "amount": amount,
+        "currency": "INR",
+        "receipt": "Order",
+        "payment_capture": "1",
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      CreateOrderData model = CreateOrderData.fromJson(parsed);
+      return model;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<RazorpayOrderData> razorpayVerifyTransactionApi(String razorpay_order_id) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.razorpayVerifyTransaction;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "razorpay_order_id": razorpay_order_id,
+      });
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      RazorpayOrderData model = RazorpayOrderData.fromJson(parsed);
+      return model;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+
 
 }

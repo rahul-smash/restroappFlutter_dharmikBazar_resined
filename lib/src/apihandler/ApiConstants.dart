@@ -1,5 +1,6 @@
 class ApiConstants{
-  static String baseUrl = 'https://app.restroapp.com/storeId/api_v5/';
+  static String baseUrl = 'https://app.restroapp.com/storeId/api/';
+  static String baseUrl2 = 'https://app.restroapp.com/storeId/api/';
 
   static String storeList = 'storeList';
   static String version = 'version';
@@ -30,6 +31,10 @@ class ApiConstants{
   static String cancelOrder = 'orderCancel';
 
   static String deliveryAreasArea = 'deliveryAreas/Area';
+
+  static String razorpayCreateOrder = 'razorpayCreateOrder';
+  static String razorpayVerifyTransaction = 'razorpayVerifyTransaction';
+
 
   static final String txt_mobile = "Please enter your Mobile No. to proceed further";
   static final String txt_Submit = "Submit";

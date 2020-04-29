@@ -136,22 +136,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Stack(
       children: <Widget>[
-        /*CarouselSlider(
-          viewportFraction: 0.9,
-          aspectRatio: 1.7,
-          autoPlay: true,
-          enlargeCenterPage: false,
-          items: imgList.map((url) {
-              return Container(
-                width: Utils.getDeviceWidth(context),
-                margin: EdgeInsets.all(0.0),
-                child: Image.network(url,fit: BoxFit.cover,
-                  width: Utils.getDeviceWidth(context),
-                ),
-              );
-            },
-          ).toList(),
-        ),*/
         Center(
           child: SizedBox(
             height: 220.0,
@@ -168,10 +152,6 @@ class _HomeScreenState extends State<HomeScreen> {
               dotVerticalPadding: 10.0,
               showIndicator: imgList.length == 1 ? false : true,
               indicatorBgPadding: 7.0,
-              /*images: [
-                NetworkImage('https://cdn-images-1.medium.com/max/2000/1*GqdzzfB_BHorv7V2NV7Jgg.jpeg'),
-                NetworkImage('https://cdn-images-1.medium.com/max/2000/1*wnIEgP1gNMrK5gZU7QS0-A.jpeg'),
-              ],*/
               images: imgList,
             ),
           ),

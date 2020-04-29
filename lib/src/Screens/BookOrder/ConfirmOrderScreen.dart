@@ -7,7 +7,9 @@ import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
@@ -39,6 +41,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   String shippingCharges = "0";
   static const platform = const MethodChannel("razorpay_flutter");
   Razorpay _razorpay;
+  String razorpay_order_id= "";
+  String razorpay_payment_id= "";
+  String onlineMethod = "";
 
   @override
   void initState() {
@@ -306,7 +311,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         onTap: () {
           print("----paymentMod----${widget.paymentMode}--");
           if(widget.paymentMode == "3"){
-            openCheckout();
+            callOrderIdApi();
           }else{
             placeOrderApiCall();
           }
@@ -340,14 +345,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
 
-  void openCheckout() async {
-
+  void openCheckout(String razorpay_order_id) async {
+    Utils.hideProgressDialog(context);
     UserModel user = await SharedPrefs.getUser();
     double price = totalPrice + int.parse(shippingCharges);
-
+    this.razorpay_order_id = razorpay_order_id;
     var options = {
-      'key': 'rzp_test_1DP5mmOlF5G5ag',
+      'key': 'rzp_test_kc9p3xCAsk7Sl9',
       'currency': "INR",
+      'order_id': razorpay_order_id,
       'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
       'name': '${user.fullName}',
       'description': '${noteController.text}',
@@ -364,14 +370,81 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
+
+
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    //Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId, timeInSecForIos: 4);
+    Utils.showProgressDialog(context);
+    ApiController.razorpayVerifyTransactionApi(response.orderId).then((response){
+      print("----razorpayVerifyTransactionApi----${response}--");
+      if(response != null){
+
+        RazorpayOrderData model = response;
+        if(model.success){
+          this.razorpay_payment_id = model.data.id;
+          this.onlineMethod = "razorpay";
+          placeOrderApiCall();
+        }else{
+          Utils.showToast("Something went wrong!", true);
+          Utils.hideProgressDialog(context);
+        }
+      }else{
+        Utils.hideProgressDialog(context);
+      }
+    });
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    Fluttertoast.showToast(msg:response.message,timeInSecForIos: 4);
+
+    print("----_handlePaymentError--message--${response.message}--");
+    print("----_handlePaymentError--code--${response.code.toString()}--");
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+
+    /*print("----ExternalWalletResponse----${response.walletName}--");
+
+    Fluttertoast.showToast(
+        msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
+  }
+
+  void callOrderIdApi() {
+    Utils.showProgressDialog(context);
+    double price = totalPrice + int.parse(shippingCharges);
+    print("=======1===${price}===========");
+    price = price * 100;
+    print("=======2===${price}===========");
+    String mPrice = price.toString().substring(0 , price.toString().indexOf('.'));
+    print("=======mPrice===${mPrice}===========");
+    ApiController.razorpayCreateOrderApi(mPrice).then((response){
+      print("----razorpayCreateOrderApi----${response.data.id}--");
+
+      CreateOrderData model = response;
+      if(model != null && response.success){
+
+        openCheckout(model.data.id);
+
+      }else{
+        Utils.showToast("Something went wrong!", true);
+        Utils.hideProgressDialog(context);
+      }
+    });
+  }
+
+
+
   void placeOrderApiCall() {
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
         Utils.showProgressDialog(context);
         databaseHelper.getCartItemsListToJson().then((json) {
+
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
-                  widget.paymentMode, taxModel, widget.address, json ,
-              widget.isComingFromPickUpScreen,widget.areaId)
+              widget.paymentMode, taxModel, widget.address, json ,
+              widget.isComingFromPickUpScreen,widget.areaId ,
+              razorpay_order_id, razorpay_payment_id, onlineMethod)
               .then((response) {
             Utils.hideProgressDialog(context);
             showDialog(
@@ -402,26 +475,5 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         Utils.showToast(AppConstant.noInternet, false);
       }
     });
-  }
-
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    Fluttertoast.showToast(
-        msg: "SUCCESS: " + response.paymentId, timeInSecForIos: 4);
-    placeOrderApiCall();
-  }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    Fluttertoast.showToast(
-        msg: "ERROR: " + response.code.toString() + " - " + response.message,
-        timeInSecForIos: 4);
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-
-    print("----ExternalWalletResponse----${response.walletName}--");
-
-    Fluttertoast.showToast(
-        msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);
   }
 }
