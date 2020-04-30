@@ -45,7 +45,7 @@ class DialogUtils {
   }
 
 
-  static Future<bool> displayPaymentDialog(BuildContext context,String title ) async {
+  static Future<bool> displayPaymentDialog(BuildContext context,String title,String note) async {
 
     return await showDialog<bool>(
       context: context,
@@ -59,32 +59,39 @@ class DialogUtils {
                 borderRadius: BorderRadius.all(Radius.circular(10.0))
             ),
             title: Text(title,textAlign: TextAlign.center,),
-            content: Row(
-              children: <Widget>[
-                Container(
-                  margin: EdgeInsets.all(20),
-                  child: FlatButton(
-                    child: Text('Offline'),
-                    color: appTheme,
-                    textColor: Colors.white,
-                    onPressed: () {
-                      Navigator.pop(context, false);
-                    },
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.all(20),
-                  child: FlatButton(
-                    child: Text('Online'),
-                    color: appTheme,
-                    textColor: Colors.white,
-                    onPressed: () {
-                      Navigator.pop(context, true);
-                    },
-                  ),
-                )
-              ],
-            ),
+            content: Container(
+              child: Wrap(
+                children: <Widget>[
+                  Text(note,textAlign: TextAlign.center,),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(20),
+                        child: FlatButton(
+                          child: Text('Offline'),
+                          color: appTheme,
+                          textColor: Colors.white,
+                          onPressed: () {
+                            Navigator.pop(context, false);
+                          },
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.all(20),
+                        child: FlatButton(
+                          child: Text('Online'),
+                          color: appTheme,
+                          textColor: Colors.white,
+                          onPressed: () {
+                            Navigator.pop(context, true);
+                          },
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              ),
+            )
           ),
         );
       },

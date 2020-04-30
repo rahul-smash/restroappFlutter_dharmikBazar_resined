@@ -98,7 +98,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
             print("--${store.onlinePayment}-}-");
             if(store.onlinePayment == "1"){
               String paymentValue;
-              var result = await DialogUtils.displayPaymentDialog(context, "Select Payment");
+              var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",widget.areaObject.note);
               if(result == true){
                 paymentValue = "3";
               }else{

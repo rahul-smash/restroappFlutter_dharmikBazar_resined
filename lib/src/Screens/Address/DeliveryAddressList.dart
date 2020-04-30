@@ -363,7 +363,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             StoreModel store = await SharedPrefs.getStore();
             print("--${store.onlinePayment}-}-");
             if(store.onlinePayment == "1"){
-              var result = await DialogUtils.displayPaymentDialog(context, "Select Payment");
+              var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",addressList[selectedIndex].note);
               String paymentValue;
               if(result == true){
                 paymentValue = "3";
