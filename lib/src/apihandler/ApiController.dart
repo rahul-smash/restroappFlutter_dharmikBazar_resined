@@ -551,22 +551,22 @@ class ApiController {
         "shipping_charges": "${shipping_charges}",
         "note": note,
         "calculated_tax_detail": "",
-        "coupon_code": taxModel == null ? "" : taxModel.couponCode,
+        "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
         "user_address": isComingFromPickUpScreen == true ? areaId : address.address,
         "store_fixed_tax_detail": "",
-        "tax": taxModel == null ? "0" : taxModel.tax,
+        "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",
         "platform": Platform.isIOS ? "IOS" : "Android",
         "tax_rate": "0",
-        "total": taxModel == null ? totalPrice : taxModel.total,
+        "total": taxModel == null ? '${totalPrice}' : '${taxModel.total}',
         "user_id": user.id,
         "device_token": deviceToken,
         "user_address_id": isComingFromPickUpScreen == true ? areaId : address.address,
         "orders": orderJson,
         "checkout": totalPrice,
         "payment_method": paymentMethod == "2" ? "COD" : "online",
-        "discount": taxModel == null ? "" : taxModel.discount,
+        "discount": taxModel == null ? "" : '${taxModel.discount}',
         "payment_request_id": razorpay_order_id,
         "payment_id": razorpay_payment_id,
         "online_method": online_method,
@@ -582,7 +582,7 @@ class ApiController {
       ResponseModel model = ResponseModel.fromJson(parsed);
       return model;
     } catch (e) {
-      print("--fields--${e.toString()}--");
+      print("-x-fields--${e.toString()}--");
       //Utils.showToast(e.toString(), true);
       return null;
     }
@@ -611,12 +611,14 @@ class ApiController {
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print("--respStr--${respStr}--");
       final parsed = json.decode(respStr);
 
       UserResponse model = UserResponse.fromJson(parsed);
       return model;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      print("--fields--${e.toString()}--");
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }

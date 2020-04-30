@@ -73,7 +73,7 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                     val.isEmpty ? AppConstant.enterEmailAddress : null,
 
                     onSaved: (val) {
-                      forgotPwddData.email = val;
+                      forgotPwddData.email = val.trim();
                     },
                   ),
                   GestureDetector(
@@ -138,6 +138,8 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
           Utils.showToast(AppConstant.noInternet, true);
         }
       });
+    }else {
+      Utils.showToast("Please enter a valid email", true);
     }
   }
 

@@ -22,16 +22,6 @@ class TaxCalculationResponse {
 
 class TaxCalculationModel {
 
-  /*String total;
-  int itemSubTotal;
-  int tax;
-  int discount;
-  String shipping;
-  int fixedTaxAmount;
-  List<dynamic> taxDetail;
-  List<dynamic> taxLabel;
-  List<dynamic> fixedTax;*/
-
   String total;
   int itemSubTotal;
   int tax;

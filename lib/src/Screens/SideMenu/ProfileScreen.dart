@@ -127,14 +127,14 @@ class _ProfileState extends State<ProfileScreen> {
     } else {
       form.save();
       Utils.showProgressDialog(context);
-      ApiController.updateProfileRequest(
-              nameController.text, emailController.text, phoneController.text)
+      ApiController.updateProfileRequest(nameController.text, emailController.text, phoneController.text)
           .then((response) {
         Utils.hideProgressDialog(context);
         if (response.success) {
-              user.fullName =  nameController.text;
-              user.email =  emailController.text;
-              user.phone =  phoneController.text;
+              user.fullName =  nameController.text.trim();
+              user.email =  emailController.text.trim();
+              user.phone =  phoneController.text.trim();
+              Utils.showToast(response.message, true);
               SharedPrefs.saveUser(user);
               Navigator.pop(context);
         }

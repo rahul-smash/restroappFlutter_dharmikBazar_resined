@@ -356,9 +356,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       'name': '${user.fullName}',
       'description': '${noteController.text}',
       'prefill': {'contact': '${user.phone}', 'email': '${user.email}'},
-      'external': {
+      /*'external': {
         'wallets': ['paytm']
-      }
+      }*/
     };
 
     try {
@@ -436,27 +436,30 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       if (isNetworkAvailable == true) {
         Utils.showProgressDialog(context);
         databaseHelper.getCartItemsListToJson().then((json) {
-
+          if(json == null){
+            print("--json == null-json == null-");
+            return;
+          }
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,
               widget.isComingFromPickUpScreen,widget.areaId ,
-              razorpay_order_id,razorpay_payment_id,onlineMethod)
-              .then((response) {
+              razorpay_order_id,razorpay_payment_id,onlineMethod).then((response) {
             Utils.hideProgressDialog(context);
+            if(response == null){
+              print("--response == null-response == null-");
+              return;
+            }
             showDialog(
                 context: context,
                 builder: (BuildContext context) {
                   // return object of type Dialog
                   return AlertDialog(
                       title: new Text("Thank you!"),
-                      content: Text(response.success
-                          ? AppConstant.orderAdded
-                          : response.message),
+                      content: Text(response.success? AppConstant.orderAdded: response.message),
                       actions: <Widget>[
                         new FlatButton(
                           child: new Text("Ok"),
                           onPressed: () async{
-
                             await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
 
                             Navigator.of(context)
