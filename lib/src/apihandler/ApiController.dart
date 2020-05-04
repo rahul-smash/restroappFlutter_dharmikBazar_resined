@@ -5,6 +5,7 @@ import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
 import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/AdminLoginModel.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
@@ -848,5 +849,26 @@ class ApiController {
   }
 
 
+  static Future<AdminLoginModel> getAdminApiRequest(String username,String password) async {
+    var url = ApiConstants.baseUrl+ApiConstants.storeLogin;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "email": username,
+        "password": password
+      });
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      AdminLoginModel model = AdminLoginModel.fromJson(parsed);
+
+      return model;
+    } catch (e) {
+      print('----catch-----' + e.toString());
+      return null;
+    }
+  }
 
 }

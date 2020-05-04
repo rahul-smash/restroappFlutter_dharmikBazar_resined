@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/Screens/Dashboard/SplashScreen.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -14,6 +15,8 @@ Future<void> main() async {
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AppConstant.isLoggedIn = await SharedPrefs.isUserLoggedIn();
 
+  bool isAdminLogin = false;
+
   // Set `enableInDevMode` to true to see reports while in debug mode
   // This is only to be used for confirming that reports are being
   // submitted as expected. It is not intended to be used for everyday
@@ -22,6 +25,7 @@ Future<void> main() async {
 
   // Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
+  SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "${isAdminLogin}");
 
   if (Platform.isIOS) {
     IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
@@ -34,12 +38,15 @@ Future<void> main() async {
   }
 
   runZoned(() {
-    runApp(ValueApp());
+    runApp(ValueApp(isAdminLogin));
   }, onError: Crashlytics.instance.recordError);
 
 }
 
 class ValueApp extends StatelessWidget {
+
+  bool isAdminLogin;
+  ValueApp(this.isAdminLogin);
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +57,7 @@ class ValueApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: appTheme,
       ),
-      home: SplashScreen(),
+      home: isAdminLogin == true? LoginEmailScreen("menu"): SplashScreen(),
     );
   }
 }

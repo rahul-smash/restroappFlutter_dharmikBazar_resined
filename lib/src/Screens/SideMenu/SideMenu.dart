@@ -240,6 +240,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     try {
 
       SharedPrefs.setUserLoggedIn(false);
+      SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);

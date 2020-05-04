@@ -58,6 +58,11 @@ class SharedPrefs {
     prefs.setString(key, value);
   }
 
+  static Future<String> getStoreSharedValue(String key) async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    return sharedUser.getString(key);
+  }
+
 
   static void saveUserMobile(UserModelMobile model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();

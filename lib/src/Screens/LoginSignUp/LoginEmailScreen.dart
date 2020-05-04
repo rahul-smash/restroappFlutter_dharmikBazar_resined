@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
+import 'package:restroapp/src/Screens/Dashboard/SplashScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
 import 'package:restroapp/src/UI/SocialLoginTabs.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/AdminLoginModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:flutter/gestures.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -19,7 +24,9 @@ class LoginEmailScreen extends StatefulWidget {
 }
 
 class _LoginEmailScreenState extends State<LoginEmailScreen> {
+
   String menu;
+
   _LoginEmailScreenState(this.menu);
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -112,7 +119,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                 fontSize: 14,
               ),
             ),
-            inputFormatters: [new LengthLimitingTextInputFormatter(30)],
+            inputFormatters: [new LengthLimitingTextInputFormatter(80)],
             controller: _usernameController,
           ),
           SizedBox(
@@ -163,22 +170,6 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
               ),
             ),
           ),
-        /*  Align(
-
-            child: Text(
-              'Forgot password?',
-              style: TextStyle(
-                fontFamily: 'Medium',
-                fontSize: 14,
-                color: colorBlueText,
-
-              ),
-
-            ),
-
-            alignment: Alignment.centerRight,
-          ),*/
-
           SizedBox(height: 10),
         ],
       ),
@@ -187,8 +178,14 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
 
   Widget addLoginButton() {
     return InkWell(
-      onTap: () {
-        _performLogin();
+      onTap: () async {
+        String isAdminLogin = await SharedPrefs.getStoreSharedValue(AppConstant.isAdminLogin);
+        print("${isAdminLogin}");
+        if(isAdminLogin == "true"){
+          performAdminLogin();
+        }else{
+          _performLogin();
+        }
       },
       child: Padding(
         padding: const EdgeInsets.only(right: 16),
@@ -272,6 +269,49 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
               Utils.showToast(response.message, true);
             }
           });
+        }
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    });
+  }
+
+  void performAdminLogin() {
+    String username = _usernameController.text.trim();
+    String password = _passwordController.text.trim();
+    Utils.isNetworkAvailable().then((isNetworkAvailable) async {
+      if(isNetworkAvailable) {
+        if (username.isEmpty) {
+          Utils.showToast(AppConstant.enterUsername, true);
+        } else if (password.isEmpty) {
+          Utils.showToast(AppConstant.enterPassword, true);
+        } else {
+
+          Utils.showProgressDialog(context);
+          ApiController.getAdminApiRequest(username, password).then((response) {
+
+            AdminLoginModel categoryResponse = response;
+            if (categoryResponse != null && categoryResponse.success) {
+              //Navigator.pop(context);
+              Utils.showToast(response.message, true);
+
+              ApiController.versionApiRequest("7").then((response){
+                Utils.hideProgressDialog(context);
+                StoreResponse model = response;
+                if(model != null && model.success){
+                  Navigator.of(context).pushReplacement(CustomPageRoute(HomeScreen(model.store)));
+                }else{
+                  Utils.showToast("Something went wrong!", false);
+                }
+
+              });
+
+            }else{
+              Utils.showToast(response.message, true);
+              Utils.hideProgressDialog(context);
+            }
+          });
+
         }
       } else {
         Utils.showToast(AppConstant.noInternet, true);
