@@ -8,6 +8,7 @@ import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -127,11 +128,13 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
           ApiController.forgotPasswordApiRequest(forgotPwddData)
               .then((response) {
             Utils.hideProgressDialog(context);
+            GetForgotPwdData userResponse = response;
             if (response != null && response.success) {
               print('@@----forgotPasswordApiRequest+'+response.success.toString());
              // Utils.showToast(response.message, true);
-              //Navigator.pop(context);
               sowDialogForForgot(response.message);
+            }else{
+              Utils.showToast(userResponse.message, true);
             }
           });
         } else {

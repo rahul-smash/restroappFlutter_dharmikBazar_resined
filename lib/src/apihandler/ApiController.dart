@@ -162,7 +162,7 @@ class ApiController {
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
-
+      print('---forgotPassword--${respStr}');
       final parsed = json.decode(respStr);
       GetForgotPwdData userResponse = GetForgotPwdData.fromJson(parsed);
       //Utils.showToast(userResponse.message, true);
