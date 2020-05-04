@@ -95,6 +95,8 @@ flutter:
     - images/button_delivery_on.png
     - images/button_pickup_on.png
     - images/splash.png
+    - images/icon_home_categories.png
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
 

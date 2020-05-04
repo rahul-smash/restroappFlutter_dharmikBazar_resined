@@ -161,31 +161,45 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget addBottomBar() {
-    return BottomNavigationBar(
-      currentIndex: _currentIndex,
-      // new
-      backgroundColor: appTheme,
-      type: BottomNavigationBarType.fixed,
-      onTap: onTabTapped,
-      // new
-      items: [
-        new BottomNavigationBarItem(
-            icon: Icon(Icons.shopping_cart, color: Colors.white),
-            title: Text('Cart', style: TextStyle(color: Colors.white)),
-            backgroundColor: appTheme),
-        new BottomNavigationBarItem(
-          icon: Icon(Icons.local_offer, color: Colors.white),
-          title: Text('Offers', style: TextStyle(color: Colors.white)),
+    return Stack(
+      overflow: Overflow.visible,
+      alignment: new FractionalOffset(.5, 1.0),
+      children: <Widget>[
+        BottomNavigationBar(
+          currentIndex: _currentIndex,
           backgroundColor: appTheme,
+          type: BottomNavigationBarType.fixed,
+          onTap: onTabTapped,
+          items: [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.shopping_cart, color: Colors.white),
+                title: Text('Cart', style: TextStyle(color: Colors.white)),
+                backgroundColor: appTheme),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.local_offer, color: Colors.white),
+              title: Text('Offers', style: TextStyle(color: Colors.white)),
+              backgroundColor: appTheme,
+            ),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.shopping_cart, color: Colors.white,size: 0,),
+                title: Text(''),
+                backgroundColor: appTheme),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.history, color: Colors.white),
+                title: Text('History', style: TextStyle(color: Colors.white)),
+                backgroundColor: appTheme),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.contact_mail, color: Colors.white),
+                title: Text('Contact', style: TextStyle(color: Colors.white)),
+                backgroundColor: appTheme)
+          ],
         ),
-        new BottomNavigationBarItem(
-            icon: Icon(Icons.history, color: Colors.white),
-            title: Text('History', style: TextStyle(color: Colors.white)),
-            backgroundColor: appTheme),
-        new BottomNavigationBarItem(
-            icon: Icon(Icons.contact_mail, color: Colors.white),
-            title: Text('Contact', style: TextStyle(color: Colors.white)),
-            backgroundColor: appTheme)
+        Container(
+          margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
+          child: Image.asset("images/icon_home_categories.png",
+            height: 60, width: 60,
+          ),
+        ),
       ],
     );
   }
