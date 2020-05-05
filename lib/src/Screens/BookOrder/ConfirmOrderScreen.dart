@@ -45,11 +45,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   @override
   void initState() {
     super.initState();
-
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    initRazorPay();
     try {
       if(widget.address != null){
             if(widget.address.areaCharges != null){
@@ -305,10 +301,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       height: 45.0,
       color: appTheme,
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           print("----paymentMod----${widget.paymentMode}--");
+          StoreModel storeObject = await SharedPrefs.getStore();
+          print("-paymentGateway----${storeObject.paymentGateway}-}-");
+          bool isNetworkAvailable = await Utils.isNetworkAvailable();
+          if(!isNetworkAvailable){
+            Utils.showToast(AppConstant.noInternet, false);
+            return;
+          }
           if(widget.paymentMode == "3"){
-            callOrderIdApi();
+            if(storeObject.paymentGateway == "Razorpay"){
+              callOrderIdApi(storeObject);
+            }else if(storeObject.paymentGateway == "Stripe"){
+
+            }
           }else{
             placeOrderApiCall("","","");
           }
@@ -343,13 +350,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
 
   String razorpay_orderId = "";
-  void openCheckout(String razorpay_order_id) async {
+  void openCheckout(String razorpay_order_id,StoreModel storeObject) async {
     Utils.hideProgressDialog(context);
     UserModel user = await SharedPrefs.getUser();
     double price = totalPrice + int.parse(shippingCharges);
     razorpay_orderId = razorpay_order_id;
     var options = {
-      'key': 'rzp_test_kc9p3xCAsk7Sl9',
+      'key': '${storeObject.paymentSetting.apiKey}',
       'currency': "INR",
       'order_id': razorpay_order_id,
       'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
@@ -406,7 +413,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
   }
 
-  void callOrderIdApi() {
+  void callOrderIdApi(StoreModel storeObject) {
     Utils.showProgressDialog(context);
     double price = totalPrice + int.parse(shippingCharges);
     print("=======1===${price}===========");
@@ -420,7 +427,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       CreateOrderData model = response;
       if(model != null && response.success){
 
-        openCheckout(model.data.id);
+        openCheckout(model.data.id,storeObject);
 
       }else{
         Utils.showToast("Something went wrong!", true);
@@ -475,4 +482,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       }
     });
   }
+
+  void initRazorPay() {
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+}
+enum PaymentGateway {
+  Razorpay ,
+  Stripe,
 }
