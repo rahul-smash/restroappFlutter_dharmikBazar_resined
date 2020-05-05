@@ -49,6 +49,9 @@ class AppConstant {
   static final String enterOtp = "Please enter otp number";
 
 
+
+
+
   static final String enterEmailAddress = "Please enter a valid Email address";
 
 
@@ -93,5 +96,6 @@ class AppConstant {
   static final String txt_sharing_content = "Share Our App among your Friends and \n Relative.They will recieve the Coupon and you will get one too.";
 
 
+  static final String txt_share = "SHARE";
 
 }

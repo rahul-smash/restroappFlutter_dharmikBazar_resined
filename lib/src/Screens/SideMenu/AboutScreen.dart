@@ -88,7 +88,7 @@ class _AboutScreenState extends State<AboutScreen> {
                 child: const MySeparator(color: Colors.grey),
               ),
               Container(
-                margin: new EdgeInsets.only(top: 8.0,bottom: 8.0),
+                margin: new EdgeInsets.only(top: 8.0, bottom: 8.0),
                 child: Align(
                     alignment: Alignment.center,
                     child: new Text(
@@ -135,13 +135,13 @@ class _AboutScreenState extends State<AboutScreen> {
                       const EdgeInsets.only(left: 40.0, top: 20.0, right: 40.0),
                   child: RaisedButton(
                     color: appTheme,
-                    child: const Text(
-                      'SHARE',
+                    child:  Text(
+                    AppConstant.txt_share,
                       style: TextStyle(
                         color: Colors.white,
                       ),
                     ),
-                    onPressed: _onShare(),
+                 //   onPressed: _onShare(),
                   )),
             ])),
       ),
