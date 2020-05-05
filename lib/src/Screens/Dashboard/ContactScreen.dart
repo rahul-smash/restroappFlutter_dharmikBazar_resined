@@ -12,9 +12,12 @@ class ContactScreen extends StatefulWidget {
 }
 
 class _ContactScreen extends State<ContactScreen> {
+
   StoreModel store;
-  String lat = "0", lng = "0";
+  String lat = "0.0", lng = "0.0";
   GoogleMapController mapController;
+  LatLng center ;
+  Set<Marker> markers = Set();
 
   @override
   void initState() {
@@ -24,9 +27,18 @@ class _ContactScreen extends State<ContactScreen> {
 
   void _getUserLocation() async {
     store = await SharedPrefs.getStore();
+    center = LatLng(double.parse(lat), double.parse(lng));
     setState(() {
       lat = store.lat;
       lng = store.lng;
+      print("lat lng= ${lat},${lng}");
+      center = LatLng(double.parse(lat), double.parse(lng));
+      markers.addAll([Marker(
+          markerId: MarkerId('value'),
+          position: center,
+          infoWindow: InfoWindow(title: "${store.storeName}\n${store.location}"),
+      ),]);
+
     });
   }
 
@@ -47,9 +59,10 @@ class _ContactScreen extends State<ContactScreen> {
                   onMapCreated: (GoogleMapController controller) {
                     mapController = controller;
                   },
+                  markers: markers,
                   initialCameraPosition: CameraPosition(
-                      target: LatLng(double.parse(lat), double.parse(lng)),
-                      zoom: 15),
+                      target: center,
+                      zoom: 13),
                 ),
               ),
             ),

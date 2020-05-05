@@ -110,6 +110,8 @@ class StoreModel {
   String currencyAbbr;
   bool blDeviceIdUnique;
   bool isRefererFnEnable;
+  String paymentGateway;
+  PaymentSetting paymentSetting;
 
   StoreModel(
       {this.id,
@@ -202,6 +204,8 @@ class StoreModel {
         this.banner300200,
         this.currencyAbbr,
         this.blDeviceIdUnique,
+        this.paymentGateway,
+        this.paymentSetting,
         this.isRefererFnEnable});
 
   StoreModel.fromJson(Map<String, dynamic> json) {
@@ -252,6 +256,8 @@ class StoreModel {
     taxLabelName = json['tax_label_name'];
     taxRate = json['tax_rate'];
     istaxenable = json['istaxenable'];
+    paymentGateway = json["payment_gateway"];
+    paymentSetting =  PaymentSetting.fromJson(json["payment_setting"]);
     /* if (json['tax_detail'] != null) {
       taxDetail = new List<Null>();
       json['tax_detail'].forEach((v) {
@@ -382,6 +388,8 @@ class StoreModel {
     data['tax_label_name'] = this.taxLabelName;
     data['tax_rate'] = this.taxRate;
     data['istaxenable'] = this.istaxenable;
+    data['payment_gateway'] = this.paymentGateway;
+    data['payment_setting'] = this.paymentSetting.toJson();
     /*if (this.taxDetail != null) {
       data['tax_detail'] = this.taxDetail.map((v) => v.toJson()).toList();
     }
@@ -446,6 +454,27 @@ class StoreModel {
     return data;
   }
 }
+
+class PaymentSetting {
+  String apiKey;
+  String secretKey;
+
+  PaymentSetting({
+    this.apiKey,
+    this.secretKey,
+  });
+
+  factory PaymentSetting.fromJson(Map<String, dynamic> json) => PaymentSetting(
+    apiKey: json["api_key"],
+    secretKey: json["secret_key"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "api_key": apiKey,
+    "secret_key": secretKey,
+  };
+}
+
 
 class Banners {
   String id;

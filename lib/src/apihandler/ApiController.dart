@@ -56,7 +56,7 @@ class ApiController {
         "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
-
+      print("---url--${url}");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
 

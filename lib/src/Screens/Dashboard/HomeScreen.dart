@@ -219,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
           MaterialPageRoute(builder: (context) => MyOfferScreen(context)),
         );
       }
-      if (_currentIndex == 2) {
+      if (_currentIndex == 3) {
         if (AppConstant.isLoggedIn) {
           Navigator.push(
             context,
@@ -229,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Utils.showLoginDialog(context);
         }
       }
-      if (_currentIndex == 3) {
+      if (_currentIndex == 4) {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => ContactScreen()),
