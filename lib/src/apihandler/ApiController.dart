@@ -873,8 +873,7 @@ class ApiController {
     }
   }
 
-  static Future<ReferEarnData> referEarn(
-     ) async {
+  static Future<ReferEarnData> referEarn() async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -888,16 +887,14 @@ class ApiController {
         "user_id": user.id,
         "device_id": deviceId,
       });
-      print('@@ReferEarn' + url + request.fields.toString());
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
       final parsed = json.decode(respStr);
-      print('--response===  $parsed');
-      ReferEarnData referEarn_ = ReferEarnData.fromJson(parsed);
-       // SharedPrefs.setUserLoggedIn(true);
-      //  SharedPrefs.saveERanRefernce(referEarn_.referEarn);
-      return referEarn_;
+      ReferEarnData referEarn = ReferEarnData.fromJson(parsed);
+
+      return referEarn;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
       print('catch' + e.toString());

@@ -7,6 +7,7 @@ import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
+import 'package:restroapp/src/Screens/SideMenu/ReferEarn.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -172,11 +173,16 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         Navigator.pop(context);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AboutScreen(context)),
+          MaterialPageRoute(builder: (context) => AboutScreen()),
         );
         break;
       case 7:
-        share();
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => ReferEarn()),
+        );
+        //share();
         break;
       case 8:
         if (AppConstant.isLoggedIn) {
@@ -263,13 +269,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     }
   }
 
-  Future<void> share() async {
-    await FlutterShare.share(
-        title: 'Kindly download',
-        text: 'Kindly download' + widget.store.storeName + 'app from',
-        linkUrl: widget.store.androidShareLink,
-        chooserTitle: 'Refer & Earn');
-  }
 }
 
 
