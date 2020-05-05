@@ -81,4 +81,17 @@ class AppConstant {
   static final String favsAdded = "Added to favourites";
   static final String favsRemoved = "Removed from favourites";
 
+  static final String aboutUs = "About Us";
+  static final String txt_Refer = "Grab Discount";
+
+  static final String txt_coupon_firebies = "Coupons and Freebies";
+
+  static final String txt_Refer_code = "SHARE YOUR REFERRAL CODE ";
+
+  static final String txt_code_value = "Code";
+
+  static final String txt_sharing_content = "Share Our App among your Friends and \n Relative.They will recieve the Coupon and you will get one too.";
+
+
+
 }
