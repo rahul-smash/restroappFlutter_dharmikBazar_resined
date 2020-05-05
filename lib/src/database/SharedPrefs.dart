@@ -1,5 +1,6 @@
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
+import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -88,6 +89,20 @@ class SharedPrefs {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     Map<String, dynamic> userMap = json.decode(sharedUser.getString('data'));
     var user = OtpVerified.fromJson(userMap);
+    return user;
+  }
+
+  static void saveERanRefernce(ReferEarn model) async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    dynamic userResponse = model.toJson();
+    String jsonString = jsonEncode(userResponse);
+    sharedUser.setString('referEarn', jsonString);
+  }
+
+  static Future<ReferEarn> getReferEarn() async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    Map<String, dynamic> userMap = json.decode(sharedUser.getString('referEarn'));
+    var user = ReferEarn.fromJson(userMap);
     return user;
   }
 }

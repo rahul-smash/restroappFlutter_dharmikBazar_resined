@@ -2,6 +2,7 @@ import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
+import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -13,6 +14,7 @@ import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
+import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
@@ -871,4 +873,35 @@ class ApiController {
     }
   }
 
+  static Future<ReferEarnData> referEarn(
+     ) async {
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    UserModel user = await SharedPrefs.getUser();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getReferDetails;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "device_id": deviceId,
+      });
+      print('@@ReferEarn' + url + request.fields.toString());
+
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+      print('--response===  $parsed');
+      ReferEarnData referEarn_ = ReferEarnData.fromJson(parsed);
+       // SharedPrefs.setUserLoggedIn(true);
+      //  SharedPrefs.saveERanRefernce(referEarn_.referEarn);
+      return referEarn_;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('catch' + e.toString());
+      return null;
+    }
+  }
 }

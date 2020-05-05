@@ -36,7 +36,7 @@ class ApiConstants{
 
   static String razorpayCreateOrder = 'razorpayCreateOrder';
   static String razorpayVerifyTransaction = 'razorpayVerifyTransaction';
-
+  static String getReferDetails = 'getReferDetails';
 
   static final String txt_mobile = "Please enter your Mobile No. to proceed further";
   static final String txt_Submit = "Submit";
