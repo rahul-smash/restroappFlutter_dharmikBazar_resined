@@ -1,10 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
+import 'package:flutter/services.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/Screens/Dashboard/SplashScreen.dart';
+import 'package:restroapp/src/models/ConfigModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'dart:io';
@@ -16,6 +19,10 @@ Future<void> main() async {
   AppConstant.isLoggedIn = await SharedPrefs.isUserLoggedIn();
 
   bool isAdminLogin = false;
+  String jsonResult =  await loadAsset();
+  final parsed = json.decode(jsonResult);
+  ConfigModel configObject = ConfigModel.fromJson(parsed);
+  print(configObject.storeId);
 
   // Set `enableInDevMode` to true to see reports while in debug mode
   // This is only to be used for confirming that reports are being
@@ -29,12 +36,10 @@ Future<void> main() async {
 
   if (Platform.isIOS) {
     IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
-    SharedPrefs.storeSharedValue(
-        AppConstant.deviceId, iosDeviceInfo.identifierForVendor);
+    SharedPrefs.storeSharedValue(AppConstant.deviceId, iosDeviceInfo.identifierForVendor);
   } else {
     AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
-    SharedPrefs.storeSharedValue(
-        AppConstant.deviceId, androidDeviceInfo.androidId);
+    SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.androidId);
   }
 
   runZoned(() {
@@ -60,4 +65,9 @@ class ValueApp extends StatelessWidget {
       home: isAdminLogin == true? LoginEmailScreen("menu"): SplashScreen(),
     );
   }
+}
+
+
+Future<String> loadAsset() async {
+  return await rootBundle.loadString('assets/app_config.json');
 }

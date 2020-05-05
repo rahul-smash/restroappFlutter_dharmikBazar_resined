@@ -172,12 +172,12 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart, color: Colors.white),
-                title: Text('Cart', style: TextStyle(color: Colors.white)),
+                icon: Icon(Icons.shopping_cart, color: bottomBarIconColor),
+                title: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
                 backgroundColor: appTheme),
             BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer, color: Colors.white),
-              title: Text('Offers', style: TextStyle(color: Colors.white)),
+              icon: Icon(Icons.local_offer, color: bottomBarIconColor),
+              title: Text('Offers', style: TextStyle(color: bottomBarTextColor)),
               backgroundColor: appTheme,
             ),
             BottomNavigationBarItem(
@@ -185,12 +185,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text(''),
                 backgroundColor: appTheme),
             BottomNavigationBarItem(
-                icon: Icon(Icons.history, color: Colors.white),
-                title: Text('History', style: TextStyle(color: Colors.white)),
+                icon: Icon(Icons.history, color: bottomBarIconColor),
+                title: Text('History', style: TextStyle(color: bottomBarTextColor)),
                 backgroundColor: appTheme),
             BottomNavigationBarItem(
-                icon: Icon(Icons.contact_mail, color: Colors.white),
-                title: Text('Contact', style: TextStyle(color: Colors.white)),
+                icon: Icon(Icons.contact_mail, color: bottomBarIconColor),
+                title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
                 backgroundColor: appTheme)
           ],
         ),

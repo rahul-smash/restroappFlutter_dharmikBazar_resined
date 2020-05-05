@@ -25,6 +25,7 @@ class _AboutScreenState extends State<AboutScreen> {
     StoreModel store = await SharedPrefs.getStore();
     setState(() {
       aboutUs = store.aboutUs;
+      print("----aboutUs-----${aboutUs}-----");
     });
   }
 

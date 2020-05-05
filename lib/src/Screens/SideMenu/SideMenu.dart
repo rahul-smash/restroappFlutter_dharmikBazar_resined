@@ -10,6 +10,7 @@ import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,7 +55,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   Widget build(BuildContext context) {
     return Theme(
         data: Theme.of(context).copyWith(
-          canvasColor: Color(0xff151515),
+          canvasColor: left_menu_background_color,
         ),
         child: Drawer(
           child: ListView.builder(
@@ -80,13 +81,10 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text('Welcome',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold)),
+                        style: TextStyle( color: leftMenuTitleColors,fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 5),
                     Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
-                        style: TextStyle(color: Colors.white, fontSize: 15)),
+                        style: TextStyle(color: leftMenuUsernameColors, fontSize: 15)),
                   ])
             ])));
   }
@@ -101,7 +99,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                   ? AppConstant.isLoggedIn == false
                   ? 'images/sign_in.png'
                   : 'images/sign_out.png'
-                  : item.icon,
+                  : item.icon,color: left_menu_icon_colors,
               width: 30),
           title: index == _drawerItems.length - 1
               ? Text(AppConstant.isLoggedIn == false ? 'Login' : 'Logout',
