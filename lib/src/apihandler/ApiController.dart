@@ -17,6 +17,8 @@ import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
+import 'package:restroapp/src/models/StripeCheckOutModel.dart';
+import 'package:restroapp/src/models/StripeVerifyModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -901,4 +903,61 @@ class ApiController {
       return null;
     }
   }
+
+
+  static Future<StripeCheckOutModel> stripePaymentApi(String amount) async {
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    UserModel user = await SharedPrefs.getUser();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.stripePaymentCheckout;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "customer_email": user.email,
+        "amount": amount,
+        "currency":"usd"
+      });
+      print('--url===  $url');
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      StripeCheckOutModel object = StripeCheckOutModel.fromJson(parsed);
+
+      return object;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('catch' + e.toString());
+      return null;
+    }
+  }
+
+
+  static Future<StripeVerifyModel> stripeVerifyTransactionApi(String payment_request_id) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.stripeVerifyTransaction;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "payment_request_id": payment_request_id,
+
+      });
+      print('--url===  $url');
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      StripeVerifyModel object = StripeVerifyModel.fromJson(parsed);
+
+      return object;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('catch' + e.toString());
+      return null;
+    }
+  }
+
+
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_web_view/flutter_web_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
@@ -12,6 +13,8 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/StripeCheckOutModel.dart';
+import 'package:restroapp/src/models/StripeVerifyModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
@@ -34,6 +37,7 @@ class ConfirmOrderScreen extends StatefulWidget {
 }
 
 class ConfirmOrderState extends State<ConfirmOrderScreen> {
+
   DatabaseHelper databaseHelper = new DatabaseHelper();
   double totalPrice = 0.00;
   TaxCalculationModel taxModel;
@@ -41,6 +45,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   String shippingCharges = "0";
   static const platform = const MethodChannel("razorpay_flutter");
   Razorpay _razorpay;
+  FlutterWebView flutterWebView = new FlutterWebView();
 
   @override
   void initState() {
@@ -305,6 +310,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           print("----paymentMod----${widget.paymentMode}--");
           StoreModel storeObject = await SharedPrefs.getStore();
           print("-paymentGateway----${storeObject.paymentGateway}-}-");
+
           bool isNetworkAvailable = await Utils.isNetworkAvailable();
           if(!isNetworkAvailable){
             Utils.showToast(AppConstant.noInternet, false);
@@ -314,7 +320,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             if(storeObject.paymentGateway == "Razorpay"){
               callOrderIdApi(storeObject);
             }else if(storeObject.paymentGateway == "Stripe"){
-
+              callStripeApi();
             }
           }else{
             placeOrderApiCall("","","");
@@ -349,6 +355,33 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
 
+  void callStripeApi() {
+    Utils.showProgressDialog(context);
+    double price = totalPrice + int.parse(shippingCharges);
+    String mPrice = price.toString().substring(0 , price.toString().indexOf('.')).trim();
+    print("----mPrice----${mPrice}--");
+    ApiController.stripePaymentApi(mPrice).then((response){
+      Utils.hideProgressDialog(context);
+      print("----stripePaymentApi------");
+      if(response != null){
+        StripeCheckOutModel stripeCheckOutModel =response;
+        if(stripeCheckOutModel.success){
+
+          launchWebView(stripeCheckOutModel);
+
+        }else{
+          Utils.showToast("Something went wrong!", true);
+        }
+
+      }else{
+        Utils.showToast("Something went wrong!", true);
+      }
+    });
+
+
+  }
+
+
   String razorpay_orderId = "";
   void openCheckout(String razorpay_order_id,StoreModel storeObject) async {
     Utils.hideProgressDialog(context);
@@ -367,7 +400,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         'wallets': ['paytm']
       }*/
     };
-
     try {
       _razorpay.open(options);
     } catch (e) {
@@ -376,23 +408,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
 
-
-
   void _handlePaymentSuccess(PaymentSuccessResponse responseObj) {
     //Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId, timeInSecForIos: 4);
     Utils.showProgressDialog(context);
     ApiController.razorpayVerifyTransactionApi(responseObj.orderId).then((response){
-      print("----razorpayVerifyTransactionApi----${response}--");
+      //print("----razorpayVerifyTransactionApi----${response}--");
       if(response != null){
 
         RazorpayOrderData model = response;
         if(model.success){
-          placeOrderApiCall(responseObj.orderId,model.data.id,"razorpay");
+          placeOrderApiCall(responseObj.orderId,model.data.id,"Razorpay");
         }else{
           Utils.showToast("Something went wrong!", true);
           Utils.hideProgressDialog(context);
         }
       }else{
+        Utils.showToast("Something went wrong!", true);
         Utils.hideProgressDialog(context);
       }
     });
@@ -416,9 +447,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void callOrderIdApi(StoreModel storeObject) {
     Utils.showProgressDialog(context);
     double price = totalPrice + int.parse(shippingCharges);
-    print("=======1===${price}===========");
+    //print("=======1===${price}===========");
     price = price * 100;
-    print("=======2===${price}===========");
+    //print("=======2===${price}===========");
     String mPrice = price.toString().substring(0 , price.toString().indexOf('.'));
     print("=======mPrice===${mPrice}===========");
     ApiController.razorpayCreateOrderApi(mPrice).then((response){
@@ -438,7 +469,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
 
 
-  void placeOrderApiCall(String razorpay_order_id, String razorpay_payment_id, String onlineMethod) {
+  void placeOrderApiCall(String payment_request_id, String payment_id, String onlineMethod) {
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
         Utils.showProgressDialog(context);
@@ -450,7 +481,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,
               widget.isComingFromPickUpScreen,widget.areaId ,
-              razorpay_order_id,razorpay_payment_id,onlineMethod).then((response) {
+              payment_request_id,payment_id,onlineMethod).then((response) {
             Utils.hideProgressDialog(context);
             if(response == null){
               print("--response == null-response == null-");
@@ -489,8 +520,60 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
-}
-enum PaymentGateway {
-  Razorpay ,
-  Stripe,
+
+  void launchWebView(StripeCheckOutModel stripeCheckOutModel) {
+    print("----checkoutUrl----${stripeCheckOutModel.checkoutUrl}");
+    flutterWebView.launch("${stripeCheckOutModel.checkoutUrl}",
+        javaScriptEnabled: true,
+        toolbarActions: [ToolbarAction("Dismiss", 1)],
+        barColor: appTheme,
+        tintColor: Colors.white
+         );
+    flutterWebView.onToolbarAction.listen((identifier) {
+      switch (identifier) {
+        case 1:
+          flutterWebView.dismiss();
+          break;
+      }
+    });
+    flutterWebView.listenForRedirect("mobile://test.com", true);
+
+    flutterWebView.onWebViewDidStartLoading.listen((url) {
+      print("---listen----${url}");
+      if(url == "https://app.restroapp.com/7/api/stripeVerifyTransaction?response=success"){
+        flutterWebView.dismiss();
+        callStripeVerificationApi(stripeCheckOutModel.paymentRequestId);
+      }
+    });
+    flutterWebView.onWebViewDidLoad.listen((url) {
+      print("---onWebViewDidLoad----${url}");
+    });
+    flutterWebView.onRedirect.listen((url) {
+      print("---onRedirect----${url}");
+    });
+  }
+
+  void callStripeVerificationApi(String payment_request_id) {
+    Utils.showProgressDialog(context);
+    ApiController.stripeVerifyTransactionApi(payment_request_id).then((response){
+      Utils.hideProgressDialog(context);
+      if(response != null){
+        StripeVerifyModel object = response;
+        if(object.success){
+
+          placeOrderApiCall(payment_request_id, object.paymentId,"Stripe");
+
+        }else{
+          Utils.showToast("Something went wrong!", true);
+          Utils.hideProgressDialog(context);
+        }
+
+      }else{
+        Utils.showToast("Something went wrong!", true);
+        Utils.hideProgressDialog(context);
+      }
+    });
+  }
+
+
 }

@@ -38,6 +38,12 @@ class ApiConstants{
   static String razorpayVerifyTransaction = 'razorpayVerifyTransaction';
   static String getReferDetails = 'getReferDetails';
 
+
+  static String stripePaymentCheckout = 'stripePaymentCheckout';
+  static String stripeVerifyTransaction = 'stripeVerifyTransaction';
+
+
+
   static final String txt_mobile = "Please enter your Mobile No. to proceed further";
   static final String txt_Submit = "Submit";
   static final String pleaseFullname = "Enter FullName";
