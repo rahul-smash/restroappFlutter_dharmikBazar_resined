@@ -43,7 +43,7 @@ Future<void> main() async {
   }
 
   runZoned(() {
-    runApp(ValueApp(isAdminLogin));
+    runApp(ValueApp(isAdminLogin,configObject));
   }, onError: Crashlytics.instance.recordError);
 
 }
@@ -51,7 +51,8 @@ Future<void> main() async {
 class ValueApp extends StatelessWidget {
 
   bool isAdminLogin;
-  ValueApp(this.isAdminLogin);
+  ConfigModel configObject;
+  ValueApp(this.isAdminLogin, this.configObject);
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +63,7 @@ class ValueApp extends StatelessWidget {
       theme: ThemeData(
         primaryColor: appTheme,
       ),
-      home: isAdminLogin == true? LoginEmailScreen("menu"): SplashScreen(),
+      home: isAdminLogin == true? LoginEmailScreen("menu"): SplashScreen(configObject),
     );
   }
 }

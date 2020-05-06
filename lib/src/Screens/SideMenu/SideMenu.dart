@@ -72,7 +72,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   Widget createHeaderInfoItem() {
     return Container(
-        color: Colors.black,
+        color: left_menu_header_bkground,
         child: Padding(
             padding: EdgeInsets.only(left: 35, top: 40, bottom: 30),
             child: Row(children: [
@@ -82,10 +82,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text('Welcome',
-                        style: TextStyle( color: leftMenuTitleColors,fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: TextStyle( color: leftMenuWelcomeTextColors,fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 5),
                     Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
-                        style: TextStyle(color: leftMenuUsernameColors, fontSize: 15)),
+                        style: TextStyle(color: leftMenuUsernameColors, fontSize: 15)
+                    ),
                   ])
             ])));
   }

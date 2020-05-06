@@ -5,12 +5,16 @@ import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/ConfigModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 
 class SplashScreen extends StatefulWidget {
+  ConfigModel configObject;
+  SplashScreen(this.configObject);
+
   @override
   State<StatefulWidget> createState() {
     return _SplashScreenState();
@@ -67,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
         ),
         child: FutureBuilder(
-          future: ApiController.versionApiRequest("7"),
+          future: ApiController.versionApiRequest("${widget.configObject.storeId}"),
           builder: (context, projectSnap) {
             if (projectSnap.connectionState == ConnectionState.none &&
                 projectSnap.hasData == null) {
@@ -77,7 +81,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 StoreResponse model = projectSnap.data;
                 if (model.success) {
                   List<ForceDownload> forceDownload = model.store.forceDownload;
-                  //print("--androidAppVerison--${forceDownload[0].androidAppVerison} and ${forceDownload[0].forceDownloadMessage}");
+                  print("app= ${version} and -androidAppVerison--${forceDownload[0].androidAppVerison} and ${forceDownload[0].forceDownloadMessage}");
                   int index1 = version.lastIndexOf(".");
                   //print("--substring--${version.substring(0,index1)} ");
                   double currentVesrion = double.parse(version.substring(0,index1).trim());

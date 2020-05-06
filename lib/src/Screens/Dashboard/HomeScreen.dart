@@ -146,7 +146,7 @@ class _HomeScreenState extends State<HomeScreen> {
               animationCurve: Curves.fastOutSlowIn,
               animationDuration: Duration(milliseconds: 1000),
               dotSize: 6.0,
-              dotIncreasedColor: appTheme,
+              dotIncreasedColor: dotIncreasedColor,
               dotBgColor: Colors.transparent,
               dotPosition: DotPosition.bottomCenter,
               dotVerticalPadding: 10.0,
