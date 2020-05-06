@@ -111,7 +111,7 @@ class _OtpScreen extends State<OtpScreen> {
                           child: new RaisedButton(
                             color: appTheme,
                             textColor: Colors.white,
-                            child: Text(_start != 0 ? "${_start} sec" : "Resend OTP",style: TextStyle(
+                            child: Text(_start != 0 ? "${_start} sec" : "Skip",style: TextStyle(
                               color: Colors.white,
                             ),
                             ),
@@ -162,8 +162,11 @@ class _OtpScreen extends State<OtpScreen> {
     //print('--periodic===  $_start');
     if(_start == 0){
       // user clicked on skip button
-      print('--Resend=button==');
-      resendOtpScreen();
+      print('--Skip=Skip==');
+      Navigator.push(context,
+        MaterialPageRoute(builder: (context) => RegisterUser(true)),
+      );
+      //resendOtpScreen();
     }
   }
 

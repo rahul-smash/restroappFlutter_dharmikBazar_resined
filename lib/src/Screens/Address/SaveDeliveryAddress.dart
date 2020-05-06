@@ -14,9 +14,11 @@ import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
+
   final DeliveryAddressData selectedAddress;
   final VoidCallback callback;
   String addressValue;
+
   SaveDeliveryAddress(this.selectedAddress, this.callback,this.addressValue);
 
   @override
@@ -40,7 +42,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   @override
   void initState() {
     super.initState();
-
+    print("-initState---SaveDeliveryAddress-------");
     if (widget.selectedAddress != null) {
       selectedCity = City();
       selectedCity.city = widget.selectedAddress.city;
@@ -55,11 +57,11 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
     }else{
 
       if(widget.addressValue != null && widget.addressValue.isNotEmpty){
+        locationData = new LocationData();
+        locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
       }
-
     }
-
     //getLocation();
   }
 
@@ -271,27 +273,22 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 return;
                               }
 
+                              print("--addressController---${addressController.text}---");
                               if (selectedArea == null) {
                                 Utils.showToast(AppConstant.selectArea, false);
-                              } else if (addressController.text
-                                  .trim()
-                                  .isEmpty) {
-                                Utils.showToast(
-                                    AppConstant.pleaseEnterAddress, false);
-                              } else if (fullnameController.text
-                                  .trim()
-                                  .isEmpty) {
-                                Utils.showToast(
-                                    AppConstant.pleaseFullname, false);
+
+                              } else if (addressController.text.trim().isEmpty) {
+
+                                Utils.showToast(AppConstant.pleaseEnterAddress, false);
+                              } else if (fullnameController.text.trim().isEmpty) {
+
+                                Utils.showToast(AppConstant.pleaseFullname, false);
                               }
-                              else if (zipCodeController.text
-                                  .trim()
-                                  .isEmpty) {
-                                Utils.showToast(
-                                    AppConstant.enterZipCode, false);
+                              else if (zipCodeController.text.trim().isEmpty) {
+                                Utils.showToast(AppConstant.enterZipCode, false);
+
                               } else {
                                 // edit and save api
-
                                 if(locationData == null){
                                   Utils.showToast("Please select location!", false);
                                   return;
@@ -334,44 +331,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
         ));
   }
 
-  Future<String> getLocation() async {
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    final coordinates = new Coordinates(position.latitude, position.longitude);
-    var addresses =
-    await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    var first = addresses.first;
-    location = LatLng(position.latitude, position.longitude);
-    markers.addAll([
-      Marker(
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarker,
-          markerId: MarkerId('value'),
-          position: location,
-          onDragEnd: (value){
-            print(value.latitude);
-            print(value.longitude);
-          })]);
 
-    setState(() {
-      mapController.moveCamera(CameraUpdate.newLatLng(location));
-    });
-    return first.addressLine;
-  }
-
-
-  void _onCameraMove(CameraPosition position) {
-    CameraPosition newPos = CameraPosition(
-        target: position.target
-    );
-    Marker marker = markers.first;
-
-    setState((){
-      markers.first.copyWith(
-          positionParam: newPos.target
-      );
-    });
-  }
 }
 
 

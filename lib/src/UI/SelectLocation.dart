@@ -27,6 +27,7 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
   @override
   void initState() {
     super.initState();
+    print("--SelectLocationOnMapState-");
     address = "";
     center = LatLng(0.0, 0.0);
     selectedLocation = LatLng(0.0, 0.0);

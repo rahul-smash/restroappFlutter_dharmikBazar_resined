@@ -709,7 +709,7 @@ class ApiController {
       final parsed = json.decode(respStr);
       print('--response===  $parsed');
       MobileVerified userResponse = MobileVerified.fromJson(parsed);
-      if (userResponse.success) {
+      if (userResponse.success && userResponse.userExists == 1) {
         SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUserMobile(userResponse.user);
       }
