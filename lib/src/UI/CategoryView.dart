@@ -13,13 +13,12 @@ class CategoryView extends StatelessWidget {
       children: <Widget>[
         GestureDetector(
           onTap: () {
-
             if (categoryModel != null && categoryModel.subCategory.isNotEmpty) {
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        SubCategoryProductScreen(categoryModel)),
+                MaterialPageRoute(builder: (context) {
+                  return SubCategoryProductScreen(categoryModel);
+                }),
               );
             }
           },

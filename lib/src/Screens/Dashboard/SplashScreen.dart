@@ -89,7 +89,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   try {
                     apiVesrion = double.parse(forceDownload[0].androidAppVerison.substring(0,index1).trim());
                   } catch (e) {
-                    print(e);
+                    print("-apiVesrion--catch--${e}----");
                   }
                   print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
                   if(apiVesrion > currentVesrion){

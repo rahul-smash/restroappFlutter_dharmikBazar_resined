@@ -89,7 +89,8 @@ class MyOfferScreenState extends State<MyOfferScreen> {
                         }
 
                       } else {
-                        return Container();
+
+                        return Utils.getEmptyView("No data found");
                       }
                     } else {
                       return Center(

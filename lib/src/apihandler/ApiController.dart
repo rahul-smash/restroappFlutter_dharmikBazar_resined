@@ -68,7 +68,7 @@ class ApiController {
       return storeData;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
-      print("---catch--${e}----");
+      print("-version--catch--${e}----");
       return null;
     }
   }
@@ -769,12 +769,14 @@ class ApiController {
     try {
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print('respStr' + respStr);
       final parsed = json.decode(respStr);
 
       StoreOffersResponse res = StoreOffersResponse.fromJson(parsed);
       return res;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
+      print('storeOffers catch' + e.toString());
       return null;
     }
   }

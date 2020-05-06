@@ -16,6 +16,7 @@ class SubCategoryProductScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //print("---subCategory.length--=${categoryModel.subCategory.length}");
     return DefaultTabController(
       length: categoryModel.subCategory.length,
       child: Scaffold(
@@ -25,12 +26,16 @@ class SubCategoryProductScreen extends StatelessWidget {
         ),
         body: Column(children: <Widget>[
           TabBar(
+            isScrollable: true,
             labelColor: appTheme,
             unselectedLabelColor: Colors.black,
             indicatorColor: appTheme,
             indicatorWeight: 3,
             tabs: List.generate(categoryModel.subCategory.length, (int index) {
-              return Tab(text: categoryModel.subCategory[index].title);
+              return Tab(
+                  text: categoryModel.subCategory[index].title,
+
+              );
             }),
           ),
           Expanded(
