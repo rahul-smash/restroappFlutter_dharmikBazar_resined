@@ -81,12 +81,17 @@ class _SplashScreenState extends State<SplashScreen> {
                 StoreResponse model = projectSnap.data;
                 if (model.success) {
                   List<ForceDownload> forceDownload = model.store.forceDownload;
-                  print("app= ${version} and -androidAppVerison--${forceDownload[0].androidAppVerison} and ${forceDownload[0].forceDownloadMessage}");
+                  print("app= ${version} and -androidAppVerison--${forceDownload[0].androidAppVerison}");
                   int index1 = version.lastIndexOf(".");
                   //print("--substring--${version.substring(0,index1)} ");
                   double currentVesrion = double.parse(version.substring(0,index1).trim());
-                  double apiVesrion = double.parse(forceDownload[0].androidAppVerison.substring(0,index1).trim());
-                  //print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
+                  double apiVesrion = 1.0;
+                  try {
+                    apiVesrion = double.parse(forceDownload[0].androidAppVerison.substring(0,index1).trim());
+                  } catch (e) {
+                    print(e);
+                  }
+                  print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
                   if(apiVesrion > currentVesrion){
                     return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
                   }else{
