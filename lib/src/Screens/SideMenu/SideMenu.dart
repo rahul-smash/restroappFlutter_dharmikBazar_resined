@@ -76,7 +76,10 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         child: Padding(
             padding: EdgeInsets.only(left: 35, top: 40, bottom: 30),
             child: Row(children: [
-              Image.asset("images/app_icon.png"),
+              Image.asset("images/appiconfcfm.jpg",
+                height: 60,
+                width: 60,
+                fit: BoxFit.fill,),
               SizedBox(width: 10),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -124,7 +127,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProfileScreen()),
+            MaterialPageRoute(builder: (context) => ProfileScreen(false,"")),
           );
         } else {
           Utils.showLoginDialog(context);
@@ -194,7 +197,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             StoreModel model = storeData;
             print("---internationalOtp--${model.internationalOtp}");
             //User Login with Mobile and OTP = 0
-            if(model.internationalOtp == "1"){
+            // 1 = email and 0 = ph-no
+            if(model.internationalOtp == "0"){
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),

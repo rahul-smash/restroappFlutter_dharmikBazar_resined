@@ -126,6 +126,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
 
               }else{
                 //print('@@NOTP__Screen');
+                Navigator.pop(context);
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => OtpScreen(menu,response,loginMobile)),

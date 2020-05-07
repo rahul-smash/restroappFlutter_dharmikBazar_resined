@@ -56,6 +56,7 @@ class Utils {
                   StoreModel model = storeData;
                   //print("---internationalOtp--${model.internationalOtp}");
                   //User Login with Mobile and OTP
+                  // 1 = email and 0 = ph-no
                   if(model.internationalOtp == "0"){
                     Navigator.push(
                       context,

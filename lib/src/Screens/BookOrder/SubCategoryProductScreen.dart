@@ -26,15 +26,21 @@ class SubCategoryProductScreen extends StatelessWidget {
         ),
         body: Column(children: <Widget>[
           TabBar(
-            isScrollable: true,
+            isScrollable: categoryModel.subCategory.length == 1 ? false : true,
             labelColor: appTheme,
             unselectedLabelColor: Colors.black,
             indicatorColor: appTheme,
             indicatorWeight: 3,
             tabs: List.generate(categoryModel.subCategory.length, (int index) {
-              return Tab(
-                  text: categoryModel.subCategory[index].title,
-
+              bool isTabVisible;
+              if(categoryModel.subCategory.length == 1){
+                isTabVisible = false;
+              }else{
+                isTabVisible = true;
+              }
+              return Visibility(
+                visible: isTabVisible,
+                child: Tab(text: categoryModel.subCategory[index].title,),
               );
             }),
           ),

@@ -6,6 +6,11 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ProfileScreen extends StatefulWidget {
+
+  bool isComingFromOtpScreen;
+  String id;
+  ProfileScreen(this.isComingFromOtpScreen,this.id);
+
   @override
   _ProfileState createState() => new _ProfileState();
 }
@@ -21,7 +26,9 @@ class _ProfileState extends State<ProfileScreen> {
   @override
   initState() {
     super.initState();
-    getProfileData();
+    if(!widget.isComingFromOtpScreen){
+      getProfileData();
+    }
   }
 
   getProfileData() async {
@@ -37,7 +44,7 @@ class _ProfileState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: AppBar(
-        title: new Text('My Profile'),
+        title: new Text(widget.isComingFromOtpScreen == true ? 'SignUp' : "My Profile"),
         centerTitle: true,
       ),
       body: Container(
@@ -127,18 +134,33 @@ class _ProfileState extends State<ProfileScreen> {
     } else {
       form.save();
       Utils.showProgressDialog(context);
-      ApiController.updateProfileRequest(nameController.text, emailController.text, phoneController.text)
-          .then((response) {
+      ApiController.updateProfileRequest(nameController.text, emailController.text,
+          phoneController.text,widget.isComingFromOtpScreen,widget.id).then((response) {
         Utils.hideProgressDialog(context);
         if (response.success) {
-              user.fullName =  nameController.text.trim();
-              user.email =  emailController.text.trim();
-              user.phone =  phoneController.text.trim();
-              Utils.showToast(response.message, true);
-              SharedPrefs.saveUser(user);
-              Navigator.pop(context);
+          if(widget.isComingFromOtpScreen){
+
+            UserModel user = UserModel();
+            user.fullName =  nameController.text.trim();
+            user.email =  emailController.text.trim();
+            user.phone =  phoneController.text.trim();
+            Utils.showToast(response.message, true);
+            SharedPrefs.saveUser(user);
+            SharedPrefs.setUserLoggedIn(true);
+            Navigator.pop(context);
+
+          }else{
+            user.fullName =  nameController.text.trim();
+            user.email =  emailController.text.trim();
+            user.phone =  phoneController.text.trim();
+            Utils.showToast(response.message, true);
+            SharedPrefs.saveUser(user);
+            Navigator.pop(context);
+          }
         }
+
       });
+
     }
   }
 }

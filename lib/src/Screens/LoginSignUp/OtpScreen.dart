@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
+import 'package:restroapp/src/Screens/SideMenu/ProfileScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
@@ -32,7 +33,7 @@ class _OtpScreen extends State<OtpScreen> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   OTPData otpModel = new OTPData();
   Timer _timer;
-  int _start = 40;
+  int _start = 30;
 
   StoreModel store;
   String otpSkip,pickupfacility,delieveryAdress;
@@ -138,7 +139,7 @@ class _OtpScreen extends State<OtpScreen> {
 
 
   void startTimer() {
-    print('--startTimer===  $_start');
+    //print('--startTimer===  $_start');
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(oneSec,
           (Timer timer) {
@@ -163,15 +164,12 @@ class _OtpScreen extends State<OtpScreen> {
     if(_start == 0){
       // user clicked on skip button
       print('--Skip=Skip==');
-      Navigator.push(context,
-        MaterialPageRoute(builder: (context) => RegisterUser(true)),
-      );
-      //resendOtpScreen();
+      proceedToNextActivity();
     }
   }
 
 
-  void resendOtpScreen(){
+ /* void resendOtpScreen(){
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable) {
         Utils.showProgressDialog(context);
@@ -188,7 +186,7 @@ class _OtpScreen extends State<OtpScreen> {
       }
     });
 
-  }
+  }*/
 
   void onSubmitClicked(){
     final FormState form = _formKey.currentState;
@@ -196,14 +194,16 @@ class _OtpScreen extends State<OtpScreen> {
       form.save(); //This invokes each onSaved event
       Utils.isNetworkAvailable().then((isNetworkAvailable) async {
         if (isNetworkAvailable) {
+
           Utils.showProgressDialog(context);
+
           ApiController.otpVerified(otpModel).then((response) {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
               //print('@@----object+'+response.success.toString());
               Utils.showToast(response.message, true);
               //Navigator.pop(context);
-              proceedtoActivity();
+              proceedToNextActivity();
             }else{
               if (response != null) {
                 Utils.showToast(response.message, true);
@@ -219,27 +219,15 @@ class _OtpScreen extends State<OtpScreen> {
     }
   }
 
-  void proceedtoActivity() {
+  void proceedToNextActivity() {
     print('@@MENUGET'+widget.menu);
     if (widget.menu == ("menu")) {
-
-      /*Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen(store)),
-      );*/
-
-      Navigator.push(
-        context,
+      Navigator.pop(context);
+      Navigator.push(context,
         MaterialPageRoute(
-            builder: (context) => RegisterUser(true)),
+            builder: (context) => ProfileScreen(true,widget.response.user.id)),
       );
-
-      //  if (isNameExist && isEmailExist) {
-      //showAlertDialogForLogin(getActivity(), "Sucess", "You have login successfully. Please continue.");
-
-      /*  } else {
-        proceedToEmail(from);
-      }*/
+      //Navigator.pop(context);
     }
 
   }

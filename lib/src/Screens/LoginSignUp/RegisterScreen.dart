@@ -10,8 +10,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class RegisterUser extends StatefulWidget {
 
-  bool isComingFromOtpScreen;
-  RegisterUser(this.isComingFromOtpScreen);
+  RegisterUser();
 
   @override
   _RegisterUserState createState() => new _RegisterUserState();
@@ -33,10 +32,11 @@ class _RegisterUserState extends State<RegisterUser> {
           ),
       ),
       body: Container(
-        decoration: BoxDecoration(
+        color: Colors.white,
+        /*decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage('images/offer_bg.png'), fit: BoxFit.cover),
-        ),
+        ),*/
         child: new SafeArea(
           top: false,
           bottom: false,
@@ -80,11 +80,9 @@ class _RegisterUserState extends State<RegisterUser> {
                     ),
                     keyboardType: TextInputType.emailAddress,
                     //'Please enter a valid email address'
-                    validator: (value) => value.isEmpty
+                    validator: (value) => value.trim().isEmpty
                         ? AppConstant.enterEmail
-                        : isValidEmail(value)
-                            ? null
-                            : AppConstant.enterValidEmail,
+                        : isValidEmail(value.trim())? null: AppConstant.enterValidEmail,
                     onSaved: (val) {
                       userData.email = val.trim();
                     },
@@ -163,13 +161,6 @@ class _RegisterUserState extends State<RegisterUser> {
               Utils.hideProgressDialog(context);
               if (response != null && response.success) {
                 Navigator.pop(context);
-                if(widget.isComingFromOtpScreen){
-                  StoreModel store = await SharedPrefs.getStore();
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen(store)),
-                  );
-                }
               }
             });
           } else {

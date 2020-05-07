@@ -102,6 +102,8 @@ flutter:
     - images/icon_home_categories.png
     - images/image_pickup.png
     - images/deliver.png
+    - images/appiconfcfm.jpg
+    - images/googleplayfeature.png
     - assets/app_config.json
 
   # An image asset can refer to one or more resolution-specific "variants", see

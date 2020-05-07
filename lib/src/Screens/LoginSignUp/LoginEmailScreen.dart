@@ -55,31 +55,28 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
 
   Widget addPageHeader() {
     return Container(
-      height: 250,
+      height: 200,
       width: MediaQuery.of(context).size.width,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: AssetImage('images/loginbackground.png'),
-          fit: BoxFit.cover,
+          image: AssetImage('images/googleplayfeature.png'),
+          fit: BoxFit.scaleDown,
         ),
       ),
-      child: Center(
+      /*child: Center(
         child: SizedBox(
-          child: Image.asset('images/logo.png'),
-          width: 250,
-          height: 250,
+          child: Image.asset('images/appiconfcfm.jpg'),
+          width: 50,
+          height: 50,
         ),
-      ),
+      ),*/
     );
   }
 
   Widget addLoginFields() {
     return Container(
-      margin: EdgeInsets.only(top: 185),
-      padding: EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 20,
-      ),
+      margin: EdgeInsets.only(top: 200),
+      padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20,),
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
@@ -238,7 +235,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RegisterUser(false)),
+                              builder: (context) => RegisterUser()),
                         );
                       })),
               ],

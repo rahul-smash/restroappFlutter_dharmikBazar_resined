@@ -593,22 +593,28 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> updateProfileRequest(
-      String fullName, String emailId, String phoneNumber) async {
-    StoreModel store = await SharedPrefs.getStore();
-    UserModel user = await SharedPrefs.getUser();
+  static Future<UserResponse> updateProfileRequest(String fullName, String emailId,
+      String phoneNumber,bool isComingFromOtpScreen, String id) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    StoreModel store = await SharedPrefs.getStore();
+    String userId;
+    if(isComingFromOtpScreen){
+      userId = id;
+    }else{
+      UserModel user = await SharedPrefs.getUser();
+      userId = user.id;
+    }
+
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.updateProfile;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +ApiConstants.updateProfile;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     try {
       request.fields.addAll({
         "full_name": fullName,
         "email": emailId,
-        "user_id": user.id,
+        "user_id": userId,
         "device_id": deviceId,
         "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
@@ -706,22 +712,23 @@ class ApiController {
 
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
       final parsed = json.decode(respStr);
-      print('--response===  $parsed');
       MobileVerified userResponse = MobileVerified.fromJson(parsed);
-      if (userResponse.success && userResponse.userExists == 1) {
+      if (userResponse.success) {
         SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUserMobile(userResponse.user);
       }
       return userResponse;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
-      print('catch' + e.toString());
+      print('=mobileVerification==catch==' + e.toString());
       return null;
     }
   }
 
   static Future<OtpVerified> otpVerified(OTPData otpData) async {
+
     UserModelMobile userMobile = await SharedPrefs.getUserMobile();
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
