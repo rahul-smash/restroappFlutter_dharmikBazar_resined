@@ -13,12 +13,14 @@ class ReferEarnData {
   ReferEarn referEarn;
   bool status;
   String userReferCode;
+  String message;
 
   ReferEarnData({
     this.isRefererFnEnable,
     this.referEarn,
     this.status,
     this.userReferCode,
+    this.message,
   });
 
   factory ReferEarnData.fromJson(Map<String, dynamic> json) => ReferEarnData(
@@ -26,6 +28,7 @@ class ReferEarnData {
     referEarn: ReferEarn.fromJson(json["ReferEarn"]),
     status: json["status"],
     userReferCode: json["user_refer_code"],
+    message: json["message"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -33,6 +36,7 @@ class ReferEarnData {
     "ReferEarn": referEarn.toJson(),
     "status": status,
     "user_refer_code": userReferCode,
+    "message": message,
   };
 }
 
@@ -48,9 +52,9 @@ class ReferEarn {
   });
 
   factory ReferEarn.fromJson(Map<String, dynamic> json) => ReferEarn(
-    id: json["id"],
-    sharedMessage: json["shared_message"],
-    blDeviceIdUnique: json["bl_device_id_unique"],
+    id: json["id"] == null ? null : json["id"],
+    sharedMessage: json["shared_message"]== null ? null : json["shared_message"],
+    blDeviceIdUnique: json["bl_device_id_unique"]== null ? null :json["bl_device_id_unique"],
   );
 
   Map<String, dynamic> toJson() => {
