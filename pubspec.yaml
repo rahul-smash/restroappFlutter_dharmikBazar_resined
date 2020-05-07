@@ -98,6 +98,7 @@ flutter:
     - images/button_delivery_on.png
     - images/button_pickup_on.png
     - images/splash.png
+    - images/splash.jpg
     - images/icon_home_categories.png
     - images/image_pickup.png
     - images/deliver.png
