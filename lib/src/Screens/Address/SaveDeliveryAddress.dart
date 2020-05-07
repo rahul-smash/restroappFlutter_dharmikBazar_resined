@@ -188,10 +188,20 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                             }
                           });
                         },
-                        child: Text(
-                          "Select Location - Click here",
-                          style: TextStyle(color: infoLabel, fontSize: 17.0),
-                        ),
+                        child:Text.rich(
+                          TextSpan(
+                            text: 'Select Location - ',
+                            style: TextStyle(color: infoLabel,fontSize: 17),
+                            children: <TextSpan>[
+                              TextSpan(
+                                  text: 'Click here',
+                                  style: TextStyle(color :Colors.lightBlue,
+                                    decoration: TextDecoration.underline,
+                                  )),
+                              // can add more TextSpans here...
+                            ],
+                          ),
+                        )
                       ),
                       SizedBox(height: 10),
                       Container(
@@ -260,8 +270,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Align(
                         alignment: Alignment.center,
                         child: ButtonTheme(
-                          minWidth: 150.0,
-                          height: 50.0,
+                          minWidth: 180.0,
+                          height: 40.0,
                           child: RaisedButton(
                             shape: new RoundedRectangleBorder(
                                 borderRadius: new BorderRadius.circular(25.0),
@@ -326,6 +336,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           ),
                         ),
                       ),
+                      SizedBox(height: 20),
                     ],
                   ))),
         ));

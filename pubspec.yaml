@@ -99,6 +99,8 @@ flutter:
     - images/button_pickup_on.png
     - images/splash.png
     - images/icon_home_categories.png
+    - images/image_pickup.png
+    - images/deliver.png
     - assets/app_config.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
