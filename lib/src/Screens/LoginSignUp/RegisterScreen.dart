@@ -88,6 +88,7 @@ class _RegisterUserState extends State<RegisterUser> {
                     },
                   ),
                   new TextFormField(
+                    obscureText: true,
                     decoration: const InputDecoration(
                       icon: const Icon(Icons.lock),
                       labelText: 'Password',
@@ -100,6 +101,7 @@ class _RegisterUserState extends State<RegisterUser> {
                     },
                   ),
                   new TextFormField(
+                    obscureText: true,
                     decoration: const InputDecoration(
                       icon: const Icon(Icons.lock),
                       labelText: 'Confirm Password',
