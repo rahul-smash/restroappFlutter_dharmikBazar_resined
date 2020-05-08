@@ -85,7 +85,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     addressValue = "";
                   }
                   print("----22222222222222---${addressValue}----");
-                  //Utils.hideProgressDialog(context);
                   print("----33333333333-------");
                   var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
                           SaveDeliveryAddress(null, () {
@@ -95,7 +94,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         fullscreenDialog: true,
                       ));
                   print("--result--${result}-------");
-                  if(result){
+                  if(result != null){
                     Utils.showProgressDialog(context);
                     DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
                     setState(() {
@@ -104,6 +103,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     });
                     //getAddressList();
                   }
+                  Utils.hideProgressDialog(context);
                 });
 
               }else{
@@ -196,12 +196,18 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
 
   Future<String> getLocation() async {
-    print("-Geolocator-getLocation---");
-    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    coordinates = new Coordinates(position.latitude, position.longitude);
-    var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-    var first = addresses.first;
-    return first.addressLine;
+    try {
+      print("-Geolocator-getLocation---");
+      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      coordinates = new Coordinates(position.latitude, position.longitude);
+      print("-coordinates-${coordinates}--");
+      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      var first = addresses.first;
+      return first.addressLine;
+    } catch (e) {
+      print(e);
+      return "";
+    }
   }
 
   Widget addAddressList() {
