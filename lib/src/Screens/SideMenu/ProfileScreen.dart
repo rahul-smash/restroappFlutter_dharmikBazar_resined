@@ -48,10 +48,11 @@ class _ProfileState extends State<ProfileScreen> {
         centerTitle: true,
       ),
       body: Container(
-        decoration: BoxDecoration(
+        color: Colors.white,
+        /*decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage("images/offer_bg.png"), fit: BoxFit.cover),
-        ),
+        ),*/
         child: SafeArea(
           top: false,
           bottom: false,

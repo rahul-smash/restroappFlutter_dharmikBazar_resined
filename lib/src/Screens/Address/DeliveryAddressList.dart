@@ -102,7 +102,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               }
             });
 
-          }else if(store.deliveryArea == "1"){
+          }else if(store.deliveryArea == "1" || store.deliveryArea == null){
             Utils.isNetworkAvailable().then((isConnected){
               if(isConnected){
                 Utils.showProgressDialog(context);
