@@ -95,8 +95,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       CategoryResponse response = projectSnap.data;
                       if (response.success) {
                         return Container(
-                          padding:
-                              const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                           color: Colors.white,
                           child: GridView.count(
                               crossAxisCount: 2,
@@ -195,7 +194,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         Container(
-          margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
+          margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: Image.asset("images/icon_home_categories.png",
             height: 60, width: 60,
           ),
