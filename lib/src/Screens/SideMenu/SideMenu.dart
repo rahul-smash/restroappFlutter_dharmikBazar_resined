@@ -181,11 +181,16 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         );
         break;
       case 7:
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ReferEarn()),
-        );
+        if(widget.store.isRefererFnEnable){
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ReferEarn()),
+          );
+        }else{
+          Utils.showToast("Refer Earn is inactive!", true);
+        }
+
         //share();
         break;
       case 8:

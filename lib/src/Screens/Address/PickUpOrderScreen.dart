@@ -59,8 +59,7 @@ class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
                           child: InkWell(
                             onTap: () async {
                               cityObject = await DialogUtils.displayCityDialog(context,
-                                  "Select City",
-                                  widget.storeArea);
+                                  "Select City",widget.storeArea);
                               setState(() {
                               });
                               print("--object->---${cityObject.city.city}-");

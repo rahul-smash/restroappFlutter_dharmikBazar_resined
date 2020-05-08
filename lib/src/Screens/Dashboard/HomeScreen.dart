@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
               boxFit: BoxFit.cover,
               autoplay: true,
               animationCurve: Curves.fastOutSlowIn,
-              animationDuration: Duration(milliseconds: 1000),
+              animationDuration: Duration(milliseconds: 3000),
               dotSize: 6.0,
               dotIncreasedColor: dotIncreasedColor,
               dotBgColor: Colors.transparent,

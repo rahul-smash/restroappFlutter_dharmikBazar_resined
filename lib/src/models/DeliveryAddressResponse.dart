@@ -44,6 +44,8 @@ class DeliveryAddressData {
   String minAmount;
   String note;
   String cityId;
+  String lat;
+  String lng;
   //DeliveryTimeSlot deliveryTimeSlot;
 
   DeliveryAddressData({
@@ -61,6 +63,8 @@ class DeliveryAddressData {
     this.state,
     this.zipCode,
     this.country,
+    this.lat,
+    this.lng,
     //this.notAllow,
     this.areaCharges,
     this.minAmount,
@@ -72,6 +76,8 @@ class DeliveryAddressData {
   factory DeliveryAddressData.fromJson(Map<String, dynamic> json) =>
       DeliveryAddressData(
         id: json["id"],
+        lat: json["lat"],
+        lng: json["lng"],
         userId: json["user_id"],
         storeId: json["store_id"],
         firstName: json["first_name"],
@@ -95,6 +101,8 @@ class DeliveryAddressData {
 
   Map<String, dynamic> toJson() => {
         "id": id,
+        "lat": lat,
+        "lng": lng,
         "user_id": userId,
         "store_id": storeId,
         "first_name": firstName,

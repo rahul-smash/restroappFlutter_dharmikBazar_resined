@@ -34,7 +34,8 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
     lat = widget.areaObject.pickupLat;
     lng = widget.areaObject.pickupLng;
     center = LatLng(double.parse(lat), double.parse(lng));
-    markers.addAll([Marker(markerId: MarkerId('value'),position: center)]);
+    markers.addAll( [Marker(markerId: MarkerId('value'),position: center,)]
+    );
   }
 
   @override

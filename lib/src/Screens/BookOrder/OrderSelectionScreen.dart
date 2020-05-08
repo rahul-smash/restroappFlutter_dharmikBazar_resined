@@ -137,10 +137,12 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                             print('@@CartBottomView----'+"PickUPActivy");
                             Utils.showProgressDialog(context);
                             ApiController.getStorePickupAddress().then((response){
+
                               Utils.hideProgressDialog(context);
                               PickUpModel storeArea = response;
+
                               print('---PickUpModel---${storeArea.data.length}--');
-                              if(storeArea != null){
+                              if(storeArea != null && storeArea.data.isNotEmpty){
                                 if(storeArea.data.length == 1 && storeArea.data[0].area.length == 1){
                                   Area areaObject = storeArea.data[0].area[0];
                                   Navigator.pop(context);
@@ -156,6 +158,8 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                                         builder: (context) => PickUpOrderScreen(storeArea)),
                                   );
                                 }
+                              }else{
+                                Utils.showToast("No pickup data found!", true);
                               }
                             });
                           },

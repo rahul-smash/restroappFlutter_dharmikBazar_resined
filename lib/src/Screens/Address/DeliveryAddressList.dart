@@ -31,17 +31,19 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   int selectedIndex = 0;
   List<DeliveryAddressData> addressList = [];
   Area radiusArea;
+  Coordinates coordinates;
 
   @override
   void initState() {
     super.initState();
     addressList = widget.responsesData.data;
+    coordinates = new Coordinates(0.0, 0.0);
   }
 
   @override
   Widget build(BuildContext context) {
     print("------Widget build------AddDelivery-${addressList.length}---");
-    Utils.hideProgressDialog(context);
+
     return Scaffold(
       appBar: AppBar(
           title: Text("Delivery Addresses"),
@@ -75,9 +77,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
             Geolocator().isLocationServiceEnabled().then((value) async {
               if(value == true){
-                Utils.showToast("Getting your location, please wait..", false);
+                Utils.showToast("Getting your location, please wait..", true);
                 //Utils.showProgressDialog(context);
-                getLocation().then((addressValue){
+                getLocation().then((addressValue) async {
                   print("----1111111-------");
                   if(addressValue == null){
                     addressValue = "";
@@ -85,24 +87,31 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                   print("----22222222222222---${addressValue}----");
                   //Utils.hideProgressDialog(context);
                   print("----33333333333-------");
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (BuildContext context) =>
+                  var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
                           SaveDeliveryAddress(null, () {
                             print("--Route-SaveDeliveryAddress-------");
-                            getAddressList();
-                          },addressValue),
+                            //getAddressList();
+                          },addressValue,coordinates),
                         fullscreenDialog: true,
                       ));
+                  print("--result--${result}-------");
+                  if(result){
+                    Utils.showProgressDialog(context);
+                    DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                    setState(() {
+                      Utils.hideProgressDialog(context);
+                      addressList = response.data;
+                    });
+                    //getAddressList();
+                  }
                 });
-
-
 
               }else{
                 Utils.showToast("Please turn on gps!", false);
               }
             });
 
-          }else if(store.deliveryArea == "1" || store.deliveryArea == null){
+          }else if(store.deliveryArea == "1"){
             Utils.isNetworkAvailable().then((isConnected){
               if(isConnected){
                 Utils.showProgressDialog(context);
@@ -124,7 +133,14 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         if(result != null){
                           radiusArea = result;
                           print("----radiusArea = result-------");
-                          getAddressList();
+                          Utils.showProgressDialog(context);
+                          DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                          setState(() {
+                            print("----setState-------");
+                            Utils.hideProgressDialog(context);
+                            addressList = response.data;
+                          });
+                          //getAddressList();
                         }
                       }else{
                         Utils.showToast("Please turn on gps!", false);
@@ -172,18 +188,18 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       Utils.hideProgressDialog(context);
       DeliveryAddressResponse response = responses;
       setState(() {
+        //Utils.hideProgressDialog(context);
         addressList = response.data;
       });
     });
   }
 
+
   Future<String> getLocation() async {
     print("-Geolocator-getLocation---");
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    final coordinates = new Coordinates(position.latitude, position.longitude);
-    var addresses =
-    await Geocoder.local.findAddressesFromCoordinates(coordinates);
+    Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    coordinates = new Coordinates(position.latitude, position.longitude);
+    var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
     var first = addresses.first;
     return first.addressLine;
   }
@@ -290,16 +306,20 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     style: TextStyle(
                         color: infoLabel, fontWeight: FontWeight.w500)),
               ),
-              onTap: () {
-                Navigator.push(
+              onTap: () async {
+                var result = await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (BuildContext context) =>SaveDeliveryAddress(area, () {
                         print('@@------SaveDeliveryAddress----------');
-                        getAddressList();
-                      },""),
+                        //getAddressList();
+                      },"",coordinates),
                       fullscreenDialog: true,
                     ));
+                print("-x-result--${result}-------");
+                if(result){
+                  getAddressList();
+                }
               },
             ),
           ),

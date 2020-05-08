@@ -145,6 +145,7 @@ class _ProfileState extends State<ProfileScreen> {
             user.fullName =  nameController.text.trim();
             user.email =  emailController.text.trim();
             user.phone =  phoneController.text.trim();
+            user.id = widget.id;
             Utils.showToast(response.message, true);
             SharedPrefs.saveUser(user);
             SharedPrefs.setUserLoggedIn(true);

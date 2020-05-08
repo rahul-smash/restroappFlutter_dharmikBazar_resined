@@ -248,7 +248,7 @@ class ApiController {
 
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getAddress;
-
+    print("----user.id---${user.id}");
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
       request.fields.addAll({

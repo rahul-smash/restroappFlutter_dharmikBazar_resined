@@ -18,24 +18,21 @@ class SaveDeliveryAddress extends StatefulWidget {
   final DeliveryAddressData selectedAddress;
   final VoidCallback callback;
   String addressValue;
+  Coordinates coordinates;
 
-  SaveDeliveryAddress(this.selectedAddress, this.callback,this.addressValue);
+  SaveDeliveryAddress(this.selectedAddress, this.callback,this.addressValue, this.coordinates);
 
   @override
   _SaveDeliveryAddressState createState() => _SaveDeliveryAddressState();
 }
 
 class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
-  //StoreArea selectedArea;
+
   Area selectedArea;
   City selectedCity;
   TextEditingController addressController = new TextEditingController();
   TextEditingController zipCodeController = new TextEditingController();
   TextEditingController fullnameController = new TextEditingController();
-  GoogleMapController mapController;
-  String lat = "0", lng = "0";
-  LatLng location = LatLng(0.0, 0.0);
-  Set<Marker> markers = Set();
   LocationData locationData;
   Datum dataObject;
 
@@ -54,12 +51,21 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       addressController.text = widget.selectedAddress.address;
       zipCodeController.text = widget.selectedAddress.zipCode;
       fullnameController.text = "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
+
+      locationData = new LocationData();
+      locationData.address = widget.selectedAddress.address;
+      locationData.lat = widget.selectedAddress.lat.toString();
+      locationData.lng = widget.selectedAddress.lng.toString();
+
     }else{
 
       if(widget.addressValue != null && widget.addressValue.isNotEmpty){
         locationData = new LocationData();
         locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
+        locationData.lat = widget.coordinates.latitude.toString();
+        locationData.lng = widget.coordinates.longitude.toString();
+
       }
     }
     //getLocation();
@@ -330,14 +336,14 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                     zipCodeController.text,addressController.text,
                                     selectedArea.areaId,selectedArea.area,
                                     widget.selectedAddress == null? null: widget.selectedAddress.id,
-                                    fullnameController.text,selectedCity.city,selectedCity.id,"","")
-                                    .then((response) {
+                                    fullnameController.text,selectedCity.city,selectedCity.id,
+                                    "${locationData.lat}","${locationData.lng}").then((response) {
                                   Utils.hideProgressDialog(context);
                                   //print('@@REsonsesss'+response.toString());
                                   if (response != null && response.success) {
-                                    widget.callback();
-                                    //Navigator.pop(context);
-                                    Navigator.of(context, rootNavigator: true)..pop()..pop();
+                                    //widget.callback();
+                                    Navigator.pop(context, true);
+                                    //Navigator.of(context, rootNavigator: true)..pop()..pop();
                                     Utils.showToast(response.message, true);
                                   }
                                 });

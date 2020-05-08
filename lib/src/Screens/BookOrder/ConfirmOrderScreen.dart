@@ -5,6 +5,7 @@ import 'package:flutter_web_view/flutter_web_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
+import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -540,7 +541,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
     flutterWebView.onWebViewDidStartLoading.listen((url) {
       print("---listen----${url}");
-      if(url == "https://app.restroapp.com/7/api/stripeVerifyTransaction?response=success"){
+      String mUrl = url;
+      if(mUrl.contains("api/stripeVerifyTransaction?response=success")){
         flutterWebView.dismiss();
         callStripeVerificationApi(stripeCheckOutModel.paymentRequestId);
       }
