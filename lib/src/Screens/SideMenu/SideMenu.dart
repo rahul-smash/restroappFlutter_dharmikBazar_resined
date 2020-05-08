@@ -160,11 +160,16 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         }
         break;
       case 4:
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => BookNowScreen(context)),
-        );
+        if (AppConstant.isLoggedIn) {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => BookNowScreen(context)),
+          );
+        }else {
+          Utils.showLoginDialog(context);
+        }
+
         break;
       case 5:
         Navigator.pop(context);
@@ -181,16 +186,19 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         );
         break;
       case 7:
-        if(widget.store.isRefererFnEnable){
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ReferEarn()),
-          );
-        }else{
-          Utils.showToast("Refer Earn is inactive!", true);
+        if (AppConstant.isLoggedIn) {
+          if(widget.store.isRefererFnEnable){
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ReferEarn()),
+            );
+          }else{
+            Utils.showToast("Refer Earn is inactive!", true);
+          }
+        }else {
+          Utils.showLoginDialog(context);
         }
-
         //share();
         break;
       case 8:

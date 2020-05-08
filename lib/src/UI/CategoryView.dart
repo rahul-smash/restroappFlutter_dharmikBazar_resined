@@ -28,14 +28,11 @@ class CategoryView extends StatelessWidget {
             decoration: new BoxDecoration(
               color: Colors.white,
               image: new DecorationImage(
-                image: new NetworkImage(categoryModel.image300200),
+                image: NetworkImage(categoryModel.image300200),
                 fit: BoxFit.cover,
               ),
               borderRadius: new BorderRadius.all(new Radius.circular(50.0)),
-              border: new Border.all(
-                color: appTheme,
-                width: 2.0,
-              ),
+              border: new Border.all(color: appTheme,width: 2.0,),
             ),
           ),
         ),
