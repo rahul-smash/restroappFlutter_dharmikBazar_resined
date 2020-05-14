@@ -501,31 +501,45 @@ class AppThemeColors {
     this.dotIncreasedColor,
     this.leftMenuHeaderBkground,
   });
-
+/*
+  app_theme_colors: {
+  app_theme_color: "0xff777A18",
+  left_menu_icon_color: "0xffffffff",
+  left_menu_background_color: "0xff151515",
+  left_menu_title_color: "0xffffffff",
+  left_menu_username_color: "0xffffffff",
+  bottom_bar_icon_color: "0xffffffff",
+  bottom_bar_text_color: "0xffffffff",
+  dot_increased_color: "0xff777A18",
+  left_menu_header_background_color: "0xff000000"
+  },
+  */
   factory AppThemeColors.fromJson(Map<String, dynamic> json) => AppThemeColors(
-    appTheme: json["appTheme"],
-    leftMenuIconColors: json["left_menu_icon_colors"],
+    appTheme: json["app_theme_color"],
+    leftMenuIconColors: json["left_menu_icon_color"],
     leftMenuBackgroundColor: json["left_menu_background_color"],
-    leftMenuTitleColors: json["leftMenuTitleColors"],
-    leftMenuUsernameColors: json["leftMenuUsernameColors"],
-    bottomBarIconColor: json["bottomBarIconColor"],
-    bottomBarTextColor: json["bottomBarTextColor"],
-    dotIncreasedColor: json["dotIncreasedColor"],
-    leftMenuHeaderBkground: json["left_menu_header_bkground"],
+    leftMenuTitleColors: json["left_menu_title_color"],
+    leftMenuUsernameColors: json["left_menu_username_color"],
+    bottomBarIconColor: json["bottom_bar_icon_color"],
+    bottomBarTextColor: json["bottom_bar_text_color"],
+    dotIncreasedColor: json["dot_increased_color"],
+    leftMenuHeaderBkground: json["left_menu_header_background_color"],
   );
 
   Map<String, dynamic> toJson() => {
-    "appTheme": appTheme,
-    "left_menu_icon_colors": leftMenuIconColors,
+    "app_theme_color": appTheme,
+    "left_menu_icon_color": leftMenuIconColors,
     "left_menu_background_color": leftMenuBackgroundColor,
-    "leftMenuTitleColors": leftMenuTitleColors,
-    "leftMenuUsernameColors": leftMenuUsernameColors,
-    "bottomBarIconColor": bottomBarIconColor,
-    "bottomBarTextColor": bottomBarTextColor,
-    "dotIncreasedColor": dotIncreasedColor,
-    "left_menu_header_bkground": leftMenuHeaderBkground,
+    "left_menu_title_color": leftMenuTitleColors,
+    "left_menu_username_color": leftMenuUsernameColors,
+    "bottom_bar_icon_color": bottomBarIconColor,
+    "bottom_bar_text_color": bottomBarTextColor,
+    "dot_increased_color": dotIncreasedColor,
+    "left_menu_header_background_color": leftMenuHeaderBkground,
   };
 }
+
+
 
 
 class Banners {
