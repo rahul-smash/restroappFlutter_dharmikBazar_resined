@@ -1,3 +1,5 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
@@ -11,6 +13,7 @@ import 'package:restroapp/src/Screens/SideMenu/ReferEarn.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -34,6 +37,9 @@ class NavDrawerMenu extends StatefulWidget {
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   _NavDrawerMenuState();
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
+
 
   final _drawerItems = [
     DrawerChildItem('Home', "images/home.png"),
@@ -50,6 +56,26 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   @override
   void initState() {
     super.initState();
+    try {
+      _setSetUserId();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _setSetUserId() async {
+    try {
+      if(AppConstant.isLoggedIn){
+            UserModel user = await SharedPrefs.getUser();
+            await analytics.setUserId('${user.id}');
+            await analytics.setUserProperty(name: "userid", value: user.id);
+            await analytics.setUserProperty(name: "useremail", value: user.email);
+            await analytics.setUserProperty(name: "userfullName", value: user.fullName);
+            await analytics.setUserProperty(name: "userphone", value: user.phone);
+          }
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override

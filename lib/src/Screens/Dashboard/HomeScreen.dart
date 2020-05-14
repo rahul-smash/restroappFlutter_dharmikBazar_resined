@@ -1,4 +1,6 @@
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info/package_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -23,6 +25,7 @@ import 'package:restroapp/src/utils/version_check.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
   HomeScreen(this.store);
@@ -41,6 +44,9 @@ class _HomeScreenState extends State<HomeScreen> {
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
   UserModel user;
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
+
 
   _HomeScreenState(this.store);
 
@@ -48,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     initFirebase();
+    _setSetCurrentScreen();
     try {
       print("-----store.banners-----${store.banners.length}------");
       if (store.banners.isEmpty) {
@@ -65,6 +72,13 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<void> _setSetCurrentScreen() async {
+    await analytics.setCurrentScreen(
+      screenName: 'HomeScreen',
+      screenClassOverride: 'HomeScreenView',
+    );
   }
 
 

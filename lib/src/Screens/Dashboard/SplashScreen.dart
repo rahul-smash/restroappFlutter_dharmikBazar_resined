@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -28,6 +30,8 @@ class _SplashScreenState extends State<SplashScreen> {
   String version = "";
   String buildNumber = "";
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
 
   @override
   void initState() {
@@ -54,6 +58,8 @@ class _SplashScreenState extends State<SplashScreen> {
       SharedPrefs.storeSharedValue(AppConstant.old_appverion, version);
       //print('@@_version '+version+" and buildNumber= "+buildNumber);
     });
+
+    await analytics.logAppOpen();
   }
   @override
   void dispose() {
