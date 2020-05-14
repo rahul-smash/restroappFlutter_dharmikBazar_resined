@@ -291,6 +291,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future showNotification(String title,String body, Map<String, dynamic> message) async {
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
 
+    String appName = await SharedPrefs.getStoreSharedValue(AppConstant.appName);
+
     var initializationSettingsAndroid =
     AndroidInitializationSettings('ic_notification');
     var initializationSettingsIOS = IOSInitializationSettings(
@@ -301,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
         onSelectNotification: onSelectNotification);
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'restroapp', 'restroapp', 'restroapp app',
+        '${appName}', '${appName}', '${appName}',
         importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(

@@ -50,6 +50,7 @@ class _SplashScreenState extends State<SplashScreen> {
       appID = packageInfo.packageName;
       version = packageInfo.version;
       buildNumber = packageInfo.buildNumber;
+      SharedPrefs.storeSharedValue(AppConstant.appName, appName);
       SharedPrefs.storeSharedValue(AppConstant.old_appverion, version);
       //print('@@_version '+version+" and buildNumber= "+buildNumber);
     });
