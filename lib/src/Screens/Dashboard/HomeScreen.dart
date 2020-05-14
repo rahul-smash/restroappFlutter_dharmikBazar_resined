@@ -257,9 +257,11 @@ class _HomeScreenState extends State<HomeScreen> {
       onMessage: (Map<String, dynamic> message) async {
         try {
           print("------onMessage: $message");
-          String title = message['notification']['title'];
-          String body = message['notification']['body'];
-          showNotification(title,body,message);
+          if(AppConstant.isLoggedIn){
+            String title = message['notification']['title'];
+            String body = message['notification']['body'];
+            showNotification(title,body,message);
+          }
         } catch (e) {
           print(e);
         }
