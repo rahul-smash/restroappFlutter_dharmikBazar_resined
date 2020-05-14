@@ -18,6 +18,8 @@ class ConfigModel {
   String leftMenuUsernameColors;
   String bottomBarIconColor;
   String bottomBarTextColor;
+  String dotIncreasedColor;
+  String left_menu_header_bkground;
 
   ConfigModel({
     this.storeId,
@@ -29,6 +31,8 @@ class ConfigModel {
     this.leftMenuUsernameColors,
     this.bottomBarIconColor,
     this.bottomBarTextColor,
+    this.dotIncreasedColor,
+    this.left_menu_header_bkground,
   });
 
   factory ConfigModel.fromJson(Map<String, dynamic> json) => ConfigModel(
@@ -41,6 +45,8 @@ class ConfigModel {
     leftMenuUsernameColors: json["leftMenuUsernameColors"],
     bottomBarIconColor: json["bottomBarIconColor"],
     bottomBarTextColor: json["bottomBarTextColor"],
+    dotIncreasedColor: json["dotIncreasedColor"],
+    left_menu_header_bkground: json["left_menu_header_bkground"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -53,5 +59,7 @@ class ConfigModel {
     "leftMenuUsernameColors": leftMenuUsernameColors,
     "bottomBarIconColor": bottomBarIconColor,
     "bottomBarTextColor": bottomBarTextColor,
+    "dotIncreasedColor": dotIncreasedColor,
+    "left_menu_header_bkground": left_menu_header_bkground,
   };
 }
