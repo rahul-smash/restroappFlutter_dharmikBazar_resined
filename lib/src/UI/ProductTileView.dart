@@ -113,7 +113,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         ],
                                       ),
                                       Visibility(
-                                        visible: widget.product.variants == null && widget.product.variants.isNotEmpty? false:true,
+                                        visible: widget.product.variants == null ? false:true,
                                         child: Padding(
                                           padding: EdgeInsets.only(top: 5),
                                           child: InkWell(
@@ -124,7 +124,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             },
                                             child: Row(
                                               children: <Widget>[
-                                                Text("${widget.product.variants[0].weight}",
+                                                Text("${widget.product.variants == null ? "" : widget.product.variants[0].weight}",
                                                   style: TextStyle(color: Colors.black),),
                                                 Padding(
                                                   padding: EdgeInsets.only(left: 5),
@@ -160,7 +160,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
     Color foodOption =
     widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
     //print('@@product_nutrient'+widget.product.nutrient);
-    print("-product.variant--> ${widget.product.variants.length}");
+    //print("-product.variant--> ${widget.product.variants.length}");
 
     return Padding(
       padding: EdgeInsets.only(left: 7, right: 7),
@@ -262,9 +262,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       DatabaseHelper.image_300_200: product.image300200,
     };
 
-    databaseHelper
-        .checkIfProductsExistInCart(DatabaseHelper.CART_Table, mId)
-        .then((count) {
+    databaseHelper.checkIfProductsExistInCart(DatabaseHelper.CART_Table, mId).then((count) {
       if (count == 0) {
         databaseHelper.addProductToCart(row).then((count) {
           widget.callback();
