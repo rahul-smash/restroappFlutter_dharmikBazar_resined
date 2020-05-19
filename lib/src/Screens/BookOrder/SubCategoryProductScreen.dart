@@ -79,6 +79,7 @@ class SubCategoryProductScreen extends StatelessWidget {
                 itemBuilder: (context, index) {
                   Product product = subCategory.products[index];
                   return ProductTileItem(product, () {
+
                     bottomBar.state.updateTotalPrice();
                   });
                 },

@@ -217,9 +217,7 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.getProducts +
-        subCategoryId;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.getProducts +subCategoryId;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
       request.fields.addAll({
@@ -228,16 +226,17 @@ class ApiController {
         "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
-      print('@@getSubCategoryProducts' + url + "" + request.toString());
+      print("${url}");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
+      print("${respStr}");
 
       final parsed = json.decode(respStr);
       SubCategoryResponse subCategoryResponse =
           SubCategoryResponse.fromJson(parsed);
       return subCategoryResponse;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      print(e.toString());
       return null;
     }
   }

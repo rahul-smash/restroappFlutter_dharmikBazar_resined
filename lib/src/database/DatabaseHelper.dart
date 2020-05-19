@@ -16,6 +16,7 @@ class DatabaseHelper {
   // Database table names
   static final String Categories_Table = "categories";
   static final String Sub_Categories_Table = "sub_categories";
+  static final String Products_Table = "products";
   static final String Favorite_Table = "favorite";
   static final String CART_Table = "cart";
 
@@ -81,6 +82,23 @@ class DatabaseHelper {
         "deleted TEXT, "
         "sort TEXT"
         ")");
+    /*await db.execute("CREATE TABLE ${Products_Table}("
+        "id INTEGER PRIMARY KEY, "
+        "store_id TEXT, "
+        "category_ids TEXT, "
+        "title TEXT, "
+        "brand TEXT, "
+        "nutrient TEXT, "
+        "description TEXT, "
+        "tags TEXT, "
+        "image TEXT, "
+        "show_price TEXT, "
+        "isTaxEnable TEXT, "
+        "image_100_80 TEXT, "
+        "image_300_200 TEXT, "
+        "image_300_200 TEXT, "
+        "variants TEXT"
+        ")");*/
     await db.execute("CREATE TABLE ${CART_Table}("
         "id INTEGER PRIMARY KEY, "
         "product_name TEXT, "
@@ -174,13 +192,12 @@ class DatabaseHelper {
     var dbClient = await db;
     // get single row
     List<String> columnsToSelect = [QUANTITY];
+
     String whereClause = '${DatabaseHelper.ID} = ?';
+
     List<dynamic> whereArguments = [product_id];
 
-    List<Map> result = await dbClient.query(CART_Table,
-        columns: columnsToSelect,
-        where: whereClause,
-        whereArgs: whereArguments);
+    List<Map> result = await dbClient.query(CART_Table, columns: columnsToSelect,where: whereClause,whereArgs: whereArguments);
     // print the results
     if (result != null && result.isNotEmpty) {
       //print("---result.length--- ${result.length}");
@@ -230,7 +247,7 @@ class DatabaseHelper {
       return totalPrice;
       //print("-totalPrice is ${totalPrice}--");
     } else {
-      print("-empty cart---");
+      //print("-empty cart---");
     }
     return totalPrice;
   }
@@ -318,9 +335,9 @@ class DatabaseHelper {
         cartList.add(product);
       });
     } else {
-      print("-empty cart-in db--");
+      //print("-empty cart-in db--");
     }
-    print("---List.length===>${cartList.length}--");
+    //print("---List.length===>${cartList.length}--");
     return cartList;
   }
 
@@ -342,7 +359,7 @@ class DatabaseHelper {
     List<Map> list = await dbClient
         .rawQuery('SELECT * from $table where ${ID} = $product_id');
     int count = list.length;
-    print("-checkIfProductsExist-- ${count}");
+    //print("-checkIfProductsExist-- ${count}");
     return count;
   }
 

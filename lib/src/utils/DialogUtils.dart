@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 
 class DialogUtils {
@@ -199,7 +200,61 @@ class DialogUtils {
   }
 
 
+  static Future<Variant> displayVariantsDialog(BuildContext context,String title, List<Variant> variants) async {
 
+    return await showDialog<Variant>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            title: Container(
+              child: Text(title,textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black),),
+            ),
+            content: Container(
+              width: double.maxFinite,
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: variants.length,
+                separatorBuilder: (BuildContext context, int index) {
+
+                  return Divider();
+                },
+                itemBuilder: (context, index) {
+                  Variant areaObject = variants[index];
+                  return InkWell(
+                      onTap: () {
+                        Navigator.pop(context, areaObject);
+                      },
+                    child: ListTile(
+                      title: Text(areaObject.weight,style: TextStyle(color: Colors.black)),
+                      trailing: Text("₹ ${areaObject.price}",style: TextStyle(color: Colors.black)),
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Cancel"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.pop(context);
+                  // true here means you clicked ok
+                },
+              ),
+
+            ],
+          ),
+        );
+      },
+    );
+  }
 
 }
 

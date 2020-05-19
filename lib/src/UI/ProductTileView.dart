@@ -3,6 +3,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ProductTileItem extends StatefulWidget {
@@ -41,113 +42,129 @@ class _ProductTileItemState extends State<ProductTileItem> {
     String discount = widget.product.discount.toString();
     String imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
 
-    return Column(children: [
-      Padding(
-          padding: EdgeInsets.only(top: 15, bottom: 15),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Flexible(
-                    child: Row(
-                      children: [
-                        SizedBox(width: 10),
-                        InkWell(
-                          onTap: () async {
+    return Container(
+      color: Colors.white,
+      child: Column(
+          children: [
+            Padding(
+                padding: EdgeInsets.only(top: 15, bottom: 15),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Flexible(
+                          child: Row(
+                            children: [
+                              SizedBox(width: 10),
+                              InkWell(
+                                onTap: () async {
 
-                            int  count = await databaseHelper.checkIfProductsExistInCart
-                              (DatabaseHelper.Favorite_Table,int.parse(widget.product.id));
-                            print("--ProductFavValue-- ${count}");
-                            Product product = widget.product;
-                            if(count == 1){
-                              product.isFav = "0";
-                              Utils.showToast(AppConstant.favsRemoved, true);
-                              await databaseHelper.delete
-                                (DatabaseHelper.Favorite_Table,int.parse(widget.product.id));
-                            }else if(count == 0){
-                              product.isFav = "1";
-                              Utils.showToast(AppConstant.favsAdded, true);
-                              insertInFavTable(product,counter);
-                            }
-                            //print("--product.isFav-- ${product.isFav}");
-                            widget.callback();
-                            setState(() {
-                            });
-                          },
-                          child: Utils.showFavIcon(widget.product.isFav),
-                          //child: Image.asset("images/myfav.png", width: 25),
-                        ),
-                        addVegNonVegOption(),
-                        imageUrl == ""
-                            ? Container()
-                            : Padding(
-                            padding: EdgeInsets.only(right: 10),
-                            child: Container(
-                              width: 60.0,
-                              height: 60.0,
-                              decoration: new BoxDecoration(
-                                color: Colors.white,
-                                image: new DecorationImage(
-                                  image: new NetworkImage(imageUrl),
-                                  fit: BoxFit.cover,
-                                ),
-                                border: new Border.all(
-                                  color: appTheme,
-                                  width: 1.0,
-                                ),
+                                  int  count = await databaseHelper.checkIfProductsExistInCart
+                                    (DatabaseHelper.Favorite_Table,int.parse(widget.product.id));
+                                  //print("--ProductFavValue-- ${count}");
+                                  Product product = widget.product;
+                                  if(count == 1){
+                                    product.isFav = "0";
+                                    Utils.showToast(AppConstant.favsRemoved, true);
+                                    await databaseHelper.delete
+                                      (DatabaseHelper.Favorite_Table,int.parse(widget.product.id));
+                                  }else if(count == 0){
+                                    product.isFav = "1";
+                                    Utils.showToast(AppConstant.favsAdded, true);
+                                    insertInFavTable(product,counter);
+                                  }
+                                  //print("--product.isFav-- ${product.isFav}");
+                                  widget.callback();
+                                  setState(() {
+                                  });
+                                },
+                                child: Utils.showFavIcon(widget.product.isFav),
+                                //child: Image.asset("images/myfav.png", width: 25),
                               ),
-                            )),
-                        Flexible(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(widget.product.title,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: new TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18.0,
-                                      color: appTheme,
-                                    )),
-                                (discount == "0.00" ||
-                                    discount == "0" ||
-                                    discount == "0.0")
-                                    ? Text("\$${widget.product.price}")
-                                    : Row(
-                                  children: <Widget>[
-                                    Text("\$${widget.product.discount}",
-                                        style: TextStyle(
-                                            decoration:
-                                            TextDecoration.lineThrough)),
-                                    Text(" "),
-                                    Text("\$${widget.product.price}"),
-                                  ],
-                                )
-                              ],
-                            )),
-                      ],
-                    )),
-                addPlusMinusView()
-              ])),
-      Container(
-          height: 1,
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
-          color: Color(0xFFBDBDBD))
-    ]);
+                              addVegNonVegOption(),
+                              imageUrl == "" ? Container(): Padding(
+                                  padding: EdgeInsets.only(right: 10),
+                                  child: Container(
+                                    width: 60.0,
+                                    height: 60.0,
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      image: new DecorationImage(
+                                        image: new NetworkImage(imageUrl),
+                                        fit: BoxFit.cover,
+                                      ),
+                                      border: new Border.all(
+                                        color: appTheme,
+                                        width: 1.0,
+                                      ),
+                                    ),
+                                  )),
+                              Flexible(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(widget.product.title,overflow: TextOverflow.ellipsis,
+                                          style: new TextStyle(fontWeight: FontWeight.w500, fontSize: 18.0,color: appTheme,)),
+                                      (discount == "0.00" || discount == "0" || discount == "0.0")? Text("\$${widget.product.price}"):
+                                      Row(
+                                        children: <Widget>[
+                                          Text("\$${widget.product.discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
+                                          Text(" "),
+                                          Text("\$${widget.product.price}"),
+                                        ],
+                                      ),
+                                      Visibility(
+                                        visible: widget.product.variants == null && widget.product.variants.isNotEmpty? false:true,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(top: 5),
+                                          child: InkWell(
+                                            onTap: () async {
+                                              print("");
+                                              Variant variant = await DialogUtils.displayVariantsDialog(context, "Variants", widget.product.variants);
+
+                                            },
+                                            child: Row(
+                                              children: <Widget>[
+                                                Text("${widget.product.variants[0].weight}",
+                                                  style: TextStyle(color: Colors.black),),
+                                                Padding(
+                                                  padding: EdgeInsets.only(left: 5),
+                                                  child: Icon(Icons.keyboard_arrow_down,
+                                                      color: Colors.black, size: 25),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                              ),
+                            ],
+                          )),
+                      addPlusMinusView()
+                    ])
+            ),
+            Container(
+                height: 1,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width,
+                color: Color(0xFFBDBDBD))
+          ]),
+    );
   }
 
   Widget addVegNonVegOption() {
 
     Color foodOption =
     widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
-    print('@@product_nutrient'+widget.product.nutrient);
+    //print('@@product_nutrient'+widget.product.nutrient);
+    print("-product.variant--> ${widget.product.variants.length}");
 
     return Padding(
       padding: EdgeInsets.only(left: 7, right: 7),
-      child: widget.product.nutrient == "None"
-          ? Container()
-          : Container(
+      child: widget.product.nutrient == "None"? Container(): Container(
           decoration: new BoxDecoration(
             color: Colors.white,
             border: new Border.all(

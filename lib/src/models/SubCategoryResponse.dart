@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class SubCategoryResponse {
   bool success;
   List<SubCategoryModel> subCategories;
@@ -33,6 +35,7 @@ class SubCategoryModel {
   String image;
   List<Product> products;
 
+
   SubCategoryModel({
     this.id,
     this.title,
@@ -45,6 +48,7 @@ class SubCategoryModel {
     this.image300200,
     this.image,
     this.products,
+
   });
 
   factory SubCategoryModel.fromJson(Map<String, dynamic> json) =>
@@ -59,8 +63,7 @@ class SubCategoryModel {
         image10080: json["image_100_80"],
         image300200: json["image_300_200"],
         image: json["image"],
-        products: new List<Product>.from(
-            json["products"].map((x) => Product.fromJson(x))),
+        products: new List<Product>.from(json["products"].map((x) => Product.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
@@ -100,6 +103,9 @@ class Product {
   String image10080;
   String image300200;
 
+  List<Variant> variants;
+  SelectedVariant selectedVariant;
+
   String variantId;
   String weight;
   String mrpPrice;
@@ -108,6 +114,7 @@ class Product {
   String isUnitType;
 
   String quantity;
+
 
   Product({
     this.id,
@@ -136,6 +143,8 @@ class Product {
     this.price,
     this.discount,
     this.isUnitType,
+    this.variants,
+    this.selectedVariant,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -161,9 +170,10 @@ class Product {
     product.image10080 = json["image_100_80"] ?? "";
     product.image300200 = json["image_300_200"] ?? "";
 
-    dynamic variant = json["variants"] != null
-        ? json["variants"].length > 0 ? json["variants"].first : null
-        : null;
+    product.variants = List<Variant>.from(json["variants"].map((x) => Variant.fromJson(x)));
+    product.selectedVariant = SelectedVariant.fromJson(json["selectedVariant"]);
+
+    dynamic variant = json["variants"] != null ? json["variants"].length > 0 ? json["variants"].first : null: null;
     product.variantId = variant == null ? null : variant["id"];
     product.weight = variant == null ? null : variant["weight"];
     product.mrpPrice = variant == null ? null : variant["mrp_price"];
@@ -194,6 +204,8 @@ class Product {
         "deleted": deleted,
         "image_100_80": image10080,
         "image_300_200": image300200,
+        "variants": List<dynamic>.from(variants.map((x) => x.toJson())),
+        "selectedVariant": selectedVariant.toJson(),
       };
 
   static List encodeToJson(List<Product> list) {
@@ -213,4 +225,141 @@ class Product {
         .toList();
     return jsonList;
   }
+}
+
+
+class SelectedVariant {
+  String variantId;
+  String sku;
+  String weight;
+  String mrpPrice;
+  String price;
+  String discount;
+  String unitType;
+  String quantity;
+  String customField1;
+  String customField2;
+  String customField3;
+  String customField4;
+
+  SelectedVariant({
+    this.variantId,
+    this.sku,
+    this.weight,
+    this.mrpPrice,
+    this.price,
+    this.discount,
+    this.unitType,
+    this.quantity,
+    this.customField1,
+    this.customField2,
+    this.customField3,
+    this.customField4,
+  });
+
+  factory SelectedVariant.fromJson(Map<String, dynamic> json) => SelectedVariant(
+    variantId: json["variant_id"],
+    sku: json["sku"],
+    weight: json["weight"],
+    mrpPrice: json["mrp_price"],
+    price: json["price"],
+    discount: json["discount"],
+    unitType: json["unit_type"],
+    quantity: json["quantity"],
+    customField1: json["custom_field1"],
+    customField2: json["custom_field2"],
+    customField3: json["custom_field3"],
+    customField4: json["custom_field4"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "variant_id": variantId,
+    "sku": sku,
+    "weight": weight,
+    "mrp_price": mrpPrice,
+    "price": price,
+    "discount": discount,
+    "unit_type": unitType,
+    "quantity": quantity,
+    "custom_field1": customField1,
+    "custom_field2": customField2,
+    "custom_field3": customField3,
+    "custom_field4": customField4,
+  };
+}
+
+class Variant {
+  String id;
+  String storeId;
+  String productId;
+  String sku;
+  String weight;
+  String mrpPrice;
+  String price;
+  String discount;
+  String unitType;
+  String customField1;
+  String customField2;
+  String customField3;
+  String customField4;
+  String orderBy;
+  String sort;
+  String isExportFromFile;
+
+  Variant({
+    this.id,
+    this.storeId,
+    this.productId,
+    this.sku,
+    this.weight,
+    this.mrpPrice,
+    this.price,
+    this.discount,
+    this.unitType,
+    this.customField1,
+    this.customField2,
+    this.customField3,
+    this.customField4,
+    this.orderBy,
+    this.sort,
+    this.isExportFromFile,
+  });
+
+  factory Variant.fromJson(Map<String, dynamic> json) => Variant(
+    id: json["id"],
+    storeId: json["store_id"],
+    productId: json["product_id"],
+    sku: json["sku"],
+    weight: json["weight"],
+    mrpPrice: json["mrp_price"],
+    price: json["price"],
+    discount: json["discount"],
+    unitType: json["unit_type"],
+    customField1: json["custom_field1"],
+    customField2: json["custom_field2"],
+    customField3: json["custom_field3"],
+    customField4: json["custom_field4"],
+    orderBy: json["order_by"],
+    sort: json["sort"],
+    isExportFromFile: json["is_export_from_file"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "store_id": storeId,
+    "product_id": productId,
+    "sku": sku,
+    "weight": weight,
+    "mrp_price": mrpPrice,
+    "price": price,
+    "discount": discount,
+    "unit_type": unitType,
+    "custom_field1": customField1,
+    "custom_field2": customField2,
+    "custom_field3": customField3,
+    "custom_field4": customField4,
+    "order_by": orderBy,
+    "sort": sort,
+    "is_export_from_file": isExportFromFile,
+  };
 }
