@@ -191,7 +191,7 @@ class DatabaseHelper {
     //database connection
     var dbClient = await db;
     // get single row
-    List<String> columnsToSelect = [QUANTITY];
+    List<String> columnsToSelect=[QUANTITY,VARIENT_ID,WEIGHT,MRP_PRICE,PRICE,DISCOUNT];
 
     String whereClause = '${DatabaseHelper.ID} = ?';
 

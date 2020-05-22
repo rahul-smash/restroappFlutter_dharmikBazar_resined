@@ -93,7 +93,7 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
@@ -129,7 +129,7 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
@@ -165,7 +165,7 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"*/
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('---forgotPassword--${respStr}');
       final parsed = json.decode(respStr);
@@ -184,7 +184,7 @@ class ApiController {
         ApiConstants.getCategories;
     var request = new http.MultipartRequest("GET", Uri.parse(url));
 
-    final response = await request.send();
+    final response = await request.send().timeout(Duration(seconds: timeout));
     final respStr = await response.stream.bytesToString();
 
     final parsed = json.decode(respStr);
@@ -227,7 +227,7 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
       print("${url}");
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("${respStr}");
 
@@ -255,7 +255,7 @@ class ApiController {
         "method": "GET",
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
@@ -277,7 +277,7 @@ class ApiController {
 
     var request = new http.MultipartRequest("GET", Uri.parse(url));
     try {
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----url---${url}");
       print("----respStr---${respStr}");
@@ -300,7 +300,7 @@ class ApiController {
 
     var request = new http.MultipartRequest("GET", Uri.parse(url));
     try {
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----url---${url}");
       print("----respStr---${respStr}");
@@ -322,7 +322,7 @@ class ApiController {
 
     var request = new http.MultipartRequest("GET", Uri.parse(url));
     try {
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----url---${url}");
       print("----respStr---${respStr}");
@@ -379,7 +379,7 @@ class ApiController {
       print(
           '@@saveDeliveryAddressApiRequest' + url + request.fields.toString());
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
 
       print("---respStr>---${respStr}");
@@ -415,7 +415,7 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
 
@@ -447,7 +447,7 @@ class ApiController {
         request.fields["area_id"] = areaId;
       }
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
 
@@ -482,7 +482,7 @@ class ApiController {
       });
 
       print("----url---${url}");
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
@@ -518,7 +518,7 @@ class ApiController {
         "device_id": deviceId,
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
@@ -549,7 +549,7 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.placeOrder;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-    print("====${razorpay_order_id}==and ${razorpay_payment_id}===and ${online_method}======");
+    //print("==orderJson==${orderJson}====");
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
@@ -619,7 +619,7 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("--respStr--${respStr}--");
       final parsed = json.decode(respStr);
@@ -653,7 +653,7 @@ class ApiController {
         "query": queryString
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
 
@@ -678,7 +678,7 @@ class ApiController {
         "user_id": user.id,
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
 
@@ -709,7 +709,7 @@ class ApiController {
       });
       print('@@mobileVerification' + url + request.fields.toString());
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('--response===  $respStr');
       final parsed = json.decode(respStr);
@@ -747,7 +747,7 @@ class ApiController {
       });
       print('@@url' + url);
       print('@@fields' + request.fields.toString());
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('response' + respStr);
       final parsed = json.decode(respStr);
@@ -773,7 +773,7 @@ class ApiController {
     print('@@myOffersApiRequest' + url);
 
     try {
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('respStr' + respStr);
       final parsed = json.decode(respStr);
@@ -795,7 +795,7 @@ class ApiController {
     print('@@storeRadiusApi' + url);
 
     try {
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
@@ -823,7 +823,7 @@ class ApiController {
         "payment_capture": "1",
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('----respStr-----' + respStr);
       final parsed = json.decode(respStr);
@@ -847,7 +847,7 @@ class ApiController {
         "razorpay_order_id": razorpay_order_id,
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('----respStr-----' + respStr);
       final parsed = json.decode(respStr);
@@ -869,7 +869,7 @@ class ApiController {
         "email": username,
         "password": password
       });
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('----respStr-----' + respStr);
       final parsed = json.decode(respStr);
@@ -898,7 +898,7 @@ class ApiController {
         "device_id": deviceId,
       });
 
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('--response===  $respStr');
       final parsed = json.decode(respStr);
@@ -927,7 +927,7 @@ class ApiController {
         "currency":"usd"
       });
       print('--url===  $url');
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('--response===  $respStr');
       final parsed = json.decode(respStr);
@@ -953,7 +953,7 @@ class ApiController {
 
       });
       print('--url===  $url');
-      final response = await request.send();
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('--response===  $respStr');
       final parsed = json.decode(respStr);

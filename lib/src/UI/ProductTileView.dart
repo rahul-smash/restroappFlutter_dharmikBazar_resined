@@ -42,6 +42,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
     String discount = widget.product.discount.toString();
     String imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
 
+    bool variantsVisibility;
+    variantsVisibility = widget.product.variants != null && widget.product.variants.isNotEmpty &&
+        widget.product.variants.length > 1 ? true : false;
+
     return Container(
       color: Colors.white,
       child: Column(
@@ -64,12 +68,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                   Product product = widget.product;
                                   if(count == 1){
                                     product.isFav = "0";
-                                    Utils.showToast(AppConstant.favsRemoved, true);
+                                    //Utils.showToast(AppConstant.favsRemoved, true);
                                     await databaseHelper.delete
                                       (DatabaseHelper.Favorite_Table,int.parse(widget.product.id));
                                   }else if(count == 0){
                                     product.isFav = "1";
-                                    Utils.showToast(AppConstant.favsAdded, true);
+                                    //Utils.showToast(AppConstant.favsAdded, true);
                                     insertInFavTable(product,counter);
                                   }
                                   //print("--product.isFav-- ${product.isFav}");
@@ -113,15 +117,18 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         ],
                                       ),
                                       Visibility(
-                                        visible: widget.product.variants == null ? false:true,
+                                        visible: variantsVisibility,
                                         child: Padding(
                                           padding: EdgeInsets.only(top: 5),
                                           child: InkWell(
                                             onTap: () async {
-                                              print("");
-                                              Variant variant = await DialogUtils.displayVariantsDialog(context, "Variants", widget.product.variants);
-
-                                            },
+                                              print("-variants.length--${widget.product.variants.length}");
+                                              Variant variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
+                                              //print("-variants.id--${variant.toJson()}");
+                                              if(variant != null){
+                                                updateSelectedVariantInDb(widget.product,variant,counter);
+                                              }
+                                              },
                                             child: Row(
                                               children: <Widget>[
                                                 Text("${widget.product.variants == null ? "" : widget.product.variants[0].weight}",
@@ -187,6 +194,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
   Widget addPlusMinusView() {
     return Container(
+      margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
@@ -244,16 +252,17 @@ class _ProductTileItemState extends State<ProductTileItem> {
     Map<String, dynamic> row = {
       DatabaseHelper.ID: mId,
       DatabaseHelper.VARIENT_ID: product.variantId,
-      DatabaseHelper.PRODUCT_ID: product.id,
       DatabaseHelper.WEIGHT: product.weight,
-      DatabaseHelper.isFavorite: product.isFav,
       DatabaseHelper.MRP_PRICE: product.mrpPrice,
       DatabaseHelper.PRICE: product.price,
       DatabaseHelper.DISCOUNT: product.discount,
+      DatabaseHelper.UNIT_TYPE: product.isUnitType,
+
+      DatabaseHelper.PRODUCT_ID: product.id,
+      DatabaseHelper.isFavorite: product.isFav,
       DatabaseHelper.QUANTITY: quantity.toString(),
       DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
       DatabaseHelper.Product_Name: product.title,
-      DatabaseHelper.UNIT_TYPE: product.isUnitType,
       DatabaseHelper.nutrient: product.nutrient,
       DatabaseHelper.description: product.description,
       DatabaseHelper.imageType: product.imageType,
@@ -315,6 +324,35 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
     databaseHelper.addProductToFavTable(row).then((count) {
       print("-------count--------${count}-----");
+    });
+  }
+
+  void updateSelectedVariantInDb(Product product, Variant variant, int quantity) {
+    var mId = int.parse(product.id);
+
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID: mId,
+      DatabaseHelper.VARIENT_ID: variant.id,
+      DatabaseHelper.WEIGHT: variant.weight,
+      DatabaseHelper.MRP_PRICE: variant.mrpPrice,
+      DatabaseHelper.PRICE: variant.price,
+      DatabaseHelper.DISCOUNT: variant.discount,
+      DatabaseHelper.UNIT_TYPE: variant.unitType,
+
+      DatabaseHelper.PRODUCT_ID: product.id,
+      DatabaseHelper.isFavorite: product.isFav,
+      DatabaseHelper.QUANTITY: quantity.toString(),
+      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+      DatabaseHelper.Product_Name: product.title,
+      DatabaseHelper.nutrient: product.nutrient,
+      DatabaseHelper.description: product.description,
+      DatabaseHelper.imageType: product.imageType,
+      DatabaseHelper.imageUrl: product.imageUrl,
+      DatabaseHelper.image_100_80: product.image10080,
+      DatabaseHelper.image_300_200: product.image300200,
+    };
+    databaseHelper.updateProductInCart(row, mId).then((count) {
+      widget.callback();
     });
   }
 
