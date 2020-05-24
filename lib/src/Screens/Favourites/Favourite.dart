@@ -43,9 +43,7 @@ class _FavouritesState extends State<Favourites> {
                     return Container();
                   } else {
                     if (projectSnap.hasData) {
-
                       if(projectSnap.data.length == 0){
-
                         return Container(
                           child: Expanded(
                             child: Center(
@@ -65,11 +63,11 @@ class _FavouritesState extends State<Favourites> {
                             itemCount: projectSnap.data.length,
                             itemBuilder: (context, index) {
                               Product product = projectSnap.data[index];
+
                               return ProductTileItem(product, () {
                                 print("-------updateTotalPrice---------");
                                 bottomBar.state.updateTotalPrice();
                                 setState(() {
-
                                 });
                               },ClassType.Favourites);
                             },
