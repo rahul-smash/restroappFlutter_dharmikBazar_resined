@@ -33,13 +33,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
       counter = int.parse(cartData.QUANTITY);
       setState(() {});
     });
-    /*databaseHelper.checkIfProductsExistInCart(DatabaseHelper.Favorite_Table,widget.product.variantId).then((favValue){
+    databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,widget.product.id).then((favValue){
       //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
       setState(() {
         widget.product.isFav = favValue.toString();
         //print("-isFav-${widget.product.isFav}");
       });
-    });*/
+    });
   }
 
   @override
@@ -76,24 +76,38 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               InkWell(
                                 onTap: () async {
 
-                                  /*int count = await databaseHelper.checkIfProductsExistInDb
-                                    (DatabaseHelper.Favorite_Table,widget.product.variantId);
+                                  int count = await databaseHelper.checkProductsExistInFavTable
+                                    (DatabaseHelper.Favorite_Table,widget.product.id);
                                   //print("--ProductFavValue-- ${count}");
                                   Product product = widget.product;
                                   if(count == 1){
                                     product.isFav = "0";
                                     //Utils.showToast(AppConstant.favsRemoved, true);
-                                    await databaseHelper.delete(DatabaseHelper.Favorite_Table,variantId);
+                                    await databaseHelper.deleteFav(DatabaseHelper.Favorite_Table,product.id);
 
                                   }else if(count == 0){
+                                    String variantId, weight, mrpPrice, price, discount, isUnitType;
+                                    variantId = variant == null ? widget.product.variantId : variant.id;
+                                    weight = variant == null ? widget.product.weight : variant.weight;
+                                    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
+                                    price = variant == null ? widget.product.price : variant.price;
+                                    discount = variant == null ? widget.product.discount : variant.discount;
+                                    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
+
                                     product.isFav = "1";
+                                    product.variantId = variantId;
+                                    product.weight = weight;
+                                    product.mrpPrice = mrpPrice;
+                                    product.price = price;
+                                    product.discount = discount;
+                                    product.isUnitType = isUnitType;
                                     //Utils.showToast(AppConstant.favsAdded, true);
                                     insertInFavTable(product,counter);
                                   }
                                   //print("--product.isFav-- ${product.isFav}");
                                   widget.callback();
                                   setState(() {
-                                  });*/
+                                  });
                                 },
                                 child: Utils.showFavIcon(widget.product.isFav),
                                 //child: Image.asset("images/myfav.png", width: 25),
@@ -299,7 +313,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
     databaseHelper.checkIfProductsExistInDb(DatabaseHelper.CART_Table, variantId)
         .then((count) {
-      print("-count-- ${count}");
+      //print("-count-- ${count}");
       if (count == 0) {
         databaseHelper.addProductToCart(row).then((count) {
           widget.callback();
@@ -330,12 +344,18 @@ class _ProductTileItemState extends State<ProductTileItem> {
   void insertInFavTable(Product product, int quantity) {
     var mId = int.parse(product.id);
 
+    /*Product product = widget.product;
+    print("${product.toJson()}");
+    Product product1 = Product.fromJson(product.toJson());
+    print("${product1.variants.length}");*/
+
     Map<String, dynamic> row = {
       DatabaseHelper.ID: mId,
       DatabaseHelper.VARIENT_ID: product.variantId,
       DatabaseHelper.PRODUCT_ID: product.id,
       DatabaseHelper.WEIGHT: product.weight,
       DatabaseHelper.isFavorite: product.isFav,
+      DatabaseHelper.Product_Json: "${product.toJson()}",
       DatabaseHelper.MRP_PRICE: product.mrpPrice,
       DatabaseHelper.PRICE: product.price,
       DatabaseHelper.DISCOUNT: product.discount,

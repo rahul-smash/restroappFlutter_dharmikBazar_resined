@@ -32,6 +32,7 @@ class DatabaseHelper {
   static final String DISCOUNT = "discount";
   static final String QUANTITY = "quantity";
   static final String isFavorite = "isfavorite";
+  static final String Product_Json = "product_json";
   static final String IS_TAX_ENABLE = "isTaxEnable";
   static final String Product_Name = "product_name";
   static final String UNIT_TYPE = "unit_type";
@@ -106,6 +107,7 @@ class DatabaseHelper {
         ")");
     await db.execute("CREATE TABLE ${Favorite_Table}("
         "id INTEGER, "
+        "product_json TEXT, "
         "product_name TEXT, "
         "isfavorite TEXT, "
         "nutrient TEXT, "
@@ -291,7 +293,7 @@ class DatabaseHelper {
     List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
-      MRP_PRICE,PRICE,DISCOUNT,isFavorite,QUANTITY,Product_Name,
+      MRP_PRICE,PRICE,DISCOUNT,isFavorite,QUANTITY,Product_Name,Product_Json,
       VARIENT_ID,WEIGHT,PRODUCT_ID,UNIT_TYPE,IS_TAX_ENABLE,nutrient,
       description,imageType,imageUrl,image_100_80,image_300_200
     ];
@@ -310,6 +312,7 @@ class DatabaseHelper {
         product.isFav = row[isFavorite];
         product.discount = row[DISCOUNT];
         product.quantity = row[QUANTITY];
+        product.productJson = row[Product_Json];
         product.title = row[Product_Name];
         product.variantId = row[VARIENT_ID];
         product.weight = row[WEIGHT];
@@ -344,13 +347,23 @@ class DatabaseHelper {
     return ((val * mod).round().toDouble() / mod);
   }
 
+  Future<int> checkProductsExistInFavTable(String table, String product_id) async {
+    //database connection
+    var dbClient = await db;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT * from $table where ${ID} = $product_id');
+    int count = list.length;
+    //print("-checkProductsExistInFavTable-- ${count}");
+    return count;
+  }
+
   Future<int> checkIfProductsExistInDb(String table, String variant_id) async {
     //database connection
     var dbClient = await db;
     List<Map> list = await dbClient
         .rawQuery('SELECT * from $table where ${VARIENT_ID} = $variant_id');
     int count = list.length;
-    print("-checkIfProductsExist-- ${count}");
+    //print("-checkIfProductsExist-- ${count}");
     return count;
   }
 
@@ -360,6 +373,11 @@ class DatabaseHelper {
     var x = await dbClient.rawQuery('SELECT COUNT (*) from $table');
     int count = Sqflite.firstIntValue(x);
     return count;
+  }
+
+  Future<int> deleteFav(String table, String product_Id) async {
+    var dbClient = await db;
+    return await dbClient.delete(table, where: '$ID = ?', whereArgs: [product_Id]);
   }
 
   Future<int> delete(String table, String variant_Id) async {
