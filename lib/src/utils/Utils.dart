@@ -164,3 +164,6 @@ class Utils {
   }
 
 }
+enum ClassType {
+  CART,SubCategory,Favourites,
+}

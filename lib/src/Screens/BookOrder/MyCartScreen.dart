@@ -37,7 +37,7 @@ class MyCartScreen extends StatelessWidget {
                   } else {
                     if (projectSnap.hasData) {
 
-                      print("--length---${projectSnap.data.length}----");
+                      //print("--length---${projectSnap.data.length}----");
 
                       if(projectSnap.data.length == 0){
 
@@ -62,7 +62,7 @@ class MyCartScreen extends StatelessWidget {
                               Product product = projectSnap.data[index];
                               return ProductTileItem(product, () {
                                 bottomBar.state.updateTotalPrice();
-                              });
+                              },ClassType.CART);
                             },
                           ),
                         );

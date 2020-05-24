@@ -58,11 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       print("-----store.banners-----${store.banners.length}------");
       if (store.banners.isEmpty) {
-        imgList = [
-          NetworkImage(AppConstant.placeholderImageUrl),
-          NetworkImage(AppConstant.placeholderImageUrl),
-          NetworkImage(AppConstant.placeholderImageUrl),
-        ];
+        imgList = [NetworkImage(AppConstant.placeholderImageUrl)];
       } else {
         for (var i = 0; i < store.banners.length; i++) {
           String imageUrl = store.banners[i].image;
