@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
@@ -62,10 +64,13 @@ class _FavouritesState extends State<Favourites> {
                             shrinkWrap: true,
                             itemCount: projectSnap.data.length,
                             itemBuilder: (context, index) {
-                              Product product = projectSnap.data[index];
 
-                              return ProductTileItem(product, () {
-                                print("-------updateTotalPrice---------");
+                              Product product = projectSnap.data[index];
+                              Map<String, dynamic> map = jsonDecode(product.productJson);
+                              Product productData = Product.fromJson(map);
+
+                              return ProductTileItem(productData, () {
+                                //print("-------updateTotalPrice---------");
                                 bottomBar.state.updateTotalPrice();
                                 setState(() {
                                 });

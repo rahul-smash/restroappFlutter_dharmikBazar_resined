@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
@@ -343,11 +345,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
   void insertInFavTable(Product product, int quantity) {
     var mId = int.parse(product.id);
-
-    /*Product product = widget.product;
-    print("${product.toJson()}");
-    Product product1 = Product.fromJson(product.toJson());
-    print("${product1.variants.length}");*/
+    String productJson = JsonEncoder().convert(product.toJson());
+    //print("${productJson}");
 
     Map<String, dynamic> row = {
       DatabaseHelper.ID: mId,
@@ -355,7 +354,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       DatabaseHelper.PRODUCT_ID: product.id,
       DatabaseHelper.WEIGHT: product.weight,
       DatabaseHelper.isFavorite: product.isFav,
-      DatabaseHelper.Product_Json: "${product.toJson()}",
+      DatabaseHelper.Product_Json: productJson,
       DatabaseHelper.MRP_PRICE: product.mrpPrice,
       DatabaseHelper.PRICE: product.price,
       DatabaseHelper.DISCOUNT: product.discount,
