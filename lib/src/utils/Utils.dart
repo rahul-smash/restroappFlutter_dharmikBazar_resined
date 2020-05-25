@@ -19,7 +19,7 @@ class Utils {
         Fluttertoast.showToast(
             msg: msg,
             toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
+            gravity: ToastGravity.BOTTOM,
             timeInSecForIos: 1,
             backgroundColor: appTheme,
             textColor: Colors.white,
@@ -27,8 +27,8 @@ class Utils {
       } else {
         Fluttertoast.showToast(
             msg: msg,
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.CENTER,
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
             timeInSecForIos: 1,
             backgroundColor: appTheme,
             textColor: Colors.white,
@@ -163,4 +163,7 @@ class Utils {
     );
   }
 
+}
+enum ClassType {
+  CART,SubCategory,Favourites,
 }

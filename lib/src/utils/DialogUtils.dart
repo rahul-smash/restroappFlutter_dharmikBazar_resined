@@ -53,7 +53,6 @@ class DialogUtils {
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: (){
-
           },
           child: AlertDialog(
             shape: RoundedRectangleBorder(
@@ -65,9 +64,10 @@ class DialogUtils {
                 children: <Widget>[
                   Text(note,textAlign: TextAlign.center,),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Container(
-                        margin: EdgeInsets.all(20),
+                        //margin: EdgeInsets.all(10),
                         child: FlatButton(
                           child: Text('Offline'),
                           color: appTheme,
@@ -78,7 +78,7 @@ class DialogUtils {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.all(20),
+                        //margin: EdgeInsets.all(10),
                         child: FlatButton(
                           child: Text('Online'),
                           color: appTheme,

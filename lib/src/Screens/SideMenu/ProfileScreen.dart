@@ -89,6 +89,8 @@ class _ProfileState extends State<ProfileScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 8.0),
                   child: TextField(
+                      keyboardType: TextInputType.phone,
+                      readOnly: widget.isComingFromOtpScreen ? false : true,
                       controller: phoneController,
                      // onChanged: (v) => phoneController.text = v,
                       decoration: InputDecoration(

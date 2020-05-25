@@ -71,9 +71,7 @@ class SubCategoryProductScreen extends StatelessWidget {
               Utils.showToast("No data found!", true);
             }
             if (response.success) {
-
               SubCategoryModel subCategory = response.subCategories.first;
-
               return ListView.builder(
                 itemCount: subCategory.products.length,
                 itemBuilder: (context, index) {
@@ -81,7 +79,7 @@ class SubCategoryProductScreen extends StatelessWidget {
                   return ProductTileItem(product, () {
 
                     bottomBar.state.updateTotalPrice();
-                  });
+                  },ClassType.SubCategory);
                 },
               );
 

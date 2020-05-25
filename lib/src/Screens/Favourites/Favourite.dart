@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class Favourites extends StatefulWidget {
 
@@ -42,9 +45,7 @@ class _FavouritesState extends State<Favourites> {
                     return Container();
                   } else {
                     if (projectSnap.hasData) {
-
                       if(projectSnap.data.length == 0){
-
                         return Container(
                           child: Expanded(
                             child: Center(
@@ -63,14 +64,17 @@ class _FavouritesState extends State<Favourites> {
                             shrinkWrap: true,
                             itemCount: projectSnap.data.length,
                             itemBuilder: (context, index) {
+
                               Product product = projectSnap.data[index];
-                              return ProductTileItem(product, () {
-                                print("-------updateTotalPrice---------");
+                              Map<String, dynamic> map = jsonDecode(product.productJson);
+                              Product productData = Product.fromJson(map);
+
+                              return ProductTileItem(productData, () {
+                                //print("-------updateTotalPrice---------");
                                 bottomBar.state.updateTotalPrice();
                                 setState(() {
-
                                 });
-                              });
+                              },ClassType.Favourites);
                             },
                           ),
                         );

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:sqflite/sqflite.dart';
@@ -31,6 +32,7 @@ class DatabaseHelper {
   static final String DISCOUNT = "discount";
   static final String QUANTITY = "quantity";
   static final String isFavorite = "isfavorite";
+  static final String Product_Json = "product_json";
   static final String IS_TAX_ENABLE = "isTaxEnable";
   static final String Product_Name = "product_name";
   static final String UNIT_TYPE = "unit_type";
@@ -82,25 +84,9 @@ class DatabaseHelper {
         "deleted TEXT, "
         "sort TEXT"
         ")");
-    /*await db.execute("CREATE TABLE ${Products_Table}("
-        "id INTEGER PRIMARY KEY, "
-        "store_id TEXT, "
-        "category_ids TEXT, "
-        "title TEXT, "
-        "brand TEXT, "
-        "nutrient TEXT, "
-        "description TEXT, "
-        "tags TEXT, "
-        "image TEXT, "
-        "show_price TEXT, "
-        "isTaxEnable TEXT, "
-        "image_100_80 TEXT, "
-        "image_300_200 TEXT, "
-        "image_300_200 TEXT, "
-        "variants TEXT"
-        ")");*/
     await db.execute("CREATE TABLE ${CART_Table}("
-        "id INTEGER PRIMARY KEY, "
+        //"id INTEGER PRIMARY KEY, "
+        "id INTEGER, "
         "product_name TEXT, "
         "isfavorite TEXT, "
         "nutrient TEXT, "
@@ -120,7 +106,8 @@ class DatabaseHelper {
         "unit_type TEXT"
         ")");
     await db.execute("CREATE TABLE ${Favorite_Table}("
-        "id INTEGER PRIMARY KEY, "
+        "id INTEGER, "
+        "product_json TEXT, "
         "product_name TEXT, "
         "isfavorite TEXT, "
         "nutrient TEXT, "
@@ -166,6 +153,7 @@ class DatabaseHelper {
   Future<int> addProductToCart(Map<String, dynamic> row) async {
     var dbClient = await db;
     int res = await dbClient.insert(CART_Table, row);
+    print("-insert Products-- ${res}");
     return res;
   }
 
@@ -177,25 +165,26 @@ class DatabaseHelper {
   }
 
 
-  Future<int> updateProductInCart(Map<String, dynamic> row, int product_id) async {
+  Future<int> updateProductInCart(Map<String, dynamic> row, String variantId) async {
     var dbClient = await db;
     return dbClient.update(CART_Table,
         row,
-        where: "${ID} = ?",
-        whereArgs: [product_id]
+        where: "${VARIENT_ID} = ?",
+        whereArgs: [variantId]
     );
   }
 
-  Future<String> getProductQuantitiy(int product_id) async {
+  Future<CartData> getProductQuantitiy(String variantId) async {
+    CartData cartData;
     String count = "0";
     //database connection
     var dbClient = await db;
     // get single row
-    List<String> columnsToSelect = [QUANTITY];
+    List<String> columnsToSelect=[QUANTITY,VARIENT_ID,WEIGHT,MRP_PRICE,PRICE,DISCOUNT];
 
-    String whereClause = '${DatabaseHelper.ID} = ?';
+    String whereClause = '${DatabaseHelper.VARIENT_ID} = ?';
 
-    List<dynamic> whereArguments = [product_id];
+    List<dynamic> whereArguments = [variantId];
 
     List<Map> result = await dbClient.query(CART_Table, columns: columnsToSelect,where: whereClause,whereArgs: whereArguments);
     // print the results
@@ -203,15 +192,19 @@ class DatabaseHelper {
       //print("---result.length--- ${result.length}");
       result.forEach((row) {
         //print("-1-quantity--- ${row['quantity']}");
+        cartData = new CartData();
         count = row[QUANTITY];
+        cartData.QUANTITY = count;
         //return count;
       });
     } else {
       //print("-X-quantity--- return 0");
       //return count;
+      cartData = new CartData();
       count = "0";
+      cartData.QUANTITY = count;
     }
-    return count;
+    return cartData;
   }
 
   /*
@@ -300,7 +293,7 @@ class DatabaseHelper {
     List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
-      MRP_PRICE,PRICE,DISCOUNT,isFavorite,QUANTITY,Product_Name,
+      MRP_PRICE,PRICE,DISCOUNT,isFavorite,QUANTITY,Product_Name,Product_Json,
       VARIENT_ID,WEIGHT,PRODUCT_ID,UNIT_TYPE,IS_TAX_ENABLE,nutrient,
       description,imageType,imageUrl,image_100_80,image_300_200
     ];
@@ -319,6 +312,7 @@ class DatabaseHelper {
         product.isFav = row[isFavorite];
         product.discount = row[DISCOUNT];
         product.quantity = row[QUANTITY];
+        product.productJson = row[Product_Json];
         product.title = row[Product_Name];
         product.variantId = row[VARIENT_ID];
         product.weight = row[WEIGHT];
@@ -353,11 +347,21 @@ class DatabaseHelper {
     return ((val * mod).round().toDouble() / mod);
   }
 
-  Future<int> checkIfProductsExistInCart(String table, int product_id) async {
+  Future<int> checkProductsExistInFavTable(String table, String product_id) async {
     //database connection
     var dbClient = await db;
     List<Map> list = await dbClient
         .rawQuery('SELECT * from $table where ${ID} = $product_id');
+    int count = list.length;
+    //print("-checkProductsExistInFavTable-- ${count}");
+    return count;
+  }
+
+  Future<int> checkIfProductsExistInDb(String table, String variant_id) async {
+    //database connection
+    var dbClient = await db;
+    List<Map> list = await dbClient
+        .rawQuery('SELECT * from $table where ${VARIENT_ID} = $variant_id');
     int count = list.length;
     //print("-checkIfProductsExist-- ${count}");
     return count;
@@ -371,9 +375,14 @@ class DatabaseHelper {
     return count;
   }
 
-  Future<int> delete(String table, int id) async {
+  Future<int> deleteFav(String table, String product_Id) async {
     var dbClient = await db;
-    return await dbClient.delete(table, where: '$ID = ?', whereArgs: [id]);
+    return await dbClient.delete(table, where: '$ID = ?', whereArgs: [product_Id]);
+  }
+
+  Future<int> delete(String table, String variant_Id) async {
+    var dbClient = await db;
+    return await dbClient.delete(table, where: '$VARIENT_ID = ?', whereArgs: [variant_Id]);
   }
 
   Future<int> deleteTable(String table) async {

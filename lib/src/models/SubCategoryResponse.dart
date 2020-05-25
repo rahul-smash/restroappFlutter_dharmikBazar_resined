@@ -114,7 +114,7 @@ class Product {
   String isUnitType;
 
   String quantity;
-
+  String productJson="";
 
   Product({
     this.id,
