@@ -25,6 +25,8 @@ import 'package:restroapp/src/utils/version_check.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
+import 'SearchScreen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
@@ -89,6 +91,15 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Image.asset('images/hamburger.png', width: 25),
           onPressed: _handleDrawer,
         ),
+        actions: <Widget>[
+          IconButton(icon: Icon(Icons.search),
+              onPressed: () async {
+                var result = await Navigator.push(context, MaterialPageRoute(
+                  builder: (BuildContext context) => SearchScreen(),
+                  fullscreenDialog: true,)
+                );
+                //print("-onPressed-${result}---");
+              })],
       ),
       body: Column(
         children: <Widget>[

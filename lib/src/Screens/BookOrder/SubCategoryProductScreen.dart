@@ -24,16 +24,6 @@ class SubCategoryProductScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text(categoryModel.title),
           centerTitle: true,
-          actions: <Widget>[
-            IconButton(icon: Icon(Icons.search),
-              onPressed: () async {
-              Navigator.pop(context);
-                var result = await Navigator.push(context, MaterialPageRoute(
-                  builder: (BuildContext context) => SearchScreen(),
-                  fullscreenDialog: true,)
-                );
-                print("-onPressed-${result}---");
-              })],
         ),
         body: Column(children: <Widget>[
           TabBar(
