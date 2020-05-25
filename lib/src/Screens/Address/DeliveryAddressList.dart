@@ -42,8 +42,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   @override
   Widget build(BuildContext context) {
-    print("------Widget build------AddDelivery-${addressList.length}---");
-
     return Scaffold(
       appBar: AppBar(
           title: Text("Delivery Addresses"),
@@ -185,12 +183,16 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     print("=====getAddressList==========");
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses){
+      print("====called then future completes====");
       Utils.hideProgressDialog(context);
       DeliveryAddressResponse response = responses;
       setState(() {
         //Utils.hideProgressDialog(context);
         addressList = response.data;
       });
+    }).whenComplete(() {
+      Utils.hideProgressDialog(context);
+      print("====called when future completes====");
     });
   }
 
@@ -325,6 +327,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 print("-x-result--${result}-------");
                 if(result){
                   getAddressList();
+                }else{
+
                 }
               },
             ),
