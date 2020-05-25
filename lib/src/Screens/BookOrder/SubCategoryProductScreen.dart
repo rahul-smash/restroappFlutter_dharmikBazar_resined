@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/Dashboard/SearchScreen.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -21,8 +22,18 @@ class SubCategoryProductScreen extends StatelessWidget {
       length: categoryModel.subCategory.length,
       child: Scaffold(
         appBar: AppBar(
-            title: Text(categoryModel.title),
-            centerTitle: true,
+          title: Text(categoryModel.title),
+          centerTitle: true,
+          actions: <Widget>[
+            IconButton(icon: Icon(Icons.search),
+              onPressed: () async {
+              Navigator.pop(context);
+                var result = await Navigator.push(context, MaterialPageRoute(
+                  builder: (BuildContext context) => SearchScreen(),
+                  fullscreenDialog: true,)
+                );
+                print("-onPressed-${result}---");
+              })],
         ),
         body: Column(children: <Widget>[
           TabBar(

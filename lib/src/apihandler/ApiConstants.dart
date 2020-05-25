@@ -10,6 +10,10 @@ class ApiConstants{
   static String getCategories = 'getCategories';
   static String getProducts = 'getSubCategoryProducts/';
 
+  static String search = 'searchProducts';
+  static String getTagsList = 'getTagsList';
+
+
   static String getAddress = 'deliveryAddress';
   static String getAddressArea = 'deliveryAreas/Area';
   static String getStorePickupAddress = 'storePickupAddress';

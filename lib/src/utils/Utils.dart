@@ -39,6 +39,10 @@ class Utils {
     }
   }
 
+  static void hideKeyboard(BuildContext context){
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
+
   static void showLoginDialog(BuildContext context) {
     // flutter defined function
     showDialog(
@@ -147,8 +151,6 @@ class Utils {
   }
 
   static Widget getEmptyView(String value){
-
-
     return  Container(
       child: Expanded(
         child: Center(
@@ -163,7 +165,20 @@ class Utils {
     );
   }
 
+  static Widget getEmptyView2(String value){
+    return  Container(
+      child: Center(
+        child: Text(value,
+            overflow: TextOverflow.ellipsis,
+            style: new TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
+            )),
+      ),
+    );
+  }
+
 }
 enum ClassType {
-  CART,SubCategory,Favourites,
+  CART,SubCategory,Favourites,Search
 }
