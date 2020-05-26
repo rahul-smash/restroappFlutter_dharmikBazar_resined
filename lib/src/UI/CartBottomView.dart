@@ -38,14 +38,9 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
   void getAddresKey() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     store = await SharedPrefs.getStore();
-   /* SharedPrefs.storeSharedValue(
-        AppConstant.app_OLD_VERISON, store.version);
-*/
     setState(() {
       pickupfacility = store.pickupFacility;
       delieveryAdress = store.deliveryFacility;
-
-   //   print('@@HomeModel   '+pickupfacility+'  Delievery'+delieveryAdress+prefs.getString(AppConstant.app_OLD_VERISON));
     });
   }
   updateTotalPrice() {
@@ -202,4 +197,5 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
 enum ParentInfo {
   productList,
   cartList,
+  favouritesList,
 }

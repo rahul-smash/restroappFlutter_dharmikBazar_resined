@@ -581,7 +581,7 @@ class ApiController {
         "delivery_time_slot": selectedDeliverSlotValue,
       });
 
-      print("----${url}--");
+      print("----${url}");
       print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();

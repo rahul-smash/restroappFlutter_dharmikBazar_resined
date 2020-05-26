@@ -659,13 +659,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             print("--json == null-json == null-");
             return;
           }
-
-          //2020-05-24, 11:00 AM - 12:00 PM
           String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
           String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
-          print("slotDate.date= ${Utils.convertDateFormat(slotDate)}, ${timeSlot}");
-          String selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)}, ${timeSlot}";
-
+          String selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
+          print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
 
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,

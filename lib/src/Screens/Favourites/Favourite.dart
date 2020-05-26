@@ -19,7 +19,7 @@ class Favourites extends StatefulWidget {
 }
 
 class _FavouritesState extends State<Favourites> {
-  final CartTotalPriceBottomBar bottomBar = CartTotalPriceBottomBar(ParentInfo.cartList);
+  final CartTotalPriceBottomBar bottomBar = CartTotalPriceBottomBar(ParentInfo.productList);
 
   final DatabaseHelper databaseHelper = new DatabaseHelper();
 
