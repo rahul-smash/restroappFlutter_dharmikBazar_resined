@@ -507,15 +507,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             return;
           }
 
-          if(storeObject.deliverySlot == "1" && !isSlotSelected){
-            Utils.showToast("Please select delivery slot", false);
-            return;
+          if(storeObject.deliverySlot == "0"){
+            selectedDeliverSlotValue = "";
           }else{
-            String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
-            String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
-            selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
-            print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
+            if(storeObject.deliverySlot == "1" && !isSlotSelected){
+              Utils.showToast("Please select delivery slot", false);
+              return;
+            }else{
+              String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
+              String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+              selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
+              print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
+            }
           }
+
           if(widget.paymentMode == "3"){
             if(storeObject.paymentGateway == "Razorpay"){
               callOrderIdApi(storeObject);
