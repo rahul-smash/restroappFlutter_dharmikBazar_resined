@@ -114,9 +114,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                             print("----radiusArea = result-------");
                             Utils.showProgressDialog(context);
                             DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                            Utils.hideProgressDialog(context);
                             setState(() {
                               print("----setState-------");
-                              Utils.hideProgressDialog(context);
                               addressList = response.data;
                             });
                           }
@@ -146,16 +146,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             IconButton(
-                icon: const Icon(
-                  Icons.add_circle_outline,
-                  color: Colors.white,
-                  size: 35.0,
-                ),
+                icon: Icon(Icons.add_circle_outline,color: Colors.white,size: 35.0,),
                 padding: const EdgeInsets.all(0),
                 onPressed: () {}),
-            Text(
-              "Add Delivery Address",
-              style: TextStyle(color: Colors.white, fontSize: 18.0),
+            Text("Add Delivery Address",style: TextStyle(color: Colors.white, fontSize: 18.0),
             ),
           ],
         ),
@@ -230,10 +224,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Icon(
-            icon,
-            color: Colors.grey,
-          ),
+          Icon(icon, color: Colors.grey,),
           Padding(
             padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
             child: SizedBox(
@@ -265,11 +256,11 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 var result = await Navigator.push(context,
                     MaterialPageRoute(
                       builder: (BuildContext context) =>SaveDeliveryAddress(area, () {
-                        print('@@------SaveDeliveryAddress----------');
+                        print('@@---Edit---SaveDeliveryAddress----------');
                       },"",coordinates),
                       fullscreenDialog: true,
                     ));
-                print("-x-result--${result}-------");
+                print("-Edit-result--${result}-------");
                 if(result){
                   Utils.showProgressDialog(context);
                   DeliveryAddressResponse response = await ApiController.getAddressApiRequest();

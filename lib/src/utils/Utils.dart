@@ -112,8 +112,15 @@ class Utils {
 
   static void hideProgressDialog(BuildContext context) {
     //For normal dialog
-    if (pr != null && pr.isShowing()) {
-      pr.hide();
+    try {
+      if (pr != null && pr.isShowing()) {
+            pr.hide();
+      }else{
+        if (pr != null)
+        pr.hide();
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
