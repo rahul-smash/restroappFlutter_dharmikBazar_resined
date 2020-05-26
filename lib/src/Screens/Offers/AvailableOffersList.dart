@@ -139,9 +139,10 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
 
   void validateCouponApi(String couponCode, String json) {
     //print("----couponCode-----=>${couponCode}");
-    ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json)
-        .then((validCouponModel) {
+    ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json).then((validCouponModel) {
       if (validCouponModel != null &&validCouponModel.success) {
+
+        Utils.showToast(validCouponModel.message, true);
 
         ApiController.multipleTaxCalculationRequest(couponCode,validCouponModel.discountAmount, "0", json)
             .then((response) async {

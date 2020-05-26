@@ -11,6 +11,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -47,11 +48,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   static const platform = const MethodChannel("razorpay_flutter");
   Razorpay _razorpay;
   FlutterWebView flutterWebView = new FlutterWebView();
+  StoreModel storeModel;
+  DeliveryTimeSlotModel deliverySlotModel;
+  int selctedTag, selectedTimeSlot;
+  List<Timeslot> timeslotList;
 
   @override
   void initState() {
     super.initState();
     initRazorPay();
+    selctedTag = 0;
     try {
       if(widget.address != null){
             if(widget.address.areaCharges != null){
@@ -61,12 +67,39 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     } catch (e) {
       print(e);
     }
+    try {
+      databaseHelper.getTotalPrice().then((mTotalPrice) {
+            setState(() {
+              totalPrice = mTotalPrice;
+            });
+          });
+    } catch (e) {
+      print(e);
+    }
+    try {
+      SharedPrefs.getStore().then((storeData){
+        storeModel = storeData;
+        if(storeModel.deliverySlot == "1"){
+          ApiController.deliveryTimeSlotApi().then((response){
+            setState(() {
+              deliverySlotModel = response;
+              timeslotList = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot;
 
-    databaseHelper.getTotalPrice().then((mTotalPrice) {
-      setState(() {
-        totalPrice = mTotalPrice;
+              for(int i = 0; i < timeslotList.length; i++){
+                Timeslot timeslot = timeslotList[i];
+                if(timeslot.isEnable){
+                  selectedTimeSlot = i;
+                  break;
+                }
+              }
+            });
+          });
+        }
+
       });
-    });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -78,6 +111,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
           title: Text("Confirm Order"),
@@ -108,6 +142,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     border: InputBorder.none,
                   ),
                 ))),
+        showDeliverySlot(),
         Expanded(child: FutureBuilder(
           future: databaseHelper.getCartItemList(),
           builder: (context, projectSnap) {
@@ -149,6 +184,150 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
+  Widget showDeliverySlot(){
+    Color selectedSlotColor, textColor;
+    if(deliverySlotModel == null){
+      return Container();
+    }else{
+      //print("--length = ${deliverySlotModel.data.dateTimeCollection.length}----");
+      if(deliverySlotModel.data != null && deliverySlotModel.data.dateTimeCollection != null &&
+          deliverySlotModel.data.dateTimeCollection.isNotEmpty){
+        return Padding(
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    child: Text("When would you like your service?"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    child: Text("${Utils.getDate()}"),
+                  ),
+                  Container(
+                      margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      height: 1,
+                      width: MediaQuery.of(context).size.width,
+                      color: Color(0xFFBDBDBD)
+                  ),
+                  Container(
+                    //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                    height: 50.0,
+                    child: ListView.builder(
+                      itemCount: deliverySlotModel.data.dateTimeCollection.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        DateTimeCollection slotsObject = deliverySlotModel.data.dateTimeCollection[index];
+                        if(selctedTag == index){
+                          selectedSlotColor = Color(0xFFEEEEEE);
+                          textColor = Color(0xFFff4600);
+                        }else{
+                          selectedSlotColor = Color(0xFFFFFFFF);
+                          textColor = Color(0xFF000000);
+                        }
+                        return Container(
+                          color: selectedSlotColor,
+                          margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: InkWell(
+                            onTap: (){
+                              print("${slotsObject.timeslot.length}");
+                              setState(() {
+                                selctedTag = index;
+                                timeslotList = slotsObject.timeslot;
+                                //selectedTimeSlot = 0;
+                                //print("timeslotList=${timeslotList.length}");
+                                for(int i = 0; i < timeslotList.length; i++){
+                                  //print("isEnable=${timeslotList[i].isEnable}");
+                                  Timeslot timeslot = timeslotList[i];
+                                  if(timeslot.isEnable){
+                                    selectedTimeSlot = i;
+                                    break;
+                                  }
+                                }
+
+                              });
+                            },
+                            child: Container(
+                              child: Center(
+                                child: Text(' ${Utils.convertStringToDate(slotsObject.label)} ',
+                                    style: TextStyle(color: textColor)),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      height: 1,
+                      width: MediaQuery.of(context).size.width,
+                      color: Color(0xFFBDBDBD)
+                  ),
+                  Container(
+                    //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                    height: 50.0,
+                    child: ListView.builder(
+                      itemCount: timeslotList.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        Timeslot slotsObject = timeslotList[index];
+                        print("----${slotsObject.label}-and ${selctedTag}--");
+
+                        //selectedTimeSlot
+                        Color textColor;
+                        if(!slotsObject.isEnable){
+                          textColor = Color(0xFFBDBDBD);
+                        }else{
+                          textColor = Color(0xFF000000);
+                        }
+                        if(selectedTimeSlot == index && (slotsObject.isEnable)){
+                          textColor = Color(0xFFff4600);
+                        }
+
+                        return Container(
+                          //color: selectedSlotColor,
+                          margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: InkWell(
+                            onTap: (){
+                              print("${slotsObject.label}");
+                              if(slotsObject.isEnable){
+                                setState(() {
+                                  selectedTimeSlot = index;
+                                });
+                              }else{
+                                Utils.showToast(slotsObject.innerText, false);
+                              }
+                            },
+                            child: Container(
+                              child: Center(
+                                child: Text('${slotsObject.isEnable == true ? slotsObject.label :
+                                "${slotsObject.label}(${slotsObject.innerText})"}',
+                                    style: TextStyle(color: textColor)
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }else{
+        return Container();
+      }
+    }
+  }
+
+
   Widget addProductCart(Product product) {
     return Container(
         padding: EdgeInsets.fromLTRB(15, 0, 20, 0),
@@ -176,6 +355,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           ],
         ));
   }
+
 
   Widget addItemPrice() {
 
@@ -479,10 +659,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             print("--json == null-json == null-");
             return;
           }
+
+          //2020-05-24, 11:00 AM - 12:00 PM
+          String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
+          String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+          print("slotDate.date= ${Utils.convertDateFormat(slotDate)}, ${timeSlot}");
+          String selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)}, ${timeSlot}";
+
+
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,
               widget.isComingFromPickUpScreen,widget.areaId ,
-              payment_request_id,payment_id,onlineMethod).then((response) {
+              payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) {
             Utils.hideProgressDialog(context);
             if(response == null){
               print("--response == null-response == null-");

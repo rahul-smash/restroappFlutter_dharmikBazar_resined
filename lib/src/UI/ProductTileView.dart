@@ -145,6 +145,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                           Text("\$${widget.product.discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
                                           Text(" "),
                                           Text("\$${widget.product.price}"),
+                                          //Text('\u{20B9}'),
                                         ],
                                       ),
                                       Visibility(
@@ -155,13 +156,14 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             onTap: () async {
                                               //print("-variants.length--${widget.product.variants.length}");
                                               variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
-
-                                              databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                                                //print("QUANTITY= ${cartDataObj.QUANTITY}");
-                                                cartData = cartDataObj;
-                                                counter = int.parse(cartData.QUANTITY);
-                                                setState(() {});
-                                              });
+                                              if(variant != null){
+                                                databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
+                                                  //print("QUANTITY= ${cartDataObj.QUANTITY}");
+                                                  cartData = cartDataObj;
+                                                  counter = int.parse(cartData.QUANTITY);
+                                                  setState(() {});
+                                                });
+                                              }
                                               },
                                             child: Row(
                                               children: <Widget>[

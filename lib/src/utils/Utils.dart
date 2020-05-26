@@ -1,7 +1,9 @@
+import 'dart:core';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:intl/intl.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
@@ -165,6 +167,32 @@ class Utils {
     );
   }
 
+  static String getDate(){
+    var now = new DateTime.now();
+    var formatter = new DateFormat('MMM yyyy');
+    String formatted = formatter.format(now);
+    //print(formatted); // something like 2013-04-20
+    return formatted;
+  }
+
+  static convertStringToDate(String dateObj){
+    DateFormat dateFormat = DateFormat("dd MMM yyyy");
+    DateTime dateTime = dateFormat.parse(dateObj);
+    DateFormat formatter = new DateFormat('dd MMM');
+    String formatted = formatter.format(dateTime);
+    //print(formatted);
+    return formatted;
+  }
+
+  static convertDateFormat(String dateObj){
+    DateFormat dateFormat = DateFormat("dd MMM yyyy");
+    DateTime dateTime = dateFormat.parse(dateObj);
+    DateFormat formatter = new DateFormat('yyyy-MM-dd');
+    String formatted = formatter.format(dateTime);
+    //print(formatted);
+    return formatted;
+  }
+
   static Widget getEmptyView2(String value){
     return  Container(
       child: Center(
@@ -177,8 +205,14 @@ class Utils {
       ),
     );
   }
-
 }
+
+
+
+
+
+
 enum ClassType {
   CART,SubCategory,Favourites,Search
 }
+

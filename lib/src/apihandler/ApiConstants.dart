@@ -25,6 +25,7 @@ class ApiConstants{
   static String validateCoupon = 'validateAllCoupons';
   static String multipleTaxCalculation = 'multiple_tax_calculation';
 
+  static String deliveryTimeSlot = 'deliveryTimeSlot';
   static String placeOrder = 'placeOrder';
   static String setStoreQuery = 'setStoreQuery';
   static String orderHistory = 'orderHistory';

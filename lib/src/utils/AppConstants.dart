@@ -58,6 +58,9 @@ class AppConstant {
   static final String entertxForgotPssword = "Please enter your registered email id and we will email you the password.";
   static final String appName = "appName";
 
+
+  static final String is24x7Open = 'is24x7Open';
+  static final String DeliverySlot = 'deliverySlot';
   static final String txtSendEmail = "SEND EMAIL";
   static final String app_OLD_VERISON = "APP_OLD_VERISON";
 

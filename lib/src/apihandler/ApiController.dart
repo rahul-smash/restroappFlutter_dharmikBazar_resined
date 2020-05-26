@@ -10,6 +10,7 @@ import 'package:restroapp/src/models/AdminLoginModel.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
@@ -482,13 +483,14 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
-      print("----url---${url}");
+      print("----url---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
       return model;
+
     } catch (e) {
       print("----respStr---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -540,7 +542,8 @@ class ApiController {
       TaxCalculationModel taxModel,
       DeliveryAddressData address,
       String orderJson, bool isComingFromPickUpScreen, String areaId,
-      String razorpay_order_id,String razorpay_payment_id,String online_method) async {
+      String razorpay_order_id,String razorpay_payment_id,String online_method,
+      String selectedDeliverSlotValue) async {
 
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -575,6 +578,7 @@ class ApiController {
         "payment_request_id": razorpay_order_id,
         "payment_id": razorpay_payment_id,
         "online_method": online_method,
+        "delivery_time_slot": selectedDeliverSlotValue,
       });
 
       print("----${url}--");
@@ -1018,6 +1022,27 @@ class ApiController {
       return subCategoryResponse;
     } catch (e) {
       print(e.toString());
+      return null;
+    }
+  }
+
+
+  static Future<DeliveryTimeSlotModel> deliveryTimeSlotApi() async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.deliveryTimeSlot;
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+    try {
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+
+      final parsed = json.decode(respStr);
+
+      DeliveryTimeSlotModel storeArea = DeliveryTimeSlotModel.fromJson(parsed);
+      return storeArea;
+
+    } catch (e) {
+      print("----catch---${e.toString()}");
       return null;
     }
   }
