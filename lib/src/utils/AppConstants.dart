@@ -1,6 +1,8 @@
 class AppConstant {
   static bool isLoggedIn = false;
 
+  static String currency = "\u20B9";
+
   static final String isAdminLogin = "isAdminLogin";
   static final String deviceId = "DEVICE_ID";
   static final String deviceToken = "device_token";

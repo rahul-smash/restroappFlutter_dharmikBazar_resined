@@ -84,7 +84,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                         children: [
                           TextSpan(
                             text:
-                            "\$${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                            "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
                             style: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 fontSize: 18,
@@ -133,7 +133,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
                   ),
                   Text(
-                    "\$${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
                   ),
                 ],

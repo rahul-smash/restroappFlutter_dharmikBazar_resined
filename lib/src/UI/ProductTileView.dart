@@ -139,12 +139,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                       Text(widget.product.title,
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18.0,color: appTheme,)),
-                                      (discount == "0.00" || discount == "0" || discount == "0.0")? Text("\$${price}"):
+                                      (discount == "0.00" || discount == "0" || discount == "0.0")
+                                          ? Text("${AppConstant.currency}${price}"):
                                       Row(
                                         children: <Widget>[
-                                          Text("\$${widget.product.discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
+                                          Text("${AppConstant.currency}${widget.product.discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
                                           Text(" "),
-                                          Text("\$${widget.product.price}"),
+                                          Text("${AppConstant.currency}${widget.product.price}"),
                                           //Text('\u{20B9}'),
                                         ],
                                       ),

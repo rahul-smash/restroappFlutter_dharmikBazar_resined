@@ -52,6 +52,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   DeliveryTimeSlotModel deliverySlotModel;
   int selctedTag, selectedTimeSlot;
   List<Timeslot> timeslotList;
+  bool isSlotSelected = false;
 
   @override
   void initState() {
@@ -83,12 +84,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           ApiController.deliveryTimeSlotApi().then((response){
             setState(() {
               deliverySlotModel = response;
-              timeslotList = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot;
-
-              for(int i = 0; i < timeslotList.length; i++){
-                Timeslot timeslot = timeslotList[i];
-                if(timeslot.isEnable){
-                  selectedTimeSlot = i;
+              for(int i = 0; i < deliverySlotModel.data.dateTimeCollection.length; i++){
+                timeslotList = deliverySlotModel.data.dateTimeCollection[i].timeslot;
+                for(int j = 0; j < timeslotList.length; j++){
+                  Timeslot timeslot = timeslotList[j];
+                  if(timeslot.isEnable){
+                    selectedTimeSlot = j;
+                    isSlotSelected = true;
+                    break;
+                  }
+                }
+                if(isSlotSelected){
+                  selctedTag = i;
                   break;
                 }
               }
@@ -238,6 +245,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               setState(() {
                                 selctedTag = index;
                                 timeslotList = slotsObject.timeslot;
+                                isSlotSelected = false;
                                 //selectedTimeSlot = 0;
                                 //print("timeslotList=${timeslotList.length}");
                                 for(int i = 0; i < timeslotList.length; i++){
@@ -245,6 +253,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                   Timeslot timeslot = timeslotList[i];
                                   if(timeslot.isEnable){
                                     selectedTimeSlot = i;
+                                    isSlotSelected = true;
                                     break;
                                   }
                                 }
@@ -346,11 +355,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     child: Text("Quantity: " + product.quantity)),
                 Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 30),
-                    child: Text("Price: " + "\$${product.price}")),
+                    child: Text("Price: " + "${AppConstant.currency}${product.price}")),
               ],
             ),
             Text(
-                "\$${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2)}",
+                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2)}",
                 style: TextStyle(fontSize: 16, color: Colors.black45)),
           ],
         ));
@@ -371,7 +380,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Items Price", style: TextStyle(color: Colors.black54)),
-                Text("\$${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
@@ -384,7 +393,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Shipping Charges:", style: TextStyle(color: Colors.black54)),
-                Text("\$${widget.address == null? "0" : widget.address.areaCharges}",
+                Text("${AppConstant.currency}${widget.address == null? "0" : widget.address.areaCharges}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
@@ -409,7 +418,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Total",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text("\$${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)+int.parse(shippingCharges)}",
+                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)+int.parse(shippingCharges)}",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
@@ -481,7 +490,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ));
   }
 
-
+  String selectedDeliverSlotValue = "";
   Widget addConfirmOrder() {
     return Container(
       height: 45.0,
@@ -496,6 +505,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if(!isNetworkAvailable){
             Utils.showToast(AppConstant.noInternet, false);
             return;
+          }
+
+          if(storeObject.deliverySlot == "1" && !isSlotSelected){
+            Utils.showToast("Please select delivery slot", false);
+            return;
+          }else{
+            String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
+            String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+            selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
+            print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
           }
           if(widget.paymentMode == "3"){
             if(storeObject.paymentGateway == "Razorpay"){
@@ -659,10 +678,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             print("--json == null-json == null-");
             return;
           }
-          String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
-          String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
-          String selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
-          print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
 
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,
