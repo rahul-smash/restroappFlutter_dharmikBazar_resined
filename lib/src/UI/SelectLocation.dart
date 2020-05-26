@@ -167,16 +167,15 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
 
 class LocationData{
 
-  String _address;
-  String _lat;
+  String _address="";
+  String _lat="";
+  String _lng="";
 
   String get address => _address;
 
   set address(String value) {
     _address = value;
   }
-
-  String _lng;
 
   String get lat => _lat;
 

@@ -39,8 +39,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   @override
   void initState() {
     super.initState();
-    print("-initState---SaveDeliveryAddress-------");
     if (widget.selectedAddress != null) {
+      print("-11111111111-------");
       selectedCity = City();
       selectedCity.city = widget.selectedAddress.city;
       selectedCity.id = widget.selectedAddress.cityId;
@@ -58,9 +58,11 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       locationData.lng = widget.selectedAddress.lng.toString();
 
     }else{
+      print("-2222222222222222-------");
+      locationData = new LocationData();
 
       if(widget.addressValue != null && widget.addressValue.isNotEmpty){
-        locationData = new LocationData();
+        print("-3333333333333333-------");
         locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
         locationData.lat = widget.coordinates.latitude.toString();
@@ -201,13 +203,23 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           onTap: (){
                             Geolocator().isLocationServiceEnabled().then((value) async {
                               if(value == true){
-                                var result = await Navigator.push(context, new MaterialPageRoute(
-                                  builder: (BuildContext context) => SelectLocationOnMap(),
-                                  fullscreenDialog: true,)
-                                );
-                                if(result != null){
-                                  locationData = result;
-                                  addressController.text = locationData.address;
+
+                                var geoLocator = Geolocator();
+                                var status = await geoLocator.checkGeolocationPermissionStatus();
+                                print("--status--=${status}");
+                                if (status == GeolocationStatus.granted){
+                                  var result = await Navigator.push(context, new MaterialPageRoute(
+                                    builder: (BuildContext context) => SelectLocationOnMap(),
+                                    fullscreenDialog: true,)
+                                  );
+                                  if(result != null){
+                                    locationData = result;
+                                    if(locationData.address.isNotEmpty){
+                                      addressController.text = locationData.address;
+                                    }
+                                  }
+                                }else{
+                                  Utils.showToast("Please accept location permissions to get your location from settings!", false);
                                 }
                               }else{
                                 Utils.showToast("Please turn on gps!", false);
@@ -300,57 +312,58 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           height: 40.0,
                           child: RaisedButton(
                             shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(25.0),
-                                side: BorderSide(color: appTheme)),
-                            onPressed: () {
+                                borderRadius: new BorderRadius.circular(25.0),side: BorderSide(color: appTheme)),
+
+                            onPressed: () async {
+                              bool isNetworkAvailable = await Utils.isNetworkAvailable();
+                              if(!isNetworkAvailable){
+                                Utils.showToast(AppConstant.noInternet, false);
+                                return;
+                              }
 
                               if(selectedCity == null){
                                 Utils.showToast(AppConstant.selectCity, false);
                                 return;
                               }
-
-                              print("--addressController---${addressController.text}---");
                               if (selectedArea == null) {
                                 Utils.showToast(AppConstant.selectArea, false);
-
-                              } else if (addressController.text.trim().isEmpty) {
-
+                                return;
+                              }
+                              if (addressController.text.trim().isEmpty) {
                                 Utils.showToast(AppConstant.pleaseEnterAddress, false);
-                              } else if (fullnameController.text.trim().isEmpty) {
-
+                                return;
+                              }
+                              if (fullnameController.text.trim().isEmpty) {
                                 Utils.showToast(AppConstant.pleaseFullname, false);
+                                return;
                               }
-                              else if (zipCodeController.text.trim().isEmpty) {
+                              if(zipCodeController.text.trim().isEmpty) {
                                 Utils.showToast(AppConstant.enterZipCode, false);
-
-                              } else {
-                                // edit and save api
-                                if(locationData == null){
-                                  Utils.showToast("Please select location!", false);
-                                  return;
-                                }
-
-                                Utils.showProgressDialog(context);
-                                ApiController.saveDeliveryAddressApiRequest(
-                                    widget.selectedAddress == null? "ADD": "EDIT",
-                                    zipCodeController.text,addressController.text,
-                                    selectedArea.areaId,selectedArea.area,
-                                    widget.selectedAddress == null? null: widget.selectedAddress.id,
-                                    fullnameController.text,selectedCity.city,selectedCity.id,
-                                    "${locationData.lat}","${locationData.lng}").then((response) {
-                                  Utils.hideProgressDialog(context);
-                                  //print('@@REsonsesss'+response.toString());
-                                  if (response != null && response.success) {
-                                    print('@@response.success');
-                                    //widget.callback();
-                                    Navigator.pop(context, true);
-                                    //Navigator.of(context, rootNavigator: true)..pop()..pop();
-                                    Utils.showToast(response.message, true);
-                                  }else{
-                                    print('Not @@response.success');
-                                  }
-                                });
+                                return;
                               }
+
+                              print("--addressController---${addressController.text}---");
+
+                              Utils.showProgressDialog(context);
+                              ApiController.saveDeliveryAddressApiRequest(
+                                  widget.selectedAddress == null? "ADD": "EDIT",
+                                  zipCodeController.text,addressController.text,
+                                  selectedArea.areaId,selectedArea.area,
+                                  widget.selectedAddress == null? null: widget.selectedAddress.id,
+                                  fullnameController.text,selectedCity.city,selectedCity.id,
+                                  "${locationData.lat}","${locationData.lng}").then((response) {
+                                Utils.hideProgressDialog(context);
+                                //print('@@REsonsesss'+response.toString());
+                                if (response != null && response.success) {
+                                  print('@@response.success');
+                                  //widget.callback();
+                                  Navigator.pop(context, true);
+                                  //Navigator.of(context, rootNavigator: true)..pop()..pop();
+                                  Utils.showToast(response.message, true);
+                                }else{
+                                  print('Not @@response.success');
+                                }
+                              });
                             },
                             color: appTheme,
                             padding: EdgeInsets.all(5.0),

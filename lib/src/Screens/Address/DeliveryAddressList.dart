@@ -72,42 +72,21 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           StoreModel store = await SharedPrefs.getStore();
           print("--deliveryArea->--${store.deliveryArea}-------");
           if(store.deliveryArea == "0"){
-
-            Geolocator().isLocationServiceEnabled().then((value) async {
-              if(value == true){
-                Utils.showToast("Getting your location, please wait..", true);
-                //Utils.showProgressDialog(context);
-                getLocation().then((addressValue) async {
-                  print("----1111111-------");
-                  if(addressValue == null){
-                    addressValue = "";
-                  }
-                  print("----22222222222222---${addressValue}----");
-                  print("----33333333333-------");
-                  var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                          SaveDeliveryAddress(null, () {
-                            print("--Route-SaveDeliveryAddress-------");
-                            //getAddressList();
-                          },addressValue,coordinates),
-                        fullscreenDialog: true,
-                      ));
-                  print("--result--${result}-------");
-                  if(result != null){
-                    Utils.showProgressDialog(context);
-                    DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
-                    setState(() {
-                      Utils.hideProgressDialog(context);
-                      addressList = response.data;
-                    });
-                    //getAddressList();
-                  }
-                  Utils.hideProgressDialog(context);
-                });
-
-              }else{
-                Utils.showToast("Please turn on gps!", false);
-              }
-            });
+            var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
+                SaveDeliveryAddress(null, () {
+                  print("--Route-SaveDeliveryAddress-------");
+                },"",coordinates),
+              fullscreenDialog: true,
+            ));
+            print("--result--${result}-------");
+            if(result != null){
+              Utils.showProgressDialog(context);
+              DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+              setState(() {
+                Utils.hideProgressDialog(context);
+                addressList = response.data;
+              });
+            }
 
           }else if(store.deliveryArea == "1"){
             Utils.isNetworkAvailable().then((isConnected){
@@ -117,29 +96,34 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
                   Utils.hideProgressDialog(context);
                   if(response != null && response.success){
-
                     StoreRadiousResponse data =response;
-
                     Geolocator().isLocationServiceEnabled().then((isLocationServiceEnabled) async {
                       print("----isLocationServiceEnabled----${isLocationServiceEnabled}--");
                       if(isLocationServiceEnabled){
 
-                        var result = await Navigator.push(context, new MaterialPageRoute(
-                          builder: (BuildContext context) => DragMarkerMap(data),
-                          fullscreenDialog: true,)
-                        );
-                        if(result != null){
-                          radiusArea = result;
-                          print("----radiusArea = result-------");
-                          Utils.showProgressDialog(context);
-                          DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
-                          setState(() {
-                            print("----setState-------");
-                            Utils.hideProgressDialog(context);
-                            addressList = response.data;
-                          });
-                          //getAddressList();
+                        var geoLocator = Geolocator();
+                        var status = await geoLocator.checkGeolocationPermissionStatus();
+                        print("--status--=${status}");
+                        if (status == GeolocationStatus.granted){
+                          var result = await Navigator.push(context, new MaterialPageRoute(
+                            builder: (BuildContext context) => DragMarkerMap(data),
+                            fullscreenDialog: true,)
+                          );
+                          if(result != null){
+                            radiusArea = result;
+                            print("----radiusArea = result-------");
+                            Utils.showProgressDialog(context);
+                            DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                            setState(() {
+                              print("----setState-------");
+                              Utils.hideProgressDialog(context);
+                              addressList = response.data;
+                            });
+                          }
+                        }else{
+                          Utils.showToast("Please accept location permissions to get your location from settings!", false);
                         }
+
                       }else{
                         Utils.showToast("Please turn on gps!", false);
                       }
@@ -177,39 +161,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         ),
       ),
     );
-  }
-
-  getAddressList(){
-    print("=====getAddressList==========");
-    Utils.showProgressDialog(context);
-    ApiController.getAddressApiRequest().then((responses){
-      print("====called then future completes====");
-      Utils.hideProgressDialog(context);
-      DeliveryAddressResponse response = responses;
-      setState(() {
-        //Utils.hideProgressDialog(context);
-        addressList = response.data;
-      });
-    }).whenComplete(() {
-      Utils.hideProgressDialog(context);
-      print("====called when future completes====");
-    });
-  }
-
-
-  Future<String> getLocation() async {
-    try {
-      print("-Geolocator-getLocation---");
-      Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      coordinates = new Coordinates(position.latitude, position.longitude);
-      print("-coordinates-${coordinates}--");
-      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      var first = addresses.first;
-      return first.addressLine;
-    } catch (e) {
-      print(e);
-      return "";
-    }
   }
 
   Widget addAddressList() {
@@ -308,27 +259,24 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         children: <Widget>[
           Flexible(
             child: InkWell(
-              child: Align(
-                alignment: Alignment.center,
-                child: new Text("Edit Address",
-                    style: TextStyle(
-                        color: infoLabel, fontWeight: FontWeight.w500)),
-              ),
-              onTap: () async {
-                var result = await Navigator.push(
-                    context,
+              child: Align(alignment: Alignment.center,
+                child:Text("Edit Address",style: TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),),
+              onTap:() async {
+                var result = await Navigator.push(context,
                     MaterialPageRoute(
                       builder: (BuildContext context) =>SaveDeliveryAddress(area, () {
                         print('@@------SaveDeliveryAddress----------');
-                        //getAddressList();
                       },"",coordinates),
                       fullscreenDialog: true,
                     ));
                 print("-x-result--${result}-------");
                 if(result){
-                  getAddressList();
-                }else{
-
+                  Utils.showProgressDialog(context);
+                  DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                  setState(() {
+                    Utils.hideProgressDialog(context);
+                    addressList = response.data;
+                  });
                 }
               },
             ),
@@ -343,8 +291,25 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               alignment: Alignment.center,
               child: new Text("Remove Address",style: TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),
             ),
-            onTap: () {
-              showDialogForDelete(area);
+            onTap: () async {
+              var results = await DialogUtils.displayDialog(context,"Delete",AppConstant.deleteAddress,
+                  "Cancel","OK");
+              if(results == true){
+                Utils.showProgressDialog(context);
+                ApiController.deleteDeliveryAddressApiRequest(area.id).then((response) async {
+                  Utils.hideProgressDialog(context);
+                  if (response != null && response.success) {
+                    print("---showDialogForDelete-----");
+                    Utils.showProgressDialog(context);
+                    DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                    setState(() {
+                      Utils.hideProgressDialog(context);
+                      addressList = response.data;
+                    });
+                  }
+                });
+              }
+              //showDialogForDelete(area);
             },
           )),
         ],
@@ -404,42 +369,21 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     );
   }
 
-  void showDialogForDelete(DeliveryAddressData area) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Delete"),
-          content: new Text(AppConstant.deleteAddress),
-          actions: <Widget>[
-            new FlatButton(
-              child: new Text("Yes"),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Utils.showProgressDialog(context);
-                ApiController.deleteDeliveryAddressApiRequest(area.id)
-                    .then((response) {
-                  Utils.hideProgressDialog(context);
-                  if (response != null && response.success) {
-                    print("---showDialogForDelete-----");
-                    getAddressList();
-                  }
-                });
-              },
-            ),
-            new FlatButton(
-              child: new Text("No"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-
+  /*getAddressList(){
+    print("=====getAddressList==========");
+    Utils.showProgressDialog(context);
+    ApiController.getAddressApiRequest().then((responses){
+      print("====called then future completes====");
+      Utils.hideProgressDialog(context);
+      DeliveryAddressResponse response = responses;
+      setState(() {
+        //Utils.hideProgressDialog(context);
+        addressList = response.data;
+      });
+    }).whenComplete(() {
+      Utils.hideProgressDialog(context);
+      print("====called when future completes====");
+    });
+  }*/
 
 }
