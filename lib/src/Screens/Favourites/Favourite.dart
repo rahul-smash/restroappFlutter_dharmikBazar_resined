@@ -80,8 +80,8 @@ class _FavouritesState extends State<Favourites> {
                               Product productData = Product.fromJson(map);
                               //print("-1--Favs----ProductTileItem---------");
                               return ProductTileItem(productData, () {
-                                print("-2--Favs----updateTotalPrice---------");
-
+                                //print("-2--Favs----updateTotalPrice---------");
+                                updateTotalPrice();
                               },ClassType.Favourites);
                             },
                           ),
