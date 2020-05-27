@@ -184,13 +184,17 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
 
   void goToMyCartScreen(BuildContext _context) async {
     print("-goToMyCart-----${widget.parent.toString()}----");
-    Navigator.push(_context,
+    Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
+
+        })));
+    /*Navigator.push(_context,
         MaterialPageRoute(
           builder: (BuildContext context) => MyCartScreen(() {
             updateTotalPrice();
           }),
           fullscreenDialog: true,
-        ));
+        ));*/
   }
 }
 
