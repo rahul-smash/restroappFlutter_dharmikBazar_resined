@@ -321,29 +321,18 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             StoreModel store = await SharedPrefs.getStore();
             print("--${store.onlinePayment}-}-");
             if(store.onlinePayment == "1"){
-              var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",addressList[selectedIndex].note);
-              String paymentValue;
+              //var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",addressList[selectedIndex].note);
+              var result = await DialogUtils.displayDialog(context, "Confirmation",addressList[selectedIndex].note,
+              "Cancel","Proceed");
               if(result == true){
-                paymentValue = "3";
-              }else{
-                paymentValue = "2";
+                Navigator.push(context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ConfirmOrderScreen(addressList[selectedIndex],false,"")),
+                );
               }
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ConfirmOrderScreen(addressList[selectedIndex], paymentValue,false,"")),
-              );
-            }else{
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ConfirmOrderScreen(addressList[selectedIndex], "2",false,"")),
-              );
+
             }
-
-
           }
         },
         child: Row(

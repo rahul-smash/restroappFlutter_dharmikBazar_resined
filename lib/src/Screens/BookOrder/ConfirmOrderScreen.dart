@@ -22,17 +22,18 @@ import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
 
   bool isComingFromPickUpScreen;
   DeliveryAddressData address;
-  String paymentMode; // 2 = COD, 3 = Online Payment
+  String paymentMode = "2"; // 2 = COD, 3 = Online Payment
   String areaId;
   double shippingCharges = 0.0;
 
-  ConfirmOrderScreen(this.address, this.paymentMode,this.isComingFromPickUpScreen,this.areaId);
+  ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen,this.areaId);
 
   @override
   ConfirmOrderState createState() => ConfirmOrderState();
@@ -472,7 +473,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) => AvailableOffersDialog(
-                      widget.address, widget.paymentMode ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
+                      widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
                         setState(() {
                           taxModel = model;
                         });
@@ -497,6 +498,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       color: appTheme,
       child: InkWell(
         onTap: () async {
+          var result = await DialogUtils.displayPaymentDialog(context, "Select Payment","");
+          if(result == true){
+            widget.paymentMode = "3";
+          }else{
+            widget.paymentMode = "2";
+          }
           print("----paymentMod----${widget.paymentMode}--");
           StoreModel storeObject = await SharedPrefs.getStore();
           print("-paymentGateway----${storeObject.paymentGateway}-}-");

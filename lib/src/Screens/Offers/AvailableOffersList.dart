@@ -9,6 +9,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class AvailableOffersDialog extends StatefulWidget {
+
   final DeliveryAddressData address;
   final String paymentMode; // 2 = COD, 3 = Online Payment
   final Function(TaxCalculationModel) callback;
