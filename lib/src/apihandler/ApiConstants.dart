@@ -10,6 +10,10 @@ class ApiConstants{
   static String getCategories = 'getCategories';
   static String getProducts = 'getSubCategoryProducts/';
 
+  static String search = 'searchProducts';
+  static String getTagsList = 'getTagsList';
+
+
   static String getAddress = 'deliveryAddress';
   static String getAddressArea = 'deliveryAreas/Area';
   static String getStorePickupAddress = 'storePickupAddress';
@@ -21,6 +25,7 @@ class ApiConstants{
   static String validateCoupon = 'validateAllCoupons';
   static String multipleTaxCalculation = 'multiple_tax_calculation';
 
+  static String deliveryTimeSlot = 'deliveryTimeSlot';
   static String placeOrder = 'placeOrder';
   static String setStoreQuery = 'setStoreQuery';
   static String orderHistory = 'orderHistory';

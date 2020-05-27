@@ -9,6 +9,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class AvailableOffersDialog extends StatefulWidget {
+
   final DeliveryAddressData address;
   final String paymentMode; // 2 = COD, 3 = Online Payment
   final Function(TaxCalculationModel) callback;
@@ -139,9 +140,10 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
 
   void validateCouponApi(String couponCode, String json) {
     //print("----couponCode-----=>${couponCode}");
-    ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json)
-        .then((validCouponModel) {
+    ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json).then((validCouponModel) {
       if (validCouponModel != null &&validCouponModel.success) {
+
+        Utils.showToast(validCouponModel.message, true);
 
         ApiController.multipleTaxCalculationRequest(couponCode,validCouponModel.discountAmount, "0", json)
             .then((response) async {

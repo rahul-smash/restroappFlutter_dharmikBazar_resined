@@ -10,11 +10,13 @@ import 'package:restroapp/src/models/AdminLoginModel.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
+import 'package:restroapp/src/models/SearchTagsModel.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
@@ -481,13 +483,14 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
-      print("----url---${url}");
+      print("----url---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
       return model;
+
     } catch (e) {
       print("----respStr---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -539,7 +542,8 @@ class ApiController {
       TaxCalculationModel taxModel,
       DeliveryAddressData address,
       String orderJson, bool isComingFromPickUpScreen, String areaId,
-      String razorpay_order_id,String razorpay_payment_id,String online_method) async {
+      String razorpay_order_id,String razorpay_payment_id,String online_method,
+      String selectedDeliverSlotValue) async {
 
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -574,9 +578,10 @@ class ApiController {
         "payment_request_id": razorpay_order_id,
         "payment_id": razorpay_payment_id,
         "online_method": online_method,
+        "delivery_time_slot": selectedDeliverSlotValue,
       });
 
-      print("----${url}--");
+      print("----${url}");
       print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
@@ -963,6 +968,81 @@ class ApiController {
     } catch (e) {
       //Utils.showToast(e.toString(), true);
       print('catch' + e.toString());
+      return null;
+    }
+  }
+
+
+  static Future<SearchTagsModel> searchTagsAPI() async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.getTagsList;
+
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+    try {
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+
+      final parsed = json.decode(respStr);
+
+      SearchTagsModel storeArea = SearchTagsModel.fromJson(parsed);
+      return storeArea;
+
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<SubCategoryResponse> getSearchResults(String keyword) async {
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+    var url=ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.search;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "keyword": "${keyword}",
+        "user_id": "",
+        "device_id": deviceId,
+        "device_token": deviceToken,
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+      print("${url}");
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("${respStr}");
+
+      final parsed = json.decode(respStr);
+      SubCategoryResponse subCategoryResponse = SubCategoryResponse.fromJson(parsed);
+      return subCategoryResponse;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+  }
+
+
+  static Future<DeliveryTimeSlotModel> deliveryTimeSlotApi() async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.deliveryTimeSlot;
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+    try {
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+
+      final parsed = json.decode(respStr);
+
+      DeliveryTimeSlotModel storeArea = DeliveryTimeSlotModel.fromJson(parsed);
+      return storeArea;
+
+    } catch (e) {
+      print("----catch---${e.toString()}");
       return null;
     }
   }

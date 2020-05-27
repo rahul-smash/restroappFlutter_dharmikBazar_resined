@@ -290,6 +290,7 @@ class DatabaseHelper {
 
 
   Future<List<Product>> getFavouritesList() async {
+    print("------------getFavouritesList--------------");
     List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [

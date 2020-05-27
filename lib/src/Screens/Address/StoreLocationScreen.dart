@@ -99,26 +99,19 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
             print("--${store.onlinePayment}-}-");
             if(store.onlinePayment == "1"){
               String paymentValue;
-              var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",widget.areaObject.note);
+              //var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",widget.areaObject.note);
+              var result = await DialogUtils.displayDialog(context, "Confirmation",widget.areaObject.note,
+                  "Cancel","Proceed");
               if(result == true){
-                paymentValue = "3";
-              }else{
-                paymentValue = "2";
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ConfirmOrderScreen(null,true, widget.areaObject.areaId)),
+                );
               }
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ConfirmOrderScreen(null, paymentValue,true, widget.areaObject.areaId)),
-              );
-            }else{
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ConfirmOrderScreen(null, "2",true, widget.areaObject.areaId)),
-              );
+
             }
           },
           child: Container(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/Dashboard/SearchScreen.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -14,15 +15,17 @@ class SubCategoryProductScreen extends StatelessWidget {
   final CartTotalPriceBottomBar bottomBar =
       CartTotalPriceBottomBar(ParentInfo.productList);
 
+
   @override
   Widget build(BuildContext context) {
     //print("---subCategory.length--=${categoryModel.subCategory.length}");
     return DefaultTabController(
       length: categoryModel.subCategory.length,
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
-            title: Text(categoryModel.title),
-            centerTitle: true,
+          title: Text(categoryModel.title),
+          centerTitle: true,
         ),
         body: Column(children: <Widget>[
           TabBar(

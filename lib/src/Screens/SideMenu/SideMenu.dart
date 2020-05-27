@@ -49,7 +49,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     DrawerChildItem('Book Now', "images/booknow.png"),
     DrawerChildItem('My Favorites', "images/myfav.png"),
     DrawerChildItem('About Us', "images/about.png"),
-    DrawerChildItem('Refer & Earn', "images/refer.png"),
+    DrawerChildItem('Share', "images/refer.png"),
     DrawerChildItem('Login', "images/sign_in.png"),
   ];
 
@@ -212,7 +212,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         );
         break;
       case 7:
-        if (AppConstant.isLoggedIn) {
+        /*if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
             Navigator.push(
@@ -224,8 +224,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           }
         }else {
           Utils.showLoginDialog(context);
-        }
-        //share();
+        }*/
+        share();
+
         break;
       case 8:
         if (AppConstant.isLoggedIn) {
@@ -282,6 +283,14 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         );
       },
     );
+  }
+
+  Future<void> share() async {
+    await FlutterShare.share(
+        title: 'Kindly download',
+        text: 'Kindly download' + widget.store.storeName + 'app from',
+        linkUrl: widget.store.androidShareLink,
+        chooserTitle: 'Refer & Earn');
   }
 
   Future logout(BuildContext context) async {

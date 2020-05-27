@@ -1,7 +1,9 @@
+import 'dart:core';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:intl/intl.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
@@ -37,6 +39,10 @@ class Utils {
     } catch (e) {
       print(e);
     }
+  }
+
+  static void hideKeyboard(BuildContext context){
+    FocusScope.of(context).requestFocus(FocusNode());
   }
 
   static void showLoginDialog(BuildContext context) {
@@ -106,8 +112,15 @@ class Utils {
 
   static void hideProgressDialog(BuildContext context) {
     //For normal dialog
-    if (pr != null && pr.isShowing()) {
-      pr.hide();
+    try {
+      if (pr != null && pr.isShowing()) {
+            pr.hide();
+      }else{
+        if (pr != null)
+        pr.hide();
+      }
+    } catch (e) {
+      print(e);
     }
   }
 
@@ -147,8 +160,6 @@ class Utils {
   }
 
   static Widget getEmptyView(String value){
-
-
     return  Container(
       child: Expanded(
         child: Center(
@@ -163,7 +174,52 @@ class Utils {
     );
   }
 
+  static String getDate(){
+    var now = new DateTime.now();
+    var formatter = new DateFormat('MMM yyyy');
+    String formatted = formatter.format(now);
+    //print(formatted); // something like 2013-04-20
+    return formatted;
+  }
+
+  static convertStringToDate(String dateObj){
+    DateFormat dateFormat = DateFormat("dd MMM yyyy");
+    DateTime dateTime = dateFormat.parse(dateObj);
+    DateFormat formatter = new DateFormat('dd MMM');
+    String formatted = formatter.format(dateTime);
+    //print(formatted);
+    return formatted;
+  }
+
+  static convertDateFormat(String dateObj){
+    DateFormat dateFormat = DateFormat("dd MMM yyyy");
+    DateTime dateTime = dateFormat.parse(dateObj);
+    DateFormat formatter = new DateFormat('yyyy-MM-dd');
+    String formatted = formatter.format(dateTime);
+    //print(formatted);
+    return formatted;
+  }
+
+  static Widget getEmptyView2(String value){
+    return  Container(
+      child: Center(
+        child: Text(value,
+            overflow: TextOverflow.ellipsis,
+            style: new TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
+            )),
+      ),
+    );
+  }
 }
+
+
+
+
+
+
 enum ClassType {
-  CART,SubCategory,Favourites,
+  CART,SubCategory,Favourites,Search
 }
+

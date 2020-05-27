@@ -14,8 +14,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class CartTotalPriceBottomBar extends StatefulWidget {
 
-  final ParentInfo parent;
-  final _CartTotalPriceBottomBarState state = _CartTotalPriceBottomBarState();
+  ParentInfo parent;
+  _CartTotalPriceBottomBarState state = _CartTotalPriceBottomBarState();
 
   CartTotalPriceBottomBar(this.parent);
 
@@ -38,14 +38,9 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
   void getAddresKey() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     store = await SharedPrefs.getStore();
-   /* SharedPrefs.storeSharedValue(
-        AppConstant.app_OLD_VERISON, store.version);
-*/
     setState(() {
       pickupfacility = store.pickupFacility;
       delieveryAdress = store.deliveryFacility;
-
-   //   print('@@HomeModel   '+pickupfacility+'  Delievery'+delieveryAdress+prefs.getString(AppConstant.app_OLD_VERISON));
     });
   }
   updateTotalPrice() {
@@ -58,7 +53,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.parent == ParentInfo.productList
+    return widget.parent == ParentInfo.productList || widget.parent == ParentInfo.favouritesList
         ? addProductScreenBottom()
         : addMyCartScreenBottom();
   }
@@ -89,7 +84,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                         children: [
                           TextSpan(
                             text:
-                            "\$${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                            "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
                             style: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 fontSize: 18,
@@ -102,11 +97,11 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
               Container(
                   color: appTheme,
                   child: FlatButton(
-                    child: Row(children: <Widget>[
-                      Image.asset("images/my_order.png", width: 25),
-                      SizedBox(width: 5),
-                      Text("Proceed To Order",
-                          style: TextStyle(fontSize: 12, color: Colors.white)),
+                    child: Row(
+                        children: <Widget>[
+                          Image.asset("images/my_order.png", width: 25),
+                          SizedBox(width: 5),
+                          Text("Proceed To Order",style: TextStyle(fontSize: 12, color: Colors.white)),
                     ]),
                     onPressed: () {
                       if (totalPrice == 0.0) {
@@ -138,7 +133,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
                   ),
                   Text(
-                    "\$${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
                   ),
                 ],
@@ -188,9 +183,9 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
   }
 
   void goToMyCartScreen(BuildContext _context) async {
-    Navigator.push(
-        _context,
-        new MaterialPageRoute(
+    print("-goToMyCart-----${widget.parent.toString()}----");
+    Navigator.push(_context,
+        MaterialPageRoute(
           builder: (BuildContext context) => MyCartScreen(() {
             updateTotalPrice();
           }),
@@ -202,4 +197,5 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
 enum ParentInfo {
   productList,
   cartList,
+  favouritesList,
 }

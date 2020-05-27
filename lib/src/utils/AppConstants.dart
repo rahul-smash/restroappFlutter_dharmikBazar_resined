@@ -1,6 +1,8 @@
 class AppConstant {
   static bool isLoggedIn = false;
 
+  static String currency = "\u20B9";
+
   static final String isAdminLogin = "isAdminLogin";
   static final String deviceId = "DEVICE_ID";
   static final String deviceToken = "device_token";
@@ -58,6 +60,9 @@ class AppConstant {
   static final String entertxForgotPssword = "Please enter your registered email id and we will email you the password.";
   static final String appName = "appName";
 
+
+  static final String is24x7Open = 'is24x7Open';
+  static final String DeliverySlot = 'deliverySlot';
   static final String txtSendEmail = "SEND EMAIL";
   static final String app_OLD_VERISON = "APP_OLD_VERISON";
 
