@@ -1,11 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:restroapp/src/UI/CartBottomView.dart';
+import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
-import 'package:restroapp/src/utils/BaseState.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class Favourites extends StatefulWidget {
@@ -19,12 +21,20 @@ class Favourites extends StatefulWidget {
 }
 
 class _FavouritesState extends State<Favourites> {
-  final CartTotalPriceBottomBar bottomBar = CartTotalPriceBottomBar(ParentInfo.productList);
 
-  final DatabaseHelper databaseHelper = new DatabaseHelper();
+  DatabaseHelper databaseHelper = new DatabaseHelper();
+  double totalPrice = 0.00;
+
+  @override
+  void initState() {
+    super.initState();
+    updateTotalPrice();
+  }
+
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
           title: Text("MY Favourites".toUpperCase()),
@@ -68,12 +78,10 @@ class _FavouritesState extends State<Favourites> {
                               Product product = projectSnap.data[index];
                               Map<String, dynamic> map = jsonDecode(product.productJson);
                               Product productData = Product.fromJson(map);
-
+                              //print("-1--Favs----ProductTileItem---------");
                               return ProductTileItem(productData, () {
-                                //print("-------updateTotalPrice---------");
-                                bottomBar.state.updateTotalPrice();
-                                setState(() {
-                                });
+                                print("-2--Favs----updateTotalPrice---------");
+
                               },ClassType.Favourites);
                             },
                           ),
@@ -97,8 +105,76 @@ class _FavouritesState extends State<Favourites> {
             Navigator.pop(context);
             return new Future(() => false);
           }),
-      bottomNavigationBar: bottomBar,
+      bottomNavigationBar: Container(
+        height: 55,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Center(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 10.0),
+                  child: RichText(
+                    text: TextSpan(
+                      text: "Total: ",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black),
+                      children: [
+                        TextSpan(
+                          text:
+                          "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                          style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 18,
+                              color: Colors.black),
+                        ),
+                      ],
+                    ),
+                  ),
+                )),
+            Container(
+                color: appTheme,
+                child: FlatButton(
+                  child: Row(
+                      children: <Widget>[
+                        Image.asset("images/my_order.png", width: 25),
+                        SizedBox(width: 5),
+                        Text("Proceed To Order",style: TextStyle(fontSize: 12, color: Colors.white)),
+                      ]),
+                  onPressed: () {
+                    if (totalPrice == 0.0) {
+                      Utils.showToast(AppConstant.addItems, false);
+                    } else {
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
+
+                          })));
+                    }
+                  },
+                ))
+          ],
+        ),
+      ),
     );
+  }
+
+  updateTotalPrice() {
+    databaseHelper.getTotalPrice().then((mTotalPrice) {
+      setState(() {
+        totalPrice = mTotalPrice;
+      });
+    });
+  }
+
+  void listenDatabaseChanges() {
+    eventBus.on<updateData>().listen((event) {
+      print("<-----updateData------updateData->");
+      setState(() {
+
+      });
+    });
+
   }
 }
 

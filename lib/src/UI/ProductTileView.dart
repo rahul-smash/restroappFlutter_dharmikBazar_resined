@@ -12,9 +12,9 @@ import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ProductTileItem extends StatefulWidget {
-  final Product product;
-  final VoidCallback callback;
-  final ClassType classType;
+  Product product;
+  VoidCallback callback;
+  ClassType classType;
 
   ProductTileItem(this.product, this.callback, this.classType);
 
@@ -31,6 +31,11 @@ class _ProductTileItemState extends State<ProductTileItem> {
   @override
   initState() {
     super.initState();
+    print("--_ProductTileItemState-- initState");
+    getDataFromDB();
+  }
+
+  void getDataFromDB() {
     databaseHelper.getProductQuantitiy(widget.product.variantId).then((cartDataObj) {
       cartData = cartDataObj;
       counter = int.parse(cartData.QUANTITY);
@@ -296,7 +301,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
         ));
   }
 
-
   Widget addPlusMinusView() {
     return Container(
         //color: Colors.grey,
@@ -307,32 +311,38 @@ class _ProductTileItemState extends State<ProductTileItem> {
             Container(
               //padding: const EdgeInsets.all(0.0),
               width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(onTap: () {
-                if (counter != 0) {
-                  setState(() => counter--);
-                  if (counter == 0) {
-                    // delete from cart table
-                    removeFromCartTable(widget.product.variantId);
-                  } else {
-                    // insert/update to cart table
-                    insertInCartTable(widget.product, counter);
-                  }
-                  widget.callback();
+              child: GestureDetector(
+                  onTap: () {
+                    if (counter != 0) {
+                      setState(() {
+                        return counter--;
+                      });
+                      if (counter == 0) {
+                        // delete from cart table
+                        removeFromCartTable(widget.product.variantId);
+                      } else {
+                        // insert/update to cart table
+                        insertInCartTable(widget.product, counter);
+                      }
+                      widget.callback();
                 }
               }, child: Icon(Icons.remove_circle_outline, color: Colors.grey, size: 25)),
             ),
             Container(
               margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
               width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(onTap: () {
-                setState(() => counter++);
-                if (counter == 0) {
-                  // delete from cart table
-                  removeFromCartTable(widget.product.variantId);
-                } else {
-                  // insert/update to cart table
-                  insertInCartTable(widget.product, counter);
-                }
+              child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      return counter++;
+                    });
+                    if (counter == 0) {
+                      // delete from cart table
+                      removeFromCartTable(widget.product.variantId);
+                    } else {
+                      // insert/update to cart table
+                      insertInCartTable(widget.product, counter);
+                    }
                 }, child: Icon(Icons.add_circle_outline, color: Colors.grey, size: 25)),
             ),
           ],
@@ -401,8 +411,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
     }
   }
 
-
-
   void insertInFavTable(Product product, int quantity) {
     var mId = int.parse(product.id);
     String productJson = JsonEncoder().convert(product.toJson());
@@ -434,6 +442,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
       //print("-------count--------${count}-----");
     });
   }
+
+
 
 
 

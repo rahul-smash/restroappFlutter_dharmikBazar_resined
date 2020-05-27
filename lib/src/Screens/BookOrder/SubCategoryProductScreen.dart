@@ -21,6 +21,7 @@ class SubCategoryProductScreen extends StatelessWidget {
     return DefaultTabController(
       length: categoryModel.subCategory.length,
       child: Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           title: Text(categoryModel.title),
           centerTitle: true,
