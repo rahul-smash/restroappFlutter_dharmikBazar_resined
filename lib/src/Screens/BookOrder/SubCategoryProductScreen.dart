@@ -15,6 +15,7 @@ class SubCategoryProductScreen extends StatelessWidget {
   final CartTotalPriceBottomBar bottomBar =
       CartTotalPriceBottomBar(ParentInfo.productList);
 
+
   @override
   Widget build(BuildContext context) {
     //print("---subCategory.length--=${categoryModel.subCategory.length}");

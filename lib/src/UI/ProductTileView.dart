@@ -31,7 +31,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
   @override
   initState() {
     super.initState();
-    print("--_ProductTileItemState-- initState");
+    //print("--_ProductTileItemState-- initState");
     getDataFromDB();
   }
 
