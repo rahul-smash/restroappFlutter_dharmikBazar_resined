@@ -276,7 +276,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                   // insert/update to cart table
                   insertInCartTable(widget.product, counter);
                 }
-              }, child: Icon(Icons.add, color: Colors.grey, size: 20)),
+                }, child: Icon(Icons.add, color: Colors.grey, size: 20)),
             ),
           ],
         ));
