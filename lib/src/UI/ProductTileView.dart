@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
@@ -66,128 +67,140 @@ class _ProductTileItemState extends State<ProductTileItem> {
       color: Colors.white,
       child: Column(
           children: [
-            Padding(
-                padding: EdgeInsets.only(top: 15, bottom: 15),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Flexible(
-                          child: Row(
-                            children: [
-                              SizedBox(width: 10),
-                              InkWell(
-                                onTap: () async {
+            InkWell(
+              onTap: (){
+                print("----print-----");
+                Navigator.push(context,
+                    MaterialPageRoute(
+                      builder: (BuildContext context) => ProductDetailsScreen(widget.product),
+                      fullscreenDialog: true,
+                    ));
+              },
+              child: Padding(
+                  padding: EdgeInsets.only(top: 15, bottom: 15),
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Flexible(
+                            child: Row(
+                              children: [
+                                SizedBox(width: 10),
+                                InkWell(
+                                  onTap: () async {
 
-                                  int count = await databaseHelper.checkProductsExistInFavTable
-                                    (DatabaseHelper.Favorite_Table,widget.product.id);
-                                  //print("--ProductFavValue-- ${count}");
-                                  Product product = widget.product;
-                                  if(count == 1){
-                                    product.isFav = "0";
-                                    //Utils.showToast(AppConstant.favsRemoved, true);
-                                    await databaseHelper.deleteFav(DatabaseHelper.Favorite_Table,product.id);
+                                    int count = await databaseHelper.checkProductsExistInFavTable
+                                      (DatabaseHelper.Favorite_Table,widget.product.id);
+                                    //print("--ProductFavValue-- ${count}");
+                                    Product product = widget.product;
+                                    if(count == 1){
+                                      product.isFav = "0";
+                                      //Utils.showToast(AppConstant.favsRemoved, true);
+                                      await databaseHelper.deleteFav(DatabaseHelper.Favorite_Table,product.id);
 
-                                  }else if(count == 0){
-                                    String variantId, weight, mrpPrice, price, discount, isUnitType;
-                                    variantId = variant == null ? widget.product.variantId : variant.id;
-                                    weight = variant == null ? widget.product.weight : variant.weight;
-                                    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
-                                    price = variant == null ? widget.product.price : variant.price;
-                                    discount = variant == null ? widget.product.discount : variant.discount;
-                                    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
+                                    }else if(count == 0){
+                                      String variantId, weight, mrpPrice, price, discount, isUnitType;
+                                      variantId = variant == null ? widget.product.variantId : variant.id;
+                                      weight = variant == null ? widget.product.weight : variant.weight;
+                                      mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
+                                      price = variant == null ? widget.product.price : variant.price;
+                                      discount = variant == null ? widget.product.discount : variant.discount;
+                                      isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
 
-                                    product.isFav = "1";
-                                    product.variantId = variantId;
-                                    product.weight = weight;
-                                    product.mrpPrice = mrpPrice;
-                                    product.price = price;
-                                    product.discount = discount;
-                                    product.isUnitType = isUnitType;
-                                    //Utils.showToast(AppConstant.favsAdded, true);
-                                    insertInFavTable(product,counter);
-                                  }
-                                  //print("--product.isFav-- ${product.isFav}");
-                                  widget.callback();
-                                  setState(() {
-                                  });
-                                },
-                                child: Utils.showFavIcon(widget.product.isFav),
-                                //child: Image.asset("images/myfav.png", width: 25),
-                              ),
-                              addVegNonVegOption(),
-                              imageUrl == "" ? Container(): Padding(
-                                  padding: EdgeInsets.only(right: 10),
-                                  child: Container(
-                                    width: 60.0,
-                                    height: 60.0,
-                                    decoration: new BoxDecoration(
-                                      color: Colors.white,
-                                      image: new DecorationImage(
-                                        image: new NetworkImage(imageUrl),
-                                        fit: BoxFit.cover,
+                                      product.isFav = "1";
+                                      product.variantId = variantId;
+                                      product.weight = weight;
+                                      product.mrpPrice = mrpPrice;
+                                      product.price = price;
+                                      product.discount = discount;
+                                      product.isUnitType = isUnitType;
+                                      //Utils.showToast(AppConstant.favsAdded, true);
+                                      insertInFavTable(product,counter);
+                                    }
+                                    //print("--product.isFav-- ${product.isFav}");
+                                    widget.callback();
+                                    setState(() {
+                                    });
+                                  },
+                                  child: Utils.showFavIcon(widget.product.isFav),
+                                  //child: Image.asset("images/myfav.png", width: 25),
+                                ),
+                                addVegNonVegOption(),
+                                imageUrl == "" ? Container(): Padding(
+                                    padding: EdgeInsets.only(right: 10),
+                                    child: Container(
+                                      width: 60.0,
+                                      height: 60.0,
+                                      decoration: new BoxDecoration(
+                                        color: Colors.white,
+                                        image: new DecorationImage(
+                                          image: new NetworkImage(imageUrl),
+                                          fit: BoxFit.cover,
+                                        ),
+                                        border: new Border.all(
+                                          color: appTheme,
+                                          width: 1.0,
+                                        ),
                                       ),
-                                      border: new Border.all(
-                                        color: appTheme,
-                                        width: 1.0,
-                                      ),
-                                    ),
-                                  )),
-                              Flexible(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(widget.product.title,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18.0,color: appTheme,)),
-                                      (discount == "0.00" || discount == "0" || discount == "0.0")
-                                          ? Text("${AppConstant.currency}${price}"):
-                                      Row(
-                                        children: <Widget>[
-                                          Text("${AppConstant.currency}${widget.product.discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
-                                          Text(" "),
-                                          Text("${AppConstant.currency}${widget.product.price}"),
-                                          //Text('\u{20B9}'),
-                                        ],
-                                      ),
-                                      Visibility(
-                                        visible: variantsVisibility,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(top: 5),
-                                          child: InkWell(
-                                            onTap: () async {
-                                              //print("-variants.length--${widget.product.variants.length}");
-                                              variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
-                                              if(variant != null){
-                                                databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                                                  //print("QUANTITY= ${cartDataObj.QUANTITY}");
-                                                  cartData = cartDataObj;
-                                                  counter = int.parse(cartData.QUANTITY);
-                                                  setState(() {});
-                                                });
-                                              }
+                                    )),
+                                Flexible(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(widget.product.title,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18.0,color: appTheme,)
+                                        ),
+                                        (discount == "0.00" || discount == "0" || discount == "0.0")
+                                            ? Text("${AppConstant.currency}${price}"):
+                                        Row(
+                                          children: <Widget>[
+                                            Text("${AppConstant.currency}${widget.product.discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
+                                            Text(" "),
+                                            Text("${AppConstant.currency}${widget.product.price}"),
+                                            //Text('\u{20B9}'),
+                                          ],
+                                        ),
+                                        Visibility(
+                                          visible: variantsVisibility,
+                                          child: Padding(
+                                            padding: EdgeInsets.only(top: 5),
+                                            child: InkWell(
+                                              onTap: () async {
+                                                //print("-variants.length--${widget.product.variants.length}");
+                                                variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
+                                                if(variant != null){
+                                                  databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
+                                                    //print("QUANTITY= ${cartDataObj.QUANTITY}");
+                                                    cartData = cartDataObj;
+                                                    counter = int.parse(cartData.QUANTITY);
+                                                    setState(() {});
+                                                  });
+                                                }
                                               },
-                                            child: Row(
-                                              children: <Widget>[
-                                                Text("${weight}",style: TextStyle(color: Colors.black),),
-                                                Visibility(
-                                                  visible: widget.classType == ClassType.CART ? false : true,
-                                                  child: Padding(
-                                                    padding: EdgeInsets.only(left: 5),
-                                                    child: Icon(Icons.keyboard_arrow_down,color: Colors.black, size: 25),
+                                              child: Row(
+                                                children: <Widget>[
+                                                  Text("${weight}",style: TextStyle(color: Colors.black),),
+                                                  Visibility(
+                                                    visible: widget.classType == ClassType.CART ? false : true,
+                                                    child: Padding(
+                                                      padding: EdgeInsets.only(left: 5),
+                                                      child: Icon(Icons.keyboard_arrow_down,color: Colors.black, size: 25),
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  )
-                              ),
-                            ],
-                          )),
-                      addPlusMinusView()
-                    ])
+                                      ],
+                                    )
+                                ),
+                              ],
+                            )),
+                        addQuantityView(),
+                        addPlusMinusView(),
+                      ])
+              ),
             ),
             Container(
                 height: 1,
@@ -228,13 +241,14 @@ class _ProductTileItemState extends State<ProductTileItem> {
     );
   }
 
-  Widget addPlusMinusView() {
+  Widget addQuantityView() {
     return Container(
+      //color: Colors.grey,
       margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Container(
+            /*Container(
               padding: const EdgeInsets.all(0.0),
               width: 30.0, // you can adjust the width as you need
               child: GestureDetector(onTap: () {
@@ -250,9 +264,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
                   widget.callback();
                 }
               }, child: Icon(Icons.remove, color: Colors.grey, size: 20)),
-            ),
+            ),*/
             Container(
-              width: 40.0,
+              width: 30.0,
               height: 24.0,
               decoration: new BoxDecoration(
                 color: Colors.white,
@@ -264,7 +278,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
               ),
               child: Center(child: Text("$counter")),
             ),
-            Container(
+            /*Container(
               padding: const EdgeInsets.all(0.0),
               width: 30.0, // you can adjust the width as you need
               child: GestureDetector(onTap: () {
@@ -277,6 +291,49 @@ class _ProductTileItemState extends State<ProductTileItem> {
                   insertInCartTable(widget.product, counter);
                 }
                 }, child: Icon(Icons.add, color: Colors.grey, size: 20)),
+            ),*/
+          ],
+        ));
+  }
+
+
+  Widget addPlusMinusView() {
+    return Container(
+        //color: Colors.grey,
+        margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+        child: Column(
+          //mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              //padding: const EdgeInsets.all(0.0),
+              width: 30.0, // you can adjust the width as you need
+              child: GestureDetector(onTap: () {
+                if (counter != 0) {
+                  setState(() => counter--);
+                  if (counter == 0) {
+                    // delete from cart table
+                    removeFromCartTable(widget.product.variantId);
+                  } else {
+                    // insert/update to cart table
+                    insertInCartTable(widget.product, counter);
+                  }
+                  widget.callback();
+                }
+              }, child: Icon(Icons.remove_circle_outline, color: Colors.grey, size: 25)),
+            ),
+            Container(
+              margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+              width: 30.0, // you can adjust the width as you need
+              child: GestureDetector(onTap: () {
+                setState(() => counter++);
+                if (counter == 0) {
+                  // delete from cart table
+                  removeFromCartTable(widget.product.variantId);
+                } else {
+                  // insert/update to cart table
+                  insertInCartTable(widget.product, counter);
+                }
+                }, child: Icon(Icons.add_circle_outline, color: Colors.grey, size: 25)),
             ),
           ],
         ));
