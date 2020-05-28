@@ -45,7 +45,6 @@ dependencies:
   firebase_analytics: ^5.0.11
   event_bus: ^1.1.0
   intl: ^0.16.1
-  image_picker: ^0.6.6+5
   flutter_tags: "^0.4.8+1"
 
 
