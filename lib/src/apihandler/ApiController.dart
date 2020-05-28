@@ -682,11 +682,11 @@ class ApiController {
       request.fields.addAll({
         "user_id": user.id,
       });
-
+      print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
-
+      print('--respStr===  $respStr');
       GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
       return getOrderHistory;
     } catch (e) {

@@ -106,8 +106,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
-                                            Text(widget.product.title,overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black, )
+                                            Flexible(
+                                              child: Text(widget.product.title,overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black, )
+                                              ),
                                             ),
                                             InkWell(
                                               onTap: () async {
@@ -156,6 +158,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             ),
                                           ],
                                         ),
+                                        SizedBox(
+                                          height: variantsVisibility == true? 0 : 20,
+                                        ),
                                         Visibility(
                                           visible: variantsVisibility,
                                           child: Padding(
@@ -183,7 +188,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 child: Wrap(
                                                   children: <Widget>[
                                                     Padding(
-                                                      padding: EdgeInsets.only(top: 5),
+                                                      padding: EdgeInsets.only(top: 5,right: 5,bottom: widget.classType == ClassType.CART ? 5 : 0),
                                                       child: Text("${weight}", textAlign: TextAlign.center,
                                                         style: TextStyle(color: orangeColor),),
                                                     ),

@@ -15,6 +15,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: new Text('Order History'),
         centerTitle: true,
