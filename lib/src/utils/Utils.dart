@@ -133,7 +133,7 @@ class Utils {
     Icon favIcon;
     //print("-showFavIcon- ${isFav}");
     if(isFav == null || isFav == "null" || isFav == "1"){
-      favIcon = Icon(Icons.favorite);
+      favIcon = Icon(Icons.favorite,color: orangeColor,);
     }else if(isFav == "0"){
       favIcon = Icon(Icons.favorite_border);
     }

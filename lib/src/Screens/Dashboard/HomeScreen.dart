@@ -104,6 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: <Widget>[
           addBanners(),
+          Container(
+            padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+            width: Utils.getDeviceWidth(context),
+            color: gridBackgroundCOlor,
+            child: Text('SHOP BY CATEGORY', style: TextStyle(color: Colors.black)),
+          ),
           Expanded(
             child: FutureBuilder<CategoryResponse>(
                 future: ApiController.getCategoriesApiRequest(store.id),
@@ -117,19 +123,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       if (response.success) {
                         return Container(
                           padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                          color: Colors.white,
+                          color: gridBackgroundCOlor,
                           child: GridView.count(
                               crossAxisCount: 2,
                               childAspectRatio: 1.3,
-                              padding: const EdgeInsets.all(14.0),
-                              mainAxisSpacing: 4.0,
-                              crossAxisSpacing: 4.0,
+                              padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+                              mainAxisSpacing: 5.0,
+                              crossAxisSpacing: 8.0,
                               shrinkWrap: true,
-                              children: response.categories
-                                  .map((CategoryModel model) {
-                                return GridTile(
-                                    child: CategoryView(model)
-                                );
+                              children: response.categories.map((CategoryModel model) {
+
+                                return GridTile(child: CategoryView(model));
                               }).toList()),
                         );
                       } else {
@@ -158,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: <Widget>[
         Center(
           child: SizedBox(
-            height: 220.0,
+            height: 200.0,
             width: Utils.getDeviceWidth(context),
             child: Carousel(
               boxFit: BoxFit.cover,
@@ -187,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
       children: <Widget>[
         BottomNavigationBar(
           currentIndex: _currentIndex,
-          backgroundColor: appTheme,
+          backgroundColor: bottomBarBackgroundColor,
           type: BottomNavigationBarType.fixed,
           onTap: onTabTapped,
           items: [

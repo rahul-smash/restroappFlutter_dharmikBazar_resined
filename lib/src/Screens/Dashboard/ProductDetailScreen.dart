@@ -84,7 +84,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
             style: TextStyle(
                 fontSize: 16.0,
                 color: Colors.black,
-                fontWeight: FontWeight.w400),
+                fontWeight: FontWeight.w700),
             textAlign: TextAlign.center,
           ),
         ),
@@ -103,7 +103,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                     style: TextStyle(
                         fontSize: 16.0,
                         color: Colors.black,
-                        fontWeight: FontWeight.w400),
+                        fontWeight: FontWeight.w700),
                   ),
                 ),
 
@@ -117,7 +117,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0, left: 20.0),
                         child: Text(
-                          "1 Kg",
+                          "${widget.product.weight}",
                           style: TextStyle(
                               fontSize: 16.0,
                               color: Colors.black,

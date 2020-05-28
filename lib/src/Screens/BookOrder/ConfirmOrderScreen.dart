@@ -31,7 +31,7 @@ class ConfirmOrderScreen extends StatefulWidget {
   DeliveryAddressData address;
   String paymentMode = "2"; // 2 = COD, 3 = Online Payment
   String areaId;
-  double shippingCharges = 0.0;
+  //double shippingCharges = 0.0;
 
   ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen,this.areaId);
 
@@ -64,6 +64,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       if(widget.address != null){
             if(widget.address.areaCharges != null){
               shippingCharges = widget.address.areaCharges;
+              print("-shippingCharges--${widget.address.areaCharges}---");
             }
           }
     } catch (e) {

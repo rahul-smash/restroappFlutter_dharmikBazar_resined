@@ -15,4 +15,12 @@ Color leftMenuUsernameColors = Color(0xffffffff);
 Color bottomBarIconColor = Color(0xffffffff);
 Color bottomBarTextColor = Color(0xffffffff);
 
+
 Color dotIncreasedColor = Color(0xff777A18);
+
+//=================new added==========
+Color bottomBarBackgroundColor = Color(0xffffffff);
+Color gridBackgroundCOlor = Color(0xffECECEC);
+Color orangeColor = Color(0xffFF4600);
+Color grayColor = Color(0xffd3d3d3);
+Color favGrayColor = Color(0xfff3f3f3);
