@@ -106,8 +106,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
-                                            Text(widget.product.title,overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black, )
+                                            Flexible(
+                                              child: Text(widget.product.title,overflow: TextOverflow.ellipsis,
+                                                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black, )
+                                              ),
                                             ),
                                             InkWell(
                                               onTap: () async {
