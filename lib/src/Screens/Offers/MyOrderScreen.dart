@@ -54,14 +54,15 @@ class _MyOrderScreen extends State<MyOrderScreen> {
                   child: Column(
                     children: <Widget>[
                       Expanded(
-                          child: ListView.separated(
+                          child: ListView.builder(
                             shrinkWrap: true,
                             itemCount: orders.length,
-                            separatorBuilder: (context, index) =>
-                                Divider(height: 2.0, color: Colors.black),
+//                            separatorBuilder: (context, index) =>
+//                                Divider(height: 2.0, color: Colors.black),
                             itemBuilder: (context, index) {
                               OrderData orderHistoryData = orders[index];
                               return CardOrderHistoryItems(orderHistoryData);
+
                             },
                           )),
                     ],
@@ -83,4 +84,5 @@ class _MyOrderScreen extends State<MyOrderScreen> {
       },
     );
   }
+
 }
