@@ -188,7 +188,7 @@ class ApiController {
 
     final response = await request.send().timeout(Duration(seconds: timeout));
     final respStr = await response.stream.bytesToString();
-
+    print("${url}");
     final parsed = json.decode(respStr);
     CategoryResponse categoryResponse = CategoryResponse.fromJson(parsed);
     try {

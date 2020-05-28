@@ -90,85 +90,76 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             child: Row(
                               children: [
                                 SizedBox(width: 10),
-                                InkWell(
-                                  onTap: () async {
-
-                                    int count = await databaseHelper.checkProductsExistInFavTable
-                                      (DatabaseHelper.Favorite_Table,widget.product.id);
-                                    //print("--ProductFavValue-- ${count}");
-                                    Product product = widget.product;
-                                    if(count == 1){
-                                      product.isFav = "0";
-                                      //Utils.showToast(AppConstant.favsRemoved, true);
-                                      await databaseHelper.deleteFav(DatabaseHelper.Favorite_Table,product.id);
-
-                                    }else if(count == 0){
-                                      String variantId, weight, mrpPrice, price, discount, isUnitType;
-                                      variantId = variant == null ? widget.product.variantId : variant.id;
-                                      weight = variant == null ? widget.product.weight : variant.weight;
-                                      mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
-                                      price = variant == null ? widget.product.price : variant.price;
-                                      discount = variant == null ? widget.product.discount : variant.discount;
-                                      isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
-
-                                      product.isFav = "1";
-                                      product.variantId = variantId;
-                                      product.weight = weight;
-                                      product.mrpPrice = mrpPrice;
-                                      product.price = price;
-                                      product.discount = discount;
-                                      product.isUnitType = isUnitType;
-                                      //Utils.showToast(AppConstant.favsAdded, true);
-                                      insertInFavTable(product,counter);
-                                    }
-                                    //print("--product.isFav-- ${product.isFav}");
-                                    widget.callback();
-                                    setState(() {
-                                    });
-                                  },
-                                  child: Utils.showFavIcon(widget.product.isFav),
-                                  //child: Image.asset("images/myfav.png", width: 25),
-                                ),
-                                addVegNonVegOption(),
+                                //addVegNonVegOption(),
                                 imageUrl == "" ? Container(): Padding(
-                                    padding: EdgeInsets.only(right: 10),
+                                    padding: EdgeInsets.only(left: 5,right: 20),
                                     child: Container(
-                                      width: 60.0,
-                                      height: 60.0,
-                                      decoration: new BoxDecoration(
-                                        color: Colors.white,
-                                        image: new DecorationImage(
-                                          image: new NetworkImage(imageUrl),
-                                          fit: BoxFit.cover,
-                                        ),
-                                        border: new Border.all(
-                                          color: appTheme,
-                                          width: 1.0,
-                                        ),
-                                      ),
+                                      width: 70.0,
+                                      height: 80.0,
+                                      child: Image.network(imageUrl,width: 60.0,
+                                        height: 60.0,fit: BoxFit.cover),
                                     )),
                                 Flexible(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(widget.product.title,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18.0,color: appTheme,)
-                                        ),
-                                        (discount == "0.00" || discount == "0" || discount == "0.0")
-                                            ? Text("${AppConstant.currency}${price}"):
                                         Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
-                                            Text("${AppConstant.currency}${widget.product.discount}", style: TextStyle(decoration: TextDecoration.lineThrough)),
-                                            Text(" "),
-                                            Text("${AppConstant.currency}${widget.product.price}"),
-                                            //Text('\u{20B9}'),
+                                            Text(widget.product.title,overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black, )
+                                            ),
+                                            InkWell(
+                                              onTap: () async {
+                                                int count = await databaseHelper.checkProductsExistInFavTable
+                                                  (DatabaseHelper.Favorite_Table,widget.product.id);
+                                                Product product = widget.product;
+                                                if(count == 1){
+                                                  product.isFav = "0";
+                                                  await databaseHelper.deleteFav(DatabaseHelper.Favorite_Table,product.id);
+                                                }else if(count == 0){
+                                                  String variantId, weight, mrpPrice, price, discount, isUnitType;
+                                                  variantId = variant == null ? widget.product.variantId : variant.id;
+                                                  weight = variant == null ? widget.product.weight : variant.weight;
+                                                  mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
+                                                  price = variant == null ? widget.product.price : variant.price;
+                                                  discount = variant == null ? widget.product.discount : variant.discount;
+                                                  isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
+
+                                                  product.isFav = "1";
+                                                  product.variantId = variantId;
+                                                  product.weight = weight;
+                                                  product.mrpPrice = mrpPrice;
+                                                  product.price = price;
+                                                  product.discount = discount;
+                                                  product.isUnitType = isUnitType;
+                                                  insertInFavTable(product,counter);
+                                                }
+                                                //print("--product.isFav-- ${product.isFav}");
+                                                widget.callback();
+                                                setState(() {
+                                                });
+
+                                              },
+                                              child: Container(
+                                                height: 30,width: 30,
+                                                decoration: BoxDecoration(
+                                                  color: favGrayColor,
+                                                  border: Border.all(color: favGrayColor, width: 1,),
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(5.0)),
+                                                ),
+                                                margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
+                                                child: Utils.showFavIcon(widget.product.isFav),
+                                              ),
+                                              //child: Image.asset("images/myfav.png", width: 25),
+                                            ),
                                           ],
                                         ),
                                         Visibility(
                                           visible: variantsVisibility,
                                           child: Padding(
-                                            padding: EdgeInsets.only(top: 5),
+                                            padding: EdgeInsets.only(top: 20,bottom: 10),
                                             child: InkWell(
                                               onTap: () async {
                                                 //print("-variants.length--${widget.product.variants.length}");
@@ -182,47 +173,152 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                   });
                                                 }
                                               },
-                                              child: Row(
-                                                children: <Widget>[
-                                                  Text("${weight}",style: TextStyle(color: Colors.black),),
-                                                  Visibility(
-                                                    visible: widget.classType == ClassType.CART ? false : true,
-                                                    child: Padding(
-                                                      padding: EdgeInsets.only(left: 5),
-                                                      child: Icon(Icons.keyboard_arrow_down,color: Colors.black, size: 25),
+                                              child: Container(
+                                                padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(color: orangeColor, width: 1,),
+                                                  borderRadius: BorderRadius.all(
+                                                      Radius.circular(5.0)),
+                                                ),
+                                                child: Wrap(
+                                                  children: <Widget>[
+                                                    Padding(
+                                                      padding: EdgeInsets.only(top: 5),
+                                                      child: Text("${weight}", textAlign: TextAlign.center,
+                                                        style: TextStyle(color: orangeColor),),
                                                     ),
-                                                  ),
-                                                ],
+                                                    Visibility(
+                                                      visible: widget.classType == ClassType.CART ? false : true,
+                                                      child: Padding(
+                                                        padding: EdgeInsets.only(left: 10),
+                                                        child: Icon(Icons.keyboard_arrow_down,
+                                                            color: orangeColor, size: 25),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
+                                        ),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            (discount == "0.00" || discount == "0" || discount == "0.0")
+                                                ? Text("${AppConstant.currency}${price}",style: TextStyle(fontWeight: FontWeight.bold),)
+                                                :
+                                            Row(
+                                              children: <Widget>[
+                                                Text("${AppConstant.currency}${widget.product.discount}",
+                                                    style: TextStyle(decoration: TextDecoration.lineThrough,fontWeight: FontWeight.bold)),
+                                                Text(" "),
+                                                Text("${AppConstant.currency}${widget.product.price}",style: TextStyle(fontWeight: FontWeight.bold),),
+                                              ],
+                                            ),
+                                            addQuantityView(),
+                                          ],
                                         ),
                                       ],
                                     )
                                 ),
                               ],
                             )),
-                        addQuantityView(),
-                        addPlusMinusView(),
-                      ])
+
+                        //addPlusMinusView(),
+                      ]
+                  )
               ),
             ),
-            Container(
-                height: 1,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width,
-                color: Color(0xFFBDBDBD))
+            Container(height: 1,width: MediaQuery.of(context).size.width,color: Color(0xFFBDBDBD))
           ]),
     );
   }
 
+
+  Widget addQuantityView() {
+    return Container(
+      //color: Colors.grey,
+      margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(0.0),
+              width: 30.0, // you can adjust the width as you need
+              child: GestureDetector(onTap: () {
+                if (counter != 0) {
+                  setState(() => counter--);
+                  if (counter == 0) {
+                    // delete from cart table
+                    removeFromCartTable(widget.product.variantId);
+                  } else {
+                    // insert/update to cart table
+                    insertInCartTable(widget.product, counter);
+                  }
+                  widget.callback();
+
+                }
+                },
+                  child: Container(
+                    width: 35,
+                    height: 25,
+                    decoration: BoxDecoration(
+                        color: grayColor,
+                        border: Border.all(color: grayColor, width: 1,),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(5.0)),
+                    ),
+                    child: Icon(Icons.remove, color: Colors.white, size: 20),
+                  )
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+              width: 30.0,
+              height: 30.0,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
+                border: new Border.all(
+                  color: Colors.white,
+                  width: 1.0,
+                ),
+              ),
+              child: Center(child: Text("$counter",style: TextStyle(fontSize: 18),)),
+            ),
+            Container(
+              padding: const EdgeInsets.all(0.0),
+              width: 30.0, // you can adjust the width as you need
+              child: GestureDetector(onTap: () {
+                setState(() => counter++);
+                if (counter == 0) {
+                  // delete from cart table
+                  removeFromCartTable(widget.product.variantId);
+                } else {
+                  // insert/update to cart table
+                  insertInCartTable(widget.product, counter);
+                }
+                },
+                  child: Container(
+                      width: 35,
+                      height: 25,
+                      decoration: BoxDecoration(
+                        color: orangeColor,
+                        border: Border.all(color: orangeColor, width: 1,),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(5.0)),
+                      ),
+                      child: Icon(Icons.add, color: Colors.white, size: 20)),
+              ),
+            ),
+          ],
+        ));
+  }
+
+
   Widget addVegNonVegOption() {
     Color foodOption =
     widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
-    //print('@@product_nutrient'+widget.product.nutrient);
-    //print("-product.variant--> ${widget.product.variants.length}");
     return Padding(
       padding: EdgeInsets.only(left: 7, right: 7),
       child: widget.product.nutrient == "None"? Container(): Container(
@@ -244,109 +340,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
                 )),
           )),
     );
-  }
-
-  Widget addQuantityView() {
-    return Container(
-      //color: Colors.grey,
-      margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            /*Container(
-              padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(onTap: () {
-                if (counter != 0) {
-                  setState(() => counter--);
-                  if (counter == 0) {
-                    // delete from cart table
-                    removeFromCartTable(widget.product.variantId);
-                  } else {
-                    // insert/update to cart table
-                    insertInCartTable(widget.product, counter);
-                  }
-                  widget.callback();
-                }
-              }, child: Icon(Icons.remove, color: Colors.grey, size: 20)),
-            ),*/
-            Container(
-              width: 30.0,
-              height: 24.0,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
-                border: new Border.all(
-                  color: Color(0xFFBDBDBD),
-                  width: 1.0,
-                ),
-              ),
-              child: Center(child: Text("$counter")),
-            ),
-            /*Container(
-              padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(onTap: () {
-                setState(() => counter++);
-                if (counter == 0) {
-                  // delete from cart table
-                  removeFromCartTable(widget.product.variantId);
-                } else {
-                  // insert/update to cart table
-                  insertInCartTable(widget.product, counter);
-                }
-                }, child: Icon(Icons.add, color: Colors.grey, size: 20)),
-            ),*/
-          ],
-        ));
-  }
-
-  Widget addPlusMinusView() {
-    return Container(
-        //color: Colors.grey,
-        margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
-        child: Column(
-          //mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              //padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(
-                  onTap: () {
-                    if (counter != 0) {
-                      setState(() {
-                        return counter--;
-                      });
-                      if (counter == 0) {
-                        // delete from cart table
-                        removeFromCartTable(widget.product.variantId);
-                      } else {
-                        // insert/update to cart table
-                        insertInCartTable(widget.product, counter);
-                      }
-                      widget.callback();
-                }
-              }, child: Icon(Icons.remove_circle_outline, color: Colors.grey, size: 25)),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      return counter++;
-                    });
-                    if (counter == 0) {
-                      // delete from cart table
-                      removeFromCartTable(widget.product.variantId);
-                    } else {
-                      // insert/update to cart table
-                      insertInCartTable(widget.product, counter);
-                    }
-                }, child: Icon(Icons.add_circle_outline, color: Colors.grey, size: 25)),
-            ),
-          ],
-        ));
   }
 
   void insertInCartTable(Product product, int quantity) {
