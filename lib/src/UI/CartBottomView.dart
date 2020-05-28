@@ -54,7 +54,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
   @override
   Widget build(BuildContext context) {
     return widget.parent == ParentInfo.productList || widget.parent == ParentInfo.favouritesList
-        ? addProductScreenBottom()
+        || widget.parent == ParentInfo.searchList ? addProductScreenBottom()
         : addMyCartScreenBottom();
   }
 
@@ -202,4 +202,5 @@ enum ParentInfo {
   productList,
   cartList,
   favouritesList,
+  searchList
 }

@@ -147,7 +147,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                   ),
                 ),
               ),
-            )
+            ),
           ]
       ),
     );

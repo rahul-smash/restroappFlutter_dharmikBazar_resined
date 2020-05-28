@@ -10,6 +10,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:flutter_tags/flutter_tags.dart';
 
 class SearchScreen extends StatefulWidget {
 
@@ -26,13 +27,16 @@ class _SearchScreenState extends BaseState<SearchScreen> {
   List<String> tagsList = List();
   SubCategoryModel subCategory;
   CartTotalPriceBottomBar bottomBar =
-  CartTotalPriceBottomBar(ParentInfo.productList);
+  CartTotalPriceBottomBar(ParentInfo.searchList);
+  bool isSearchEmpty;
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     selctedTag = -1;
+    isSearchEmpty = true;
     ApiController.searchTagsAPI().then((respons){
       SearchTagsModel response = respons;
       setState(() {
@@ -62,56 +66,82 @@ class _SearchScreenState extends BaseState<SearchScreen> {
           child: Column(
             children: <Widget>[
               Container(
+                height: 40,
                 margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                padding: EdgeInsets.all(3.0),
+                //padding: EdgeInsets.all(5.0),
                 decoration: BoxDecoration(
-                    border: Border.all(color: appTheme)
+                    color: searchGrayColor,
+                    borderRadius: BorderRadius.all(
+                        Radius.circular(5.0)),
+                    border: Border.all(color: searchGrayColor,)
                 ),
-                child: ListTile(
-                  title: TextField(
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (value) {
-                      if(value.trim().isEmpty){
-                        Utils.showToast("Please enter some valid keyword", false);
-                      }else{
-                        selctedTag = -1;
-                        callSearchAPI();
-                      }
-                    },
-                    controller: controller,
-                    cursorColor: Colors.black,
-                    keyboardType: TextInputType.text,
-                    decoration: new InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        errorBorder: InputBorder.none,
-                        disabledBorder: InputBorder.none,
-                        hintText: "Search"),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                  child: Center(
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                              icon: Icon(Icons.search,color: appTheme,),
+                              onPressed: () {
+                                if(controller.text.trim().isEmpty){
+                                  Utils.showToast("Please enter some valid keyword", false);
+                                }else{
+                                  selctedTag = -1;
+                                  callSearchAPI();
+                                }
+                              }),
+                          Flexible(
+                            child: TextField(
+                              textInputAction: TextInputAction.search,
+                              onSubmitted: (value) {
+                                if(value.trim().isEmpty){
+                                  Utils.showToast("Please enter some valid keyword", false);
+                                }else{
+                                  selctedTag = -1;
+                                  callSearchAPI();
+                                }
+                              },
+                              onChanged: (text){
+                                print("onChanged ${text}");
+                                if(text.trim().isEmpty){
+                                  isSearchEmpty = true;
+                                }else{
+                                  isSearchEmpty = false;
+                                }
+                                setState(() {
+                                });
+                              },
+                              controller: controller,
+                              cursorColor: Colors.black,
+                              keyboardType: TextInputType.text,
+                              decoration: new InputDecoration(
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  hintText: "Search"),
+                            ),
+                          ),
+                          IconButton(
+                              icon: Icon(Icons.clear,color: appTheme,),
+                              onPressed: () {
+                                setState(() {
+                                  controller.text = "";
+                                });
+                              }),
+                        ]
+                    ),
                   ),
-                  trailing: IconButton(icon: Icon(Icons.search,color: appTheme,),
-                      onPressed: () {
-                        if(controller.text.trim().isEmpty){
-                          Utils.showToast("Please enter some valid keyword", false);
-                        }else{
-                          selctedTag = -1;
-                          callSearchAPI();
-                        }
-                      }),
                 ),
               ),
               Container(
                 margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                 child: showTagsList(),
               ),
-              Container(
-                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  height: 1,
-                  width: MediaQuery.of(context).size.width,
-                  color: Color(0xFFBDBDBD)
-              ),
               Expanded(
-                child: subCategory == null ? Utils.getEmptyView2("No data found!")
+                child: subCategory == null ? Utils.getEmptyView2("")
                     : ListView.builder(
                   itemCount: subCategory.products.length,
                   itemBuilder: (context, index) {
@@ -135,8 +165,41 @@ class _SearchScreenState extends BaseState<SearchScreen> {
     print("---selctedTag-${selctedTag}---");
     Widget horizontalList = new Container(
         margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-        height: 50.0,
-        child: ListView.builder(
+        //height: 150.0,
+        child: Tags(
+          itemCount: tagsList.length,
+          alignment: WrapAlignment.start,
+          //horizontalScroll: true,
+          itemBuilder: (int index){
+            String tagName = tagsList[index];
+            return ItemTags(
+              key: Key(index.toString()),
+              index: index,
+              elevation: 0.0,
+              borderRadius: BorderRadius.circular(5.0),
+              border: Border.all(
+                width: 1,
+                color: favGrayColor,
+              ),
+              color: favGrayColor,
+              activeColor: searchTagsColor,
+              textActiveColor: Colors.white,
+              singleItem: true,
+              splashColor: Colors.green,
+              combine: ItemTagsCombine.withTextBefore,
+              title: tagName,
+              onPressed: (item){
+                setState(() {
+                  selctedTag = index;
+                  //print("selctedTag= ${tagsList[selctedTag]}");
+                  controller.text = tagsList[selctedTag];
+                  //callSearchAPI();
+                });
+              },
+            );
+          },
+        ) ,
+        /*child: ListView.builder(
           itemCount: tagsList.length,
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) {
@@ -167,7 +230,7 @@ class _SearchScreenState extends BaseState<SearchScreen> {
               ),
             );
           },
-        )
+        )*/
     );
     return horizontalList;
   }

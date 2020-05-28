@@ -91,15 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
           icon: Image.asset('images/hamburger.png', width: 25),
           onPressed: _handleDrawer,
         ),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.search),
-              onPressed: () async {
-                var result = await Navigator.push(context, MaterialPageRoute(
-                  builder: (BuildContext context) => SearchScreen(),
-                  fullscreenDialog: true,)
-                );
-                //print("-onPressed-${result}---");
-              })],
+
       ),
       body: Column(
         children: <Widget>[
@@ -200,8 +192,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
                 backgroundColor: appTheme),
             BottomNavigationBarItem(
-              icon: Icon(Icons.local_offer, color: bottomBarIconColor),
-              title: Text('Offers', style: TextStyle(color: bottomBarTextColor)),
+              icon: Icon(Icons.search, color: bottomBarIconColor),
+              title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
               backgroundColor: appTheme,
             ),
             BottomNavigationBarItem(
@@ -239,9 +231,13 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       }
       if (_currentIndex == 1) {
-        Navigator.push(
+        /*Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MyOfferScreen(context)),
+        );*/
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => SearchScreen()),
         );
       }
       if (_currentIndex == 3) {

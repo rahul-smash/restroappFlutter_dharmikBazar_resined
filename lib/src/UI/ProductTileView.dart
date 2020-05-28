@@ -158,6 +158,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             ),
                                           ],
                                         ),
+                                        SizedBox(
+                                          height: variantsVisibility == true? 0 : 20,
+                                        ),
                                         Visibility(
                                           visible: variantsVisibility,
                                           child: Padding(
@@ -185,7 +188,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 child: Wrap(
                                                   children: <Widget>[
                                                     Padding(
-                                                      padding: EdgeInsets.only(top: 5),
+                                                      padding: EdgeInsets.only(top: 5,right: 5,bottom: widget.classType == ClassType.CART ? 5 : 0),
                                                       child: Text("${weight}", textAlign: TextAlign.center,
                                                         style: TextStyle(color: orangeColor),),
                                                     ),
