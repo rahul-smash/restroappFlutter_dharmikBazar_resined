@@ -80,7 +80,7 @@ class _ProfileState extends State<ProfileScreen> {
                         controller: firstNameController,
                         decoration: InputDecoration(
                             labelText: 'First name',
-                            floatingLabelBehavior: FloatingLabelBehavior.never
+                            //floatingLabelBehavior: FloatingLabelBehavior.never
                         ),
                         style: TextStyle(
                             fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
@@ -94,7 +94,7 @@ class _ProfileState extends State<ProfileScreen> {
                         controller: lastNameController,
                         decoration: InputDecoration(
                             labelText: 'Last name',
-                            floatingLabelBehavior: FloatingLabelBehavior.never
+                            //floatingLabelBehavior: FloatingLabelBehavior.never
                         ),
                         style: TextStyle(
                             fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
@@ -114,7 +114,7 @@ class _ProfileState extends State<ProfileScreen> {
                         controller: emailController,
                         decoration: InputDecoration(
                             labelText: 'Email',
-                            floatingLabelBehavior: FloatingLabelBehavior.never
+                            //floatingLabelBehavior: FloatingLabelBehavior.never
                         ),
                         style: TextStyle(
                             fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
@@ -127,7 +127,7 @@ class _ProfileState extends State<ProfileScreen> {
                         controller: phoneController,
                         decoration: InputDecoration(
                             labelText: 'Phone number',
-                            floatingLabelBehavior: FloatingLabelBehavior.never
+                            //floatingLabelBehavior: FloatingLabelBehavior.never
                         ),
                         style: TextStyle(
                             fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
