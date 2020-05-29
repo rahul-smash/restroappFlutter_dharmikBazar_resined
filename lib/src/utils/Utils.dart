@@ -182,6 +182,15 @@ class Utils {
     return formatted;
   }
 
+  static convertStringToDate2(String dateObj){
+    DateFormat dateFormat = DateFormat("dd-MM-yyyy");
+    DateTime dateTime = dateFormat.parse(dateObj);
+    DateFormat formatter = new DateFormat('dd MMM');
+    String formatted = formatter.format(dateTime);
+    //print(formatted);
+    return formatted;
+  }
+
   static convertStringToDate(String dateObj){
     DateFormat dateFormat = DateFormat("dd MMM yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);

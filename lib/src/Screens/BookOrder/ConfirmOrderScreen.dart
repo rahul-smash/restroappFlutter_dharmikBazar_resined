@@ -422,9 +422,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Total",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)}",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(
+                    taxModel == null ? totalPrice : double.parse(taxModel.total), 2)}",
+                    style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ))
       ]),
@@ -469,6 +469,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
                         setState(() {
                           taxModel = model;
+                          print("===couponCode=== ${model.couponCode}");
+                          print("taxModel.total=${taxModel.total}");
                         });
                   }),
                 );

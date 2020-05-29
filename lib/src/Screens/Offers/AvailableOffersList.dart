@@ -103,6 +103,10 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                               padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                                               child: Text("Min Booking -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
                                             ),
+                                            Padding(
+                                              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                              child: Text("Valid ${Utils.convertStringToDate2(offer.validFrom)} - ${Utils.convertStringToDate2(offer.validTo)}"),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -163,14 +167,14 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
   }
 
   void validateCouponApi(String couponCode, String json) {
-    //print("----couponCode-----=>${couponCode}");
+    print("----couponCode-----=>${couponCode}");
     ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json).then((validCouponModel) {
       if (validCouponModel != null &&validCouponModel.success) {
 
         Utils.showToast(validCouponModel.message, true);
 
-        ApiController.multipleTaxCalculationRequest(couponCode,validCouponModel.discountAmount, "0", json)
-            .then((response) async {
+        ApiController.multipleTaxCalculationRequest(couponCode,
+            validCouponModel.discountAmount, "0", json).then((response) async {
           Utils.hideProgressDialog(context);
           if (response.success) {
             widget.callback(response.taxCalculation);
