@@ -384,7 +384,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Items Price", style: TextStyle(color: Colors.black54)),
-                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                Text("${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice-int.parse(shippingCharges)), 2)}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
