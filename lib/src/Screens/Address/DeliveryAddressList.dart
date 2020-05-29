@@ -213,7 +213,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               )
             ]),
             Divider(color: Color(0xFFBDBDBD), thickness: 1.0),
-            addOperationBar(area)
+            addOperationBar(area,index)
           ])),
     );
   }
@@ -242,7 +242,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     );
   }
 
-  Widget addOperationBar(DeliveryAddressData area) {
+  Widget addOperationBar(DeliveryAddressData area, int index) {
     return Padding(
       padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
       child: new Row(
@@ -283,6 +283,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               child: new Text("Remove Address",style: TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),
             ),
             onTap: () async {
+              print("--selectedIndex= ${index}");
               var results = await DialogUtils.displayDialog(context,"Delete",AppConstant.deleteAddress,
                   "Cancel","OK");
               if(results == true){
@@ -291,12 +292,15 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                   Utils.hideProgressDialog(context);
                   if (response != null && response.success) {
                     print("---showDialogForDelete-----");
-                    Utils.showProgressDialog(context);
+                    setState(() {
+                      addressList.removeAt(index);
+                    });
+                    /*Utils.showProgressDialog(context);
                     DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
                     setState(() {
                       Utils.hideProgressDialog(context);
                       addressList = response.data;
-                    });
+                    });*/
                   }
                 });
               }

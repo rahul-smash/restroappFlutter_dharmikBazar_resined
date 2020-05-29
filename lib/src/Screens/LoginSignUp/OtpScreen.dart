@@ -143,7 +143,7 @@ class _OtpScreen extends State<OtpScreen> {
     const oneSec = const Duration(seconds: 1);
     _timer = new Timer.periodic(oneSec,
           (Timer timer) {
-            print('--periodic===  $_start');
+            //print('--periodic===  $_start');
         setState(
               () {
             if (_start < 1) {
@@ -163,7 +163,7 @@ class _OtpScreen extends State<OtpScreen> {
     //print('--periodic===  $_start');
     if(_start == 0){
       // user clicked on skip button
-      print('--Skip=Skip==');
+      //print('--Skip=Skip==');
       proceedToNextActivity();
     }
   }

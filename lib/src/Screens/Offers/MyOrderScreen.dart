@@ -72,7 +72,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
               }
 
             } else {
-              return Container();
+              return Utils.getEmptyView2("No data found");
             }
           } else {
             return Center(
