@@ -422,7 +422,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Total",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)+int.parse(shippingCharges)}",
+                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)}",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
@@ -553,11 +553,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-  void removeCoupon() {
+  Future<void> removeCoupon() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if(!isNetworkAvailable){
+      Utils.showToast(AppConstant.noInternet, false);
+      return;
+    }
     Utils.showProgressDialog(context);
     databaseHelper.getCartItemsListToJson().then((json) {
-      ApiController.multipleTaxCalculationRequest("", "0", "0", json)
-          .then((response) {
+      ApiController.multipleTaxCalculationRequest("", "0", "0", json).then((response) {
         Utils.hideProgressDialog(context);
         setState(() {
           taxModel = null;
@@ -569,7 +573,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void callStripeApi() {
     Utils.showProgressDialog(context);
-    double price = totalPrice + int.parse(shippingCharges);
+    double price = totalPrice;
     String mPrice = price.toString().substring(0 , price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
     ApiController.stripePaymentApi(mPrice).then((response){
@@ -598,7 +602,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void openCheckout(String razorpay_order_id,StoreModel storeObject) async {
     Utils.hideProgressDialog(context);
     UserModel user = await SharedPrefs.getUser();
-    double price = totalPrice + int.parse(shippingCharges);
+    double price = totalPrice ;
     razorpay_orderId = razorpay_order_id;
     var options = {
       'key': '${storeObject.paymentSetting.apiKey}',
@@ -658,7 +662,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void callOrderIdApi(StoreModel storeObject) {
     Utils.showProgressDialog(context);
-    double price = totalPrice + int.parse(shippingCharges);
+    double price = totalPrice ;
     //print("=======1===${price}===========");
     price = price * 100;
     //print("=======2===${price}===========");
