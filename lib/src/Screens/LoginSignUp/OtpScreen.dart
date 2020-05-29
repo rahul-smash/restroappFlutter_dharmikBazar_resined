@@ -197,7 +197,7 @@ class _OtpScreen extends State<OtpScreen> {
 
           Utils.showProgressDialog(context);
 
-          ApiController.otpVerified(otpModel).then((response) {
+          ApiController.otpVerified(otpModel,widget.phone).then((response) {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
               //print('@@----object+'+response.success.toString());

@@ -29,9 +29,7 @@ class _ProfileState extends State<ProfileScreen> {
   @override
   initState() {
     super.initState();
-    if(!widget.isComingFromOtpScreen){
-      getProfileData();
-    }
+    getProfileData();
   }
 
   getProfileData() async {

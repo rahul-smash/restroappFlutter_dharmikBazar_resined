@@ -720,10 +720,10 @@ class ApiController {
       print('--response===  $respStr');
       final parsed = json.decode(respStr);
       MobileVerified userResponse = MobileVerified.fromJson(parsed);
-      /*if (userResponse.success) {
-        SharedPrefs.setUserLoggedIn(true);
+      if (userResponse.success) {
+        //SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUserMobile(userResponse.user);
-      }*/
+      }
       return userResponse;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
@@ -732,7 +732,7 @@ class ApiController {
     }
   }
 
-  static Future<OtpVerified> otpVerified(OTPData otpData) async {
+  static Future<OtpVerified> otpVerified(OTPData otpData,LoginMobile phone) async {
 
     UserModelMobile userMobile = await SharedPrefs.getUserMobile();
     StoreModel store = await SharedPrefs.getStore();

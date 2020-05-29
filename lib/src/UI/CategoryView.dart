@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -38,9 +39,9 @@ class CategoryView extends StatelessWidget {
           ),
           Expanded(
             child: Padding(
-              padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+              padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
               child: Center(
-                child: Text(categoryModel.title,
+                child: Text(categoryModel.title,textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: new TextStyle(color: Colors.black)),
               ),

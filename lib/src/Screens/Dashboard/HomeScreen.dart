@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: gridBackgroundCOlor,
                           child: GridView.count(
                               crossAxisCount: 2,
-                              childAspectRatio: 1.3,
+                              childAspectRatio: 1.2,
                               padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
                               mainAxisSpacing: 5.0,
                               crossAxisSpacing: 8.0,
