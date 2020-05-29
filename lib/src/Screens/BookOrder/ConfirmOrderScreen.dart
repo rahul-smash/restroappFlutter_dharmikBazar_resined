@@ -518,7 +518,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         onTap: () async {
           var result = await DialogUtils.displayPaymentDialog(context, "Select Payment","");
           //print("----result----${result}--");
-          if(result == false){
+          if(result == null){
             return;
           }
           if(result == PaymentType.ONLINE){
