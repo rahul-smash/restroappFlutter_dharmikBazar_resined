@@ -8,10 +8,12 @@ class OrderDetailScreen extends StatelessWidget {
   OrderDetailScreen(this.orderHistoryData);
   var screenWidth;
   var mainContext;
+
   @override
   Widget build(BuildContext context) {
     screenWidth =  MediaQuery.of(context).size.width;
     mainContext =  context;
+
     return new Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -21,31 +23,23 @@ class OrderDetailScreen extends StatelessWidget {
       body:  SafeArea(
           child: Column(
             children: <Widget>[
-            Expanded(
-              child: projectWidget()
-            ),
-              bottomView(false),
-
-        ],
-          )
-      )
-    );
-  }
-
-  bottomView(bool forBottomSheet){
-    return  Container(
-        height: 60,
+              Expanded(
+                  child: projectWidget()
+              ),
+            ],
+          ),
+      ),
+      bottomNavigationBar: Container(
+        height: 50,
         color: Color(0xFF74990A),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            GestureDetector(
-              onTap: (){
-                 if(!forBottomSheet) {
-                  bottomSheet(mainContext);
-                }
-              },
-              child: Row(
+        child: InkWell(
+          onTap: (){
+            bottomSheet(mainContext);
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Row(
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.only(left: 15.0,top: 0.0,),
@@ -57,13 +51,14 @@ class OrderDetailScreen extends StatelessWidget {
                     Image.asset("images/topArrow.png",width: 15,height: 15,),
                   ]
               ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(right: 10.0,),
-              child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
-            ),
-          ],
-        )
+              Padding(
+                padding: EdgeInsets.only(right: 10.0,),
+                child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -74,7 +69,6 @@ class OrderDetailScreen extends StatelessWidget {
       itemBuilder: (BuildContext ctx, int index){
         final item = orderHistoryData.orderItems[index];
         return Container(
-//                height: 150,
           color: Colors.white,
           child: Column(
             children: <Widget>[
@@ -87,7 +81,6 @@ class OrderDetailScreen extends StatelessWidget {
       },
     );
   }
-
 
   firstRow(OrderItems item){
     return Row(
@@ -179,125 +172,107 @@ class OrderDetailScreen extends StatelessWidget {
   bottomSheet(context){
     showModalBottomSheet(
         context: context,
+        isScrollControlled: false,
         builder: (BuildContext bc){
-          return SafeArea(
-                child: Container(
-                  child: new Wrap(
-                      children: <Widget>[
-                        Padding(padding: EdgeInsets.only(left: screenWidth-50,top: 10),
-                          child: GestureDetector(
-                            onTap: (){
-                              Navigator.pop(mainContext);
-                            },
-                            child: Image.asset('images/close.png'),
-                          ),
+          return Container(
+            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: Wrap(
+                //crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(left: screenWidth-40 ,top: 5,bottom: 10),
+                    child: GestureDetector(
+                      onTap: (){
+                        Navigator.pop(mainContext);
+                      },
+                      child: Image.asset('images/close.png'),
+                    ),
 
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                    child:  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('Item Price : ',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                        Text("RS ${orderHistoryData.total}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                    child:  sheetDeviderLine(),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                    child:   Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                        Text("RS ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                    child:  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                        Text("RS ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                    child:  bottomDeviderView(),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                    child: Text('Delivery Address',
+                        style: TextStyle(color: Colors.black,fontSize: 16)),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
+                    child: Text('${orderHistoryData.address}',
+                        style: TextStyle(color: Color(0xFF737879),fontSize: 16)),
+                  ),
+                  Container(
+                    height: 50,
+                    color: Color(0xFF74990A),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: EdgeInsets.only(left: 15.0,top: 0.0,),
+                                child : Text("View Details",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w600),),
+                              ),
+                              SizedBox(
+                                  width: 6
+                              ),
+                              Image.asset("images/topArrow.png",width: 15,height: 15,),
+                            ]
                         ),
                         Padding(
-                          padding: EdgeInsets.only(left: 15,top: 10,right: 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-
-                              Padding(
-                                padding: EdgeInsets.only(top: 15.0),
-                                child:  Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text('Item Price : ',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                                    Text("RS ${orderHistoryData.total}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                                  ],
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 15.0),
-                                child:  sheetDeviderLine(),
-                              ),
-
-                              Padding(
-                                padding: EdgeInsets.only(top: 15.0),
-                                child:   Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-
-                                    Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                                    Text("RS ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                                  ],
-                                ),
-                              ),
-
-
-                              Padding(
-                                padding: EdgeInsets.only(top: 20.0),
-                                child:  Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                                    Text("RS ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
-                                  ],
-                                ),
-                              ),
-
-                            ],
-                          ),
+                          padding: EdgeInsets.only(right: 10.0,),
+                          child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
                         ),
-                        Padding(padding: EdgeInsets.only(top: 15),
-                          child:  bottomDeviderView(),
-                        ),
-
-                        Padding(padding: EdgeInsets.all(15),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text('Delivery Address',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                                Row(
-                                  children: <Widget>[
-
-                                    Padding(padding: EdgeInsets.only(top: 20),
-                                      child: Text('Vicky sharma',style: TextStyle(color: Colors.black,fontSize: 19,fontWeight: FontWeight.w600)),
-                                    ),
-                                    Padding(padding: EdgeInsets.only(top: 20,left: 15),
-                                      child: SizedBox(
-                                        width: 75,
-                                        height: 30,
-                                        child: FlatButton(onPressed: (){
-                                        },
-                                          child: Text("Home",style: TextStyle(color: Color(0xFF797C80),fontSize: 14,),),
-                                          color: Color(0xFFDEDFE0),
-                                          shape:  RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(4.0),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Padding(padding: EdgeInsets.only(top: 5),
-                                    child:Text('Mob 123433333',style: TextStyle(color: Color(0xFF737879),fontSize: 18))
-                                ),
-
-                                Padding(padding: EdgeInsets.only(top: 5,bottom: 20),
-                                    child:Text("RS ${orderHistoryData.address}",style: TextStyle(color: Color(0xFF737879),fontSize: 18))
-                                ),
-                              ]
-                          ),
-                        ),
-                        bottomView(true)
-                      ]
+                      ],
+                    ),
                   ),
-                )
+                ]
+            ),
           );
         }
     );
   }
 
-
   bottomDeviderView() {
     return Container(
-      width: MediaQuery
-          .of(mainContext)
-          .size
-          .width,
+      width: MediaQuery.of(mainContext).size.width,
       height: 10,
       color: Color(0xFFDBDCDD),
     );
@@ -332,8 +307,10 @@ class OrderDetailScreen extends StatelessWidget {
       return "Waiting";
     }
   }
+
   Color getStatusColor(status){
     return status == "0" ? Color(0xFFA1BF4C) : status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
   }
+
 
 }

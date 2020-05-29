@@ -22,7 +22,6 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
   @override
   Widget build(BuildContext context) {
     return Container(
-//                height: 150,
       color: Colors.white,
       child: Column(
         children: <Widget>[
@@ -43,7 +42,6 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-
             Padding(
               padding: EdgeInsets.only(left: 12.0, top: 15.0, right: 10.0),
               child: Row(
@@ -62,30 +60,11 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
             ),
           ],
         ),
-
-        Padding(
-          padding: EdgeInsets.only(top: 15.0, right: 12.0),
-          child: SizedBox(
-            width: 70,
-            height: 30,
-            child: FlatButton(onPressed: () {
-
-            },
-              child: Text("Cancel",
-                style: TextStyle(color: Color(0xFF525A5F), fontSize: 11,),),
-              color: Color(0xFFEAEEEF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(3.0),
-              ),
-            ),
-          ),
-        )
       ],
     );
   }
 
   secondRow() {
-
     return  Padding(
       padding: EdgeInsets.only(bottom: 15,top: 10),
       child:  Row(
@@ -94,7 +73,6 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-
                 Padding(
                   padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
                   child: Row(
@@ -137,14 +115,16 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
               child:  SizedBox(
                 width: 90,
                 height: 30,
-                child: FlatButton(onPressed: (){
+                child: FlatButton(
+                  onPressed: (){
+                    print("OrderDetailScreen");
                   Navigator.push( context,
                     MaterialPageRoute(
                       builder: (context) => OrderDetailScreen(cardOrderHistoryItems),
                     ),
                   );
                 },
-                  child: Text("View order",style: TextStyle(color: Colors.white,fontSize: 11),),
+                  child: Text("View Order",style: TextStyle(color: Colors.white,fontSize: 11),),
                   color: Color(0xFFFD5401),
                   shape:  RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(3.0),
