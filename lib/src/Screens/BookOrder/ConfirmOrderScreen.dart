@@ -74,6 +74,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       databaseHelper.getTotalPrice().then((mTotalPrice) {
             setState(() {
               totalPrice = mTotalPrice;
+              totalPrice = totalPrice + int.parse(shippingCharges);
             });
           });
     } catch (e) {
@@ -536,6 +537,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               callStripeApi();
             }
           }else{
+
             placeOrderApiCall("","","");
           }
 

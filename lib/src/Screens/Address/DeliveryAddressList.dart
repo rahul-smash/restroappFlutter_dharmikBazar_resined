@@ -20,7 +20,8 @@ class DeliveryAddressList extends StatefulWidget {
 
   final bool showProceedBar;
   DeliveryAddressResponse responsesData;
-  DeliveryAddressList(this.showProceedBar,this.responsesData);
+  OrderType delivery;
+  DeliveryAddressList(this.showProceedBar,this.responsesData,this.delivery);
 
   @override
   _AddDeliveryAddressState createState() => _AddDeliveryAddressState();

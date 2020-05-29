@@ -214,12 +214,11 @@ class Utils {
   }
 }
 
-
-
-
-
-
 enum ClassType {
   CART,SubCategory,Favourites,Search
+}
+
+enum OrderType {
+  Delivery,PickUp,Menu
 }
 
