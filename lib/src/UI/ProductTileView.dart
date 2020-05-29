@@ -146,13 +146,16 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                               child: Container(
                                                 height: 30,width: 30,
                                                 decoration: BoxDecoration(
-                                                  color: favGrayColor,
+                                                  color: widget.classType == ClassType.CART? Colors.white : favGrayColor,
                                                   border: Border.all(color: favGrayColor, width: 1,),
                                                   borderRadius: BorderRadius.all(
                                                       Radius.circular(5.0)),
                                                 ),
                                                 margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
-                                                child: Utils.showFavIcon(widget.product.isFav),
+                                                child: Visibility(
+                                                  visible: widget.classType == ClassType.CART? false : true,
+                                                  child: Utils.showFavIcon(widget.product.isFav),
+                                                ),
                                               ),
                                               //child: Image.asset("images/myfav.png", width: 25),
                                             ),
