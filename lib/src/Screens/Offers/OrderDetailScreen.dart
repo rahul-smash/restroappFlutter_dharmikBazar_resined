@@ -30,7 +30,7 @@ class OrderDetailScreen extends StatelessWidget {
           ),
       ),
       bottomNavigationBar: Container(
-        height: 50,
+        height: 40,
         color: Color(0xFF74990A),
         child: InkWell(
           onTap: (){
@@ -43,7 +43,7 @@ class OrderDetailScreen extends StatelessWidget {
                   children: <Widget>[
                     Padding(
                       padding: EdgeInsets.only(left: 15.0,top: 0.0,),
-                      child : Text("View Details",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w600),),
+                      child : Text("View Details",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w600),),
                     ),
                     SizedBox(
                         width: 6
@@ -53,7 +53,7 @@ class OrderDetailScreen extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.only(right: 10.0,),
-                child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+                child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
               ),
             ],
           ),
@@ -239,7 +239,7 @@ class OrderDetailScreen extends StatelessWidget {
                         style: TextStyle(color: Color(0xFF737879),fontSize: 16)),
                   ),
                   Container(
-                    height: 50,
+                    height: 40,
                     color: Color(0xFF74990A),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -248,7 +248,7 @@ class OrderDetailScreen extends StatelessWidget {
                             children: <Widget>[
                               Padding(
                                 padding: EdgeInsets.only(left: 15.0,top: 0.0,),
-                                child : Text("View Details",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w600),),
+                                child : Text("View Details",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w600),),
                               ),
                               SizedBox(
                                   width: 6
@@ -258,7 +258,7 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                         Padding(
                           padding: EdgeInsets.only(right: 10.0,),
-                          child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+                          child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
                         ),
                       ],
                     ),

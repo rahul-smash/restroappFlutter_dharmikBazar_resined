@@ -108,15 +108,15 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                                       Container(
                                         margin: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
                                         height: 100.0,
-                                        width: 100.0,
+                                        width: 150.0,
                                         decoration: new BoxDecoration(
                                           image: DecorationImage(
                                             image: new AssetImage(
                                               'images/deliver.png',
                                             ),
-                                            fit: BoxFit.fill,
+                                            fit: BoxFit.scaleDown,
                                           ),
-                                          shape: BoxShape.circle,
+                                          shape: BoxShape.rectangle,
                                         ),
                                       ),
                                       Text("Deliver"),
@@ -177,15 +177,15 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                                       Container(
                                         margin: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 5.0),
                                         height: 100.0,
-                                        width: 100.0,
+                                        width: 150.0,
                                         decoration: new BoxDecoration(
                                           image: DecorationImage(
                                             image: new AssetImage(
                                               'images/pickup.png',
                                             ),
-                                            fit: BoxFit.fill,
+                                            fit: BoxFit.scaleDown,
                                           ),
-                                          shape: BoxShape.circle,
+                                          shape: BoxShape.rectangle,
                                         ),
                                       ),
                                       // Code to create the view for address.
