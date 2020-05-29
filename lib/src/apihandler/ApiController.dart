@@ -448,11 +448,11 @@ class ApiController {
       if (areaId != null) {
         request.fields["area_id"] = areaId;
       }
-
+      print("----url---${url}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
-
+      print("----respStr---${respStr}");
       StoreOffersResponse res = StoreOffersResponse.fromJson(parsed);
       return res;
     } catch (e) {

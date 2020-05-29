@@ -333,7 +333,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 Navigator.push(context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ConfirmOrderScreen(addressList[selectedIndex],false,"")),
+                          ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
                 );
               }
 

@@ -109,7 +109,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ConfirmOrderScreen(null,true, widget.areaObject.areaId)),
+                          ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
                 );
               }
 
