@@ -3,6 +3,8 @@ import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 
+import 'Utils.dart';
+
 class DialogUtils {
 
   static Future<bool> displayDialog(BuildContext context,String title
@@ -46,13 +48,16 @@ class DialogUtils {
   }
 
 
-  static Future<bool> displayPaymentDialog(BuildContext context,String title,String note) async {
+  static Future<PaymentType> displayPaymentDialog(BuildContext context,String title,String note) async {
 
-    return await showDialog<bool>(
+    return await showDialog<PaymentType>(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: (){
+            print("onWillPop onWillPop");
+            Navigator.pop(context);
           },
           child: AlertDialog(
             shape: RoundedRectangleBorder(
@@ -73,7 +78,7 @@ class DialogUtils {
                           color: appTheme,
                           textColor: Colors.white,
                           onPressed: () {
-                            Navigator.pop(context, false);
+                            Navigator.pop(context, PaymentType.COD);
                           },
                         ),
                       ),
@@ -84,7 +89,7 @@ class DialogUtils {
                           color: appTheme,
                           textColor: Colors.white,
                           onPressed: () {
-                            Navigator.pop(context, true);
+                            Navigator.pop(context, PaymentType.ONLINE);
                           },
                         ),
                       )

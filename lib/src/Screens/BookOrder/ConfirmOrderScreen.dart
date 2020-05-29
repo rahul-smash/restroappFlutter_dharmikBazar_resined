@@ -403,6 +403,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
           ),
         ),
+        Visibility(
+          visible: taxModel == null? false : true,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Discount:", style: TextStyle(color: Colors.black54)),
+                Text("${AppConstant.currency}${taxModel == null? "0" : taxModel.discount}",
+                    style: TextStyle(color: Colors.black54)),
+              ],
+            ),
+          ),
+        ),
 
       ]),
     );
@@ -431,7 +445,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-
+  List<String> appliedCouponCodeList = List();
   Widget addCouponCodeRow() {
     return Padding(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
@@ -469,10 +483,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
                         setState(() {
                           taxModel = model;
+                          if(model != null){
+                            appliedCouponCodeList.add(model.couponCode);
+                          }
                           print("===couponCode=== ${model.couponCode}");
                           print("taxModel.total=${taxModel.total}");
                         });
-                  }),
+                  },appliedCouponCodeList),
                 );
               },
               child: Container(
@@ -500,10 +517,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       child: InkWell(
         onTap: () async {
           var result = await DialogUtils.displayPaymentDialog(context, "Select Payment","");
-          if(result == true){
+          //print("----result----${result}--");
+          if(result == false){
+            return;
+          }
+          if(result == PaymentType.ONLINE){
             widget.paymentMode = "3";
           }else{
-            widget.paymentMode = "2";
+            widget.paymentMode = "2"; //cod
           }
           print("----paymentMod----${widget.paymentMode}--");
           StoreModel storeObject = await SharedPrefs.getStore();
@@ -567,6 +588,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         Utils.hideProgressDialog(context);
         setState(() {
           taxModel = null;
+          appliedCouponCodeList.clear();
         });
       });
     });

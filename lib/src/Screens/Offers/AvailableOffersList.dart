@@ -16,9 +16,10 @@ class AvailableOffersDialog extends StatefulWidget {
   final Function(TaxCalculationModel) callback;
   bool isComingFromPickUpScreen;
   String areaId;
+  List<String> appliedCouponCodeList;
 
-  AvailableOffersDialog(this.address, this.paymentMode,
-      this.isComingFromPickUpScreen , this. areaId,this.callback);
+  AvailableOffersDialog(this.address,this.paymentMode,
+      this.isComingFromPickUpScreen,this.areaId,this.callback,this.appliedCouponCodeList);
 
   @override
   AvailableOffersState createState() => AvailableOffersState();
@@ -128,10 +129,15 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                               Utils.showToast(AppConstant.noInternet, false);
                                               return;
                                             }
-                                            Utils.showProgressDialog(context);
-                                            databaseHelper.getCartItemsListToJson().then((json) {
-                                              validateCouponApi(offer.couponCode, json);
-                                            });
+                                            if(widget.appliedCouponCodeList.contains(offer.couponCode)){
+                                              //Utils.showToast("Already Applied this Coupon", false);
+                                            }else{
+                                              Utils.showProgressDialog(context);
+                                              databaseHelper.getCartItemsListToJson().then((json) {
+                                                validateCouponApi(offer.couponCode, json);
+                                              });
+                                            }
+
                                           },
                                           child: new Text("APPLY"),
                                         ),

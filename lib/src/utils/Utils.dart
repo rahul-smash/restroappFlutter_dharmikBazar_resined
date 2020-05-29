@@ -231,3 +231,7 @@ enum OrderType {
   Delivery,PickUp,Menu
 }
 
+enum PaymentType {
+  COD,ONLINE,CANCEL
+}
+
