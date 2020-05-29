@@ -105,24 +105,21 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         var geoLocator = Geolocator();
                         var status = await geoLocator.checkGeolocationPermissionStatus();
                         print("--status--=${status}");
-                        if (status == GeolocationStatus.granted){
-                          var result = await Navigator.push(context, new MaterialPageRoute(
-                            builder: (BuildContext context) => DragMarkerMap(data),
-                            fullscreenDialog: true,)
-                          );
-                          if(result != null){
-                            radiusArea = result;
-                            print("----radiusArea = result-------");
-                            Utils.showProgressDialog(context);
-                            DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
-                            Utils.hideProgressDialog(context);
-                            setState(() {
-                              print("----setState-------");
-                              addressList = response.data;
-                            });
-                          }
-                        }else{
-                          Utils.showToast("Please accept location permissions to get your location from settings!", false);
+
+                        var result = await Navigator.push(context, new MaterialPageRoute(
+                          builder: (BuildContext context) => DragMarkerMap(data),
+                          fullscreenDialog: true,)
+                        );
+                        if(result != null){
+                          radiusArea = result;
+                          print("----radiusArea = result-------");
+                          Utils.showProgressDialog(context);
+                          DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                          Utils.hideProgressDialog(context);
+                          setState(() {
+                            print("----setState-------");
+                            addressList = response.data;
+                          });
                         }
 
                       }else{

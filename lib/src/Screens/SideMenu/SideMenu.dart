@@ -46,7 +46,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     DrawerChildItem('My Profile', "images/myprofile.png"),
     DrawerChildItem('Delivery Address', "images/deliveryaddress.png"),
     DrawerChildItem('My Orders', "images/my_order.png"),
-    DrawerChildItem('Book Now', "images/booknow.png"),
+    //DrawerChildItem('Book Now', "images/booknow.png"),
     DrawerChildItem('My Favorites', "images/myfav.png"),
     DrawerChildItem('About Us', "images/about.png"),
     DrawerChildItem('Share', "images/refer.png"),
@@ -185,7 +185,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 4:
+      /*case 4:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -196,22 +196,24 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
 
+        break;*/
+      case 4:
+        if (AppConstant.isLoggedIn) {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => Favourites(() { })),
+          );
+        }
         break;
       case 5:
-        Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => Favourites(() { })),
-        );
-        break;
-      case 6:
         Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => AboutScreen()),
         );
         break;
-      case 7:
+      case 6:
         /*if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
@@ -228,7 +230,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         share();
 
         break;
-      case 8:
+      case 7:
         if (AppConstant.isLoggedIn) {
           _showDialog(context);
         } else {

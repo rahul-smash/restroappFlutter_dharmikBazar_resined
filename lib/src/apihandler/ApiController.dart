@@ -514,9 +514,9 @@ class ApiController {
     print("--discount-${discount}");
     try {
       request.fields.addAll({
-        "fixed_discount_amount": "0",
+        "fixed_discount_amount": "${discount}",
         "tax": "0",
-        "discount": discount,
+        "discount": "0",
         "shipping": shipping,
         "order_detail": orderJson,
         "device_id": deviceId,

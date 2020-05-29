@@ -71,6 +71,12 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                             itemBuilder: (context, index) {
                               OfferModel offer = offerList[index];
 
+                              String applyText;
+                              if(widget.appliedCouponCodeList.contains(offer.couponCode)){
+                                applyText = "Applied";
+                              }else{
+                                applyText = "Apply";
+                              }
                               return Container(
                                 margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
                                 padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
@@ -132,14 +138,19 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             if(widget.appliedCouponCodeList.contains(offer.couponCode)){
                                               //Utils.showToast("Already Applied this Coupon", false);
                                             }else{
-                                              Utils.showProgressDialog(context);
-                                              databaseHelper.getCartItemsListToJson().then((json) {
-                                                validateCouponApi(offer.couponCode, json);
-                                              });
+                                              if(widget.appliedCouponCodeList.isEmpty){
+                                                Utils.showProgressDialog(context);
+                                                databaseHelper.getCartItemsListToJson().then((json) {
+                                                  validateCouponApi(offer.couponCode, json);
+                                                });
+                                              }else{
+                                                Utils.showToast("Please remove the applied coupon first!", false);
+                                              }
+
                                             }
 
                                           },
-                                          child: new Text("APPLY"),
+                                          child: new Text("${applyText}"),
                                         ),
                                       ),
                                     ),

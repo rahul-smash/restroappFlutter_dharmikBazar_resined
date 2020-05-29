@@ -207,20 +207,21 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 var geoLocator = Geolocator();
                                 var status = await geoLocator.checkGeolocationPermissionStatus();
                                 print("--status--=${status}");
-                                if (status == GeolocationStatus.granted){
-                                  var result = await Navigator.push(context, new MaterialPageRoute(
-                                    builder: (BuildContext context) => SelectLocationOnMap(),
-                                    fullscreenDialog: true,)
-                                  );
-                                  if(result != null){
-                                    locationData = result;
-                                    if(locationData.address.isNotEmpty){
-                                      addressController.text = locationData.address;
-                                    }
-                                  }
-                                }else{
+                                /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){
                                   Utils.showToast("Please accept location permissions to get your location from settings!", false);
+                                }*/
+
+                                var result = await Navigator.push(context, new MaterialPageRoute(
+                                  builder: (BuildContext context) => SelectLocationOnMap(),
+                                  fullscreenDialog: true,)
+                                );
+                                if(result != null){
+                                  locationData = result;
+                                  if(locationData.address.isNotEmpty){
+                                    addressController.text = locationData.address;
+                                  }
                                 }
+
                               }else{
                                 Utils.showToast("Please turn on gps!", false);
                               }

@@ -452,7 +452,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         child: Row(
           children: <Widget>[
             new Flexible(
-                child: Container(width: 155.0,height: 40.0,
+                child: Container(width: 140.0,height: 40.0,
                     decoration: new BoxDecoration(color: Colors.white,
                       border: new Border.all(color: Colors.grey, width: 1.0, ),
                     ),
@@ -483,17 +483,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
                         setState(() {
                           taxModel = model;
-                          if(model != null){
-                            appliedCouponCodeList.add(model.couponCode);
-                          }
+                          double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
+                          taxModel.total = taxModelTotal.toString();
+                          appliedCouponCodeList.add(model.couponCode);
                           print("===couponCode=== ${model.couponCode}");
                           print("taxModel.total=${taxModel.total}");
                         });
                   },appliedCouponCodeList),
                 );
               },
-              child: Container(
-                padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
+              child: Container(height: 40,
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                 decoration: new BoxDecoration(
                   color: Colors.white,
                   border: new Border.all(
@@ -501,8 +501,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     width: 1.0,
                   ),
                 ),
-                child: Text("Available\nOffers",textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 13)),
+                child: Center(
+                  child: Text("Available\nOffers",textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.black,)),
+                ),
               ),
             ),
           ],
