@@ -1,0 +1,339 @@
+import 'package:flutter/material.dart';
+import 'package:restroapp/src/models/GetOrderHistory.dart';
+
+class OrderDetailScreen extends StatelessWidget {
+
+  final OrderData orderHistoryData;
+
+  OrderDetailScreen(this.orderHistoryData);
+  var screenWidth;
+  var mainContext;
+  @override
+  Widget build(BuildContext context) {
+    screenWidth =  MediaQuery.of(context).size.width;
+    mainContext =  context;
+    return new Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: new Text('My Orders'),
+        centerTitle: true,
+      ),
+      body:  SafeArea(
+          child: Column(
+            children: <Widget>[
+            Expanded(
+              child: projectWidget()
+            ),
+              bottomView(false),
+
+        ],
+          )
+      )
+    );
+  }
+
+  bottomView(bool forBottomSheet){
+    return  Container(
+        height: 60,
+        color: Color(0xFF74990A),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            GestureDetector(
+              onTap: (){
+                 if(!forBottomSheet) {
+                  bottomSheet(mainContext);
+                }
+              },
+              child: Row(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: 15.0,top: 0.0,),
+                      child : Text("View Details",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w600),),
+                    ),
+                    SizedBox(
+                        width: 6
+                    ),
+                    Image.asset("images/topArrow.png",width: 15,height: 15,),
+                  ]
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 10.0,),
+              child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+            ),
+          ],
+        )
+    );
+  }
+
+  projectWidget(){
+    return ListView.builder(
+      scrollDirection: Axis.vertical,
+      itemCount: orderHistoryData.orderItems.length,
+      itemBuilder: (BuildContext ctx, int index){
+        final item = orderHistoryData.orderItems[index];
+        return Container(
+//                height: 150,
+          color: Colors.white,
+          child: Column(
+            children: <Widget>[
+              firstRow(item) ,
+              secondRow(item),
+              deviderLine(),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  firstRow(OrderItems item){
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        LimitedBox(
+          maxWidth: screenWidth-100,
+          child:  Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(left: 12.0,top: 20.0,right: 10.0),
+                child: Row(
+                  children: <Widget>[
+                    Text('Product Name : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
+                    Flexible(
+                        child: Text("${item.productName}",style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                    ),
+
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
+                child: Row(
+                  children: <Widget>[
+                    Text('Price : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
+                    Padding(
+                      padding: EdgeInsets.only(left: 70.0),
+                      child: Text("${item.price}",style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                    )
+
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 15.0,right: 12.0),
+          child:  SizedBox(
+            width: 80,
+            height: 35,
+            child: FlatButton(onPressed: (){
+            },
+              child: Text("${item.quantity} kg",style: TextStyle(color: Color(0xFF15282F),fontSize: 13,),),
+              color: Color(0xFFEAEEEF),
+              shape:  RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(3.0),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  secondRow(OrderItems item){
+    return  Padding(
+        padding: EdgeInsets.only(bottom: 15,top: 20),
+        child:  Padding(
+          padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
+          child: Row(
+            children: <Widget>[
+              Text('Status : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
+              Padding(
+                padding: EdgeInsets.only(left: 15.0),
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                      color: getStatusColor(item.status)
+                  ),
+                ),
+              ),
+
+              Padding(
+                padding: EdgeInsets.only(left: 5.0),
+                child: Text(getStatus(item.status),style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+              )
+            ],
+          ),
+        )
+    );
+
+  }
+
+  bottomSheet(context){
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc){
+          return SafeArea(
+                child: Container(
+                  child: new Wrap(
+                      children: <Widget>[
+                        Padding(padding: EdgeInsets.only(left: screenWidth-50,top: 10),
+                          child: GestureDetector(
+                            onTap: (){
+                              Navigator.pop(mainContext);
+                            },
+                            child: Image.asset('images/close.png'),
+                          ),
+
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 15,top: 10,right: 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+
+                              Padding(
+                                padding: EdgeInsets.only(top: 15.0),
+                                child:  Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text('Item Price : ',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                                    Text("RS ${orderHistoryData.total}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 15.0),
+                                child:  sheetDeviderLine(),
+                              ),
+
+                              Padding(
+                                padding: EdgeInsets.only(top: 15.0),
+                                child:   Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+
+                                    Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                                    Text("RS ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+
+
+                              Padding(
+                                padding: EdgeInsets.only(top: 20.0),
+                                child:  Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: <Widget>[
+                                    Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                                    Text("RS ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
+                                  ],
+                                ),
+                              ),
+
+                            ],
+                          ),
+                        ),
+                        Padding(padding: EdgeInsets.only(top: 15),
+                          child:  bottomDeviderView(),
+                        ),
+
+                        Padding(padding: EdgeInsets.all(15),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text('Delivery Address',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                                Row(
+                                  children: <Widget>[
+
+                                    Padding(padding: EdgeInsets.only(top: 20),
+                                      child: Text('Vicky sharma',style: TextStyle(color: Colors.black,fontSize: 19,fontWeight: FontWeight.w600)),
+                                    ),
+                                    Padding(padding: EdgeInsets.only(top: 20,left: 15),
+                                      child: SizedBox(
+                                        width: 75,
+                                        height: 30,
+                                        child: FlatButton(onPressed: (){
+                                        },
+                                          child: Text("Home",style: TextStyle(color: Color(0xFF797C80),fontSize: 14,),),
+                                          color: Color(0xFFDEDFE0),
+                                          shape:  RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(4.0),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Padding(padding: EdgeInsets.only(top: 5),
+                                    child:Text('Mob 123433333',style: TextStyle(color: Color(0xFF737879),fontSize: 18))
+                                ),
+
+                                Padding(padding: EdgeInsets.only(top: 5,bottom: 20),
+                                    child:Text("RS ${orderHistoryData.address}",style: TextStyle(color: Color(0xFF737879),fontSize: 18))
+                                ),
+                              ]
+                          ),
+                        ),
+                        bottomView(true)
+                      ]
+                  ),
+                )
+          );
+        }
+    );
+  }
+
+
+  bottomDeviderView() {
+    return Container(
+      width: MediaQuery
+          .of(mainContext)
+          .size
+          .width,
+      height: 10,
+      color: Color(0xFFDBDCDD),
+    );
+  }
+
+  deviderLine(){
+    return  Divider(
+      color: Color(0xFFDBDCDD),
+      height: 1,
+      thickness: 1,
+      indent: 12,
+      endIndent: 12,
+    );
+  }
+
+  sheetDeviderLine(){
+    return  Divider(
+      color: Color(0xFFDBDCDD),
+      height: 1,
+      thickness: 1,
+      indent: 0,
+      endIndent: 0,
+    );
+  }
+
+  String getStatus(status) {
+    if (status == "0") {
+      return 'Pending';
+    } else if (status == "1") {
+      return 'Order';
+    } else {
+      return "Waiting";
+    }
+  }
+  Color getStatusColor(status){
+    return status == "0" ? Color(0xFFA1BF4C) : status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
+  }
+
+}

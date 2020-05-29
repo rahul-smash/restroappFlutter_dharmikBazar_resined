@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
-
+import 'package:restroapp/src/Screens/Offers/OrderDetailScreen.dart';
 class CardOrderHistoryItems extends StatefulWidget {
   final OrderData orderHistoryData;
   CardOrderHistoryItems(this.orderHistoryData);
@@ -138,7 +138,11 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                 width: 90,
                 height: 30,
                 child: FlatButton(onPressed: (){
-
+                  Navigator.push( context,
+                    MaterialPageRoute(
+                      builder: (context) => OrderDetailScreen(cardOrderHistoryItems),
+                    ),
+                  );
                 },
                   child: Text("View order",style: TextStyle(color: Colors.white,fontSize: 11),),
                   color: Color(0xFFFD5401),
@@ -182,9 +186,9 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
 
 
   String getStatus(status) {
-    if (cardOrderHistoryItems.status == "0") {
+    if (status == "0") {
       return 'Pending';
-    } else if (cardOrderHistoryItems.status == "1") {
+    } else if (status == "1") {
       return 'Order';
     } else {
       return "Waiting";
