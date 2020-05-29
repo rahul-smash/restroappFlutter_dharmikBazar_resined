@@ -420,7 +420,7 @@ class ApiController {
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
-
+      print("---respStr>---${respStr}");
       DeliveryAddressResponse res = DeliveryAddressResponse.fromJson(parsed);
       return res;
     } catch (e) {
@@ -448,11 +448,11 @@ class ApiController {
       if (areaId != null) {
         request.fields["area_id"] = areaId;
       }
-
+      print("----url---${url}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
-
+      print("----respStr---${respStr}");
       StoreOffersResponse res = StoreOffersResponse.fromJson(parsed);
       return res;
     } catch (e) {
@@ -719,10 +719,10 @@ class ApiController {
       print('--response===  $respStr');
       final parsed = json.decode(respStr);
       MobileVerified userResponse = MobileVerified.fromJson(parsed);
-      if (userResponse.success) {
+      /*if (userResponse.success) {
         SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUserMobile(userResponse.user);
-      }
+      }*/
       return userResponse;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
@@ -750,11 +750,11 @@ class ApiController {
         "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "android"
       });
-      print('@@url' + url);
-      print('@@fields' + request.fields.toString());
+      print('@@url=${url}');
+      //print('@@fields' + request.fields.toString());
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print('response' + respStr);
+      print('response= ${respStr}');
       final parsed = json.decode(respStr);
 
       OtpVerified userResponse = OtpVerified.fromJson(parsed);

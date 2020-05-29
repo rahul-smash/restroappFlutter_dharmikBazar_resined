@@ -31,9 +31,9 @@ class ConfirmOrderScreen extends StatefulWidget {
   DeliveryAddressData address;
   String paymentMode = "2"; // 2 = COD, 3 = Online Payment
   String areaId;
-  //double shippingCharges = 0.0;
+  OrderType deliveryType;
 
-  ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen,this.areaId);
+  ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen,this.areaId,this.deliveryType);
 
   @override
   ConfirmOrderState createState() => ConfirmOrderState();
@@ -60,6 +60,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     super.initState();
     initRazorPay();
     selctedTag = 0;
+    print("-deliveryType--${widget.deliveryType}---");
     try {
       if(widget.address != null){
             if(widget.address.areaCharges != null){
@@ -74,6 +75,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       databaseHelper.getTotalPrice().then((mTotalPrice) {
             setState(() {
               totalPrice = mTotalPrice;
+              totalPrice = totalPrice + int.parse(shippingCharges);
             });
           });
     } catch (e) {
@@ -184,7 +186,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ))
       ]),
       bottomNavigationBar: Container(
-        height: 125,
+        height: 135,
         color: Colors.white,
         child: Column(
           children: [addTotalPrice(), addCouponCodeRow(), addConfirmOrder()],
@@ -356,7 +358,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     padding: EdgeInsets.only(top: 5),
                     child: Text("Quantity: " + product.quantity)),
                 Padding(
-                    padding: EdgeInsets.only(top: 5, bottom: 30),
+                    padding: EdgeInsets.only(top: 5, bottom: 20),
                     child: Text("Price: " + "${AppConstant.currency}${product.price}")),
               ],
             ),
@@ -415,12 +417,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
         Padding(
-            padding: EdgeInsets.fromLTRB(10, 5, 10, 10),
+            padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Total",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)+int.parse(shippingCharges)}",
+                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2)}",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
@@ -436,36 +438,26 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         child: Row(
           children: <Widget>[
             new Flexible(
-                child: Container(
-                    width: 155.0,
-                    height: 40.0,
-                    decoration: new BoxDecoration(
-                      color: Colors.white,
-                      border: new Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
+                child: Container(width: 155.0,height: 40.0,
+                    decoration: new BoxDecoration(color: Colors.white,
+                      border: new Border.all(color: Colors.grey, width: 1.0, ),
                     ),
                     child: Center(child: Text(
                         taxModel == null ? 'Coupon Code:' : taxModel.couponCode ?? "")))
                 ),
-            Container(
-              width: 130.0,
-              height: 40.0,
+            Container( width: 130.0,height: 40.0,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                 child: RaisedButton(
                   padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                  textColor: Colors.white,
-                  color: Colors.green,
+                  textColor: Colors.white,color: Colors.green,
                   onPressed: () {
                     if (taxModel != null) {
                       removeCoupon();
                     }
                   },
-                  child: new Text(
-                      taxModel == null ? "Apply Coupon" : "Remove Coupon",
-                      softWrap: true),
+                  child: new Text(taxModel == null ?
+                  "Apply Coupon" : "Remove Coupon",softWrap: true),
                 ),
               ),
             ),
@@ -481,12 +473,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   }),
                 );
               },
-              child: Text("Available\nOffers",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Color(0xFF0D47A1),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13)),
+              child: Container(
+                padding: EdgeInsets.fromLTRB(5, 2, 5, 2),
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  border: new Border.all(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+                child: Text("Available\nOffers",textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black,fontWeight: FontWeight.bold,fontSize: 13)),
+              ),
             ),
           ],
         ));
@@ -495,7 +493,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   String selectedDeliverSlotValue = "";
   Widget addConfirmOrder() {
     return Container(
-      height: 45.0,
+      height: 50.0,
       color: appTheme,
       child: InkWell(
         onTap: () async {
@@ -536,6 +534,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               callStripeApi();
             }
           }else{
+
             placeOrderApiCall("","","");
           }
 
@@ -554,11 +553,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-  void removeCoupon() {
+  Future<void> removeCoupon() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if(!isNetworkAvailable){
+      Utils.showToast(AppConstant.noInternet, false);
+      return;
+    }
     Utils.showProgressDialog(context);
     databaseHelper.getCartItemsListToJson().then((json) {
-      ApiController.multipleTaxCalculationRequest("", "0", "0", json)
-          .then((response) {
+      ApiController.multipleTaxCalculationRequest("", "0", "0", json).then((response) {
         Utils.hideProgressDialog(context);
         setState(() {
           taxModel = null;
@@ -570,7 +573,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void callStripeApi() {
     Utils.showProgressDialog(context);
-    double price = totalPrice + int.parse(shippingCharges);
+    double price = totalPrice;
     String mPrice = price.toString().substring(0 , price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
     ApiController.stripePaymentApi(mPrice).then((response){
@@ -599,7 +602,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void openCheckout(String razorpay_order_id,StoreModel storeObject) async {
     Utils.hideProgressDialog(context);
     UserModel user = await SharedPrefs.getUser();
-    double price = totalPrice + int.parse(shippingCharges);
+    double price = totalPrice ;
     razorpay_orderId = razorpay_order_id;
     var options = {
       'key': '${storeObject.paymentSetting.apiKey}',
@@ -659,7 +662,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void callOrderIdApi(StoreModel storeObject) {
     Utils.showProgressDialog(context);
-    double price = totalPrice + int.parse(shippingCharges);
+    double price = totalPrice ;
     //print("=======1===${price}===========");
     price = price * 100;
     //print("=======2===${price}===========");

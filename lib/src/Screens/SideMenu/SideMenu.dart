@@ -167,7 +167,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             Navigator.pop(context);
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DeliveryAddressList(false,responses)),
+              MaterialPageRoute(builder: (context) => DeliveryAddressList(false,responses,OrderType.Menu)),
             );
           });
         } else {

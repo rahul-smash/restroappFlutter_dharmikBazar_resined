@@ -8,12 +8,13 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class StoreLocationScreen extends StatefulWidget {
 
   Area areaObject;
-
-  StoreLocationScreen(this.areaObject);
+  OrderType pickUp;
+  StoreLocationScreen(this.areaObject,this.pickUp);
 
   @override
   _StoreLocationScreenState createState() {
@@ -108,7 +109,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ConfirmOrderScreen(null,true, widget.areaObject.areaId)),
+                          ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
                 );
               }
 

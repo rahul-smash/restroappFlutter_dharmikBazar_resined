@@ -87,14 +87,13 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                           onTap: () async {
                             print('@@CartBottomView----'+"DeliveryScreen");
                             Utils.showProgressDialog(context);
-
                             DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
                             Utils.hideProgressDialog(context);
                             Navigator.pop(context);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => DeliveryAddressList(true,deliveryAddressResponse)),
+                                  builder: (context) => DeliveryAddressList(true,deliveryAddressResponse,OrderType.Delivery)),
                             );
                           },
                           child: new Container(
@@ -149,13 +148,13 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => StoreLocationScreen(areaObject)),
+                                        builder: (context) => StoreLocationScreen(areaObject,OrderType.PickUp)),
                                   );
                                 }else{
                                   Navigator.pop(context);
                                   Navigator.push(context,
                                     MaterialPageRoute(
-                                        builder: (context) => PickUpOrderScreen(storeArea)),
+                                        builder: (context) => PickUpOrderScreen(storeArea,OrderType.PickUp)),
                                   );
                                 }
                               }else{
@@ -206,106 +205,6 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
         )
     );
 
-    /* child: addBottomBar());*/
   }
-
-
-  Widget addBottomBar() {
-    return Column(
-      children: [
-        new Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () async {
-                print('@@CartBottomView----'+"PickUPActivy");
-                Utils.showProgressDialog(context);
-
-                DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
-                Utils.hideProgressDialog(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DeliveryAddressList(true,deliveryAddressResponse)),
-                );
-              },
-              child: new Container(
-                padding: const EdgeInsets.all(15.0),
-                child: new Column(
-                  children: [
-                    new Expanded(
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          new Container(
-                            height: 30.0,
-                            width: 30.0,
-                            decoration: new BoxDecoration(
-                              image: DecorationImage(
-                                image: new AssetImage(
-                                  'images/logo.png',
-                                ),
-                                fit: BoxFit.fill,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Icon to indicate the phone number.
-                  ],
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () async {
-                print('@@CartBottomView----'+"DelieveryAddressList");
-                Utils.showProgressDialog(context);
-
-                DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
-                Utils.hideProgressDialog(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DeliveryAddressList(true,deliveryAddressResponse)),
-                );
-              },
-              child: new Container(
-                padding: const EdgeInsets.all(15.0),
-                child: new Column(
-                  children: [
-                    new Expanded(
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          new Container(
-                            height: 30.0,
-                            width: 30.0,
-                            decoration: new BoxDecoration(
-                              image: DecorationImage(
-                                image: new AssetImage(
-                                  'images/theme35.png',
-                                ),
-                                fit: BoxFit.fill,
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-
-          ],
-        ),
-      ],
-    );
-  }
-
 
 }

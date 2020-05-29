@@ -121,7 +121,11 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
               print("=====otpVerify===${response.user.otpVerify}--and--${response.userExists}-----");
 
               if(response.userExists == 1 || otpSkip == "yes"){
-                //print('@@NotOTP__Screen');
+                print('@@userExists=${response.userExists} and otpSkip = ${response.user.otpVerify}');
+                if (response.success) {
+                  SharedPrefs.setUserLoggedIn(true);
+                  SharedPrefs.saveUserMobile(response.user);
+                }
                 Navigator.pop(context);
 
               }else{

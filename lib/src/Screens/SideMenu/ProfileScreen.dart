@@ -1,12 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
 
@@ -48,120 +46,102 @@ class _ProfileState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: new Text(widget.isComingFromOtpScreen == true ? 'SignUp' : "My Profile"),
         centerTitle: true,
       ),
-      body: Container(
+      body: SingleChildScrollView(
+        child: Container(
+          margin: EdgeInsets.fromLTRB(20, 25, 20, 20),
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: new Form(
+              key: _formKey,
+              autovalidate: true,
+              child: Padding(
+                padding: EdgeInsets.all(0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(top: 0),
+                        child: Center(
+                          child: Icon(Icons.account_circle,size: 100,color: Colors.grey,),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: TextField(
+                          controller: firstNameController,
+                          decoration: InputDecoration(
+                            labelText: 'Full name',
+                          ),
+                          style: TextStyle(fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
+                          ),
+                        ),
 
-        /*decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage("images/offer_bg.png"), fit: BoxFit.cover),
-        ),*/
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: new Form(
-            key: _formKey,
-            autovalidate: true,
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(top: 20),
-                      child: setProfileImage(context),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: TextField(
-                        controller: firstNameController,
-                        decoration: InputDecoration(
-                            labelText: 'First name',
-                            //floatingLabelBehavior: FloatingLabelBehavior.never
-                        ),
-                        style: TextStyle(
-                            fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 30),
+                        child: Text("Private Information",style: TextStyle(
+                            fontSize: 16,color: Color(0xFF8F9396),fontWeight: FontWeight.w500),
                         ),
                       ),
-
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: TextField(
-                        controller: lastNameController,
-                        decoration: InputDecoration(
-                            labelText: 'Last name',
-                            //floatingLabelBehavior: FloatingLabelBehavior.never
-                        ),
-                        style: TextStyle(
-                            fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 40),
-                      child: Text("Private Information",style: TextStyle(
-                          fontSize: 16,color: Color(0xFF8F9396),fontWeight: FontWeight.w500),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: TextField(
-                        keyboardType: TextInputType.emailAddress,
-                        controller: emailController,
-                        decoration: InputDecoration(
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: TextField(
+                          keyboardType: TextInputType.emailAddress,
+                          controller: emailController,
+                          decoration: InputDecoration(
                             labelText: 'Email',
-                            //floatingLabelBehavior: FloatingLabelBehavior.never
-                        ),
-                        style: TextStyle(
-                            fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
+                          ),
+                          style: TextStyle(
+                              fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
-                      child: TextField(
-                        controller: phoneController,
-                        decoration: InputDecoration(
+                      Padding(
+                        padding: const EdgeInsets.only(top: 15.0),
+                        child: TextField(
+                          readOnly: true,
+                          controller: phoneController,
+                          decoration: InputDecoration(
                             labelText: 'Phone number',
-                            //floatingLabelBehavior: FloatingLabelBehavior.never
-                        ),
-                        style: TextStyle(
-                            fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
+                          ),
+                          style: TextStyle(
+                              fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
+                          ),
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 35.0,left: 20,right: 20),
-                      child: ButtonTheme(
-                        height: 50,
-                        minWidth: MediaQuery.of(context).size.width,
-                        child: RaisedButton(
-                          onPressed: () => {
-
-
-                          },
-                          color: Color(0xFFF55202),
-                          shape : RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(3.0),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 35.0,left: 20,right: 20),
+                        child: ButtonTheme(
+                          height: 40,
+                          minWidth: MediaQuery.of(context).size.width,
+                          child: RaisedButton(
+                            onPressed: (){
+                              _submitForm();
+                            },
+                            color: orangeColor,
+                            shape : RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3.0),
+                            ),
+                            child:  Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text("Update",style: TextStyle(color: Colors.white,fontSize: 18)),
+                                SizedBox(width: 6),
+                                Image.asset("images/rightArrow.png",width: 15,height: 15,),
+                              ],
+                            ),
                           ),
-                          child:  Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text("Update",style: TextStyle(color: Colors.white,fontSize: 20)),
-                              SizedBox(
-                                  width: 6
-                              ),
-                              Image.asset("images/rightArrow.png",width: 15,height: 15,),
-                            ],
-                          ),
-                        ),
-                      ) ,
-                    )
-                  ],
+                        ) ,
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -171,85 +151,6 @@ class _ProfileState extends State<ProfileScreen> {
     );
   }
 
-  setProfileImage(BuildContext context){
-    var img = image == null ? NetworkImage('https://via.placeholder.com/140x100') : Image.file(image).image;
-    return GestureDetector(
-      onTap: (){
-        showAlertDialog(context);
-      },
-      child: Center(
-          child: CircleAvatar(
-            backgroundColor: grayColor,
-              radius: 60,
-              backgroundImage: img
-          )
-      ),
-    );
-  }
-
-  showAlertDialog(BuildContext context) {
-
-    // set up the buttons
-    Widget camera = FlatButton(
-      child: Text("Camera"),
-      onPressed:  () {
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        getCamera();
-
-      },
-    );
-    Widget gallery = FlatButton(
-      child: Text("Gallery"),
-      onPressed:  () {
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-        getGallery();
-
-      },
-    );
-
-    Widget cancelButton = FlatButton(
-      child: Text("Cancel"),
-      onPressed:  () {
-        Navigator.of(context, rootNavigator: true).pop('dialog');
-
-      },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("Select Image"),
-      content: Text("Please select image "),
-      actions: [
-        camera,
-        gallery,
-        cancelButton
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
-
-  Future getCamera() async {
-    var imageData = await ImagePicker.pickImage(source: ImageSource.camera);
-
-    setState(() {
-      image =  imageData;
-    });
-  }
-
-  Future getGallery() async {
-    var imageData = await ImagePicker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      image =  imageData;
-    });
-  }
 
   bool isValidEmail(String input) {
     final RegExp regex = new RegExp(

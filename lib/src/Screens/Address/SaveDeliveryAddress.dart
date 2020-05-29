@@ -228,7 +228,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           },
                           child:Text.rich(
                             TextSpan(
-                              text: 'Select Location - ',
+                              text: 'Enter or Select Location - ',
                               style: TextStyle(color: infoLabel,fontSize: 17),
                               children: <TextSpan>[
                                 TextSpan(
@@ -255,7 +255,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               hintStyle: TextStyle(color: Colors.grey),
                               focusedBorder: InputBorder.none,
                               contentPadding: EdgeInsets.only(
-                                  left: 5, bottom: 5, top: 5, right: 5),
+                                  left: 10, bottom: 10, top: 10, right: 10),
                               hintText: AppConstant.enterAddress),
                         ),
                       ),

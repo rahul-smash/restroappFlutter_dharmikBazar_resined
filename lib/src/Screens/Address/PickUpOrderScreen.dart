@@ -11,7 +11,8 @@ import 'StoreLocationScreen.dart';
 class PickUpOrderScreen extends StatefulWidget {
 
   PickUpModel storeArea;
-  PickUpOrderScreen(this.storeArea);
+  OrderType pickUp;
+  PickUpOrderScreen(this.storeArea, this.pickUp);
 
   @override
   _PickUpOrderScreen createState() => _PickUpOrderScreen();
@@ -111,7 +112,7 @@ class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => StoreLocationScreen(areaObject)),
+                    builder: (context) => StoreLocationScreen(areaObject,widget.pickUp)),
               );
             }else{
               Utils.showToast("Please select City and Area", true);
