@@ -220,7 +220,7 @@ class DatabaseHelper {
         await dbClient.query(CART_Table, columns: columnsToSelect);
     // print the results
     if (resultList != null && resultList.isNotEmpty) {
-      print("---result.length--- ${resultList.length}");
+      print("--TotalPrice-result.length--- ${resultList.length}");
       resultList.forEach((row) {
         //print(row);
       });
@@ -290,7 +290,7 @@ class DatabaseHelper {
 
 
   Future<List<Product>> getFavouritesList() async {
-    print("------------getFavouritesList--------------");
+    //print("------------getFavouritesList--------------");
     List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
@@ -332,7 +332,7 @@ class DatabaseHelper {
     } else {
       //print("-empty cart-in db--");
     }
-    //print("---List.length===>${cartList.length}--");
+    print("-Fav--List.length===>${cartList.length}--");
     return cartList;
   }
 

@@ -210,7 +210,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     )),
               )
             ]),
-            Divider(color: Color(0xFFBDBDBD), thickness: 1.0),
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+              child: Divider(color: Color(0xFFBDBDBD), thickness: 1.0),
+            ),
             addOperationBar(area,index)
           ])),
     );
@@ -222,9 +225,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Icon(icon, color: Colors.grey,),
+          //Icon(icon, color: Colors.grey,),
           Padding(
-            padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: SizedBox(
               width: (Utils.getDeviceWidth(context)-150),
               child: Text(
@@ -242,7 +245,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   Widget addOperationBar(DeliveryAddressData area, int index) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+      padding: EdgeInsets.fromLTRB(0, 0, 5, 5),
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[

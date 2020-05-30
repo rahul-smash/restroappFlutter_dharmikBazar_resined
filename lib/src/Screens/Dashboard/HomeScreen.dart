@@ -188,26 +188,31 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart, color: bottomBarIconColor),
-                title: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
-                backgroundColor: appTheme),
+                icon: Image.asset('images/carticon.png', width: 24,fit: BoxFit.scaleDown,),
+                //icon: Icon(Icons.shopping_cart, color: bottomBarIconColor),
+                title: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                  child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
+                ),
+                ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.search, color: bottomBarIconColor),
+              icon: Image.asset('images/searchcion.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
+              //icon: Icon(Icons.search, color: bottomBarIconColor),
               title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
-              backgroundColor: appTheme,
             ),
             BottomNavigationBarItem(
                 icon: Icon(Icons.shopping_cart, color: Colors.white,size: 0,),
-                title: Text(''),
-                backgroundColor: appTheme),
+                title: Text(''),),
             BottomNavigationBarItem(
-                icon: Icon(Icons.history, color: bottomBarIconColor),
+              icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,),
+                //icon: Icon(Icons.history, color: bottomBarIconColor),
                 title: Text('History', style: TextStyle(color: bottomBarTextColor)),
-                backgroundColor: appTheme),
+                ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.contact_mail, color: bottomBarIconColor),
+              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,),
+                //icon: Icon(Icons.contact_mail, color: bottomBarIconColor),
                 title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
-                backgroundColor: appTheme)
+                )
           ],
         ),
         Container(

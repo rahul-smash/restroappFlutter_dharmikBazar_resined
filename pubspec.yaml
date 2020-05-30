@@ -112,6 +112,11 @@ flutter:
     - images/rightArrow.png
     - images/close.png
     - images/topArrow.png
+    - images/cancelpopupicon.png
+    - images/carticon.png
+    - images/contacticon.png
+    - images/historyicon.png
+    - images/searchcion.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
