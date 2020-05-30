@@ -724,31 +724,47 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,
               widget.isComingFromPickUpScreen,widget.areaId ,
-              payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) {
+              payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) async {
             Utils.hideProgressDialog(context);
             if(response == null){
               print("--response == null-response == null-");
               return;
             }
-            showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  // return object of type Dialog
-                  return AlertDialog(
-                      title: new Text("Thank you!"),
-                      content: Text(response.success? AppConstant.orderAdded: response.message),
-                      actions: <Widget>[
-                        new FlatButton(
-                          child: new Text("Ok"),
-                          onPressed: () async{
-                            await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
 
-                            Navigator.of(context)
-                                .popUntil((route) => route.isFirst);
-                          },
-                        ),
-                      ]);
-                });
+            print("${widget.deliveryType}");
+            //print("Location = ${storeModel.lat},${storeModel.lng}");
+            if(widget.deliveryType == OrderType.PickUp){
+              bool result = await DialogUtils.displayPickUpDialog(context,storeModel);
+              if(result == true){
+                //print("==result== ${result}");
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                DialogUtils.openMap(double.parse(storeModel.lat), double.parse(storeModel.lng));
+              }else{
+                //print("==result== ${result}");
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              }
+            }else{
+              showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    // return object of type Dialog
+                    return AlertDialog(
+                        title: new Text("Thank you!"),
+                        content: Text(response.success? AppConstant.orderAdded: response.message),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: new Text("Ok"),
+                            onPressed: () async{
+                              await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                              Navigator.of(context)
+                                  .popUntil((route) => route.isFirst);
+                            },
+                          ),
+                        ]);
+                  });
+            }
           });
         });
       } else {

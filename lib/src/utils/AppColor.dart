@@ -26,3 +26,4 @@ Color grayColor = Color(0xffd3d3d3);
 Color favGrayColor = Color(0xfff3f3f3);
 Color searchGrayColor = Color(0xfff0f0f0);
 Color searchTagsColor = Color(0xff2f3138);
+Color yellowColor = Color(0xfffcb200);

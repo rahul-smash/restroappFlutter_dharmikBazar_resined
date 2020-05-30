@@ -39,7 +39,7 @@ class DeliveryAddressData {
   String state;
   String zipCode;
   String country;
-  //String notAllow;
+  bool notAllow;
   String areaCharges;
   String minAmount;
   String note;
@@ -65,7 +65,7 @@ class DeliveryAddressData {
     this.country,
     this.lat,
     this.lng,
-    //this.notAllow,
+    this.notAllow,
     this.areaCharges,
     this.minAmount,
     this.note,
@@ -91,7 +91,7 @@ class DeliveryAddressData {
         state: json["state"],
         zipCode: json["zipcode"],
         country: json["country"],
-        //notAllow: json["not_allow"],
+        notAllow: json["not_allow"],
         areaCharges: json["area_charges"],
         minAmount: json["min_amount"],
         note: json["note"],
@@ -116,7 +116,7 @@ class DeliveryAddressData {
         "state": state,
         "zipcode": zipCode,
         "country": country,
-        //"not_allow": notAllow,
+        "not_allow": notAllow,
         "area_charges": areaCharges,
         "min_amount": minAmount,
         "note": note,

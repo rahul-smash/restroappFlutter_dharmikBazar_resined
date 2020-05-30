@@ -73,13 +73,15 @@ class _ProductTileItemState extends State<ProductTileItem> {
       child: Column(
           children: [
             InkWell(
-              onTap: (){
+              onTap: () async {
                 print("----print-----");
-                Navigator.push(context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => ProductDetailsScreen(widget.product),
-                      fullscreenDialog: true,
-                    ));
+                if(widget.classType != ClassType.CART){
+                  var result = await Navigator.push(context, new MaterialPageRoute(
+                    builder: (BuildContext context) => ProductDetailsScreen(widget.product),
+                    fullscreenDialog: true,)
+                  );
+                  print("----result---${result}");
+                }
               },
               child: Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),

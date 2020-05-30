@@ -8,6 +8,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class OrderSelectionScreen extends StatefulWidget {
@@ -132,8 +133,9 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                       Visibility(
                         visible: pickUpFacility,
                         child:  GestureDetector(
-                          onTap: () {
+                          onTap: ()  {
                             print('@@CartBottomView----'+"PickUPActivy");
+
                             Utils.showProgressDialog(context);
                             ApiController.getStorePickupAddress().then((response){
 

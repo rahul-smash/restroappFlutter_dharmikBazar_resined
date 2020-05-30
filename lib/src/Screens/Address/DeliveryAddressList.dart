@@ -330,6 +330,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               var result = await DialogUtils.displayDialog(context, "Confirmation",addressList[selectedIndex].note,
               "Cancel","Proceed");
               if(result == true){
+                print("minAmount=${addressList[selectedIndex].minAmount}");
+                print("notAllow=${addressList[selectedIndex].notAllow}");
                 Navigator.push(context,
                   MaterialPageRoute(
                       builder: (context) =>
