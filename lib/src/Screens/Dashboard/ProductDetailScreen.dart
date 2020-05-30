@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
+import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -21,13 +23,25 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsState extends State<ProductDetailsScreen> {
 
+  DatabaseHelper databaseHelper = new DatabaseHelper();
   String imageUrl;
   Variant variant;
   String discount,price,variantId,weight;
+  int counter = 0;
+  CartData cartData;
 
   @override
   initState() {
     super.initState();
+    getDataFromDB();
+  }
+
+  void getDataFromDB() {
+    databaseHelper.getProductQuantitiy(widget.product.variantId).then((cartDataObj) {
+      cartData = cartDataObj;
+      counter = int.parse(cartData.QUANTITY);
+      setState(() {});
+    });
   }
 
   Widget build(BuildContext context) {
@@ -92,7 +106,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
+          //crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -119,7 +133,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                 ),
               ],
             ),
-
+            addQuantityView(),
           ],
         ),
         addDividerView(),
@@ -127,7 +141,14 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           onTap: () async {
             variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
             if(variant != null){
-              setState(() {});
+              setState(() {
+                databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
+                  //print("QUANTITY= ${cartDataObj.QUANTITY}");
+                  cartData = cartDataObj;
+                  counter = int.parse(cartData.QUANTITY);
+                  setState(() {});
+                });
+              });
             }
             },
           child: Row(
@@ -189,6 +210,147 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         ),
       ],
     );
+  }
+
+
+  Widget addQuantityView() {
+    return Container(
+      //color: Colors.grey,
+        margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(0.0),
+              width: 30.0, // you can adjust the width as you need
+              child: GestureDetector(onTap: () {
+                if (counter != 0) {
+                  setState(() => counter--);
+                  if (counter == 0) {
+                    // delete from cart table
+                    removeFromCartTable(widget.product.variantId);
+                  } else {
+                    // insert/update to cart table
+                    insertInCartTable(widget.product, counter);
+                  }
+                  //widget.callback();
+                }
+              },
+                  child: Container(
+                    width: 35,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      color: grayColor,
+                      border: Border.all(color: grayColor, width: 1,),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(5.0)),
+                    ),
+                    child: Icon(Icons.remove, color: Colors.white, size: 20),
+                  )
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+              width: 30.0,
+              height: 30.0,
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
+                border: new Border.all(
+                  color: Colors.white,
+                  width: 1.0,
+                ),
+              ),
+              child: Center(child: Text("$counter",style: TextStyle(fontSize: 18),)),
+            ),
+            Container(
+              padding: const EdgeInsets.all(0.0),
+              width: 30.0, // you can adjust the width as you need
+              child: GestureDetector(onTap: () {
+                setState(() => counter++);
+                if (counter == 0) {
+                  // delete from cart table
+                  removeFromCartTable(widget.product.variantId);
+                } else {
+                  // insert/update to cart table
+                  insertInCartTable(widget.product, counter);
+                }
+              },
+                child: Container(
+                    width: 35,
+                    height: 25,
+                    decoration: BoxDecoration(
+                      color: orangeColor,
+                      border: Border.all(color: orangeColor, width: 1,),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(5.0)),
+                    ),
+                    child: Icon(Icons.add, color: Colors.white, size: 20)),
+              ),
+            ),
+          ],
+        ));
+  }
+
+  void insertInCartTable(Product product, int quantity) {
+    String variantId, weight, mrpPrice, price, discount, isUnitType;
+    variantId = variant == null ? widget.product.variantId : variant.id;
+    weight = variant == null ? widget.product.weight : variant.weight;
+    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
+    price = variant == null ? widget.product.price : variant.price;
+    discount = variant == null ? widget.product.discount : variant.discount;
+    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
+
+    var mId = int.parse(product.id);
+    //String variantId = product.variantId;
+
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID: mId,
+      DatabaseHelper.VARIENT_ID: variantId,
+      DatabaseHelper.WEIGHT: weight,
+      DatabaseHelper.MRP_PRICE: mrpPrice,
+      DatabaseHelper.PRICE: price,
+      DatabaseHelper.DISCOUNT: discount,
+      DatabaseHelper.UNIT_TYPE: isUnitType,
+
+      DatabaseHelper.PRODUCT_ID: product.id,
+      DatabaseHelper.isFavorite: product.isFav,
+      DatabaseHelper.QUANTITY: quantity.toString(),
+      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+      DatabaseHelper.Product_Name: product.title,
+      DatabaseHelper.nutrient: product.nutrient,
+      DatabaseHelper.description: product.description,
+      DatabaseHelper.imageType: product.imageType,
+      DatabaseHelper.imageUrl: product.imageUrl,
+      DatabaseHelper.image_100_80: product.image10080,
+      DatabaseHelper.image_300_200: product.image300200,
+    };
+
+    databaseHelper.checkIfProductsExistInDb(DatabaseHelper.CART_Table, variantId)
+        .then((count) {
+      //print("-count-- ${count}");
+      if (count == 0) {
+        databaseHelper.addProductToCart(row).then((count) {
+          //widget.callback();
+        });
+      } else {
+        databaseHelper.updateProductInCart(row, variantId).then((count) {
+          //widget.callback();
+        });
+      }
+    });
+  }
+
+  void removeFromCartTable(String variant_Id) {
+    try {
+      String variantId;
+      variantId = variant == null ? variant_Id : variant.id;
+      databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {
+        //widget.callback();
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   // Add divider View 

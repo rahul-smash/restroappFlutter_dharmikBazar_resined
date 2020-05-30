@@ -80,6 +80,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     builder: (BuildContext context) => ProductDetailsScreen(widget.product),
                     fullscreenDialog: true,)
                   );
+                  setState(() {
+                    getDataFromDB();
+                    widget.callback();
+                  });
                   print("----result---${result}");
                 }
               },
