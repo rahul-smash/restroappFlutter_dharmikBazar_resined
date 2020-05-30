@@ -327,8 +327,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             print("--${store.onlinePayment}-}-");
             if(store.onlinePayment == "1"){
               //var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",addressList[selectedIndex].note);
-              var result = await DialogUtils.displayDialog(context, "Confirmation",addressList[selectedIndex].note,
-              "Cancel","Proceed");
+              /*var result = await DialogUtils.displayDialog(context, "Confirmation",addressList[selectedIndex].note,
+              "Cancel","Proceed");*/
+              var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",addressList[selectedIndex].note,);
               if(result == true){
                 print("minAmount=${addressList[selectedIndex].minAmount}");
                 print("notAllow=${addressList[selectedIndex].notAllow}");
@@ -356,21 +357,5 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     );
   }
 
-  /*getAddressList(){
-    print("=====getAddressList==========");
-    Utils.showProgressDialog(context);
-    ApiController.getAddressApiRequest().then((responses){
-      print("====called then future completes====");
-      Utils.hideProgressDialog(context);
-      DeliveryAddressResponse response = responses;
-      setState(() {
-        //Utils.hideProgressDialog(context);
-        addressList = response.data;
-      });
-    }).whenComplete(() {
-      Utils.hideProgressDialog(context);
-      print("====called when future completes====");
-    });
-  }*/
 
 }

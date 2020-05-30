@@ -48,7 +48,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                 children: <Widget>[
                   Text('Order Number : ',
                       style: TextStyle(color: Color(0xFF39444D), fontSize: 14)),
-                  Text(cardOrderHistoryItems.orderId,
+                  Text(cardOrderHistoryItems.displayOrderId,
                       style: TextStyle(color: Color(0xFF858B8F), fontSize: 13))
                 ],
               ),
@@ -90,8 +90,8 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                       Padding(
                         padding: EdgeInsets.only(left: 15.0),
                         child: Container(
-                          width: 6,
-                          height: 6,
+                          width: 8,
+                          height: 8,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.all(Radius.circular(3.0)),
                               color: getStatusColor(cardOrderHistoryItems.status)

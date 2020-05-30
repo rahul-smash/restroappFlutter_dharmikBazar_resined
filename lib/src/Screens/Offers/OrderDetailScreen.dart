@@ -149,8 +149,8 @@ class OrderDetailScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 15.0),
                 child: Container(
-                  width: 6,
-                  height: 6,
+                  width: 8,
+                  height: 8,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(3.0)),
                       color: getStatusColor(item.status)

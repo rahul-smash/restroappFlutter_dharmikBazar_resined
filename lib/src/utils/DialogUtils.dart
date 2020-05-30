@@ -338,6 +338,82 @@ class DialogUtils {
     );
   }
 
+
+  static Future<bool> displayOrderConfirmationDialog(BuildContext context,String title,
+      String deliveryNoteText) async {
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+            //print("onWillPop onWillPop");
+            //Navigator.pop(context);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      child: Center(
+                        child: Text("${title}",textAlign: TextAlign.center,
+                          style: TextStyle(color: appTheme,fontSize: 18,fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+                    Container(
+                        height: 1,
+                        color: Colors.black45,
+                        width: MediaQuery.of(context).size.width),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      child: Center(
+                        child: Text("${deliveryNoteText}",textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,fontSize: 18,),),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                            child: FlatButton(
+                              child: Text('Cancel'),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, false);
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('Proceed'),
+                              color: appTheme,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+          ),
+        );
+      },
+    );
+  }
+
   static Future<void> openMap(double latitude, double longitude) async {
     String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
     if (await canLaunch(googleUrl)) {
