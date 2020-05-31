@@ -54,6 +54,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   int selctedTag, selectedTimeSlot;
   List<Timeslot> timeslotList;
   bool isSlotSelected = false;
+  bool minOrderCheck =true;
 
   @override
   void initState() {
@@ -63,21 +64,26 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     print("-deliveryType--${widget.deliveryType}---");
     try {
       if(widget.address != null){
-            if(widget.address.areaCharges != null){
-              shippingCharges = widget.address.areaCharges;
-              print("-shippingCharges--${widget.address.areaCharges}---");
-            }
-          }
+        if(widget.address.areaCharges != null){
+          shippingCharges = widget.address.areaCharges;
+          print("-shippingCharges--${widget.address.areaCharges}---");
+        }
+        //print("----minAmount=${widget.address.minAmount}");
+        //print("----notAllow=${widget.address.notAllow}");
+        checkMinOrderAmount();
+      }
     } catch (e) {
       print(e);
     }
     try {
-      databaseHelper.getTotalPrice().then((mTotalPrice) {
-            setState(() {
-              totalPrice = mTotalPrice;
-              totalPrice = totalPrice + int.parse(shippingCharges);
-            });
+      if(widget.deliveryType == OrderType.PickUp){
+        databaseHelper.getTotalPrice().then((mTotalPrice) {
+          setState(() {
+            totalPrice = mTotalPrice;
+            //totalPrice = totalPrice;
           });
+        });
+      }
     } catch (e) {
       print(e);
     }
@@ -117,6 +123,53 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void dispose() {
     super.dispose();
     _razorpay.clear();
+  }
+
+
+  Future<void> checkMinOrderAmount() async {
+    if(widget.deliveryType == OrderType.Delivery){
+      print("----minAmount=${widget.address.minAmount}");
+      print("----notAllow=${widget.address.notAllow}");
+      print("--------------------------------------------");
+      try {
+        int minAmount = double.parse(widget.address.minAmount).toInt();
+        double totalPrice = await databaseHelper.getTotalPrice();
+        int mtotalPrice = totalPrice.round();
+
+        print("----minAmount=${minAmount}");
+        print("--Cart--mtotalPrice=${mtotalPrice}");
+        print("----shippingCharges=${shippingCharges}");
+
+        if(widget.address.notAllow){
+          if(mtotalPrice < minAmount){
+            print("---Cart-totalPrice is less than min amount----}");
+            // then Store will charge shipping charges.
+            minOrderCheck = false;
+            setState(() {
+              this.totalPrice = mtotalPrice.toDouble();
+            });
+          }
+        }else{
+          if(mtotalPrice < minAmount){
+            print("---Cart-totalPrice is less than min amount----}");
+            // then Store will charge shipping charges.
+            setState(() {
+              this.totalPrice = totalPrice + int.parse(shippingCharges);
+            });
+          }else{
+            print("-Cart-totalPrice is greater than min amount---}");
+            //then Store will not charge shipping.
+            setState(() {
+              this.totalPrice = totalPrice;
+              shippingCharges = "0";
+              widget.address.areaCharges = "0";
+            });
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
   @override
@@ -518,6 +571,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       color: appTheme,
       child: InkWell(
         onTap: () async {
+
+          if(widget.deliveryType == OrderType.Delivery && widget.address.notAllow){
+            if(!minOrderCheck){
+              Utils.showToast("Your order amount is to low. Minimum order amount is ${widget.address.minAmount}", false);
+              return;
+            }
+          }
+
           var result = await DialogUtils.displayPaymentDialog(context, "Select Payment","");
           //print("----result----${result}--");
           if(result == null){
@@ -548,7 +609,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
               String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
               selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
-              print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
+              //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
             }
           }
 
@@ -559,7 +620,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               callStripeApi();
             }
           }else{
-
             placeOrderApiCall("","","");
           }
 
@@ -689,9 +749,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void callOrderIdApi(StoreModel storeObject) {
     Utils.showProgressDialog(context);
     double price = totalPrice ;
-    //print("=======1===${price}===========");
+    print("=======1===${price}===========");
     price = price * 100;
-    //print("=======2===${price}===========");
+    print("=======2===${price}===========");
     String mPrice = price.toString().substring(0 , price.toString().indexOf('.'));
     print("=======mPrice===${mPrice}===========");
     ApiController.razorpayCreateOrderApi(mPrice).then((response){
@@ -834,6 +894,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       }
     });
   }
+
+
 
 
 }

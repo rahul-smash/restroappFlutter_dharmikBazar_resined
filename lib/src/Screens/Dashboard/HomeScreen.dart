@@ -114,8 +114,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       CategoryResponse response = projectSnap.data;
                       if (response.success) {
                         return Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage("images/backgroundimg.png"),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                           padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                          color: gridBackgroundCOlor,
+                          //color: Colors.transparent,
                           child: GridView.count(
                               crossAxisCount: 2,
                               childAspectRatio: 1.2,
