@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -20,6 +21,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:restroapp/src/utils/version_check.dart';
@@ -50,6 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
   static FirebaseAnalytics analytics = FirebaseAnalytics();
   static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
   bool isStoreClosed;
+  final DatabaseHelper databaseHelper = new DatabaseHelper();
+  int cartBadgeCount;
 
   _HomeScreenState(this.store);
 
@@ -59,8 +63,11 @@ class _HomeScreenState extends State<HomeScreen> {
     isStoreClosed = false;
     initFirebase();
     _setSetCurrentScreen();
+    cartBadgeCount = 0;
+    getCartCount();
+    listenCartChanges();
     try {
-      print("-----store.banners-----${store.banners.length}------");
+      //print("-----store.banners-----${store.banners.length}------");
       if (store.banners.isEmpty) {
         imgList = [NetworkImage(AppConstant.placeholderImageUrl)];
       } else {
@@ -82,9 +89,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  getCartCount(){
+    databaseHelper.getCount(DatabaseHelper.CART_Table).then((value){
+      setState(() {
+        cartBadgeCount = value;
+      });
+      //print("--getCARTCount---${value}------");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       key: _key,
       appBar: AppBar(
@@ -186,6 +202,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget addBottomBar() {
+    //print("-------addBottomBar--------");
+    //getCartCount();
     return Stack(
       overflow: Overflow.visible,
       alignment: new FractionalOffset(.5, 1.0),
@@ -197,8 +215,11 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-                icon: Image.asset('images/carticon.png', width: 24,fit: BoxFit.scaleDown,),
-                //icon: Icon(Icons.shopping_cart, color: bottomBarIconColor),
+                icon: Badge(
+                  showBadge: cartBadgeCount == 0 ? false : true,
+                  badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
+                  child: Image.asset('images/carticon.png', width: 24,fit: BoxFit.scaleDown,),
+                ),
                 title: Padding(
                   padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
                   child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
@@ -206,7 +227,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
             BottomNavigationBarItem(
               icon: Image.asset('images/searchcion.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
-              //icon: Icon(Icons.search, color: bottomBarIconColor),
               title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
             ),
             BottomNavigationBarItem(
@@ -214,12 +234,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text(''),),
             BottomNavigationBarItem(
               icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,),
-                //icon: Icon(Icons.history, color: bottomBarIconColor),
                 title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
                 ),
             BottomNavigationBarItem(
               icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,),
-                //icon: Icon(Icons.contact_mail, color: bottomBarIconColor),
                 title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
                 )
           ],
@@ -235,25 +253,19 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> onTabTapped(int index) async {
-    /*if(isStoreClosed){
-      var result = await DialogUtils.displayDialog(context, "${widget.store.storeName}", widget.store.storeMsg,
-          "", "OK");
-      return;
-    }*/
+  onTabTapped(int index) {
     setState(() {
       _currentIndex = index;
       if (_currentIndex == 0) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => MyCartScreen(() {})),
+          MaterialPageRoute(builder: (context) => MyCartScreen(() {
+            //print("-----cart screen----");
+            getCartCount();
+          })),
         );
       }
       if (_currentIndex == 1) {
-        /*Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MyOfferScreen(context)),
-        );*/
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => SearchScreen()),
@@ -279,13 +291,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _handleDrawer() async {
-    /*if(isStoreClosed){
-      var result = await DialogUtils.displayDialog(context, "${widget.store.storeName}", widget.store.storeMsg,
-          "", "OK");
-      return;
-    }else{
-
-    }*/
     try {
       _key.currentState.openDrawer();
       //print("------_handleDrawer-------");
@@ -366,5 +371,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> onDidReceiveLocalNotification(int id, String title,
       String body, String payload) async {
     debugPrint('onDidReceiveLocalNotification : ');
+  }
+
+  void listenCartChanges() {
+    eventBus.on<updateCartCount>().listen((event) {
+      print("<---Home----updateCartCount------->");
+      getCartCount();
+    });
   }
 }

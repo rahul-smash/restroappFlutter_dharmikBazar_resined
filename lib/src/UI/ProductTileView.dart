@@ -89,6 +89,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                   setState(() {
                     getDataFromDB();
                     widget.callback();
+                    eventBus.fire(updateCartCount());
                   });
                   print("----result---${result}");
                 }
@@ -183,7 +184,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             padding: EdgeInsets.only(top: 20,bottom: 10),
                                             child: InkWell(
                                               onTap: () async {
-                                                print("-variants.length--${widget.product.variants.length}");
+                                                //print("-variants.length--${widget.product.variants.length}");
                                                 if(widget.product.variants.length != null){
                                                   if(widget.product.variants.length == 1){
                                                     return;
@@ -288,7 +289,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
                       insertInCartTable(widget.product, counter);
                     }
                     widget.callback();
-
                   }
                 },
                     child: Container(
@@ -416,10 +416,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
       if (count == 0) {
         databaseHelper.addProductToCart(row).then((count) {
           widget.callback();
+          eventBus.fire(updateCartCount());
         });
       } else {
         databaseHelper.updateProductInCart(row, variantId).then((count) {
           widget.callback();
+          eventBus.fire(updateCartCount());
         });
       }
     });
@@ -429,9 +431,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
     try {
       String variantId;
       variantId = variant == null ? variant_Id : variant.id;
-      databaseHelper.delete(DatabaseHelper.CART_Table, variantId)
-          .then((count) {
+      databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {
         widget.callback();
+        eventBus.fire(updateCartCount());
       });
     } catch (e) {
       print(e);

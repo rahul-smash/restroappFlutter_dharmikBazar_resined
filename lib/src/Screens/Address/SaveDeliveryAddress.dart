@@ -149,7 +149,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       : "Select",
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 20.0,
+                                    fontSize: 17.0,
                                   ),
                                 )),
                           )),
@@ -193,7 +193,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       : "Select",
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 20.0,
+                                    fontSize: 17.0,
                                   ),
                                 )),
                           )),

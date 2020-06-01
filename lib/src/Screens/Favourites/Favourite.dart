@@ -167,14 +167,5 @@ class _FavouritesState extends State<Favourites> {
     });
   }
 
-  void listenDatabaseChanges() {
-    eventBus.on<updateData>().listen((event) {
-      print("<-----updateData------updateData->");
-      setState(() {
-
-      });
-    });
-
-  }
 }
 

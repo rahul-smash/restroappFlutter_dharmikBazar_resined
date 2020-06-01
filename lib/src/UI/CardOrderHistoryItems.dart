@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreen.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 class CardOrderHistoryItems extends StatefulWidget {
+
   final OrderData orderHistoryData;
   CardOrderHistoryItems(this.orderHistoryData);
 
@@ -62,23 +66,31 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
           ],
         ),
 
-        Padding(
-          padding: EdgeInsets.only(top: 15.0, right: 12.0),
-          child: SizedBox(
-            width: 70,
-            height: 30,
-            child: FlatButton(onPressed: () {
+        Visibility(
+          visible: showCancelButton(cardOrderHistoryItems.status),
+          child: Padding(
+            padding: EdgeInsets.only(top: 15.0, right: 12.0),
+            child: SizedBox(
+              width: 70,
+              height: 30,
+              child: FlatButton(
+                onPressed: () async {
+                  Utils.showProgressDialog(context);
+                  await ApiController.orderCancelApi(cardOrderHistoryItems.orderId);
+                  Utils.hideProgressDialog(context);
+                  eventBus.fire(refreshOrderHistory());
+                },
 
-            },
-              child: Text("Cancel",
-                style: TextStyle(color: Color(0xFF525A5F), fontSize: 11,),),
-              color: Color(0xFFEAEEEF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(3.0),
+                child: Text("Cancel",
+                  style: TextStyle(color: Color(0xFF525A5F), fontSize: 11,),),
+                color: Color(0xFFEAEEEF),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(3.0),
+                ),
               ),
             ),
           ),
-        )
+        ),
       ],
     );
   }
@@ -124,7 +136,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                       )
                     ],
                   ),
-                )
+                ),
 
               ],
             ),
@@ -186,16 +198,52 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
 
   String getStatus(status) {
     if (status == "0") {
+
       return 'Pending';
+
     } else if (status == "1") {
+
       return 'Order';
-    } else {
+
+    }if (status == "2") {
+      return 'Rejected';
+
+    }if (status == "4") {
+      return 'Shipped';
+
+    }if (status == "5") {
+      return 'Delivered';
+
+    } if (status == "6") {
+      return 'Canceled';
+
+    }else {
       return "Waiting";
     }
   }
+
+  bool showCancelButton(status) {
+    bool showCancelButton;
+    if(status == "1" || status == "4" || status == "0"){
+      showCancelButton = true;
+    }else{
+      showCancelButton = false;
+    }
+    return showCancelButton;
+  }
+
    Color getStatusColor(status){
-     return status == "0" ? Color(0xFFA1BF4C) : status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
+     // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
+     // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
+     // status 1, 4, 0     =>show cancel btn
+     if (status == "0") {
+       return Color(0xFFA1BF4C);
+     } else {
+       return status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
+     }
    }
+
+
 
 }
 

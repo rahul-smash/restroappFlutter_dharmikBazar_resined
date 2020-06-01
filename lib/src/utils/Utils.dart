@@ -187,7 +187,7 @@ class Utils {
   }
 
   static Widget showVariantDropDown(ClassType classType, Product product){
-    print("variants = ${product.variants} and ${classType}");
+    //print("variants = ${product.variants} and ${classType}");
 
     if(classType == ClassType.CART){
       return Icon(Icons.keyboard_arrow_down,

@@ -22,6 +22,7 @@ import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
@@ -801,6 +802,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 //print("==result== ${result}");
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
+                eventBus.fire(updateCartCount());
                 DialogUtils.openMap(double.parse(storeModel.lat), double.parse(storeModel.lng));
               }else{
                 //print("==result== ${result}");
@@ -822,6 +824,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                               Navigator.of(context)
                                   .popUntil((route) => route.isFirst);
+                              eventBus.fire(updateCartCount());
                             },
                           ),
                         ]);

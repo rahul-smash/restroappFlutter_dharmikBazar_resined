@@ -4,6 +4,7 @@ import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class MyCartScreen extends StatelessWidget {
@@ -38,7 +39,7 @@ class MyCartScreen extends StatelessWidget {
                     if (projectSnap.hasData) {
 
                       //print("--length---${projectSnap.data.length}----");
-
+                      eventBus.fire(updateCartCount());
                       if(projectSnap.data.length == 0){
 
                         return Container(
@@ -62,6 +63,7 @@ class MyCartScreen extends StatelessWidget {
                               Product product = projectSnap.data[index];
                               return ProductTileItem(product, () {
                                 bottomBar.state.updateTotalPrice();
+                                callback();
                               },ClassType.CART);
                             },
                           ),

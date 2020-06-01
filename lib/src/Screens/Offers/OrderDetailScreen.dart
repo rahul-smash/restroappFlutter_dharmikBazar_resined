@@ -205,24 +205,30 @@ class OrderDetailScreen extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
                     child:  sheetDeviderLine(),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child:   Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                        Text("${AppConstant.currency} ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                      ],
+                  Visibility(
+                    visible: orderHistoryData.discount == "0.00" ? false :true ,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child:   Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                          Text("${AppConstant.currency} ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                        ],
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child:  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                        Text("${AppConstant.currency} ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
-                      ],
+                  Visibility(
+                    visible: orderHistoryData.shippingCharges == "0.00" ? false :true ,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child:  Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                          Text("${AppConstant.currency} ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
+                        ],
+                      ),
                     ),
                   ),
                   Padding(
@@ -301,10 +307,26 @@ class OrderDetailScreen extends StatelessWidget {
 
   String getStatus(status) {
     if (status == "0") {
+
       return 'Pending';
+
     } else if (status == "1") {
+
       return 'Order';
-    } else {
+
+    }if (status == "2") {
+      return 'Rejected';
+
+    }if (status == "4") {
+      return 'Shipped';
+
+    }if (status == "5") {
+      return 'Delivered';
+
+    } if (status == "6") {
+      return 'Canceled';
+
+    }else {
       return "Waiting";
     }
   }
