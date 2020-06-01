@@ -143,10 +143,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.add_circle_outline,color: Colors.white,size: 35.0,),
-                padding: const EdgeInsets.all(0),
-                onPressed: () {}),
+            Icon(Icons.add_circle_outline,color: Colors.white,size: 35.0,),
             Text("Add Delivery Address",style: TextStyle(color: Colors.white, fontSize: 18.0),
             ),
           ],
