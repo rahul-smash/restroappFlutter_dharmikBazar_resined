@@ -810,25 +810,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }
             }else{
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    // return object of type Dialog
-                    return AlertDialog(
-                        title: new Text("Thank you!"),
-                        content: Text(response.success? AppConstant.orderAdded: response.message),
-                        actions: <Widget>[
-                          new FlatButton(
-                            child: new Text("Ok"),
-                            onPressed: () async{
-                              await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                              Navigator.of(context)
-                                  .popUntil((route) => route.isFirst);
-                              eventBus.fire(updateCartCount());
-                            },
-                          ),
-                        ]);
-                  });
+              bool result = await DialogUtils.displayThankYouDialog(context,response.success? AppConstant.orderAdded: response.message);
+              if(result == true){
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                Navigator.of(context)
+                    .popUntil((route) => route.isFirst);
+                eventBus.fire(updateCartCount());
+              }
             }
           });
         });

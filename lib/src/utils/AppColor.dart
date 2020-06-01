@@ -29,3 +29,6 @@ Color searchTagsColor = Color(0xff2f3138);
 Color yellowColor = Color(0xfffcb200);
 Color whiteColor = Color(0xffffffff);
 Color toastbgColor = Color(0xff656565);
+Color grayColorTitle = Color(0xff474d54);
+
+

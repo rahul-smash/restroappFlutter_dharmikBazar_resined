@@ -105,7 +105,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         Padding(
           padding: const EdgeInsets.only(top: 15.0,left: 20),
           child: Text("${widget.product.title}",
-            style: TextStyle(fontSize: 16.0,color: Colors.black,fontWeight: FontWeight.w700),
+            style: TextStyle(fontSize: 16.0,color: grayColorTitle,),
             textAlign: TextAlign.center,
           ),
         ),
@@ -120,13 +120,15 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                   padding: EdgeInsets.only(top: 10.0, left: 20.0),
                   child: (discount == "0.00" || discount == "0" || discount == "0.0")
                       ? Text("${AppConstant.currency}${price}",
-                    style: TextStyle(fontSize: 18.0,fontWeight: FontWeight.bold),):
+                    style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w600),):
                   Row(
                     children: <Widget>[
-                      Text("${AppConstant.currency}${discount}",
-                          style: TextStyle(decoration: TextDecoration.lineThrough,fontWeight: FontWeight.bold)),
+                      Text("${AppConstant.currency}${price}",
+                        style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
                       Text(" "),
-                      Text("${AppConstant.currency}${price}",style: TextStyle(fontWeight: FontWeight.bold),),
+                      Text("${AppConstant.currency}${discount}",
+                          style: TextStyle(decoration: TextDecoration.lineThrough,
+                              color: grayColorTitle,fontWeight: FontWeight.w400)),
                     ],
                   ),
                 ),

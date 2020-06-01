@@ -110,8 +110,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                     child: Container(
                                       width: 70.0,
                                       height: 80.0,
-                                      child: Image.network(imageUrl,width: 60.0,
-                                        height: 60.0,fit: BoxFit.cover),
+                                      child: Image.network(imageUrl,width: 60.0,height: 60.0,fit: BoxFit.cover),
                                     )),
                                 Flexible(
                                     child: Column(
@@ -122,7 +121,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                           children: <Widget>[
                                             Flexible(
                                               child: Text(widget.product.title,overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black, )
+                                                  style: TextStyle(fontSize: 16.0,color: grayColorTitle,)
                                               ),
                                             ),
                                             InkWell(
@@ -157,21 +156,23 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 });
 
                                               },
-                                              child: Container(
-                                                height: 30,width: 30,
-                                                decoration: BoxDecoration(
-                                                  color: widget.classType == ClassType.CART? Colors.white : favGrayColor,
-                                                  border: Border.all(color: favGrayColor, width: 1,),
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(5.0)),
-                                                ),
-                                                margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
-                                                child: Visibility(
-                                                  visible: widget.classType == ClassType.CART? false : true,
-                                                  child: Utils.showFavIcon(widget.product.isFav),
+                                              child: Visibility(
+                                                visible: widget.classType == ClassType.CART? false : true,
+                                                child: Container(
+                                                  height: 30,width: 30,
+                                                  decoration: BoxDecoration(
+                                                    color: widget.classType == ClassType.CART? Colors.white : favGrayColor,
+                                                    border: Border.all(color: favGrayColor, width: 1,),
+                                                    borderRadius: BorderRadius.all(
+                                                        Radius.circular(5.0)),
+                                                  ),
+                                                  margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
+                                                  child: Visibility(
+                                                    visible: widget.classType == ClassType.CART? false : true,
+                                                    child: Utils.showFavIcon(widget.product.isFav),
+                                                  ),
                                                 ),
                                               ),
-                                              //child: Image.asset("images/myfav.png", width: 25),
                                             ),
                                           ],
                                         ),
@@ -181,7 +182,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         Visibility(
                                           visible: variantsVisibility,
                                           child: Padding(
-                                            padding: EdgeInsets.only(top: 20,bottom: 10),
+                                            padding: EdgeInsets.only(top: 20,bottom: 3),
                                             child: InkWell(
                                               onTap: () async {
                                                 //print("-variants.length--${widget.product.variants.length}");
@@ -232,14 +233,17 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             (discount == "0.00" || discount == "0" || discount == "0.0")
-                                                ? Text("${AppConstant.currency}${price}",style: TextStyle(fontWeight: FontWeight.bold),)
+                                                ? Text("${AppConstant.currency}${price}",
+                                              style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w600),)
                                                 :
                                             Row(
                                               children: <Widget>[
-                                                Text("${AppConstant.currency}${widget.product.discount}",
-                                                    style: TextStyle(decoration: TextDecoration.lineThrough,fontWeight: FontWeight.bold)),
+                                                Text("${AppConstant.currency}${widget.product.price}",
+                                                  style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
                                                 Text(" "),
-                                                Text("${AppConstant.currency}${widget.product.price}",style: TextStyle(fontWeight: FontWeight.bold),),
+                                                Text("${AppConstant.currency}${widget.product.discount}",
+                                                    style: TextStyle(decoration: TextDecoration.lineThrough,
+                                                        color: grayColorTitle,fontWeight: FontWeight.w400)),
                                               ],
                                             ),
                                             addQuantityView(),

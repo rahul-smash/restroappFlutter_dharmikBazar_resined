@@ -285,7 +285,7 @@ class DialogUtils {
                       padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
                       child: Center(
                         child: Text("Thank You",textAlign: TextAlign.center,
-                          style: TextStyle(color: yellowColor,fontSize: 18,fontWeight: FontWeight.bold),),
+                          style: TextStyle(color: yellowColor,fontWeight: FontWeight.bold),),
                       ),
                     ),
                     Container(
@@ -295,8 +295,8 @@ class DialogUtils {
                     Padding(
                       padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
                       child: Center(
-                        child: Text("Thank you for placing the order.We will confirm your order soon.",textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black,fontSize: 18,),),
+                        child: Text("Thank you for placing the order.\nWe will confirm your order soon.",textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,),),
                       ),
                     ),
                     Padding(
@@ -339,6 +339,70 @@ class DialogUtils {
   }
 
 
+  static Future<bool> displayThankYouDialog(BuildContext context,String message) async {
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+            //print("onWillPop onWillPop");
+            //Navigator.pop(context);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      child: Center(
+                        child: Text("Thank You",textAlign: TextAlign.center,
+                          style: TextStyle(color: yellowColor,fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+                    Container(
+                        height: 1,
+                        color: Colors.black45,
+                        width: MediaQuery.of(context).size.width),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      child: Center(
+                        child: Text("${message}",textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,),),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('OK'),
+                              color: appTheme,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+          ),
+        );
+      },
+    );
+  }
+
+
   static Future<bool> displayOrderConfirmationDialog(BuildContext context,String title,
       String deliveryNoteText) async {
 
@@ -361,7 +425,7 @@ class DialogUtils {
                       padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
                       child: Center(
                         child: Text("${title}",textAlign: TextAlign.center,
-                          style: TextStyle(color: appTheme,fontSize: 18,fontWeight: FontWeight.bold),),
+                          style: TextStyle(color: appTheme,fontWeight: FontWeight.bold),),
                       ),
                     ),
                     Container(
@@ -372,7 +436,7 @@ class DialogUtils {
                       padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
                       child: Center(
                         child: Text("${deliveryNoteText}",textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black,fontSize: 18,),),
+                          style: TextStyle(color: Colors.black,),),
                       ),
                     ),
                     Padding(

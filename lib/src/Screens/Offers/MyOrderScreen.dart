@@ -36,7 +36,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
     return new Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: new Text('Order History'),
+        title: new Text('My Orders'),
         centerTitle: true,
       ),
       //body: projectWidget(),
@@ -78,7 +78,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
                       BoxShadow(
                         color: Colors.black26,
                         blurRadius: 10.0,
-                        offset: const Offset(0.0, 10.0),
+                        offset: Offset(0.0, 10.0),
                       ),
                     ],
                   ),
