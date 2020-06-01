@@ -80,7 +80,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               fullscreenDialog: true,
             ));
             print("--result--${result}-------");
-            if(result != null){
+            if(result == true){
               Utils.showProgressDialog(context);
               DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
               setState(() {

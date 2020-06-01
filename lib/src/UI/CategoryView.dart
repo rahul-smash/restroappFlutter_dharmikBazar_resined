@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class CategoryView extends StatelessWidget {
+
   final CategoryModel categoryModel;
-  CategoryView(this.categoryModel);
+  StoreModel store;
+  CategoryView(this.categoryModel, this.store);
 
   Widget build(BuildContext context) {
     return Container(
@@ -18,7 +22,7 @@ class CategoryView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           GestureDetector(
-            onTap: () {
+            onTap: () async {
               if (categoryModel != null && categoryModel.subCategory.isNotEmpty) {
                 Navigator.push(context,
                   MaterialPageRoute(builder: (context) {

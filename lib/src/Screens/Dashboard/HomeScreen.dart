@@ -20,6 +20,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:restroapp/src/utils/version_check.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,13 +49,14 @@ class _HomeScreenState extends State<HomeScreen> {
   UserModel user;
   static FirebaseAnalytics analytics = FirebaseAnalytics();
   static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
-
+  bool isStoreClosed;
 
   _HomeScreenState(this.store);
 
   @override
   void initState() {
     super.initState();
+    isStoreClosed = false;
     initFirebase();
     _setSetCurrentScreen();
     try {
@@ -70,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     }
+    //Utils.getDayOfWeek(widget.store);
   }
 
   Future<void> _setSetCurrentScreen() async {
@@ -131,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               shrinkWrap: true,
                               children: response.categories.map((CategoryModel model) {
 
-                                return GridTile(child: CategoryView(model));
+                                return GridTile(child: CategoryView(model,widget.store));
                               }).toList()),
                         );
                       } else {
@@ -232,7 +235,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void onTabTapped(int index) {
+  Future<void> onTabTapped(int index) async {
+    /*if(isStoreClosed){
+      var result = await DialogUtils.displayDialog(context, "${widget.store.storeName}", widget.store.storeMsg,
+          "", "OK");
+      return;
+    }*/
     setState(() {
       _currentIndex = index;
       if (_currentIndex == 0) {
@@ -271,14 +279,21 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _handleDrawer() async {
+    /*if(isStoreClosed){
+      var result = await DialogUtils.displayDialog(context, "${widget.store.storeName}", widget.store.storeMsg,
+          "", "OK");
+      return;
+    }else{
+
+    }*/
     try {
       _key.currentState.openDrawer();
       //print("------_handleDrawer-------");
       if (AppConstant.isLoggedIn) {
-            user = await SharedPrefs.getUser();
-            //if(user != null)
-            setState(() {});
-          }
+        user = await SharedPrefs.getUser();
+        //if(user != null)
+        setState(() {});
+      }
     } catch (e) {
       print(e);
     }

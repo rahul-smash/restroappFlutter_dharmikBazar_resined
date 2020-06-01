@@ -66,7 +66,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
     String imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
     bool variantsVisibility;
     variantsVisibility = widget.classType == ClassType.CART ? true : widget.product.variants != null && widget.product.variants.isNotEmpty &&
-          widget.product.variants.length > 1 ? true : false;
+          widget.product.variants.length >= 1 ? true : false;
 
     return Container(
       color: Colors.white,
@@ -75,6 +75,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
             InkWell(
               onTap: () async {
                 print("----print-----");
+                if(widget.product.description.isEmpty){
+                  return;
+                }
                 if(widget.classType != ClassType.CART){
                   var result = await Navigator.push(context, new MaterialPageRoute(
                     builder: (BuildContext context) => ProductDetailsScreen(widget.product),
@@ -97,7 +100,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               children: [
                                 SizedBox(width: 10),
                                 //addVegNonVegOption(),
-                                imageUrl == "" ? Container(): Padding(
+                                imageUrl == "" ? Container(child: Utils.getImgPlaceHolder(),)
+                                    : Padding(
                                     padding: EdgeInsets.only(left: 5,right: 20),
                                     child: Container(
                                       width: 70.0,
@@ -176,7 +180,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             padding: EdgeInsets.only(top: 20,bottom: 10),
                                             child: InkWell(
                                               onTap: () async {
-                                                //print("-variants.length--${widget.product.variants.length}");
+                                                print("-variants.length--${widget.product.variants.length}");
+                                                if(widget.product.variants.length != null){
+                                                  if(widget.product.variants.length == 1){
+                                                    return;
+                                                  }
+                                                }
+
                                                 variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
                                                 if(variant != null){
                                                   databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
@@ -205,8 +215,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                       visible: widget.classType == ClassType.CART ? false : true,
                                                       child: Padding(
                                                         padding: EdgeInsets.only(left: 10),
-                                                        child: Icon(Icons.keyboard_arrow_down,
-                                                            color: orangeColor, size: 25),
+                                                        child: Utils.showVariantDropDown(widget.classType,widget.product),
                                                       ),
                                                     ),
                                                   ],
@@ -449,9 +458,5 @@ class _ProductTileItemState extends State<ProductTileItem> {
       //print("-------count--------${count}-----");
     });
   }
-
-
-
-
 
 }

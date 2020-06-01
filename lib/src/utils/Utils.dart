@@ -9,6 +9,7 @@ import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 
@@ -174,6 +175,37 @@ class Utils {
     );
   }
 
+  static Widget getImgPlaceHolder(){
+
+    return Padding(
+      padding: EdgeInsets.only(left: 10,right: 10),
+      child: Image.asset("images/appiconfcfm.jpg",
+        height: 60,
+        width: 60,
+        fit: BoxFit.scaleDown,),
+    );
+  }
+
+  static Widget showVariantDropDown(ClassType classType, Product product){
+    print("variants = ${product.variants} and ${classType}");
+
+    if(classType == ClassType.CART){
+      return Icon(Icons.keyboard_arrow_down,
+          color: orangeColor,
+          size: 25);
+    }else{
+      bool isVariantNull= false;
+      if(product.variants != null){
+        if(product.variants.length == 1){
+          isVariantNull = true;
+        }
+      }
+      return Icon(Icons.keyboard_arrow_down,
+          color: isVariantNull ? whiteColor : orangeColor,
+          size: 25);
+    }
+  }
+
   static String getDate(){
     var now = new DateTime.now();
     var formatter = new DateFormat('MMM yyyy');
@@ -207,6 +239,62 @@ class Utils {
     String formatted = formatter.format(dateTime);
     //print(formatted);
     return formatted;
+  }
+
+  static String getDayOfWeek(StoreModel store){
+    DateFormat dateFormat = DateFormat("hh:mm");
+
+    var currentDate = DateTime.now();
+    //print(date.toString()); // prints something like 2019-12-10 10:02:22.287949
+    //print(DateFormat('EEEE').format(date)); // prints Tuesday
+    //print(DateFormat('EEEE, d MMM, yyyy').format(date)); // prints Tuesday, 10 Dec, 2019
+    //print(DateFormat('h:mma').format(date)); // prints 10:02 AM
+
+    String currentTime = dateFormat.format(currentDate);
+    //currentTime = currentTime.replaceAll("AM", "am").replaceAll("PM","pm");
+
+    print("openhoursFrom= ${store.openhoursFrom}");
+    print("openhoursTo=   ${store.openhoursTo}");
+    print("currentTime=   ${currentTime}");
+    print("----------------------------------------------");
+
+
+    /*DateFormat dateFormat = DateFormat("hh:mm a");
+    DateTime storeOpenTime = dateFormat.parse("11:00 AM");
+    DateTime storeCloseTime = dateFormat.parse("11:00 PM");
+
+    final currentTimeObj = DateTime.now();
+    print(storeOpenTime.toString());
+    print(storeCloseTime.toString());
+    print(currentTimeObj.toString());*/
+
+    /*if(currentTimeObj.isAfter(storeOpenTime) && currentTimeObj.isBefore(storeCloseTime)) {
+      // do something
+      print("---if----isAfter---and --isBefore---}");
+    }else{
+      print("---else----isAfter---and --isBefore---}");
+    }*/
+
+  }
+
+
+  static bool checkStoreOpenDays(StoreModel store){
+    bool isStoreOpenToday;
+    var date = DateTime.now();
+    //print(DateFormat('EEE').format(date)); // prints Tuesday
+    String dayName = DateFormat('EEE').format(date).toLowerCase();
+
+    List<String> storeOpenDaysList = store.storeOpenDays.split(",");
+    //print("${dayName} and ${storeOpenDaysList}");
+
+    if(storeOpenDaysList.contains(dayName)){
+      //print("true contains");
+      isStoreOpenToday = true;
+    }else{
+      //print("false contains");
+      isStoreOpenToday = false;
+    }
+    return isStoreOpenToday;
   }
 
   static Widget getEmptyView2(String value){

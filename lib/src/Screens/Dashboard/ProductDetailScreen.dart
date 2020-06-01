@@ -86,8 +86,13 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(top: 20.0, bottom: 10.0,left: 40,right: 40),
-          child: imageUrl == "" ? Container(): Padding(
+          padding: EdgeInsets.only(top: 20.0, bottom: 10.0,left: 40,right: 40),
+          child: imageUrl == "" ? Container(
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: Utils.getImgPlaceHolder(),
+            ))
+              : Padding(
               padding: EdgeInsets.all(0),
               child: Container(
                 child: AspectRatio(
@@ -139,6 +144,9 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         addDividerView(),
         InkWell(
           onTap: () async {
+            if(widget.product.variants.length != null && widget.product.variants.length == 1){
+              return;
+            }
             variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
             if(variant != null){
               setState(() {
@@ -181,10 +189,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 0.0, left: 10.0,right: 5),
+                      padding: EdgeInsets.only(top: 0.0,
+                          left: widget.product.variants.length != null && widget.product.variants.length == 1 ? 0 : 10.0,
+                          right: 5),
                       child: Icon(
                         Icons.keyboard_arrow_down,
-                        color: orangeColor,
+                        color: widget.product.variants.length != null && widget.product.variants.length == 1 ? Colors.white : orangeColor,
                         size: 30,
                       ),
                     ),
