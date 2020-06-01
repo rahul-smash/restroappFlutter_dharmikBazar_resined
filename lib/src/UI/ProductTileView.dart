@@ -267,15 +267,25 @@ class _ProductTileItemState extends State<ProductTileItem> {
   Widget addQuantityView() {
     return Container(
       //color: orangeColor,
-        /*decoration: BoxDecoration(
-          color: orangeColor,
-          border: Border.all(color: orangeColor, width: 1,),
-          borderRadius: BorderRadius.all(
-              Radius.circular(5.0)),
-        ),*/
+      width: 100,
+      height: 30,
+      decoration: BoxDecoration(
+        color: showAddButton == false ? whiteColor : orangeColor,
+        //border: Border.all(color: showAddButton == false ? whiteColor : orangeColor, width: 0,),
+        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+      ),
       margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
-        child: Visibility(
-          visible: showAddButton == true ? true : true,
+        child: showAddButton == true
+            ? InkWell(onTap: (){
+              print("add onTap");
+              setState(() {
+                showAddButton = false;
+              });
+          },
+          child: Container(child: Center(child: Text("Add",style: TextStyle(color: whiteColor),),),),
+        )
+            : Visibility(
+          visible: showAddButton == true ? false : true,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
@@ -349,7 +359,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
               ),
             ],
           ),
-        )
+        ),
     );
   }
 
