@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreen.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 class CardOrderHistoryItems extends StatefulWidget {
   final OrderData orderHistoryData;
   CardOrderHistoryItems(this.orderHistoryData);
@@ -60,6 +61,24 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
             ),
           ],
         ),
+
+        Padding(
+          padding: EdgeInsets.only(top: 15.0, right: 12.0),
+          child: SizedBox(
+            width: 70,
+            height: 30,
+            child: FlatButton(onPressed: () {
+
+            },
+              child: Text("Cancel",
+                style: TextStyle(color: Color(0xFF525A5F), fontSize: 11,),),
+              color: Color(0xFFEAEEEF),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(3.0),
+              ),
+            ),
+          ),
+        )
       ],
     );
   }
@@ -78,7 +97,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                   child: Row(
                     children: <Widget>[
                       Text('Total Price : ',style: TextStyle(color: Color(0xFF39444D),fontSize: 14)),
-                      Text("Rs ${cardOrderHistoryItems.total}",style: TextStyle(color: Colors.black,fontSize: 13))
+                      Text("${AppConstant.currency} ${cardOrderHistoryItems.total}",style: TextStyle(color: Colors.black,fontSize: 13))
                     ],
                   ),
                 ),

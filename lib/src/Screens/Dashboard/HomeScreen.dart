@@ -215,7 +215,7 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,),
                 //icon: Icon(Icons.history, color: bottomBarIconColor),
-                title: Text('History', style: TextStyle(color: bottomBarTextColor)),
+                title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
                 ),
             BottomNavigationBarItem(
               icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,),

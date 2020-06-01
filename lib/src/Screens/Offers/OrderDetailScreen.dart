@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 
 class OrderDetailScreen extends StatelessWidget {
 
@@ -53,7 +54,7 @@ class OrderDetailScreen extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.only(right: 10.0,),
-                child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+                child : Text(" ${AppConstant.currency} ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
               ),
             ],
           ),
@@ -110,7 +111,7 @@ class OrderDetailScreen extends StatelessWidget {
                     Text('Price : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
                     Padding(
                       padding: EdgeInsets.only(left: 70.0),
-                      child: Text("${item.price}",style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                      child: Text("${AppConstant.currency} ${item.price}",style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
                     )
 
                   ],
@@ -196,7 +197,7 @@ class OrderDetailScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text('Item Price : ',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                        Text("RS ${orderHistoryData.total}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                        Text("${AppConstant.currency} ${orderHistoryData.total}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -210,7 +211,7 @@ class OrderDetailScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                        Text("RS ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                        Text("${AppConstant.currency} ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -220,7 +221,7 @@ class OrderDetailScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                        Text("RS ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
+                        Text("${AppConstant.currency} ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -258,7 +259,7 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                         Padding(
                           padding: EdgeInsets.only(right: 10.0,),
-                          child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+                          child : Text(" ${AppConstant.currency} ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
                         ),
                       ],
                     ),

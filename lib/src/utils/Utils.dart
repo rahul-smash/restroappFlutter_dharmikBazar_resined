@@ -24,7 +24,7 @@ class Utils {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIos: 1,
-            backgroundColor: appTheme,
+            backgroundColor: toastbgColor,
             textColor: Colors.white,
             fontSize: 16.0);
       } else {
@@ -33,7 +33,7 @@ class Utils {
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIos: 1,
-            backgroundColor: appTheme,
+            backgroundColor: toastbgColor,
             textColor: Colors.white,
             fontSize: 16.0);
       }

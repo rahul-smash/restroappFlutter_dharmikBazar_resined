@@ -338,20 +338,24 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 Utils.showToast(AppConstant.pleaseFullname, false);
                                 return;
                               }
-                              if(zipCodeController.text.trim().isEmpty) {
+                              /*if(zipCodeController.text.trim().isEmpty) {
                                 Utils.showToast(AppConstant.enterZipCode, false);
                                 return;
-                              }
+                              }*/
 
                               print("--addressController---${addressController.text}---");
 
                               Utils.showProgressDialog(context);
                               ApiController.saveDeliveryAddressApiRequest(
                                   widget.selectedAddress == null? "ADD": "EDIT",
-                                  zipCodeController.text,addressController.text,
-                                  selectedArea.areaId,selectedArea.area,
+                                  zipCodeController.text,
+                                  addressController.text,
+                                  selectedArea.areaId,
+                                  selectedArea.area,
                                   widget.selectedAddress == null? null: widget.selectedAddress.id,
-                                  fullnameController.text,selectedCity.city,selectedCity.id,
+                                  fullnameController.text,
+                                  selectedCity.city,
+                                  selectedCity.id,
                                   "${locationData.lat}","${locationData.lng}").then((response) {
                                 Utils.hideProgressDialog(context);
                                 //print('@@REsonsesss'+response.toString());
