@@ -80,7 +80,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         databaseHelper.getTotalPrice().then((mTotalPrice) {
           setState(() {
             totalPrice = mTotalPrice;
-            //totalPrice = totalPrice;
           });
         });
       }
@@ -90,29 +89,30 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     try {
       SharedPrefs.getStore().then((storeData){
         storeModel = storeData;
-        if(storeModel.deliverySlot == "1"){
-          ApiController.deliveryTimeSlotApi().then((response){
-            setState(() {
-              deliverySlotModel = response;
-              for(int i = 0; i < deliverySlotModel.data.dateTimeCollection.length; i++){
-                timeslotList = deliverySlotModel.data.dateTimeCollection[i].timeslot;
-                for(int j = 0; j < timeslotList.length; j++){
-                  Timeslot timeslot = timeslotList[j];
-                  if(timeslot.isEnable){
-                    selectedTimeSlot = j;
-                    isSlotSelected = true;
+        if(widget.deliveryType == OrderType.Delivery){
+          if(storeModel.deliverySlot == "1"){
+            ApiController.deliveryTimeSlotApi().then((response){
+              setState(() {
+                deliverySlotModel = response;
+                for(int i = 0; i < deliverySlotModel.data.dateTimeCollection.length; i++){
+                  timeslotList = deliverySlotModel.data.dateTimeCollection[i].timeslot;
+                  for(int j = 0; j < timeslotList.length; j++){
+                    Timeslot timeslot = timeslotList[j];
+                    if(timeslot.isEnable){
+                      selectedTimeSlot = j;
+                      isSlotSelected = true;
+                      break;
+                    }
+                  }
+                  if(isSlotSelected){
+                    selctedTag = i;
                     break;
                   }
                 }
-                if(isSlotSelected){
-                  selctedTag = i;
-                  break;
-                }
-              }
+              });
             });
-          });
+          }
         }
-
       });
     } catch (e) {
       print(e);
@@ -571,14 +571,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       color: appTheme,
       child: InkWell(
         onTap: () async {
-
           if(widget.deliveryType == OrderType.Delivery && widget.address.notAllow){
             if(!minOrderCheck){
               Utils.showToast("Your order amount is to low. Minimum order amount is ${widget.address.minAmount}", false);
               return;
             }
           }
-
           var result = await DialogUtils.displayPaymentDialog(context, "Select Payment","");
           //print("----result----${result}--");
           if(result == null){
@@ -599,18 +597,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             return;
           }
 
-          if(storeObject.deliverySlot == "0"){
-            selectedDeliverSlotValue = "";
-          }else{
-            if(storeObject.deliverySlot == "1" && !isSlotSelected){
-              Utils.showToast("Please select delivery slot", false);
-              return;
+          if(widget.deliveryType == OrderType.Delivery){
+            if(storeObject.deliverySlot == "0"){
+              selectedDeliverSlotValue = "";
             }else{
-              String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
-              String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
-              selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
-              //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
+              if(storeObject.deliverySlot == "1" && !isSlotSelected){
+                Utils.showToast("Please select delivery slot", false);
+                return;
+              }else{
+                String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
+                String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+                selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
+                //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
+              }
             }
+          }else{
+            selectedDeliverSlotValue = "";
           }
 
           if(widget.paymentMode == "3"){
