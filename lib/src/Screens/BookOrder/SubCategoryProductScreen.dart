@@ -32,7 +32,7 @@ class SubCategoryProductScreen extends StatelessWidget {
             isScrollable: categoryModel.subCategory.length == 1 ? false : true,
             labelColor: Colors.black,
             unselectedLabelColor: grayColorTitle,
-            indicatorColor: orangeColor,
+            indicatorColor: categoryModel.subCategory.length == 1 ? appTheme:orangeColor,
             indicatorWeight: 3,
             tabs: List.generate(categoryModel.subCategory.length, (int index) {
               bool isTabVisible;

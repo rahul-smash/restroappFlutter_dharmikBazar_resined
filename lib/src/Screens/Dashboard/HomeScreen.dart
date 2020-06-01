@@ -257,10 +257,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _currentIndex = index;
       if (_currentIndex == 0) {
-        Navigator.push(
-          context,
+        Navigator.push(context,
           MaterialPageRoute(builder: (context) => MyCartScreen(() {
-            //print("-----cart screen----");
             getCartCount();
           })),
         );

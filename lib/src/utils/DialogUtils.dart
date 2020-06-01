@@ -285,7 +285,8 @@ class DialogUtils {
                       padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
                       child: Center(
                         child: Text("Thank You",textAlign: TextAlign.center,
-                          style: TextStyle(color: yellowColor,fontWeight: FontWeight.bold),),
+                          style: TextStyle(color: grayColorTitle,
+                          fontSize: 18),),
                       ),
                     ),
                     Container(
@@ -293,7 +294,7 @@ class DialogUtils {
                         color: Colors.black45,
                         width: MediaQuery.of(context).size.width),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
                       child: Center(
                         child: Text("Thank you for placing the order.\nWe will confirm your order soon.",textAlign: TextAlign.center,
                           style: TextStyle(color: Colors.black,),),
@@ -307,9 +308,11 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
                             child: FlatButton(
-                              child: Text('Guide Me'),
-                              color: orangeColor,
-                              textColor: Colors.white,
+                              child: Text('Guide Me',style: TextStyle(
+                                decoration: TextDecoration.underline,
+                              ),),
+                              color: Colors.white,
+                              textColor: orangeColor,
                               onPressed: () {
                                 Navigator.pop(context, true);
                               },
@@ -319,7 +322,7 @@ class DialogUtils {
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
                               child: Text('OK'),
-                              color: appTheme,
+                              color: orangeColor,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context, false);
@@ -360,7 +363,7 @@ class DialogUtils {
                       padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
                       child: Center(
                         child: Text("Thank You",textAlign: TextAlign.center,
-                          style: TextStyle(color: yellowColor,fontWeight: FontWeight.bold),),
+                          style: TextStyle(color: grayColorTitle,fontSize: 18),),
                       ),
                     ),
                     Container(
@@ -383,7 +386,7 @@ class DialogUtils {
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
                               child: Text('OK'),
-                              color: appTheme,
+                              color: orangeColor,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context, true);
