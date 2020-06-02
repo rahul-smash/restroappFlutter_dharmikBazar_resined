@@ -81,6 +81,15 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     //Utils.getDayOfWeek(widget.store);
   }
+  
+  bool checkIfStoreClosed(){
+    if(store.storeStatus == "0"){
+      //0 mean Store close
+      return true;
+    }else{
+      return false;
+    }
+  }
 
   Future<void> _setSetCurrentScreen() async {
     await analytics.setCurrentScreen(
@@ -254,48 +263,56 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-      if (_currentIndex == 0) {
-        Navigator.push(context,
-          MaterialPageRoute(builder: (context) => MyCartScreen(() {
-            getCartCount();
-          })),
-        );
-      }
-      if (_currentIndex == 1) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SearchScreen()),
-        );
-      }
-      if (_currentIndex == 3) {
-        if (AppConstant.isLoggedIn) {
+    if(checkIfStoreClosed()){
+      DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
+    }else{
+      setState(() {
+        _currentIndex = index;
+        if (_currentIndex == 0) {
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MyCartScreen(() {
+              getCartCount();
+            })),
+          );
+        }
+        if (_currentIndex == 1) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+            MaterialPageRoute(builder: (context) => SearchScreen()),
           );
-        } else {
-          Utils.showLoginDialog(context);
         }
-      }
-      if (_currentIndex == 4) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ContactScreen()),
-        );
-      }
-    });
+        if (_currentIndex == 3) {
+          if (AppConstant.isLoggedIn) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+            );
+          } else {
+            Utils.showLoginDialog(context);
+          }
+        }
+        if (_currentIndex == 4) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ContactScreen()),
+          );
+        }
+      });
+    }
   }
 
   _handleDrawer() async {
     try {
-      _key.currentState.openDrawer();
-      //print("------_handleDrawer-------");
-      if (AppConstant.isLoggedIn) {
-        user = await SharedPrefs.getUser();
-        //if(user != null)
-        setState(() {});
+      if(checkIfStoreClosed()){
+        DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
+      }else{
+        _key.currentState.openDrawer();
+        //print("------_handleDrawer-------");
+        if (AppConstant.isLoggedIn) {
+          user = await SharedPrefs.getUser();
+          //if(user != null)
+          setState(() {});
+        }
       }
     } catch (e) {
       print(e);

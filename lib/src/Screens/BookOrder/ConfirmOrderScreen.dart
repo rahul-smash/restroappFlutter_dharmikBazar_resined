@@ -572,6 +572,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       color: appTheme,
       child: InkWell(
         onTap: () async {
+
+          StoreModel storeObject = await SharedPrefs.getStore();
+          bool status = checkStoreOpenTime(storeObject);
+          print("----checkStoreOpenTime----${status}--");
+
+          if(!status){
+            Utils.showToast("Store is closed.", false);
+            return;
+          }
           if(widget.deliveryType == OrderType.Delivery && widget.address.notAllow){
             if(!minOrderCheck){
               Utils.showToast("Your order amount is to low. Minimum order amount is ${widget.address.minAmount}", false);
@@ -589,7 +598,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             widget.paymentMode = "2"; //cod
           }
           print("----paymentMod----${widget.paymentMode}--");
-          StoreModel storeObject = await SharedPrefs.getStore();
           print("-paymentGateway----${storeObject.paymentGateway}-}-");
 
           bool isNetworkAvailable = await Utils.isNetworkAvailable();
@@ -886,6 +894,27 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         Utils.hideProgressDialog(context);
       }
     });
+  }
+
+  bool checkStoreOpenTime(StoreModel storeObject) {
+    // in case of deliver ignore is24x7Open
+    bool status = false;
+    if(storeObject.is24x7Open == "1" && widget.deliveryType == OrderType.PickUp){
+      // 1 = means store open 24x7
+      // 0 = not open for 24x7
+      status = true;
+    }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
+      status = true;
+    } else {
+      bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
+      if(isStoreOpenToday){
+        bool isStoreOpen = Utils.getDayOfWeek(storeObject);
+        status = isStoreOpen;
+      }else{
+        status = false;
+      }
+    }
+    return status;
   }
 
 

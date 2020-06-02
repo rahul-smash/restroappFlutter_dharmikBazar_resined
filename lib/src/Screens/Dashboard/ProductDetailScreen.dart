@@ -29,10 +29,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   String discount,price,variantId,weight;
   int counter = 0;
   CartData cartData;
+  bool showAddButton;
 
   @override
   initState() {
     super.initState();
+    showAddButton = false;
     getDataFromDB();
   }
 
@@ -40,6 +42,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     databaseHelper.getProductQuantitiy(widget.product.variantId).then((cartDataObj) {
       cartData = cartDataObj;
       counter = int.parse(cartData.QUANTITY);
+      showAddButton = counter == 0 ? true : false;
       setState(() {});
     });
   }
@@ -227,17 +230,79 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
   Widget addQuantityView() {
     return Container(
-      //color: Colors.grey,
+        width: 100,
+        height: 30,
+        decoration: BoxDecoration(
+          color: showAddButton == false ? whiteColor : orangeColor,
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+        ),
         margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(onTap: () {
-                if (counter != 0) {
-                  setState(() => counter--);
+        child: showAddButton == true
+            ? InkWell(onTap: (){
+          print("add onTap");
+          setState(() {
+            counter ++ ;
+            showAddButton = false;
+            // insert/update to cart table
+            insertInCartTable(widget.product, counter);
+          });
+        },
+          child: Container(child: Center(child: Text("Add",style: TextStyle(color: whiteColor),),),),
+        )
+            :
+        Visibility(
+          visible: showAddButton == true ? false : true,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.all(0.0),
+                width: 30.0, // you can adjust the width as you need
+                child: GestureDetector(onTap: () {
+                  if (counter != 0) {
+                    setState(() => counter--);
+                    if (counter == 0) {
+                      // delete from cart table
+                      removeFromCartTable(widget.product.variantId);
+                    } else {
+                      // insert/update to cart table
+                      insertInCartTable(widget.product, counter);
+                    }
+                    //widget.callback();
+                  }
+                },
+                    child: Container(
+                      width: 35,
+                      height: 25,
+                      decoration: BoxDecoration(
+                        color: grayColor,
+                        border: Border.all(color: grayColor, width: 1,),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(5.0)),
+                      ),
+                      child: Icon(Icons.remove, color: Colors.white, size: 20),
+                    )
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                width: 30.0,
+                height: 30.0,
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
+                  border: new Border.all(
+                    color: Colors.white,
+                    width: 1.0,
+                  ),
+                ),
+                child: Center(child: Text("$counter",style: TextStyle(fontSize: 18),)),
+              ),
+              Container(
+                padding: const EdgeInsets.all(0.0),
+                width: 30.0, // you can adjust the width as you need
+                child: GestureDetector(onTap: () {
+                  setState(() => counter++);
                   if (counter == 0) {
                     // delete from cart table
                     removeFromCartTable(widget.product.variantId);
@@ -245,63 +310,23 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                     // insert/update to cart table
                     insertInCartTable(widget.product, counter);
                   }
-                  //widget.callback();
-                }
-              },
+                },
                   child: Container(
-                    width: 35,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: grayColor,
-                      border: Border.all(color: grayColor, width: 1,),
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(5.0)),
-                    ),
-                    child: Icon(Icons.remove, color: Colors.white, size: 20),
-                  )
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
-              width: 30.0,
-              height: 30.0,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
-                border: new Border.all(
-                  color: Colors.white,
-                  width: 1.0,
+                      width: 35,
+                      height: 25,
+                      decoration: BoxDecoration(
+                        color: orangeColor,
+                        border: Border.all(color: orangeColor, width: 1,),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(5.0)),
+                      ),
+                      child: Icon(Icons.add, color: Colors.white, size: 20)),
                 ),
               ),
-              child: Center(child: Text("$counter",style: TextStyle(fontSize: 18),)),
-            ),
-            Container(
-              padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(onTap: () {
-                setState(() => counter++);
-                if (counter == 0) {
-                  // delete from cart table
-                  removeFromCartTable(widget.product.variantId);
-                } else {
-                  // insert/update to cart table
-                  insertInCartTable(widget.product, counter);
-                }
-              },
-                child: Container(
-                    width: 35,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: orangeColor,
-                      border: Border.all(color: orangeColor, width: 1,),
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(5.0)),
-                    ),
-                    child: Icon(Icons.add, color: Colors.white, size: 20)),
-              ),
-            ),
-          ],
-        ));
+            ],
+          ),
+        ),
+    );
   }
 
   void insertInCartTable(Product product, int quantity) {

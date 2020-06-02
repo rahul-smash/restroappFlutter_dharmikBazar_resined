@@ -279,8 +279,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
             ? InkWell(onTap: (){
               print("add onTap");
               setState(() {
-                showAddButton = false;
+
               });
+              counter ++ ;
+              showAddButton = false;
+              insertInCartTable(widget.product, counter);
+              widget.callback();
           },
           child: Container(child: Center(child: Text("Add",style: TextStyle(color: whiteColor),),),),
         )
@@ -305,6 +309,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     widget.callback();
                   }
                 },
+
                     child: Container(
                       width: 35,
                       height: 25,

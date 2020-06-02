@@ -23,12 +23,16 @@ class CategoryView extends StatelessWidget {
         children: <Widget>[
           GestureDetector(
             onTap: () async {
-              if (categoryModel != null && categoryModel.subCategory.isNotEmpty) {
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context) {
-                    return SubCategoryProductScreen(categoryModel);
-                  }),
-                );
+              if(checkIfStoreClosed()){
+                DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
+              }else{
+                if (categoryModel != null && categoryModel.subCategory.isNotEmpty) {
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) {
+                      return SubCategoryProductScreen(categoryModel);
+                    }),
+                  );
+                }
               }
             },
             child: Container(
@@ -54,5 +58,14 @@ class CategoryView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  bool checkIfStoreClosed(){
+    if(store.storeStatus == "0"){
+      //0 mean Store close
+      return true;
+    }else{
+      return false;
+    }
   }
 }

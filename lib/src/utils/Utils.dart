@@ -214,6 +214,14 @@ class Utils {
     return formatted;
   }
 
+  static String getCurrentDate(){
+    var now = new DateTime.now();
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String formatted = formatter.format(now);
+    //print(formatted); // something like 2013-04-20
+    return formatted;
+  }
+
   static convertStringToDate2(String dateObj){
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);
@@ -241,40 +249,50 @@ class Utils {
     return formatted;
   }
 
-  static String getDayOfWeek(StoreModel store){
-    DateFormat dateFormat = DateFormat("hh:mm");
+  static bool getDayOfWeek(StoreModel store){
+    bool isStoreOpen;
+    DateFormat dateFormat = DateFormat("hh:mma");
+    DateFormat apiDateFormat = new DateFormat("yyyy-MM-dd hh:mm a");
 
     var currentDate = DateTime.now();
-    //print(date.toString()); // prints something like 2019-12-10 10:02:22.287949
-    //print(DateFormat('EEEE').format(date)); // prints Tuesday
-    //print(DateFormat('EEEE, d MMM, yyyy').format(date)); // prints Tuesday, 10 Dec, 2019
-    //print(DateFormat('h:mma').format(date)); // prints 10:02 AM
+    print(currentDate.toString()); // prints something like 2019-12-10 10:02:22.287949
 
-    String currentTime = dateFormat.format(currentDate);
+    String currentTime = apiDateFormat.format(currentDate);
     //currentTime = currentTime.replaceAll("AM", "am").replaceAll("PM","pm");
-
+    print("----------------------------------------------");
     print("openhoursFrom= ${store.openhoursFrom}");
     print("openhoursTo=   ${store.openhoursTo}");
     print("currentTime=   ${currentTime}");
     print("----------------------------------------------");
 
+    String openhours_From = store.openhoursFrom.replaceAll("am", " AM").replaceAll("pm"," PM");
+    String openhours_To = store.openhoursTo.replaceAll("am", " AM").replaceAll("pm"," PM");
+   // print("--${getCurrentDate()}--openhoursFrom----${openhours_From} and ${openhours_To}");
 
-    /*DateFormat dateFormat = DateFormat("hh:mm a");
-    DateTime storeOpenTime = dateFormat.parse("11:00 AM");
-    DateTime storeCloseTime = dateFormat.parse("11:00 PM");
+    String openhoursFrom = "${getCurrentDate()} ${openhours_From}";//"2020-06-02 09:30 AM";
+    String openhoursTo =   "${getCurrentDate()} ${openhours_To}";//"2020-06-02 06:30 PM";
+    String currentDateTime = currentTime; //"2020-06-02 08:30 AM";
 
-    final currentTimeObj = DateTime.now();
-    print(storeOpenTime.toString());
-    print(storeCloseTime.toString());
-    print(currentTimeObj.toString());*/
+    DateTime storeOpenTime = apiDateFormat.parse(openhoursFrom);
+    DateTime storeCloseTime = apiDateFormat.parse(openhoursTo);
+    DateTime currentTimeObj = apiDateFormat.parse(currentDateTime);
 
-    /*if(currentTimeObj.isAfter(storeOpenTime) && currentTimeObj.isBefore(storeCloseTime)) {
+    //print("${dateFormat.format(storeOpenTime)} and ${dateFormat.format(storeCloseTime)}");
+    //print("currentTimeObj = ${currentTimeObj.toString()}");
+    print("----------------------------------------------");
+    print("openhoursFrom=   ${openhoursFrom}");
+    print("openhoursTo=     ${openhoursTo}");
+    print("currentDateTime= ${currentDateTime}");
+    print("----------------------------------------------");
+    if(currentTimeObj.isAfter(storeOpenTime) && currentTimeObj.isBefore(storeCloseTime)) {
       // do something
       print("---if----isAfter---and --isBefore---}");
+      isStoreOpen = true;
     }else{
-      print("---else----isAfter---and --isBefore---}");
-    }*/
-
+      print("---else---else--else---else----else-------------}");
+      isStoreOpen = false;
+    }
+    return isStoreOpen;
   }
 
 
