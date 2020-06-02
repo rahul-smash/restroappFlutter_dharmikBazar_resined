@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_tags/flutter_tags.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
@@ -30,10 +31,11 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   int counter = 0;
   CartData cartData;
   bool showAddButton;
-
+  int selctedTag;
   @override
   initState() {
     super.initState();
+    selctedTag = 0;
     showAddButton = false;
     getDataFromDB();
   }
@@ -147,67 +149,22 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           ],
         ),
         addDividerView(),
-        InkWell(
-          onTap: () async {
-            if(widget.product.variants.length != null && widget.product.variants.length == 1){
-              return;
-            }
-            variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
-            if(variant != null){
-              setState(() {
-                databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                  //print("QUANTITY= ${cartDataObj.QUANTITY}");
-                  cartData = cartDataObj;
-                  counter = int.parse(cartData.QUANTITY);
-                  setState(() {});
-                });
-              });
-            }
-            },
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 5.0, left: 20.0),
-                child: Text("Available In - ",
-                  style: TextStyle( fontSize: 16.0,fontWeight: FontWeight.w500),
+        Row(
+          children: <Widget>[
+            SizedBox(
+              width: 120,
+              child: Padding(
+                padding: EdgeInsets.only(top: 0.0, left: 20.0),
+                child: Center(
+                  child: Text("Available In ",
+                      style: TextStyle( fontSize: 16.0,fontWeight: FontWeight.w400)),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                decoration: BoxDecoration(
-                  border: Border.all(color: orangeColor, width: 1,),
-                  borderRadius: BorderRadius.all(
-                      Radius.circular(5.0)),
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5.0, left: 15.0),
-                      child: Text(
-                        "${weight}",
-                        style: TextStyle(
-                            fontSize: 16.0,
-                            color: orangeColor,
-                            fontWeight: FontWeight.w700),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.only(top: 0.0,
-                          left: widget.product.variants.length != null && widget.product.variants.length == 1 ? 0 : 10.0,
-                          right: 5),
-                      child: Icon(
-                        Icons.keyboard_arrow_down,
-                        color: widget.product.variants.length != null && widget.product.variants.length == 1 ? Colors.white : orangeColor,
-                        size: 30,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: showTagsList(widget.product.variants),
+            ),
+          ],
         ),
         addDividerView(),
         Padding(
@@ -227,6 +184,63 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     );
   }
 
+
+  Widget showTagsList(List<Variant> variants){
+    Color chipSelectedColor, textColor;
+
+    print("---variants---${variants.length}---");
+    Widget horizontalList = new Container(
+      height: 50.0,
+      //margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: variants.length,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            Variant tagName = variants[index];
+            if(selctedTag == index){
+              chipSelectedColor = orangeColor;
+              textColor = Color(0xFFFFFFFF);
+            }else{
+              chipSelectedColor = Color(0xFFBDBDBD);
+              textColor = Color(0xFF000000);
+            }
+            return Container(
+              margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
+              child: InkWell(
+                onTap: (){
+                  setState(() {
+                    selctedTag = index;
+                    //print("selctedTag= ${tagsList[selctedTag]}");
+                    if(widget.product.variants.length != null && widget.product.variants.length == 1){
+                      return;
+                    }
+                    variant = tagName;
+                    if(variant != null){
+                      setState(() {
+                        databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
+                          //print("QUANTITY= ${cartDataObj.QUANTITY}");
+                          cartData = cartDataObj;
+                          counter = int.parse(cartData.QUANTITY);
+                          setState(() {});
+                        });
+                      });
+                    }
+                  });
+                },
+                child: Chip(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
+                  autofocus: true,
+                  label: Text('${tagName.weight}',style: TextStyle(color: textColor),),
+                  backgroundColor: chipSelectedColor,
+                ),
+              ),
+            );
+          },
+        ),
+    );
+    return horizontalList;
+  }
 
   Widget addQuantityView() {
     return Container(
