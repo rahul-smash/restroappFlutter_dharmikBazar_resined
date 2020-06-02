@@ -159,23 +159,31 @@ class ForceUpdateAlertState extends BaseState<ForceUpdateAlert>{
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      body: AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))
-        ),
-        title: Text("${widget.appName}",textAlign: TextAlign.center,),
-        content: Text("${widget.forceDownloadMessage}",textAlign: TextAlign.center,),
-        actions: <Widget>[
-          new FlatButton(
-            child: Text("OK"),
-            textColor: Colors.blue,
-            onPressed: () {
-              SystemNavigator.pop();
-              //Navigator.of(context).pop(true);
-              // true here means you clicked ok
-            },
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/splash.jpg"),
+            fit: BoxFit.cover,
           ),
-        ],
+        ),
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))
+          ),
+          title: Text("${widget.appName}",textAlign: TextAlign.center,),
+          content: Text("${widget.forceDownloadMessage}",textAlign: TextAlign.center,),
+          actions: <Widget>[
+            new FlatButton(
+              child: Text("OK"),
+              textColor: Colors.blue,
+              onPressed: () {
+                SystemNavigator.pop();
+                //Navigator.of(context).pop(true);
+                // true here means you clicked ok
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

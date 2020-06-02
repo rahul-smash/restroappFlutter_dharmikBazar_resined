@@ -204,6 +204,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             context,
             MaterialPageRoute(builder: (context) => Favourites(() { })),
           );
+        }else {
+          Utils.showLoginDialog(context);
         }
         break;
       case 5:
@@ -306,6 +308,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
       databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
       Utils.showToast(AppConstant.logoutSuccess, true);
 
       setState(() {
