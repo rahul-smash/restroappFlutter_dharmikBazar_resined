@@ -99,7 +99,6 @@ class DatabaseHelper {
         "isTaxEnable TEXT, "
         "image_100_80 TEXT, "
         "image_300_200 TEXT, "
-        "image_300_200 TEXT, "
         "variants TEXT"
         ")");
     await db.execute("CREATE TABLE ${CART_Table}("
