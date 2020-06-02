@@ -320,23 +320,15 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             Utils.showToast(AppConstant.selectAddress, false);
           } else {
 
-            StoreModel store = await SharedPrefs.getStore();
-            print("--${store.onlinePayment}-}-");
-            if(store.onlinePayment == "1"){
-              //var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",addressList[selectedIndex].note);
-              /*var result = await DialogUtils.displayDialog(context, "Confirmation",addressList[selectedIndex].note,
-              "Cancel","Proceed");*/
-              var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",addressList[selectedIndex].note,);
-              if(result == true){
-                print("minAmount=${addressList[selectedIndex].minAmount}");
-                print("notAllow=${addressList[selectedIndex].notAllow}");
-                Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
-                );
-              }
-
+            var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",addressList[selectedIndex].note,);
+            if(result == true){
+              print("minAmount=${addressList[selectedIndex].minAmount}");
+              print("notAllow=${addressList[selectedIndex].notAllow}");
+              Navigator.push(context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
+              );
             }
           }
         },

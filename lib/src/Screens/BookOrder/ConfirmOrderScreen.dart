@@ -149,6 +149,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             setState(() {
               this.totalPrice = mtotalPrice.toDouble();
             });
+          }else{
+            minOrderCheck = true;
+            setState(() {
+              this.totalPrice = mtotalPrice.toDouble();
+            });
           }
         }else{
           if(mtotalPrice < minAmount){

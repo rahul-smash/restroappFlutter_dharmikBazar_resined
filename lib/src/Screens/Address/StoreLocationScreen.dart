@@ -96,26 +96,15 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
         child: InkWell(
           onTap: () async {
 
-            StoreModel store = await SharedPrefs.getStore();
-            print("--${store.onlinePayment}-}-");
-            if(store.onlinePayment == "1"){
-              String paymentValue;
-              //var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",widget.areaObject.note);
-              /*var result = await DialogUtils.displayDialog(context, "Confirmation",widget.areaObject.note,
-                  "Cancel","Proceed");*/
-
-              var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
-
-              if(result == true){
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
-                );
-              }
-
+            var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
+            if(result == true){
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
+              );
             }
           },
           child: Container(
