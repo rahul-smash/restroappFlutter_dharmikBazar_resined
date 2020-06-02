@@ -64,21 +64,33 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
     imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("${widget.product.title}"),
-        centerTitle: true,
-      ),
-      body: Container(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              getProductDetailsView(),
-            ],
+    return WillPopScope(
+      onWillPop: (){
+        print("onWillPop onWillPop");
+        Navigator.pop(context, variant);
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              return  Navigator.pop(context, variant);
+            },
+          ),
+          title: Text("${widget.product.title}"),
+          centerTitle: true,
+        ),
+        body: Container(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                getProductDetailsView(),
+              ],
+            ),
           ),
         ),
       ),
@@ -222,6 +234,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                           //print("QUANTITY= ${cartDataObj.QUANTITY}");
                           cartData = cartDataObj;
                           counter = int.parse(cartData.QUANTITY);
+                          showAddButton = counter == 0 ? true : false;
                           setState(() {});
                         });
                       });

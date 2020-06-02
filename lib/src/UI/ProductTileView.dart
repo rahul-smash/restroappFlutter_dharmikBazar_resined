@@ -42,6 +42,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       cartData = cartDataObj;
       counter = int.parse(cartData.QUANTITY);
       showAddButton = counter == 0 ? true : false;
+      print("-QUANTITY-${counter}=");
       setState(() {});
     });
     databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,widget.product.id).then((favValue){
@@ -87,11 +88,33 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     fullscreenDialog: true,)
                   );
                   setState(() {
-                    getDataFromDB();
+                    if(result != null){
+                      variant = result;
+                      discount = variant.discount.toString();
+                      price = variant.price.toString();
+                      weight = variant.weight;
+                      variantId = variant.id;
+                    }else{
+                      variantId = widget.product.variantId;
+                    }
+                    databaseHelper.getProductQuantitiy(variantId).then((cartDataObj) {
+                      setState(() {
+                        cartData = cartDataObj;
+                        counter = int.parse(cartData.QUANTITY);
+                        showAddButton = counter == 0 ? true : false;
+                        print("-QUANTITY-${counter}=");
+                      });
+                    });
+                    databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,variantId).then((favValue){
+                      //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
+                      setState(() {
+                        widget.product.isFav = favValue.toString();
+                      });
+                    });
                     widget.callback();
                     eventBus.fire(updateCartCount());
                   });
-                  print("----result---${result}");
+                  print("--ProductDetails--result---${result}");
                 }
               },
               child: Padding(
@@ -185,19 +208,19 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             padding: EdgeInsets.only(top: 20,bottom: 3),
                                             child: InkWell(
                                               onTap: () async {
-                                                //print("-variants.length--${widget.product.variants.length}");
+                                                print("-variants.length--${widget.product.variants.length}");
                                                 if(widget.product.variants.length != null){
                                                   if(widget.product.variants.length == 1){
                                                     return;
                                                   }
                                                 }
-
                                                 variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
                                                 if(variant != null){
                                                   databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                                                    //print("QUANTITY= ${cartDataObj.QUANTITY}");
+                                                    print("QUANTITY= ${cartDataObj.QUANTITY}");
                                                     cartData = cartDataObj;
                                                     counter = int.parse(cartData.QUANTITY);
+                                                    showAddButton = counter == 0 ? true : false;
                                                     setState(() {});
                                                   });
                                                 }
