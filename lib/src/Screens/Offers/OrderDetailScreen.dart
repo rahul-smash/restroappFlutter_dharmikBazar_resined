@@ -202,9 +202,13 @@ class OrderDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child:  sheetDeviderLine(),
+                  Visibility(
+                    visible: orderHistoryData.discount == "0.00" && orderHistoryData.shippingCharges == "0.00" ?
+                     false :true ,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child:  sheetDeviderLine(),
+                    ),
                   ),
                   Visibility(
                     visible: orderHistoryData.discount == "0.00" ? false :true ,
@@ -232,19 +236,28 @@ class OrderDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
-                    child:  bottomDeviderView(),
+                  Visibility(
+                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child:  bottomDeviderView(),
+                    ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child: Text('Delivery Address',
-                        style: TextStyle(color: Colors.black,fontSize: 16)),
+                  Visibility(
+                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child: Text('Delivery Address',
+                          style: TextStyle(color: Colors.black,fontSize: 16)),
+                    ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
-                    child: Text('${orderHistoryData.address}',
-                        style: TextStyle(color: Color(0xFF737879),fontSize: 16)),
+                  Visibility(
+                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
+                      child: Text('${orderHistoryData.address}',
+                          style: TextStyle(color: Color(0xFF737879),fontSize: 16)),
+                    ),
                   ),
                   Container(
                     height: 50,
