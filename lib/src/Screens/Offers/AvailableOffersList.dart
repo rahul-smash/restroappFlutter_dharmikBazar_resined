@@ -162,6 +162,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                         );
                       } else {
                         return Container(
+                          margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
                             child: Center(
                               child: Text(response.message,textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.black45, fontSize: 18.0,)),
