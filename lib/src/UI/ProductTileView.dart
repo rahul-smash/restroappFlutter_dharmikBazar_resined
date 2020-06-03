@@ -47,10 +47,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
       setState(() {});
     });
     databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,widget.product.id).then((favValue){
-      //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
+      print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
       setState(() {
         widget.product.isFav = favValue.toString();
-        //print("-isFav-${widget.product.isFav}");
+        print("-isFav-${widget.product.isFav}");
       });
     });
   }
@@ -203,7 +203,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                   margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
                                                   child: Visibility(
                                                     visible: widget.classType == ClassType.CART? false : true,
-                                                    child: Utils.showFavIcon(widget.product.isFav),
+                                                    child: widget.product.isFav == null ? Icon(Icons.favorite_border)
+                                                        :Utils.showFavIcon(widget.product.isFav),
                                                   ),
                                                 ),
                                               ),
