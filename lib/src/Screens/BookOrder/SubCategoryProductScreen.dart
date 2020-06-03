@@ -47,10 +47,8 @@ class SubCategoryProductScreen extends StatelessWidget {
               );
             }),
           ),
-          Expanded(
-              child: TabBarView(
-            children:
-                List.generate(categoryModel.subCategory.length, (int index) {
+          Expanded(child: TabBarView(
+            children:List.generate(categoryModel.subCategory.length, (int index) {
               return getProductsWidget(categoryModel.subCategory[index].id);
             }),
           ))
@@ -70,23 +68,26 @@ class SubCategoryProductScreen extends StatelessWidget {
         } else {
           if (projectSnap.hasData) {
             SubCategoryResponse response = projectSnap.data;
-            if (response.success != null && !response.success) {
-              Utils.showToast("No data found!", true);
-            }
+
             if (response.success) {
               SubCategoryModel subCategory = response.subCategories.first;
-              return ListView.builder(
-                itemCount: subCategory.products.length,
-                itemBuilder: (context, index) {
-                  Product product = subCategory.products[index];
-                  return ProductTileItem(product, () {
+              //print("products.length= ${subCategory.products.length}");
+              if(subCategory.products.length == 0){
+                return Utils.getEmptyView2("No Products found!");
+              }else{
+                return ListView.builder(
+                  itemCount: subCategory.products.length,
+                  itemBuilder: (context, index) {
+                    Product product = subCategory.products[index];
+                    return ProductTileItem(product, () {
 
-                    bottomBar.state.updateTotalPrice();
-                  },ClassType.SubCategory);
-                },
-              );
-
+                      bottomBar.state.updateTotalPrice();
+                    },ClassType.SubCategory);
+                  },
+                );
+              }
             } else {
+              print("no products.length=");
               return Container();
             }
           } else {
