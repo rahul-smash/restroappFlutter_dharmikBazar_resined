@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
@@ -102,11 +103,19 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         child: Padding(
             padding: EdgeInsets.only(left: 35, top: 40, bottom: 30),
             child: Row(children: [
-              Image.asset("images/appiconfcfm.jpg",
+              /*Image.asset("images/appiconfcfm.jpg",
                 height: 60,
                 width: 60,
                 fit: BoxFit.fill,),
-              SizedBox(width: 10),
+              SizedBox(width: 10),*/
+              CachedNetworkImage(
+                imageUrl: "${widget.store.banner}",
+                fit: BoxFit.fill,
+                height: 60,
+                width: 60,
+                //placeholder: (context, url) => CircularProgressIndicator(),
+                //errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -242,7 +251,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             print("---internationalOtp--${model.internationalOtp}");
             //User Login with Mobile and OTP = 0
             // 1 = email and 0 = ph-no
-            if(model.internationalOtp == "0"){
+            if(model.internationalOtp == "1"){
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),

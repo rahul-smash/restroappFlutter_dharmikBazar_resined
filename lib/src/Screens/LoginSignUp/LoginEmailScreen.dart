@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
@@ -26,10 +27,23 @@ class LoginEmailScreen extends StatefulWidget {
 class _LoginEmailScreenState extends State<LoginEmailScreen> {
 
   String menu;
+  StoreModel storeModel;
 
   _LoginEmailScreenState(this.menu);
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    SharedPrefs.getStore().then((value){
+       setState(() {
+         storeModel = value;
+       });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,19 +71,20 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
     return Container(
       height: 200,
       width: MediaQuery.of(context).size.width,
-      decoration: BoxDecoration(
+      /*decoration: BoxDecoration(
         image: DecorationImage(
           image: AssetImage('images/googleplayfeature.png'),
           fit: BoxFit.scaleDown,
         ),
-      ),
-      /*child: Center(
-        child: SizedBox(
-          child: Image.asset('images/appiconfcfm.jpg'),
-          width: 50,
-          height: 50,
-        ),
       ),*/
+      child: Center(
+        child: SizedBox(
+          child: CachedNetworkImage(
+              imageUrl: "${storeModel.banner}",
+              fit: BoxFit.cover
+          ),
+        ),
+      ),
     );
   }
 
