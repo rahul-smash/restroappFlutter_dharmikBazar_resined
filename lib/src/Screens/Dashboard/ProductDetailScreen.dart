@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -121,7 +122,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               child: Container(
                 child: AspectRatio(
                   aspectRatio: 16 / 9,
-                  child:Image.network(imageUrl, fit: BoxFit.cover),
+                  child: CachedNetworkImage(
+                    imageUrl: "${imageUrl}", fit: BoxFit.cover
+                    //placeholder: (context, url) => CircularProgressIndicator(),
+                    //errorWidget: (context, url, error) => Icon(Icons.error),
+                  ),
+                  //child:Image.network(imageUrl, fit: BoxFit.cover),
                 ),
               )),
         ),

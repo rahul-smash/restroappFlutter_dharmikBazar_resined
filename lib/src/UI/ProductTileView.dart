@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -137,7 +138,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                     child: Container(
                                       width: 70.0,
                                       height: 80.0,
-                                      child: Image.network(imageUrl,width: 60.0,height: 60.0,fit: BoxFit.cover),
+                                      child: CachedNetworkImage(
+                                        imageUrl: "${imageUrl}",fit: BoxFit.cover
+                                        //placeholder: (context, url) => CircularProgressIndicator(),
+                                        //errorWidget: (context, url, error) => Icon(Icons.error),
+                                      ),
+                                      /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                                          fit: BoxFit.cover),*/
                                     )),
                                 Flexible(
                                     child: Column(
