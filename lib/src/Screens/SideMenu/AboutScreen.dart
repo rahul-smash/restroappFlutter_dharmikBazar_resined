@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class AboutScreen extends StatefulWidget {
   AboutScreen();
@@ -13,7 +15,9 @@ class AboutScreen extends StatefulWidget {
 }
 
 class _AboutScreenState extends State<AboutScreen> {
+
   String aboutUs;
+  WebViewController _controller;
 
   @override
   void initState() {
@@ -35,7 +39,7 @@ class _AboutScreenState extends State<AboutScreen> {
         title: new Text('About Us'),
         centerTitle: true,
       ),
-      body: new Container(
+      /*body: Container(
         child: SingleChildScrollView(
           child: aboutUs == null
               ? Container()
@@ -44,7 +48,21 @@ class _AboutScreenState extends State<AboutScreen> {
             padding: EdgeInsets.all(10.0),
           ),
         ),
+      ),*/
+      body: WebView(
+        initialUrl: 'about:blank',
+        onWebViewCreated: (WebViewController webViewController) {
+          _controller = webViewController;
+          _loadHtmlFromAssets();
+        },
       ),
     );
+  }
+
+  _loadHtmlFromAssets() async {
+    _controller.loadUrl(Uri.dataFromString(aboutUs,
+        mimeType: 'text/html',
+        encoding: Encoding.getByName('utf-8')
+    ).toString());
   }
 }
