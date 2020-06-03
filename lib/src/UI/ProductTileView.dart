@@ -72,6 +72,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
     variantsVisibility = widget.classType == ClassType.CART ? true : widget.product.variants != null && widget.product.variants.isNotEmpty &&
           widget.product.variants.length >= 1 ? true : false;
 
+    if(weight.isEmpty){
+      variantsVisibility = false;
+    }
+
     return Container(
       color: Colors.white,
       child: Column(

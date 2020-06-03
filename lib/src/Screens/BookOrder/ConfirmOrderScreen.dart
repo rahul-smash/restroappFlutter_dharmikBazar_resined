@@ -142,7 +142,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         print("----shippingCharges=${shippingCharges}");
 
         if(widget.address.notAllow){
-          if(mtotalPrice < minAmount){
+          if(mtotalPrice <= minAmount){
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
             minOrderCheck = false;
@@ -156,7 +156,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             });
           }
         }else{
-          if(mtotalPrice < minAmount){
+          if(mtotalPrice <= minAmount){
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
             setState(() {

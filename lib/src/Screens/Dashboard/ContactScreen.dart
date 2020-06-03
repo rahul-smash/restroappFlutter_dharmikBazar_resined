@@ -67,35 +67,27 @@ class _ContactScreen extends State<ContactScreen> {
               ),
             ),
             Container(
-                height: 120,
+                //height: 120,
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Padding(
-                          padding: EdgeInsets.only(top: 10, left: 10),
+                          padding: EdgeInsets.only(top: 10, left: 10,bottom: 10),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(store == null ? "" : store.storeName ?? "",
-                                  style: TextStyle(
-                                      color: infoLabel, fontSize: 18)),
+                              Text(store == null ? "" : store.storeName ?? "", style: TextStyle(color: infoLabel, fontSize: 18)),
                               SizedBox(height: 10),
-                              Text("Address",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w500)),
+                              Text("Address", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500)),
                               SizedBox(height: 7),
-                              Text(store == null ? "" : store.location ?? "",
-                                  style: TextStyle(
-                                      color: infoLabel, fontSize: 15)),
-                              Text(
-                                  store == null
-                                      ? ""
-                                      : (store.city ??
-                                          "" + ", " + store.state ??
-                                          ""),
-                                  style:
-                                      TextStyle(color: infoLabel, fontSize: 15))
+                              SizedBox(
+                                width: (Utils.getDeviceWidth(context)-100),
+                                child: Text(store == null ? "" : store.location ?? "",
+                                    style: TextStyle(
+                                        color: infoLabel, fontSize: 15)),
+                              ),
+                              Text(store == null? "": (store.city ??"" + ", " + store.state ??""),
+                                  style:TextStyle(color: infoLabel, fontSize: 15))
                             ],
                           )),
                       Padding(padding: EdgeInsets.only(right: 10), child: IconButton(
