@@ -543,7 +543,7 @@ class ApiController {
       String paymentMethod,
       TaxCalculationModel taxModel,
       DeliveryAddressData address,
-      String orderJson, bool isComingFromPickUpScreen, String areaId,
+      String orderJson, bool isComingFromPickUpScreen, String areaId,OrderType deliveryType,
       String razorpay_order_id,String razorpay_payment_id,String online_method,
       String selectedDeliverSlotValue) async {
 
@@ -552,8 +552,18 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.placeOrder;
+
+    var url;
+    if(deliveryType == OrderType.Delivery){
+      url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+          ApiConstants.placeOrder;
+    }else{
+      url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+          ApiConstants.pickupPlaceOrder;
+    }
+
+    /*var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.placeOrder;*/
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     //print("==orderJson==${orderJson}====");
     try {
@@ -683,6 +693,7 @@ class ApiController {
     try {
       request.fields.addAll({
         "user_id": user.id,
+        "platform": Platform.isIOS ? "IOS" : "android",
       });
       print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
@@ -1039,7 +1050,7 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
-
+      print("----respStr---${respStr}");
       DeliveryTimeSlotModel storeArea = DeliveryTimeSlotModel.fromJson(parsed);
       return storeArea;
 

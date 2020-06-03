@@ -183,7 +183,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
   Widget addBanners() {
-
     return Stack(
       children: <Widget>[
         Center(
@@ -211,8 +210,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget addBottomBar() {
-    //print("-------addBottomBar--------");
-    //getCartCount();
     return Stack(
       overflow: Overflow.visible,
       alignment: new FractionalOffset(.5, 1.0),

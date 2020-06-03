@@ -27,6 +27,7 @@ class ApiConstants{
 
   static String deliveryTimeSlot = 'deliveryTimeSlot';
   static String placeOrder = 'placeOrder';
+  static String pickupPlaceOrder = 'pickupPlaceOrder';
   static String setStoreQuery = 'setStoreQuery';
   static String orderHistory = 'orderHistory';
 

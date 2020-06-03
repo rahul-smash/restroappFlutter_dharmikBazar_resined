@@ -806,7 +806,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,
-              widget.isComingFromPickUpScreen,widget.areaId ,
+              widget.isComingFromPickUpScreen,widget.areaId ,widget.deliveryType,
               payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) async {
             Utils.hideProgressDialog(context);
             if(response == null){
