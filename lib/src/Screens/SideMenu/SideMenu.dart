@@ -251,7 +251,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             print("---internationalOtp--${model.internationalOtp}");
             //User Login with Mobile and OTP = 0
             // 1 = email and 0 = ph-no
-            if(model.internationalOtp == "1"){
+            if(model.internationalOtp == "0"){
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
