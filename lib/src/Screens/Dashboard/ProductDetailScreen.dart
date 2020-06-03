@@ -32,6 +32,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   CartData cartData;
   bool showAddButton;
   int selctedTag;
+  bool isVisible = true;
+
   @override
   initState() {
     super.initState();
@@ -63,6 +65,11 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     }
 
     imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
+
+    if(weight.isEmpty){
+      isVisible = false;
+    }
+
 
     return WillPopScope(
       onWillPop: (){
@@ -160,25 +167,34 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
             addQuantityView(),
           ],
         ),
-        addDividerView(),
-        Row(
-          children: <Widget>[
-            SizedBox(
-              width: 120,
-              child: Padding(
-                padding: EdgeInsets.only(top: 0.0, left: 20.0),
-                child: Center(
-                  child: Text("Available In ",
-                      style: TextStyle( fontSize: 16.0,fontWeight: FontWeight.w400)),
+        Visibility(
+          visible: isVisible,
+          child: addDividerView(),
+        ),
+        Visibility(
+          visible: isVisible,
+          child: Row(
+            children: <Widget>[
+              SizedBox(
+                width: 120,
+                child: Padding(
+                  padding: EdgeInsets.only(top: 0.0, left: 20.0),
+                  child: Center(
+                    child: Text("Available In ",
+                        style: TextStyle( fontSize: 16.0,fontWeight: FontWeight.w400)),
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: showTagsList(widget.product.variants),
-            ),
-          ],
+              Expanded(
+                child: showTagsList(widget.product.variants),
+              ),
+            ],
+          ),
         ),
-        addDividerView(),
+        Visibility(
+          visible: isVisible,
+          child: addDividerView(),
+        ),
         Padding(
           padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
           child:Text("Product Detail",style: TextStyle(fontSize: 16.0),
