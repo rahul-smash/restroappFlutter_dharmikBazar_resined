@@ -583,7 +583,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           print("----checkStoreOpenTime----${status}--");
 
           if(!status){
-            Utils.showToast("Store is closed.", false);
+            Utils.showToast("${storeObject.closehoursMessage}", false);
             return;
           }
           if(widget.deliveryType == OrderType.Delivery && widget.address.notAllow){

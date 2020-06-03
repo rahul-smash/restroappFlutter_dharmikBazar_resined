@@ -215,7 +215,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
       return 'Delivered';
 
     } if (status == "6") {
-      return 'Canceled';
+      return 'Cancelled';
 
     }else {
       return "Waiting";

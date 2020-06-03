@@ -93,7 +93,7 @@ class _OtpScreen extends State<OtpScreen> {
                   TextFormField(
                     decoration: const InputDecoration(
                       hintText: 'Enter OTP Number',
-                      labelText: 'Enter OTP Number',
+                      //labelText: 'Enter OTP Number',
                     ),
                     keyboardType: TextInputType.phone,
                     validator: (val) =>
