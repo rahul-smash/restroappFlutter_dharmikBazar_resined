@@ -259,7 +259,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                       fullscreenDialog: true,
                     ));
                 print("-Edit-result--${result}-------");
-                if(result){
+                if(result == true){
                   Utils.showProgressDialog(context);
                   DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
                   setState(() {
