@@ -1,3 +1,4 @@
+import 'package:badges/badges.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -20,6 +21,8 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:restroapp/src/utils/version_check.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -48,17 +51,23 @@ class _HomeScreenState extends State<HomeScreen> {
   UserModel user;
   static FirebaseAnalytics analytics = FirebaseAnalytics();
   static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
-
+  bool isStoreClosed;
+  final DatabaseHelper databaseHelper = new DatabaseHelper();
+  int cartBadgeCount;
 
   _HomeScreenState(this.store);
 
   @override
   void initState() {
     super.initState();
+    isStoreClosed = false;
     initFirebase();
     _setSetCurrentScreen();
+    cartBadgeCount = 0;
+    getCartCount();
+    listenCartChanges();
     try {
-      print("-----store.banners-----${store.banners.length}------");
+      //print("-----store.banners-----${store.banners.length}------");
       if (store.banners.isEmpty) {
         imgList = [NetworkImage(AppConstant.placeholderImageUrl)];
       } else {
@@ -70,6 +79,16 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     }
+    //Utils.getDayOfWeek(widget.store);
+  }
+  
+  bool checkIfStoreClosed(){
+    if(store.storeStatus == "0"){
+      //0 mean Store close
+      return true;
+    }else{
+      return false;
+    }
   }
 
   Future<void> _setSetCurrentScreen() async {
@@ -79,9 +98,18 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  getCartCount(){
+    databaseHelper.getCount(DatabaseHelper.CART_Table).then((value){
+      setState(() {
+        cartBadgeCount = value;
+      });
+      //print("--getCARTCount---${value}------");
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       key: _key,
       appBar: AppBar(
@@ -114,8 +142,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       CategoryResponse response = projectSnap.data;
                       if (response.success) {
                         return Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage("images/backgroundimg.png"),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
                           padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                          color: gridBackgroundCOlor,
+                          //color: Colors.transparent,
                           child: GridView.count(
                               crossAxisCount: 2,
                               childAspectRatio: 1.2,
@@ -125,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               shrinkWrap: true,
                               children: response.categories.map((CategoryModel model) {
 
-                                return GridTile(child: CategoryView(model));
+                                return GridTile(child: CategoryView(model,widget.store));
                               }).toList()),
                         );
                       } else {
@@ -177,6 +211,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget addBottomBar() {
+    //print("-------addBottomBar--------");
+    //getCartCount();
     return Stack(
       overflow: Overflow.visible,
       alignment: new FractionalOffset(.5, 1.0),
@@ -188,26 +224,31 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart, color: bottomBarIconColor),
-                title: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
-                backgroundColor: appTheme),
+                icon: Badge(
+                  showBadge: cartBadgeCount == 0 ? false : true,
+                  badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
+                  child: Image.asset('images/carticon.png', width: 24,fit: BoxFit.scaleDown,),
+                ),
+                title: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                  child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
+                ),
+                ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.search, color: bottomBarIconColor),
+              icon: Image.asset('images/searchcion.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
               title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
-              backgroundColor: appTheme,
             ),
             BottomNavigationBarItem(
                 icon: Icon(Icons.shopping_cart, color: Colors.white,size: 0,),
-                title: Text(''),
-                backgroundColor: appTheme),
+                title: Text(''),),
             BottomNavigationBarItem(
-                icon: Icon(Icons.history, color: bottomBarIconColor),
-                title: Text('History', style: TextStyle(color: bottomBarTextColor)),
-                backgroundColor: appTheme),
+              icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,),
+                title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
+                ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.contact_mail, color: bottomBarIconColor),
+              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,),
                 title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
-                backgroundColor: appTheme)
+                )
           ],
         ),
         Container(
@@ -221,53 +262,58 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void onTabTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-      if (_currentIndex == 0) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MyCartScreen(() {})),
-        );
-      }
-      if (_currentIndex == 1) {
-        /*Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MyOfferScreen(context)),
-        );*/
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SearchScreen()),
-        );
-      }
-      if (_currentIndex == 3) {
-        if (AppConstant.isLoggedIn) {
+  onTabTapped(int index) {
+    if(checkIfStoreClosed()){
+      DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
+    }else{
+      setState(() {
+        _currentIndex = index;
+        if (_currentIndex == 0) {
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MyCartScreen(() {
+              getCartCount();
+            })),
+          );
+        }
+        if (_currentIndex == 1) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+            MaterialPageRoute(builder: (context) => SearchScreen()),
           );
-        } else {
-          Utils.showLoginDialog(context);
         }
-      }
-      if (_currentIndex == 4) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => ContactScreen()),
-        );
-      }
-    });
+        if (_currentIndex == 3) {
+          if (AppConstant.isLoggedIn) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+            );
+          } else {
+            Utils.showLoginDialog(context);
+          }
+        }
+        if (_currentIndex == 4) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ContactScreen()),
+          );
+        }
+      });
+    }
   }
 
   _handleDrawer() async {
     try {
-      _key.currentState.openDrawer();
-      //print("------_handleDrawer-------");
-      if (AppConstant.isLoggedIn) {
-            user = await SharedPrefs.getUser();
-            //if(user != null)
-            setState(() {});
-          }
+      if(checkIfStoreClosed()){
+        DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
+      }else{
+        _key.currentState.openDrawer();
+        //print("------_handleDrawer-------");
+        if (AppConstant.isLoggedIn) {
+          user = await SharedPrefs.getUser();
+          //if(user != null)
+          setState(() {});
+        }
+      }
     } catch (e) {
       print(e);
     }
@@ -340,5 +386,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> onDidReceiveLocalNotification(int id, String title,
       String body, String payload) async {
     debugPrint('onDidReceiveLocalNotification : ');
+  }
+
+  void listenCartChanges() {
+    eventBus.on<updateCartCount>().listen((event) {
+      print("<---Home----updateCartCount------->");
+      getCartCount();
+    });
   }
 }

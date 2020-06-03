@@ -42,7 +42,7 @@ class ApiConstants{
   static String razorpayCreateOrder = 'razorpayCreateOrder';
   static String razorpayVerifyTransaction = 'razorpayVerifyTransaction';
   static String getReferDetails = 'getReferDetails';
-
+  static String orderCancel = 'orderCancel';
 
   static String stripePaymentCheckout = 'stripePaymentCheckout';
   static String stripeVerifyTransaction = 'stripeVerifyTransaction';

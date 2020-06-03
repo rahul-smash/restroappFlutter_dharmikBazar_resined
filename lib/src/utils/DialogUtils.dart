@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'Utils.dart';
 
 class DialogUtils {
 
@@ -46,13 +50,16 @@ class DialogUtils {
   }
 
 
-  static Future<bool> displayPaymentDialog(BuildContext context,String title,String note) async {
+  static Future<PaymentType> displayPaymentDialog(BuildContext context,String title,String note) async {
 
-    return await showDialog<bool>(
+    return await showDialog<PaymentType>(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return WillPopScope(
           onWillPop: (){
+            print("onWillPop onWillPop");
+            Navigator.pop(context);
           },
           child: AlertDialog(
             shape: RoundedRectangleBorder(
@@ -73,7 +80,7 @@ class DialogUtils {
                           color: appTheme,
                           textColor: Colors.white,
                           onPressed: () {
-                            Navigator.pop(context, false);
+                            Navigator.pop(context, PaymentType.COD);
                           },
                         ),
                       ),
@@ -84,7 +91,7 @@ class DialogUtils {
                           color: appTheme,
                           textColor: Colors.white,
                           onPressed: () {
-                            Navigator.pop(context, true);
+                            Navigator.pop(context, PaymentType.ONLINE);
                           },
                         ),
                       )
@@ -254,6 +261,297 @@ class DialogUtils {
         );
       },
     );
+  }
+
+
+  static Future<bool> displayPickUpDialog(BuildContext context, StoreModel storeModel) async {
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+            //print("onWillPop onWillPop");
+            //Navigator.pop(context);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      child: Center(
+                        child: Text("Thank You",textAlign: TextAlign.center,
+                          style: TextStyle(color: grayColorTitle,
+                          fontSize: 18),),
+                      ),
+                    ),
+                    Container(
+                        height: 1,
+                        color: Colors.black45,
+                        width: MediaQuery.of(context).size.width),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 20, 0, 10),
+                      child: Center(
+                        child: Text("Thank you for placing the order.\nWe will confirm your order soon.",textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,),),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                            child: FlatButton(
+                              child: Text('Guide Me',style: TextStyle(
+                                decoration: TextDecoration.underline,
+                              ),),
+                              color: Colors.white,
+                              textColor: orangeColor,
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('OK'),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, false);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+          ),
+        );
+      },
+    );
+  }
+
+
+  static Future<bool> displayCommonDialog(BuildContext context,String title, String message) async {
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+            //print("onWillPop onWillPop");
+            //Navigator.pop(context);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      child: Center(
+                        child: Text("${title}",textAlign: TextAlign.center,
+                          style: TextStyle(color: grayColorTitle,fontSize: 18),),
+                      ),
+                    ),
+                    Container(
+                        height: 1,
+                        color: Colors.black45,
+                        width: MediaQuery.of(context).size.width),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      child: Center(
+                        child: Text("${message}",textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,),),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('OK'),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+          ),
+        );
+      },
+    );
+  }
+
+
+  static Future<bool> displayThankYouDialog(BuildContext context,String message) async {
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+            //print("onWillPop onWillPop");
+            //Navigator.pop(context);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      child: Center(
+                        child: Text("Thank You",textAlign: TextAlign.center,
+                          style: TextStyle(color: grayColorTitle,fontSize: 18),),
+                      ),
+                    ),
+                    Container(
+                        height: 1,
+                        color: Colors.black45,
+                        width: MediaQuery.of(context).size.width),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      child: Center(
+                        child: Text("${message}",textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,),),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('OK'),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+          ),
+        );
+      },
+    );
+  }
+
+
+  static Future<bool> displayOrderConfirmationDialog(BuildContext context,String title,
+      String deliveryNoteText) async {
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+            //print("onWillPop onWillPop");
+            //Navigator.pop(context);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      child: Center(
+                        child: Text("${title}",textAlign: TextAlign.center,
+                          style: TextStyle(color: appTheme,fontWeight: FontWeight.bold),),
+                      ),
+                    ),
+                    Container(
+                        height: 1,
+                        color: Colors.black45,
+                        width: MediaQuery.of(context).size.width),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      child: Center(
+                        child: Text("${deliveryNoteText}",textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,),),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                            child: FlatButton(
+                              child: Text('Cancel'),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, false);
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('Proceed'),
+                              color: appTheme,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+          ),
+        );
+      },
+    );
+  }
+
+  static Future<void> openMap(double latitude, double longitude) async {
+    String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    if (await canLaunch(googleUrl)) {
+      await launch(googleUrl);
+    } else {
+      throw 'Could not open the map.';
+    }
   }
 
 }

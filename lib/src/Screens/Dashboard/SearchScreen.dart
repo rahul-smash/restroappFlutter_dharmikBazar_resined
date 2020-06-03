@@ -193,7 +193,7 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                   selctedTag = index;
                   //print("selctedTag= ${tagsList[selctedTag]}");
                   controller.text = tagsList[selctedTag];
-                  //callSearchAPI();
+                  callSearchAPI();
                 });
               },
             );

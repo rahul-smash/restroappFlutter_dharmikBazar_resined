@@ -7,6 +7,7 @@ import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/AdminLoginModel.dart';
+import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
@@ -514,9 +515,9 @@ class ApiController {
     print("--discount-${discount}");
     try {
       request.fields.addAll({
-        "fixed_discount_amount": "0",
+        "fixed_discount_amount": "${discount}",
         "tax": "0",
-        "discount": discount,
+        "discount": "0",
         "shipping": shipping,
         "order_detail": orderJson,
         "device_id": deviceId,
@@ -1044,6 +1045,29 @@ class ApiController {
 
     } catch (e) {
       print("----catch---${e.toString()}");
+      return null;
+    }
+  }
+
+  static Future<CancelOrderModel> orderCancelApi(String order_id) async {
+    // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
+    // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    UserModel user = await SharedPrefs.getUser();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.orderCancel;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({"user_id": user.id,"order_id": order_id,});
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      CancelOrderModel referEarn = CancelOrderModel.fromJson(parsed);
+      return referEarn;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('---CancelOrderModel catch' + e.toString());
       return null;
     }
   }

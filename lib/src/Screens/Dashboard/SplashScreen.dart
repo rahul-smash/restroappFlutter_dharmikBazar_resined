@@ -12,6 +12,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class SplashScreen extends StatefulWidget {
   ConfigModel configObject;
@@ -87,31 +88,27 @@ class _SplashScreenState extends State<SplashScreen> {
               if (projectSnap.hasData) {
                 StoreResponse model = projectSnap.data;
                 if (model.success) {
-                  if(model.store.storeStatus == "0"){
-                    //0 mean Store close
-                    return ForceUpdateAlert(model.store.storeMsg,appName);
-                  }else{
-                    SharedPrefs.storeSharedValue(AppConstant.DeliverySlot, model.store.deliverySlot);
-                    SharedPrefs.storeSharedValue(AppConstant.is24x7Open, model.store.is24x7Open);
 
-                    List<ForceDownload> forceDownload = model.store.forceDownload;
-                    print("app= ${version} and -androidAppVerison--${forceDownload[0].androidAppVerison}");
-                    int index1 = version.lastIndexOf(".");
-                    //print("--substring--${version.substring(0,index1)} ");
-                    double currentVesrion = double.parse(version.substring(0,index1).trim());
-                    double apiVesrion = 1.0;
-                    try {
-                      apiVesrion = double.parse(forceDownload[0].androidAppVerison.substring(0,index1).trim());
-                    } catch (e) {
-                      print("-apiVesrion--catch--${e}----");
-                    }
-                    print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
-                    if(apiVesrion > currentVesrion){
-                      return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
-                    }else{
-                      openHomePage(model.store);
-                      return Container();
-                    }
+                  SharedPrefs.storeSharedValue(AppConstant.DeliverySlot, model.store.deliverySlot);
+                  SharedPrefs.storeSharedValue(AppConstant.is24x7Open, model.store.is24x7Open);
+
+                  List<ForceDownload> forceDownload = model.store.forceDownload;
+                  print("app= ${version} and -androidAppVerison--${forceDownload[0].androidAppVerison}");
+                  int index1 = version.lastIndexOf(".");
+                  //print("--substring--${version.substring(0,index1)} ");
+                  double currentVesrion = double.parse(version.substring(0,index1).trim());
+                  double apiVesrion = 1.0;
+                  try {
+                    apiVesrion = double.parse(forceDownload[0].androidAppVerison.substring(0,index1).trim());
+                  } catch (e) {
+                    print("-apiVesrion--catch--${e}----");
+                  }
+                  print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
+                  if(apiVesrion > currentVesrion){
+                    return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
+                  }else{
+                    openHomePage(model.store);
+                    return Container();
                   }
 
                 } else {
@@ -162,23 +159,31 @@ class ForceUpdateAlertState extends BaseState<ForceUpdateAlert>{
   Widget build(BuildContext context) {
     // TODO: implement build
     return Scaffold(
-      body: AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(10.0))
-        ),
-        title: Text("${widget.appName}",textAlign: TextAlign.center,),
-        content: Text("${widget.forceDownloadMessage}",textAlign: TextAlign.center,),
-        actions: <Widget>[
-          new FlatButton(
-            child: Text("OK"),
-            textColor: Colors.blue,
-            onPressed: () {
-              SystemNavigator.pop();
-              //Navigator.of(context).pop(true);
-              // true here means you clicked ok
-            },
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/splash.jpg"),
+            fit: BoxFit.cover,
           ),
-        ],
+        ),
+        child: AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(10.0))
+          ),
+          title: Text("${widget.appName}",textAlign: TextAlign.center,),
+          content: Text("${widget.forceDownloadMessage}",textAlign: TextAlign.center,),
+          actions: <Widget>[
+            new FlatButton(
+              child: Text("OK"),
+              textColor: Colors.blue,
+              onPressed: () {
+                SystemNavigator.pop();
+                //Navigator.of(context).pop(true);
+                // true here means you clicked ok
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -29,7 +29,7 @@ class AppConstant {
   static final String pleaseLogin = "Please login to proceed further";
   static final String selectAddress = "Please select delivery address";
   static final String deleteAddress = "Are you sure you want to delete this address?";
-  static final String orderAdded = "Thank you for placing the order. We will confirm your order soon.";
+  static final String orderAdded = "Thank you for placing the order.\nWe will confirm your order soon.";
   static final String enterAddress = 'Enter Complete Address';
   static final String selectArea = 'Please select area';
   static final String selectCity = 'Please select city';

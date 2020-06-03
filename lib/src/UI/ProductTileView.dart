@@ -27,11 +27,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
   int counter = 0;
   CartData cartData;
   Variant variant;
+  bool showAddButton;
 
   @override
   initState() {
     super.initState();
-    //print("--_ProductTileItemState-- initState");
+    showAddButton = false;
+    print("--_ProductTileItemState-- initState");
     getDataFromDB();
   }
 
@@ -39,6 +41,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
     databaseHelper.getProductQuantitiy(widget.product.variantId).then((cartDataObj) {
       cartData = cartDataObj;
       counter = int.parse(cartData.QUANTITY);
+      showAddButton = counter == 0 ? true : false;
+      print("-QUANTITY-${counter}=");
       setState(() {});
     });
     databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,widget.product.id).then((favValue){
@@ -66,20 +70,56 @@ class _ProductTileItemState extends State<ProductTileItem> {
     String imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
     bool variantsVisibility;
     variantsVisibility = widget.classType == ClassType.CART ? true : widget.product.variants != null && widget.product.variants.isNotEmpty &&
-          widget.product.variants.length > 1 ? true : false;
+          widget.product.variants.length >= 1 ? true : false;
+
+    if(weight.isEmpty){
+      variantsVisibility = false;
+    }
 
     return Container(
       color: Colors.white,
       child: Column(
           children: [
             InkWell(
-              onTap: (){
+              onTap: () async {
                 print("----print-----");
-                Navigator.push(context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) => ProductDetailsScreen(widget.product),
-                      fullscreenDialog: true,
-                    ));
+                if(widget.product.description.isEmpty){
+                  return;
+                }
+                if(widget.classType != ClassType.CART){
+                  var result = await Navigator.push(context, new MaterialPageRoute(
+                    builder: (BuildContext context) => ProductDetailsScreen(widget.product),
+                    fullscreenDialog: true,)
+                  );
+                  setState(() {
+                    if(result != null){
+                      variant = result;
+                      discount = variant.discount.toString();
+                      price = variant.price.toString();
+                      weight = variant.weight;
+                      variantId = variant.id;
+                    }else{
+                      variantId = widget.product.variantId;
+                    }
+                    databaseHelper.getProductQuantitiy(variantId).then((cartDataObj) {
+                      setState(() {
+                        cartData = cartDataObj;
+                        counter = int.parse(cartData.QUANTITY);
+                        showAddButton = counter == 0 ? true : false;
+                        print("-QUANTITY-${counter}=");
+                      });
+                    });
+                    databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,variantId).then((favValue){
+                      //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
+                      setState(() {
+                        widget.product.isFav = favValue.toString();
+                      });
+                    });
+                    widget.callback();
+                    eventBus.fire(updateCartCount());
+                  });
+                  print("--ProductDetails--result---${result}");
+                }
               },
               child: Padding(
                   padding: EdgeInsets.only(top: 15, bottom: 15),
@@ -91,13 +131,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               children: [
                                 SizedBox(width: 10),
                                 //addVegNonVegOption(),
-                                imageUrl == "" ? Container(): Padding(
+                                imageUrl == "" ? Container(child: Utils.getImgPlaceHolder(),)
+                                    : Padding(
                                     padding: EdgeInsets.only(left: 5,right: 20),
                                     child: Container(
                                       width: 70.0,
                                       height: 80.0,
-                                      child: Image.network(imageUrl,width: 60.0,
-                                        height: 60.0,fit: BoxFit.cover),
+                                      child: Image.network(imageUrl,width: 60.0,height: 60.0,fit: BoxFit.cover),
                                     )),
                                 Flexible(
                                     child: Column(
@@ -108,7 +148,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                           children: <Widget>[
                                             Flexible(
                                               child: Text(widget.product.title,overflow: TextOverflow.ellipsis,
-                                                  style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18.0,color: Colors.black, )
+                                                  style: TextStyle(fontSize: 16.0,color: grayColorTitle,)
                                               ),
                                             ),
                                             InkWell(
@@ -143,18 +183,23 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 });
 
                                               },
-                                              child: Container(
-                                                height: 30,width: 30,
-                                                decoration: BoxDecoration(
-                                                  color: favGrayColor,
-                                                  border: Border.all(color: favGrayColor, width: 1,),
-                                                  borderRadius: BorderRadius.all(
-                                                      Radius.circular(5.0)),
+                                              child: Visibility(
+                                                visible: widget.classType == ClassType.CART? false : true,
+                                                child: Container(
+                                                  height: 30,width: 30,
+                                                  decoration: BoxDecoration(
+                                                    color: widget.classType == ClassType.CART? Colors.white : favGrayColor,
+                                                    border: Border.all(color: favGrayColor, width: 1,),
+                                                    borderRadius: BorderRadius.all(
+                                                        Radius.circular(5.0)),
+                                                  ),
+                                                  margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
+                                                  child: Visibility(
+                                                    visible: widget.classType == ClassType.CART? false : true,
+                                                    child: Utils.showFavIcon(widget.product.isFav),
+                                                  ),
                                                 ),
-                                                margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
-                                                child: Utils.showFavIcon(widget.product.isFav),
                                               ),
-                                              //child: Image.asset("images/myfav.png", width: 25),
                                             ),
                                           ],
                                         ),
@@ -164,16 +209,22 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         Visibility(
                                           visible: variantsVisibility,
                                           child: Padding(
-                                            padding: EdgeInsets.only(top: 20,bottom: 10),
+                                            padding: EdgeInsets.only(top: 20,bottom: 3),
                                             child: InkWell(
                                               onTap: () async {
-                                                //print("-variants.length--${widget.product.variants.length}");
+                                                print("-variants.length--${widget.product.variants.length}");
+                                                if(widget.product.variants.length != null){
+                                                  if(widget.product.variants.length == 1){
+                                                    return;
+                                                  }
+                                                }
                                                 variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
                                                 if(variant != null){
                                                   databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                                                    //print("QUANTITY= ${cartDataObj.QUANTITY}");
+                                                    print("QUANTITY= ${cartDataObj.QUANTITY}");
                                                     cartData = cartDataObj;
                                                     counter = int.parse(cartData.QUANTITY);
+                                                    showAddButton = counter == 0 ? true : false;
                                                     setState(() {});
                                                   });
                                                 }
@@ -196,8 +247,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                       visible: widget.classType == ClassType.CART ? false : true,
                                                       child: Padding(
                                                         padding: EdgeInsets.only(left: 10),
-                                                        child: Icon(Icons.keyboard_arrow_down,
-                                                            color: orangeColor, size: 25),
+                                                        child: Utils.showVariantDropDown(widget.classType,widget.product),
                                                       ),
                                                     ),
                                                   ],
@@ -210,14 +260,17 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             (discount == "0.00" || discount == "0" || discount == "0.0")
-                                                ? Text("${AppConstant.currency}${price}",style: TextStyle(fontWeight: FontWeight.bold),)
+                                                ? Text("${AppConstant.currency}${price}",
+                                              style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w600),)
                                                 :
                                             Row(
                                               children: <Widget>[
-                                                Text("${AppConstant.currency}${widget.product.discount}",
-                                                    style: TextStyle(decoration: TextDecoration.lineThrough,fontWeight: FontWeight.bold)),
+                                                Text("${AppConstant.currency}${widget.product.price}",
+                                                  style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
                                                 Text(" "),
-                                                Text("${AppConstant.currency}${widget.product.price}",style: TextStyle(fontWeight: FontWeight.bold),),
+                                                Text("${AppConstant.currency}${widget.product.discount}",
+                                                    style: TextStyle(decoration: TextDecoration.lineThrough,
+                                                        color: grayColorTitle,fontWeight: FontWeight.w400)),
                                               ],
                                             ),
                                             addQuantityView(),
@@ -228,8 +281,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                 ),
                               ],
                             )),
-
-                        //addPlusMinusView(),
                       ]
                   )
               ),
@@ -242,17 +293,82 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
   Widget addQuantityView() {
     return Container(
-      //color: Colors.grey,
+      //color: orangeColor,
+      width: 100,
+      height: 30,
+      decoration: BoxDecoration(
+        color: showAddButton == false ? whiteColor : orangeColor,
+        //border: Border.all(color: showAddButton == false ? whiteColor : orangeColor, width: 0,),
+        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+      ),
       margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(onTap: () {
-                if (counter != 0) {
-                  setState(() => counter--);
+        child: showAddButton == true
+            ? InkWell(onTap: (){
+              print("add onTap");
+              setState(() {
+
+              });
+              counter ++ ;
+              showAddButton = false;
+              insertInCartTable(widget.product, counter);
+              widget.callback();
+          },
+          child: Container(child: Center(child: Text("Add",style: TextStyle(color: whiteColor),),),),
+        )
+            : Visibility(
+          visible: showAddButton == true ? false : true,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Container(
+                padding: const EdgeInsets.all(0.0),
+                width: 30.0, // you can adjust the width as you need
+                child: GestureDetector(onTap: () {
+                  if (counter != 0) {
+                    setState(() => counter--);
+                    if (counter == 0) {
+                      // delete from cart table
+                      removeFromCartTable(widget.product.variantId);
+                    } else {
+                      // insert/update to cart table
+                      insertInCartTable(widget.product, counter);
+                    }
+                    widget.callback();
+                  }
+                },
+
+                    child: Container(
+                      width: 35,
+                      height: 25,
+                      decoration: BoxDecoration(
+                        color: grayColor,
+                        border: Border.all(color: grayColor, width: 1,),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(5.0)),
+                      ),
+                      child: Icon(Icons.remove, color: Colors.white, size: 20),
+                    )
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                width: 30.0,
+                height: 30.0,
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
+                  border: new Border.all(
+                    color: Colors.white,
+                    width: 1.0,
+                  ),
+                ),
+                child: Center(child: Text("$counter",style: TextStyle(fontSize: 18),)),
+              ),
+              Container(
+                padding: const EdgeInsets.all(0.0),
+                width: 30.0, // you can adjust the width as you need
+                child: GestureDetector(onTap: () {
+                  setState(() => counter++);
                   if (counter == 0) {
                     // delete from cart table
                     removeFromCartTable(widget.product.variantId);
@@ -260,49 +376,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     // insert/update to cart table
                     insertInCartTable(widget.product, counter);
                   }
-                  widget.callback();
-
-                }
-                },
-                  child: Container(
-                    width: 35,
-                    height: 25,
-                    decoration: BoxDecoration(
-                        color: grayColor,
-                        border: Border.all(color: grayColor, width: 1,),
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(5.0)),
-                    ),
-                    child: Icon(Icons.remove, color: Colors.white, size: 20),
-                  )
-              ),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
-              width: 30.0,
-              height: 30.0,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
-                border: new Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: Center(child: Text("$counter",style: TextStyle(fontSize: 18),)),
-            ),
-            Container(
-              padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(onTap: () {
-                setState(() => counter++);
-                if (counter == 0) {
-                  // delete from cart table
-                  removeFromCartTable(widget.product.variantId);
-                } else {
-                  // insert/update to cart table
-                  insertInCartTable(widget.product, counter);
-                }
                 },
                   child: Container(
                       width: 35,
@@ -314,10 +387,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             Radius.circular(5.0)),
                       ),
                       child: Icon(Icons.add, color: Colors.white, size: 20)),
+                ),
               ),
-            ),
-          ],
-        ));
+            ],
+          ),
+        ),
+    );
   }
 
 
@@ -387,10 +462,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
       if (count == 0) {
         databaseHelper.addProductToCart(row).then((count) {
           widget.callback();
+          eventBus.fire(updateCartCount());
         });
       } else {
         databaseHelper.updateProductInCart(row, variantId).then((count) {
           widget.callback();
+          eventBus.fire(updateCartCount());
         });
       }
     });
@@ -400,9 +477,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
     try {
       String variantId;
       variantId = variant == null ? variant_Id : variant.id;
-      databaseHelper.delete(DatabaseHelper.CART_Table, variantId)
-          .then((count) {
+      databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {
         widget.callback();
+        eventBus.fire(updateCartCount());
       });
     } catch (e) {
       print(e);
@@ -440,9 +517,5 @@ class _ProductTileItemState extends State<ProductTileItem> {
       //print("-------count--------${count}-----");
     });
   }
-
-
-
-
 
 }

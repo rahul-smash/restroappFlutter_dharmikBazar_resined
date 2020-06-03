@@ -80,7 +80,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               fullscreenDialog: true,
             ));
             print("--result--${result}-------");
-            if(result != null){
+            if(result == true){
               Utils.showProgressDialog(context);
               DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
               setState(() {
@@ -105,24 +105,21 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         var geoLocator = Geolocator();
                         var status = await geoLocator.checkGeolocationPermissionStatus();
                         print("--status--=${status}");
-                        if (status == GeolocationStatus.granted){
-                          var result = await Navigator.push(context, new MaterialPageRoute(
-                            builder: (BuildContext context) => DragMarkerMap(data),
-                            fullscreenDialog: true,)
-                          );
-                          if(result != null){
-                            radiusArea = result;
-                            print("----radiusArea = result-------");
-                            Utils.showProgressDialog(context);
-                            DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
-                            Utils.hideProgressDialog(context);
-                            setState(() {
-                              print("----setState-------");
-                              addressList = response.data;
-                            });
-                          }
-                        }else{
-                          Utils.showToast("Please accept location permissions to get your location from settings!", false);
+
+                        var result = await Navigator.push(context, new MaterialPageRoute(
+                          builder: (BuildContext context) => DragMarkerMap(data),
+                          fullscreenDialog: true,)
+                        );
+                        if(result != null){
+                          radiusArea = result;
+                          print("----radiusArea = result-------");
+                          Utils.showProgressDialog(context);
+                          DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                          Utils.hideProgressDialog(context);
+                          setState(() {
+                            print("----setState-------");
+                            addressList = response.data;
+                          });
                         }
 
                       }else{
@@ -146,10 +143,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            IconButton(
-                icon: Icon(Icons.add_circle_outline,color: Colors.white,size: 35.0,),
-                padding: const EdgeInsets.all(0),
-                onPressed: () {}),
+            Icon(Icons.add_circle_outline,color: Colors.white,size: 35.0,),
             Text("Add Delivery Address",style: TextStyle(color: Colors.white, fontSize: 18.0),
             ),
           ],
@@ -213,7 +207,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     )),
               )
             ]),
-            Divider(color: Color(0xFFBDBDBD), thickness: 1.0),
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+              child: Divider(color: Color(0xFFBDBDBD), thickness: 1.0),
+            ),
             addOperationBar(area,index)
           ])),
     );
@@ -225,9 +222,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Icon(icon, color: Colors.grey,),
+          //Icon(icon, color: Colors.grey,),
           Padding(
-            padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: SizedBox(
               width: (Utils.getDeviceWidth(context)-150),
               child: Text(
@@ -245,7 +242,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   Widget addOperationBar(DeliveryAddressData area, int index) {
     return Padding(
-      padding: EdgeInsets.fromLTRB(5, 0, 5, 5),
+      padding: EdgeInsets.fromLTRB(0, 0, 5, 5),
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -323,20 +320,15 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             Utils.showToast(AppConstant.selectAddress, false);
           } else {
 
-            StoreModel store = await SharedPrefs.getStore();
-            print("--${store.onlinePayment}-}-");
-            if(store.onlinePayment == "1"){
-              //var result = await DialogUtils.displayPaymentDialog(context, "Select Payment",addressList[selectedIndex].note);
-              var result = await DialogUtils.displayDialog(context, "Confirmation",addressList[selectedIndex].note,
-              "Cancel","Proceed");
-              if(result == true){
-                Navigator.push(context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
-                );
-              }
-
+            var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",addressList[selectedIndex].note,);
+            if(result == true){
+              print("minAmount=${addressList[selectedIndex].minAmount}");
+              print("notAllow=${addressList[selectedIndex].notAllow}");
+              Navigator.push(context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
+              );
             }
           }
         },
@@ -354,21 +346,5 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     );
   }
 
-  /*getAddressList(){
-    print("=====getAddressList==========");
-    Utils.showProgressDialog(context);
-    ApiController.getAddressApiRequest().then((responses){
-      print("====called then future completes====");
-      Utils.hideProgressDialog(context);
-      DeliveryAddressResponse response = responses;
-      setState(() {
-        //Utils.hideProgressDialog(context);
-        addressList = response.data;
-      });
-    }).whenComplete(() {
-      Utils.hideProgressDialog(context);
-      print("====called when future completes====");
-    });
-  }*/
 
 }

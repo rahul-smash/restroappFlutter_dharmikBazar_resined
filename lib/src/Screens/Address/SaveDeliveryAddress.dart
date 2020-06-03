@@ -40,7 +40,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   void initState() {
     super.initState();
     if (widget.selectedAddress != null) {
-      print("-11111111111-------");
+      //print("-11111111111-------");
       selectedCity = City();
       selectedCity.city = widget.selectedAddress.city;
       selectedCity.id = widget.selectedAddress.cityId;
@@ -58,11 +58,11 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       locationData.lng = widget.selectedAddress.lng.toString();
 
     }else{
-      print("-2222222222222222-------");
+      //print("-2222222222222222-------");
       locationData = new LocationData();
 
       if(widget.addressValue != null && widget.addressValue.isNotEmpty){
-        print("-3333333333333333-------");
+        //print("-3333333333333333-------");
         locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
         locationData.lat = widget.coordinates.latitude.toString();
@@ -149,7 +149,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       : "Select",
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 20.0,
+                                    fontSize: 17.0,
                                   ),
                                 )),
                           )),
@@ -193,7 +193,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       : "Select",
                                   style: TextStyle(
                                     color: Colors.black,
-                                    fontSize: 20.0,
+                                    fontSize: 17.0,
                                   ),
                                 )),
                           )),
@@ -207,20 +207,21 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 var geoLocator = Geolocator();
                                 var status = await geoLocator.checkGeolocationPermissionStatus();
                                 print("--status--=${status}");
-                                if (status == GeolocationStatus.granted){
-                                  var result = await Navigator.push(context, new MaterialPageRoute(
-                                    builder: (BuildContext context) => SelectLocationOnMap(),
-                                    fullscreenDialog: true,)
-                                  );
-                                  if(result != null){
-                                    locationData = result;
-                                    if(locationData.address.isNotEmpty){
-                                      addressController.text = locationData.address;
-                                    }
-                                  }
-                                }else{
+                                /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){
                                   Utils.showToast("Please accept location permissions to get your location from settings!", false);
+                                }*/
+
+                                var result = await Navigator.push(context, new MaterialPageRoute(
+                                  builder: (BuildContext context) => SelectLocationOnMap(),
+                                  fullscreenDialog: true,)
+                                );
+                                if(result != null){
+                                  locationData = result;
+                                  if(locationData.address.isNotEmpty){
+                                    addressController.text = locationData.address;
+                                  }
                                 }
+
                               }else{
                                 Utils.showToast("Please turn on gps!", false);
                               }
@@ -337,20 +338,24 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 Utils.showToast(AppConstant.pleaseFullname, false);
                                 return;
                               }
-                              if(zipCodeController.text.trim().isEmpty) {
+                              /*if(zipCodeController.text.trim().isEmpty) {
                                 Utils.showToast(AppConstant.enterZipCode, false);
                                 return;
-                              }
+                              }*/
 
                               print("--addressController---${addressController.text}---");
 
                               Utils.showProgressDialog(context);
                               ApiController.saveDeliveryAddressApiRequest(
                                   widget.selectedAddress == null? "ADD": "EDIT",
-                                  zipCodeController.text,addressController.text,
-                                  selectedArea.areaId,selectedArea.area,
+                                  zipCodeController.text,
+                                  addressController.text,
+                                  selectedArea.areaId,
+                                  selectedArea.area,
                                   widget.selectedAddress == null? null: widget.selectedAddress.id,
-                                  fullnameController.text,selectedCity.city,selectedCity.id,
+                                  fullnameController.text,
+                                  selectedCity.city,
+                                  selectedCity.id,
                                   "${locationData.lat}","${locationData.lng}").then((response) {
                                 Utils.hideProgressDialog(context);
                                 //print('@@REsonsesss'+response.toString());

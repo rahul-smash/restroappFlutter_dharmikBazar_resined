@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 
 class OrderDetailScreen extends StatelessWidget {
 
@@ -42,8 +43,9 @@ class OrderDetailScreen extends StatelessWidget {
               Row(
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.only(left: 15.0,top: 0.0,),
-                      child : Text("View Details",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w600),),
+                      padding: EdgeInsets.only(left: 15.0,top: 4.0,bottom: 4),
+                      child : Text("View Details",
+                        style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w600),),
                     ),
                     SizedBox(
                         width: 6
@@ -53,7 +55,7 @@ class OrderDetailScreen extends StatelessWidget {
               ),
               Padding(
                 padding: EdgeInsets.only(right: 10.0,),
-                child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+                child : Text(" ${AppConstant.currency} ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
               ),
             ],
           ),
@@ -110,7 +112,7 @@ class OrderDetailScreen extends StatelessWidget {
                     Text('Price : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
                     Padding(
                       padding: EdgeInsets.only(left: 70.0),
-                      child: Text("${item.price}",style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                      child: Text("${AppConstant.currency} ${item.price}",style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
                     )
 
                   ],
@@ -149,8 +151,8 @@ class OrderDetailScreen extends StatelessWidget {
               Padding(
                 padding: EdgeInsets.only(left: 15.0),
                 child: Container(
-                  width: 6,
-                  height: 6,
+                  width: 8,
+                  height: 8,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(3.0)),
                       color: getStatusColor(item.status)
@@ -181,7 +183,7 @@ class OrderDetailScreen extends StatelessWidget {
                 //crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(left: screenWidth-40 ,top: 5,bottom: 10),
+                    padding: EdgeInsets.only(left: screenWidth - 40 ,top: 5,bottom: 10),
                     child: GestureDetector(
                       onTap: (){
                         Navigator.pop(mainContext);
@@ -196,7 +198,7 @@ class OrderDetailScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text('Item Price : ',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                        Text("RS ${orderHistoryData.total}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                        Text("${AppConstant.currency} ${orderHistoryData.total}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),
@@ -204,24 +206,30 @@ class OrderDetailScreen extends StatelessWidget {
                     padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
                     child:  sheetDeviderLine(),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child:   Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                        Text("RS ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                      ],
+                  Visibility(
+                    visible: orderHistoryData.discount == "0.00" ? false :true ,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child:   Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                          Text("${AppConstant.currency} ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                        ],
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child:  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                        Text("RS ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
-                      ],
+                  Visibility(
+                    visible: orderHistoryData.shippingCharges == "0.00" ? false :true ,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child:  Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                          Text("${AppConstant.currency} ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
+                        ],
+                      ),
                     ),
                   ),
                   Padding(
@@ -247,8 +255,8 @@ class OrderDetailScreen extends StatelessWidget {
                         Row(
                             children: <Widget>[
                               Padding(
-                                padding: EdgeInsets.only(left: 15.0,top: 0.0,),
-                                child : Text("View Details",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w600),),
+                                padding: EdgeInsets.only(left: 15.0,top: 4.0,bottom: 4),
+                                child : Text("View Details",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w600),),
                               ),
                               SizedBox(
                                   width: 6
@@ -258,7 +266,8 @@ class OrderDetailScreen extends StatelessWidget {
                         ),
                         Padding(
                           padding: EdgeInsets.only(right: 10.0,),
-                          child : Text(" ₹ ${orderHistoryData.total}",style: TextStyle(fontSize: 20,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+                          child : Text(" ${AppConstant.currency} ${orderHistoryData.total}",
+                            style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
                         ),
                       ],
                     ),
@@ -300,10 +309,26 @@ class OrderDetailScreen extends StatelessWidget {
 
   String getStatus(status) {
     if (status == "0") {
+
       return 'Pending';
+
     } else if (status == "1") {
+
       return 'Order';
-    } else {
+
+    }if (status == "2") {
+      return 'Rejected';
+
+    }if (status == "4") {
+      return 'Shipped';
+
+    }if (status == "5") {
+      return 'Delivered';
+
+    } if (status == "6") {
+      return 'Canceled';
+
+    }else {
       return "Waiting";
     }
   }

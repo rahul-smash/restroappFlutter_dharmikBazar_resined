@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/UI/CardOrderHistoryItems.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class MyOrderScreen extends StatefulWidget {
@@ -12,15 +13,44 @@ class MyOrderScreen extends StatefulWidget {
 }
 
 class _MyOrderScreen extends State<MyOrderScreen> {
+
+  List<OrderData> ordersList = List();
+  bool isLoading ;
+
+  @override
+  void initState() {
+    super.initState();
+    getOrderListApi();
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    eventBus.on<refreshOrderHistory>().listen((event) {
+      //print("<---refreshOrderHistory------->");
+      setState(() {
+        getOrderListApi();
+      });
+    });
+
     return new Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: new Text('Order History'),
+        title: new Text('My Orders'),
         centerTitle: true,
       ),
-      body: projectWidget(),
+      //body: projectWidget(),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ordersList == null
+          ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
+          : ListView.builder(
+          itemCount: ordersList.length,
+          itemBuilder: (context, index) {
+            OrderData orderHistoryData = ordersList[index];
+            return CardOrderHistoryItems(orderHistoryData);
+          }
+      ),
     );
   }
 
@@ -48,7 +78,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
                       BoxShadow(
                         color: Colors.black26,
                         blurRadius: 10.0,
-                        offset: const Offset(0.0, 10.0),
+                        offset: Offset(0.0, 10.0),
                       ),
                     ],
                   ),
@@ -58,8 +88,6 @@ class _MyOrderScreen extends State<MyOrderScreen> {
                           child: ListView.builder(
                             shrinkWrap: true,
                             itemCount: orders.length,
-//                            separatorBuilder: (context, index) =>
-//                                Divider(height: 2.0, color: Colors.black),
                             itemBuilder: (context, index) {
                               OrderData orderHistoryData = orders[index];
                               return CardOrderHistoryItems(orderHistoryData);
@@ -84,6 +112,17 @@ class _MyOrderScreen extends State<MyOrderScreen> {
         }
       },
     );
+  }
+
+  void getOrderListApi() {
+    isLoading = true;
+    ApiController.getOrderHistory().then((respone){
+      setState(() {
+        isLoading = false;
+        ordersList = respone.orders;
+      });
+
+    });
   }
 
 }

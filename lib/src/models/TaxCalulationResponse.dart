@@ -23,12 +23,12 @@ class TaxCalculationResponse {
 class TaxCalculationModel {
 
   String total;
-  int itemSubTotal;
-  int tax;
-  int discount;
+  String itemSubTotal;
+  String tax;
+  String discount;
   String shipping;
   String couponCode;
-  int fixedTaxAmount;
+  String fixedTaxAmount;
   List<TaxDetail> taxDetail;
   List<TaxLabel> taxLabel;
   List<FixedTax> fixedTax;

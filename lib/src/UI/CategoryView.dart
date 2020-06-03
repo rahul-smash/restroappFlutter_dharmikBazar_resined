@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class CategoryView extends StatelessWidget {
+
   final CategoryModel categoryModel;
-  CategoryView(this.categoryModel);
+  StoreModel store;
+  CategoryView(this.categoryModel, this.store);
 
   Widget build(BuildContext context) {
     return Container(
@@ -18,13 +22,17 @@ class CategoryView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           GestureDetector(
-            onTap: () {
-              if (categoryModel != null && categoryModel.subCategory.isNotEmpty) {
-                Navigator.push(context,
-                  MaterialPageRoute(builder: (context) {
-                    return SubCategoryProductScreen(categoryModel);
-                  }),
-                );
+            onTap: () async {
+              if(checkIfStoreClosed()){
+                DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
+              }else{
+                if (categoryModel != null && categoryModel.subCategory.isNotEmpty) {
+                  Navigator.push(context,
+                    MaterialPageRoute(builder: (context) {
+                      return SubCategoryProductScreen(categoryModel);
+                    }),
+                  );
+                }
               }
             },
             child: Container(
@@ -50,5 +58,14 @@ class CategoryView extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  bool checkIfStoreClosed(){
+    if(store.storeStatus == "0"){
+      //0 mean Store close
+      return true;
+    }else{
+      return false;
+    }
   }
 }

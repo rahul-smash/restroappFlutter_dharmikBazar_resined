@@ -124,7 +124,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
         children: <Widget>[
           InkWell(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(15, 8, 15, 0),
+              padding: EdgeInsets.fromLTRB(15, 8, 15, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -167,12 +167,14 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
               }
             },
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              //crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  "Place Order",
-                  style: TextStyle(color: Colors.white, fontSize: 18.0),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                  child: Text("Place Order",
+                    style: TextStyle(color: Colors.white, fontSize: 18.0),
+                  ),
                 ),
               ],
             ),

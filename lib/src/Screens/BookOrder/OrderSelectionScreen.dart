@@ -8,6 +8,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class OrderSelectionScreen extends StatefulWidget {
@@ -108,15 +109,15 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                                       Container(
                                         margin: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
                                         height: 100.0,
-                                        width: 100.0,
+                                        width: 150.0,
                                         decoration: new BoxDecoration(
                                           image: DecorationImage(
                                             image: new AssetImage(
                                               'images/deliver.png',
                                             ),
-                                            fit: BoxFit.fill,
+                                            fit: BoxFit.scaleDown,
                                           ),
-                                          shape: BoxShape.circle,
+                                          shape: BoxShape.rectangle,
                                         ),
                                       ),
                                       Text("Deliver"),
@@ -132,8 +133,9 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                       Visibility(
                         visible: pickUpFacility,
                         child:  GestureDetector(
-                          onTap: () {
+                          onTap: ()  {
                             print('@@CartBottomView----'+"PickUPActivy");
+
                             Utils.showProgressDialog(context);
                             ApiController.getStorePickupAddress().then((response){
 
@@ -177,15 +179,15 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                                       Container(
                                         margin: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 5.0),
                                         height: 100.0,
-                                        width: 100.0,
+                                        width: 150.0,
                                         decoration: new BoxDecoration(
                                           image: DecorationImage(
                                             image: new AssetImage(
                                               'images/pickup.png',
                                             ),
-                                            fit: BoxFit.fill,
+                                            fit: BoxFit.scaleDown,
                                           ),
-                                          shape: BoxShape.circle,
+                                          shape: BoxShape.rectangle,
                                         ),
                                       ),
                                       // Code to create the view for address.
