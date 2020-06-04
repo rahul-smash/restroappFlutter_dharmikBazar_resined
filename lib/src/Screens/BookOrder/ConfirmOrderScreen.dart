@@ -418,11 +418,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     child: Text("Quantity: " + product.quantity)),
                 Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
-                    child: Text("Price: " + "${AppConstant.currency}${product.price}")),
+                    child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")),
               ],
             ),
             Text(
-                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2)}",
+                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
                 style: TextStyle(fontSize: 16, color: Colors.black45)),
           ],
         ));
@@ -443,7 +443,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Items Price", style: TextStyle(color: Colors.black54)),
-                Text("${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice-int.parse(shippingCharges)), 2)}",
+                Text("${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice-int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
@@ -496,7 +496,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               children: [
                 Text("Total",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Text("${AppConstant.currency}${databaseHelper.roundOffPrice(
-                    taxModel == null ? totalPrice : double.parse(taxModel.total), 2)}",
+                    taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}",
                     style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ))

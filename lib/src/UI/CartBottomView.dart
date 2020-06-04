@@ -47,6 +47,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
     databaseHelper.getTotalPrice().then((mTotalPrice) {
       setState(() {
         totalPrice = mTotalPrice;
+        print("----mTotalPrice==== ${mTotalPrice}--");
       });
     });
   }
@@ -84,7 +85,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                         children: [
                           TextSpan(
                             text:
-                            "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                            "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
                             style: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 fontSize: 18,
@@ -133,7 +134,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
                   ),
                   Text(
-                    "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
                   ),
                 ],
