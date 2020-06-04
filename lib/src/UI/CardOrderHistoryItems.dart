@@ -60,7 +60,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
             ),
             Padding(
               padding: EdgeInsets.only(left: 12.0, top: 4.0, right: 10.0),
-              child: Text(cardOrderHistoryItems.orderDate,
+              child: Text(Utils.convertOrderDateTime(cardOrderHistoryItems.orderDate),
                   style: TextStyle(color: Color(0xFF858B8F), fontSize: 13)),
             ),
           ],
