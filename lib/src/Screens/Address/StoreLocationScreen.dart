@@ -96,8 +96,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
         child: InkWell(
           onTap: () async {
 
-            var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
-            if(result == true){
+            if(widget.areaObject.note.isEmpty){
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -105,7 +104,19 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                     builder: (context) =>
                         ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
               );
+            }else{
+              var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
+              if(result == true){
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
+                );
+              }
             }
+
           },
           child: Container(
             height: 40,

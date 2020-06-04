@@ -343,17 +343,25 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           if (addressList.length == 0) {
             Utils.showToast(AppConstant.selectAddress, false);
           } else {
-
-            var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",addressList[selectedIndex].note,);
-            if(result == true){
-              print("minAmount=${addressList[selectedIndex].minAmount}");
-              print("notAllow=${addressList[selectedIndex].notAllow}");
+            print("minAmount=${addressList[selectedIndex].minAmount}");
+            print("notAllow=${addressList[selectedIndex].notAllow}");
+            if(addressList[selectedIndex].note.isEmpty){
               Navigator.push(context,
                 MaterialPageRoute(
                     builder: (context) =>
                         ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
               );
+            }else{
+              var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",addressList[selectedIndex].note,);
+              if(result == true){
+                Navigator.push(context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
+                );
+              }
             }
+
           }
         },
         child: Row(
