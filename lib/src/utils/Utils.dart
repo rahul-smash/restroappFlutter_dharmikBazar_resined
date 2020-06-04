@@ -102,6 +102,7 @@ class Utils {
   }
 
   static void showProgressDialog(BuildContext context) {
+    print("--showProgressDialog----");
     //For normal dialog
     if (pr != null && pr.isShowing()) {
       pr.hide();
@@ -115,10 +116,18 @@ class Utils {
     //For normal dialog
     try {
       if (pr != null && pr.isShowing()) {
+        print("-1-hideProgressDialog----");
             pr.hide();
+        pr = null;
       }else{
-        if (pr != null)
-        pr.hide();
+        if (pr != null){
+          pr.hide();
+          print("-2-hideProgressDialog---");
+          pr.hide().then((value){
+            print("-3 hide -${value}---");
+          });
+          pr = null;
+        }
       }
     } catch (e) {
       print(e);

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -33,11 +34,15 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   List<DeliveryAddressData> addressList = [];
   Area radiusArea;
   Coordinates coordinates;
+  bool isLoading =false;
 
   @override
   void initState() {
     super.initState();
     addressList = widget.responsesData.data;
+    if(addressList.isNotEmpty){
+      isLoading = false;
+    }
     coordinates = new Coordinates(0.0, 0.0);
   }
 
@@ -55,7 +60,19 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         children: <Widget>[
           Divider(color: Colors.white, height: 2.0),
           addCreateAddressButton(),
-          addAddressList()
+          //addAddressList()
+          isLoading? Center(child: CircularProgressIndicator()): addressList == null
+              ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
+              : Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: addressList.length,
+              itemBuilder: (context, index) {
+                DeliveryAddressData area = addressList[index];
+                return addAddressCard(area, index);
+                },
+            ),
+          ),
         ],
       ),
       bottomNavigationBar: widget.showProceedBar ? addProceedBar() : Container(height: 5),
@@ -81,12 +98,19 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             ));
             print("--result--${result}-------");
             if(result == true){
-              Utils.showProgressDialog(context);
-              DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+              //Utils.showProgressDialog(context);
               setState(() {
-                Utils.hideProgressDialog(context);
+                isLoading = true;
+              });
+              DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+              //Utils.hideProgressDialog(context);
+              setState(() {
+                //addressList = null;
+                isLoading = false;
                 addressList = response.data;
               });
+            }else{
+              print("--result--else------");
             }
 
           }else if(store.deliveryArea == "1"){
@@ -113,11 +137,16 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         if(result != null){
                           radiusArea = result;
                           print("----radiusArea = result-------");
-                          Utils.showProgressDialog(context);
+                          //Utils.showProgressDialog(context);
+                          setState(() {
+                            isLoading = true;
+                          });
                           DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
-                          Utils.hideProgressDialog(context);
+                          //Utils.hideProgressDialog(context);
                           setState(() {
                             print("----setState-------");
+                            isLoading = false;
+                            //addressList = null;
                             addressList = response.data;
                           });
                         }
@@ -201,6 +230,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                       value: selectedIndex == index,
                       onChanged: (value) {
                         setState(() {
+                          print("index = ${index}");
                           selectedIndex = index;
                         });
                       },
@@ -281,7 +311,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               child: new Text("Remove Address",style: TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),
             ),
             onTap: () async {
-              print("--selectedIndex= ${index}");
+              print("--selectedIndex ${selectedIndex} and ${index}");
               var results = await DialogUtils.displayDialog(context,"Delete",AppConstant.deleteAddress,
                   "Cancel","OK");
               if(results == true){
@@ -292,6 +322,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     print("---showDialogForDelete-----");
                     setState(() {
                       addressList.removeAt(index);
+                      print("--selectedIndex ${selectedIndex} and ${index}");
+                      if(selectedIndex == index && addressList .isNotEmpty){
+                        selectedIndex = 0;
+                      }
                     });
                     /*Utils.showProgressDialog(context);
                     DeliveryAddressResponse response = await ApiController.getAddressApiRequest();

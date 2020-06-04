@@ -260,7 +260,7 @@ class ApiController {
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print("----respStr---${respStr}");
+      print("-1--getAddress-respStr---${respStr}");
       final parsed = json.decode(respStr);
       DeliveryAddressResponse deliveryAddressResponse =
           DeliveryAddressResponse.fromJson(parsed);
@@ -385,7 +385,7 @@ class ApiController {
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
 
-      print("---respStr>---${respStr}");
+      print("-getAddress--respStr>---${respStr}");
 
       final parsed = json.decode(respStr);
 
