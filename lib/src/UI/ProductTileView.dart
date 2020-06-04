@@ -34,7 +34,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
   initState() {
     super.initState();
     showAddButton = false;
-    //print("--_ProductTileItemState-- initState");
+    print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
   }
 
@@ -163,6 +163,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 int count = await databaseHelper.checkProductsExistInFavTable
                                                   (DatabaseHelper.Favorite_Table,widget.product.id);
                                                 Product product = widget.product;
+                                                print("--product.count-- ${count}");
                                                 if(count == 1){
                                                   product.isFav = "0";
                                                   await databaseHelper.deleteFav(DatabaseHelper.Favorite_Table,product.id);
@@ -203,8 +204,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                   margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
                                                   child: Visibility(
                                                     visible: widget.classType == ClassType.CART? false : true,
-                                                    child: widget.product.isFav == null ? Icon(Icons.favorite_border)
-                                                        :Utils.showFavIcon(widget.product.isFav),
+                                                   /* child: widget.product.isFav == null ? Icon(Icons.favorite_border)
+                                                        :Utils.showFavIcon(widget.product.isFav),*/
+                                                    child: widget.classType == ClassType.Favourites ? Icon(Icons.favorite,color: orangeColor,)
+                                                        : Utils.showFavIcon(widget.product.isFav),
                                                   ),
                                                 ),
                                               ),

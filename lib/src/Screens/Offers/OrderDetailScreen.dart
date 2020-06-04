@@ -155,14 +155,14 @@ class OrderDetailScreen extends StatelessWidget {
                   height: 8,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                      color: getStatusColor(item.status)
+                      color: getStatusColor(orderHistoryData.status)
                   ),
                 ),
               ),
 
               Padding(
                 padding: EdgeInsets.only(left: 5.0),
-                child: Text(getStatus(item.status),style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                child: Text(getStatus(orderHistoryData.status),style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
               )
             ],
           ),
@@ -321,6 +321,7 @@ class OrderDetailScreen extends StatelessWidget {
   }
 
   String getStatus(status) {
+    print("---${status}---");
     if (status == "0") {
 
       return 'Pending';
@@ -347,7 +348,8 @@ class OrderDetailScreen extends StatelessWidget {
   }
 
   Color getStatusColor(status){
-    return status == "0" ? Color(0xFFA1BF4C) : status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
+    return status == "0" ? Color(0xFFA1BF4C) :
+    status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
   }
 
 

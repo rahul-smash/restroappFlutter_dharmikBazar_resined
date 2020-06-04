@@ -249,13 +249,13 @@ class DatabaseHelper {
         try {
           double total = int.parse(quantity) * double.parse(price);
           //print("-------total------${roundOffPrice(total,2)}");
-          print("-price ${price}---");
+          //print("-price ${price}---");
           totalPrice = totalPrice + roundOffPrice(total, 2);
         } catch (e) {
           print(e);
         }
       });
-      print("-DB totalPrice is ${totalPrice}--");
+      //print("-DB totalPrice is ${totalPrice}--");
       return totalPrice;
     } else {
       //print("-empty cart---");

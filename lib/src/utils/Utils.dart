@@ -142,10 +142,10 @@ class Utils {
   static showFavIcon(String isFav) {
     Icon favIcon;
     print("-showFavIcon- ${isFav}");
-    /*if(isFav == null){
+    if(isFav == null){
       favIcon = Icon(Icons.favorite_border);
       return favIcon;
-    }*/
+    }
     if(isFav == "1"){
       favIcon = Icon(Icons.favorite,color: orangeColor,);
     }else if(isFav == "0"){
