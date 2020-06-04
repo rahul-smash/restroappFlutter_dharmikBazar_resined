@@ -196,10 +196,13 @@ class Utils {
 
     return Padding(
       padding: EdgeInsets.only(left: 10,right: 10),
-      child: Image.asset("images/appiconfcfm.jpg",
-        height: 60,
-        width: 60,
-        fit: BoxFit.scaleDown,),
+      child: Visibility(
+        visible: true,
+        child: Image.asset("images/appiconfcfm.jpg",
+      height: 60,
+      width: 60,
+      fit: BoxFit.scaleDown,),
+      ),
     );
   }
 
