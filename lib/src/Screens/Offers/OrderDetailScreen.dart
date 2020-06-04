@@ -141,32 +141,42 @@ class OrderDetailScreen extends StatelessWidget {
   }
 
   secondRow(OrderItems item){
-    return  Padding(
-        padding: EdgeInsets.only(bottom: 15,top: 20),
-        child:  Padding(
-          padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
-          child: Row(
-            children: <Widget>[
-              Text('Status : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
-              Padding(
-                padding: EdgeInsets.only(left: 15.0),
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                      color: getStatusColor(orderHistoryData.status)
-                  ),
-                ),
-              ),
 
-              Padding(
-                padding: EdgeInsets.only(left: 5.0),
-                child: Text(getStatus(orderHistoryData.status),style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
-              )
-            ],
+    return  Visibility(
+      visible: true,
+      child: Padding(
+          padding: EdgeInsets.only(bottom: 10,top: 20),
+          child:  Visibility(
+            visible: item.status == "2" ? true : false,
+            child: Padding(
+              padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
+              child: Row(
+                children: <Widget>[
+                  Text('Status : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.0),
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                          color: getStatusColor(item.status)
+                      ),
+                    ),
+                  ),
+
+                  Visibility(
+                    visible: item.status == "2" ? true : false,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 5.0),
+                      child: Text(getStatus(item.status),style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        )
+      ),
     );
 
   }
@@ -322,28 +332,19 @@ class OrderDetailScreen extends StatelessWidget {
 
   String getStatus(status) {
     print("---${status}---");
+    /*0 =pending ,
+    1= active,
+    2 = rejected = show view only for this else hide status.*/
     if (status == "0") {
-
       return 'Pending';
 
     } else if (status == "1") {
-
-      return 'Order';
+      return 'Active';
 
     }if (status == "2") {
       return 'Rejected';
+    }else{
 
-    }if (status == "4") {
-      return 'Shipped';
-
-    }if (status == "5") {
-      return 'Delivered';
-
-    } if (status == "6") {
-      return 'Cancelled';
-
-    }else {
-      return "Waiting";
     }
   }
 

@@ -195,15 +195,14 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
     );
   }
 
-
+// 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
+  // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
   String getStatus(status) {
     if (status == "0") {
-
       return 'Pending';
 
     } else if (status == "1") {
-
-      return 'Order';
+      return 'Processing';
 
     }if (status == "2") {
       return 'Rejected';
