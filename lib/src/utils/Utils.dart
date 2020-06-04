@@ -46,6 +46,17 @@ class Utils {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
+  static bool validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    /*if (!regex.hasMatch(value))
+      return true;
+    else
+      return false;*/
+    return regex.hasMatch(value);
+  }
+
   static void showLoginDialog(BuildContext context) {
     // flutter defined function
     showDialog(
@@ -102,7 +113,6 @@ class Utils {
   }
 
   static void showProgressDialog(BuildContext context) {
-    print("--showProgressDialog----");
     //For normal dialog
     if (pr != null && pr.isShowing()) {
       pr.hide();
@@ -116,17 +126,11 @@ class Utils {
     //For normal dialog
     try {
       if (pr != null && pr.isShowing()) {
-        print("-1-hideProgressDialog----");
             pr.hide();
         pr = null;
       }else{
         if (pr != null){
           pr.hide();
-          print("-2-hideProgressDialog---");
-          pr.hide().then((value){
-            print("-3 hide -${value}---");
-          });
-          pr = null;
         }
       }
     } catch (e) {
@@ -230,6 +234,14 @@ class Utils {
   static String getCurrentDate(){
     var now = new DateTime.now();
     var formatter = new DateFormat('yyyy-MM-dd');
+    String formatted = formatter.format(now);
+    //print(formatted); // something like 2013-04-20
+    return formatted;
+  }
+
+  static String getCurrentDateTime(){
+    var now = new DateTime.now();
+    var formatter = new DateFormat('dd-MM-yyyy hh:mm');
     String formatted = formatter.format(now);
     //print(formatted); // something like 2013-04-20
     return formatted;

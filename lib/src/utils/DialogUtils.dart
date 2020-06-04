@@ -547,11 +547,11 @@ class DialogUtils {
   }
 
   static Future<void> openMap(StoreModel storeModel,double latitude, double longitude) async {
-    /*String address = "${storeModel.storeName}, ${storeModel.location},"
+    String address = "${storeModel.storeName}, ${storeModel.location},"
         "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
-    print("address= ${address}");*/
-    String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-    //String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$address';
+    print("address= ${address}");
+    //String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$address';
     if (await canLaunch(googleUrl)) {
       await launch(googleUrl);
     } else {

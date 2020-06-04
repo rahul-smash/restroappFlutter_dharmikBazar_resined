@@ -669,11 +669,11 @@ class ApiController {
         "user_id": user.id,
         "query": queryString
       });
-
+      print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
-
+      print('--respStr===  $respStr');
       ResponseModel resModel = ResponseModel.fromJson(parsed);
       return resModel;
     } catch (e) {
@@ -1083,5 +1083,35 @@ class ApiController {
     }
   }
 
+  static Future<DeliveryAddressResponse> storeQueryApi() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getAddress;
+    print("----user.id---${user.id}");
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "method": "GET",
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("-1--getAddress-respStr---${respStr}");
+      final parsed = json.decode(respStr);
+
+      DeliveryAddressResponse deliveryAddressResponse =
+      DeliveryAddressResponse.fromJson(parsed);
+      //print("----respStr---${deliveryAddressResponse.success}");
+      return deliveryAddressResponse;
+
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
 
 }
