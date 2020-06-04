@@ -90,28 +90,43 @@ class _ContactScreen extends State<ContactScreen> {
                                   style:TextStyle(color: infoLabel, fontSize: 15))
                             ],
                           )),
-                      Padding(padding: EdgeInsets.only(right: 10), child: IconButton(
-                        icon: Icon(Icons.phone, size: 40,),
-                        onPressed: () {
-                          if(store != null) {
-                            if(store.contactNumber != null || store.contactNumber.isEmpty){
-                              Utils.showToast("No Contact Number found!", false);
-                            }
-                            launch(store.contactNumber);
-                          }
-                        },
-                      )),
+                      Column(
+                        children: <Widget>[
+                          Padding(
+                              padding: EdgeInsets.only(right: 10),
+                              child: IconButton(
+                                icon: Icon(Icons.phone, size: 30,),
+                                onPressed: () {
+                                  print("${store.contactNumber}");
+                                  if(store != null) {
+                                    if(store.contactNumber != null || store.contactNumber.isEmpty){
+                                      Utils.showToast("No Contact Number found!", false);
+                                    }
+                                    _launchCaller(store.contactNumber);
+                                  }
+                                },
+                              )
+                          ),
+                          Padding(
+                              padding: EdgeInsets.only(right: 10),
+                              child: IconButton(
+                                icon: Icon(Icons.markunread, size: 30,),
+                                onPressed: () {
+                                  print("${store.contactEmail}");
+                                  if(store != null) {
+                                    if(store.contactEmail != null || store.contactEmail.isEmpty){
+                                      Utils.showToast("No Contact Email found!", false);
+                                    }
+                                    _launchEmail(store.contactEmail);
+                                  }
+                                },
+                              )
+                          ),
+                        ],
+                      ),
                     ]))
           ],
         ));
-  }
-
-  _launchURL(String url) async {
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
   }
 
   _launchCaller(String call) async {
@@ -122,4 +137,15 @@ class _ContactScreen extends State<ContactScreen> {
       throw 'Could not launch $url';
     }
   }
+
+  _launchEmail(String email) async {
+    String url = "mailto:${email}?subject=&body=";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+
 }
