@@ -179,7 +179,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: NavDrawerMenu(store, user == null ? null : user.fullName),
+      drawer: NavDrawerMenu(store, user == null ? "" : user.fullName),
       bottomNavigationBar: addBottomBar(),
     );
   }
@@ -309,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //print("------_handleDrawer-------");
         if (AppConstant.isLoggedIn) {
           user = await SharedPrefs.getUser();
-          //if(user != null)
+          if(user != null)
           setState(() {});
         }
       }
