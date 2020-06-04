@@ -56,23 +56,13 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             icon: Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.pop(context, false),
           )),
-      body: Column(
+      body: isLoading? Center(child: CircularProgressIndicator()): addressList == null
+          ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
+          : Column(
         children: <Widget>[
           Divider(color: Colors.white, height: 2.0),
           addCreateAddressButton(),
-          //addAddressList()
-          isLoading? Center(child: CircularProgressIndicator()): addressList == null
-              ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
-              : Expanded(
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: addressList.length,
-              itemBuilder: (context, index) {
-                DeliveryAddressData area = addressList[index];
-                return addAddressCard(area, index);
-                },
-            ),
-          ),
+          addAddressList()
         ],
       ),
       bottomNavigationBar: widget.showProceedBar ? addProceedBar() : Container(height: 5),
