@@ -34,7 +34,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
   initState() {
     super.initState();
     showAddButton = false;
-    print("--_ProductTileItemState-- initState ${widget.classType}");
+    //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
   }
 
@@ -47,10 +47,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
       setState(() {});
     });
     databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,widget.product.id).then((favValue){
-      print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
+      //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
       setState(() {
         widget.product.isFav = favValue.toString();
-        print("-isFav-${widget.product.isFav}");
+        //print("-isFav-${widget.product.isFav}");
       });
     });
   }
