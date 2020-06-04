@@ -6,7 +6,9 @@ import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import 'ContactUs.dart';
@@ -84,10 +86,15 @@ class _AboutScreenState extends State<AboutScreen> {
                     textColor: Colors.white,
                     onPressed: () {
                       //Navigator.pop(context, false);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => ContactUs()),
-                      );
+                      if (AppConstant.isLoggedIn) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ContactUs()),
+                        );
+                      }else{
+                        Utils.showToast(AppConstant.pleaseLogin, true);
+                      }
+
                     },
                   ),
                 ),
