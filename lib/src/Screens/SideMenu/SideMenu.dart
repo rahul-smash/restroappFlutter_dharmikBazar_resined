@@ -108,13 +108,16 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                 width: 60,
                 fit: BoxFit.fill,),
               SizedBox(width: 10),*/
-              CachedNetworkImage(
-                imageUrl: "${widget.store.banner}",
-                fit: BoxFit.fill,
-                height: 60,
-                width: 60,
-                //placeholder: (context, url) => CircularProgressIndicator(),
-                //errorWidget: (context, url, error) => Icon(Icons.error),
+              Padding(
+                padding: EdgeInsets.only(left: 0, right: 20),
+                child: CachedNetworkImage(
+                  imageUrl: "${widget.store.banner10080}",
+                  fit: BoxFit.fill,
+                  height: 60,
+                  width: 60,
+                  //placeholder: (context, url) => CircularProgressIndicator(),
+                  //errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
               ),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
