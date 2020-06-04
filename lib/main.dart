@@ -44,7 +44,9 @@ Future<void> main() async {
     AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
     SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.androidId);
   }
-
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp]);
+  // To turn off landscape mode
   runZoned(() {
     runApp(ValueApp(isAdminLogin,configObject));
   }, onError: Crashlytics.instance.recordError);

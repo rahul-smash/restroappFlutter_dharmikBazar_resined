@@ -49,7 +49,7 @@ dependencies:
   badges: ^1.1.1
   webview_flutter: ^0.3.22+1
   cached_network_image: ^2.2.0+1
-
+  maps_launcher: ^1.2.0
 
 
 dev_dependencies:

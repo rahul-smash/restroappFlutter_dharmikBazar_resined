@@ -3,6 +3,7 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:package_info/package_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
@@ -266,6 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _currentIndex = index;
         if (_currentIndex == 0) {
+
           Navigator.push(context,
             MaterialPageRoute(builder: (context) => MyCartScreen(() {
               getCartCount();

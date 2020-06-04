@@ -129,6 +129,9 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                               onPressed: () {
                                 setState(() {
                                   controller.text = "";
+                                  setState(() {
+                                    subCategory = null;
+                                  });
                                 });
                               }),
                         ]

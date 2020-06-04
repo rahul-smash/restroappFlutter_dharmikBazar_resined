@@ -823,7 +823,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 eventBus.fire(updateCartCount());
-                DialogUtils.openMap(double.parse(storeModel.lat), double.parse(storeModel.lng));
+                DialogUtils.openMap(storeModel,double.parse(storeModel.lat), double.parse(storeModel.lng));
               }else{
                 //print("==result== ${result}");
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
