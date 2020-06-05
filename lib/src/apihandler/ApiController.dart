@@ -511,8 +511,8 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.multipleTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
-    print("----orderJson---${orderJson}");
-    print("--discount-${discount}");
+    //print("----orderJson---${orderJson}");
+    //print("--discount-${discount}");
     try {
       request.fields.addAll({
         "fixed_discount_amount": "${discount}",
@@ -522,7 +522,7 @@ class ApiController {
         "order_detail": orderJson,
         "device_id": deviceId,
       });
-
+      print("----fields---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----respStr---${respStr}");
