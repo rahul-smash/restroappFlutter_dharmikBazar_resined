@@ -23,7 +23,7 @@ class OrderSelectionScreen extends StatefulWidget {
 class _OrderSelectionScreen extends State<OrderSelectionScreen> {
 
   DatabaseHelper databaseHelper = new DatabaseHelper();
-  StoreModel store;
+  //StoreModel store;
   bool pickUpFacility,delieveryAddress;
   double mheight;
 
@@ -87,6 +87,15 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                         child:  GestureDetector(
                           onTap: () async {
                             print('@@CartBottomView----'+"DeliveryScreen");
+
+                            StoreModel storeObject = await SharedPrefs.getStore();
+                            bool status = Utils.checkStoreOpenTime(storeObject,OrderType.Delivery);
+                            if(!status){
+                              Utils.showToast("${storeObject.closehoursMessage}", false);
+                              Navigator.pop(context);
+                              return;
+                            }
+
                             Utils.showProgressDialog(context);
                             DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
                             Utils.hideProgressDialog(context);
@@ -133,8 +142,16 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                       Visibility(
                         visible: pickUpFacility,
                         child:  GestureDetector(
-                          onTap: ()  {
+                          onTap: ()  async {
                             print('@@CartBottomView----'+"PickUPActivy");
+
+                            StoreModel storeObject = await SharedPrefs.getStore();
+                            bool status = Utils.checkStoreOpenTime(storeObject,OrderType.Delivery);
+                            if(!status){
+                              Utils.showToast("${storeObject.closehoursMessage}", false);
+                              Navigator.pop(context);
+                              return;
+                            }
 
                             Utils.showProgressDialog(context);
                             ApiController.getStorePickupAddress().then((response){

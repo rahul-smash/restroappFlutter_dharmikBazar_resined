@@ -141,32 +141,42 @@ class OrderDetailScreen extends StatelessWidget {
   }
 
   secondRow(OrderItems item){
-    return  Padding(
-        padding: EdgeInsets.only(bottom: 15,top: 20),
-        child:  Padding(
-          padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
-          child: Row(
-            children: <Widget>[
-              Text('Status : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
-              Padding(
-                padding: EdgeInsets.only(left: 15.0),
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                      color: getStatusColor(item.status)
-                  ),
-                ),
-              ),
 
-              Padding(
-                padding: EdgeInsets.only(left: 5.0),
-                child: Text(getStatus(item.status),style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
-              )
-            ],
+    return  Visibility(
+      visible: true,
+      child: Padding(
+          padding: EdgeInsets.only(bottom: 10,top: 20),
+          child:  Visibility(
+            visible: item.status == "2" ? true : false,
+            child: Padding(
+              padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
+              child: Row(
+                children: <Widget>[
+                  Text('Status : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
+                  Padding(
+                    padding: EdgeInsets.only(left: 15.0),
+                    child: Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                          color: getStatusColor(item.status)
+                      ),
+                    ),
+                  ),
+
+                  Visibility(
+                    visible: item.status == "2" ? true : false,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 5.0),
+                      child: Text(getStatus(item.status),style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        )
+      ),
     );
 
   }
@@ -202,9 +212,13 @@ class OrderDetailScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child:  sheetDeviderLine(),
+                  Visibility(
+                    visible: orderHistoryData.discount == "0.00" && orderHistoryData.shippingCharges == "0.00" ?
+                     false :true ,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child:  sheetDeviderLine(),
+                    ),
                   ),
                   Visibility(
                     visible: orderHistoryData.discount == "0.00" ? false :true ,
@@ -232,19 +246,28 @@ class OrderDetailScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
-                    child:  bottomDeviderView(),
+                  Visibility(
+                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child:  bottomDeviderView(),
+                    ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                    child: Text('Delivery Address',
-                        style: TextStyle(color: Colors.black,fontSize: 16)),
+                  Visibility(
+                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                      child: Text('Delivery Address',
+                          style: TextStyle(color: Colors.black,fontSize: 16)),
+                    ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
-                    child: Text('${orderHistoryData.address}',
-                        style: TextStyle(color: Color(0xFF737879),fontSize: 16)),
+                  Visibility(
+                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
+                      child: Text('${orderHistoryData.address}',
+                          style: TextStyle(color: Color(0xFF737879),fontSize: 16)),
+                    ),
                   ),
                   Container(
                     height: 50,
@@ -308,33 +331,26 @@ class OrderDetailScreen extends StatelessWidget {
   }
 
   String getStatus(status) {
+    print("---${status}---");
+    /*0 =pending ,
+    1= active,
+    2 = rejected = show view only for this else hide status.*/
     if (status == "0") {
-
       return 'Pending';
 
     } else if (status == "1") {
-
-      return 'Order';
+      return 'Active';
 
     }if (status == "2") {
       return 'Rejected';
+    }else{
 
-    }if (status == "4") {
-      return 'Shipped';
-
-    }if (status == "5") {
-      return 'Delivered';
-
-    } if (status == "6") {
-      return 'Canceled';
-
-    }else {
-      return "Waiting";
     }
   }
 
   Color getStatusColor(status){
-    return status == "0" ? Color(0xFFA1BF4C) : status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
+    return status == "0" ? Color(0xFFA1BF4C) :
+    status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
   }
 
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
@@ -545,8 +546,12 @@ class DialogUtils {
     );
   }
 
-  static Future<void> openMap(double latitude, double longitude) async {
-    String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+  static Future<void> openMap(StoreModel storeModel,double latitude, double longitude) async {
+    String address = "${storeModel.storeName}, ${storeModel.location},"
+        "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
+    print("address= ${address}");
+    //String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+    String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$address';
     if (await canLaunch(googleUrl)) {
       await launch(googleUrl);
     } else {

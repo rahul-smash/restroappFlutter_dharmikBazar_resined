@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -33,7 +34,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
   initState() {
     super.initState();
     showAddButton = false;
-    print("--_ProductTileItemState-- initState");
+    //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
   }
 
@@ -42,7 +43,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       cartData = cartDataObj;
       counter = int.parse(cartData.QUANTITY);
       showAddButton = counter == 0 ? true : false;
-      print("-QUANTITY-${counter}=");
+      //print("-QUANTITY-${counter}=");
       setState(() {});
     });
     databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,widget.product.id).then((favValue){
@@ -106,7 +107,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                         cartData = cartDataObj;
                         counter = int.parse(cartData.QUANTITY);
                         showAddButton = counter == 0 ? true : false;
-                        print("-QUANTITY-${counter}=");
+                        //print("-QUANTITY-${counter}=");
                       });
                     });
                     databaseHelper.checkProductsExistInFavTable(DatabaseHelper.Favorite_Table,variantId).then((favValue){
@@ -118,7 +119,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     widget.callback();
                     eventBus.fire(updateCartCount());
                   });
-                  print("--ProductDetails--result---${result}");
+                  //print("--ProductDetails--result---${result}");
                 }
               },
               child: Padding(
@@ -131,13 +132,23 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               children: [
                                 SizedBox(width: 10),
                                 //addVegNonVegOption(),
-                                imageUrl == "" ? Container(child: Utils.getImgPlaceHolder(),)
+                                imageUrl == "" ? Container(
+                                  width: 70.0,
+                                  height: 80.0,
+                                  child: Utils.getImgPlaceHolder(),
+                                )
                                     : Padding(
                                     padding: EdgeInsets.only(left: 5,right: 20),
                                     child: Container(
                                       width: 70.0,
                                       height: 80.0,
-                                      child: Image.network(imageUrl,width: 60.0,height: 60.0,fit: BoxFit.cover),
+                                      child: CachedNetworkImage(
+                                        imageUrl: "${imageUrl}",fit: BoxFit.cover
+                                        //placeholder: (context, url) => CircularProgressIndicator(),
+                                        //errorWidget: (context, url, error) => Icon(Icons.error),
+                                      ),
+                                      /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                                          fit: BoxFit.cover),*/
                                     )),
                                 Flexible(
                                     child: Column(
@@ -156,6 +167,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 int count = await databaseHelper.checkProductsExistInFavTable
                                                   (DatabaseHelper.Favorite_Table,widget.product.id);
                                                 Product product = widget.product;
+                                                print("--product.count-- ${count}");
                                                 if(count == 1){
                                                   product.isFav = "0";
                                                   await databaseHelper.deleteFav(DatabaseHelper.Favorite_Table,product.id);
@@ -196,7 +208,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                   margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
                                                   child: Visibility(
                                                     visible: widget.classType == ClassType.CART? false : true,
-                                                    child: Utils.showFavIcon(widget.product.isFav),
+                                                   /* child: widget.product.isFav == null ? Icon(Icons.favorite_border)
+                                                        :Utils.showFavIcon(widget.product.isFav),*/
+                                                    child: widget.classType == ClassType.Favourites ? Icon(Icons.favorite,color: orangeColor,)
+                                                        : Utils.showFavIcon(widget.product.isFav),
                                                   ),
                                                 ),
                                               ),
@@ -212,7 +227,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             padding: EdgeInsets.only(top: 20,bottom: 3),
                                             child: InkWell(
                                               onTap: () async {
-                                                print("-variants.length--${widget.product.variants.length}");
+                                                //print("-variants.length--${widget.product.variants.length}");
                                                 if(widget.product.variants.length != null){
                                                   if(widget.product.variants.length == 1){
                                                     return;
@@ -221,7 +236,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
                                                 if(variant != null){
                                                   databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                                                    print("QUANTITY= ${cartDataObj.QUANTITY}");
+                                                    //print("QUANTITY= ${cartDataObj.QUANTITY}");
                                                     cartData = cartDataObj;
                                                     counter = int.parse(cartData.QUANTITY);
                                                     showAddButton = counter == 0 ? true : false;
@@ -304,7 +319,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
         child: showAddButton == true
             ? InkWell(onTap: (){
-              print("add onTap");
+              //print("add onTap");
               setState(() {
 
               });

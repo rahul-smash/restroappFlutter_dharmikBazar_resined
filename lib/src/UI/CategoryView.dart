@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
@@ -39,10 +40,17 @@ class CategoryView extends StatelessWidget {
               margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
               width: Utils.getDeviceWidth(context),
               height: 100.0,
-              child: Image.network('${categoryModel.image300200}',
+              child: CachedNetworkImage(
+                  imageUrl: "${categoryModel.image300200}",
+                  width: Utils.getDeviceWidth(context),height: 100.0,
+                  fit: BoxFit.cover
+                //placeholder: (context, url) => CircularProgressIndicator(),
+                //errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+              /*child: Image.network('${categoryModel.image300200}',
                 width: Utils.getDeviceWidth(context),height: 100.0,
                 fit: BoxFit.cover,
-              ),
+              ),*/
             ),
           ),
           Expanded(

@@ -3,6 +3,7 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:package_info/package_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
@@ -67,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
     getCartCount();
     listenCartChanges();
     try {
+      AppConstant.placeholderUrl = store.banner10080;
       //print("-----store.banners-----${store.banners.length}------");
       if (store.banners.isEmpty) {
         imgList = [NetworkImage(AppConstant.placeholderImageUrl)];
@@ -178,12 +180,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: NavDrawerMenu(store, user == null ? null : user.fullName),
+      drawer: NavDrawerMenu(store, user == null ? "" : user.fullName),
       bottomNavigationBar: addBottomBar(),
     );
   }
   Widget addBanners() {
-
     return Stack(
       children: <Widget>[
         Center(
@@ -211,8 +212,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget addBottomBar() {
-    //print("-------addBottomBar--------");
-    //getCartCount();
     return Stack(
       overflow: Overflow.visible,
       alignment: new FractionalOffset(.5, 1.0),
@@ -269,6 +268,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _currentIndex = index;
         if (_currentIndex == 0) {
+
           Navigator.push(context,
             MaterialPageRoute(builder: (context) => MyCartScreen(() {
               getCartCount();
@@ -310,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //print("------_handleDrawer-------");
         if (AppConstant.isLoggedIn) {
           user = await SharedPrefs.getUser();
-          //if(user != null)
+          if(user != null)
           setState(() {});
         }
       }

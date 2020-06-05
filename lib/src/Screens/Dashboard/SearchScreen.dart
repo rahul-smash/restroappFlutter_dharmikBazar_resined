@@ -129,6 +129,9 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                               onPressed: () {
                                 setState(() {
                                   controller.text = "";
+                                  setState(() {
+                                    subCategory = null;
+                                  });
                                 });
                               }),
                         ]
@@ -248,6 +251,9 @@ class _SearchScreenState extends BaseState<SearchScreen> {
         print("==subCategories= ${subCategoryResponse.subCategories.length}");
         if(subCategoryResponse == null || subCategoryResponse.subCategories.isEmpty){
           Utils.showToast("No result found.", false);
+          setState(() {
+            subCategory = null;
+          });
         }else{
           setState(() {
             subCategory = subCategoryResponse.subCategories.first;

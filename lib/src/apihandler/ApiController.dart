@@ -260,7 +260,7 @@ class ApiController {
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print("----respStr---${respStr}");
+      print("-1--getAddress-respStr---${respStr}");
       final parsed = json.decode(respStr);
       DeliveryAddressResponse deliveryAddressResponse =
           DeliveryAddressResponse.fromJson(parsed);
@@ -385,7 +385,7 @@ class ApiController {
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
 
-      print("---respStr>---${respStr}");
+      print("-getAddress--respStr>---${respStr}");
 
       final parsed = json.decode(respStr);
 
@@ -543,7 +543,7 @@ class ApiController {
       String paymentMethod,
       TaxCalculationModel taxModel,
       DeliveryAddressData address,
-      String orderJson, bool isComingFromPickUpScreen, String areaId,
+      String orderJson, bool isComingFromPickUpScreen, String areaId,OrderType deliveryType,
       String razorpay_order_id,String razorpay_payment_id,String online_method,
       String selectedDeliverSlotValue) async {
 
@@ -552,8 +552,18 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.placeOrder;
+
+    var url;
+    if(deliveryType == OrderType.Delivery){
+      url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+          ApiConstants.placeOrder;
+    }else{
+      url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+          ApiConstants.pickupPlaceOrder;
+    }
+
+    /*var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.placeOrder;*/
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     //print("==orderJson==${orderJson}====");
     try {
@@ -659,11 +669,11 @@ class ApiController {
         "user_id": user.id,
         "query": queryString
       });
-
+      print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);
-
+      print('--respStr===  $respStr');
       ResponseModel resModel = ResponseModel.fromJson(parsed);
       return resModel;
     } catch (e) {
@@ -683,6 +693,7 @@ class ApiController {
     try {
       request.fields.addAll({
         "user_id": user.id,
+        "platform": Platform.isIOS ? "IOS" : "android",
       });
       print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
@@ -1039,7 +1050,7 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
-
+      print("----respStr---${respStr}");
       DeliveryTimeSlotModel storeArea = DeliveryTimeSlotModel.fromJson(parsed);
       return storeArea;
 
@@ -1072,5 +1083,35 @@ class ApiController {
     }
   }
 
+  static Future<DeliveryAddressResponse> storeQueryApi() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getAddress;
+    print("----user.id---${user.id}");
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "method": "GET",
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("-1--getAddress-respStr---${respStr}");
+      final parsed = json.decode(respStr);
+
+      DeliveryAddressResponse deliveryAddressResponse =
+      DeliveryAddressResponse.fromJson(parsed);
+      //print("----respStr---${deliveryAddressResponse.success}");
+      return deliveryAddressResponse;
+
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
 
 }

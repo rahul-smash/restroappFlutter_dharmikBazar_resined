@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
@@ -102,11 +103,22 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         child: Padding(
             padding: EdgeInsets.only(left: 35, top: 40, bottom: 30),
             child: Row(children: [
-              Image.asset("images/appiconfcfm.jpg",
+              /*Image.asset("images/appiconfcfm.jpg",
                 height: 60,
                 width: 60,
                 fit: BoxFit.fill,),
-              SizedBox(width: 10),
+              SizedBox(width: 10),*/
+              Padding(
+                padding: EdgeInsets.only(left: 0, right: 20),
+                child: CachedNetworkImage(
+                  imageUrl: "${widget.store.banner10080}",
+                  fit: BoxFit.fill,
+                  height: 60,
+                  width: 60,
+                  //placeholder: (context, url) => CircularProgressIndicator(),
+                  //errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+              ),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[

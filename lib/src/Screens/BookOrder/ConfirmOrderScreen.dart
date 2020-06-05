@@ -418,11 +418,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     child: Text("Quantity: " + product.quantity)),
                 Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
-                    child: Text("Price: " + "${AppConstant.currency}${product.price}")),
+                    child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")),
               ],
             ),
             Text(
-                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2)}",
+                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
                 style: TextStyle(fontSize: 16, color: Colors.black45)),
           ],
         ));
@@ -443,7 +443,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Items Price", style: TextStyle(color: Colors.black54)),
-                Text("${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice-int.parse(shippingCharges)), 2)}",
+                Text("${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice-int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
@@ -496,7 +496,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               children: [
                 Text("Total",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Text("${AppConstant.currency}${databaseHelper.roundOffPrice(
-                    taxModel == null ? totalPrice : double.parse(taxModel.total), 2)}",
+                    taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}",
                     style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ))
@@ -583,7 +583,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           print("----checkStoreOpenTime----${status}--");
 
           if(!status){
-            Utils.showToast("Store is closed.", false);
+            Utils.showToast("${storeObject.closehoursMessage}", false);
             return;
           }
           if(widget.deliveryType == OrderType.Delivery && widget.address.notAllow){
@@ -647,7 +647,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           }
 
         },
-        child: Row(
+        child: ButtonTheme(
+          minWidth: Utils.getDeviceWidth(context),
+          child: RaisedButton(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            textColor: Colors.white,
+            color: Colors.green,
+
+            onPressed: () {
+
+            },
+            child: Text("Confirm Order",
+              style: TextStyle(color: Colors.white, fontSize: 18.0),
+            ),
+          ),
+        ),
+        /*child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -656,7 +671,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               style: TextStyle(color: Colors.white, fontSize: 20.0),
             ),
           ],
-        ),
+        ),*/
       ),
     );
   }
@@ -806,7 +821,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,
-              widget.isComingFromPickUpScreen,widget.areaId ,
+              widget.isComingFromPickUpScreen,widget.areaId ,widget.deliveryType,
               payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) async {
             Utils.hideProgressDialog(context);
             if(response == null){
@@ -823,7 +838,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 eventBus.fire(updateCartCount());
-                DialogUtils.openMap(double.parse(storeModel.lat), double.parse(storeModel.lng));
+                DialogUtils.openMap(storeModel,double.parse(storeModel.lat), double.parse(storeModel.lng));
               }else{
                 //print("==result== ${result}");
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);

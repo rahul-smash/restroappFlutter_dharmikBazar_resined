@@ -78,11 +78,14 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                               Text("Address",maxLines: 1,overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       fontSize: 18,fontWeight: FontWeight.w500)),
-                              Text("${widget.areaObject.pickupAdd}",
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                  fontSize: 16,fontWeight: FontWeight.w400)),
+                              SizedBox(
+                                width: (Utils.getDeviceWidth(context)-50),
+                                child: Text("${widget.areaObject.pickupAdd}",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 16,fontWeight: FontWeight.w400)),
+                              ),
                             ],
                           ),
                       ),
@@ -96,8 +99,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
         child: InkWell(
           onTap: () async {
 
-            var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
-            if(result == true){
+            if(widget.areaObject.note.isEmpty){
               Navigator.pop(context);
               Navigator.push(
                 context,
@@ -105,7 +107,19 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                     builder: (context) =>
                         ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
               );
+            }else{
+              var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
+              if(result == true){
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
+                );
+              }
             }
+
           },
           child: Container(
             height: 40,

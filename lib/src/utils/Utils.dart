@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'dart:math';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
@@ -44,6 +45,17 @@ class Utils {
 
   static void hideKeyboard(BuildContext context){
     FocusScope.of(context).requestFocus(FocusNode());
+  }
+
+  static bool validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    /*if (!regex.hasMatch(value))
+      return true;
+    else
+      return false;*/
+    return regex.hasMatch(value);
   }
 
   static void showLoginDialog(BuildContext context) {
@@ -116,9 +128,11 @@ class Utils {
     try {
       if (pr != null && pr.isShowing()) {
             pr.hide();
+        pr = null;
       }else{
-        if (pr != null)
-        pr.hide();
+        if (pr != null){
+          pr.hide();
+        }
       }
     } catch (e) {
       print(e);
@@ -133,7 +147,11 @@ class Utils {
   static showFavIcon(String isFav) {
     Icon favIcon;
     //print("-showFavIcon- ${isFav}");
-    if(isFav == null || isFav == "null" || isFav == "1"){
+    if(isFav == null){
+      favIcon = Icon(Icons.favorite_border);
+      return favIcon;
+    }
+    if(isFav == "1"){
       favIcon = Icon(Icons.favorite,color: orangeColor,);
     }else if(isFav == "0"){
       favIcon = Icon(Icons.favorite_border);
@@ -176,13 +194,12 @@ class Utils {
   }
 
   static Widget getImgPlaceHolder(){
-
     return Padding(
       padding: EdgeInsets.only(left: 10,right: 10),
-      child: Image.asset("images/appiconfcfm.jpg",
-        height: 60,
-        width: 60,
-        fit: BoxFit.scaleDown,),
+      child: CachedNetworkImage(
+          imageUrl: "${AppConstant.placeholderUrl}",
+          fit: BoxFit.cover
+      ),
     );
   }
 
@@ -222,6 +239,14 @@ class Utils {
     return formatted;
   }
 
+  static String getCurrentDateTime(){
+    var now = new DateTime.now();
+    var formatter = new DateFormat('dd-MM-yyyy hh:mm');
+    String formatted = formatter.format(now);
+    //print(formatted); // something like 2013-04-20
+    return formatted;
+  }
+
   static convertStringToDate2(String dateObj){
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);
@@ -246,6 +271,23 @@ class Utils {
     DateFormat formatter = new DateFormat('yyyy-MM-dd');
     String formatted = formatter.format(dateTime);
     //print(formatted);
+    return formatted;
+  }
+
+  static convertOrderDateTime(String date){
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
+      DateTime time = format.parse(date);
+      time.toLocal();
+      print("time.toLocal()=   ${time.toLocal()}");
+
+      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
     return formatted;
   }
 
@@ -315,6 +357,27 @@ class Utils {
     return isStoreOpenToday;
   }
 
+  static bool checkStoreOpenTime(StoreModel storeObject, OrderType deliveryType) {
+    // in case of deliver ignore is24x7Open
+    bool status = false;
+    if(storeObject.is24x7Open == "1" && deliveryType == OrderType.PickUp){
+      // 1 = means store open 24x7
+      // 0 = not open for 24x7
+      status = true;
+    }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
+      status = true;
+    } else {
+      bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
+      if(isStoreOpenToday){
+        bool isStoreOpen = Utils.getDayOfWeek(storeObject);
+        status = isStoreOpen;
+      }else{
+        status = false;
+      }
+    }
+    return status;
+  }
+
   static Widget getEmptyView2(String value){
     return  Container(
       child: Center(
@@ -328,6 +391,9 @@ class Utils {
     );
   }
 }
+
+
+
 
 enum ClassType {
   CART,SubCategory,Favourites,Search

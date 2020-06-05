@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/UI/SelectLocation.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
@@ -362,11 +363,12 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 if (response != null && response.success) {
                                   print('@@response.success');
                                   //widget.callback();
+                                  Utils.showToast(response.message, true);
                                   Navigator.pop(context, true);
                                   //Navigator.of(context, rootNavigator: true)..pop()..pop();
-                                  Utils.showToast(response.message, true);
                                 }else{
                                   print('Not @@response.success');
+                                  Utils.showToast("Error while saving address!", true);
                                 }
                               });
                             },

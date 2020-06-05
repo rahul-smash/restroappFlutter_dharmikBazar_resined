@@ -249,13 +249,14 @@ class DatabaseHelper {
         try {
           double total = int.parse(quantity) * double.parse(price);
           //print("-------total------${roundOffPrice(total,2)}");
+          //print("-price ${price}---");
           totalPrice = totalPrice + roundOffPrice(total, 2);
         } catch (e) {
           print(e);
         }
       });
+      //print("-DB totalPrice is ${totalPrice}--");
       return totalPrice;
-      //print("-totalPrice is ${totalPrice}--");
     } else {
       //print("-empty cart---");
     }
@@ -364,6 +365,7 @@ class DatabaseHelper {
     double mod = pow(10.0, places);
     return ((val * mod).round().toDouble() / mod);
   }
+
 
   Future<int> checkProductsExistInFavTable(String table, String product_id) async {
     //database connection

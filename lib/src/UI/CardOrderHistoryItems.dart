@@ -60,7 +60,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
             ),
             Padding(
               padding: EdgeInsets.only(left: 12.0, top: 4.0, right: 10.0),
-              child: Text(cardOrderHistoryItems.orderDate,
+              child: Text(Utils.convertOrderDateTime(cardOrderHistoryItems.orderDate),
                   style: TextStyle(color: Color(0xFF858B8F), fontSize: 13)),
             ),
           ],
@@ -195,15 +195,14 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
     );
   }
 
-
+// 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
+  // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
   String getStatus(status) {
     if (status == "0") {
-
       return 'Pending';
 
     } else if (status == "1") {
-
-      return 'Order';
+      return 'Processing';
 
     }if (status == "2") {
       return 'Rejected';
@@ -215,7 +214,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
       return 'Delivered';
 
     } if (status == "6") {
-      return 'Canceled';
+      return 'Cancelled';
 
     }else {
       return "Waiting";
