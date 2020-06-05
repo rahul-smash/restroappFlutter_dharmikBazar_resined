@@ -82,7 +82,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
           child: Padding(
             padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
             child: CachedNetworkImage(
-                imageUrl: storeModel == null ? "" : storeModel.banner,
+                imageUrl: storeModel == null ? "" : storeModel.banner300200,
                 fit: BoxFit.cover
             ),
           ),
