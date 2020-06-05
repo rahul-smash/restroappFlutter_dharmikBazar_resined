@@ -105,8 +105,14 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                                 Text("Use code",),
                                                 Padding(
                                                   padding: EdgeInsets.fromLTRB(5, 0, 0, 3),
-                                                  child: Text("${offer.couponCode}",
-                                                    style: TextStyle(color: orangeColor,fontSize: 16,fontWeight: FontWeight.bold),),
+                                                  child: SizedBox(
+                                                    width: 100,
+                                                    child: Text("${offer.couponCode}",
+                                                      style: TextStyle(color: orangeColor,
+                                                          fontSize: 16,
+                                                          fontWeight: FontWeight.bold),
+                                                    ),
+                                                  ),
                                                 ),
                                               ],
                                             ),
