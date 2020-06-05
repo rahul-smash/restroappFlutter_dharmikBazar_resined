@@ -37,7 +37,7 @@ class _FavouritesState extends State<Favourites> {
 
     return Scaffold(
       appBar: AppBar(
-          title: Text("MY Favourites".toUpperCase()),
+          title: Text("MY Favourites"),
           centerTitle: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios),
@@ -123,7 +123,7 @@ class _FavouritesState extends State<Favourites> {
                       children: [
                         TextSpan(
                           text:
-                          "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2)}",
+                          "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
                           style: TextStyle(
                               fontWeight: FontWeight.normal,
                               fontSize: 18,
