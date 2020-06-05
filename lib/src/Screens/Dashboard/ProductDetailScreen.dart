@@ -112,11 +112,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       children: <Widget>[
         Padding(
           padding: EdgeInsets.only(top: 20.0, bottom: 10.0,left: 40,right: 40),
-          child: imageUrl == "" ? Container(
-            child: AspectRatio(
-              aspectRatio: 16 / 9,
+          child: imageUrl == "" ?
+          Container(
+            child: Center(
               child: Utils.getImgPlaceHolder(),
-            ))
+            ),
+          )
               : Padding(
               padding: EdgeInsets.all(0),
               child: Container(

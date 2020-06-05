@@ -1,5 +1,6 @@
 import 'dart:core';
 import 'dart:math';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
@@ -145,7 +146,7 @@ class Utils {
 
   static showFavIcon(String isFav) {
     Icon favIcon;
-    print("-showFavIcon- ${isFav}");
+    //print("-showFavIcon- ${isFav}");
     if(isFav == null){
       favIcon = Icon(Icons.favorite_border);
       return favIcon;
@@ -193,15 +194,11 @@ class Utils {
   }
 
   static Widget getImgPlaceHolder(){
-
     return Padding(
       padding: EdgeInsets.only(left: 10,right: 10),
-      child: Visibility(
-        visible: true,
-        child: Image.asset("images/appiconfcfm.jpg",
-      height: 60,
-      width: 60,
-      fit: BoxFit.scaleDown,),
+      child: CachedNetworkImage(
+          imageUrl: "${AppConstant.placeholderUrl}",
+          fit: BoxFit.cover
       ),
     );
   }
@@ -360,6 +357,27 @@ class Utils {
     return isStoreOpenToday;
   }
 
+  static bool checkStoreOpenTime(StoreModel storeObject, OrderType deliveryType) {
+    // in case of deliver ignore is24x7Open
+    bool status = false;
+    if(storeObject.is24x7Open == "1" && deliveryType == OrderType.PickUp){
+      // 1 = means store open 24x7
+      // 0 = not open for 24x7
+      status = true;
+    }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
+      status = true;
+    } else {
+      bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
+      if(isStoreOpenToday){
+        bool isStoreOpen = Utils.getDayOfWeek(storeObject);
+        status = isStoreOpen;
+      }else{
+        status = false;
+      }
+    }
+    return status;
+  }
+
   static Widget getEmptyView2(String value){
     return  Container(
       child: Center(
@@ -373,6 +391,9 @@ class Utils {
     );
   }
 }
+
+
+
 
 enum ClassType {
   CART,SubCategory,Favourites,Search

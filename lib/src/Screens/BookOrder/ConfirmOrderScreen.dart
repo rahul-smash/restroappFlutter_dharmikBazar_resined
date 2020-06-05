@@ -647,7 +647,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           }
 
         },
-        child: Row(
+        child: ButtonTheme(
+          minWidth: Utils.getDeviceWidth(context),
+          child: RaisedButton(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            textColor: Colors.white,
+            color: Colors.green,
+
+            onPressed: () {
+
+            },
+            child: Text("Confirm Order",
+              style: TextStyle(color: Colors.white, fontSize: 18.0),
+            ),
+          ),
+        ),
+        /*child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -656,7 +671,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               style: TextStyle(color: Colors.white, fontSize: 20.0),
             ),
           ],
-        ),
+        ),*/
       ),
     );
   }

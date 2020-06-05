@@ -78,11 +78,14 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                               Text("Address",maxLines: 1,overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                       fontSize: 18,fontWeight: FontWeight.w500)),
-                              Text("${widget.areaObject.pickupAdd}",
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                  fontSize: 16,fontWeight: FontWeight.w400)),
+                              SizedBox(
+                                width: (Utils.getDeviceWidth(context)-50),
+                                child: Text("${widget.areaObject.pickupAdd}",
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 16,fontWeight: FontWeight.w400)),
+                              ),
                             ],
                           ),
                       ),

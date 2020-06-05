@@ -83,9 +83,14 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                 color: Color(0xffffffff),
                                 child: Row(
                                   children: <Widget>[
-                                    Text("${offer.name}",style: TextStyle(fontWeight: FontWeight.bold),),
+                                    SizedBox(
+                                      width: 60,
+                                      child: Text("${offer.name}",
+                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
                                     Container(
-                                        margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                        margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                                         height: 60,
                                         child: VerticalDivider(color: Colors.grey)
                                     ),
@@ -110,10 +115,10 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                               padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                                               child: Text("Min Booking -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
                                             ),
-                                            Padding(
+                                            /*Padding(
                                               padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                               child: Text("Valid ${Utils.convertStringToDate2(offer.validFrom)} - ${Utils.convertStringToDate2(offer.validTo)}"),
-                                            ),
+                                            ),*/
                                           ],
                                         ),
                                       ),

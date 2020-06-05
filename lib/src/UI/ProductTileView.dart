@@ -133,6 +133,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                 SizedBox(width: 10),
                                 //addVegNonVegOption(),
                                 imageUrl == "" ? Container(
+                                  width: 70.0,
+                                  height: 80.0,
                                   child: Utils.getImgPlaceHolder(),
                                 )
                                     : Padding(
