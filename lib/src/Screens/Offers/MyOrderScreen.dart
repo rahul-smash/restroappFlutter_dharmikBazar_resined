@@ -4,6 +4,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:flutter_pull_to_refresh/flutter_pull_to_refresh.dart';
 
 class MyOrderScreen extends StatefulWidget {
   MyOrderScreen(BuildContext context);
@@ -33,6 +34,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
       });
     });
 
+
     return new Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -40,19 +42,50 @@ class _MyOrderScreen extends State<MyOrderScreen> {
         centerTitle: true,
       ),
       //body: projectWidget(),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : ordersList == null
-          ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
-          : ListView.builder(
-          itemCount: ordersList.length,
-          itemBuilder: (context, index) {
-            OrderData orderHistoryData = ordersList[index];
-            return CardOrderHistoryItems(orderHistoryData);
-          }
+      body: PullToRefreshView(
+        child:  isLoading
+            ? Center(child: CircularProgressIndicator())
+            : ordersList == null
+            ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
+            : ListView.builder(
+            itemCount: ordersList.length,
+            itemBuilder: (context, index) {
+              OrderData orderHistoryData = ordersList[index];
+              return  CardOrderHistoryItems(orderHistoryData);
+            }
+        ),
+        onRefresh:  ()  {
+          print("calleddd");
+         return getOrderListApi();
+        },
       ),
     );
+
+
+
+
+
+//    return new Scaffold(
+//      backgroundColor: Colors.white,
+//      appBar: AppBar(
+//        title: new Text('My Orders'),
+//        centerTitle: true,
+//      ),
+//      //body: projectWidget(),
+//      body: isLoading
+//          ? Center(child: CircularProgressIndicator())
+//          : ordersList == null
+//          ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
+//          : ListView.builder(
+//          itemCount: ordersList.length,
+//          itemBuilder: (context, index) {
+//            OrderData orderHistoryData = ordersList[index];
+//            return CardOrderHistoryItems(orderHistoryData);
+//          }
+//      ),
+//    );
   }
+
 
   Widget projectWidget() {
     return FutureBuilder(
@@ -114,14 +147,13 @@ class _MyOrderScreen extends State<MyOrderScreen> {
     );
   }
 
-  void getOrderListApi() {
+  Future<Null> getOrderListApi() {
     isLoading = true;
-    ApiController.getOrderHistory().then((respone){
+    return ApiController.getOrderHistory().then((respone){
       setState(() {
         isLoading = false;
         ordersList = respone.orders;
       });
-
     });
   }
 

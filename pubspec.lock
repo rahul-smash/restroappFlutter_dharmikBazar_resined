@@ -35,10 +35,7 @@ packages:
       name: boolean_selector
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "2.0.0"
-=======
-    version: "1.0.5"
   cached_network_image:
     dependency: "direct main"
     description:
@@ -46,7 +43,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.0+1"
->>>>>>> 7a74cbd2e5b62f8704d467cd639547e214b0e801
   carousel_pro:
     dependency: "direct main"
     description:
@@ -67,10 +63,7 @@ packages:
       name: charcode
       url: "https://pub.dartlang.org"
     source: hosted
-<<<<<<< HEAD
     version: "1.1.3"
-=======
-    version: "1.1.2"
   clock:
     dependency: transitive
     description:
@@ -78,7 +71,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
->>>>>>> 7a74cbd2e5b62f8704d467cd639547e214b0e801
   collection:
     dependency: transitive
     description:
@@ -210,6 +202,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.6"
+  flutter_pull_to_refresh:
+    dependency: "direct main"
+    description:
+      name: flutter_pull_to_refresh
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   flutter_share:
     dependency: "direct main"
     description:
