@@ -17,6 +17,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -321,6 +322,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
       databaseHelper.deleteTable(DatabaseHelper.CART_Table);
       databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      eventBus.fire(updateCartCount());
       Utils.showToast(AppConstant.logoutSuccess, true);
 
       setState(() {
