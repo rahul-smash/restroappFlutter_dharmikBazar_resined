@@ -578,74 +578,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       child: InkWell(
         onTap: () async {
 
-          StoreModel storeObject = await SharedPrefs.getStore();
-          bool status = checkStoreOpenTime(storeObject);
-          print("----checkStoreOpenTime----${status}--");
-
-          if(!status){
-            Utils.showToast("${storeObject.closehoursMessage}", false);
-            return;
-          }
-          if(widget.deliveryType == OrderType.Delivery && widget.address.notAllow){
-            if(!minOrderCheck){
-              Utils.showToast("Your order amount is to low. Minimum order amount is ${widget.address.minAmount}", false);
-              return;
-            }
-          }
-
-
-          if(storeModel.onlinePayment == "1"){
-            var result = await DialogUtils.displayPaymentDialog(context, "Select Payment","");
-            //print("----result----${result}--");
-            if(result == null){
-              return;
-            }
-            if(result == PaymentType.ONLINE){
-              widget.paymentMode = "3";
-            }else{
-              widget.paymentMode = "2"; //cod
-            }
-          }else{
-            widget.paymentMode = "2"; //cod
-          }
-
-          print("----paymentMod----${widget.paymentMode}--");
-          print("-paymentGateway----${storeObject.paymentGateway}-}-");
-
-          bool isNetworkAvailable = await Utils.isNetworkAvailable();
-          if(!isNetworkAvailable){
-            Utils.showToast(AppConstant.noInternet, false);
-            return;
-          }
-
-          if(widget.deliveryType == OrderType.Delivery){
-            if(storeObject.deliverySlot == "0"){
-              selectedDeliverSlotValue = "";
-            }else{
-              if(storeObject.deliverySlot == "1" && !isSlotSelected){
-                Utils.showToast("Please select delivery slot", false);
-                return;
-              }else{
-                String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
-                String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
-                selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
-                //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
-              }
-            }
-          }else{
-            selectedDeliverSlotValue = "";
-          }
-
-          if(widget.paymentMode == "3"){
-            if(storeObject.paymentGateway == "Razorpay"){
-              callOrderIdApi(storeObject);
-            }else if(storeObject.paymentGateway == "Stripe"){
-              callStripeApi();
-            }
-          }else{
-            placeOrderApiCall("","","");
-          }
-
         },
         child: ButtonTheme(
           minWidth: Utils.getDeviceWidth(context),
@@ -653,9 +585,74 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             textColor: Colors.white,
             color: Colors.green,
+            onPressed: () async {
+              StoreModel storeObject = await SharedPrefs.getStore();
+              bool status = checkStoreOpenTime(storeObject);
+              print("----checkStoreOpenTime----${status}--");
 
-            onPressed: () {
+              if(!status){
+                Utils.showToast("${storeObject.closehoursMessage}", false);
+                return;
+              }
+              if(widget.deliveryType == OrderType.Delivery && widget.address.notAllow){
+                if(!minOrderCheck){
+                  Utils.showToast("Your order amount is to low. Minimum order amount is ${widget.address.minAmount}", false);
+                  return;
+                }
+              }
 
+
+              if(storeModel.onlinePayment == "1"){
+                var result = await DialogUtils.displayPaymentDialog(context, "Select Payment","");
+                //print("----result----${result}--");
+                if(result == null){
+                  return;
+                }
+                if(result == PaymentType.ONLINE){
+                  widget.paymentMode = "3";
+                }else{
+                  widget.paymentMode = "2"; //cod
+                }
+              }else{
+                widget.paymentMode = "2"; //cod
+              }
+
+              print("----paymentMod----${widget.paymentMode}--");
+              print("-paymentGateway----${storeObject.paymentGateway}-}-");
+
+              bool isNetworkAvailable = await Utils.isNetworkAvailable();
+              if(!isNetworkAvailable){
+                Utils.showToast(AppConstant.noInternet, false);
+                return;
+              }
+
+              if(widget.deliveryType == OrderType.Delivery){
+                if(storeObject.deliverySlot == "0"){
+                  selectedDeliverSlotValue = "";
+                }else{
+                  if(storeObject.deliverySlot == "1" && !isSlotSelected){
+                    Utils.showToast("Please select delivery slot", false);
+                    return;
+                  }else{
+                    String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
+                    String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+                    selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
+                    //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
+                  }
+                }
+              }else{
+                selectedDeliverSlotValue = "";
+              }
+
+              if(widget.paymentMode == "3"){
+                if(storeObject.paymentGateway == "Razorpay"){
+                  callOrderIdApi(storeObject);
+                }else if(storeObject.paymentGateway == "Stripe"){
+                  callStripeApi();
+                }
+              }else{
+                placeOrderApiCall("","","");
+              }
             },
             child: Text("Confirm Order",
               style: TextStyle(color: Colors.white, fontSize: 18.0),

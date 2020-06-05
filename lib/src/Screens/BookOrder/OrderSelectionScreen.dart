@@ -99,14 +99,12 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                             Utils.showProgressDialog(context);
                             DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
                             Utils.hideProgressDialog(context);
-                            if(deliveryAddressResponse != null && deliveryAddressResponse.data != null){
-                              Navigator.pop(context);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DeliveryAddressList(true,deliveryAddressResponse,OrderType.Delivery)),
-                              );
-                            }
+                            Navigator.pop(context);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DeliveryAddressList(true,deliveryAddressResponse,OrderType.Delivery)),
+                            );
 
                           },
                           child: new Container(
