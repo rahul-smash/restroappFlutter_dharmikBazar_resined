@@ -653,6 +653,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               }else{
                 placeOrderApiCall("","","");
               }
+
+
             },
             child: Text("Confirm Order",
               style: TextStyle(color: Colors.white, fontSize: 18.0),
@@ -815,6 +817,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             print("--json == null-json == null-");
             return;
           }
+
+
+          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          attributeMap["ScreenName"] = "Order Confirm Screen";
+          attributeMap["action"] = "Place Order Request";
+          attributeMap["totalPrice"] = "${totalPrice}";
+          attributeMap["deliveryType"] = "${widget.deliveryType}";
+          attributeMap["paymentMode"] = "${widget.paymentMode}";
+          attributeMap["shippingCharges"] = "${shippingCharges}";
+          Utils.sendAnalyticsEvent("Clicked Place Order button",attributeMap);
 
           ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
               widget.paymentMode, taxModel, widget.address, json ,

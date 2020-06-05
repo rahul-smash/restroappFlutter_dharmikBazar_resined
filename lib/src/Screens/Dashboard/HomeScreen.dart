@@ -274,12 +274,19 @@ class _HomeScreenState extends State<HomeScreen> {
               getCartCount();
             })),
           );
+
+          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          attributeMap["ScreenName"] = "MyCartScreen";
+          Utils.sendAnalyticsEvent("Clicked MyCartScreen",attributeMap);
         }
         if (_currentIndex == 1) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => SearchScreen()),
           );
+          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          attributeMap["ScreenName"] = "SearchScreen";
+          Utils.sendAnalyticsEvent("Clicked SearchScreen",attributeMap);
         }
         if (_currentIndex == 3) {
           if (AppConstant.isLoggedIn) {
@@ -287,6 +294,9 @@ class _HomeScreenState extends State<HomeScreen> {
               context,
               MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
             );
+            Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+            attributeMap["ScreenName"] = "MyOrderScreen";
+            Utils.sendAnalyticsEvent("Clicked MyOrderScreen",attributeMap);
           } else {
             Utils.showLoginDialog(context);
           }
@@ -296,6 +306,9 @@ class _HomeScreenState extends State<HomeScreen> {
             context,
             MaterialPageRoute(builder: (context) => ContactScreen()),
           );
+          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          attributeMap["ScreenName"] = "ContactScreen";
+          Utils.sendAnalyticsEvent("Clicked ContactScreen",attributeMap);
         }
       });
     }

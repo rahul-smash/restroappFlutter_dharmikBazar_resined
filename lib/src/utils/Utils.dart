@@ -397,16 +397,17 @@ class Utils {
   static FirebaseAnalyticsObserver observer =
   FirebaseAnalyticsObserver(analytics: analytics);
 
-  static Future<void> _setSetCurrentScreen(String screenName,String screenClassOverride) async {
+  static Future<void> setSetCurrentScreen(String screenName,String screenClassOverride) async {
     await analytics.setCurrentScreen(
       screenName: '${screenName}',
       screenClassOverride: '${screenClassOverride}',
     );
   }
 
-  static Future<void> _sendAnalyticsEvent(String name,Map<String, dynamic> parameters) async {
+  static Future<void> sendAnalyticsEvent(String name,Map<String, dynamic> parameters) async {
+    String eventName = name.replaceAll(" ", "_");
     await analytics.logEvent(
-      name: '${name}',
+      name: '${eventName}',
       parameters: parameters,
     );
   }

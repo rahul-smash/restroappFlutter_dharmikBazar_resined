@@ -39,9 +39,6 @@ class NavDrawerMenu extends StatefulWidget {
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   _NavDrawerMenuState();
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
-  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
-
 
   final _drawerItems = [
     DrawerChildItem('Home', "images/home.png"),
@@ -69,11 +66,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     try {
       if(AppConstant.isLoggedIn){
             UserModel user = await SharedPrefs.getUser();
-            await analytics.setUserId('${user.id}');
-            await analytics.setUserProperty(name: "userid", value: user.id);
-            await analytics.setUserProperty(name: "useremail", value: user.email);
-            await analytics.setUserProperty(name: "userfullName", value: user.fullName);
-            await analytics.setUserProperty(name: "userphone", value: user.phone);
+            await Utils.analytics.setUserId('${user.id}');
+            await Utils.analytics.setUserProperty(name: "userid", value: user.id);
+            await Utils.analytics.setUserProperty(name: "useremail", value: user.email);
+            await Utils.analytics.setUserProperty(name: "userfullName", value: user.fullName);
+            await Utils.analytics.setUserProperty(name: "userphone", value: user.phone);
           }
     } catch (e) {
       print(e);
@@ -168,6 +165,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             context,
             MaterialPageRoute(builder: (context) => ProfileScreen(false,"")),
           );
+          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          attributeMap["ScreenName"] = "ProfileScreen";
+          Utils.sendAnalyticsEvent("Clicked ProfileScreen",attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
@@ -183,6 +183,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
               MaterialPageRoute(builder: (context) => DeliveryAddressList(false,responses,OrderType.Menu)),
             );
           });
+          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          attributeMap["ScreenName"] = "DeliveryAddressList";
+          Utils.sendAnalyticsEvent("Clicked DeliveryAddressList",attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
@@ -194,6 +197,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             context,
             MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
           );
+          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          attributeMap["ScreenName"] = "MyOrderScreen";
+          Utils.sendAnalyticsEvent("Clicked MyOrderScreen",attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
@@ -217,6 +223,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             context,
             MaterialPageRoute(builder: (context) => Favourites(() { })),
           );
+          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          attributeMap["ScreenName"] = "Favourites";
+          Utils.sendAnalyticsEvent("Clicked Favourites",attributeMap);
         }else {
           Utils.showLoginDialog(context);
         }
@@ -227,6 +236,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           context,
           MaterialPageRoute(builder: (context) => AboutScreen()),
         );
+        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        attributeMap["ScreenName"] = "AboutScreen";
+        Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
         break;
       case 6:
         /*if (AppConstant.isLoggedIn) {
@@ -244,6 +256,10 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         }*/
         share();
 
+        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        attributeMap["ScreenName"] = "share apk url";
+        Utils.sendAnalyticsEvent("Clicked share",attributeMap);
+
         break;
       case 7:
         if (AppConstant.isLoggedIn) {
@@ -260,11 +276,17 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                 context,
                 MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
               );
+              Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+              attributeMap["ScreenName"] = "LoginMobileScreen";
+              Utils.sendAnalyticsEvent("Clicked LoginMobileScreen",attributeMap);
             }else{
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
               );
+              Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+              attributeMap["ScreenName"] = "LoginEmailScreen";
+              Utils.sendAnalyticsEvent("Clicked LoginEmailScreen",attributeMap);
             }
           });
         }

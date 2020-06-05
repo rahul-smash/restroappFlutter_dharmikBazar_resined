@@ -33,6 +33,9 @@ class CategoryView extends StatelessWidget {
                       return SubCategoryProductScreen(categoryModel);
                     }),
                   );
+                  Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+                  attributeMap["ScreenName"] = "${categoryModel.title}";
+                  Utils.sendAnalyticsEvent("Clicked category",attributeMap);
                 }
               }
             },

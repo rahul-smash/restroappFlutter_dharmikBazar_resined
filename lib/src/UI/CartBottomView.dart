@@ -152,6 +152,11 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                   Utils.showToast(AppConstant.addItems, false);
                 } else {
 
+                  Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+                  attributeMap["ScreenName"] = "Place Order View";
+                  attributeMap["action"] = "Clicked on Place Order button";
+                  attributeMap["value"] = "totalPrice=${totalPrice}";
+                  Utils.sendAnalyticsEvent("Clicked Place Order",attributeMap);
                   store = await SharedPrefs.getStore();
                   pickupfacility = store.pickupFacility;
                   delieveryAdress = store.deliveryFacility;
