@@ -9,7 +9,6 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import 'ContactUs.dart';
 
@@ -25,7 +24,6 @@ class AboutScreen extends StatefulWidget {
 class _AboutScreenState extends State<AboutScreen> {
 
   String aboutUs;
-  WebViewController _controller;
   StoreModel store;
 
   @override
@@ -127,10 +125,5 @@ class _AboutScreenState extends State<AboutScreen> {
     );
   }
 
-  _loadHtmlFromAssets() async {
-    _controller.loadUrl(Uri.dataFromString(aboutUs,
-        mimeType: 'text/html',
-        encoding: Encoding.getByName('utf-8')
-    ).toString());
-  }
+
 }
