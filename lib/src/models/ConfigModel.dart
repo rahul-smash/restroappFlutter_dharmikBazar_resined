@@ -10,6 +10,7 @@ String configModelToJson(ConfigModel data) => json.encode(data.toJson());
 
 class ConfigModel {
   String storeId;
+  String isGroceryApp;
   String isAdminLogin;
   String appTheme;
   String leftMenuIconColors;
@@ -23,6 +24,7 @@ class ConfigModel {
 
   ConfigModel({
     this.storeId,
+    this.isGroceryApp,
     this.isAdminLogin,
     this.appTheme,
     this.leftMenuIconColors,
@@ -37,6 +39,7 @@ class ConfigModel {
 
   factory ConfigModel.fromJson(Map<String, dynamic> json) => ConfigModel(
     storeId: json["store_id"],
+    isGroceryApp: json["isGroceryApp"],
     isAdminLogin: json["isAdminLogin"],
     appTheme: json["appTheme"],
     leftMenuIconColors: json["left_menu_icon_colors"],
@@ -52,6 +55,7 @@ class ConfigModel {
   Map<String, dynamic> toJson() => {
     "store_id": storeId,
     "isAdminLogin": isAdminLogin,
+    "isGroceryApp":isGroceryApp,
     "appTheme": appTheme,
     "left_menu_icon_colors": leftMenuIconColors,
     "left_menu_background_color": leftMenuBackgroundColor,

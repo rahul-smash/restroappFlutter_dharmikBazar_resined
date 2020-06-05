@@ -77,7 +77,7 @@ class DialogUtils {
                       Container(
                         //margin: EdgeInsets.all(10),
                         child: FlatButton(
-                          child: Text('Offline'),
+                          child: Text('COD'),
                           color: appTheme,
                           textColor: Colors.white,
                           onPressed: () {

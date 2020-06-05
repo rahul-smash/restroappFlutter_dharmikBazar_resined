@@ -1,6 +1,8 @@
 import 'dart:core';
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
@@ -390,6 +392,26 @@ class Utils {
       ),
     );
   }
+
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
+  FirebaseAnalyticsObserver(analytics: analytics);
+
+  static Future<void> _setSetCurrentScreen(String screenName,String screenClassOverride) async {
+    await analytics.setCurrentScreen(
+      screenName: '${screenName}',
+      screenClassOverride: '${screenClassOverride}',
+    );
+  }
+
+  static Future<void> _sendAnalyticsEvent(String name,Map<String, dynamic> parameters) async {
+    await analytics.logEvent(
+      name: '${name}',
+      parameters: parameters,
+    );
+  }
+
+
 }
 
 

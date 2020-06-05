@@ -39,7 +39,6 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     getdeviceToken();
     getAppInfo();
-
   }
 
   openHomePage(StoreModel store) {
