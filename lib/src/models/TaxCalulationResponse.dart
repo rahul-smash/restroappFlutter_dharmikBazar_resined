@@ -1,18 +1,22 @@
 class TaxCalculationResponse {
 
   bool success;
+  String message;
+
   TaxCalculationModel taxCalculation;
 
   TaxCalculationResponse({this.success, this.taxCalculation});
 
   TaxCalculationResponse.fromJson(String couponCode, Map<String, dynamic> json) {
     success = json['success'];
+    message = json['message'];
     taxCalculation = json['data'] != null ? TaxCalculationModel.fromJson(couponCode, json['data']): null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
+    data['message'] = this.message;
     if (this.taxCalculation != null) {
       data['data'] = this.taxCalculation.toJson();
     }

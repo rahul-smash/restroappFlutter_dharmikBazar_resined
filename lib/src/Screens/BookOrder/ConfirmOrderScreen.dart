@@ -587,7 +587,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             color: Colors.green,
             onPressed: () async {
               StoreModel storeObject = await SharedPrefs.getStore();
-              bool status = checkStoreOpenTime(storeObject);
+              bool status = Utils.checkStoreOpenTime(storeObject,widget.deliveryType);
               print("----checkStoreOpenTime----${status}--");
 
               if(!status){
@@ -792,11 +792,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String mPrice = price.toString().substring(0 , price.toString().indexOf('.'));
     print("=======mPrice===${mPrice}===========");
     ApiController.razorpayCreateOrderApi(mPrice).then((response){
-      print("----razorpayCreateOrderApi----${response.data.id}--");
 
       CreateOrderData model = response;
       if(model != null && response.success){
-
+        print("----razorpayCreateOrderApi----${response.data.id}--");
         openCheckout(model.data.id,storeObject);
 
       }else{
@@ -811,58 +810,75 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void placeOrderApiCall(String payment_request_id, String payment_id, String onlineMethod) {
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
-        Utils.showProgressDialog(context);
         databaseHelper.getCartItemsListToJson().then((json) {
           if(json == null){
             print("--json == null-json == null-");
             return;
           }
 
+          String couponCode = taxModel == null ? "" :taxModel.couponCode;
+          String discount = taxModel == null ? "0" :taxModel.discount;
+          Utils.showProgressDialog(context);
+          ApiController.multipleTaxCalculationRequest("${couponCode}",  "${discount}",
+              shippingCharges, json).then((response) {
+            //Utils.hideProgressDialog(context);
+            taxModel = response.taxCalculation;
 
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
-          attributeMap["ScreenName"] = "Order Confirm Screen";
-          attributeMap["action"] = "Place Order Request";
-          attributeMap["totalPrice"] = "${totalPrice}";
-          attributeMap["deliveryType"] = "${widget.deliveryType}";
-          attributeMap["paymentMode"] = "${widget.paymentMode}";
-          attributeMap["shippingCharges"] = "${shippingCharges}";
-          Utils.sendAnalyticsEvent("Clicked Place Order button",attributeMap);
-
-          ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
-              widget.paymentMode, taxModel, widget.address, json ,
-              widget.isComingFromPickUpScreen,widget.areaId ,widget.deliveryType,
-              payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) async {
-            Utils.hideProgressDialog(context);
-            if(response == null){
-              print("--response == null-response == null-");
+            if (response != null && !response.success) {
+              Utils.showToast(response.message, true);
               return;
             }
 
-            print("${widget.deliveryType}");
-            //print("Location = ${storeModel.lat},${storeModel.lng}");
-            if(widget.deliveryType == OrderType.PickUp){
-              bool result = await DialogUtils.displayPickUpDialog(context,storeModel);
-              if(result == true){
-                //print("==result== ${result}");
-                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                Navigator.of(context).popUntil((route) => route.isFirst);
-                eventBus.fire(updateCartCount());
-                DialogUtils.openMap(storeModel,double.parse(storeModel.lat), double.parse(storeModel.lng));
+            Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+            attributeMap["ScreenName"] = "Order Confirm Screen";
+            attributeMap["action"] = "Place Order Request";
+            attributeMap["totalPrice"] = "${totalPrice}";
+            attributeMap["deliveryType"] = "${widget.deliveryType}";
+            attributeMap["paymentMode"] = "${widget.paymentMode}";
+            attributeMap["shippingCharges"] = "${shippingCharges}";
+            Utils.sendAnalyticsEvent("Clicked Place Order button",attributeMap);
+
+            ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
+                widget.paymentMode, taxModel, widget.address, json ,
+                widget.isComingFromPickUpScreen,widget.areaId ,widget.deliveryType,
+                payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) async {
+              Utils.hideProgressDialog(context);
+              if(response == null){
+                print("--response == null-response == null-");
+                return;
+              }
+
+              print("${widget.deliveryType}");
+              //print("Location = ${storeModel.lat},${storeModel.lng}");
+              if(widget.deliveryType == OrderType.PickUp){
+                bool result = await DialogUtils.displayPickUpDialog(context,storeModel);
+                if(result == true){
+                  //print("==result== ${result}");
+                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  eventBus.fire(updateCartCount());
+                  DialogUtils.openMap(storeModel,double.parse(storeModel.lat), double.parse(storeModel.lng));
+                }else{
+                  //print("==result== ${result}");
+                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
               }else{
-                //print("==result== ${result}");
-                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                Navigator.of(context).popUntil((route) => route.isFirst);
+                bool result = await DialogUtils.displayThankYouDialog(context,response.success? AppConstant.orderAdded: response.message);
+                if(result == true){
+                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                  Navigator.of(context)
+                      .popUntil((route) => route.isFirst);
+                  eventBus.fire(updateCartCount());
+                }
               }
-            }else{
-              bool result = await DialogUtils.displayThankYouDialog(context,response.success? AppConstant.orderAdded: response.message);
-              if(result == true){
-                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                Navigator.of(context)
-                    .popUntil((route) => route.isFirst);
-                eventBus.fire(updateCartCount());
-              }
-            }
+            });
+
+
           });
+
+
+
         });
       } else {
         Utils.showToast(AppConstant.noInternet, false);
@@ -931,29 +947,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       }
     });
   }
-
-  bool checkStoreOpenTime(StoreModel storeObject) {
-    // in case of deliver ignore is24x7Open
-    bool status = false;
-    if(storeObject.is24x7Open == "1" && widget.deliveryType == OrderType.PickUp){
-      // 1 = means store open 24x7
-      // 0 = not open for 24x7
-      status = true;
-    }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
-      status = true;
-    } else {
-      bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
-      if(isStoreOpenToday){
-        bool isStoreOpen = Utils.getDayOfWeek(storeObject);
-        status = isStoreOpen;
-      }else{
-        status = false;
-      }
-    }
-    return status;
-  }
-
-
 
 
 }

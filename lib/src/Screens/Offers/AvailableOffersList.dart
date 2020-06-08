@@ -199,7 +199,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
       if (validCouponModel != null &&validCouponModel.success) {
 
         Utils.showToast(validCouponModel.message, true);
-
+        print("-discountAmount-=${validCouponModel.discountAmount}-");
         ApiController.multipleTaxCalculationRequest(couponCode,
             validCouponModel.discountAmount, "0", json).then((response) async {
           Utils.hideProgressDialog(context);

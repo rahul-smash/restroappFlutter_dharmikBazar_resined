@@ -208,7 +208,7 @@ class OrderDetailScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text('Item Price : ',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                        Text("${AppConstant.currency} ${orderHistoryData.total}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                        Text("${AppConstant.currency} ${orderHistoryData.checkout}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
                       ],
                     ),
                   ),

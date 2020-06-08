@@ -43,13 +43,13 @@ class _MyOrderScreen extends State<MyOrderScreen> {
       ),
       //body: projectWidget(),
       body: PullToRefreshView(
-        child:  isLoading
-            ? Center(child: CircularProgressIndicator())
+        child:  isLoading ? Center(child: CircularProgressIndicator())
             : ordersList == null
             ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
-            : ListView.builder(
+            : ordersList.isEmpty ? Utils.getEmptyView2("No data found!") :ListView.builder(
             itemCount: ordersList.length,
             itemBuilder: (context, index) {
+              //print("<---refreshOrderHistory------->");
               OrderData orderHistoryData = ordersList[index];
               return  CardOrderHistoryItems(orderHistoryData);
             }
@@ -60,30 +60,6 @@ class _MyOrderScreen extends State<MyOrderScreen> {
         },
       ),
     );
-
-
-
-
-
-//    return new Scaffold(
-//      backgroundColor: Colors.white,
-//      appBar: AppBar(
-//        title: new Text('My Orders'),
-//        centerTitle: true,
-//      ),
-//      //body: projectWidget(),
-//      body: isLoading
-//          ? Center(child: CircularProgressIndicator())
-//          : ordersList == null
-//          ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
-//          : ListView.builder(
-//          itemCount: ordersList.length,
-//          itemBuilder: (context, index) {
-//            OrderData orderHistoryData = ordersList[index];
-//            return CardOrderHistoryItems(orderHistoryData);
-//          }
-//      ),
-//    );
   }
 
 
@@ -153,6 +129,9 @@ class _MyOrderScreen extends State<MyOrderScreen> {
       setState(() {
         isLoading = false;
         ordersList = respone.orders;
+        if(ordersList.isEmpty){
+          //Utils.showToast("No data found!", false);
+        }
       });
     });
   }

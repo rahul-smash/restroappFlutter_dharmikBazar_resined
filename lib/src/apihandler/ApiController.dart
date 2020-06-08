@@ -483,10 +483,7 @@ class ApiController {
   }
 
   static Future<TaxCalculationResponse> multipleTaxCalculationRequest(
-      String couponCode,
-      String discount,
-      String shipping,
-      String orderJson) async {
+      String couponCode, String discount,String shipping,String orderJson) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -494,7 +491,7 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.multipleTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
-    print("----orderJson---${orderJson}");
+    //print("----orderJson---${orderJson}");
     print("--discount-${discount}");
     try {
       request.fields.addAll({
@@ -514,7 +511,7 @@ class ApiController {
       TaxCalculationResponse model = TaxCalculationResponse.fromJson(couponCode, parsed);
       return model;
     } catch (e) {
-      print("----respStr---${e.toString()}");
+      print("--multipleTax--respStr---${e.toString()}");
       //Utils.showToast(e.toString(), true);
       return null;
     }
@@ -562,12 +559,12 @@ class ApiController {
         "store_tax_rate_detail": "",
         "platform": Platform.isIOS ? "IOS" : "Android",
         "tax_rate": "0",
-        "total": taxModel == null ? '${totalPrice}' : '${taxModel.total}',
+        "total": /*taxModel == null ? '${totalPrice}' : */'${taxModel.total}',
         "user_id": user.id,
         "device_token": deviceToken,
         "user_address_id": isComingFromPickUpScreen == true ? areaId : address.address,
         "orders": orderJson,
-        "checkout": totalPrice,
+        "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
         "payment_method": paymentMethod == "2" ? "COD" : "online",
         "discount": taxModel == null ? "" : '${taxModel.discount}',
         "payment_request_id": razorpay_order_id,
@@ -679,6 +676,7 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "android",
       });
       print('--url===  $url');
+      print('--user.id=== ${user.id}');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       final parsed = json.decode(respStr);

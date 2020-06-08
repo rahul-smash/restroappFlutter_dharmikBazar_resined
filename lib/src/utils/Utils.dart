@@ -282,7 +282,7 @@ class Utils {
       DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
       DateTime time = format.parse(date);
       time.toLocal();
-      print("time.toLocal()=   ${time.toLocal()}");
+      //print("time.toLocal()=   ${time.toLocal()}");
 
       DateFormat formatter = new DateFormat('dd MMM yyyy');
       formatted = formatter.format(time.toLocal());
@@ -303,11 +303,11 @@ class Utils {
 
     String currentTime = apiDateFormat.format(currentDate);
     //currentTime = currentTime.replaceAll("AM", "am").replaceAll("PM","pm");
-    print("----------------------------------------------");
+    /*print("----------------------------------------------");
     print("openhoursFrom= ${store.openhoursFrom}");
     print("openhoursTo=   ${store.openhoursTo}");
     print("currentTime=   ${currentTime}");
-    print("----------------------------------------------");
+    print("----------------------------------------------");*/
 
     String openhours_From = store.openhoursFrom.replaceAll("am", " AM").replaceAll("pm"," PM");
     String openhours_To = store.openhoursTo.replaceAll("am", " AM").replaceAll("pm"," PM");
@@ -323,17 +323,17 @@ class Utils {
 
     //print("${dateFormat.format(storeOpenTime)} and ${dateFormat.format(storeCloseTime)}");
     //print("currentTimeObj = ${currentTimeObj.toString()}");
-    print("----------------------------------------------");
-    print("openhoursFrom=   ${openhoursFrom}");
-    print("openhoursTo=     ${openhoursTo}");
-    print("currentDateTime= ${currentDateTime}");
-    print("----------------------------------------------");
+    //print("----------------------------------------------");
+    //print("openhoursFrom=   ${openhoursFrom}");
+    //print("openhoursTo=     ${openhoursTo}");
+    //print("currentDateTime= ${currentDateTime}");
+    //print("----------------------------------------------");
     if(currentTimeObj.isAfter(storeOpenTime) && currentTimeObj.isBefore(storeCloseTime)) {
       // do something
-      print("---if----isAfter---and --isBefore---}");
+      //print("---if----isAfter---and --isBefore---}");
       isStoreOpen = true;
     }else{
-      print("---else---else--else---else----else-------------}");
+      //print("---else---else--else---else----else-------------}");
       isStoreOpen = false;
     }
     return isStoreOpen;
@@ -362,22 +362,27 @@ class Utils {
   static bool checkStoreOpenTime(StoreModel storeObject, OrderType deliveryType) {
     // in case of deliver ignore is24x7Open
     bool status = false;
-    if(storeObject.is24x7Open == "1" && deliveryType == OrderType.PickUp){
-      // 1 = means store open 24x7
-      // 0 = not open for 24x7
-      status = true;
-    }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
-      status = true;
-    } else {
-      bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
-      if(isStoreOpenToday){
-        bool isStoreOpen = Utils.getDayOfWeek(storeObject);
-        status = isStoreOpen;
-      }else{
-        status = false;
-      }
+    try {
+      if(storeObject.is24x7Open == "1" && deliveryType == OrderType.PickUp){
+            // 1 = means store open 24x7
+            // 0 = not open for 24x7
+            status = true;
+          }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
+            status = true;
+          } else {
+            bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
+            if(isStoreOpenToday){
+              bool isStoreOpen = Utils.getDayOfWeek(storeObject);
+              status = isStoreOpen;
+            }else{
+              status = false;
+            }
+          }
+      return status;
+    } catch (e) {
+      print(e);
+      return true;
     }
-    return status;
   }
 
   static Widget getEmptyView2(String value){
