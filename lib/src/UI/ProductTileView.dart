@@ -158,7 +158,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: <Widget>[
                                             Flexible(
-                                              child: Text(widget.product.title,overflow: TextOverflow.ellipsis,
+                                              child: Text(widget.product.title,
+                                                  maxLines: 2,
+                                                  overflow: TextOverflow.ellipsis,
                                                   style: TextStyle(fontSize: 16.0,color: grayColorTitle,)
                                               ),
                                             ),

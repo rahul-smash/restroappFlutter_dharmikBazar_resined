@@ -209,7 +209,7 @@ class ApiController {
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getProducts +subCategoryId;
-
+    print(url);
     FormData formData = new FormData.from(
         {
           "user_id": "",
