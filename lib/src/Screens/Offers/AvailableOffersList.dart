@@ -79,7 +79,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                               }
                               return Container(
                                 margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
-                                padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                                padding: EdgeInsets.fromLTRB(10, 10, 5, 10),
                                 color: Color(0xffffffff),
                                 child: Row(
                                   children: <Widget>[
@@ -106,11 +106,9 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                                 Padding(
                                                   padding: EdgeInsets.fromLTRB(5, 0, 0, 3),
                                                   child: SizedBox(
-                                                    width: 100,
+                                                    width: 80,
                                                     child: Text("${offer.couponCode}",
-                                                      style: TextStyle(color: orangeColor,
-                                                          fontSize: 16,
-                                                          fontWeight: FontWeight.bold),
+                                                      style: TextStyle(color: orangeColor,),
                                                     ),
                                                   ),
                                                 ),
@@ -131,9 +129,9 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                     ),
                                     Container(
                                       child: Padding(
-                                        padding:EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                        padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
                                         child: RaisedButton(
-                                          padding:EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                          padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
                                           textColor: Colors.black,
                                           color: Color(0xffdbdbdb),
                                           shape: RoundedRectangleBorder(

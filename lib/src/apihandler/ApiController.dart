@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
@@ -42,7 +43,6 @@ class ApiController {
   static final int timeout = 18;
 
 
-
   static Future<StoreResponse> versionApiRequest(String storeId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -50,30 +50,20 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.version;
 
-    var headers = {
-      'Content-Type': 'application/json;charset=utf-8;'
-    };
-    var request = new http.MultipartRequest("POST", Uri.parse(url));
-    request.headers.addAll(headers);
-    try {
-      request.fields.addAll({
-        "device_id": deviceId,
-        "device_token": deviceToken,
-        "platform": Platform.isIOS ? "IOS" : "Android"
-      });
-      print("---url--${url}");
-      final response = await request.send();
-      final respStr = await response.stream.bytesToString();
 
-      final parsed = json.decode(respStr);
-      StoreResponse storeData = StoreResponse.fromJson(parsed);
-      SharedPrefs.saveStore(storeData.store);
-      return storeData;
-    } catch (e) {
-      //Utils.showToast(e.toString(), true);
-      print("-version--catch--${e}----");
-      return null;
-    }
+    FormData formData = new FormData.from(
+        {"device_id": deviceId, "device_token":"${deviceToken}",
+          "platform": Platform.isIOS ? "IOS" : "Android"
+        });
+    Dio dio = new Dio();
+    Response response = await dio.post(url, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    //print(response.data);
+    StoreResponse storeData = StoreResponse.fromJson(response.data);
+    print("-------store.success ---${storeData.success}");
+    SharedPrefs.saveStore(storeData.store);
+    return storeData;
   }
 
   static Future<UserResponse> registerApiRequest(UserData user) async {
@@ -181,17 +171,14 @@ class ApiController {
     }
   }
 
-  static Future<CategoryResponse> getCategoriesApiRequest(
-      String storeId) async {
+  static Future<CategoryResponse> getCategoriesApiRequest(String storeId) async {
     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.getCategories;
-    var request = new http.MultipartRequest("GET", Uri.parse(url));
 
-    final response = await request.send().timeout(Duration(seconds: timeout));
-    final respStr = await response.stream.bytesToString();
-    print("${url}");
-    final parsed = json.decode(respStr);
-    CategoryResponse categoryResponse = CategoryResponse.fromJson(parsed);
+    Response response = await Dio().get(url);
+    //print(response);
+    CategoryResponse categoryResponse = CategoryResponse.fromJson(response.data);
+    print("-------Categories.length ---${categoryResponse.categories.length}");
     try {
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.getCount(DatabaseHelper.Categories_Table).then((count) {
@@ -214,34 +201,30 @@ class ApiController {
     return categoryResponse;
   }
 
-  static Future<SubCategoryResponse> getSubCategoryProducts(
-      String subCategoryId) async {
+
+  static Future<SubCategoryResponse> getSubCategoryProducts(String subCategoryId) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getProducts +subCategoryId;
-    var request = new http.MultipartRequest("POST", Uri.parse(url));
-    try {
-      request.fields.addAll({
-        "user_id": "",
-        "device_id": deviceId,
-        "device_token": deviceToken,
-        "platform": Platform.isIOS ? "IOS" : "Android"
-      });
-      print("${url}");
-      final response = await request.send().timeout(Duration(seconds: timeout));
-      final respStr = await response.stream.bytesToString();
-      //print("${respStr}");
 
-      final parsed = json.decode(respStr);
-      SubCategoryResponse subCategoryResponse = SubCategoryResponse.fromJson(parsed);
-      return subCategoryResponse;
-    } catch (e) {
-      print(e.toString());
-      return null;
-    }
+    FormData formData = new FormData.from(
+        {
+          "user_id": "",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android"
+        });
+    Dio dio = new Dio();
+    Response response = await dio.post(url, data: formData,
+        options: new Options(
+            contentType: ContentType.parse("application/json")));
+    //print(response.data);
+    SubCategoryResponse subCategoryResponse = SubCategoryResponse.fromJson(response.data);
+    //print("-------store.success ---${storeData.success}");
+    return subCategoryResponse;
   }
 
   static Future<DeliveryAddressResponse> getAddressApiRequest() async {
@@ -511,8 +494,8 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.multipleTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
-    //print("----orderJson---${orderJson}");
-    //print("--discount-${discount}");
+    print("----orderJson---${orderJson}");
+    print("--discount-${discount}");
     try {
       request.fields.addAll({
         "fixed_discount_amount": "${discount}",
@@ -522,7 +505,7 @@ class ApiController {
         "order_detail": orderJson,
         "device_id": deviceId,
       });
-      print("----fields---${request.fields.toString()}");
+
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----respStr---${respStr}");
@@ -1050,7 +1033,7 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
-      print("----respStr---${respStr}");
+      print("---deliveryTimeSlot-respStr---${respStr}");
       DeliveryTimeSlotModel storeArea = DeliveryTimeSlotModel.fromJson(parsed);
       return storeArea;
 

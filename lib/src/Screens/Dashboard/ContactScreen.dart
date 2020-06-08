@@ -97,11 +97,8 @@ class _ContactScreen extends State<ContactScreen> {
                               child: IconButton(
                                 icon: Icon(Icons.phone, size: 30,),
                                 onPressed: () {
-                                  print("${store.contactNumber}");
+                                  //print("${store.contactNumber}");
                                   if(store != null) {
-                                    if(store.contactNumber != null || store.contactNumber.isEmpty){
-                                      Utils.showToast("No Contact Number found!", false);
-                                    }
                                     _launchCaller(store.contactNumber);
                                   }
                                 },
@@ -112,11 +109,8 @@ class _ContactScreen extends State<ContactScreen> {
                               child: IconButton(
                                 icon: Icon(Icons.markunread, size: 30,),
                                 onPressed: () {
-                                  print("${store.contactEmail}");
+                                  //print("${store.contactEmail}");
                                   if(store != null) {
-                                    if(store.contactEmail != null || store.contactEmail.isEmpty){
-                                      Utils.showToast("No Contact Email found!", false);
-                                    }
                                     _launchEmail(store.contactEmail);
                                   }
                                 },
