@@ -56,11 +56,11 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
     variantId = variant == null ? widget.product.variantId : variant.id;
     if(variant == null){
-      discount = widget.product.discount.toString();
+      discount = widget.product.mrpPrice.toString();
       price = widget.product.price.toString();
       weight = widget.product.weight;
     }else{
-      discount = variant.discount.toString();
+      discount = variant.mrpPrice.toString();
       price = variant.price.toString();
       weight = variant.weight;
     }

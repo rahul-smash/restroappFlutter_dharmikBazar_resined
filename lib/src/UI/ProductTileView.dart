@@ -285,7 +285,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 Text("${AppConstant.currency}${widget.product.price}",
                                                   style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
                                                 Text(" "),
-                                                Text("${AppConstant.currency}${widget.product.discount}",
+                                                Text("${AppConstant.currency}${widget.product.mrpPrice}",
                                                     style: TextStyle(decoration: TextDecoration.lineThrough,
                                                         color: grayColorTitle,fontWeight: FontWeight.w400)),
                                               ],
