@@ -19,8 +19,10 @@ class ConfigModel {
   String leftMenuUsernameColors;
   String bottomBarIconColor;
   String bottomBarTextColor;
+  String bottomBarBackgroundColor;
   String dotIncreasedColor;
   String left_menu_header_bkground;
+  String leftMenuLabelTextColors;
 
   ConfigModel({
     this.storeId,
@@ -35,35 +37,42 @@ class ConfigModel {
     this.bottomBarTextColor,
     this.dotIncreasedColor,
     this.left_menu_header_bkground,
+    this.bottomBarBackgroundColor,
+    this.leftMenuLabelTextColors,
   });
 
   factory ConfigModel.fromJson(Map<String, dynamic> json) => ConfigModel(
     storeId: json["store_id"],
     isGroceryApp: json["isGroceryApp"],
     isAdminLogin: json["isAdminLogin"],
-    appTheme: json["appTheme"],
-    leftMenuIconColors: json["left_menu_icon_colors"],
+    appTheme: json["app_theme_color"],
+    leftMenuIconColors: json["left_menu_icon_color"],
     leftMenuBackgroundColor: json["left_menu_background_color"],
-    leftMenuTitleColors: json["leftMenuTitleColors"],
-    leftMenuUsernameColors: json["leftMenuUsernameColors"],
-    bottomBarIconColor: json["bottomBarIconColor"],
-    bottomBarTextColor: json["bottomBarTextColor"],
-    dotIncreasedColor: json["dotIncreasedColor"],
+    leftMenuTitleColors: json["left_menu_title_color"],
+    leftMenuUsernameColors: json["left_menu_username_color"],
+    bottomBarIconColor: json["bottom_bar_icon_color"],
+    bottomBarTextColor: json["bottom_bar_text_color"],
+    dotIncreasedColor: json["dot_increased_color"],
     left_menu_header_bkground: json["left_menu_header_bkground"],
+    bottomBarBackgroundColor: json["bottom_bar_background_color"],
+    leftMenuLabelTextColors: json["left_menu_label_Color"],
   );
 
   Map<String, dynamic> toJson() => {
     "store_id": storeId,
     "isAdminLogin": isAdminLogin,
     "isGroceryApp":isGroceryApp,
-    "appTheme": appTheme,
-    "left_menu_icon_colors": leftMenuIconColors,
+    "app_theme_color": appTheme,
+    "left_menu_icon_color": leftMenuIconColors,
     "left_menu_background_color": leftMenuBackgroundColor,
-    "leftMenuTitleColors": leftMenuTitleColors,
-    "leftMenuUsernameColors": leftMenuUsernameColors,
-    "bottomBarIconColor": bottomBarIconColor,
-    "bottomBarTextColor": bottomBarTextColor,
-    "dotIncreasedColor": dotIncreasedColor,
+    "left_menu_title_color": leftMenuTitleColors,
+    "left_menu_username_color": leftMenuUsernameColors,
+    "bottom_bar_icon_color": bottomBarIconColor,
+    "bottom_bar_text_color": bottomBarTextColor,
+    "dot_increased_color": dotIncreasedColor,
     "left_menu_header_bkground": left_menu_header_bkground,
+    "bottom_bar_background_color": bottomBarBackgroundColor,
+    "left_menu_label_Color": leftMenuLabelTextColors,
+
   };
 }

@@ -2,16 +2,15 @@
   "store_id": "393",
   "isGroceryApp": "true",
   "isAdminLogin": "false",
-  "appTheme": "0xff75990B",
-  "left_menu_icon_colors": "0xffffffff",
+  "app_theme_color": "0xff75990B",
+  "left_menu_icon_color": "0xffffffff",
   "left_menu_background_color": "0xff151515",
-  "leftMenuTitleColors": "0xffffffff",
-  "leftMenuUsernameColors": "0xffffffff",
-  "bottomBarIconColor": "0xff42a700",
-  "bottomBarTextColor": "0xff000000",
-  "dotIncreasedColor": "0xff42a700",
+  "left_menu_title_color": "0xffffffff",
+  "left_menu_username_color": "0xffffffff",
+  "bottom_bar_icon_color": "0xff42a700",
+  "bottom_bar_text_color": "0xff000000",
+  "dot_increased_color": "0xff42a700",
   "left_menu_header_bkground": "0xff000000",
-  "bottomBarBackgroundColor": "0xffffffff",
-  "gridBackgroundCOlor": "0xffECECEC"
-
+  "bottom_bar_background_color": "0xffffffff",
+  "left_menu_label_Color": "0xffffffff"
 }

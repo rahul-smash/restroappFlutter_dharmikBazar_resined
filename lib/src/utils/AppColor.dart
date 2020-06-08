@@ -10,6 +10,7 @@ Color left_menu_header_bkground = Color(0xff000000);
 Color left_menu_icon_colors = Color(0xffffffff);
 Color left_menu_background_color = Color(0xff151515);
 Color leftMenuWelcomeTextColors = Color(0xffffffff);
+Color leftMenuLabelTextColors = Color(0xffffffff);
 Color leftMenuUsernameColors = Color(0xffffffff);
 
 Color bottomBarIconColor = Color(0xffffffff);

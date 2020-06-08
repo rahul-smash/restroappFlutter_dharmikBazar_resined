@@ -121,10 +121,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text('Welcome',
-                        style: TextStyle( color: leftMenuWelcomeTextColors,fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: TextStyle(color: leftMenuWelcomeTextColors,
+                            fontSize: 18, fontWeight: FontWeight.bold)),
                     SizedBox(height: 5),
                     Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
-                        style: TextStyle(color: leftMenuUsernameColors, fontSize: 15)
+                        style: TextStyle(color: leftMenuWelcomeTextColors, fontSize: 15)
                     ),
                   ])
             ])));
@@ -144,9 +145,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
               width: 30),
           title: index == _drawerItems.length - 1
               ? Text(AppConstant.isLoggedIn == false ? 'Login' : 'Logout',
-              style: TextStyle(color: Color(0xff6A6A6A), fontSize: 15))
+              style: TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
               : Text(item.title,
-              style: TextStyle(color: Color(0xff6A6A6A), fontSize: 15)),
+              style: TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
           onTap: () {
             _openPageForIndex(index, context);
           },
