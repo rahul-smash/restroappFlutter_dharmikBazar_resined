@@ -50,10 +50,6 @@ class CategoryView extends StatelessWidget {
                 //placeholder: (context, url) => CircularProgressIndicator(),
                 //errorWidget: (context, url, error) => Icon(Icons.error),
               ),
-              /*child: Image.network('${categoryModel.image300200}',
-                width: Utils.getDeviceWidth(context),height: 100.0,
-                fit: BoxFit.cover,
-              ),*/
             ),
           ),
           Expanded(

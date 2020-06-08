@@ -243,6 +243,7 @@ class _SearchScreenState extends BaseState<SearchScreen> {
     Utils.hideKeyboard(context);
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if(isNetworkAvailable){
+        Utils.sendSearchAnalyticsEvent(controller.text);
         Utils.showProgressDialog(context);
         SubCategoryResponse subCategoryResponse =
         await ApiController.getSearchResults(controller.text);

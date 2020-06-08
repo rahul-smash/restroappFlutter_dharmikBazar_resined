@@ -412,6 +412,11 @@ class Utils {
     );
   }
 
+  static Future<void> sendSearchAnalyticsEvent(String searchTerm) async {
+    await analytics.logSearch(
+      searchTerm: '${searchTerm}',
+    );
+  }
 
 }
 
