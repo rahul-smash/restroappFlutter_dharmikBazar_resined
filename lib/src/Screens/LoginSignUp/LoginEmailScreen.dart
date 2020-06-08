@@ -71,12 +71,6 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
     return Container(
       height: 200,
       width: MediaQuery.of(context).size.width,
-      /*decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('images/googleplayfeature.png'),
-          fit: BoxFit.scaleDown,
-        ),
-      ),*/
       child: Center(
         child: SizedBox(
           child: Padding(
