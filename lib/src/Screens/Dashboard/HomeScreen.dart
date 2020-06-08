@@ -181,7 +181,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       drawer: NavDrawerMenu(store, user == null ? "" : user.fullName),
-      bottomNavigationBar: addBottomBar(),
+      bottomNavigationBar: SafeArea(
+        child: addBottomBar(),
+      ),
     );
   }
   Widget addBanners() {
