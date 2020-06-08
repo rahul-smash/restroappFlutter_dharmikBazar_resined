@@ -12,17 +12,17 @@ class ConfigModel {
   String storeId;
   String isGroceryApp;
   String isAdminLogin;
-  String appTheme;
-  String leftMenuIconColors;
-  String leftMenuBackgroundColor;
-  String leftMenuTitleColors;
-  String leftMenuUsernameColors;
-  String bottomBarIconColor;
-  String bottomBarTextColor;
-  String bottomBarBackgroundColor;
-  String dotIncreasedColor;
-  String left_menu_header_bkground;
-  String leftMenuLabelTextColors;
+  String appTheme = "0xff75990B";
+  String leftMenuIconColors = "0xffffffff";
+  String leftMenuBackgroundColor = "0xff151515";
+  String leftMenuTitleColors = "0xffffffff";
+  String leftMenuUsernameColors = "0xffffffff";
+  String bottomBarIconColor = "0xff42a700";
+  String bottomBarTextColor = "0xff000000";
+  String dotIncreasedColor = "0xff42a700";
+  String left_menu_header_bkground = "0xff000000";
+  String bottomBarBackgroundColor = "0xffffffff";
+  String leftMenuLabelTextColors = "0xffffffff";
 
   ConfigModel({
     this.storeId,
