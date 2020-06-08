@@ -480,62 +480,54 @@ class PaymentSetting {
 }
 
 class AppThemeColors {
-  String appTheme;
-  String leftMenuIconColors;
-  String leftMenuBackgroundColor;
-  String leftMenuTitleColors;
-  String leftMenuUsernameColors;
-  String bottomBarIconColor;
-  String bottomBarTextColor;
-  String dotIncreasedColor;
-  String leftMenuHeaderBkground;
-
   AppThemeColors({
-    this.appTheme,
-    this.leftMenuIconColors,
+    this.id,
+    this.appThemeColor,
+    this.leftMenuIconColor,
     this.leftMenuBackgroundColor,
-    this.leftMenuTitleColors,
-    this.leftMenuUsernameColors,
+    this.leftMenuTitleColor,
+    this.leftMenuUsernameColor,
     this.bottomBarIconColor,
     this.bottomBarTextColor,
     this.dotIncreasedColor,
-    this.leftMenuHeaderBkground,
+    this.leftMenuHeaderBackgroundColor,
   });
-/*
-  app_theme_colors: {
-  app_theme_color: "0xff777A18",
-  left_menu_icon_color: "0xffffffff",
-  left_menu_background_color: "0xff151515",
-  left_menu_title_color: "0xffffffff",
-  left_menu_username_color: "0xffffffff",
-  bottom_bar_icon_color: "0xffffffff",
-  bottom_bar_text_color: "0xffffffff",
-  dot_increased_color: "0xff777A18",
-  left_menu_header_background_color: "0xff000000"
-  },
-  */
+
+  String id;
+  String appThemeColor;
+  String leftMenuIconColor;
+  String leftMenuBackgroundColor;
+  String leftMenuTitleColor;
+  String leftMenuUsernameColor;
+  String bottomBarIconColor;
+  String bottomBarTextColor;
+  String dotIncreasedColor;
+  String leftMenuHeaderBackgroundColor;
+
   factory AppThemeColors.fromJson(Map<String, dynamic> json) => AppThemeColors(
-    appTheme: json["app_theme_color"],
-    leftMenuIconColors: json["left_menu_icon_color"],
+    id: json["id"],
+    appThemeColor: json["app_theme_color"],
+    leftMenuIconColor: json["left_menu_icon_color"],
     leftMenuBackgroundColor: json["left_menu_background_color"],
-    leftMenuTitleColors: json["left_menu_title_color"],
-    leftMenuUsernameColors: json["left_menu_username_color"],
+    leftMenuTitleColor: json["left_menu_title_color"],
+    leftMenuUsernameColor: json["left_menu_username_color"],
     bottomBarIconColor: json["bottom_bar_icon_color"],
     bottomBarTextColor: json["bottom_bar_text_color"],
     dotIncreasedColor: json["dot_increased_color"],
-    leftMenuHeaderBkground: json["left_menu_header_background_color"],
+    leftMenuHeaderBackgroundColor: json["left_menu_header_background_color"],
   );
 
   Map<String, dynamic> toJson() => {
-    "app_theme_color": appTheme,
-    "left_menu_icon_color": leftMenuIconColors,
+    "id": id,
+    "app_theme_color": appThemeColor,
+    "left_menu_icon_color": leftMenuIconColor,
     "left_menu_background_color": leftMenuBackgroundColor,
-    "left_menu_title_color": leftMenuTitleColors,
-    "left_menu_username_color": leftMenuUsernameColors,
+    "left_menu_title_color": leftMenuTitleColor,
+    "left_menu_username_color": leftMenuUsernameColor,
     "bottom_bar_icon_color": bottomBarIconColor,
     "bottom_bar_text_color": bottomBarTextColor,
     "dot_increased_color": dotIncreasedColor,
-    "left_menu_header_background_color": leftMenuHeaderBkground,
+    "left_menu_header_background_color": leftMenuHeaderBackgroundColor,
   };
 }
 

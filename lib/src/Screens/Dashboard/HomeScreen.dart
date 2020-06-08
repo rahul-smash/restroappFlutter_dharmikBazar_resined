@@ -228,7 +228,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Badge(
                   showBadge: cartBadgeCount == 0 ? false : true,
                   badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
-                  child: Image.asset('images/carticon.png', width: 24,fit: BoxFit.scaleDown,),
+                  child: Image.asset('images/carticon.png', width: 24,
+                    fit: BoxFit.scaleDown,color: bottomBarIconColor),
                 ),
                 title: Padding(
                   padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
@@ -243,11 +244,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icon(Icons.shopping_cart, color: Colors.white,size: 0,),
                 title: Text(''),),
             BottomNavigationBarItem(
-              icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,),
+              icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
                 title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
                 ),
             BottomNavigationBarItem(
-              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,),
+              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
                 title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
                 )
           ],

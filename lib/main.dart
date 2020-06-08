@@ -56,7 +56,7 @@ Future<void> main() async {
 void setAppThemeColors(ConfigModel configObject) {
   appTheme = Color(int.parse(configObject.appTheme));
 
-  left_menu_header_bkground = Color(int.parse(configObject.left_menu_header_bkground));
+  /*left_menu_header_bkground = Color(int.parse(configObject.left_menu_header_bkground));
   left_menu_icon_colors = Color(int.parse(configObject.leftMenuIconColors));
   left_menu_background_color = Color(int.parse(configObject.leftMenuBackgroundColor));
   leftMenuWelcomeTextColors = Color(int.parse(configObject.leftMenuTitleColors));
@@ -65,7 +65,7 @@ void setAppThemeColors(ConfigModel configObject) {
   bottomBarTextColor = Color(int.parse(configObject.bottomBarTextColor));
   dotIncreasedColor = Color(int.parse(configObject.dotIncreasedColor));
   bottomBarBackgroundColor = Color(int.parse(configObject.bottomBarBackgroundColor));
-  leftMenuLabelTextColors = Color(int.parse(configObject.leftMenuLabelTextColors));
+  leftMenuLabelTextColors = Color(int.parse(configObject.leftMenuLabelTextColors));*/
 }
 
 class ValueApp extends StatelessWidget {

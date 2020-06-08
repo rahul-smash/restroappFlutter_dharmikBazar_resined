@@ -10,6 +10,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ConfigModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -107,6 +108,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
                   }else{
                     openHomePage(model.store);
+                    setAppThemeColors(model.store);
                     return Container();
                   }
 
@@ -141,6 +143,22 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
+
+void setAppThemeColors(StoreModel store) {
+  AppThemeColors appThemeColors = store.appThemeColors;
+  appTheme = Color(int.parse(appThemeColors.appThemeColor));
+
+  left_menu_header_bkground = Color(int.parse(appThemeColors.leftMenuHeaderBackgroundColor));
+  left_menu_icon_colors = Color(int.parse(appThemeColors.leftMenuIconColor));
+  left_menu_background_color = Color(int.parse(appThemeColors.leftMenuBackgroundColor));
+  leftMenuWelcomeTextColors = Color(int.parse(appThemeColors.leftMenuUsernameColor));
+  leftMenuUsernameColors = Color(int.parse(appThemeColors.leftMenuUsernameColor));
+  bottomBarIconColor = Color(int.parse(appThemeColors.bottomBarIconColor));
+  bottomBarTextColor = Color(int.parse(appThemeColors.bottomBarTextColor));
+  dotIncreasedColor = Color(int.parse(appThemeColors.dotIncreasedColor));
+  //bottomBarBackgroundColor = Color(int.parse(appThemeColors.bottomBarBackgroundColor));
+  //leftMenuLabelTextColors = Color(int.parse(appThemeColors.leftMenuLabelTextColors));
+}
 
 class ForceUpdateAlert extends StatefulWidget{
   String forceDownloadMessage;
