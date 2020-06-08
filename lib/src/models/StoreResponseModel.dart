@@ -36,6 +36,7 @@ class StoreModel {
   String version;
   String currency;
   String showCurrency;
+  String currency_unicode;
   String appShareLink;
   String androidShareLink;
   String iphoneShareLink;
@@ -133,6 +134,7 @@ class StoreModel {
         this.version,
         this.currency,
         this.showCurrency,
+        this.currency_unicode,
         this.appShareLink,
         this.androidShareLink,
         this.iphoneShareLink,
@@ -228,6 +230,7 @@ class StoreModel {
     version = json['version'];
     currency = json['currency'];
     showCurrency = json['show_currency'];
+    currency_unicode = json['currency_unicode'];
     appShareLink = json['app_share_link'];
     androidShareLink = json['android_share_link'];
     iphoneShareLink = json['iphone_share_link'];
@@ -362,6 +365,7 @@ class StoreModel {
     data['version'] = this.version;
     data['currency'] = this.currency;
     data['show_currency'] = this.showCurrency;
+    data['currency_unicode'] = this.currency_unicode;
     data['app_share_link'] = this.appShareLink;
     data['android_share_link'] = this.androidShareLink;
     data['iphone_share_link'] = this.iphoneShareLink;
@@ -479,19 +483,8 @@ class PaymentSetting {
   };
 }
 
+
 class AppThemeColors {
-  AppThemeColors({
-    this.id,
-    this.appThemeColor,
-    this.leftMenuIconColor,
-    this.leftMenuBackgroundColor,
-    this.leftMenuTitleColor,
-    this.leftMenuUsernameColor,
-    this.bottomBarIconColor,
-    this.bottomBarTextColor,
-    this.dotIncreasedColor,
-    this.leftMenuHeaderBackgroundColor,
-  });
 
   String id;
   String appThemeColor;
@@ -503,6 +496,23 @@ class AppThemeColors {
   String bottomBarTextColor;
   String dotIncreasedColor;
   String leftMenuHeaderBackgroundColor;
+  String bottom_bar_background_color;
+  String left_menu_label_Color;
+
+  AppThemeColors({
+    this.id,
+    this.appThemeColor,
+    this.leftMenuIconColor,
+    this.leftMenuBackgroundColor,
+    this.leftMenuTitleColor,
+    this.leftMenuUsernameColor,
+    this.bottomBarIconColor,
+    this.bottomBarTextColor,
+    this.dotIncreasedColor,
+    this.leftMenuHeaderBackgroundColor,
+    this.bottom_bar_background_color,
+    this.left_menu_label_Color,
+  });
 
   factory AppThemeColors.fromJson(Map<String, dynamic> json) => AppThemeColors(
     id: json["id"],
@@ -515,6 +525,8 @@ class AppThemeColors {
     bottomBarTextColor: json["bottom_bar_text_color"],
     dotIncreasedColor: json["dot_increased_color"],
     leftMenuHeaderBackgroundColor: json["left_menu_header_background_color"],
+    bottom_bar_background_color: json["bottom_bar_background_color"],
+    left_menu_label_Color: json["left_menu_label_color"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -528,6 +540,8 @@ class AppThemeColors {
     "bottom_bar_text_color": bottomBarTextColor,
     "dot_increased_color": dotIncreasedColor,
     "left_menu_header_background_color": leftMenuHeaderBackgroundColor,
+    "bottom_bar_background_color": bottom_bar_background_color,
+    "left_menu_label_color": left_menu_label_Color,
   };
 }
 

@@ -156,8 +156,23 @@ void setAppThemeColors(StoreModel store) {
   bottomBarIconColor = Color(int.parse(appThemeColors.bottomBarIconColor));
   bottomBarTextColor = Color(int.parse(appThemeColors.bottomBarTextColor));
   dotIncreasedColor = Color(int.parse(appThemeColors.dotIncreasedColor));
-  //bottomBarBackgroundColor = Color(int.parse(appThemeColors.bottomBarBackgroundColor));
-  //leftMenuLabelTextColors = Color(int.parse(appThemeColors.leftMenuLabelTextColors));
+  bottomBarBackgroundColor = Color(int.parse(appThemeColors.bottom_bar_background_color));
+  leftMenuLabelTextColors = Color(int.parse(appThemeColors.left_menu_label_Color));
+
+  /*if(store.showCurrency == "symbol"){
+    if(store.currency_unicode.isEmpty){
+      AppConstant.currency = store.currencyAbbr;
+    }else{
+      AppConstant.currency = store.currency_unicode.replaceAll("U+0", "");
+    }
+    //U+020B9 // \u20B9
+  }else{
+    AppConstant.currency = store.currencyAbbr;
+  }
+  print("${AppConstant.currency}");
+
+  String currency = "\u20B9";*/
+
 }
 
 class ForceUpdateAlert extends StatefulWidget{

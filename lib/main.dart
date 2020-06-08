@@ -24,8 +24,8 @@ Future<void> main() async {
   String jsonResult =  await loadAsset();
   final parsed = json.decode(jsonResult);
   ConfigModel configObject = ConfigModel.fromJson(parsed);
-  print(configObject.storeId);
-  setAppThemeColors(configObject);
+  //print(configObject.storeId);
+  //setAppThemeColors(configObject);
 
   // Set `enableInDevMode` to true to see reports while in debug mode
   // This is only to be used for confirming that reports are being
@@ -54,8 +54,7 @@ Future<void> main() async {
 }
 
 void setAppThemeColors(ConfigModel configObject) {
-  appTheme = Color(int.parse(configObject.appTheme));
-
+  //appTheme = Color(int.parse(configObject.appTheme));
   /*left_menu_header_bkground = Color(int.parse(configObject.left_menu_header_bkground));
   left_menu_icon_colors = Color(int.parse(configObject.leftMenuIconColors));
   left_menu_background_color = Color(int.parse(configObject.leftMenuBackgroundColor));
