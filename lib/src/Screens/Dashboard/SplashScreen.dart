@@ -116,7 +116,14 @@ class _SplashScreenState extends State<SplashScreen> {
       }
 
     } else {
-      return Container();
+      return Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage("images/splash.jpg"),
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
     }
 
   }
