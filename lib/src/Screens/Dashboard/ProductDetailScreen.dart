@@ -28,7 +28,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   String imageUrl;
   Variant variant;
-  String discount,price,variantId,weight;
+  String discount,price,variantId,weight,mrpPrice;
   int counter = 0;
   CartData cartData;
   bool showAddButton;
@@ -56,11 +56,13 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
     variantId = variant == null ? widget.product.variantId : variant.id;
     if(variant == null){
-      discount = widget.product.mrpPrice.toString();
+      discount = widget.product.discount.toString();
+      mrpPrice = widget.product.mrpPrice.toString();
       price = widget.product.price.toString();
       weight = widget.product.weight;
     }else{
-      discount = variant.mrpPrice.toString();
+      discount = variant.discount.toString();
+      mrpPrice = variant.mrpPrice.toString();
       price = variant.price.toString();
       weight = variant.weight;
     }
@@ -157,7 +159,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                       Text("${AppConstant.currency}${price}",
                         style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
                       Text(" "),
-                      Text("${AppConstant.currency}${discount}",
+                      Text("${AppConstant.currency}${mrpPrice}",
                           style: TextStyle(decoration: TextDecoration.lineThrough,
                               color: grayColorTitle,fontWeight: FontWeight.w400)),
                     ],
