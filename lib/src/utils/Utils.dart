@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:intl/intl.dart';
+import 'package:package_info/package_info.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
@@ -43,6 +44,14 @@ class Utils {
     } catch (e) {
       print(e);
     }
+  }
+
+  static Future<PackageInfo> getAppVersionDetails() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    SharedPrefs.storeSharedValue(AppConstant.appName, packageInfo.appName);
+    SharedPrefs.storeSharedValue(AppConstant.old_appverion, packageInfo.version);
+    return packageInfo;
   }
 
   static void hideKeyboard(BuildContext context){

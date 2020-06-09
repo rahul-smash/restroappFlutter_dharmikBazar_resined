@@ -6,10 +6,13 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
+import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/Screens/Dashboard/SplashScreen.dart';
 import 'package:restroapp/src/models/ConfigModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'dart:io';
@@ -32,10 +35,12 @@ Future<void> main() async {
   // submitted as expected. It is not intended to be used for everyday
   // development.
   Crashlytics.instance.enableInDevMode = true;
-
+  StoreResponse storeData = await ApiController.versionApiRequest("${configObject.storeId}");
+  setAppThemeColors(storeData.store);
   // Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
   SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "${isAdminLogin}");
+
 
   if (Platform.isIOS) {
     IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
@@ -48,23 +53,25 @@ Future<void> main() async {
       [DeviceOrientation.portraitUp]);
   // To turn off landscape mode
   runZoned(() {
-    runApp(ValueApp(isAdminLogin,configObject));
+    runApp(ValueApp(isAdminLogin,configObject,storeData));
   }, onError: Crashlytics.instance.recordError);
 
 }
 
-void setAppThemeColors(ConfigModel configObject) {
-  //appTheme = Color(int.parse(configObject.appTheme));
-  /*left_menu_header_bkground = Color(int.parse(configObject.left_menu_header_bkground));
-  left_menu_icon_colors = Color(int.parse(configObject.leftMenuIconColors));
-  left_menu_background_color = Color(int.parse(configObject.leftMenuBackgroundColor));
-  leftMenuWelcomeTextColors = Color(int.parse(configObject.leftMenuTitleColors));
-  leftMenuUsernameColors = Color(int.parse(configObject.leftMenuUsernameColors));
-  bottomBarIconColor = Color(int.parse(configObject.bottomBarIconColor));
-  bottomBarTextColor = Color(int.parse(configObject.bottomBarTextColor));
-  dotIncreasedColor = Color(int.parse(configObject.dotIncreasedColor));
-  bottomBarBackgroundColor = Color(int.parse(configObject.bottomBarBackgroundColor));
-  leftMenuLabelTextColors = Color(int.parse(configObject.leftMenuLabelTextColors));*/
+void setAppThemeColors(StoreModel store) {
+  AppThemeColors appThemeColors = store.appThemeColors;
+  appTheme = Color(int.parse(appThemeColors.appThemeColor));
+
+  left_menu_header_bkground = Color(int.parse(appThemeColors.leftMenuHeaderBackgroundColor));
+  left_menu_icon_colors = Color(int.parse(appThemeColors.leftMenuIconColor));
+  left_menu_background_color = Color(int.parse(appThemeColors.leftMenuBackgroundColor));
+  leftMenuWelcomeTextColors = Color(int.parse(appThemeColors.leftMenuUsernameColor));
+  leftMenuUsernameColors = Color(int.parse(appThemeColors.leftMenuUsernameColor));
+  bottomBarIconColor = Color(int.parse(appThemeColors.bottomBarIconColor));
+  bottomBarTextColor = Color(int.parse(appThemeColors.bottomBarTextColor));
+  dotIncreasedColor = Color(int.parse(appThemeColors.dotIncreasedColor));
+  bottomBarBackgroundColor = Color(int.parse(appThemeColors.bottom_bar_background_color));
+  leftMenuLabelTextColors = Color(int.parse(appThemeColors.left_menu_label_Color));
 }
 
 class ValueApp extends StatelessWidget {
@@ -73,7 +80,8 @@ class ValueApp extends StatelessWidget {
   ConfigModel configObject;
   static FirebaseAnalytics analytics = FirebaseAnalytics();
   static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
-  ValueApp(this.isAdminLogin, this.configObject);
+  StoreResponse storeData;
+  ValueApp(this.isAdminLogin, this.configObject, this.storeData);
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +93,7 @@ class ValueApp extends StatelessWidget {
         primaryColor: appTheme,
       ),
       navigatorObservers: <NavigatorObserver>[observer],
-      home: isAdminLogin == true? LoginEmailScreen("menu"):SplashScreen(configObject),
+      home: isAdminLogin == true? LoginEmailScreen("menu"):SplashScreen(configObject,storeData),
     );
   }
 }

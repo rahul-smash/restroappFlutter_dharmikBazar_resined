@@ -1,6 +1,9 @@
 import 'dart:ui';
 
-Color appTheme = Color(0xff777A18);
+//orange color - #FF5400
+//Green color - #75990B
+
+Color appTheme = Color(0xff75990B);
 Color colorText = Color(0xff3e4a59);
 Color colorInputText = Color(0xff24272b);
 Color colorBlueText = Color(0xff6078ff);

@@ -61,7 +61,7 @@ class ApiController {
               options: new Options(
                   contentType: ContentType.parse("application/json")));
       print(response.statusCode);
-      print(response.data);
+      //print(response.data);
       StoreResponse storeData = StoreResponse.fromJson(response.data);
       print("-------store.success ---${storeData.success}");
       SharedPrefs.saveStore(storeData.store);
