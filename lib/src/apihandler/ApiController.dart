@@ -50,20 +50,26 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.version;
 
-
-    FormData formData = new FormData.from(
-        {"device_id": deviceId, "device_token":"${deviceToken}",
-          "platform": Platform.isIOS ? "IOS" : "Android"
-        });
-    Dio dio = new Dio();
-    Response response = await dio.post(url, data: formData,
-        options: new Options(
-            contentType: ContentType.parse("application/json")));
-    //print(response.data);
-    StoreResponse storeData = StoreResponse.fromJson(response.data);
-    print("-------store.success ---${storeData.success}");
-    SharedPrefs.saveStore(storeData.store);
-    return storeData;
+    print("----url--${url}");
+    try {
+      FormData formData = new FormData.from(
+              {"device_id": deviceId, "device_token":"${deviceToken}",
+                "platform": Platform.isIOS ? "IOS" : "Android"
+              });
+      Dio dio = new Dio();
+      Response response = await dio.post(url, data: formData,
+              options: new Options(
+                  contentType: ContentType.parse("application/json")));
+      print(response.statusCode);
+      print(response.data);
+      StoreResponse storeData = StoreResponse.fromJson(response.data);
+      print("-------store.success ---${storeData.success}");
+      SharedPrefs.saveStore(storeData.store);
+      return storeData;
+    } catch (e) {
+      print(e);
+    }
+    return null;
   }
 
   static Future<UserResponse> registerApiRequest(UserData user) async {
@@ -541,6 +547,14 @@ class ApiController {
       url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
           ApiConstants.pickupPlaceOrder;
     }
+    String storeAddress = "";
+    try {
+      storeAddress = "${store.storeName}, ${store.location},"
+              "${store.city}, ${store.state}, ${store.country}, ${store.zipcode}";
+      print("storeAddress= ${storeAddress}");
+    } catch (e) {
+      print(e);
+    }
 
     /*var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.placeOrder;*/
@@ -553,7 +567,7 @@ class ApiController {
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
-        "user_address": isComingFromPickUpScreen == true ? areaId : address.address,
+        "user_address": isComingFromPickUpScreen == true ? storeAddress : address.address,
         "store_fixed_tax_detail": "",
         "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",
