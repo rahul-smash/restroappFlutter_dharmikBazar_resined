@@ -65,7 +65,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           addAddressList()
         ],
       ),
-      bottomNavigationBar: widget.showProceedBar ? addProceedBar() : Container(height: 5),
+      bottomNavigationBar: SafeArea(
+        child: widget.showProceedBar ? addProceedBar() : Container(height: 5),
+      ),
     );
   }
 

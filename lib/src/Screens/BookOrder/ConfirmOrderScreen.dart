@@ -244,11 +244,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           },
         ))
       ]),
-      bottomNavigationBar: Container(
-        height: 135,
-        color: Colors.white,
-        child: Column(
-          children: [addTotalPrice(), addCouponCodeRow(), addConfirmOrder()],
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          height: 135,
+          color: Colors.white,
+          child: Column(
+            children: [addTotalPrice(), addCouponCodeRow(), addConfirmOrder()],
+          ),
         ),
       ),
     );

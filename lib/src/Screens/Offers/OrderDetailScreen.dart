@@ -30,34 +30,36 @@ class OrderDetailScreen extends StatelessWidget {
             ],
           ),
       ),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: Color(0xFF74990A),
-        child: InkWell(
-          onTap: (){
-            bottomSheet(mainContext);
-          },
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Row(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(left: 15.0,top: 4.0,bottom: 4),
-                      child : Text("View Details",
-                        style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w600),),
-                    ),
-                    SizedBox(
-                        width: 6
-                    ),
-                    Image.asset("images/topArrow.png",width: 15,height: 15,),
-                  ]
-              ),
-              Padding(
-                padding: EdgeInsets.only(right: 10.0,),
-                child : Text(" ${AppConstant.currency} ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
-              ),
-            ],
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          height: 50,
+          color: Color(0xFF74990A),
+          child: InkWell(
+            onTap: (){
+              bottomSheet(mainContext);
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Row(
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.0,top: 4.0,bottom: 4),
+                        child : Text("View Details",
+                          style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w600),),
+                      ),
+                      SizedBox(
+                          width: 6
+                      ),
+                      Image.asset("images/topArrow.png",width: 15,height: 15,),
+                    ]
+                ),
+                Padding(
+                  padding: EdgeInsets.only(right: 10.0,),
+                  child : Text(" ${AppConstant.currency} ${orderHistoryData.total}",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -186,116 +188,118 @@ class OrderDetailScreen extends StatelessWidget {
         context: context,
         isScrollControlled: false,
         builder: (BuildContext bc){
-          return Container(
-            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-            child: Wrap(
+          return SafeArea(
+            child: Container(
+              margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Wrap(
                 //crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(left: screenWidth - 40 ,top: 5,bottom: 10),
-                    child: GestureDetector(
-                      onTap: (){
-                        Navigator.pop(mainContext);
-                      },
-                      child: Image.asset('images/close.png'),
-                    ),
-
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 5),
-                    child:  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text('Item Price : ',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                        Text("${AppConstant.currency} ${orderHistoryData.checkout}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-                  ),
-                  Visibility(
-                    visible: orderHistoryData.discount == "0.00" && orderHistoryData.shippingCharges == "0.00" ?
-                     false :true ,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                      child:  sheetDeviderLine(),
-                    ),
-                  ),
-                  Visibility(
-                    visible: orderHistoryData.discount == "0.00" ? false :true ,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                      child:   Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                          Text("${AppConstant.currency} ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
-                        ],
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(left: screenWidth - 40 ,top: 5,bottom: 10),
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.pop(mainContext);
+                        },
+                        child: Image.asset('images/close.png'),
                       ),
+
                     ),
-                  ),
-                  Visibility(
-                    visible: orderHistoryData.shippingCharges == "0.00" ? false :true ,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 5),
                       child:  Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[
-                          Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
-                          Text("${AppConstant.currency} ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
+                          Text('Item Price : ',style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                          Text("${AppConstant.currency} ${orderHistoryData.checkout}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ),
-                  ),
-                  Visibility(
-                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
-                      child:  bottomDeviderView(),
+                    Visibility(
+                      visible: orderHistoryData.discount == "0.00" && orderHistoryData.shippingCharges == "0.00" ?
+                      false :true ,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                        child:  sheetDeviderLine(),
+                      ),
                     ),
-                  ),
-                  Visibility(
-                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                      child: Text('Delivery Address',
-                          style: TextStyle(color: Colors.black,fontSize: 16)),
-                    ),
-                  ),
-                  Visibility(
-                    visible: orderHistoryData.orderFacility == "Pickup"? false : true,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
-                      child: Text('${orderHistoryData.address}',
-                          style: TextStyle(color: Color(0xFF737879),fontSize: 16)),
-                    ),
-                  ),
-                  Container(
-                    height: 50,
-                    color: Color(0xFF74990A),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(left: 15.0,top: 4.0,bottom: 4),
-                                child : Text("View Details",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w600),),
-                              ),
-                              SizedBox(
-                                  width: 6
-                              ),
-                              Image.asset("images/topArrow.png",width: 15,height: 15,),
-                            ]
+                    Visibility(
+                      visible: orderHistoryData.discount == "0.00" ? false :true ,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                        child:   Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text('Discount : ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                            Text("${AppConstant.currency} ${orderHistoryData.discount}",style: TextStyle(color: Colors.black,fontSize: 18,fontWeight: FontWeight.w600)),
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 10.0,),
-                          child : Text(" ${AppConstant.currency} ${orderHistoryData.total}",
-                            style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ]
+                    Visibility(
+                      visible: orderHistoryData.shippingCharges == "0.00" ? false :true ,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                        child:  Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text('Delivery Fee: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                            Text("${AppConstant.currency} ${orderHistoryData.shippingCharges}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                        child:  bottomDeviderView(),
+                      ),
+                    ),
+                    Visibility(
+                      visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                        child: Text('Delivery Address',
+                            style: TextStyle(color: Colors.black,fontSize: 16)),
+                      ),
+                    ),
+                    Visibility(
+                      visible: orderHistoryData.orderFacility == "Pickup"? false : true,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
+                        child: Text('${orderHistoryData.address}',
+                            style: TextStyle(color: Color(0xFF737879),fontSize: 16)),
+                      ),
+                    ),
+                    Container(
+                      height: 50,
+                      color: Color(0xFF74990A),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Row(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(left: 15.0,top: 4.0,bottom: 4),
+                                  child : Text("View Details",style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w600),),
+                                ),
+                                SizedBox(
+                                    width: 6
+                                ),
+                                Image.asset("images/topArrow.png",width: 15,height: 15,),
+                              ]
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(right: 10.0,),
+                            child : Text(" ${AppConstant.currency} ${orderHistoryData.total}",
+                              style: TextStyle(fontSize: 16,color: Colors.white,fontWeight: FontWeight.w700),textAlign: TextAlign.right,),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]
+              ),
             ),
           );
         }

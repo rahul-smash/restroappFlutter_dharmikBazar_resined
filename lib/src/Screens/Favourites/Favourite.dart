@@ -105,55 +105,57 @@ class _FavouritesState extends State<Favourites> {
             Navigator.pop(context);
             return new Future(() => false);
           }),
-      bottomNavigationBar: Container(
-        height: 55,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            Center(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 10.0),
-                  child: RichText(
-                    text: TextSpan(
-                      text: "Total: ",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.black),
-                      children: [
-                        TextSpan(
-                          text:
-                          "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              fontSize: 18,
-                              color: Colors.black),
-                        ),
-                      ],
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          height: 55,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10.0),
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Total: ",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.black),
+                        children: [
+                          TextSpan(
+                            text:
+                            "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
+                            style: TextStyle(
+                                fontWeight: FontWeight.normal,
+                                fontSize: 18,
+                                color: Colors.black),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                )),
-            Container(
-                color: appTheme,
-                child: FlatButton(
-                  child: Row(
-                      children: <Widget>[
-                        Image.asset("images/my_order.png", width: 25),
-                        SizedBox(width: 5),
-                        Text("Proceed To Order",style: TextStyle(fontSize: 12, color: Colors.white)),
-                      ]),
-                  onPressed: () {
-                    if (totalPrice == 0.0) {
-                      Utils.showToast(AppConstant.addItems, false);
-                    } else {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
+                  )),
+              Container(
+                  color: appTheme,
+                  child: FlatButton(
+                    child: Row(
+                        children: <Widget>[
+                          Image.asset("images/my_order.png", width: 25),
+                          SizedBox(width: 5),
+                          Text("Proceed To Order",style: TextStyle(fontSize: 12, color: Colors.white)),
+                        ]),
+                    onPressed: () {
+                      if (totalPrice == 0.0) {
+                        Utils.showToast(AppConstant.addItems, false);
+                      } else {
+                        Navigator.pushReplacement(context,
+                            MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
 
-                          })));
-                    }
-                  },
-                ))
-          ],
+                            })));
+                      }
+                    },
+                  ))
+            ],
+          ),
         ),
       ),
     );

@@ -86,7 +86,9 @@ class MyCartScreen extends StatelessWidget {
             Navigator.pop(context);
             return new Future(() => false);
           }),
-      bottomNavigationBar: bottomBar,
+      bottomNavigationBar: SafeArea(
+        child: bottomBar,
+      ),
     );
   }
 }

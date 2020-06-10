@@ -46,13 +46,16 @@ class _MyOrderScreen extends State<MyOrderScreen> {
         child:  isLoading ? Center(child: CircularProgressIndicator())
             : ordersList == null
             ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
-            : ordersList.isEmpty ? Utils.getEmptyView2("No data found!") :ListView.builder(
-            itemCount: ordersList.length,
-            itemBuilder: (context, index) {
-              //print("<---refreshOrderHistory------->");
-              OrderData orderHistoryData = ordersList[index];
-              return  CardOrderHistoryItems(orderHistoryData);
-            }
+            : ordersList.isEmpty ? Utils.getEmptyView2("No data found!")
+            :SafeArea(
+          child: ListView.builder(
+              itemCount: ordersList.length,
+              itemBuilder: (context, index) {
+                //print("<---refreshOrderHistory------->");
+                OrderData orderHistoryData = ordersList[index];
+                return  CardOrderHistoryItems(orderHistoryData);
+              }
+          ),
         ),
         onRefresh:  ()  {
           print("calleddd");
