@@ -577,7 +577,7 @@ class ApiController {
         "total": /*taxModel == null ? '${totalPrice}' : */'${taxModel.total}',
         "user_id": user.id,
         "device_token": deviceToken,
-        "user_address_id": isComingFromPickUpScreen == true ? areaId : address.address,
+        "user_address_id": isComingFromPickUpScreen == true ? areaId : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
         "payment_method": paymentMethod == "2" ? "COD" : "online",
