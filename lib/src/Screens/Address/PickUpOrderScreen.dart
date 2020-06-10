@@ -105,29 +105,31 @@ class _PickUpOrderScreen extends BaseState<PickUpOrderScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: InkWell(
-          onTap: (){
-            if(cityObject != null && areaObject != null){
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => StoreLocationScreen(areaObject,widget.pickUp)),
-              );
-            }else{
-              Utils.showToast("Please select City and Area", true);
-            }
-          },
-          child: Container(
-            height: 40,
-            color: appTheme,
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.only(left: 0.0),
-                child: RichText(
-                  text: TextSpan(
-                    text: "Proceed",
-                    style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.white),
+      bottomNavigationBar: SafeArea(
+        child: BottomAppBar(
+          child: InkWell(
+            onTap: (){
+              if(cityObject != null && areaObject != null){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => StoreLocationScreen(areaObject,widget.pickUp)),
+                );
+              }else{
+                Utils.showToast("Please select City and Area", true);
+              }
+            },
+            child: Container(
+              height: 40,
+              color: appTheme,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 0.0),
+                  child: RichText(
+                    text: TextSpan(
+                      text: "Proceed",
+                      style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.white),
+                    ),
                   ),
                 ),
               ),

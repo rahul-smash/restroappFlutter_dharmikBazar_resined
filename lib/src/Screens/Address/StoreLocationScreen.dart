@@ -95,21 +95,12 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
           ],
         ),
 
-      bottomNavigationBar: BottomAppBar(
-        child: InkWell(
-          onTap: () async {
+      bottomNavigationBar: SafeArea(
+        child: BottomAppBar(
+          child: InkWell(
+            onTap: () async {
 
-            if(widget.areaObject.note.isEmpty){
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
-              );
-            }else{
-              var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
-              if(result == true){
+              if(widget.areaObject.note.isEmpty){
                 Navigator.pop(context);
                 Navigator.push(
                   context,
@@ -117,20 +108,31 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                       builder: (context) =>
                           ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
                 );
+              }else{
+                var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
+                if(result == true){
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
+                  );
+                }
               }
-            }
 
-          },
-          child: Container(
-            height: 40,
-            color: appTheme,
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.only(left: 0.0),
-                child: RichText(
-                  text: TextSpan(
-                    text: "Proceed",
-                    style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.white),
+            },
+            child: Container(
+              height: 40,
+              color: appTheme,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 0.0),
+                  child: RichText(
+                    text: TextSpan(
+                      text: "Proceed",
+                      style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.white),
+                    ),
                   ),
                 ),
               ),
