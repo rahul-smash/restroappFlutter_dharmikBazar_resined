@@ -12,6 +12,7 @@ class ConfigModel {
   String storeId;
   String isGroceryApp;
   String isAdminLogin;
+  String currency;
   String appTheme = "0xff75990B";
   String leftMenuIconColors = "0xffffffff";
   String leftMenuBackgroundColor = "0xff151515";
@@ -28,6 +29,7 @@ class ConfigModel {
     this.storeId,
     this.isGroceryApp,
     this.isAdminLogin,
+    this.currency,
     this.appTheme,
     this.leftMenuIconColors,
     this.leftMenuBackgroundColor,
@@ -45,6 +47,7 @@ class ConfigModel {
     storeId: json["store_id"],
     isGroceryApp: json["isGroceryApp"],
     isAdminLogin: json["isAdminLogin"],
+    currency: json["currency"],
     appTheme: json["app_theme_color"],
     leftMenuIconColors: json["left_menu_icon_color"],
     leftMenuBackgroundColor: json["left_menu_background_color"],
@@ -62,6 +65,7 @@ class ConfigModel {
     "store_id": storeId,
     "isAdminLogin": isAdminLogin,
     "isGroceryApp":isGroceryApp,
+    "currency":currency,
     "app_theme_color": appTheme,
     "left_menu_icon_color": leftMenuIconColors,
     "left_menu_background_color": leftMenuBackgroundColor,

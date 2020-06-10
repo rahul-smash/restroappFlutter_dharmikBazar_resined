@@ -2,6 +2,7 @@
   "store_id": "393",
   "isGroceryApp": "true",
   "isAdminLogin": "false",
+  "currency": "\u20B9",
   "app_theme_color": "0xff75990B",
   "left_menu_icon_color": "0xffffffff",
   "left_menu_background_color": "0xff151515",

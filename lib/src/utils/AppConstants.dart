@@ -1,7 +1,7 @@
 class AppConstant {
   static bool isLoggedIn = false;
 
-  static String currency = "\u20B9";
+  static String currency = "";//\u20B9
   static String appThemeColor = "appThemeColor";
 
   static final String isAdminLogin = "isAdminLogin";

@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget showHomeScreen() {
     StoreResponse model = widget.storeData;
     if (model.success) {
-
+      setAppThemeColors(model.store);
       SharedPrefs.storeSharedValue(AppConstant.DeliverySlot, model.store.deliverySlot);
       SharedPrefs.storeSharedValue(AppConstant.is24x7Open, model.store.is24x7Open);
 
@@ -127,25 +127,25 @@ class _SplashScreenState extends State<SplashScreen> {
     }
 
   }
-}
 
-
-void setAppThemeColors(StoreModel store) {
-  /*if(store.showCurrency == "symbol"){
-    if(store.currency_unicode.isEmpty){
-      AppConstant.currency = store.currencyAbbr;
+  void setAppThemeColors(StoreModel store) {
+    if(store.showCurrency == "symbol"){
+      if(store.currency_unicode.isEmpty){
+        AppConstant.currency = store.currencyAbbr;
+      }else{
+        AppConstant.currency = widget.configObject.currency;
+      }
+      //U+020B9 // \u20B9
     }else{
-      AppConstant.currency = store.currency_unicode.replaceAll("U+0", "");
+      AppConstant.currency = store.currencyAbbr;
     }
-    //U+020B9 // \u20B9
-  }else{
-    AppConstant.currency = store.currencyAbbr;
+    //print("======currency====${AppConstant.currency}");
+    //String currency = "\u20B9";
   }
-  print("${AppConstant.currency}");
-
-  String currency = "\u20B9";*/
-
 }
+
+
+
 
 class ForceUpdateAlert extends StatefulWidget{
   String forceDownloadMessage;
