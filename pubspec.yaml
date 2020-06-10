@@ -50,7 +50,7 @@ dependencies:
   cached_network_image: ^2.2.0+1
   maps_launcher: ^1.2.0
   flutter_pull_to_refresh: ^1.0.0
-  dio: 2.1.13  #latest version
+  dio: ^3.0.9  #latest version
 
 
 dev_dependencies:

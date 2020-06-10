@@ -52,17 +52,18 @@ class ApiController {
 
     print("----url--${url}");
     try {
-      FormData formData = new FormData.from(
+      FormData formData = new FormData.fromMap(
               {"device_id": deviceId, "device_token":"${deviceToken}",
                 "platform": Platform.isIOS ? "IOS" : "Android"
               });
       Dio dio = new Dio();
-      Response response = await dio.post(url, data: formData,
-              options: new Options(
-                  contentType: ContentType.parse("application/json")));
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(
+                  contentType: "application/json",responseType: ResponseType.plain));
       print(response.statusCode);
       //print(response.data);
-      StoreResponse storeData = StoreResponse.fromJson(response.data);
+      StoreResponse storeData = StoreResponse.fromJson(json.decode(response.data));
       print("-------store.success ---${storeData.success}");
       SharedPrefs.saveStore(storeData.store);
       return storeData;
@@ -181,9 +182,9 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.getCategories;
 
-    Response response = await Dio().get(url);
+    Response response = await Dio().get(url,options: new Options(responseType: ResponseType.plain));
     //print(response);
-    CategoryResponse categoryResponse = CategoryResponse.fromJson(response.data);
+    CategoryResponse categoryResponse = CategoryResponse.fromJson(json.decode(response.data));
     print("-------Categories.length ---${categoryResponse.categories.length}");
     try {
       DatabaseHelper databaseHelper = new DatabaseHelper();
@@ -216,7 +217,7 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getProducts +subCategoryId;
     print(url);
-    FormData formData = new FormData.from(
+    FormData formData = new FormData.fromMap(
         {
           "user_id": "",
           "device_id": deviceId,
@@ -226,9 +227,9 @@ class ApiController {
     Dio dio = new Dio();
     Response response = await dio.post(url, data: formData,
         options: new Options(
-            contentType: ContentType.parse("application/json")));
+            contentType: "application/json",responseType: ResponseType.plain));
     //print(response.data);
-    SubCategoryResponse subCategoryResponse = SubCategoryResponse.fromJson(response.data);
+    SubCategoryResponse subCategoryResponse = SubCategoryResponse.fromJson(json.decode(response.data));
     //print("-------store.success ---${storeData.success}");
     return subCategoryResponse;
   }
