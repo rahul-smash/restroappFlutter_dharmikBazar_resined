@@ -203,7 +203,7 @@ class OrderDetailScreen extends StatelessWidget {
 
                   ),
                   Padding(
-                    padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                    padding: EdgeInsets.fromLTRB(15, 10, 15, 5),
                     child:  Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
