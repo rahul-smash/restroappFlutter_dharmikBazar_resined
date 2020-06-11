@@ -123,32 +123,34 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomAppBar(
-        child: InkWell(
-          onTap: () async {
+      bottomNavigationBar: SafeArea(
+        child: BottomAppBar(
+          child: InkWell(
+            onTap: () async {
 
-            StoreModel store = await SharedPrefs.getStore();
+              StoreModel store = await SharedPrefs.getStore();
 
-            print("====${selectedLocation.latitude},${selectedLocation.longitude}===");
-            double distanceInKm = Utils.calculateDistance(selectedLocation.latitude, selectedLocation.longitude,
-                double.parse(store.lat), double.parse(store.lng));
-            int distanceInKms = distanceInKm.toInt();
+              print("====${selectedLocation.latitude},${selectedLocation.longitude}===");
+              double distanceInKm = Utils.calculateDistance(selectedLocation.latitude, selectedLocation.longitude,
+                  double.parse(store.lat), double.parse(store.lng));
+              int distanceInKms = distanceInKm.toInt();
 
-            print("==distanceInKm==${distanceInKm}=AND=${distanceInKms}=");
+              print("==distanceInKm==${distanceInKm}=AND=${distanceInKms}=");
 
-            checkIfOrderDeliveryWithInRadious(distanceInKms);
+              checkIfOrderDeliveryWithInRadious(distanceInKms);
 
-          },
-          child: Container(
-            height: 40,
-            color: appTheme,
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.only(left: 0.0),
-                child: RichText(
-                  text: TextSpan(
-                    text: "Save Address",
-                    style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.white),
+            },
+            child: Container(
+              height: 40,
+              color: appTheme,
+              child: Center(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 0.0),
+                  child: RichText(
+                    text: TextSpan(
+                      text: "Save Address",
+                      style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.white),
+                    ),
                   ),
                 ),
               ),

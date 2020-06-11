@@ -586,7 +586,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           child: RaisedButton(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             textColor: Colors.white,
-            color: Colors.green,
+            color: appTheme,
             onPressed: () async {
               StoreModel storeObject = await SharedPrefs.getStore();
               bool status = Utils.checkStoreOpenTime(storeObject,widget.deliveryType);
@@ -849,7 +849,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 print("--response == null-response == null-");
                 return;
               }
-
+              eventBus.fire(updateCartCount());
               print("${widget.deliveryType}");
               //print("Location = ${storeModel.lat},${storeModel.lng}");
               if(widget.deliveryType == OrderType.PickUp){

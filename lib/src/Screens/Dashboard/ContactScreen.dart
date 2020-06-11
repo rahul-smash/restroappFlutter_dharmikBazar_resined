@@ -49,78 +49,81 @@ class _ContactScreen extends State<ContactScreen> {
           title: new Text('Contact'),
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
-                height: MediaQuery.of(context).size.height - 250,
-                width: MediaQuery.of(context).size.width,
-                child: GoogleMap(
-                  onMapCreated: (GoogleMapController controller) {
-                    mapController = controller;
-                  },
-                  markers: markers,
-                  initialCameraPosition: CameraPosition(
-                      target: center,
-                      zoom: 13),
+        body: SafeArea(
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  height: MediaQuery.of(context).size.height - 250,
+                  width: MediaQuery.of(context).size.width,
+                  child: GoogleMap(
+                    onMapCreated: (GoogleMapController controller) {
+                      mapController = controller;
+                    },
+                    markers: markers,
+                    initialCameraPosition: CameraPosition(
+                        target: center,
+                        zoom: 13),
+                  ),
                 ),
               ),
-            ),
-            Container(
+              Container(
                 //height: 120,
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                          padding: EdgeInsets.only(top: 10, left: 10,bottom: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(store == null ? "" : store.storeName ?? "", style: TextStyle(color: infoLabel, fontSize: 18)),
-                              SizedBox(height: 10),
-                              Text("Address", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500)),
-                              SizedBox(height: 7),
-                              SizedBox(
-                                width: (Utils.getDeviceWidth(context)-100),
-                                child: Text(store == null ? "" : store.location ?? "",
-                                    style: TextStyle(
-                                        color: infoLabel, fontSize: 15)),
-                              ),
-                              Text(store == null? "": (store.city ??"" + ", " + store.state ??""),
-                                  style:TextStyle(color: infoLabel, fontSize: 15))
-                            ],
-                          )),
-                      Column(
-                        children: <Widget>[
-                          Padding(
-                              padding: EdgeInsets.only(right: 10),
-                              child: IconButton(
-                                icon: Icon(Icons.phone, size: 30,),
-                                onPressed: () {
-                                  //print("${store.contactNumber}");
-                                  if(store != null) {
-                                    _launchCaller(store.contactNumber);
-                                  }
-                                },
-                              )
-                          ),
-                          Padding(
-                              padding: EdgeInsets.only(right: 10),
-                              child: IconButton(
-                                icon: Icon(Icons.markunread, size: 30,),
-                                onPressed: () {
-                                  //print("${store.contactEmail}");
-                                  if(store != null) {
-                                    _launchEmail(store.contactEmail);
-                                  }
-                                },
-                              )
-                          ),
-                        ],
-                      ),
-                    ]))
-          ],
-        ));
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                            padding: EdgeInsets.only(top: 10, left: 10,bottom: 10),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(store == null ? "" : store.storeName ?? "", style: TextStyle(color: infoLabel, fontSize: 18)),
+                                SizedBox(height: 10),
+                                Text("Address", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500)),
+                                SizedBox(height: 7),
+                                SizedBox(
+                                  width: (Utils.getDeviceWidth(context)-100),
+                                  child: Text(store == null ? "" : store.location ?? "",
+                                      style: TextStyle(
+                                          color: infoLabel, fontSize: 15)),
+                                ),
+                                Text(store == null? "": (store.city ??"" + ", " + store.state ??""),
+                                    style:TextStyle(color: infoLabel, fontSize: 15))
+                              ],
+                            )),
+                        Column(
+                          children: <Widget>[
+                            Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: IconButton(
+                                  icon: Icon(Icons.phone, size: 30,),
+                                  onPressed: () {
+                                    //print("${store.contactNumber}");
+                                    if(store != null) {
+                                      _launchCaller(store.contactNumber);
+                                    }
+                                  },
+                                )
+                            ),
+                            Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: IconButton(
+                                  icon: Icon(Icons.markunread, size: 30,),
+                                  onPressed: () {
+                                    //print("${store.contactEmail}");
+                                    if(store != null) {
+                                      _launchEmail(store.contactEmail);
+                                    }
+                                  },
+                                )
+                            ),
+                          ],
+                        ),
+                      ]))
+            ],
+          ),
+        ),
+    );
   }
 
   _launchCaller(String call) async {

@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_tags/flutter_tags.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -209,13 +210,16 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           child:Text("Product Detail",style: TextStyle(fontSize: 16.0),
           ),
         ),
-        Padding(padding: const EdgeInsets.only(top: 5.0, left: 20.0, right: 20.0),
-          child: Text("${widget.product.description}",
+        Padding(
+          padding: const EdgeInsets.only(top: 5.0, left: 20.0, right: 20.0),
+          /*child: Text("${widget.product.description}",
             style: TextStyle(
                 fontSize: 16.0,
                 color: Colors.black,
                 fontWeight: FontWeight.w400),
-          ),
+          ),*/
+          child: Html(data: "${widget.product.description}",
+            padding: EdgeInsets.all(10.0),),
         ),
       ],
     );
