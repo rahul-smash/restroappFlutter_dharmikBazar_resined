@@ -27,6 +27,14 @@ Future<void> main() async {
   String jsonResult =  await loadAsset();
   final parsed = json.decode(jsonResult);
   ConfigModel configObject = ConfigModel.fromJson(parsed);
+  if (Platform.isIOS) {
+    IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
+    SharedPrefs.storeSharedValue(AppConstant.deviceId, iosDeviceInfo.identifierForVendor);
+  } else {
+    AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
+    SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.androidId);
+  }
+
   //print(configObject.storeId);
   //setAppThemeColors(configObject);
 
@@ -42,13 +50,6 @@ Future<void> main() async {
   SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "${isAdminLogin}");
 
 
-  if (Platform.isIOS) {
-    IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
-    SharedPrefs.storeSharedValue(AppConstant.deviceId, iosDeviceInfo.identifierForVendor);
-  } else {
-    AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
-    SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.androidId);
-  }
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp]);
   // To turn off landscape mode
