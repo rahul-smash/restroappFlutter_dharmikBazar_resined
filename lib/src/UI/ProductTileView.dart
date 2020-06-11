@@ -131,7 +131,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             child: Row(
                               children: [
                                 SizedBox(width: 10),
-                                //addVegNonVegOption(),
+                                addVegNonVegOption(),
                                 imageUrl == "" ? Container(
                                   width: 70.0,
                                   height: 80.0,

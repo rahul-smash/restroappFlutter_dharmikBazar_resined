@@ -248,10 +248,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: SizedBox(
-              width: (Utils.getDeviceWidth(context)-150),
+              width: (Utils.getDeviceWidth(context)-130),
               child: Text(
                   info,
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: infoLabel)
               ),
