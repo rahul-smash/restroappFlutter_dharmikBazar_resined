@@ -101,11 +101,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         child: Padding(
             padding: EdgeInsets.only(left: 35, top: 40, bottom: 30),
             child: Row(children: [
-              /*Image.asset("images/appiconfcfm.jpg",
-                height: 60,
-                width: 60,
-                fit: BoxFit.fill,),
-              SizedBox(width: 10),*/
               Padding(
                 padding: EdgeInsets.only(left: 0, right: 20),
                 child: CachedNetworkImage(
@@ -335,7 +330,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   Future logout(BuildContext context) async {
     try {
-
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
       AppConstant.isLoggedIn = false;
@@ -351,12 +345,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       setState(() {
         widget.userName == null;
       });
-      /*SharedPreferences preferences = await SharedPreferences.getInstance();
-      preferences.clear().then((status) {
-        if (status == true) {
-
-        }
-      });*/
       //Pop Drawer
       Navigator.pop(context);
     } catch (e) {

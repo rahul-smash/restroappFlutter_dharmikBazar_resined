@@ -36,6 +36,13 @@ class CategoryView extends StatelessWidget {
                   Map<String,dynamic> attributeMap = new Map<String,dynamic>();
                   attributeMap["ScreenName"] = "${categoryModel.title}";
                   Utils.sendAnalyticsEvent("Clicked category",attributeMap);
+                }else{
+                  if(categoryModel != null && categoryModel.subCategory != null){
+                    if(categoryModel.subCategory.isEmpty){
+                      Utils.showToast("No data found!", false);
+                    }
+
+                  }
                 }
               }
             },

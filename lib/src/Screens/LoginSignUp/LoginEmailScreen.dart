@@ -308,7 +308,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                 Utils.hideProgressDialog(context);
                 StoreResponse model = response;
                 if(model != null && model.success){
-                  Navigator.of(context).pushReplacement(CustomPageRoute(HomeScreen(model.store)));
+                  //Navigator.of(context).pushReplacement(CustomPageRoute(HomeScreen(model.store)));
                 }else{
                   Utils.showToast("Something went wrong!", false);
                 }

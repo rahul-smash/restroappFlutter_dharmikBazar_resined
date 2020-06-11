@@ -4,6 +4,8 @@ class AppConstant {
   static String currency = "";//\u20B9
   static String appThemeColor = "appThemeColor";
 
+  static String branch_id = "branch_id";
+
   static final String isAdminLogin = "isAdminLogin";
   static final String deviceId = "DEVICE_ID";
   static final String deviceToken = "device_token";

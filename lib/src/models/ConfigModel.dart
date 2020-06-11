@@ -10,8 +10,10 @@ String configModelToJson(ConfigModel data) => json.encode(data.toJson());
 
 class ConfigModel {
   String storeId;
+  String primaryStoreId;
   String isGroceryApp;
   String isAdminLogin;
+  bool isMultiStore;
   String currency;
   String appTheme = "0xff75990B";
   String leftMenuIconColors = "0xffffffff";
@@ -27,10 +29,12 @@ class ConfigModel {
 
   ConfigModel({
     this.storeId,
+    this.primaryStoreId,
     this.isGroceryApp,
     this.isAdminLogin,
     this.currency,
     this.appTheme,
+    this.isMultiStore,
     this.leftMenuIconColors,
     this.leftMenuBackgroundColor,
     this.leftMenuTitleColors,
@@ -45,9 +49,11 @@ class ConfigModel {
 
   factory ConfigModel.fromJson(Map<String, dynamic> json) => ConfigModel(
     storeId: json["store_id"],
+    primaryStoreId: json["primary_store_id"],
     isGroceryApp: json["isGroceryApp"],
     isAdminLogin: json["isAdminLogin"],
     currency: json["currency"],
+    isMultiStore: json["isMultiStore"],
     appTheme: json["app_theme_color"],
     leftMenuIconColors: json["left_menu_icon_color"],
     leftMenuBackgroundColor: json["left_menu_background_color"],
@@ -63,8 +69,10 @@ class ConfigModel {
 
   Map<String, dynamic> toJson() => {
     "store_id": storeId,
+    "primary_store_id": primaryStoreId,
     "isAdminLogin": isAdminLogin,
     "isGroceryApp":isGroceryApp,
+    "isMultiStore": isMultiStore,
     "currency":currency,
     "app_theme_color": appTheme,
     "left_menu_icon_color": leftMenuIconColors,

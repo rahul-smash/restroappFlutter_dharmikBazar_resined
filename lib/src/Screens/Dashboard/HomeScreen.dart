@@ -3,38 +3,33 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
-import 'package:maps_launcher/maps_launcher.dart';
-import 'package:package_info/package_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
-import 'package:restroapp/src/Screens/Offers/OfferScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
 import 'package:restroapp/src/UI/CategoryView.dart';
-import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
+import 'package:restroapp/src/models/ConfigModel.dart';
+import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:restroapp/src/utils/version_check.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'SearchScreen.dart';
 
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
-  HomeScreen(this.store);
+  ConfigModel configObject;
+  HomeScreen(this.store, this.configObject);
 
   @override
   State<StatefulWidget> createState() {
@@ -55,6 +50,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isStoreClosed;
   final DatabaseHelper databaseHelper = new DatabaseHelper();
   int cartBadgeCount;
+  StoreBranchesModel storeBranchesModel;
+  BranchData branchData;
+  bool isLoading;
+  CategoryResponse categoryResponse;
 
   _HomeScreenState(this.store);
 
@@ -67,6 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
     cartBadgeCount = 0;
     getCartCount();
     listenCartChanges();
+    checkForMultiStore();
+    getCategoryApi();
     try {
       AppConstant.placeholderUrl = store.banner10080;
       //print("-----store.banners-----${store.banners.length}------");
@@ -81,42 +82,29 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     }
-    //Utils.getDayOfWeek(widget.store);
-  }
-  
-  bool checkIfStoreClosed(){
-    if(store.storeStatus == "0"){
-      //0 mean Store close
-      return true;
-    }else{
-      return false;
-    }
   }
 
-  Future<void> _setSetCurrentScreen() async {
-    await analytics.setCurrentScreen(
-      screenName: 'HomeScreen',
-      screenClassOverride: 'HomeScreenView',
-    );
-  }
-
-  getCartCount(){
-    databaseHelper.getCount(DatabaseHelper.CART_Table).then((value){
-      setState(() {
-        cartBadgeCount = value;
-      });
-      //print("--getCARTCount---${value}------");
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       key: _key,
       appBar: AppBar(
-        title: Text(store.storeName),
-        centerTitle: true,
+        title: widget.configObject.isMultiStore == false? Text(store.storeName) :
+        InkWell(
+          onTap: () async {
+            BranchData selectedStore = await DialogUtils.displayBranchDialog(context,
+                "Select Branch", storeBranchesModel,branchData);
+            logout(context,selectedStore);
+            },
+          child: Row(
+            children: <Widget>[
+              Text(branchData == null ? "" :branchData.storeName),
+              Icon(Icons.keyboard_arrow_down)
+            ],
+          ),
+        ),
+        centerTitle: widget.configObject.isMultiStore == true ? false : true,
         leading: new IconButton(
           icon: Image.asset('images/hamburger.png', width: 25),
           onPressed: _handleDrawer,
@@ -133,6 +121,32 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Text('SHOP BY CATEGORY', style: TextStyle(color: Colors.black)),
           ),
           Expanded(
+            child: isLoading
+                ? Center(child: CircularProgressIndicator()) : categoryResponse == null
+                ? SingleChildScrollView(child:Center(child: Text("")))
+                : Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("images/backgroundimg.png"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+              child: GridView.count(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.2,
+                  padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+                  mainAxisSpacing: 5.0,
+                  crossAxisSpacing: 8.0,
+                  shrinkWrap: true,
+                  children: categoryResponse.categories.map((CategoryModel model) {
+
+                    return GridTile(child: CategoryView(model,widget.store));
+                  }).toList()),
+            ),
+          ),
+
+          /*Expanded(
             child: FutureBuilder<CategoryResponse>(
                 future: ApiController.getCategoriesApiRequest(store.id),
                 builder: (context, projectSnap) {
@@ -177,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   }
                 }),
-          ),
+          ),*/
         ],
       ),
       drawer: NavDrawerMenu(store, user == null ? "" : user.fullName),
@@ -410,4 +424,91 @@ class _HomeScreenState extends State<HomeScreen> {
       getCartCount();
     });
   }
+
+  void checkForMultiStore() {
+    print("isMultiStore=${widget.configObject.isMultiStore}");
+    if(widget.configObject.isMultiStore){
+      ApiController.multiStoreApiRequest(widget.configObject.primaryStoreId).then((response){
+        //print("${storeBranchesModel.data.length}");
+        setState(() {
+          this.storeBranchesModel = response;
+          if(storeBranchesModel != null){
+            if(storeBranchesModel.data.isNotEmpty){
+              for (int i = 0; i < storeBranchesModel.data.length; i++) {
+                if(widget.store.id == storeBranchesModel.data[i].id){
+                  branchData =  storeBranchesModel.data[i];
+                  break;
+                }
+              }
+            }
+          }
+        });
+      });
+    }
+  }
+
+  bool checkIfStoreClosed(){
+    if(store.storeStatus == "0"){
+      //0 mean Store close
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  Future<void> _setSetCurrentScreen() async {
+    await analytics.setCurrentScreen(
+      screenName: 'HomeScreen',
+      screenClassOverride: 'HomeScreenView',
+    );
+  }
+
+  getCartCount(){
+    databaseHelper.getCount(DatabaseHelper.CART_Table).then((value){
+      setState(() {
+        cartBadgeCount = value;
+      });
+      //print("--getCARTCount---${value}------");
+    });
+  }
+
+  void getCategoryApi() {
+    isLoading = true;
+    ApiController.getCategoriesApiRequest(store.id).then((response){
+      setState(() {
+        isLoading = false;
+        this.categoryResponse = response;
+      });
+    });
+  }
+
+  Future logout(BuildContext context,BranchData selectedStore) async {
+    try {
+      Utils.showProgressDialog(context);
+      SharedPrefs.setUserLoggedIn(false);
+      SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
+      AppConstant.isLoggedIn = false;
+      DatabaseHelper databaseHelper = new DatabaseHelper();
+      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      eventBus.fire(updateCartCount());
+
+      StoreResponse storeData = await ApiController.versionApiRequest(selectedStore.id);
+      CategoryResponse categoryResponse = await ApiController.getCategoriesApiRequest(storeData.store.id);
+      setState(() {
+        this.store = storeData.store;
+        this.branchData = selectedStore;
+        this.categoryResponse = categoryResponse;
+        Utils.hideProgressDialog(context);
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+
+
 }

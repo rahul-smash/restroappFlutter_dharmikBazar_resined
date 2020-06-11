@@ -20,6 +20,7 @@ import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/SearchTagsModel.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
+import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
 import 'package:restroapp/src/models/StripeVerifyModel.dart';
@@ -185,7 +186,7 @@ class ApiController {
     Response response = await Dio().get(url,options: new Options(responseType: ResponseType.plain));
     //print(response);
     CategoryResponse categoryResponse = CategoryResponse.fromJson(json.decode(response.data));
-    print("-------Categories.length ---${categoryResponse.categories.length}");
+    //print("-------Categories.length ---${categoryResponse.categories.length}");
     try {
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.getCount(DatabaseHelper.Categories_Table).then((count) {
@@ -1108,6 +1109,20 @@ class ApiController {
       //Utils.showToast(e.toString(), true);
       return null;
     }
+  }
+
+  static Future<StoreBranchesModel> multiStoreApiRequest(String storeId) async {
+    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
+        ApiConstants.getStoreBranches;
+
+    Response response = await Dio().get(url,
+        options:Options(responseType: ResponseType.plain));
+    print(url);
+    print(response.data);
+    StoreBranchesModel storeBranchesModel = StoreBranchesModel.fromJson(json.decode(response.data));
+    print("---storeBranchesModel ---${storeBranchesModel.data.length}");
+
+    return storeBranchesModel;
   }
 
 }

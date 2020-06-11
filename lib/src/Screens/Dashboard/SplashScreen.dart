@@ -112,7 +112,7 @@ class _SplashScreenState extends State<SplashScreen> {
       if(apiVesrion > currentVesrion){
         return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
       }else{
-        return HomeScreen(model.store);
+        return HomeScreen(model.store,widget.configObject);
       }
 
     } else {

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'AppConstants.dart';
 import 'Utils.dart';
 
 class DialogUtils {
@@ -540,6 +543,72 @@ class DialogUtils {
                   ],
                 ),
               )
+          ),
+        );
+      },
+    );
+  }
+
+
+  static Future<BranchData> displayBranchDialog(BuildContext context,String title,
+      StoreBranchesModel branchesModel, BranchData selectedbranchData) async {
+
+    return await showDialog<BranchData>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            title: Container(
+              child: Text(title,textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black),),
+            ),
+            content: Container(
+              width: double.maxFinite,
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: branchesModel.data.length,
+                separatorBuilder: (BuildContext context, int index) {
+
+                  return Divider();
+                },
+                itemBuilder: (context, index) {
+                  BranchData storeObject = branchesModel.data[index];
+                  return InkWell(
+                    onTap: () {
+                      SharedPrefs.storeSharedValue(AppConstant.branch_id, storeObject.id);
+                      Navigator.pop(context, storeObject);
+                    },
+                    child: ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Icon(Icons.location_on),
+                          Flexible(
+                            child: Text(storeObject.storeName,textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.black)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Cancel"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.pop(context);
+                  // true here means you clicked ok
+                },
+              ),
+
+            ],
           ),
         );
       },

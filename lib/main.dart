@@ -35,13 +35,14 @@ Future<void> main() async {
     SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.androidId);
   }
 
-  //print(configObject.storeId);
-  //setAppThemeColors(configObject);
+  String branch_id = await SharedPrefs.getStoreSharedValue(AppConstant.branch_id);
+  if(branch_id == null || branch_id.isEmpty){
 
-  // Set `enableInDevMode` to true to see reports while in debug mode
-  // This is only to be used for confirming that reports are being
-  // submitted as expected. It is not intended to be used for everyday
-  // development.
+  }else if(branch_id.isNotEmpty){
+    configObject.storeId = branch_id;
+  }
+  //print(configObject.storeId);
+
   Crashlytics.instance.enableInDevMode = true;
   StoreResponse storeData = await ApiController.versionApiRequest("${configObject.storeId}");
   setAppThemeColors(storeData.store);
