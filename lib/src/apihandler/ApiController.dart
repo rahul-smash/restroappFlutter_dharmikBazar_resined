@@ -994,7 +994,7 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
-
+      print("----respStr---${respStr}");
       SearchTagsModel storeArea = SearchTagsModel.fromJson(parsed);
       return storeArea;
 
