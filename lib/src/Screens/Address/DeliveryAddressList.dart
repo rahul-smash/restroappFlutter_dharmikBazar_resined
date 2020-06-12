@@ -205,8 +205,12 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text( area.firstName,
-                    style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 16.0),
+                  SizedBox(
+                    width: (Utils.getDeviceWidth(context)-100),
+                    child: Text("${area.firstName}",overflow: TextOverflow.ellipsis,
+                      maxLines: 1,style: TextStyle(fontWeight: FontWeight.bold,
+                          color: Colors.black,fontSize: 16.0),
+                    ),
                   ),
                   addAddressInfoRow(Icons.phone, area.mobile),
                   addAddressInfoRow(Icons.location_on, area.address),
@@ -282,10 +286,14 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     ));
                 print("-Edit-result--${result}-------");
                 if(result == true){
-                  Utils.showProgressDialog(context);
-                  DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
                   setState(() {
-                    Utils.hideProgressDialog(context);
+                    isLoading = true;
+                  });
+                  DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                  //Utils.hideProgressDialog(context);
+                  setState(() {
+                    //addressList = null;
+                    isLoading = false;
                     addressList = response.data;
                   });
                 }
