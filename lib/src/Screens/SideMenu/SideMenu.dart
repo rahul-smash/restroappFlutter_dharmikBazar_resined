@@ -22,6 +22,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
+import 'LoyalityPoints.dart';
 import 'ProfileScreen.dart';
 
 class NavDrawerMenu extends StatefulWidget {
@@ -45,6 +46,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     DrawerChildItem('My Profile', "images/myprofile.png"),
     DrawerChildItem('Delivery Address', "images/deliveryaddress.png"),
     DrawerChildItem('My Orders', "images/my_order.png"),
+    DrawerChildItem('Loyality Points', "images/my_order.png"),
     //DrawerChildItem('Book Now', "images/booknow.png"),
     DrawerChildItem('My Favorites', "images/myfav.png"),
     DrawerChildItem('About Us', "images/about.png"),
@@ -62,20 +64,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     }
   }
 
-  Future<void> _setSetUserId() async {
-    try {
-      if(AppConstant.isLoggedIn){
-            UserModel user = await SharedPrefs.getUser();
-            await Utils.analytics.setUserId('${user.id}');
-            await Utils.analytics.setUserProperty(name: "userid", value: user.id);
-            await Utils.analytics.setUserProperty(name: "useremail", value: user.email);
-            await Utils.analytics.setUserProperty(name: "userfullName", value: user.fullName);
-            await Utils.analytics.setUserProperty(name: "userphone", value: user.phone);
-          }
-    } catch (e) {
-      print(e);
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -200,19 +188,19 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      /*case 4:
+      case 4:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => BookNowScreen(context)),
+            MaterialPageRoute(builder: (context) => LoyalityPointsScreen()),
           );
         }else {
           Utils.showLoginDialog(context);
         }
 
-        break;*/
-      case 4:
+        break;
+      case 5:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -226,7 +214,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 5:
+      case 6:
         Navigator.pop(context);
         Navigator.push(
           context,
@@ -236,7 +224,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         attributeMap["ScreenName"] = "AboutScreen";
         Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
         break;
-      case 6:
+      case 7:
         /*if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
@@ -257,7 +245,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         Utils.sendAnalyticsEvent("Clicked share",attributeMap);
 
         break;
-      case 7:
+      case 8:
         if (AppConstant.isLoggedIn) {
           _showDialog(context);
         } else {
@@ -347,6 +335,21 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       });
       //Pop Drawer
       Navigator.pop(context);
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _setSetUserId() async {
+    try {
+      if(AppConstant.isLoggedIn){
+        UserModel user = await SharedPrefs.getUser();
+        await Utils.analytics.setUserId('${user.id}');
+        await Utils.analytics.setUserProperty(name: "userid", value: user.id);
+        await Utils.analytics.setUserProperty(name: "useremail", value: user.email);
+        await Utils.analytics.setUserProperty(name: "userfullName", value: user.fullName);
+        await Utils.analytics.setUserProperty(name: "userphone", value: user.phone);
+      }
     } catch (e) {
       print(e);
     }
