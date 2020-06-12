@@ -131,7 +131,11 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             child: Row(
                               children: [
                                 SizedBox(width: 10),
-                                //addVegNonVegOption(),
+                                Visibility(
+                                  visible: AppConstant.isRestroApp,
+                                  child: addVegNonVegOption(),
+                                ),
+
                                 imageUrl == "" ? Container(
                                   width: 70.0,
                                   height: 80.0,
@@ -417,7 +421,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
     Color foodOption =
     widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
     return Padding(
-      padding: EdgeInsets.only(left: 7, right: 7),
+      padding: EdgeInsets.only(left: 0, right: 7),
       child: widget.product.nutrient == "None"? Container(): Container(
           decoration: new BoxDecoration(
             color: Colors.white,

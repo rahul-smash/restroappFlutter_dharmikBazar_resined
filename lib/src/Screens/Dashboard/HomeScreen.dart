@@ -145,53 +145,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   }).toList()),
             ),
           ),
-
-          /*Expanded(
-            child: FutureBuilder<CategoryResponse>(
-                future: ApiController.getCategoriesApiRequest(store.id),
-                builder: (context, projectSnap) {
-                  if (projectSnap.connectionState == ConnectionState.none &&
-                      projectSnap.hasData == null) {
-                    return Container();
-                  } else {
-                    if (projectSnap.hasData) {
-                      CategoryResponse response = projectSnap.data;
-                      if (response.success) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage("images/backgroundimg.png"),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                          //color: Colors.transparent,
-                          child: GridView.count(
-                              crossAxisCount: 2,
-                              childAspectRatio: 1.2,
-                              padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-                              mainAxisSpacing: 5.0,
-                              crossAxisSpacing: 8.0,
-                              shrinkWrap: true,
-                              children: response.categories.map((CategoryModel model) {
-
-                                return GridTile(child: CategoryView(model,widget.store));
-                              }).toList()),
-                        );
-                      } else {
-                        return Container();
-                      }
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(
-                            backgroundColor: Colors.black26,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.black26)),
-                      );
-                    }
-                  }
-                }),
-          ),*/
         ],
       ),
       drawer: NavDrawerMenu(store, user == null ? "" : user.fullName),
@@ -350,6 +303,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void initFirebase() {
+    if(widget.configObject.isGroceryApp == "true"){
+      AppConstant.isRestroApp = false;
+    }else{
+      AppConstant.isRestroApp = true;
+    }
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         try {

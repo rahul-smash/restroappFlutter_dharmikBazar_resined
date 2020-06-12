@@ -47,6 +47,7 @@ class ConfigModel {
     this.leftMenuLabelTextColors,
   });
 
+
   factory ConfigModel.fromJson(Map<String, dynamic> json) => ConfigModel(
     storeId: json["store_id"],
     primaryStoreId: json["primary_store_id"],

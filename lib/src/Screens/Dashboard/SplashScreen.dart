@@ -114,7 +114,6 @@ class _SplashScreenState extends State<SplashScreen> {
       }else{
         return HomeScreen(model.store,widget.configObject);
       }
-
     } else {
       return Container(
         decoration: BoxDecoration(

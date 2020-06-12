@@ -13,6 +13,8 @@ class AppConstant {
       "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?v=1530129081";
 
   static String placeholderUrl = "";
+  static bool isRestroApp;
+
   static final String noInternet = "No intenet connection";
   static final String enterUsername = "Please enter username";
   static final String enterPassword = "Please enter password";
