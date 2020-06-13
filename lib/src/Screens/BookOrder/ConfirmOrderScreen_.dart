@@ -5,7 +5,6 @@ import 'package:flutter_web_view/flutter_web_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
-import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
 import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -510,128 +509,71 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   List<String> appliedCouponCodeList = List();
-  List<String> appliedReddemPointsCodeList = List();
   Widget addCouponCodeRow() {
     return Padding(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
         child: Row(
           children: <Widget>[
-            //isloyalityPointsEnabled
-            Visibility(
-              visible:  isloyalityPointsEnabled == true ? true : false,
-              child: Expanded(
-                child: InkWell(
-                  onTap: () async {
-                    print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
-                    print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-
-                    if(appliedCouponCodeList.isNotEmpty){
-                      Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
-                      return;
-                    }
-                    var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                        RedeemPointsScreen(widget.address, "" ,widget.isComingFromPickUpScreen,
-                            widget.areaId, (model) {
-                              setState(() {
-                                taxModel = model;
-                                double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
-                                taxModel.total = taxModelTotal.toString();
-                                appliedReddemPointsCodeList.add(model.couponCode);
-                                print("===discount=== ${model.discount}");
-                                print("taxModel.total=${taxModel.total}");
-                              });
-                        },appliedReddemPointsCodeList),
-
-                      fullscreenDialog: true,
-                    ));
-
-                  },
-                  child: Container(
+            Expanded(
+                child: Container(
                     //width: 140.0,
                     height: 40.0,
-                    decoration: new BoxDecoration(color: appTheme,
-                      border: new Border.all(color: appTheme, width: 1.0,),
+                    decoration: new BoxDecoration(color: Colors.white,
+                      border: new Border.all(color: Colors.grey, width: 1.0, ),
                     ),
-                    child: Center(child: Text("Redeem Points",style: TextStyle(color: whiteColor),)
+                    child: Center(child: Text(
+                    taxModel == null ? 'Coupon Code:' : taxModel.couponCode ?? "")
                     ),
-                  ),
                 ),
-              ),
             ),
-            Visibility(
-              visible:  isloyalityPointsEnabled == true ? false : true,
-              child: Expanded(
-                child: Container(
-                  //width: 140.0,
-                  height: 40.0,
-                  decoration: new BoxDecoration(color: Colors.white,
-                    border: new Border.all(color: Colors.grey, width: 1.0, ),
-                  ),
-                  child: Center(child: Text(
-                      taxModel == null ? 'Coupon Code:' : taxModel.couponCode ?? "")
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                //width: 130.0,
-                height: 40.0,
-                child: Padding(
+            Container(
+              width: 130.0,height: 40.0,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
+                child: RaisedButton(
                   padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                  child: RaisedButton(
-                    padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                    textColor: Colors.white,
-                    color: appTheme,
-                    onPressed: () {
-                      if (taxModel != null) {
-                        removeCoupon();
-                      }
-                    },
-                    child: new Text(taxModel == null ?
-                    "Apply Coupon" : "Remove Coupon",softWrap: true),
-                  ),
+                  textColor: Colors.white,
+                  color: appTheme,
+                  onPressed: () {
+                    if (taxModel != null) {
+                      removeCoupon();
+                    }
+                  },
+                  child: new Text(taxModel == null ?
+                  "Apply Coupon" : "Remove Coupon",softWrap: true),
                 ),
               ),
             ),
-            Expanded(
-              child: InkWell(
-                onTap: () {
-
-                  if(appliedReddemPointsCodeList.isNotEmpty){
-                    Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
-                    return;
-                  }
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => AvailableOffersDialog(
-                        widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
-                      setState(() {
-                        taxModel = model;
-                        double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
-                        taxModel.total = taxModelTotal.toString();
-                        appliedCouponCodeList.add(model.couponCode);
-                        print("===couponCode=== ${model.couponCode}");
-                        print("taxModel.total=${taxModel.total}");
-                      });
-                    },appliedCouponCodeList),
-                  );
-                },
-                child: Container(
-                  //width: 100.0,
-                  height: 40,
-                  padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  decoration: new BoxDecoration(
+            InkWell(
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) => AvailableOffersDialog(
+                      widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
+                        setState(() {
+                          taxModel = model;
+                          double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
+                          taxModel.total = taxModelTotal.toString();
+                          appliedCouponCodeList.add(model.couponCode);
+                          print("===couponCode=== ${model.couponCode}");
+                          print("taxModel.total=${taxModel.total}");
+                        });
+                  },appliedCouponCodeList),
+                );
+              },
+              child: Container(
+                height: 40,
+                padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                decoration: new BoxDecoration(
+                  color: appTheme,
+                  border: new Border.all(
                     color: appTheme,
-                    border: new Border.all(
-                      color: appTheme,
-                      width: 1.0,
-                    ),
+                    width: 1.0,
                   ),
-                  child: Center(
-                    child: Text("Available\nOffers",textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white,)),
-                  ),
+                ),
+                child: Center(
+                  child: Text("Available\nOffers",textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.white,)),
                 ),
               ),
             ),
@@ -747,7 +689,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         setState(() {
           taxModel = null;
           appliedCouponCodeList.clear();
-          appliedReddemPointsCodeList.clear();
         });
       });
     });
@@ -1008,19 +949,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     });
   }
 
-  bool isloyalityPointsEnabled;
   void checkLoyalityPointsOption() {
     //1 - enable, 0 means disable
-    try {
-      print("====-loyality===== ${storeModel.loyality}--");
-      if(storeModel.loyality != null && storeModel.loyality == "1"){
-            isloyalityPointsEnabled = true;
-          }else{
-            isloyalityPointsEnabled = false;
-          }
-    } catch (e) {
-      print(e);
-    }
+    print("====-loyality===== ${storeModel.loyality}--");
+
   }
 
 

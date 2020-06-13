@@ -88,7 +88,6 @@ class _LoyalityPointsScreenState extends BaseState<LoyalityPointsScreen> {
             )
         ),
       ),
-
     );
   }
 

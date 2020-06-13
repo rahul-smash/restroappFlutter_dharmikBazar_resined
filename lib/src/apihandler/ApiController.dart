@@ -464,7 +464,7 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.validateCoupon;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    print("----url---${url}");
     try {
       request.fields.addAll({
         "coupon_code": couponCode,
@@ -497,7 +497,8 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.multipleTaxCalculation;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.multipleTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
     //print("----orderJson---${orderJson}");
