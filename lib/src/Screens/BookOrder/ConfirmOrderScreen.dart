@@ -90,6 +90,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     try {
       SharedPrefs.getStore().then((storeData){
         storeModel = storeData;
+        checkLoyalityPointsOption();
         if(widget.deliveryType == OrderType.Delivery){
           if(storeModel.deliverySlot == "1"){
             ApiController.deliveryTimeSlotApi().then((response){
@@ -948,6 +949,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         Utils.hideProgressDialog(context);
       }
     });
+  }
+
+  void checkLoyalityPointsOption() {
+    //1 - enable, 0 means disable
+    print("====-loyality===== ${storeModel.loyality}--");
+
   }
 
 
