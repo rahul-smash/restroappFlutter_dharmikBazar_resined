@@ -46,7 +46,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     DrawerChildItem('My Profile', "images/myprofile.png"),
     DrawerChildItem('Delivery Address', "images/deliveryaddress.png"),
     DrawerChildItem('My Orders', "images/my_order.png"),
-    DrawerChildItem('Loyality Points', "images/my_order.png"),
+    DrawerChildItem('Loyality Points', "images/loyality.png"),
     //DrawerChildItem('Book Now', "images/booknow.png"),
     DrawerChildItem('My Favorites', "images/myfav.png"),
     DrawerChildItem('About Us', "images/about.png"),
@@ -80,7 +80,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                     ? createHeaderInfoItem()
                     : createDrawerItem(index - 1, context));
               }),
-        ));
+        )
+    );
   }
 
   Widget createHeaderInfoItem() {

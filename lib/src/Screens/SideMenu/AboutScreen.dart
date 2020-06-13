@@ -56,15 +56,6 @@ class _AboutScreenState extends State<AboutScreen> {
           ),
         ),
       ),
-      /*body: Container(
-        child: WebView(
-          initialUrl: 'about:blank',
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller = webViewController;
-            _loadHtmlFromAssets();
-          },
-        ),
-      ),*/
       bottomNavigationBar: BottomAppBar(
         child: Container(
             height: 50,

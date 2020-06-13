@@ -13,6 +13,7 @@ import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
@@ -1124,5 +1125,40 @@ class ApiController {
 
     return storeBranchesModel;
   }
+
+  static Future<LoyalityPointsModel> getLoyalityPointsApiRequest() async {
+
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getLoyalityPoints;
+
+    print("----url--${url}");
+    print("--user.id--${user.id}");
+    try {
+      FormData formData = new FormData.fromMap({
+            "user_id": user.id,
+            "platform": Platform.isIOS ? "IOS" : "Android"
+          });
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(
+              contentType: "application/json",responseType: ResponseType.plain));
+      print(response.statusCode);
+      print(response.data);
+
+      LoyalityPointsModel storeData = LoyalityPointsModel.fromJson(json.decode(response.data));
+      print("-----LoyalityPointsModel ---${storeData.success}");
+
+      return storeData;
+
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
 
 }

@@ -32,6 +32,7 @@ class ApiConstants{
   static String pickupPlaceOrder = 'pickupPlaceOrder';
   static String setStoreQuery = 'setStoreQuery';
   static String orderHistory = 'orderHistory';
+  static String getLoyalityPoints = 'getLoyalityPoints';
 
   static String login = 'userLogin';
   static String signUp = 'userSignup';
