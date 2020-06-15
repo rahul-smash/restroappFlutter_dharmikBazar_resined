@@ -549,6 +549,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   child: Container(
                     //width: 140.0,
                     height: 40.0,
+                    margin: EdgeInsets.fromLTRB(0, 0, taxModel == null ? 5 : 0, 0),
                     decoration: new BoxDecoration(color: appTheme,
                       border: new Border.all(color: appTheme, width: 1.0,),
                     ),
@@ -573,23 +574,26 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 ),
               ),
             ),
-            Expanded(
-              child: Container(
-                //width: 130.0,
-                height: 40.0,
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                  child: RaisedButton(
-                    padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
-                    textColor: Colors.white,
-                    color: appTheme,
-                    onPressed: () {
-                      if (taxModel != null) {
-                        removeCoupon();
-                      }
-                    },
-                    child: new Text(taxModel == null ?
-                    "Apply Coupon" : "Remove Coupon",softWrap: true),
+            Visibility(
+              visible: taxModel == null ? false : true,
+              child: Expanded(
+                child: Container(
+                  //width: 130.0,
+                  height: 40.0,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                    child: RaisedButton(
+                      padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                      textColor: Colors.white,
+                      color: appTheme,
+                      onPressed: () {
+                        if (taxModel != null) {
+                          removeCoupon();
+                        }
+                      },
+                      child: new Text(taxModel == null ?
+                      "Apply Coupon" : "Remove Coupon",softWrap: true),
+                    ),
                   ),
                 ),
               ),
