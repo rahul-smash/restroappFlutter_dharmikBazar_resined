@@ -90,7 +90,7 @@ class ValueApp extends StatelessWidget {
     // define it once at root level.
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Restro App',
+      title: '${storeData.store.storeName}',
       theme: ThemeData(
         primaryColor: appTheme,
       ),
