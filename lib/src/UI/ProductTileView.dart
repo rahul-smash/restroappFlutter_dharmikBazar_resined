@@ -57,16 +57,20 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
   @override
   Widget build(BuildContext context) {
-    String discount,price,variantId,weight;
+    String discount,price,variantId,weight,mrpPrice;
     variantId = variant == null ? widget.product.variantId : variant.id;
     if(variant == null){
+      print("====-variant == null====");
       discount = widget.product.discount.toString();
       price = widget.product.price.toString();
       weight = widget.product.weight;
+      mrpPrice = widget.product.mrpPrice;
     }else{
+      print("==else==-variant == null====");
       discount = variant.discount.toString();
       price = variant.price.toString();
       weight = variant.weight;
+      mrpPrice = variant.mrpPrice;
     }
     String imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
     bool variantsVisibility;
@@ -236,7 +240,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             padding: EdgeInsets.only(top: 20,bottom: 3),
                                             child: InkWell(
                                               onTap: () async {
-                                                //print("-variants.length--${widget.product.variants.length}");
+                                                print("-variants.length--${widget.product.variants.length}");
                                                 if(widget.product.variants.length != null){
                                                   if(widget.product.variants.length == 1){
                                                     return;
@@ -244,8 +248,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 }
                                                 variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
                                                 if(variant != null){
+                                                  print("variant.weight= ${variant.weight}");
+                                                  print("variant.discount= ${variant.discount}");
+                                                  print("variant.mrpPrice= ${variant.mrpPrice}");
+                                                  print("variant.price= ${variant.price}");
                                                   databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                                                    //print("QUANTITY= ${cartDataObj.QUANTITY}");
+                                                    print("QUANTITY= ${cartDataObj.QUANTITY}");
                                                     cartData = cartDataObj;
                                                     counter = int.parse(cartData.QUANTITY);
                                                     showAddButton = counter == 0 ? true : false;
@@ -289,10 +297,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 :
                                             Row(
                                               children: <Widget>[
-                                                Text("${AppConstant.currency}${widget.product.price}",
+                                                Text("${AppConstant.currency}${price}",
                                                   style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
                                                 Text(" "),
-                                                Text("${AppConstant.currency}${widget.product.mrpPrice}",
+                                                Text("${AppConstant.currency}${mrpPrice}",
                                                     style: TextStyle(decoration: TextDecoration.lineThrough,
                                                         color: grayColorTitle,fontWeight: FontWeight.w400)),
                                               ],
