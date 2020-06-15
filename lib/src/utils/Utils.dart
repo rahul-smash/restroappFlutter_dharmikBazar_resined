@@ -373,20 +373,20 @@ class Utils {
     bool status = false;
     try {
       if(storeObject.is24x7Open == "1" && deliveryType == OrderType.PickUp){
-            // 1 = means store open 24x7
-            // 0 = not open for 24x7
-            status = true;
-          }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
-            status = true;
-          } else {
-            bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
-            if(isStoreOpenToday){
-              bool isStoreOpen = Utils.getDayOfWeek(storeObject);
-              status = isStoreOpen;
-            }else{
-              status = false;
-            }
-          }
+        // 1 = means store open 24x7
+        // 0 = not open for 24x7
+        status = true;
+      }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
+        status = true;
+      } else {
+        bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
+        if(isStoreOpenToday){
+          bool isStoreOpen = Utils.getDayOfWeek(storeObject);
+          status = isStoreOpen;
+        }else{
+          status = false;
+        }
+      }
       return status;
     } catch (e) {
       print(e);

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -621,8 +623,14 @@ class DialogUtils {
     print("address= ${address}");
     //String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
     String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$address';
-    if (await canLaunch(googleUrl)) {
-      await launch(googleUrl);
+    if (Platform.isIOS) {
+         googleUrl = 'http://maps.apple.com/?q=$address';
+    }
+
+    print("urlll ===> ${Uri.encodeFull(googleUrl)}");
+    if (await canLaunch(Uri.encodeFull(googleUrl))) {
+      print("launchedd");
+      await launch(Uri.encodeFull(googleUrl));
     } else {
       throw 'Could not open the map.';
     }
