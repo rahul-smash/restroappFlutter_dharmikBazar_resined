@@ -372,20 +372,40 @@ class Utils {
     // in case of deliver ignore is24x7Open
     bool status = false;
     try {
-      if(storeObject.is24x7Open == "1" && deliveryType == OrderType.PickUp){
-        // 1 = means store open 24x7
-        // 0 = not open for 24x7
-        status = true;
-      }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
-        status = true;
-      } else {
-        bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
-        if(isStoreOpenToday){
-          bool isStoreOpen = Utils.getDayOfWeek(storeObject);
-          status = isStoreOpen;
-        }else{
-          status = false;
+      // user selct deliver  = is24x7Open ignore , if delivery slots is 1
+      //if delivery slots = 0 , is24x7Open == 0, proced aage, then check time
+      if(deliveryType ==  OrderType.Delivery){
+        if(storeObject.deliverySlot == "1"){
+          status = true;
+        }else if(storeObject.deliverySlot == "0"){
+          bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
+          if(isStoreOpenToday){
+            bool isStoreOpen = Utils.getDayOfWeek(storeObject);
+            status = isStoreOpen;
+          }else{
+            status = false;
+          }
         }
+      }else{
+        if(deliveryType == OrderType.PickUp){
+
+          if(storeObject.is24x7Open == "1"){
+            // 1 = means store open 24x7
+            // 0 = not open for 24x7
+            status = true;
+          }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
+            status = true;
+          } else {
+            bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
+            if(isStoreOpenToday){
+              bool isStoreOpen = Utils.getDayOfWeek(storeObject);
+              status = isStoreOpen;
+            }else{
+              status = false;
+            }
+          }
+        }
+
       }
       return status;
     } catch (e) {

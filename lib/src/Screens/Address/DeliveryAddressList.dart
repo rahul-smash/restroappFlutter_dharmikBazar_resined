@@ -39,9 +39,13 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   @override
   void initState() {
     super.initState();
-    addressList = widget.responsesData.data;
-    if(addressList.isNotEmpty){
-      isLoading = false;
+    try {
+      addressList = widget.responsesData.data;
+      if(addressList.isNotEmpty){
+            isLoading = false;
+          }
+    } catch (e) {
+      print(e);
     }
     coordinates = new Coordinates(0.0, 0.0);
   }
@@ -69,7 +73,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
         ],
       ),
-      body: isLoading? Center(child: CircularProgressIndicator()): addressList == null
+      body: isLoading? Center(child: CircularProgressIndicator())
+          : addressList == null
           ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
           : Column(
         children: <Widget>[
