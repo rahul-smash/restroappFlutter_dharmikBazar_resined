@@ -83,6 +83,18 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          actions: <Widget>[
+            InkWell(
+              onTap: (){
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: Padding(
+                padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
+                child: Icon(Icons.home, color: Colors.white,size: 30,),
+              ),
+            ),
+
+          ],
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {

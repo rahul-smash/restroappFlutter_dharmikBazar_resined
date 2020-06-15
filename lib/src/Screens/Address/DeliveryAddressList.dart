@@ -55,7 +55,20 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.pop(context, false),
-          )),
+          ),
+        actions: <Widget>[
+          InkWell(
+            onTap: (){
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            child: Padding(
+              padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
+              child: Icon(Icons.home, color: Colors.white,size: 30,),
+            ),
+          ),
+
+        ],
+      ),
       body: isLoading? Center(child: CircularProgressIndicator()): addressList == null
           ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
           : Column(
