@@ -377,7 +377,7 @@ class Utils {
       if(deliveryType ==  OrderType.Delivery){
         if(storeObject.deliverySlot == "1"){
           status = true;
-        }else if(storeObject.deliverySlot == "0"){
+        }else if(storeObject.deliverySlot == "0" && storeObject.is24x7Open == "0"){
           bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
           if(isStoreOpenToday){
             bool isStoreOpen = Utils.getDayOfWeek(storeObject);
@@ -385,6 +385,8 @@ class Utils {
           }else{
             status = false;
           }
+        }else if(storeObject.is24x7Open == "1"){
+          status = true;
         }
       }else{
         if(deliveryType == OrderType.PickUp){

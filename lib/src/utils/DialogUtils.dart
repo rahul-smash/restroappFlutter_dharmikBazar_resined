@@ -239,28 +239,14 @@ class DialogUtils {
                   return Divider();
                 },
                 itemBuilder: (context, index) {
-                  Variant variant = variants[index];
+                  Variant areaObject = variants[index];
                   return InkWell(
                       onTap: () {
-                        Navigator.pop(context, variant);
+                        Navigator.pop(context, areaObject);
                       },
                     child: ListTile(
-                      title: Text(variant.weight,style: TextStyle(color: Colors.black)),
-                      //trailing: Text("₹ ${variant.price}",style: TextStyle(color: Colors.black)),
-                      trailing: (variant.discount == "0.00" || variant.discount == "0" || variant.discount == "0.0")
-                          ? Text("${AppConstant.currency}${variant.price}",
-                        style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w600),)
-                          :
-                      Row(
-                        children: <Widget>[
-                          Text("${AppConstant.currency}${variant.price}",
-                            style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
-                          Text(" "),
-                          Text("${AppConstant.currency}${variant.mrpPrice}",
-                              style: TextStyle(decoration: TextDecoration.lineThrough,
-                                  color: grayColorTitle,fontWeight: FontWeight.w400)),
-                        ],
-                      ),
+                      title: Text(areaObject.weight,style: TextStyle(color: Colors.black)),
+                      trailing: Text("₹ ${areaObject.price}",style: TextStyle(color: Colors.black)),
                     ),
                   );
                 },
