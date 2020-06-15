@@ -154,6 +154,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                       /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
                                           fit: BoxFit.cover),*/
                                     )),
+
                                 Flexible(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,6 +173,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                               onTap: () async {
                                                 int count = await databaseHelper.checkProductsExistInFavTable
                                                   (DatabaseHelper.Favorite_Table,widget.product.id);
+
+
                                                 Product product = widget.product;
                                                 print("--product.count-- ${count}");
                                                 if(count == 1){
@@ -344,7 +347,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
               Container(
                 padding: const EdgeInsets.all(0.0),
                 width: 30.0, // you can adjust the width as you need
-                child: GestureDetector(onTap: () {
+                child: GestureDetector(
+                    onTap: () {
                   if (counter != 0) {
                     setState(() => counter--);
                     if (counter == 0) {
