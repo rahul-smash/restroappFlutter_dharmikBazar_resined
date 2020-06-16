@@ -368,6 +368,8 @@ class Utils {
     return isStoreOpenToday;
   }
 
+
+
   static bool checkStoreOpenTime(StoreModel storeObject, OrderType deliveryType) {
     // in case of deliver ignore is24x7Open
     bool status = false;
@@ -414,6 +416,16 @@ class Utils {
       print(e);
       return true;
     }
+  }
+
+  static Widget getIndicatorView(){
+
+    return Center(
+      child: CircularProgressIndicator(
+          backgroundColor: Colors.black26,
+          valueColor:
+          AlwaysStoppedAnimation<Color>(Colors.black26)),
+    );
   }
 
   static Widget getEmptyView2(String value){

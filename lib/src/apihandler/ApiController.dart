@@ -479,7 +479,7 @@ class ApiController {
       print("----url---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print("----respStr---${respStr}");
+      //print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
       return model;
@@ -515,7 +515,7 @@ class ApiController {
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print("----respStr---${respStr}");
+      print("--Tax--respStr---${respStr}");
       final parsed = json.decode(respStr);
 
       TaxCalculationResponse model = TaxCalculationResponse.fromJson(couponCode, parsed);
@@ -623,7 +623,7 @@ class ApiController {
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +ApiConstants.updateProfile;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    print("--url--${url}--");
     try {
       request.fields.addAll({
         "full_name": fullName,
@@ -633,7 +633,7 @@ class ApiController {
         "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
-
+      print("--fields--${request.fields.toString()}--");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("--respStr--${respStr}--");
@@ -1050,7 +1050,7 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
-      print("---deliveryTimeSlot-respStr---${respStr}");
+      //print("---deliveryTimeSlot-respStr---${respStr}");
       DeliveryTimeSlotModel storeArea = DeliveryTimeSlotModel.fromJson(parsed);
       return storeArea;
 

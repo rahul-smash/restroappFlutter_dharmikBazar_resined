@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 
 class OrderDetailScreen extends StatelessWidget {
@@ -33,7 +35,7 @@ class OrderDetailScreen extends StatelessWidget {
       bottomNavigationBar: SafeArea(
         child: Container(
           height: 50,
-          color: Color(0xFF74990A),
+          color: appTheme,
           child: InkWell(
             onTap: (){
               bottomSheet(mainContext);
@@ -260,7 +262,7 @@ class OrderDetailScreen extends StatelessWidget {
                       visible: orderHistoryData.orderFacility == "Pickup"? false : true,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                        child: Text('Delivery Address',
+                        child: Text('Delivery Address',maxLines: 3,overflow: TextOverflow.ellipsis,
                             style: TextStyle(color: Colors.black,fontSize: 16)),
                       ),
                     ),
@@ -274,7 +276,7 @@ class OrderDetailScreen extends StatelessWidget {
                     ),
                     Container(
                       height: 50,
-                      color: Color(0xFF74990A),
+                      color: appTheme,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: <Widget>[

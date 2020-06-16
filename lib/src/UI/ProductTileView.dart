@@ -60,13 +60,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
     String discount,price,variantId,weight,mrpPrice;
     variantId = variant == null ? widget.product.variantId : variant.id;
     if(variant == null){
-      print("====-variant == null====");
+      //print("====-variant == null====");
       discount = widget.product.discount.toString();
       price = widget.product.price.toString();
       weight = widget.product.weight;
       mrpPrice = widget.product.mrpPrice;
     }else{
-      print("==else==-variant == null====");
+      //print("==else==-variant == null====");
       discount = variant.discount.toString();
       price = variant.price.toString();
       weight = variant.weight;
@@ -87,7 +87,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
           children: [
             InkWell(
               onTap: () async {
-                print("----print-----");
+                //print("----print-----");
                 if(widget.product.description.isEmpty){
                   return;
                 }
@@ -240,7 +240,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                             padding: EdgeInsets.only(top: 20,bottom: 3),
                                             child: InkWell(
                                               onTap: () async {
-                                                print("-variants.length--${widget.product.variants.length}");
+                                                //print("-variants.length--${widget.product.variants.length}");
                                                 if(widget.product.variants.length != null){
                                                   if(widget.product.variants.length == 1){
                                                     return;
@@ -248,12 +248,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 }
                                                 variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
                                                 if(variant != null){
-                                                  print("variant.weight= ${variant.weight}");
+                                                  /*print("variant.weight= ${variant.weight}");
                                                   print("variant.discount= ${variant.discount}");
                                                   print("variant.mrpPrice= ${variant.mrpPrice}");
-                                                  print("variant.price= ${variant.price}");
+                                                  print("variant.price= ${variant.price}");*/
                                                   databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                                                    print("QUANTITY= ${cartDataObj.QUANTITY}");
+                                                    //print("QUANTITY= ${cartDataObj.QUANTITY}");
                                                     cartData = cartDataObj;
                                                     counter = int.parse(cartData.QUANTITY);
                                                     showAddButton = counter == 0 ? true : false;

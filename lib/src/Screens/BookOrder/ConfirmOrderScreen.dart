@@ -34,6 +34,7 @@ class ConfirmOrderScreen extends StatefulWidget {
   String paymentMode = "2"; // 2 = COD, 3 = Online Payment
   String areaId;
   OrderType deliveryType;
+  List<Product> cartList = new List();
 
   ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen,this.areaId,this.deliveryType);
 
@@ -56,6 +57,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   List<Timeslot> timeslotList;
   bool isSlotSelected = false;
   bool minOrderCheck =true;
+  bool isLoading = true;
+  bool hideRemoveCouponFirstTime;
 
   @override
   void initState() {
@@ -63,6 +66,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     initRazorPay();
     listenWebViewChanges();
     selctedTag = 0;
+    hideRemoveCouponFirstTime = true;
     print("-deliveryType--${widget.deliveryType}---");
     try {
       if(widget.address != null){
@@ -120,6 +124,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     } catch (e) {
       print(e);
     }
+    multiTaxCalculationApi();
   }
 
   @override
@@ -128,57 +133,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     _razorpay.clear();
   }
 
-
-  Future<void> checkMinOrderAmount() async {
-    if(widget.deliveryType == OrderType.Delivery){
-      print("----minAmount=${widget.address.minAmount}");
-      print("----notAllow=${widget.address.notAllow}");
-      print("--------------------------------------------");
-      try {
-        int minAmount = double.parse(widget.address.minAmount).toInt();
-        double totalPrice = await databaseHelper.getTotalPrice();
-        int mtotalPrice = totalPrice.round();
-
-        print("----minAmount=${minAmount}");
-        print("--Cart--mtotalPrice=${mtotalPrice}");
-        print("----shippingCharges=${shippingCharges}");
-
-        if(widget.address.notAllow){
-          if(mtotalPrice <= minAmount){
-            print("---Cart-totalPrice is less than min amount----}");
-            // then Store will charge shipping charges.
-            minOrderCheck = false;
-            setState(() {
-              this.totalPrice = mtotalPrice.toDouble();
-            });
-          }else{
-            minOrderCheck = true;
-            setState(() {
-              this.totalPrice = mtotalPrice.toDouble();
-            });
-          }
-        }else{
-          if(mtotalPrice <= minAmount){
-            print("---Cart-totalPrice is less than min amount----}");
-            // then Store will charge shipping charges.
-            setState(() {
-              this.totalPrice = totalPrice + int.parse(shippingCharges);
-            });
-          }else{
-            print("-Cart-totalPrice is greater than min amount---}");
-            //then Store will not charge shipping.
-            setState(() {
-              this.totalPrice = totalPrice;
-              shippingCharges = "0";
-              widget.address.areaCharges = "0";
-            });
-          }
-        }
-      } catch (e) {
-        print(e);
-      }
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -228,36 +182,64 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   ),
                 ))),
         showDeliverySlot(),
-        Expanded(child: FutureBuilder(
-          future: databaseHelper.getCartItemList(),
-          builder: (context, projectSnap) {
-            if (projectSnap.connectionState == ConnectionState.none &&
-                projectSnap.hasData == null) {
-              return Container();
-            } else {
-              if (projectSnap.hasData) {
+        Expanded(
+          child: isLoading ? Utils.getIndicatorView()
+              : widget.cartList == null ? Text("") :ListView.separated(
+            separatorBuilder: (BuildContext context, int index) {
 
-                return ListView.separated(
-                  separatorBuilder: (BuildContext context, int index) =>
-                      Divider(color: Colors.grey, height: 1),
-                  shrinkWrap: true,
-                  itemCount: projectSnap.data.length + 1,
-                  itemBuilder: (context, index) {
-                    return index == projectSnap.data.length
-                        ? addItemPrice(): addProductCart(projectSnap.data[index]);
-                  },
-                );
-              } else {
-                return Center(
-                  child: CircularProgressIndicator(
-                      backgroundColor: Colors.black26,
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.black26)),
-                );
+              if(widget.cartList[index].taxDetail == null ||
+                  widget.cartList[index].taxDetail == null){
+                return Divider(color: Colors.grey, height: 1);
+              }else{
+                return Divider(color: Colors.white, height: 1);
               }
-            }
-          },
-        ))
+            },
+            shrinkWrap: true,
+            itemCount: widget.cartList.length + 1,
+            itemBuilder: (context, index) {
+              if (index == widget.cartList.length) {
+                return addItemPrice();
+              } else {
+                return addProductCart(widget.cartList[index]);
+              }
+            },
+          ),
+        ),
+        /*Expanded(
+            child: FutureBuilder(
+              future: databaseHelper.getCartItemList(),
+              builder: (context, projectSnap) {
+                if (projectSnap.connectionState == ConnectionState.none &&
+                    projectSnap.hasData == null) {
+                  return Container();
+                } else {
+                  if (projectSnap.hasData) {
+                    return ListView.separated(
+                      separatorBuilder: (BuildContext context, int index) {
+                        return Divider(color: Colors.grey, height: 1);
+                        },
+                      shrinkWrap: true,
+                      itemCount: projectSnap.data.length + 1,
+                      itemBuilder: (context, index) {
+                        if (index == projectSnap.data.length) {
+                          return addItemPrice();
+                        } else {
+                          return addProductCart(projectSnap.data[index]);
+                        }
+                        },
+                    );
+                  } else {
+                    return Center(
+                      child: CircularProgressIndicator(
+                          backgroundColor: Colors.black26,
+                          valueColor:
+                          AlwaysStoppedAnimation<Color>(Colors.black26)),
+                    );
+                  }
+                  }
+                },
+            ),
+        ),*/
       ]),
       bottomNavigationBar: SafeArea(
         child: Container(
@@ -269,6 +251,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> multiTaxCalculationApi() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if(!isNetworkAvailable){
+      Utils.showToast(AppConstant.noInternet, false);
+      return;
+    }
+    isLoading = true;
+    databaseHelper.getCartItemsListToJson().then((json) {
+      ApiController.multipleTaxCalculationRequest("", "0", "$shippingCharges", json).then((response) async {
+        TaxCalculationResponse model = response;
+        taxModel = model.taxCalculation;
+        widget.cartList = await databaseHelper.getCartItemList();
+        for(int i = 0; i < model.taxCalculation.taxDetail.length; i++){
+          Product product = Product();
+          product.taxDetail = model.taxCalculation.taxDetail[i];
+          widget.cartList.add(product);
+        }
+        for (var i = 0; i < model.taxCalculation.fixedTax.length; i++) {
+          Product product = Product();
+          product.fixedTax = model.taxCalculation.fixedTax[i];
+          widget.cartList.add(product);
+        }
+        setState(() {
+          isLoading = false;
+        });
+      });
+    });
   }
 
   Widget showDeliverySlot(){
@@ -416,9 +427,40 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-
   Widget addProductCart(Product product) {
-    return Container(
+
+    if(product.taxDetail != null){
+
+      return Container(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("${product.taxDetail.label} (${product.taxDetail.rate}%)", style: TextStyle(color: Colors.black54)),
+              Text("${AppConstant.currency}${product.taxDetail.tax}",
+                  style: TextStyle(color: Colors.black54)),
+            ],
+          ),
+        ),
+      );
+
+    }else if(product.fixedTax != null){
+      return Container(
+        child: Padding(
+          padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("${product.fixedTax.fixedTaxLabel}", style: TextStyle(color: Colors.black54)),
+              Text("${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
+                  style: TextStyle(color: Colors.black54)),
+            ],
+          ),
+        ),
+      );
+    }else{
+      return Container(
         padding: EdgeInsets.fromLTRB(15, 0, 20, 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -442,29 +484,19 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
                 style: TextStyle(fontSize: 16, color: Colors.black45)),
           ],
-        ));
+        ),
+      );
+    }
+
   }
 
-
   Widget addItemPrice() {
-
     return Container(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Container(
             height: 1,
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
-        Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Items Price", style: TextStyle(color: Colors.black54)),
-                Text("${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice-int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
-                    style: TextStyle(color: Colors.black54)),
-              ],
-            ),
-        ),
         Visibility(
           visible: widget.address == null? false : true,
           child: Padding(
@@ -493,11 +525,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
           ),
         ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Items Price", style: TextStyle(color: Colors.black)),
+              Text("${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice-int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
+                  style: TextStyle(color: Colors.black)),
+            ],
+          ),
+        ),
 
       ]),
     );
   }
-
 
   Widget addTotalPrice() {
     return Container(
@@ -546,6 +588,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         RedeemPointsScreen(widget.address, "" ,widget.isComingFromPickUpScreen,
                             widget.areaId, (model) {
                               setState(() {
+                                hideRemoveCouponFirstTime = false;
                                 taxModel = model;
                                 double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
                                 taxModel.total = taxModelTotal.toString();
@@ -562,7 +605,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   child: Container(
                     //width: 140.0,
                     height: 40.0,
-                    margin: EdgeInsets.fromLTRB(0, 0, taxModel == null ? 5 : 0, 0),
+                    margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                     decoration: new BoxDecoration(color: appTheme,
                       border: new Border.all(color: appTheme, width: 1.0,),
                     ),
@@ -572,7 +615,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 ),
               ),
             ),
-            Visibility(
+            /*Visibility(
               visible:  isloyalityPointsEnabled == true ? false : true,
               child: Expanded(
                 child: Container(
@@ -586,9 +629,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   ),
                 ),
               ),
-            ),
+            ),*/
             Visibility(
-              visible: taxModel == null ? false : true,
+              //visible: taxModel == null ? false : true,
+              visible: hideRemoveCouponFirstTime ? false : true,
               child: Expanded(
                 child: Container(
                   //width: 130.0,
@@ -624,6 +668,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     builder: (BuildContext context) => AvailableOffersDialog(
                         widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
                       setState(() {
+                        hideRemoveCouponFirstTime = false;
                         taxModel = model;
                         double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
                         taxModel.total = taxModelTotal.toString();
@@ -759,15 +804,69 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     Utils.showProgressDialog(context);
     databaseHelper.getCartItemsListToJson().then((json) {
-      ApiController.multipleTaxCalculationRequest("", "0", "0", json).then((response) {
+      ApiController.multipleTaxCalculationRequest("", "0", "${shippingCharges}", json)
+          .then((response) {
         Utils.hideProgressDialog(context);
         setState(() {
-          taxModel = null;
+          hideRemoveCouponFirstTime = true;
+          taxModel = response.taxCalculation;
           appliedCouponCodeList.clear();
           appliedReddemPointsCodeList.clear();
         });
       });
     });
+  }
+
+
+  Future<void> checkMinOrderAmount() async {
+    if(widget.deliveryType == OrderType.Delivery){
+      print("----minAmount=${widget.address.minAmount}");
+      print("----notAllow=${widget.address.notAllow}");
+      print("--------------------------------------------");
+      try {
+        int minAmount = double.parse(widget.address.minAmount).toInt();
+        double totalPrice = await databaseHelper.getTotalPrice();
+        int mtotalPrice = totalPrice.round();
+
+        print("----minAmount=${minAmount}");
+        print("--Cart--mtotalPrice=${mtotalPrice}");
+        print("----shippingCharges=${shippingCharges}");
+
+        if(widget.address.notAllow){
+          if(mtotalPrice <= minAmount){
+            print("---Cart-totalPrice is less than min amount----}");
+            // then Store will charge shipping charges.
+            minOrderCheck = false;
+            setState(() {
+              this.totalPrice = mtotalPrice.toDouble();
+            });
+          }else{
+            minOrderCheck = true;
+            setState(() {
+              this.totalPrice = mtotalPrice.toDouble();
+            });
+          }
+        }else{
+          if(mtotalPrice <= minAmount){
+            print("---Cart-totalPrice is less than min amount----}");
+            // then Store will charge shipping charges.
+            setState(() {
+              this.totalPrice = totalPrice + int.parse(shippingCharges);
+            });
+          }else{
+            print("-Cart-totalPrice is greater than min amount---}");
+            //then Store will not charge shipping.
+            setState(() {
+              this.totalPrice = totalPrice;
+              shippingCharges = "0";
+              widget.address.areaCharges = "0";
+            });
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
   }
 
 

@@ -378,7 +378,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void listenCartChanges() {
     eventBus.on<updateCartCount>().listen((event) {
-      print("<---Home----updateCartCount------->");
+      //print("<---Home----updateCartCount------->");
       getCartCount();
     });
   }

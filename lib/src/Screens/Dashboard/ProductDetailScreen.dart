@@ -241,7 +241,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   Widget showTagsList(List<Variant> variants){
     Color chipSelectedColor, textColor;
 
-    print("---variants---${variants.length}---");
+    //print("---variants---${variants.length}---");
     Widget horizontalList = new Container(
       height: 50.0,
       //margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -307,7 +307,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
         child: showAddButton == true
             ? InkWell(onTap: (){
-          print("add onTap");
+          //print("add onTap");
           setState(() {
             counter ++ ;
             showAddButton = false;
