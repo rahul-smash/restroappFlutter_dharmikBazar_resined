@@ -1028,7 +1028,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           placeOrderApiCall(payment_request_id, object.paymentId,"Stripe");
 
         }else{
-          Utils.showToast("Something went wrong!", true);
+          Utils.showToast("Transaction is not completed, please try again!", true);
           Utils.hideProgressDialog(context);
         }
 
@@ -1098,7 +1098,7 @@ class _StripeWebViewState extends State<StripeWebView> {
           onPageFinished: (String url) {
             print('======Page finished loading======: $url');
             if(url.contains("api/stripeVerifyTransaction?response=success")){
-              eventBus.fire(onPageFinished(url));
+              eventBus.fire(onPageFinished(widget.stripeCheckOutModel.paymentRequestId));
               Navigator.pop(context);
             }
           },
