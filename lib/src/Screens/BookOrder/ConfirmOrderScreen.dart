@@ -159,97 +159,76 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
         ],
       ),
-      body: Column(children: [
-        Padding(
-            padding: EdgeInsets.all(5),
-            child: Container(
-                height: 45,
-                decoration: new BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
-                  border: new Border.all(
-                    color: Colors.grey,
-                    width: 1.0,
-                  ),
-                ),
-                child: TextField(
-                  textAlign: TextAlign.left,
-                  controller: noteController,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.all(10.0),
-                    hintText: "Enter note",
-                    border: InputBorder.none,
-                  ),
-                ))),
-        showDeliverySlot(),
-        Expanded(
-          child: isLoading ? Utils.getIndicatorView()
-              : widget.cartList == null ? Text("") :ListView.separated(
-            separatorBuilder: (BuildContext context, int index) {
-
-              if(widget.cartList[index].taxDetail == null ||
-                  widget.cartList[index].taxDetail == null){
-                return Divider(color: Colors.grey, height: 1);
-              }else{
-                return Divider(color: Colors.white, height: 1);
-              }
-            },
-            shrinkWrap: true,
-            itemCount: widget.cartList.length + 1,
-            itemBuilder: (context, index) {
-              if (index == widget.cartList.length) {
-                return addItemPrice();
-              } else {
-                return addProductCart(widget.cartList[index]);
-              }
-            },
-          ),
-        ),
-        /*Expanded(
-            child: FutureBuilder(
-              future: databaseHelper.getCartItemList(),
-              builder: (context, projectSnap) {
-                if (projectSnap.connectionState == ConnectionState.none &&
-                    projectSnap.hasData == null) {
-                  return Container();
-                } else {
-                  if (projectSnap.hasData) {
-                    return ListView.separated(
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Column(
+                children: [
+                  Padding(
+                      padding: EdgeInsets.all(5),
+                      child: Container(
+                          height: 45,
+                          decoration: new BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                            border: new Border.all(
+                              color: Colors.grey,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: TextField(
+                            textAlign: TextAlign.left,
+                            controller: noteController,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10.0),
+                              hintText: "Enter note",
+                              border: InputBorder.none,
+                            ),
+                          ))),
+                  showDeliverySlot(),
+                  Expanded(
+                    child: isLoading ? Utils.getIndicatorView()
+                        : widget.cartList == null ? Text("") :ListView.separated(
                       separatorBuilder: (BuildContext context, int index) {
-                        return Divider(color: Colors.grey, height: 1);
-                        },
+
+                        if(widget.cartList[index].taxDetail == null ||
+                            widget.cartList[index].taxDetail == null){
+                          return Divider(color: Colors.grey, height: 1);
+                        }else{
+                          return Divider(color: Colors.white, height: 1);
+                        }
+                      },
                       shrinkWrap: true,
-                      itemCount: projectSnap.data.length + 1,
+                      itemCount: widget.cartList.length + 1,
                       itemBuilder: (context, index) {
-                        if (index == projectSnap.data.length) {
+                        if (index == widget.cartList.length) {
                           return addItemPrice();
                         } else {
-                          return addProductCart(projectSnap.data[index]);
+                          return addProductCart(widget.cartList[index]);
                         }
-                        },
-                    );
-                  } else {
-                    return Center(
-                      child: CircularProgressIndicator(
-                          backgroundColor: Colors.black26,
-                          valueColor:
-                          AlwaysStoppedAnimation<Color>(Colors.black26)),
-                    );
-                  }
-                  }
-                },
+                      },
+                    ),
+                  ),
+                ]
             ),
-        ),*/
-      ]),
-      bottomNavigationBar: SafeArea(
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Wrap(
+              children: [addTotalPrice(), addCouponCodeRow(), addConfirmOrder()],
+            ),
+          ),
+        ],
+      ),
+      /*bottomNavigationBar: SafeArea(
         child: Container(
           height: 135,
           color: Colors.white,
-          child: Column(
+          child: Wrap(
             children: [addTotalPrice(), addCouponCodeRow(), addConfirmOrder()],
           ),
         ),
-      ),
+      ),*/
     );
   }
 
@@ -470,8 +449,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               children: [
                 Padding(
                     padding: EdgeInsets.only(top: 15),
-                    child: Text(product.title,
-                        style: TextStyle(fontWeight: FontWeight.bold))),
+                    child: SizedBox(
+                      width: (Utils.getDeviceWidth(context)-150),
+                      child: Container(
+                        color: whiteColor,
+                        child: Text(product.title,maxLines: 2,overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    ),
                 Padding(
                     padding: EdgeInsets.only(top: 5),
                     child: Text("Quantity: " + product.quantity)),
