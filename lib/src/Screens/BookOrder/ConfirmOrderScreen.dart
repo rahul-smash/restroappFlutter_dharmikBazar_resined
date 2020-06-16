@@ -3,12 +3,10 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_web_view/flutter_web_view.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
-import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -16,7 +14,6 @@ import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
-import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
 import 'package:restroapp/src/models/StripeVerifyModel.dart';
@@ -53,7 +50,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   String shippingCharges = "0";
   static const platform = const MethodChannel("razorpay_flutter");
   Razorpay _razorpay;
-  FlutterWebView flutterWebView = new FlutterWebView();
   StoreModel storeModel;
   DeliveryTimeSlotModel deliverySlotModel;
   int selctedTag, selectedTimeSlot;
@@ -975,39 +971,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-  }
-
-  void launchWebView(StripeCheckOutModel stripeCheckOutModel) {
-    print("----checkoutUrl----${stripeCheckOutModel.checkoutUrl}");
-    flutterWebView.launch("${stripeCheckOutModel.checkoutUrl}",
-        javaScriptEnabled: true,
-        toolbarActions: [ToolbarAction("Dismiss", 1)],
-        barColor: appTheme,
-        tintColor: Colors.white
-         );
-    flutterWebView.onToolbarAction.listen((identifier) {
-      switch (identifier) {
-        case 1:
-          flutterWebView.dismiss();
-          break;
-      }
-    });
-    flutterWebView.listenForRedirect("mobile://test.com", true);
-
-    flutterWebView.onWebViewDidStartLoading.listen((url) {
-      print("---listen----${url}");
-      String mUrl = url;
-      if(mUrl.contains("api/stripeVerifyTransaction?response=success")){
-        flutterWebView.dismiss();
-        callStripeVerificationApi(stripeCheckOutModel.paymentRequestId);
-      }
-    });
-    flutterWebView.onWebViewDidLoad.listen((url) {
-      print("---onWebViewDidLoad----${url}");
-    });
-    flutterWebView.onRedirect.listen((url) {
-      print("---onRedirect----${url}");
-    });
   }
 
   void listenWebViewChanges() {
