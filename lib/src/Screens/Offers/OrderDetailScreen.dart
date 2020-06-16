@@ -252,6 +252,19 @@ class OrderDetailScreen extends StatelessWidget {
                       ),
                     ),
                     Visibility(
+                      visible: orderHistoryData.tax == "0.00" ? false :true ,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                        child:  Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text('Tax: ',style: TextStyle(color: Color(0xFF737879),fontSize: 18)),
+                            Text("${AppConstant.currency} ${orderHistoryData.tax}",style: TextStyle(color: Color(0xFF749A00),fontSize: 18,fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Visibility(
                       visible: orderHistoryData.orderFacility == "Pickup"? false : true,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
