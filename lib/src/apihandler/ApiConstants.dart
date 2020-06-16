@@ -26,6 +26,8 @@ class ApiConstants{
   static String storeOffers = 'storeOffers';
   static String validateCoupon = 'validateAllCoupons';
   static String multipleTaxCalculation = 'multiple_tax_calculation';
+  static String stripeVerifyTransactionUrl = 'stripeVerifyTransaction?response=success';
+
 
   static String deliveryTimeSlot = 'deliveryTimeSlot';
   static String placeOrder = 'placeOrder';

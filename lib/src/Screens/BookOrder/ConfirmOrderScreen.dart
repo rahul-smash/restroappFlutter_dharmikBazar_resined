@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,6 +28,7 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
 
@@ -62,6 +65,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void initState() {
     super.initState();
     initRazorPay();
+    listenWebViewChanges();
     selctedTag = 0;
     print("-deliveryType--${widget.deliveryType}---");
     try {
@@ -782,8 +786,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       if(response != null){
         StripeCheckOutModel stripeCheckOutModel =response;
         if(stripeCheckOutModel.success){
-
-          launchWebView(stripeCheckOutModel);
+          //launchWebView(stripeCheckOutModel);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => StripeWebView(stripeCheckOutModel,storeModel)),
+          );
 
         }else{
           Utils.showToast("Something went wrong!", true);
@@ -1003,6 +1010,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     });
   }
 
+  void listenWebViewChanges() {
+    eventBus.on<onPageFinished>().listen((event) {
+      print("<---onPageFinished------->");
+      callStripeVerificationApi(event.url);
+    });
+  }
+
   void callStripeVerificationApi(String payment_request_id) {
     Utils.showProgressDialog(context);
     ApiController.stripeVerifyTransactionApi(payment_request_id).then((response){
@@ -1040,5 +1054,58 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
+}
+
+class StripeWebView extends StatefulWidget {
+
+  StripeCheckOutModel stripeCheckOutModel;
+  StoreModel storeModel;
+  StripeWebView(this.stripeCheckOutModel, this.storeModel);
+
+  @override
+  _StripeWebViewState createState() {
+    return _StripeWebViewState();
+  }
+}
+
+class _StripeWebViewState extends State<StripeWebView> {
+
+  Completer<WebViewController> _controller = Completer<WebViewController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false, // Used for removing back buttoon.
+        title: Text('Payment'),
+        centerTitle: true,
+      ),
+      body: Builder(builder: (BuildContext context) {
+        return WebView(
+          initialUrl: '${widget.stripeCheckOutModel.checkoutUrl}',
+          javascriptMode: JavascriptMode.unrestricted,
+          onWebViewCreated: (WebViewController webViewController) {
+            _controller.complete(webViewController);
+          },
+          navigationDelegate: (NavigationRequest request) {
+            //print('=======NavigationRequest======= $request}');
+            return NavigationDecision.navigate;
+          },
+          onPageStarted: (String url) {
+            //print('======Page started loading======: $url');
+          },
+          onPageFinished: (String url) {
+            print('======Page finished loading======: $url');
+            if(url.contains("api/stripeVerifyTransaction?response=success")){
+              eventBus.fire(onPageFinished(url));
+              Navigator.pop(context);
+            }
+          },
+          gestureNavigationEnabled: false,
+        );
+      }),
+    );
+  }
 
 }

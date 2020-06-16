@@ -51,6 +51,7 @@ dependencies:
   maps_launcher: ^1.2.0
   flutter_pull_to_refresh: ^1.0.0
   dio: ^3.0.9  #latest version
+  webview_flutter: ^0.3.22+1
 
 
 dev_dependencies:
