@@ -7,13 +7,15 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ContactScreen extends StatefulWidget {
+  StoreModel store;
+  ContactScreen(this.store);
+
   @override
   _ContactScreen createState() => _ContactScreen();
 }
 
 class _ContactScreen extends State<ContactScreen> {
 
-  StoreModel store;
   String lat = "0.0", lng = "0.0";
   GoogleMapController mapController;
   LatLng center ;
@@ -26,20 +28,16 @@ class _ContactScreen extends State<ContactScreen> {
   }
 
   void _getUserLocation() async {
-    store = await SharedPrefs.getStore();
     center = LatLng(double.parse(lat), double.parse(lng));
-    setState(() {
-      lat = store.lat;
-      lng = store.lng;
-      print("lat lng= ${lat},${lng}");
-      center = LatLng(double.parse(lat), double.parse(lng));
-      markers.addAll([Marker(
-          markerId: MarkerId('value'),
-          position: center,
-          infoWindow: InfoWindow(title: "${store.storeName}\n${store.location}"),
-      ),]);
-
-    });
+    lat = widget.store.lat;
+    lng = widget.store.lng;
+    print("lat lng= ${lat},${lng}");
+    center = LatLng(double.parse(lat), double.parse(lng));
+    markers.addAll([Marker(
+      markerId: MarkerId('value'),
+      position: center,
+      infoWindow: InfoWindow(title: "${widget.store.storeName}\n${widget.store.location}"),
+    ),]);
   }
 
   @override
@@ -77,17 +75,17 @@ class _ContactScreen extends State<ContactScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(store == null ? "" : store.storeName ?? "", style: TextStyle(color: infoLabel, fontSize: 18)),
+                                Text(widget.store == null ? "" : widget.store.storeName ?? "", style: TextStyle(color: infoLabel, fontSize: 18)),
                                 SizedBox(height: 10),
                                 Text("Address", style: TextStyle(fontSize: 18,fontWeight: FontWeight.w500)),
                                 SizedBox(height: 7),
                                 SizedBox(
                                   width: (Utils.getDeviceWidth(context)-100),
-                                  child: Text(store == null ? "" : store.location ?? "",
+                                  child: Text(widget.store == null ? "" : widget.store.location ?? "",
                                       style: TextStyle(
                                           color: infoLabel, fontSize: 15)),
                                 ),
-                                Text(store == null? "": (store.city ??"" + ", " + store.state ??""),
+                                Text(widget.store == null? "": (widget.store.city ??"" + ", " + widget.store.state ??""),
                                     style:TextStyle(color: infoLabel, fontSize: 15))
                               ],
                             )),
@@ -99,8 +97,8 @@ class _ContactScreen extends State<ContactScreen> {
                                   icon: Icon(Icons.phone, size: 30,),
                                   onPressed: () {
                                     //print("${store.contactNumber}");
-                                    if(store != null) {
-                                      _launchCaller(store.contactNumber);
+                                    if(widget.store != null) {
+                                      _launchCaller(widget.store.contactNumber);
                                     }
                                   },
                                 )
@@ -111,8 +109,8 @@ class _ContactScreen extends State<ContactScreen> {
                                   icon: Icon(Icons.markunread, size: 30,),
                                   onPressed: () {
                                     //print("${store.contactEmail}");
-                                    if(store != null) {
-                                      _launchEmail(store.contactEmail);
+                                    if(widget.store != null) {
+                                      _launchEmail(widget.store.contactEmail);
                                     }
                                   },
                                 )

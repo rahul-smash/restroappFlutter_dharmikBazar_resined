@@ -274,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> {
         if (_currentIndex == 4) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ContactScreen()),
+            MaterialPageRoute(builder: (context) => ContactScreen(store)),
           );
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "ContactScreen";
