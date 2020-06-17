@@ -564,13 +564,41 @@ class ApiController {
         ApiConstants.placeOrder;*/
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     //print("==orderJson==${orderJson}====");
-    double tax = 0;
+    String encodedtaxDetail = "[]";
+    String encodedtaxLabel = "[]";
+    String encodedFixedTax = "[]";
     try {
-      tax = double.parse(taxModel.tax) + double.parse(taxModel.fixedTaxAmount);
-      print("==taxModel==${taxModel.tax} + ${taxModel.fixedTaxAmount}==");
+      print("fixedTax= ${taxModel.fixedTax}");
+      print("taxLabel= ${taxModel.taxLabel}");
+      print("taxDetail= ${taxModel.taxDetail}");
+
+      try {
+        List jsonfixedTaxList = taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+        encodedFixedTax = jsonEncode(jsonfixedTaxList);
+        print("encodedFixedTax= ${encodedFixedTax}");
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        List jsontaxDetailList = taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+        encodedtaxDetail = jsonEncode(jsontaxDetailList);
+        print("encodedtaxDetail= ${encodedtaxDetail}");
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        List jsontaxLabelList = taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+        encodedtaxLabel = jsonEncode(jsontaxLabelList);
+        print("encodedtaxLabel= ${encodedtaxLabel}");
+      } catch (e) {
+        print(e);
+      }
     } catch (e) {
       print(e);
     }
+
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
@@ -580,7 +608,7 @@ class ApiController {
         "device_id": deviceId,
         "user_address": isComingFromPickUpScreen == true ? storeAddress : address.address,
         "store_fixed_tax_detail": "",
-        "tax": taxModel == null ? "0" : '${tax}',
+        "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",
         "platform": Platform.isIOS ? "IOS" : "Android",
         "tax_rate": "0",
@@ -596,6 +624,9 @@ class ApiController {
         "payment_id": razorpay_payment_id,
         "online_method": online_method,
         "delivery_time_slot": selectedDeliverSlotValue,
+        "store_fixed_tax_detail": encodedFixedTax,
+        "store_tax_rate_detail": encodedtaxLabel,
+        "calculated_tax_detail": encodedtaxDetail,
       });
 
       print("----${url}");
