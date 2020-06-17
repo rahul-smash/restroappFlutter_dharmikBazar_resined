@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreen.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 class CardOrderHistoryItems extends StatefulWidget {
 
@@ -75,11 +77,21 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
               height: 30,
               child: FlatButton(
                 onPressed: () async {
-                  Utils.showProgressDialog(context);
-                  await ApiController.orderCancelApi(cardOrderHistoryItems.orderId);
-                  Utils.hideProgressDialog(context);
-                  eventBus.fire(refreshOrderHistory());
-                },
+
+                  var results = await DialogUtils.displayDialog(context,"Cancel Order?",AppConstant.cancelOrder,
+                      "Cancel","OK");
+                  if(results == true){
+                    Utils.showProgressDialog(context);
+                    CancelOrderModel cancelOrder = await ApiController.orderCancelApi(cardOrderHistoryItems.orderId);
+                    try {
+                      Utils.showToast("${cancelOrder.data}", false);
+                    } catch (e) {
+                      print(e);
+                    }
+                    Utils.hideProgressDialog(context);
+                    eventBus.fire(refreshOrderHistory());
+                  }
+                  },
 
                 child: Text("Cancel",
                   style: TextStyle(color: Color(0xFF525A5F), fontSize: 11,),),

@@ -215,8 +215,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           ),
           Align(
             alignment: Alignment.bottomCenter,
-            child: Wrap(
-              children: [addTotalPrice(), addCouponCodeRow(), addConfirmOrder()],
+            child: SafeArea(
+              child: Wrap(
+                children: [addTotalPrice(), addCouponCodeRow(), addConfirmOrder()],
+              ),
             ),
           ),
         ],
