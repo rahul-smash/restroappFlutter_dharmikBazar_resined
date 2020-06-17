@@ -246,7 +246,7 @@ class DialogUtils {
                       },
                     child: ListTile(
                       title: Text(areaObject.weight,style: TextStyle(color: Colors.black)),
-                      trailing: Text("₹ ${areaObject.price}",style: TextStyle(color: Colors.black)),
+                      trailing: Text("${AppConstant.currency}${areaObject.price}",style: TextStyle(color: Colors.black)),
                     ),
                   );
                 },
