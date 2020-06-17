@@ -105,7 +105,7 @@ class _LoyalityPointsScreenState extends BaseState<LoyalityPointsScreen> {
   Widget showListView() {
 
     return Expanded(
-      child: ListView.builder(
+      child: loyalityList.isEmpty ? Utils.getEmptyView2("No data found!") :ListView.builder(
           itemCount: loyalityList.length,
           itemBuilder: (context, index) {
             LoyalityData loyalityData = loyalityList[index];
