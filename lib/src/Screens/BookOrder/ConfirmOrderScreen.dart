@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
+import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -220,15 +221,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           ),
         ],
       ),
-      /*bottomNavigationBar: SafeArea(
-        child: Container(
-          height: 135,
-          color: Colors.white,
-          child: Wrap(
-            children: [addTotalPrice(), addCouponCodeRow(), addConfirmOrder()],
-          ),
-        ),
-      ),*/
     );
   }
 
@@ -241,22 +233,34 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     isLoading = true;
     databaseHelper.getCartItemsListToJson().then((json) {
       ApiController.multipleTaxCalculationRequest("", "0", "$shippingCharges", json).then((response) async {
+        //{"success":false,"message":"Some products are not available."}
         TaxCalculationResponse model = response;
-        taxModel = model.taxCalculation;
-        widget.cartList = await databaseHelper.getCartItemList();
-        for(int i = 0; i < model.taxCalculation.taxDetail.length; i++){
-          Product product = Product();
-          product.taxDetail = model.taxCalculation.taxDetail[i];
-          widget.cartList.add(product);
+        if(model.success){
+          taxModel = model.taxCalculation;
+          widget.cartList = await databaseHelper.getCartItemList();
+          for(int i = 0; i < model.taxCalculation.taxDetail.length; i++){
+            Product product = Product();
+            product.taxDetail = model.taxCalculation.taxDetail[i];
+            widget.cartList.add(product);
+          }
+          for (var i = 0; i < model.taxCalculation.fixedTax.length; i++) {
+            Product product = Product();
+            product.fixedTax = model.taxCalculation.fixedTax[i];
+            widget.cartList.add(product);
+          }
+          setState(() {
+            isLoading = false;
+          });
+        }else{
+          var result = await DialogUtils.displayCommonDialog(context, storeModel == null ? ""
+              : storeModel.storeName, "${model.message}");
+          if(result != null && result == true){
+            databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+            databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+            databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          }
         }
-        for (var i = 0; i < model.taxCalculation.fixedTax.length; i++) {
-          Product product = Product();
-          product.fixedTax = model.taxCalculation.fixedTax[i];
-          widget.cartList.add(product);
-        }
-        setState(() {
-          isLoading = false;
-        });
       });
     });
   }
@@ -793,12 +797,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       ApiController.multipleTaxCalculationRequest("", "0", "${shippingCharges}", json)
           .then((response) {
         Utils.hideProgressDialog(context);
-        setState(() {
-          hideRemoveCouponFirstTime = true;
-          taxModel = response.taxCalculation;
-          appliedCouponCodeList.clear();
-          appliedReddemPointsCodeList.clear();
-        });
+        if (response != null && !response.success) {
+          Utils.showToast(response.message, true);
+          databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+          databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+          databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }else{
+          setState(() {
+            hideRemoveCouponFirstTime = true;
+            taxModel = response.taxCalculation;
+            appliedCouponCodeList.clear();
+            appliedReddemPointsCodeList.clear();
+          });
+        }
+
       });
     });
   }
@@ -987,12 +1000,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           ApiController.multipleTaxCalculationRequest("${couponCode}",  "${discount}",
               shippingCharges, json).then((response) {
             //Utils.hideProgressDialog(context);
-            taxModel = response.taxCalculation;
-
             if (response != null && !response.success) {
               Utils.showToast(response.message, true);
+              databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+              databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+              databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+              Navigator.of(context).popUntil((route) => route.isFirst);
               return;
             }
+
+            taxModel = response.taxCalculation;
 
             Map<String,dynamic> attributeMap = new Map<String,dynamic>();
             attributeMap["ScreenName"] = "Order Confirm Screen";
