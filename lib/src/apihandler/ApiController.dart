@@ -564,6 +564,13 @@ class ApiController {
         ApiConstants.placeOrder;*/
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     //print("==orderJson==${orderJson}====");
+    double tax = 0;
+    try {
+      tax = double.parse(taxModel.tax) + double.parse(taxModel.fixedTaxAmount);
+      print("==taxModel==${taxModel.tax} + ${taxModel.fixedTaxAmount}==");
+    } catch (e) {
+      print(e);
+    }
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
@@ -573,7 +580,7 @@ class ApiController {
         "device_id": deviceId,
         "user_address": isComingFromPickUpScreen == true ? storeAddress : address.address,
         "store_fixed_tax_detail": "",
-        "tax": taxModel == null ? "0" : '${taxModel.tax}',
+        "tax": taxModel == null ? "0" : '${tax}',
         "store_tax_rate_detail": "",
         "platform": Platform.isIOS ? "IOS" : "Android",
         "tax_rate": "0",
