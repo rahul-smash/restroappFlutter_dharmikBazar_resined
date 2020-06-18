@@ -69,7 +69,29 @@ class Utils {
     return regex.hasMatch(value);
   }
 
-  static void showLoginDialog(BuildContext context) {
+  static Future<void> showLoginDialog(BuildContext context) async {
+    try {
+      StoreModel model = await SharedPrefs.getStore();
+      if(model.internationalOtp == "0"){
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+        );
+        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        attributeMap["ScreenName"] = "LoginMobileScreen";
+        Utils.sendAnalyticsEvent("Clicked LoginMobileScreen",attributeMap);
+      }else{
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+        );
+        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        attributeMap["ScreenName"] = "LoginEmailScreen";
+        Utils.sendAnalyticsEvent("Clicked LoginEmailScreen",attributeMap);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  static void showLoginDialog2(BuildContext context) {
     // flutter defined function
     showDialog(
       context: context,

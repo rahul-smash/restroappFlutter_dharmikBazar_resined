@@ -78,7 +78,7 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
                   ? Center(child: CircularProgressIndicator())
                   : loyalityList == null
                   ? SingleChildScrollView(child:Center(child: Text('No Data found!')))
-                  : showListView(),
+                  : loyalityList.isEmpty ? Utils.getEmptyView2("No Data found!") :showListView(),
             ],
           ),
         ),

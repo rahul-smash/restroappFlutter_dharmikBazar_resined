@@ -236,22 +236,29 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _currentIndex = index;
         if (_currentIndex == 4) {
-
-          Navigator.push(context,
-            MaterialPageRoute(builder: (context) => MyCartScreen(() {
-              getCartCount();
-            })),
-          );
+          if (AppConstant.isLoggedIn) {
+            Navigator.push(context,
+              MaterialPageRoute(builder: (context) => MyCartScreen(() {
+                getCartCount();
+              })),
+            );
+          }else{
+            Utils.showLoginDialog(context);
+          }
 
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "MyCartScreen";
           Utils.sendAnalyticsEvent("Clicked MyCartScreen",attributeMap);
         }
         if (_currentIndex == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SearchScreen()),
-          );
+          if (AppConstant.isLoggedIn) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SearchScreen()),
+            );
+          }else{
+            Utils.showLoginDialog(context);
+          }
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "SearchScreen";
           Utils.sendAnalyticsEvent("Clicked SearchScreen",attributeMap);
