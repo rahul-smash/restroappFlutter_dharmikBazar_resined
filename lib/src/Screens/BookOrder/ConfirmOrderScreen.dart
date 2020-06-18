@@ -975,11 +975,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void callOrderIdApi(StoreModel storeObject) {
     Utils.showProgressDialog(context);
     double price = totalPrice ;
-    print("=======1===${price}===========");
+    //print("=======1===${price}===========");
     price = price * 100;
-    print("=======2===${price}===========");
+    //print("=======2===${price}===========");
     String mPrice = price.toString().substring(0 , price.toString().indexOf('.'));
-    print("=======mPrice===${mPrice}===========");
+    //print("=======mPrice===${mPrice}===========");
     ApiController.razorpayCreateOrderApi(mPrice).then((response){
 
       CreateOrderData model = response;
