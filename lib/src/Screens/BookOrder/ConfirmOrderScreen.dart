@@ -988,7 +988,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         openCheckout(model.data.id,storeObject);
 
       }else{
-        Utils.showToast("Something went wrong!", true);
+        Utils.showToast("${model.message}", true);
         Utils.hideProgressDialog(context);
       }
     });
