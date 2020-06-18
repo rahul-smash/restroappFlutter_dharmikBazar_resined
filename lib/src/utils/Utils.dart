@@ -25,19 +25,19 @@ class Utils {
       if (shortLength) {
         Fluttertoast.showToast(
             msg: msg,
-            toastLength: Toast.LENGTH_LONG,
+            toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            timeInSecForIos: 1,
-            backgroundColor: toastbgColor,
+            timeInSecForIosWeb: 1,
+            backgroundColor: toastbgColor.withOpacity(0.6),
             textColor: Colors.white,
             fontSize: 16.0);
       } else {
         Fluttertoast.showToast(
             msg: msg,
-            toastLength: Toast.LENGTH_LONG,
+            toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
-            timeInSecForIos: 1,
-            backgroundColor: toastbgColor,
+            timeInSecForIosWeb: 1,
+            backgroundColor: toastbgColor.withOpacity(0.6),
             textColor: Colors.white,
             fontSize: 16.0);
       }

@@ -959,7 +959,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    Fluttertoast.showToast(msg:response.message,timeInSecForIos: 4);
+    Fluttertoast.showToast(msg:response.message,timeInSecForIosWeb: 4);
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
 
