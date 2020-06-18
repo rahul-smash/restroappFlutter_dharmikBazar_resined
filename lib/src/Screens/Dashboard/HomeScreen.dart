@@ -186,17 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-                icon: Badge(
-                  showBadge: cartBadgeCount == 0 ? false : true,
-                  badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
-                  child: Image.asset('images/carticon.png', width: 24,
-                    fit: BoxFit.scaleDown,color: bottomBarIconColor),
-                ),
-                title: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
-                  child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
-                ),
-                ),
+              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
+              title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
+            ),
             BottomNavigationBarItem(
               icon: Image.asset('images/searchcion.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
               title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
@@ -209,9 +201,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
                 ),
             BottomNavigationBarItem(
-              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
-                title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
-                )
+              icon: Badge(
+                showBadge: cartBadgeCount == 0 ? false : true,
+                badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
+                child: Image.asset('images/carticon.png', width: 24,
+                    fit: BoxFit.scaleDown,color: bottomBarIconColor),
+              ),
+              title: Padding(
+                padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
+              ),
+            ),
           ],
         ),
         Container(
@@ -231,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }else{
       setState(() {
         _currentIndex = index;
-        if (_currentIndex == 0) {
+        if (_currentIndex == 4) {
 
           Navigator.push(context,
             MaterialPageRoute(builder: (context) => MyCartScreen(() {
@@ -265,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Utils.showLoginDialog(context);
           }
         }
-        if (_currentIndex == 4) {
+        if (_currentIndex == 0) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ContactScreen(store)),

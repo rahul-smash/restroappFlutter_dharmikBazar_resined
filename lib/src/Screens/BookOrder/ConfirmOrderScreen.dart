@@ -463,10 +463,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ),
-                    ),
+                ),
                 Padding(
                     padding: EdgeInsets.only(top: 5),
-                    child: Text("Quantity: " + product.quantity)),
+                    child: Text("${product.weight}",style: TextStyle(color: orangeColor),)
+                ),
+                Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: Text("Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")
+                ),
+                //
                 Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
                     child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")),
