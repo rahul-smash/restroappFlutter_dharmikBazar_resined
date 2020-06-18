@@ -215,11 +215,15 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         Container(
+          padding:  EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: appTheme),
           margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Image.asset("images/icon_home_categories.png",
-            height: 60, width: 60,
-          ),
+          //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: widget.configObject.isGroceryApp == "true" ?
+          Image.asset("images/groceryicon.png",height: 40, width: 40,color: whiteColor,)
+              :Image.asset("images/restauranticon.png",height: 40, width: 40,color: whiteColor),
         ),
       ],
     );
