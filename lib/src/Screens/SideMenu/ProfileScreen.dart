@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -25,6 +26,8 @@ class _ProfileState extends State<ProfileScreen> {
   final emailController = new TextEditingController();
   final phoneController = new TextEditingController();
   File image;
+  StoreModel storeModel;
+  bool isEmailEditable = false;
 
   @override
   initState() {
@@ -33,11 +36,19 @@ class _ProfileState extends State<ProfileScreen> {
   }
 
   getProfileData() async {
+    //User Login with Mobile and OTP
+    // 1 = email and 0 = ph-no
     user = await SharedPrefs.getUser();
+    storeModel = await SharedPrefs.getStore();
     setState(() {
       firstNameController.text = user.fullName;
       emailController.text = user.email;
       phoneController.text = user.phone;
+      if(storeModel.internationalOtp == "0"){
+        isEmailEditable = false;
+      }else{
+        isEmailEditable = true;
+      }
     });
   }
 
@@ -91,6 +102,7 @@ class _ProfileState extends State<ProfileScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0),
                         child: TextField(
+                          readOnly: isEmailEditable,
                           keyboardType: TextInputType.emailAddress,
                           controller: emailController,
                           decoration: InputDecoration(
