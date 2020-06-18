@@ -1141,38 +1141,45 @@ class _StripeWebViewState extends State<StripeWebView> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false, // Used for removing back buttoon.
-        title: Text('Payment'),
-        centerTitle: true,
+
+    return WillPopScope(
+      onWillPop: (){
+        //print("onWillPop onWillPop");
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Used for removing back buttoon.
+          title: Text('Payment'),
+          centerTitle: true,
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return WebView(
+            initialUrl: '${widget.stripeCheckOutModel.checkoutUrl}',
+            javascriptMode: JavascriptMode.unrestricted,
+            onWebViewCreated: (WebViewController webViewController) {
+              _controller.complete(webViewController);
+            },
+            navigationDelegate: (NavigationRequest request) {
+              //print('=======NavigationRequest======= $request}');
+              return NavigationDecision.navigate;
+            },
+            onPageStarted: (String url) {
+              //print('======Page started loading======: $url');
+            },
+            onPageFinished: (String url) {
+              print('======Page finished loading======: $url');
+              if(url.contains("api/stripeVerifyTransaction?response=success")){
+                eventBus.fire(onPageFinished(widget.stripeCheckOutModel.paymentRequestId));
+                Navigator.pop(context);
+              }
+            },
+            gestureNavigationEnabled: false,
+          );
+        }),
       ),
-      body: Builder(builder: (BuildContext context) {
-        return WebView(
-          initialUrl: '${widget.stripeCheckOutModel.checkoutUrl}',
-          javascriptMode: JavascriptMode.unrestricted,
-          onWebViewCreated: (WebViewController webViewController) {
-            _controller.complete(webViewController);
-          },
-          navigationDelegate: (NavigationRequest request) {
-            //print('=======NavigationRequest======= $request}');
-            return NavigationDecision.navigate;
-          },
-          onPageStarted: (String url) {
-            //print('======Page started loading======: $url');
-          },
-          onPageFinished: (String url) {
-            print('======Page finished loading======: $url');
-            if(url.contains("api/stripeVerifyTransaction?response=success")){
-              eventBus.fire(onPageFinished(widget.stripeCheckOutModel.paymentRequestId));
-              Navigator.pop(context);
-            }
-          },
-          gestureNavigationEnabled: false,
-        );
-      }),
     );
   }
+
 
 }
