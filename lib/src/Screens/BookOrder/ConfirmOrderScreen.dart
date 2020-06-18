@@ -882,7 +882,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void callStripeApi() {
     Utils.showProgressDialog(context);
-    double price = totalPrice;
+    double price = double.parse(taxModel.total);//;
     String mPrice = price.toString().substring(0 , price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
     ApiController.stripePaymentApi(mPrice).then((response){
@@ -914,13 +914,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void openCheckout(String razorpay_order_id,StoreModel storeObject) async {
     Utils.hideProgressDialog(context);
     UserModel user = await SharedPrefs.getUser();
-    double price = totalPrice ;
+    //double price = totalPrice ;
     razorpay_orderId = razorpay_order_id;
     var options = {
       'key': '${storeObject.paymentSetting.apiKey}',
       'currency': "INR",
       'order_id': razorpay_order_id,
-      'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
+      //'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
+      'amount': (double.parse(taxModel.total) * 100),
       'name': '${user.fullName}',
       'description': '${noteController.text}',
       'prefill': {'contact': '${user.phone}', 'email': '${user.email}'},
@@ -974,12 +975,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void callOrderIdApi(StoreModel storeObject) {
     Utils.showProgressDialog(context);
-    double price = totalPrice ;
-    //print("=======1===${price}===========");
+    double price = double.parse(taxModel.total); //totalPrice ;
+    print("=======1===${price}===total==${taxModel.total}======");
     price = price * 100;
-    //print("=======2===${price}===========");
+    print("=======2===${price}===========");
     String mPrice = price.toString().substring(0 , price.toString().indexOf('.'));
-    //print("=======mPrice===${mPrice}===========");
+    print("=======mPrice===${mPrice}===========");
     ApiController.razorpayCreateOrderApi(mPrice).then((response){
 
       CreateOrderData model = response;
