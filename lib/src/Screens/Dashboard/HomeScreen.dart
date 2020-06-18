@@ -114,12 +114,6 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: <Widget>[
           addBanners(),
-          Container(
-            padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-            width: Utils.getDeviceWidth(context),
-            color: gridBackgroundCOlor,
-            child: Text('SHOP BY CATEGORY', style: TextStyle(color: Colors.black)),
-          ),
           Expanded(
             child: isLoading
                 ? Center(child: CircularProgressIndicator()) : categoryResponse == null
@@ -135,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: GridView.count(
                   crossAxisCount: 2,
                   childAspectRatio: 1.2,
-                  padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+                  padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
                   mainAxisSpacing: 5.0,
                   crossAxisSpacing: 8.0,
                   shrinkWrap: true,

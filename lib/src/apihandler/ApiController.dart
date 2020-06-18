@@ -568,14 +568,14 @@ class ApiController {
     String encodedtaxLabel = "[]";
     String encodedFixedTax = "[]";
     try {
-      print("fixedTax= ${taxModel.fixedTax}");
+      /*print("fixedTax= ${taxModel.fixedTax}");
       print("taxLabel= ${taxModel.taxLabel}");
-      print("taxDetail= ${taxModel.taxDetail}");
+      print("taxDetail= ${taxModel.taxDetail}");*/
 
       try {
         List jsonfixedTaxList = taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
         encodedFixedTax = jsonEncode(jsonfixedTaxList);
-        print("encodedFixedTax= ${encodedFixedTax}");
+        //print("encodedFixedTax= ${encodedFixedTax}");
       } catch (e) {
         print(e);
       }
@@ -583,7 +583,7 @@ class ApiController {
       try {
         List jsontaxDetailList = taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
         encodedtaxDetail = jsonEncode(jsontaxDetailList);
-        print("encodedtaxDetail= ${encodedtaxDetail}");
+        //print("encodedtaxDetail= ${encodedtaxDetail}");
       } catch (e) {
         print(e);
       }
@@ -591,7 +591,7 @@ class ApiController {
       try {
         List jsontaxLabelList = taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
         encodedtaxLabel = jsonEncode(jsontaxLabelList);
-        print("encodedtaxLabel= ${encodedtaxLabel}");
+        //print("encodedtaxLabel= ${encodedtaxLabel}");
       } catch (e) {
         print(e);
       }
@@ -629,11 +629,11 @@ class ApiController {
         "calculated_tax_detail": encodedtaxDetail,
       });
 
-      print("----${url}");
-      print("--fields--${request.fields.toString()}--");
+      //print("----${url}");
+      //print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
-      print("--respStr--${respStr}--");
+      //print("--respStr--${respStr}--");
       final parsed = json.decode(respStr);
 
       ResponseModel model = ResponseModel.fromJson(parsed);

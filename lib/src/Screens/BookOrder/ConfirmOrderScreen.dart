@@ -496,7 +496,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Shipping Charges:", style: TextStyle(color: Colors.black54)),
+                Text("Delivery charges:", style: TextStyle(color: Colors.black54)),
                 Text("${AppConstant.currency}${widget.address == null? "0" : widget.address.areaCharges}",
                     style: TextStyle(color: Colors.black54)),
               ],
