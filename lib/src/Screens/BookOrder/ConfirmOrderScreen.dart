@@ -464,9 +464,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       ),
                     ),
                 ),
-                Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: Text("${product.weight}",style: TextStyle(color: orangeColor),)
+                Visibility(
+                  visible: product.weight.isEmpty ? false : true,
+                  child: Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child: Text("${product.weight}",style: TextStyle(color: orangeColor),)
+                  ),
                 ),
                 Padding(
                     padding: EdgeInsets.only(top: 5),
