@@ -191,7 +191,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     child: isLoading ? Utils.getIndicatorView()
                         : widget.cartList == null ? Text("") :ListView.separated(
                       separatorBuilder: (BuildContext context, int index) {
-
                         if(widget.cartList[index].taxDetail == null ||
                             widget.cartList[index].taxDetail == null){
                           return Divider(color: Colors.grey, height: 1);
@@ -472,13 +471,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   ),
                 ),
                 Padding(
-                    padding: EdgeInsets.only(top: 5),
+                    padding: EdgeInsets.only(top: 5, bottom: 20),
                     child: Text("Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")
                 ),
                 //
-                Padding(
+                /*Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
-                    child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")),
+                    child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")
+                ),*/
               ],
             ),
             Text(
@@ -882,8 +882,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void callStripeApi() {
     Utils.showProgressDialog(context);
-    double price = double.parse(taxModel.total);//;
-    String mPrice = price.toString().substring(0 , price.toString().indexOf('.')).trim();
+    double price = double.parse(taxModel.total);
+    print("----taxModel.total----${taxModel.total}--");
+    String mPrice = price.toString().substring(0,price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
     ApiController.stripePaymentApi(mPrice).then((response){
       Utils.hideProgressDialog(context);
