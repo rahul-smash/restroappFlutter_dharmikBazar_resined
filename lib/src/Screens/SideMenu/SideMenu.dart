@@ -180,7 +180,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+            MaterialPageRoute(builder: (context) => MyOrderScreen(widget.store)),
           );
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "MyOrderScreen";

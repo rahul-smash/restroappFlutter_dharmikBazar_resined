@@ -267,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (AppConstant.isLoggedIn) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+              MaterialPageRoute(builder: (context) => MyOrderScreen(store)),
             );
             Map<String,dynamic> attributeMap = new Map<String,dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";
