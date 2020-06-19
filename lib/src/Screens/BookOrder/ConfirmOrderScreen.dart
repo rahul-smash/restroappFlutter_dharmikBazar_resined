@@ -612,7 +612,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         child: Align(
                           alignment: Alignment.centerLeft,
                           child: Text(appliedReddemPointsCodeList.isEmpty ? "Redeem Loyality Points" : "${taxModel.couponCode} Applied",
-                            textAlign : TextAlign.left,style: TextStyle(
+                            textAlign : TextAlign.left,style: TextStyle(fontWeight: FontWeight.w600,
                                 color: isCouponsApplied ? appTheme : appTheme),
                           ),
                         ),
@@ -673,7 +673,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         alignment: Alignment.centerLeft,
                         child: Text(appliedCouponCodeList.isEmpty ? "Available Offers" : "${taxModel.couponCode} Applied",
                             textAlign: TextAlign.left,
-                            style: TextStyle(color: isCouponsApplied ? appTheme : appTheme)
+                            style: TextStyle(fontWeight: FontWeight.w600,color: isCouponsApplied ? appTheme : appTheme)
                         ),
                       ),
                     ),
