@@ -48,7 +48,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   double totalPrice = 0.00;
   TaxCalculationModel taxModel;
-  TextEditingController noteController = TextEditingController();
+  //TextEditingController noteController = TextEditingController();
   String shippingCharges = "0";
   static const platform = const MethodChannel("razorpay_flutter");
   Razorpay _razorpay;
@@ -165,7 +165,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           Expanded(
             child: Column(
                 children: [
-                  Padding(
+                  /*Padding(
                       padding: EdgeInsets.all(5),
                       child: Container(
                           height: 45,
@@ -185,7 +185,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               hintText: "Enter note",
                               border: InputBorder.none,
                             ),
-                          ))),
+                          ))),*/
                   showDeliverySlot(),
                   Expanded(
                     child: isLoading ? Utils.getIndicatorView()
@@ -923,7 +923,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       //'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
       'amount': (double.parse(taxModel.total) * 100),
       'name': '${user.fullName}',
-      'description': '${noteController.text}',
+      'description': '',
       'prefill': {'contact': '${user.phone}', 'email': '${user.email}'},
       /*'external': {
         'wallets': ['paytm']
@@ -1032,7 +1032,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             attributeMap["shippingCharges"] = "${shippingCharges}";
             Utils.sendAnalyticsEvent("Clicked Place Order button",attributeMap);
 
-            ApiController.placeOrderRequest(shippingCharges,noteController.text, totalPrice.toString(),
+            ApiController.placeOrderRequest(shippingCharges,"", totalPrice.toString(),
                 widget.paymentMode, taxModel, widget.address, json ,
                 widget.isComingFromPickUpScreen,widget.areaId ,widget.deliveryType,
                 payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) async {

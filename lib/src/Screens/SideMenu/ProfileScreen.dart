@@ -28,6 +28,7 @@ class _ProfileState extends State<ProfileScreen> {
   File image;
   StoreModel storeModel;
   bool isEmailEditable = false;
+  bool isPhonereadOnly = true;
 
   @override
   initState() {
@@ -48,6 +49,7 @@ class _ProfileState extends State<ProfileScreen> {
         isEmailEditable = false;
       }else{
         isEmailEditable = true;
+        isPhonereadOnly = true;
       }
     });
   }
@@ -116,7 +118,7 @@ class _ProfileState extends State<ProfileScreen> {
                       Padding(
                         padding: const EdgeInsets.only(top: 15.0),
                         child: TextField(
-                          readOnly: true,
+                          readOnly: isPhonereadOnly,
                           controller: phoneController,
                           decoration: InputDecoration(
                             labelText: 'Phone number',

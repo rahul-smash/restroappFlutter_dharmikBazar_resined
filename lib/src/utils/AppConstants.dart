@@ -36,6 +36,7 @@ class AppConstant {
   static final String selectAddress = "Please select delivery address";
   static final String deleteAddress = "Are you sure you want to delete this address?";
   static final String cancelOrder = "Are you sure you want to Cancel this order?";
+  static final String emptyCartMsg = "Are you sure you want to clear cart?";
   static final String orderAdded = "Thank you for placing the order.\nWe will confirm your order soon.";
   static final String enterAddress = 'Enter Complete Address';
   static final String selectArea = 'Please select area';
