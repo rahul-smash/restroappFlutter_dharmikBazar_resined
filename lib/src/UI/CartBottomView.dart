@@ -2,10 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
+import 'package:restroapp/src/Screens/Address/StoreLocationScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/OrderSelectionScreen.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -28,13 +32,14 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   double totalPrice = 0.00;
   StoreModel store;
-  String pickupfacility,delieveryAdress;
+  String pickupfacility, delieveryAdress;
 
   @override
   void initState() {
     super.initState();
     updateTotalPrice();
   }
+
   void getAddresKey() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     store = await SharedPrefs.getStore();
@@ -43,6 +48,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
       delieveryAdress = store.deliveryFacility;
     });
   }
+
   updateTotalPrice() {
     databaseHelper.getTotalPrice().then((mTotalPrice) {
       setState(() {
@@ -54,7 +60,8 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.parent == ParentInfo.productList || widget.parent == ParentInfo.favouritesList
+    return widget.parent == ParentInfo.productList ||
+        widget.parent == ParentInfo.favouritesList
         || widget.parent == ParentInfo.searchList ? addProductScreenBottom()
         : addMyCartScreenBottom();
   }
@@ -85,7 +92,9 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                         children: [
                           TextSpan(
                             text:
-                            "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
+                            "${AppConstant.currency}${databaseHelper
+                                .roundOffPrice(totalPrice, 2).toStringAsFixed(
+                                2)}",
                             style: TextStyle(
                                 fontWeight: FontWeight.normal,
                                 fontSize: 18,
@@ -102,8 +111,9 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                         children: <Widget>[
                           Image.asset("images/my_order.png", width: 25),
                           SizedBox(width: 5),
-                          Text("Proceed To Order",style: TextStyle(fontSize: 12, color: Colors.white)),
-                    ]),
+                          Text("Proceed To Order", style: TextStyle(
+                              fontSize: 12, color: Colors.white)),
+                        ]),
                     onPressed: () {
                       if (totalPrice == 0.0) {
                         Utils.showToast(AppConstant.addItems, false);
@@ -134,7 +144,8 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
                   ),
                   Text(
-                    "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(
+                        totalPrice, 2).toStringAsFixed(2)}",
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
                   ),
                 ],
@@ -151,22 +162,83 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                 if (totalPrice == 0.0) {
                   Utils.showToast(AppConstant.addItems, false);
                 } else {
-
-                  Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+                  Map<String, dynamic> attributeMap = new Map<String,
+                      dynamic>();
                   attributeMap["ScreenName"] = "Place Order View";
                   attributeMap["action"] = "Clicked on Place Order button";
                   attributeMap["value"] = "totalPrice=${totalPrice}";
-                  Utils.sendAnalyticsEvent("Clicked Place Order",attributeMap);
+                  Utils.sendAnalyticsEvent("Clicked Place Order", attributeMap);
                   store = await SharedPrefs.getStore();
                   pickupfacility = store.pickupFacility;
                   delieveryAdress = store.deliveryFacility;
 
                   //print('---------${pickupfacility} and ${delieveryAdress}--------');
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) => OrderSelectionScreen(pickupfacility,delieveryAdress),
-                  );
 
+                  if (pickupfacility=="1"&&delieveryAdress=="1") {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) =>
+                          OrderSelectionScreen(pickupfacility, delieveryAdress),
+                    );
+                  }else if(pickupfacility=="1"){
+                    StoreModel storeObject = await SharedPrefs.getStore();
+                    bool status = Utils.checkStoreOpenTime(storeObject,OrderType.Delivery);
+                    if(!status){
+                      Utils.showToast("${storeObject.closehoursMessage}", false);
+//                      Navigator.pop(context);
+                      return;
+                    }
+
+                    Utils.showProgressDialog(context);
+                    DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
+                    Utils.hideProgressDialog(context);
+//                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DeliveryAddressList(true,deliveryAddressResponse,OrderType.Delivery)),
+                    );
+
+                  }else if(delieveryAdress=="1"){
+
+                    StoreModel storeObject = await SharedPrefs.getStore();
+                    bool status = Utils.checkStoreOpenTime(storeObject,OrderType.Delivery);
+                    if(!status){
+                      Utils.showToast("${storeObject.closehoursMessage}", false);
+//                      Navigator.pop(context);
+                      return;
+                    }
+
+                    Utils.showProgressDialog(context);
+                    ApiController.getStorePickupAddress().then((response){
+
+                      Utils.hideProgressDialog(context);
+                      PickUpModel storeArea = response;
+
+                      print('---PickUpModel---${storeArea.data.length}--');
+                      if(storeArea != null && storeArea.data.isNotEmpty){
+                        if(storeArea.data.length == 1 && storeArea.data[0].area.length == 1){
+                          Area areaObject = storeArea.data[0].area[0];
+//                          Navigator.pop(context);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => StoreLocationScreen(areaObject,OrderType.PickUp)),
+                          );
+                        }else{
+//                          Navigator.pop(context);
+                          Navigator.push(context,
+                            MaterialPageRoute(
+                                builder: (context) => PickUpOrderScreen(storeArea,OrderType.PickUp)),
+                          );
+                        }
+                      }else{
+                        Utils.showToast("No pickup data found!", true);
+                      }
+                    });
+                  }else{
+                    Utils.showToast("No pickup data found!", true);
+                  }
                 }
               } else {
                 Utils.showLoginDialog(context);
@@ -193,9 +265,10 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
   void goToMyCartScreen(BuildContext _context) async {
     print("-goToMyCart-----${widget.parent.toString()}----");
     Navigator.pushReplacement(context,
-        MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
+        MaterialPageRoute(builder: (BuildContext context) =>
+            MyCartScreen(() {
 
-        })));
+            })));
     /*Navigator.push(_context,
         MaterialPageRoute(
           builder: (BuildContext context) => MyCartScreen(() {
