@@ -51,7 +51,11 @@ class _LoyalityPointsScreenState extends BaseState<LoyalityPointsScreen> {
             isLoading
                 ? Center(child: CircularProgressIndicator())
                 : loyalityList == null
-                ? SingleChildScrollView(child:Center(child: Text('No Data found!')))
+                ? SingleChildScrollView(
+                child: Center(child: Padding(padding: EdgeInsets.only(top: 50),
+                  child: Text('No Data found!'),
+                ),
+                ))
                 : showListView(),
           ],
         ),
@@ -105,7 +109,9 @@ class _LoyalityPointsScreenState extends BaseState<LoyalityPointsScreen> {
   Widget showListView() {
 
     return Expanded(
-      child: loyalityList.isEmpty ? Utils.getEmptyView2("No data found!") :ListView.builder(
+      child: loyalityList.isEmpty ? Padding(padding: EdgeInsets.only(top: 50),
+        child: Utils.getEmptyView2("No data found!"),)
+          :ListView.builder(
           itemCount: loyalityList.length,
           itemBuilder: (context, index) {
             LoyalityData loyalityData = loyalityList[index];

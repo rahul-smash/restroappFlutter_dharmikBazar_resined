@@ -21,8 +21,8 @@ class LoyalityPointsModel {
 
   factory LoyalityPointsModel.fromJson(Map<String, dynamic> json) => LoyalityPointsModel(
     success: json["success"],
-    loyalityPoints: json["loyality_points"],
-    data: List<LoyalityData>.from(json["data"].map((x) => LoyalityData.fromJson(x))),
+    loyalityPoints: json["loyality_points"] == null ? null : json["loyality_points"],
+    data: json["data"] == null ? null : List<LoyalityData>.from(json["data"].map((x) => LoyalityData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {

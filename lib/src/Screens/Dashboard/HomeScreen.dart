@@ -186,17 +186,9 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-                icon: Badge(
-                  showBadge: cartBadgeCount == 0 ? false : true,
-                  badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
-                  child: Image.asset('images/carticon.png', width: 24,
-                    fit: BoxFit.scaleDown,color: bottomBarIconColor),
-                ),
-                title: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
-                  child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
-                ),
-                ),
+              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
+              title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
+            ),
             BottomNavigationBarItem(
               icon: Image.asset('images/searchcion.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
               title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
@@ -209,17 +201,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
                 ),
             BottomNavigationBarItem(
-              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
-                title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
-                )
+              icon: Badge(
+                showBadge: cartBadgeCount == 0 ? false : true,
+                badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
+                child: Image.asset('images/carticon.png', width: 24,
+                    fit: BoxFit.scaleDown,color: bottomBarIconColor),
+              ),
+              title: Padding(
+                padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
+              ),
+            ),
           ],
         ),
         Container(
+          padding:  EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: appTheme),
           margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Image.asset("images/icon_home_categories.png",
-            height: 60, width: 60,
-          ),
+          //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: widget.configObject.isGroceryApp == "true" ?
+          Image.asset("images/groceryicon.png",height: 40, width: 40,color: whiteColor,)
+              :Image.asset("images/restauranticon.png",height: 40, width: 40,color: whiteColor),
         ),
       ],
     );
@@ -231,23 +235,30 @@ class _HomeScreenState extends State<HomeScreen> {
     }else{
       setState(() {
         _currentIndex = index;
-        if (_currentIndex == 0) {
-
-          Navigator.push(context,
-            MaterialPageRoute(builder: (context) => MyCartScreen(() {
-              getCartCount();
-            })),
-          );
+        if (_currentIndex == 4) {
+          if (AppConstant.isLoggedIn) {
+            Navigator.push(context,
+              MaterialPageRoute(builder: (context) => MyCartScreen(() {
+                getCartCount();
+              })),
+            );
+          }else{
+            Utils.showLoginDialog(context);
+          }
 
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "MyCartScreen";
           Utils.sendAnalyticsEvent("Clicked MyCartScreen",attributeMap);
         }
         if (_currentIndex == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SearchScreen()),
-          );
+          if (AppConstant.isLoggedIn) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SearchScreen()),
+            );
+          }else{
+            Utils.showLoginDialog(context);
+          }
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "SearchScreen";
           Utils.sendAnalyticsEvent("Clicked SearchScreen",attributeMap);
@@ -256,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (AppConstant.isLoggedIn) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+              MaterialPageRoute(builder: (context) => MyOrderScreen(store)),
             );
             Map<String,dynamic> attributeMap = new Map<String,dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";
@@ -265,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
             Utils.showLoginDialog(context);
           }
         }
-        if (_currentIndex == 4) {
+        if (_currentIndex == 0) {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => ContactScreen(store)),
