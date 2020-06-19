@@ -21,6 +21,7 @@ import 'package:restroapp/src/models/StripeVerifyModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -141,7 +142,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
           title: Text("Confirm Order"),
           centerTitle: true,
@@ -167,32 +168,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           Expanded(
             child: Column(
                 children: [
-                  /*Padding(
-                      padding: EdgeInsets.all(5),
-                      child: Container(
-                          height: 45,
-                          decoration: new BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
-                            border: new Border.all(
-                              color: Colors.grey,
-                              width: 1.0,
-                            ),
-                          ),
-                          child: TextField(
-                            textAlign: TextAlign.left,
-                            controller: noteController,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                              hintText: "Enter note",
-                              border: InputBorder.none,
-                            ),
-                          ))),*/
-                  showDeliverySlot(),
                   Expanded(
                     child: isLoading ? Utils.getIndicatorView()
                         : widget.cartList == null ? Text("") :ListView.separated(
                       separatorBuilder: (BuildContext context, int index) {
+
                         if(widget.cartList[index].taxDetail == null ||
                             widget.cartList[index].taxDetail == null){
                           return Divider(color: Colors.grey, height: 1);
@@ -203,11 +183,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       shrinkWrap: true,
                       itemCount: widget.cartList.length + 1,
                       itemBuilder: (context, index) {
-                        if (index == widget.cartList.length) {
-                          return addItemPrice();
-                        } else {
-                          return addProductCart(widget.cartList[index]);
+                        if(index == 0){
+                          return showDeliverySlot();
+                        }else{
+                          if (index == widget.cartList.length) {
+                            return addItemPrice();
+                          } else {
+                            return addProductCart(widget.cartList[index]);
+                          }
                         }
+
                       },
                     ),
                   ),
@@ -583,17 +568,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           children: <Widget>[
             Visibility(
               visible:  isloyalityPointsEnabled == true ? true : false,
+              //visible:  false,
               child: Expanded(
                 child: InkWell(
                   onTap: () async {
                     print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
                     print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-
+                    if(isCouponsApplied){
+                      Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
+                      return;
+                    }
                     if(appliedCouponCodeList.isNotEmpty){
                       Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
                       return;
                     }
-
                     if (taxModel != null && appliedReddemPointsCodeList.isNotEmpty) {
                       removeCoupon();
                     }else{
@@ -621,14 +609,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
                     decoration:
                     BoxDecoration(
-                      color: appliedCouponCodeList.isEmpty ? appTheme : grayColor,
+                      color: appliedCouponCodeList.isEmpty ? isCouponsApplied ? appTheme.withOpacity(0.4):appTheme : appTheme.withOpacity(0.4),
                       border: Border.all(
                         color: appliedCouponCodeList.isEmpty ? appTheme : grayColor,
                         width: 0.0,),
                     ),
                     child: Center(
                         child: Text(appliedReddemPointsCodeList.isEmpty ? "Redeem\nLoyality Points" : "Remove Coupon",
-                      textAlign : TextAlign.center,style: TextStyle(color: appliedCouponCodeList.isEmpty ? Colors.white : Colors.black),)
+                      textAlign : TextAlign.center,style: TextStyle(
+                              color: isCouponsApplied ? Colors.white.withOpacity(0.5) :Colors.white),)
                     ),
                   ),
                 ),
@@ -639,6 +628,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 onTap: () {
                   print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
                   print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                  if(isCouponsApplied){
+                    Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
+                    return;
+                  }
                   if(appliedReddemPointsCodeList.isNotEmpty){
                     Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
                     return;
@@ -665,11 +658,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
                 },
                 child: Container(
-                  margin: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                  margin: EdgeInsets.fromLTRB(isloyalityPointsEnabled ? 0 : 15, 0, 0, 0),
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                   decoration: new BoxDecoration(
-                    color: appliedReddemPointsCodeList.isEmpty ? appTheme : grayColor,
+                    color: appliedReddemPointsCodeList.isEmpty ? isCouponsApplied ? appTheme.withOpacity(0.4):appTheme : appTheme.withOpacity(0.4),
                     border: new Border.all(
                       color: appTheme,
                       width: 0.0,
@@ -678,7 +671,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   child: Center(
                     child: Text(appliedCouponCodeList.isEmpty ? "Available\nOffers" : "Remove Coupon",
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: appliedReddemPointsCodeList.isEmpty ? Colors.white : Colors.black,)),
+                        style: TextStyle(color: isCouponsApplied ? Colors.white.withOpacity(0.5) :Colors.white)),
                   ),
                 ),
               ),
@@ -687,6 +680,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ));
   }
 
+  bool isCouponsApplied = false;
   Widget addEnterCouponCodeView(){
 
     return Padding(
@@ -730,10 +724,57 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                   textColor: Colors.white,
                   color: appTheme,
-                  onPressed: () {
+                  onPressed: () async{
                     print("---Apply Coupon----");
+                    if(couponCodeController.text.trim().isEmpty){
+                    }else{
+                      print("--${appliedCouponCodeList.length}-and -${appliedReddemPointsCodeList.length}---");
+                      if(appliedCouponCodeList.isNotEmpty || appliedReddemPointsCodeList.isNotEmpty){
+                        Utils.showToast("Please remove the applied coupon first!", false);
+                        return;
+                      }
+
+                      if(isCouponsApplied){
+                        removeCoupon();
+                      }else{
+                        String couponCode = couponCodeController.text;
+                        Utils.showProgressDialog(context);
+                        Utils.hideKeyboard(context);
+                        databaseHelper.getCartItemsListToJson().then((json) async {
+                          ValidateCouponResponse couponModel = await ApiController.validateOfferApiRequest(couponCodeController.text,
+                              widget.paymentMode, json);
+                          if(couponModel.success){
+                            print("---success----");
+
+                            TaxCalculationResponse model = await ApiController.multipleTaxCalculationRequest(couponCodeController.text,
+                                couponModel.discountAmount, "0", json);
+                            Utils.hideProgressDialog(context);
+                            if (model != null && !model.success) {
+                              Utils.showToast(model.message, true);
+                              databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+                              databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                              databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+                              Navigator.of(context).popUntil((route) => route.isFirst);
+                            }else{
+                              setState(() {
+                                taxModel = model.taxCalculation;
+                                isCouponsApplied = true;
+                                couponCodeController.text = couponCode;
+                              });
+                            }
+
+                          }else{
+                            Utils.showToast("${couponModel.message}", false);
+                            Utils.hideProgressDialog(context);
+                            Utils.hideKeyboard(context);
+                          }
+
+                        });
+                      }
+
+                    }
                   },
-                  child: new Text("Apply Coupon"),
+                  child: new Text(isCouponsApplied?"Remove Coupon":"Apply Coupon"),
                 ),
               ),
             ),
@@ -861,6 +902,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             taxModel = response.taxCalculation;
             appliedCouponCodeList.clear();
             appliedReddemPointsCodeList.clear();
+            isCouponsApplied = false;
+            couponCodeController.text = "";
           });
         }
 

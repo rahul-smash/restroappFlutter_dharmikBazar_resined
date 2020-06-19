@@ -479,7 +479,7 @@ class ApiController {
       print("----url---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      //print("----respStr---${respStr}");
+      print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
       return model;
