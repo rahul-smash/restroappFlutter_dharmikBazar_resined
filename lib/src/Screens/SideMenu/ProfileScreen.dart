@@ -49,7 +49,7 @@ class _ProfileState extends State<ProfileScreen> {
         isEmailEditable = false;
       }else{
         isEmailEditable = true;
-        isPhonereadOnly = true;
+        isPhonereadOnly = false;
       }
     });
   }
