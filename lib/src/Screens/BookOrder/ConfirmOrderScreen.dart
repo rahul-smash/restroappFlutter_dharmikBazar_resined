@@ -558,9 +558,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addCouponCodeRow() {
-    /*print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
-    print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-    print("isloyalityPointsEnabled=${isloyalityPointsEnabled}");*/
 
     return Padding(
         padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
@@ -658,7 +655,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
                 },
                 child: Container(
-                  margin: EdgeInsets.fromLTRB(isloyalityPointsEnabled ? 0 : 15, 0, 0, 0),
+                  margin: EdgeInsets.fromLTRB(isloyalityPointsEnabled ? 15 : 0, 0, 0, 0),
                   height: 40,
                   padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                   decoration: new BoxDecoration(
@@ -890,6 +887,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       ApiController.multipleTaxCalculationRequest("", "0", "${shippingCharges}", json)
           .then((response) {
         Utils.hideProgressDialog(context);
+        Utils.hideKeyboard(context);
         if (response != null && !response.success) {
           Utils.showToast(response.message, true);
           databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
@@ -1083,6 +1081,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
 
   void placeOrderApiCall(String payment_request_id, String payment_id, String onlineMethod) {
+    Utils.hideKeyboard(context);
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
         databaseHelper.getCartItemsListToJson().then((json) {
@@ -1207,10 +1206,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     try {
       print("====-loyality===== ${storeModel.loyality}--");
       if(storeModel.loyality != null && storeModel.loyality == "1"){
-            isloyalityPointsEnabled = true;
-          }else{
-            isloyalityPointsEnabled = false;
-          }
+        this.isloyalityPointsEnabled = true;
+      }else{
+        this.isloyalityPointsEnabled = false;
+      }
     } catch (e) {
       print(e);
     }
