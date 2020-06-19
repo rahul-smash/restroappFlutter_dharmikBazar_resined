@@ -560,121 +560,132 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   Widget addCouponCodeRow() {
 
     return Padding(
-        padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
-        child: Row(
-          children: <Widget>[
-            Visibility(
-              visible:  isloyalityPointsEnabled == true ? true : false,
-              //visible:  false,
-              child: Expanded(
-                child: InkWell(
-                  onTap: () async {
-                    print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
-                    print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-                    if(isCouponsApplied){
-                      Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
-                      return;
-                    }
-                    if(appliedCouponCodeList.isNotEmpty){
-                      Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
-                      return;
-                    }
-                    if (taxModel != null && appliedReddemPointsCodeList.isNotEmpty) {
-                      removeCoupon();
-                    }else{
-                      var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                          RedeemPointsScreen(widget.address, "" ,widget.isComingFromPickUpScreen,
-                              widget.areaId, (model) {
-                                setState(() {
-                                  hideRemoveCouponFirstTime = false;
-                                  taxModel = model;
-                                  double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
-                                  taxModel.total = taxModelTotal.toString();
-                                  appliedReddemPointsCodeList.add(model.couponCode);
-                                  print("===discount=== ${model.discount}");
-                                  print("taxModel.total=${taxModel.total}");
-                                });
-                              },appliedReddemPointsCodeList),
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+        child: Container(
+          height: 82,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Visibility(
+                    visible:  isloyalityPointsEnabled == true ? true : false,
+                    //visible:  false,
+                    child: InkWell(
+                      onTap: () async {
+                        print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                        print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                        if(isCouponsApplied){
+                          Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
+                          return;
+                        }
+                        if(appliedCouponCodeList.isNotEmpty){
+                          Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
+                          return;
+                        }
+                        if (taxModel != null && appliedReddemPointsCodeList.isNotEmpty) {
+                          removeCoupon();
+                        }else{
+                          var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
+                              RedeemPointsScreen(widget.address, "" ,widget.isComingFromPickUpScreen,
+                                  widget.areaId, (model) {
+                                    setState(() {
+                                      hideRemoveCouponFirstTime = false;
+                                      taxModel = model;
+                                      double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
+                                      taxModel.total = taxModelTotal.toString();
+                                      appliedReddemPointsCodeList.add(model.couponCode);
+                                      print("===discount=== ${model.discount}");
+                                      print("taxModel.total=${taxModel.total}");
+                                    });
+                                  },appliedReddemPointsCodeList),
 
-                        fullscreenDialog: true,
-                      ));
-                    }
-                  },
-                  child: Container(
-                    //width: 140.0,
-                    height: 40.0,
-                    margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                    decoration:
-                    BoxDecoration(
-                      color: appliedCouponCodeList.isEmpty ? isCouponsApplied ? appTheme.withOpacity(0.4):appTheme : appTheme.withOpacity(0.4),
-                      border: Border.all(
-                        color: appliedCouponCodeList.isEmpty ? appTheme : grayColor,
-                        width: 0.0,),
-                    ),
-                    child: Center(
-                        child: Text(appliedReddemPointsCodeList.isEmpty ? "Redeem\nLoyality Points" : "Remove Coupon",
-                      textAlign : TextAlign.center,style: TextStyle(
-                              color: isCouponsApplied ? Colors.white.withOpacity(0.5) :Colors.white),)
+                            fullscreenDialog: true,
+                          ));
+                        }
+                      },
+                      child: Container(
+                        height: 40.0,
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                        decoration:BoxDecoration(color: whiteColor,),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(appliedReddemPointsCodeList.isEmpty ? "Redeem Loyality Points" : "Remove Coupon",
+                            textAlign : TextAlign.left,style: TextStyle(
+                                color: isCouponsApplied ? appTheme : appTheme),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Icon(Icons.keyboard_arrow_right),
+                ],
               ),
-            ),
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
-                  print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-                  if(isCouponsApplied){
-                    Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
-                    return;
-                  }
-                  if(appliedReddemPointsCodeList.isNotEmpty){
-                    Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
-                    return;
-                  }
-                  if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
-                    removeCoupon();
-                  }else{
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AvailableOffersDialog(
-                          widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
-                        setState(() {
-                          hideRemoveCouponFirstTime = false;
-                          taxModel = model;
-                          double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
-                          taxModel.total = taxModelTotal.toString();
-                          appliedCouponCodeList.add(model.couponCode);
-                          print("===couponCode=== ${model.couponCode}");
-                          print("taxModel.total=${taxModel.total}");
-                        });
-                      },appliedCouponCodeList),
-                    );
-                  }
+              Container(
+                width: MediaQuery.of(context).size.width,
+                height: 1,
+                margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                color: Color(0xFFDBDCDD),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  InkWell(
+                    onTap: () {
+                      print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                      print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                      if(isCouponsApplied){
+                        Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
+                        return;
+                      }
+                      if(appliedReddemPointsCodeList.isNotEmpty){
+                        Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
+                        return;
+                      }
+                      if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
+                        removeCoupon();
+                      }else{
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) => AvailableOffersDialog(
+                              widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
+                            setState(() {
+                              hideRemoveCouponFirstTime = false;
+                              taxModel = model;
+                              double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
+                              taxModel.total = taxModelTotal.toString();
+                              appliedCouponCodeList.add(model.couponCode);
+                              print("===couponCode=== ${model.couponCode}");
+                              print("taxModel.total=${taxModel.total}");
+                            });
+                          },appliedCouponCodeList),
+                        );
+                      }
 
-                },
-                child: Container(
-                  margin: EdgeInsets.fromLTRB(isloyalityPointsEnabled ? 15 : 0, 0, 0, 0),
-                  height: 40,
-                  padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  decoration: new BoxDecoration(
-                    color: appliedReddemPointsCodeList.isEmpty ? isCouponsApplied ? appTheme.withOpacity(0.4):appTheme : appTheme.withOpacity(0.4),
-                    border: new Border.all(
-                      color: appTheme,
-                      width: 0.0,
+                    },
+                    child: Container(
+                      margin: EdgeInsets.fromLTRB(isloyalityPointsEnabled ? 0 : 0, 0, 0, 0),
+                      height: 40,
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      decoration: new BoxDecoration(color: whiteColor,),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(appliedCouponCodeList.isEmpty ? "Available Offers" : "Remove Coupon",
+                            textAlign: TextAlign.left,
+                            style: TextStyle(color: isCouponsApplied ? appTheme : appTheme)
+                        ),
+                      ),
                     ),
                   ),
-                  child: Center(
-                    child: Text(appliedCouponCodeList.isEmpty ? "Available\nOffers" : "Remove Coupon",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: isCouponsApplied ? Colors.white.withOpacity(0.5) :Colors.white)),
-                  ),
-                ),
+                  Icon(Icons.keyboard_arrow_right),
+                ],
               ),
-            ),
-          ],
-        ));
+
+            ],
+          ),
+        ),
+    );
   }
 
   bool isCouponsApplied = false;
@@ -715,64 +726,61 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             child: Container(
               height: 40.0,
               margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(5, 0, 0, 0),
-                child: RaisedButton(
-                  padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                  textColor: Colors.white,
-                  color: appTheme,
-                  onPressed: () async{
-                    print("---Apply Coupon----");
-                    if(couponCodeController.text.trim().isEmpty){
+              child: RaisedButton(
+                padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                textColor: Colors.white,
+                color: appTheme,
+                onPressed: () async{
+                  print("---Apply Coupon----");
+                  if(couponCodeController.text.trim().isEmpty){
+                  }else{
+                    print("--${appliedCouponCodeList.length}-and -${appliedReddemPointsCodeList.length}---");
+                    if(appliedCouponCodeList.isNotEmpty || appliedReddemPointsCodeList.isNotEmpty){
+                      Utils.showToast("Please remove the applied coupon first!", false);
+                      return;
+                    }
+
+                    if(isCouponsApplied){
+                      removeCoupon();
                     }else{
-                      print("--${appliedCouponCodeList.length}-and -${appliedReddemPointsCodeList.length}---");
-                      if(appliedCouponCodeList.isNotEmpty || appliedReddemPointsCodeList.isNotEmpty){
-                        Utils.showToast("Please remove the applied coupon first!", false);
-                        return;
-                      }
+                      String couponCode = couponCodeController.text;
+                      Utils.showProgressDialog(context);
+                      Utils.hideKeyboard(context);
+                      databaseHelper.getCartItemsListToJson().then((json) async {
+                        ValidateCouponResponse couponModel = await ApiController.validateOfferApiRequest(couponCodeController.text,
+                            widget.paymentMode, json);
+                        if(couponModel.success){
+                          print("---success----");
 
-                      if(isCouponsApplied){
-                        removeCoupon();
-                      }else{
-                        String couponCode = couponCodeController.text;
-                        Utils.showProgressDialog(context);
-                        Utils.hideKeyboard(context);
-                        databaseHelper.getCartItemsListToJson().then((json) async {
-                          ValidateCouponResponse couponModel = await ApiController.validateOfferApiRequest(couponCodeController.text,
-                              widget.paymentMode, json);
-                          if(couponModel.success){
-                            print("---success----");
-
-                            TaxCalculationResponse model = await ApiController.multipleTaxCalculationRequest(couponCodeController.text,
-                                couponModel.discountAmount, "0", json);
-                            Utils.hideProgressDialog(context);
-                            if (model != null && !model.success) {
-                              Utils.showToast(model.message, true);
-                              databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
-                              databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                              databaseHelper.deleteTable(DatabaseHelper.Products_Table);
-                              Navigator.of(context).popUntil((route) => route.isFirst);
-                            }else{
-                              setState(() {
-                                taxModel = model.taxCalculation;
-                                isCouponsApplied = true;
-                                couponCodeController.text = couponCode;
-                              });
-                            }
-
+                          TaxCalculationResponse model = await ApiController.multipleTaxCalculationRequest(couponCodeController.text,
+                              couponModel.discountAmount, "0", json);
+                          Utils.hideProgressDialog(context);
+                          if (model != null && !model.success) {
+                            Utils.showToast(model.message, true);
+                            databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+                            databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                            databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+                            Navigator.of(context).popUntil((route) => route.isFirst);
                           }else{
-                            Utils.showToast("${couponModel.message}", false);
-                            Utils.hideProgressDialog(context);
-                            Utils.hideKeyboard(context);
+                            setState(() {
+                              taxModel = model.taxCalculation;
+                              isCouponsApplied = true;
+                              couponCodeController.text = couponCode;
+                            });
                           }
 
-                        });
-                      }
+                        }else{
+                          Utils.showToast("${couponModel.message}", false);
+                          Utils.hideProgressDialog(context);
+                          Utils.hideKeyboard(context);
+                        }
 
+                      });
                     }
-                  },
-                  child: new Text(isCouponsApplied?"Remove Coupon":"Apply Coupon"),
-                ),
+
+                  }
+                },
+                child: new Text(isCouponsApplied?"Remove Coupon":"Apply Coupon"),
               ),
             ),
           ),
@@ -965,6 +973,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void callStripeApi() {
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total);
+    price = price * 100;
     print("----taxModel.total----${taxModel.total}--");
     String mPrice = price.toString().substring(0,price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
@@ -1200,7 +1209,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     });
   }
 
-  bool isloyalityPointsEnabled;
+  bool isloyalityPointsEnabled = false;
   void checkLoyalityPointsOption() {
     //1 - enable, 0 means disable
     try {

@@ -116,6 +116,8 @@ flutter:
     - images/groceryicon.png
     - images/restauranticon.png
     - images/cancel_cart.png
+    - images/next_arrow_icon.png
+    - images/cancel_icon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
