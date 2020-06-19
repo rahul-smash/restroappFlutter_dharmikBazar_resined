@@ -611,7 +611,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         decoration:BoxDecoration(color: whiteColor,),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(appliedReddemPointsCodeList.isEmpty ? "Redeem Loyality Points" : "Remove Coupon",
+                          child: Text(appliedReddemPointsCodeList.isEmpty ? "Redeem Loyality Points" : "${taxModel.couponCode} Applied",
                             textAlign : TextAlign.left,style: TextStyle(
                                 color: isCouponsApplied ? appTheme : appTheme),
                           ),
@@ -619,7 +619,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       ),
                     ),
                   ),
-                  Icon(Icons.keyboard_arrow_right),
+                  Icon(appliedReddemPointsCodeList.isNotEmpty ? Icons.cancel :Icons.keyboard_arrow_right),
                 ],
               ),
               Container(
@@ -671,14 +671,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       decoration: new BoxDecoration(color: whiteColor,),
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(appliedCouponCodeList.isEmpty ? "Available Offers" : "Remove Coupon",
+                        child: Text(appliedCouponCodeList.isEmpty ? "Available Offers" : "${taxModel.couponCode} Applied",
                             textAlign: TextAlign.left,
                             style: TextStyle(color: isCouponsApplied ? appTheme : appTheme)
                         ),
                       ),
                     ),
                   ),
-                  Icon(Icons.keyboard_arrow_right),
+                  Icon(appliedCouponCodeList.isNotEmpty ? Icons.cancel :Icons.keyboard_arrow_right),
                 ],
               ),
 
