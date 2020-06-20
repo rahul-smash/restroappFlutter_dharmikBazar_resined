@@ -458,7 +458,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 Visibility(
                   visible: product.weight.isEmpty ? false : true,
                   child: Padding(
-                      padding: EdgeInsets.only(top: 5),
+                      padding: EdgeInsets.only(top: 10),
                       child: Text("${product.weight}",style: TextStyle(color: orangeColor),)
                   ),
                 ),
@@ -560,52 +560,49 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   Widget addCouponCodeRow() {
 
     return Padding(
-        padding: EdgeInsets.fromLTRB(15, 0, 15, 0),
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
         child: Container(
-          height: 82,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Wrap(
             children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Visibility(
-                    visible:  isloyalityPointsEnabled == true ? true : false,
-                    //visible:  false,
-                    child: InkWell(
-                      onTap: () async {
-                        print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
-                        print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-                        if(isCouponsApplied){
-                          Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
-                          return;
-                        }
-                        if(appliedCouponCodeList.isNotEmpty){
-                          Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
-                          return;
-                        }
-                        if (taxModel != null && appliedReddemPointsCodeList.isNotEmpty) {
-                          removeCoupon();
-                        }else{
-                          var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                              RedeemPointsScreen(widget.address, "" ,widget.isComingFromPickUpScreen,
-                                  widget.areaId, (model) {
-                                    setState(() {
-                                      hideRemoveCouponFirstTime = false;
-                                      taxModel = model;
-                                      double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
-                                      taxModel.total = taxModelTotal.toString();
-                                      appliedReddemPointsCodeList.add(model.couponCode);
-                                      print("===discount=== ${model.discount}");
-                                      print("taxModel.total=${taxModel.total}");
-                                    });
-                                  },appliedReddemPointsCodeList),
+              Visibility(
+                visible: isloyalityPointsEnabled == true ? true : false,
+                child: InkWell(
+                  onTap: () async {
+                    //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                    //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                    if(isCouponsApplied){
+                      Utils.showToast("Please remove Applied Coupon to Redeem Loyality Points", false);
+                      return;
+                    }
+                    if(appliedCouponCodeList.isNotEmpty){
+                      Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
+                      return;
+                    }
+                    if (taxModel != null && appliedReddemPointsCodeList.isNotEmpty) {
+                      removeCoupon();
+                    }else{
+                      var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
+                          RedeemPointsScreen(widget.address, "" ,widget.isComingFromPickUpScreen,
+                              widget.areaId, (model) {
+                                setState(() {
+                                  hideRemoveCouponFirstTime = false;
+                                  taxModel = model;
+                                  double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
+                                  taxModel.total = taxModelTotal.toString();
+                                  appliedReddemPointsCodeList.add(model.couponCode);
+                                  print("===discount=== ${model.discount}");
+                                  print("taxModel.total=${taxModel.total}");
+                                });
+                              },appliedReddemPointsCodeList),
 
-                            fullscreenDialog: true,
-                          ));
-                        }
-                      },
-                      child: Container(
+                        fullscreenDialog: true,
+                      ));
+                    }
+                  },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Container(
                         height: 40.0,
                         margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                         decoration:BoxDecoration(color: whiteColor,),
@@ -613,58 +610,56 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           alignment: Alignment.centerLeft,
                           child: Text(appliedReddemPointsCodeList.isEmpty ? "Redeem Loyality Points" : "${taxModel.couponCode} Applied",
                             textAlign : TextAlign.left,style: TextStyle(fontWeight: FontWeight.w600,
-                                color: isCouponsApplied ? appTheme : appTheme),
+                                color: appliedCouponCodeList.isEmpty ? isCouponsApplied ? appTheme.withOpacity(0.5) :appTheme : appTheme.withOpacity(0.5)),
                           ),
                         ),
                       ),
-                    ),
+                      Icon(appliedReddemPointsCodeList.isNotEmpty ? Icons.cancel :Icons.keyboard_arrow_right),
+                    ],
                   ),
-                  Icon(appliedReddemPointsCodeList.isNotEmpty ? Icons.cancel :Icons.keyboard_arrow_right),
-                ],
+                ),
               ),
-              Container(
-                width: MediaQuery.of(context).size.width,
-                height: 1,
-                margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                color: Color(0xFFDBDCDD),
+              Visibility(
+                visible: isloyalityPointsEnabled == true ? true : false,
+                child: Utils.showDivider(context),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  InkWell(
-                    onTap: () {
-                      print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
-                      print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-                      if(isCouponsApplied){
-                        Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
-                        return;
-                      }
-                      if(appliedReddemPointsCodeList.isNotEmpty){
-                        Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
-                        return;
-                      }
-                      if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
-                        removeCoupon();
-                      }else{
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) => AvailableOffersDialog(
-                              widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
-                            setState(() {
-                              hideRemoveCouponFirstTime = false;
-                              taxModel = model;
-                              double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
-                              taxModel.total = taxModelTotal.toString();
-                              appliedCouponCodeList.add(model.couponCode);
-                              print("===couponCode=== ${model.couponCode}");
-                              print("taxModel.total=${taxModel.total}");
-                            });
-                          },appliedCouponCodeList),
-                        );
-                      }
+              InkWell(
+                onTap: () {
+                  print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                  print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                  if(isCouponsApplied){
+                    Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
+                    return;
+                  }
+                  if(appliedReddemPointsCodeList.isNotEmpty){
+                    Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
+                    return;
+                  }
+                  if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
+                    removeCoupon();
+                  }else{
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) => AvailableOffersDialog(
+                          widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
+                        setState(() {
+                          hideRemoveCouponFirstTime = false;
+                          taxModel = model;
+                          double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
+                          taxModel.total = taxModelTotal.toString();
+                          appliedCouponCodeList.add(model.couponCode);
+                          print("===couponCode=== ${model.couponCode}");
+                          print("taxModel.total=${taxModel.total}");
+                        });
+                      },appliedCouponCodeList),
+                    );
+                  }
 
-                    },
-                    child: Container(
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
                       margin: EdgeInsets.fromLTRB(isloyalityPointsEnabled ? 0 : 0, 0, 0, 0),
                       height: 40,
                       padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -673,15 +668,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         alignment: Alignment.centerLeft,
                         child: Text(appliedCouponCodeList.isEmpty ? "Available Offers" : "${taxModel.couponCode} Applied",
                             textAlign: TextAlign.left,
-                            style: TextStyle(fontWeight: FontWeight.w600,color: isCouponsApplied ? appTheme : appTheme)
+                            style: TextStyle(fontWeight: FontWeight.w600,
+                                color: appliedReddemPointsCodeList.isEmpty ? isCouponsApplied ? appTheme.withOpacity(0.5) :appTheme : appTheme.withOpacity(0.5))
                         ),
                       ),
                     ),
-                  ),
-                  Icon(appliedCouponCodeList.isNotEmpty ? Icons.cancel :Icons.keyboard_arrow_right),
-                ],
+                    Icon(appliedCouponCodeList.isNotEmpty ? Icons.cancel :Icons.keyboard_arrow_right),
+                  ],
+                ),
               ),
-
             ],
           ),
         ),
@@ -727,6 +722,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               height: 40.0,
               margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
               child: RaisedButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                ),
                 padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                 textColor: Colors.white,
                 color: appTheme,
@@ -739,7 +737,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       Utils.showToast("Please remove the applied coupon first!", false);
                       return;
                     }
-
                     if(isCouponsApplied){
                       removeCoupon();
                     }else{
@@ -751,7 +748,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             widget.paymentMode, json);
                         if(couponModel.success){
                           print("---success----");
-
+                          Utils.showToast("${couponModel.message}", false);
                           TaxCalculationResponse model = await ApiController.multipleTaxCalculationRequest(couponCodeController.text,
                               couponModel.discountAmount, "0", json);
                           Utils.hideProgressDialog(context);
@@ -1058,9 +1055,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-
     /*print("----ExternalWalletResponse----${response.walletName}--");
-
     Fluttertoast.showToast(
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
   }
@@ -1086,8 +1081,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       }
     });
   }
-
-
 
   void placeOrderApiCall(String payment_request_id, String payment_id, String onlineMethod) {
     Utils.hideKeyboard(context);
@@ -1160,12 +1153,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 }
               }
             });
-
-
           });
-
-
-
         });
       } else {
         Utils.showToast(AppConstant.noInternet, false);
