@@ -987,7 +987,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           );
 
         }else{
-          Utils.showToast("Something went wrong!", true);
+          Utils.showToast("${stripeCheckOutModel.message}!", true);
         }
 
       }else{
