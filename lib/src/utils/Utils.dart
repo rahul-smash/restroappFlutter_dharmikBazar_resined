@@ -321,10 +321,9 @@ class Utils {
     try {
       DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
       DateTime time = format.parse(date);
-      time.toLocal();
+      time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
-
-      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm');
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);

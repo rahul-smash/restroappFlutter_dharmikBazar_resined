@@ -46,6 +46,42 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
       color: Colors.white,
       child: Column(
         children: <Widget>[
+          Container(
+            color: Color(0xFFEBECEE),
+            padding: EdgeInsets.only(left: 12.0, top: 8.0, right: 10.0,bottom: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  child: Text("Total Items - ${cardOrderHistoryItems.orderItems.length}"),
+                ),
+
+                Container(
+                  child: Visibility(
+                    visible: showCancelButton(cardOrderHistoryItems.status),
+                    child: InkWell(
+                      onTap: () async {
+                        var results = await DialogUtils.displayDialog(context,"Cancel Order?",AppConstant.cancelOrder,
+                            "Cancel","OK");
+                        if(results == true){
+                          Utils.showProgressDialog(context);
+                          CancelOrderModel cancelOrder = await ApiController.orderCancelApi(cardOrderHistoryItems.orderId);
+                          try {
+                            Utils.showToast("${cancelOrder.data}", false);
+                          } catch (e) {
+                            print(e);
+                          }
+                          Utils.hideProgressDialog(context);
+                          eventBus.fire(refreshOrderHistory());
+                        }
+                      },
+                      child: Text("Cancel"),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
           firstRow(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -53,40 +89,8 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
               Container(
                 width: MediaQuery.of(context).size.width / 2,
                 height: 1,
-                margin: EdgeInsets.fromLTRB(12, showOrderType ? 0 : 5, 0, showOrderType ? 0 : 15),
+                margin: EdgeInsets.fromLTRB(12, 5, 5, 15),
                 color: Color(0xFFDBDCDD),
-              ),
-              Visibility(
-                visible: showOrderType,
-                child: Container(
-                  margin: EdgeInsets.fromLTRB(0, 5, 12, 0),
-                  padding: EdgeInsets.all(3.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(5.0)),
-                  ),
-                  child: Row(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(left: 5.0,right: 5),
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                              color: getOrderTypeColor(cardOrderHistoryItems.orderFacility)
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 5.0,right: 5),
-                        child: Text('${cardOrderHistoryItems.orderFacility}',
-                            style: TextStyle(color: Color(0xFF39444D),fontSize: 14)),
-                      ),
-                    ],
-                  ),
-                ),
               ),
             ],
           ),
@@ -124,37 +128,34 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
           ],
         ),
         Visibility(
-          visible: showCancelButton(cardOrderHistoryItems.status),
-          child: Padding(
-            padding: EdgeInsets.only(top: 0.0, right: 12.0),
-            child: SizedBox(
-              width: 80,
-              height: 30,
-              child: FlatButton(
-                onPressed: () async {
-
-                  var results = await DialogUtils.displayDialog(context,"Cancel Order?",AppConstant.cancelOrder,
-                      "Cancel","OK");
-                  if(results == true){
-                    Utils.showProgressDialog(context);
-                    CancelOrderModel cancelOrder = await ApiController.orderCancelApi(cardOrderHistoryItems.orderId);
-                    try {
-                      Utils.showToast("${cancelOrder.data}", false);
-                    } catch (e) {
-                      print(e);
-                    }
-                    Utils.hideProgressDialog(context);
-                    eventBus.fire(refreshOrderHistory());
-                  }
-                  },
-
-                child: Text("Cancel",
-                  style: TextStyle(color: Color(0xFF525A5F), ),),
-                color: Color(0xFFEAEEEF),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(3.0),
+          visible: showOrderType,
+          child: Container(
+            margin: EdgeInsets.fromLTRB(0, 5, 12, 0),
+            padding: EdgeInsets.all(3.0),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.all(
+                  Radius.circular(5.0)),
+            ),
+            child: Row(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(left: 5.0,right: 5),
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.all(Radius.circular(3.0)),
+                        color: getOrderTypeColor(cardOrderHistoryItems.orderFacility)
+                    ),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: EdgeInsets.only(left: 5.0,right: 5),
+                  child: Text('${cardOrderHistoryItems.orderFacility}',
+                      style: TextStyle(color: Color(0xFF39444D),fontSize: 14)),
+                ),
+              ],
             ),
           ),
         ),
@@ -173,7 +174,9 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
             child: Row(
               children: <Widget>[
                 Text('Total Price : ',style: TextStyle(color: Color(0xFF39444D),fontSize: 14)),
-                Text("${AppConstant.currency} ${cardOrderHistoryItems.total}",style: TextStyle(color: Colors.black,fontSize: 13))
+                Text("${AppConstant.currency} ${cardOrderHistoryItems.total}",
+                    style: TextStyle(color: Colors.black,fontSize: 14,
+                        fontWeight: FontWeight.w600))
               ],
             ),
           ),
@@ -198,7 +201,8 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                   child: Padding(
                     padding: EdgeInsets.only(left: 5.0),
                     child: Text(getStatus(cardOrderHistoryItems.status),
-                        style: TextStyle(color: Color(0xFF39444D),fontSize: 14)),
+                        style: TextStyle(color: Color(0xFF39444D),fontSize: 14,
+                        fontWeight: FontWeight.w600)),
                   ),
                 ),
 
@@ -236,7 +240,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
   bottomDeviderView() {
     return Container(
       width: MediaQuery .of(context).size.width,
-      height: 5,
+      height: 8,
       color: Color(0xFFDBDCDD),
     );
   }
