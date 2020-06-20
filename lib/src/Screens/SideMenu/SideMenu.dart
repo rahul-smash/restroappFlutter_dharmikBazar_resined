@@ -159,15 +159,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         break;
       case 2:
         if (AppConstant.isLoggedIn) {
-          Utils.showProgressDialog(context);
-          ApiController.getAddressApiRequest().then((responses){
-            Utils.hideProgressDialog(context);
-            Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => DeliveryAddressList(false,responses,OrderType.Menu)),
-            );
-          });
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => DeliveryAddressList(false,OrderType.Menu)),
+          );
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "DeliveryAddressList";
           Utils.sendAnalyticsEvent("Clicked DeliveryAddressList",attributeMap);
