@@ -92,13 +92,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             child: Row(children: [
               Padding(
                 padding: EdgeInsets.only(left: 0, right: 20),
-                child: CachedNetworkImage(
-                  imageUrl: "${widget.store.banner10080}",
-                  fit: BoxFit.fill,
-                  height: 60,
-                  width: 60,
-                  //placeholder: (context, url) => CircularProgressIndicator(),
-                  //errorWidget: (context, url, error) => Icon(Icons.error),
+                child: Center(
+                  child: Icon(Icons.account_circle,size: 60, color: Colors.white,),
                 ),
               ),
               Column(

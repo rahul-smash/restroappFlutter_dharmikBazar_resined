@@ -72,12 +72,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     listenWebViewChanges();
     selctedTag = 0;
     hideRemoveCouponFirstTime = true;
-    print("-deliveryType--${widget.deliveryType}---");
+    //print("-deliveryType--${widget.deliveryType}---");
     try {
       if(widget.address != null){
         if(widget.address.areaCharges != null){
           shippingCharges = widget.address.areaCharges;
-          print("-shippingCharges--${widget.address.areaCharges}---");
+          //print("-shippingCharges--${widget.address.areaCharges}---");
         }
         //print("----minAmount=${widget.address.minAmount}");
         //print("----notAllow=${widget.address.notAllow}");
@@ -169,31 +169,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             child: Column(
                 children: [
                   Expanded(
-                    child: isLoading ? Utils.getIndicatorView()
-                        : widget.cartList == null ? Text("") :ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) {
+                    child: isLoading ? Utils.getIndicatorView() : widget.cartList==null ? Text("")
+                        :ListView(
+                      children: <Widget>[
+                        showDeliverySlot(),
+                        ListView.separated(
+                          separatorBuilder: (BuildContext context, int index) {
+                            if(widget.cartList[index].taxDetail == null ||
+                                widget.cartList[index].taxDetail == null){
+                              return Divider(color: Colors.grey, height: 1);
+                            }else{
+                              return Divider(color: Colors.white, height: 1);
+                            }
+                          },
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          itemCount: widget.cartList.length + 1,
+                          itemBuilder: (context, index) {
+                            if (index == widget.cartList.length) {
+                              return addItemPrice();
+                            } else {
+                              return addProductCart(widget.cartList[index]);
+                            }
 
-                        if(widget.cartList[index].taxDetail == null ||
-                            widget.cartList[index].taxDetail == null){
-                          return Divider(color: Colors.grey, height: 1);
-                        }else{
-                          return Divider(color: Colors.white, height: 1);
-                        }
-                      },
-                      shrinkWrap: true,
-                      itemCount: widget.cartList.length + 1,
-                      itemBuilder: (context, index) {
-                        if(index == 0){
-                          return showDeliverySlot();
-                        }else{
-                          if (index == widget.cartList.length) {
-                            return addItemPrice();
-                          } else {
-                            return addProductCart(widget.cartList[index]);
-                          }
-                        }
-
-                      },
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ]
