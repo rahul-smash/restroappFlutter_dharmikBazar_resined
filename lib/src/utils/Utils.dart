@@ -71,6 +71,8 @@ class Utils {
 
   static Future<void> showLoginDialog(BuildContext context) async {
     try {
+      //User Login with Mobile and OTP
+      // 1 = email and 0 = ph-no
       StoreModel model = await SharedPrefs.getStore();
       if(model.internationalOtp == "0"){
         Navigator.push(context,
