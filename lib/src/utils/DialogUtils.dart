@@ -246,8 +246,22 @@ class DialogUtils {
                       },
                     child: ListTile(
                       title: Text(areaObject.weight,style: TextStyle(color: Colors.black)),
-                      trailing: Text("${AppConstant.currency}${areaObject.price}",style: TextStyle(color: Colors.black)),
-                    ),
+                      trailing:
+//                      (areaObject.discount == "0.00" || areaObject.discount == "0" || areaObject.discount == "0.0")
+                      (false)
+                          ? Text("${AppConstant.currency}${areaObject.price}",
+                        style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w600),)
+                          :
+                      Wrap(
+                     children:<Widget>[
+                       Text("${AppConstant.currency}${areaObject.price}",
+                         style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700)),
+                       Text(" "),
+                       Text("${AppConstant.currency}${areaObject.mrpPrice}",
+                                           style: TextStyle(decoration: TextDecoration.lineThrough,
+                                               color: grayColorTitle,fontWeight: FontWeight.w400))]
+//                      Text("${AppConstant.currency}${areaObject.price}",style: TextStyle(color: Colors.black)),
+                    )),
                   );
                 },
               ),
