@@ -71,7 +71,7 @@ class AppConstant {
 
   static final String is24x7Open = 'is24x7Open';
   static final String DeliverySlot = 'deliverySlot';
-  static final String txtSendEmail = "SEND EMAIL";
+  static final String txtSendEmail = "Send Email";
   static final String app_OLD_VERISON = "APP_OLD_VERISON";
 
   static final String app_VERISON = "APP_VERISON";

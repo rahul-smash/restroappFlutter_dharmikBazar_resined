@@ -35,6 +35,12 @@ Future<void> main() async {
     SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.androidId);
   }
 
+  if(configObject.isGroceryApp == "true"){
+    AppConstant.isRestroApp = false;
+  }else{
+    AppConstant.isRestroApp = true;
+  }
+
   String branch_id = await SharedPrefs.getStoreSharedValue(AppConstant.branch_id);
   if(branch_id == null || branch_id.isEmpty){
 

@@ -52,6 +52,7 @@ dependencies:
   flutter_pull_to_refresh: ^1.0.0
   dio: ^3.0.9  #latest version
   webview_flutter: ^0.3.22+1
+  keyboard_visibility: ^0.5.6
 
 
 dev_dependencies:
@@ -119,6 +120,7 @@ flutter:
     - images/next_arrow_icon.png
     - images/cancel_icon.png
     - images/login_img.jpg
+    - images/login_restro_bg.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

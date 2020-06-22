@@ -171,6 +171,12 @@ class _ProfileState extends State<ProfileScreen> {
   }
 
   void _submitForm() {
+
+    if(firstNameController.text.trim().isEmpty){
+      Utils.showToast("Please enter your name", false);
+      return;
+    }
+
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
     } else {

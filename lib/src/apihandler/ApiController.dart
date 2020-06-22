@@ -101,7 +101,7 @@ class ApiController {
       final parsed = json.decode(respStr);
       UserResponse userResponse = UserResponse.fromJson(parsed);
       if (userResponse.success) {
-        SharedPrefs.setUserLoggedIn(true);
+        //SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUser(userResponse.user);
       }
       Utils.showToast(userResponse.message, true);
