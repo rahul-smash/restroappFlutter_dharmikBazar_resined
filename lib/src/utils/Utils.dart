@@ -76,7 +76,7 @@ class Utils {
       StoreModel model = await SharedPrefs.getStore();
       if(model.internationalOtp == "0"){
         Navigator.push(context,
-          MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+          MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
         );
         Map<String,dynamic> attributeMap = new Map<String,dynamic>();
         attributeMap["ScreenName"] = "LoginMobileScreen";
