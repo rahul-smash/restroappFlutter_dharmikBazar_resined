@@ -22,121 +22,133 @@ class _RegisterUserState extends State<RegisterUser> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: new AppBar(
-        title: new Text('Sign Up'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Sign Up'),
         centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.pop(context, false),
-          ),
-      ),
-      body: Container(
-        color: Colors.white,
-        /*decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('images/offer_bg.png'), fit: BoxFit.cover),
-        ),*/
-        child: new SafeArea(
-          top: false,
-          bottom: false,
-          child: new Form(
-              key: _formKey,
-              autovalidate: true,
-              child: new ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                children: <Widget>[
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      icon: const Icon(Icons.person),
-                      labelText: 'Name',
-                    ),
-                    inputFormatters: [new LengthLimitingTextInputFormatter(30)],
-                    validator: (val) =>
-                        val.isEmpty ? AppConstant.enterName : null,
-                    onSaved: (val) {
-                      userData.name = val.trim();
-                    },
-                  ),
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      icon: const Icon(Icons.phone),
-                      labelText: 'Phone',
-                    ),
-                    keyboardType: TextInputType.phone,
-                    validator: (val) =>
-                        val.isEmpty ? AppConstant.enterPhone : null,
-                    inputFormatters: [
-                      WhitelistingTextInputFormatter.digitsOnly,
-                    ],
-                    onSaved: (val) {
-                      userData.phone = val.trim();
-                    },
-                  ),
-                  new TextFormField(
-                    decoration: const InputDecoration(
-                      icon: const Icon(Icons.email),
-                      labelText: 'Email',
-                    ),
-                    keyboardType: TextInputType.emailAddress,
-                    //'Please enter a valid email address'
-                    validator: (value) => value.trim().isEmpty
-                        ? AppConstant.enterEmail
-                        : isValidEmail(value.trim())? null: AppConstant.enterValidEmail,
-                    onSaved: (val) {
-                      userData.email = val.trim();
-                    },
-                  ),
-                  new TextFormField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      icon: const Icon(Icons.lock),
-                      labelText: 'Password',
-                    ),
-                    keyboardType: TextInputType.visiblePassword,
-                    validator: (val) =>
-                        val.isEmpty ? AppConstant.enterPassword : null,
-                    onSaved: (val) {
-                      userData.password = val.trim();
-                    },
-                  ),
-                  new TextFormField(
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      icon: const Icon(Icons.lock),
-                      labelText: 'Confirm Password',
-                    ),
-                    keyboardType: TextInputType.visiblePassword,
-                    validator: (val) =>
-                        val.isEmpty ? AppConstant.enterConfirmPassword : null,
-                    onSaved: (val) {
-                      userData.confirmPassword = val.trim();
-                    },
-                  ),
-                  Container(height: 20.0),
-                  Container(
-                    height: 40.0,
-                    child: InkWell(
-                      onTap: () {},
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          new RaisedButton(
-                            child: const Text(
-                              'Submit',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                            onPressed: _submitForm,
-                            color: appTheme,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              )),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context, false),
         ),
+      ),
+      body: Stack(
+        children: <Widget>[
+          Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              width: Utils.getDeviceWidth(context),
+              child: Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: SafeArea(
+              child: Form(
+                  key: _formKey,
+                  autovalidate: true,
+                  child: ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    children: <Widget>[
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          icon: const Icon(Icons.person),
+                          labelText: 'Name',
+                        ),
+                        inputFormatters: [new LengthLimitingTextInputFormatter(30)],
+                        validator: (val) =>
+                        val.isEmpty ? AppConstant.enterName : null,
+                        onSaved: (val) {
+                          userData.name = val.trim();
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          icon: const Icon(Icons.phone),
+                          labelText: 'Phone',
+                        ),
+                        keyboardType: TextInputType.phone,
+                        validator: (val) =>
+                        val.isEmpty ? AppConstant.enterPhone : null,
+                        inputFormatters: [
+                          WhitelistingTextInputFormatter.digitsOnly,
+                        ],
+                        onSaved: (val) {
+                          userData.phone = val.trim();
+                        },
+                      ),
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          icon: const Icon(Icons.email),
+                          labelText: 'Email',
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        //'Please enter a valid email address'
+                        validator: (value) => value.trim().isEmpty
+                            ? AppConstant.enterEmail
+                            : isValidEmail(value.trim())? null: AppConstant.enterValidEmail,
+                        onSaved: (val) {
+                          userData.email = val.trim();
+                        },
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          icon: const Icon(Icons.lock),
+                          labelText: 'Password',
+                        ),
+                        keyboardType: TextInputType.visiblePassword,
+                        validator: (val) =>
+                        val.isEmpty ? AppConstant.enterPassword : null,
+                        onSaved: (val) {
+                          userData.password = val.trim();
+                        },
+                      ),
+                      TextFormField(
+                        obscureText: true,
+                        decoration: const InputDecoration(
+                          icon: const Icon(Icons.lock),
+                          labelText: 'Confirm Password',
+                        ),
+                        keyboardType: TextInputType.visiblePassword,
+                        validator: (val) =>
+                        val.isEmpty ? AppConstant.enterConfirmPassword : null,
+                        onSaved: (val) {
+                          userData.confirmPassword = val.trim();
+                        },
+                      ),
+                      Container(height: 20.0),
+                      Container(
+                        height: 40.0,
+                        child: InkWell(
+                          onTap: () {},
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              ButtonTheme(
+                                minWidth: 150,
+                                child: RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                  ),
+                                  child: const Text(
+                                    'Submit',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  onPressed: _submitForm,
+                                  color: orangeColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  )),
+            ),
+          ),
+        ],
       ),
     );
   }

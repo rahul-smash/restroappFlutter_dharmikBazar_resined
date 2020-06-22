@@ -47,7 +47,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: whiteColor,
-      resizeToAvoidBottomPadding: true,
+      resizeToAvoidBottomPadding: false,
       body: Stack(
         children: <Widget>[
           Align(
@@ -187,9 +187,9 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
         alignment: Alignment.bottomCenter,
         child: RichText(
           text: TextSpan(
-            text: 'New User?',
+            text: 'Don\'t have an account?',
             style: TextStyle(
-                fontFamily: 'Medium', fontSize: 16, color: orangeColor),
+                fontFamily: 'Medium', fontSize: 16, color:Colors.grey),
             children: [
               TextSpan(
                   text: ' Sign Up',
