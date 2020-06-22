@@ -26,9 +26,9 @@ import 'LoyalityPoints.dart';
 import 'ProfileScreen.dart';
 
 class NavDrawerMenu extends StatefulWidget {
-
   final StoreModel store;
   final String userName;
+
   NavDrawerMenu(this.store, this.userName);
 
   @override
@@ -38,32 +38,38 @@ class NavDrawerMenu extends StatefulWidget {
 }
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
+  List<dynamic> _drawerItems = List();
 
-  _NavDrawerMenuState();
-
-  final _drawerItems = [
-    DrawerChildItem('Home', "images/home.png"),
-    DrawerChildItem('My Profile', "images/myprofile.png"),
-    DrawerChildItem('Delivery Address', "images/deliveryaddress.png"),
-    DrawerChildItem('My Orders', "images/my_order.png"),
-    DrawerChildItem('Loyality Points', "images/loyality.png"),
-    //DrawerChildItem('Book Now', "images/booknow.png"),
-    DrawerChildItem('My Favorites', "images/myfav.png"),
-    DrawerChildItem('About Us', "images/about.png"),
-    DrawerChildItem('Share', "images/refer.png"),
-    DrawerChildItem('Login', "images/sign_in.png"),
-  ];
+  _NavDrawerMenuState() {}
 
   @override
   void initState() {
     super.initState();
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.HOME, "images/home.png"));
+    _drawerItems.add(DrawerChildItem(
+        DrawerChildConstants.MY_PROFILE, "images/myprofile.png"));
+    _drawerItems.add(DrawerChildItem(
+        DrawerChildConstants.DELIVERY_ADDRESS, "images/deliveryaddress.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.MY_ORDERS, "images/my_order.png"));
+    if (widget.store.loyality == "1")
+      _drawerItems.add(DrawerChildItem(
+          DrawerChildConstants.LOYALITY_POINTS, "images/loyality.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.MY_FAVORITES, "images/myfav.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about.png"));
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.SHARE, "images/refer.png"));
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
       _setSetUserId();
     } catch (e) {
       print(e);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -80,8 +86,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                     ? createHeaderInfoItem()
                     : createDrawerItem(index - 1, context));
               }),
-        )
-    );
+        ));
   }
 
   Widget createHeaderInfoItem() {
@@ -105,12 +110,14 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text('Welcome',
-                        style: TextStyle(color: leftMenuWelcomeTextColors,
-                            fontSize: 18, fontWeight: FontWeight.bold)),
+                        style: TextStyle(
+                            color: leftMenuWelcomeTextColors,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold)),
                     SizedBox(height: 5),
                     Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
-                        style: TextStyle(color: leftMenuWelcomeTextColors, fontSize: 15)
-                    ),
+                        style: TextStyle(
+                            color: leftMenuWelcomeTextColors, fontSize: 15)),
                   ])
             ])));
   }
@@ -121,111 +128,122 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         padding: EdgeInsets.only(left: 20),
         child: ListTile(
           leading: Image.asset(
-              index == _drawerItems.length - 1
+              item.title == DrawerChildConstants.LOGIN ||
+                      item.title == DrawerChildConstants.LOGOUT
                   ? AppConstant.isLoggedIn == false
-                  ? 'images/sign_in.png'
-                  : 'images/sign_out.png'
-                  : item.icon,color: left_menu_icon_colors,
+                      ? 'images/sign_in.png'
+                      : 'images/sign_out.png'
+                  : item.icon,
+              color: left_menu_icon_colors,
               width: 30),
-          title: index == _drawerItems.length - 1
-              ? Text(AppConstant.isLoggedIn == false ? 'Login' : 'Logout',
-              style: TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
+          title: item.title == DrawerChildConstants.LOGIN ||
+                  item.title == DrawerChildConstants.LOGOUT
+              ? Text(
+                  AppConstant.isLoggedIn == false
+                      ? DrawerChildConstants.LOGIN
+                      : DrawerChildConstants.LOGOUT,
+                  style:
+                      TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
               : Text(item.title,
-              style: TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
+                  style:
+                      TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
           onTap: () {
-            _openPageForIndex(index, context);
+            _openPageForIndex(item, index, context);
           },
         ));
   }
 
-  _openPageForIndex(int pos, BuildContext context) {
-    switch (pos) {
-      case 0:
+  _openPageForIndex(DrawerChildItem item, int pos, BuildContext context) {
+    switch (item.title) {
+      case DrawerChildConstants.HOME:
         Navigator.pop(context);
         break;
-      case 1:
+      case DrawerChildConstants.MY_PROFILE:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProfileScreen(false,"")),
+            MaterialPageRoute(builder: (context) => ProfileScreen(false, "")),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "ProfileScreen";
-          Utils.sendAnalyticsEvent("Clicked ProfileScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
         break;
-      case 2:
+      case DrawerChildConstants.DELIVERY_ADDRESS:
         if (AppConstant.isLoggedIn) {
           Utils.showProgressDialog(context);
-          ApiController.getAddressApiRequest().then((responses){
+          ApiController.getAddressApiRequest().then((responses) {
             Utils.hideProgressDialog(context);
             Navigator.pop(context);
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => DeliveryAddressList(false,responses,OrderType.Menu)),
+              MaterialPageRoute(
+                  builder: (context) =>
+                      DeliveryAddressList(false, responses, OrderType.Menu)),
             );
           });
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "DeliveryAddressList";
-          Utils.sendAnalyticsEvent("Clicked DeliveryAddressList",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
         break;
-      case 3:
+      case DrawerChildConstants.MY_ORDERS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MyOrderScreen(widget.store)),
+            MaterialPageRoute(
+                builder: (context) => MyOrderScreen(widget.store)),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "MyOrderScreen";
-          Utils.sendAnalyticsEvent("Clicked MyOrderScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
         break;
-      case 4:
+      case DrawerChildConstants.LOYALITY_POINTS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => LoyalityPointsScreen()),
           );
-        }else {
+        } else {
           Utils.showLoginDialog(context);
         }
 
         break;
-      case 5:
+      case DrawerChildConstants.MY_FAVORITES:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Favourites(() { })),
+            MaterialPageRoute(builder: (context) => Favourites(() {})),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "Favourites";
-          Utils.sendAnalyticsEvent("Clicked Favourites",attributeMap);
-        }else {
+          Utils.sendAnalyticsEvent("Clicked Favourites", attributeMap);
+        } else {
           Utils.showLoginDialog(context);
         }
         break;
-      case 6:
+      case DrawerChildConstants.ABOUT_US:
         Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => AboutScreen()),
         );
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "AboutScreen";
-        Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
+        Utils.sendAnalyticsEvent("Clicked AboutScreen", attributeMap);
         break;
-      case 7:
+      case DrawerChildConstants.SHARE:
         /*if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
@@ -241,37 +259,42 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         }*/
         share();
 
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "share apk url";
-        Utils.sendAnalyticsEvent("Clicked share",attributeMap);
+        Utils.sendAnalyticsEvent("Clicked share", attributeMap);
 
         break;
-      case 8:
+      case DrawerChildConstants.LOGIN:
+      case DrawerChildConstants.LOGOUT:
         if (AppConstant.isLoggedIn) {
           _showDialog(context);
         } else {
           Navigator.pop(context);
-          SharedPrefs.getStore().then((storeData){
+          SharedPrefs.getStore().then((storeData) {
             StoreModel model = storeData;
             print("---internationalOtp--${model.internationalOtp}");
             //User Login with Mobile and OTP = 0
             // 1 = email and 0 = ph-no
-            if(model.internationalOtp == "0"){
+            if (model.internationalOtp == "0") {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+                MaterialPageRoute(
+                    builder: (context) => LoginMobileScreen("menu")),
               );
-              Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+              Map<String, dynamic> attributeMap = new Map<String, dynamic>();
               attributeMap["ScreenName"] = "LoginMobileScreen";
-              Utils.sendAnalyticsEvent("Clicked LoginMobileScreen",attributeMap);
-            }else{
+              Utils.sendAnalyticsEvent(
+                  "Clicked LoginMobileScreen", attributeMap);
+            } else {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+                MaterialPageRoute(
+                    builder: (context) => LoginEmailScreen("menu")),
               );
-              Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+              Map<String, dynamic> attributeMap = new Map<String, dynamic>();
               attributeMap["ScreenName"] = "LoginEmailScreen";
-              Utils.sendAnalyticsEvent("Clicked LoginEmailScreen",attributeMap);
+              Utils.sendAnalyticsEvent(
+                  "Clicked LoginEmailScreen", attributeMap);
             }
           });
         }
@@ -343,25 +366,39 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   Future<void> _setSetUserId() async {
     try {
-      if(AppConstant.isLoggedIn){
+      if (AppConstant.isLoggedIn) {
         UserModel user = await SharedPrefs.getUser();
         await Utils.analytics.setUserId('${user.id}');
         await Utils.analytics.setUserProperty(name: "userid", value: user.id);
-        await Utils.analytics.setUserProperty(name: "useremail", value: user.email);
-        await Utils.analytics.setUserProperty(name: "userfullName", value: user.fullName);
-        await Utils.analytics.setUserProperty(name: "userphone", value: user.phone);
+        await Utils.analytics
+            .setUserProperty(name: "useremail", value: user.email);
+        await Utils.analytics
+            .setUserProperty(name: "userfullName", value: user.fullName);
+        await Utils.analytics
+            .setUserProperty(name: "userphone", value: user.phone);
       }
     } catch (e) {
       print(e);
     }
   }
-
 }
-
-
 
 class DrawerChildItem {
   String title;
   String icon;
+
   DrawerChildItem(this.title, this.icon);
+}
+
+class DrawerChildConstants {
+  static const HOME = "Home";
+  static const MY_PROFILE = "My Profile";
+  static const DELIVERY_ADDRESS = "Delivery Address";
+  static const MY_ORDERS = "My Orders";
+  static const LOYALITY_POINTS = "Loyality Points";
+  static const MY_FAVORITES = "My Favorites";
+  static const ABOUT_US = "About Us";
+  static const SHARE = "Share";
+  static const LOGIN = "Login";
+  static const LOGOUT = "Logout";
 }
