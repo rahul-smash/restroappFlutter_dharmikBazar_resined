@@ -43,109 +43,99 @@ class _RegisterUserState extends State<RegisterUser> {
           Align(
             alignment: Alignment.bottomCenter,
             child: SafeArea(
-              child: Form(
-                  key: _formKey,
-                  autovalidate: true,
-                  child: ListView(
-                    shrinkWrap: true,
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    children: <Widget>[
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          icon: const Icon(Icons.person),
-                          labelText: 'Name',
+              child: Container(
+                margin: EdgeInsets.only(left: 30,right: 30),
+                child: Form(
+                    key: _formKey,
+                    autovalidate: true,
+                    child: ListView(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      children: <Widget>[
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Name',
+                          ),
+                          inputFormatters: [new LengthLimitingTextInputFormatter(30)],
+                          validator: (val) =>
+                          val.isEmpty ? AppConstant.enterName : null,
+                          onSaved: (val) {
+                            userData.name = val.trim();
+                          },
                         ),
-                        inputFormatters: [new LengthLimitingTextInputFormatter(30)],
-                        validator: (val) =>
-                        val.isEmpty ? AppConstant.enterName : null,
-                        onSaved: (val) {
-                          userData.name = val.trim();
-                        },
-                      ),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          icon: const Icon(Icons.phone),
-                          labelText: 'Phone',
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Phone',
+                          ),
+                          keyboardType: TextInputType.phone,
+                          validator: (val) =>
+                          val.isEmpty ? AppConstant.enterPhone : null,
+                          inputFormatters: [
+                            WhitelistingTextInputFormatter.digitsOnly,
+                          ],
+                          onSaved: (val) {
+                            userData.phone = val.trim();
+                          },
                         ),
-                        keyboardType: TextInputType.phone,
-                        validator: (val) =>
-                        val.isEmpty ? AppConstant.enterPhone : null,
-                        inputFormatters: [
-                          WhitelistingTextInputFormatter.digitsOnly,
-                        ],
-                        onSaved: (val) {
-                          userData.phone = val.trim();
-                        },
-                      ),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          icon: const Icon(Icons.email),
-                          labelText: 'Email',
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            labelText: 'Email',
+                          ),
+                          keyboardType: TextInputType.emailAddress,
+                          //'Please enter a valid email address'
+                          validator: (value) => value.trim().isEmpty
+                              ? AppConstant.enterEmail
+                              : isValidEmail(value.trim())? null: AppConstant.enterValidEmail,
+                          onSaved: (val) {
+                            userData.email = val.trim();
+                          },
                         ),
-                        keyboardType: TextInputType.emailAddress,
-                        //'Please enter a valid email address'
-                        validator: (value) => value.trim().isEmpty
-                            ? AppConstant.enterEmail
-                            : isValidEmail(value.trim())? null: AppConstant.enterValidEmail,
-                        onSaved: (val) {
-                          userData.email = val.trim();
-                        },
-                      ),
-                      TextFormField(
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          icon: const Icon(Icons.lock),
-                          labelText: 'Password',
+                        TextFormField(
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Password',
+                          ),
+                          keyboardType: TextInputType.visiblePassword,
+                          validator: (val) =>
+                          val.isEmpty ? AppConstant.enterPassword : null,
+                          onSaved: (val) {
+                            userData.password = val.trim();
+                          },
                         ),
-                        keyboardType: TextInputType.visiblePassword,
-                        validator: (val) =>
-                        val.isEmpty ? AppConstant.enterPassword : null,
-                        onSaved: (val) {
-                          userData.password = val.trim();
-                        },
-                      ),
-                      TextFormField(
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                          icon: const Icon(Icons.lock),
-                          labelText: 'Confirm Password',
+                        TextFormField(
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            labelText: 'Confirm Password',
+                          ),
+                          keyboardType: TextInputType.visiblePassword,
+                          validator: (val) =>
+                          val.isEmpty ? AppConstant.enterConfirmPassword : null,
+                          onSaved: (val) {
+                            userData.confirmPassword = val.trim();
+                          },
                         ),
-                        keyboardType: TextInputType.visiblePassword,
-                        validator: (val) =>
-                        val.isEmpty ? AppConstant.enterConfirmPassword : null,
-                        onSaved: (val) {
-                          userData.confirmPassword = val.trim();
-                        },
-                      ),
-                      Container(height: 20.0),
-                      Container(
-                        height: 40.0,
-                        child: InkWell(
-                          onTap: () {},
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              ButtonTheme(
-                                minWidth: 150,
-                                child: RaisedButton(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(5.0),
-                                  ),
-                                  child: const Text(
-                                    'Submit',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  onPressed: _submitForm,
-                                  color: orangeColor,
-                                ),
+                        Container(height: 20.0),
+                        Container(
+                          color: grayColor,
+                          height: 40.0,
+                          margin: EdgeInsets.only(left:0, right:0,bottom: 20),
+                          child: ButtonTheme(
+                            child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5.0),
                               ),
-                            ],
+                              child: const Text(
+                                'Submit',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              onPressed: _submitForm,
+                              color: orangeColor,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  )),
+                      ],
+                    )),
+              ),
             ),
           ),
         ],

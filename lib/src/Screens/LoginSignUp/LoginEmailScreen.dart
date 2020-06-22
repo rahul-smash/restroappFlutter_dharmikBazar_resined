@@ -47,7 +47,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: whiteColor,
-      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomPadding: true,
       body: Stack(
         children: <Widget>[
           Align(

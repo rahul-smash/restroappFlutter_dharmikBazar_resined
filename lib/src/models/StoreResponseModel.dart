@@ -103,6 +103,7 @@ class StoreModel {
   String iphoneAppShare;
   String windowAppShare;
   List<Banners> banners;
+  List<Banner> aboutusBanner;
   List<ForceDownload> forceDownload;
 /*  List<Geofencing> geofencing;*/
   List<AppLabels> appLabels;
@@ -118,6 +119,7 @@ class StoreModel {
   StoreModel(
       {this.id,
         this.storeName,
+        this.aboutusBanner,
         this.location,
         this.city,
         this.state,
@@ -215,6 +217,7 @@ class StoreModel {
   StoreModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     storeName = json['store_name'];
+    aboutusBanner = json["aboutus_banner"] == null ? null : List<Banner>.from(json["aboutus_banner"].map((x) => Banner.fromJson(x)));
     location = json['location'];
     city = json['city'];
     state = json['state'];
@@ -371,6 +374,7 @@ class StoreModel {
     data['iphone_share_link'] = this.iphoneShareLink;
     data['theme'] = this.theme;
     data['web_theme'] = this.webTheme;
+    data['aboutus_banner'] = this.aboutusBanner;
     data['type'] = this.type;
     data['cat_type'] = this.catType;
     data['store_app'] = this.storeApp;
@@ -546,7 +550,73 @@ class AppThemeColors {
 }
 
 
+class Banner {
+  Banner({
+    this.id,
+    this.storeId,
+    this.link,
+    this.title,
+    this.categoryId,
+    this.subCategoryId,
+    this.productId,
+    this.offerId,
+    this.image,
+    this.linkTo,
+    this.pageId,
+    this.status,
+    this.type,
+    this.platform,
+  });
 
+  String id;
+  String storeId;
+  String link;
+  String title;
+  String categoryId;
+  String subCategoryId;
+  String productId;
+  String offerId;
+  String image;
+  String linkTo;
+  String pageId;
+  bool status;
+  String type;
+  String platform;
+
+  factory Banner.fromJson(Map<String, dynamic> json) => Banner(
+    id: json["id"],
+    storeId: json["store_id"],
+    link: json["link"],
+    title: json["title"],
+    categoryId: json["category_id"],
+    subCategoryId: json["sub_category_id"],
+    productId: json["product_id"],
+    offerId: json["offer_id"],
+    image: json["image"],
+    linkTo: json["link_to"],
+    pageId: json["page_id"],
+    status: json["status"],
+    type: json["type"],
+    platform: json["platform"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "store_id": storeId,
+    "link": link,
+    "title": title,
+    "category_id": categoryId,
+    "sub_category_id": subCategoryId,
+    "product_id": productId,
+    "offer_id": offerId,
+    "image": image,
+    "link_to": linkTo,
+    "page_id": pageId,
+    "status": status,
+    "type": type,
+    "platform": platform,
+  };
+}
 
 class Banners {
   String id;

@@ -185,7 +185,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => LoyalityPointsScreen()),
+            MaterialPageRoute(builder: (context) => LoyalityPointsScreen(widget.store)),
           );
         }else {
           Utils.showLoginDialog(context);
@@ -210,7 +210,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         Navigator.pop(context);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AboutScreen()),
+          MaterialPageRoute(builder: (context) => AboutScreen(widget.store)),
         );
         Map<String,dynamic> attributeMap = new Map<String,dynamic>();
         attributeMap["ScreenName"] = "AboutScreen";

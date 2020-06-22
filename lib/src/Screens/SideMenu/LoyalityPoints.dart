@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class LoyalityPointsScreen extends StatefulWidget {
+
+  StoreModel store;
+  LoyalityPointsScreen(this.store);
 
   @override
   _LoyalityPointsScreenState createState() {

@@ -141,9 +141,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
 
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
-
               print("=====otpVerify===${response.user.otpVerify}--and--${response.userExists}-----");
-
               if(response.userExists == 1 || otpSkip == "yes"){
                 print('@@userExists=${response.userExists} and otpSkip = ${response.user.otpVerify}');
                 if (response.success) {
