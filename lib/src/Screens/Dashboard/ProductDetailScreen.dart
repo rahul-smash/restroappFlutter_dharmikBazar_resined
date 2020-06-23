@@ -126,7 +126,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: 20.0, bottom: 10.0,left: 40,right: 40),
+          padding: EdgeInsets.only(top: 10.0, bottom: 10.0,left: 40,right: 40),
           child: imageUrl == "" ?
           Container(
             child: Center(
@@ -136,14 +136,18 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               : Padding(
               padding: EdgeInsets.all(0),
               child: Container(
-                child: AspectRatio(
+                /*child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: CachedNetworkImage(
                     imageUrl: "${imageUrl}", fit: BoxFit.cover
+                  ),
+                ),*/
+                child: Center(
+                  child: CachedNetworkImage(
+                    imageUrl: "${imageUrl}", fit: BoxFit.fitWidth,
                     //placeholder: (context, url) => CircularProgressIndicator(),
                     //errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
-                  //child:Image.network(imageUrl, fit: BoxFit.cover),
                 ),
               )),
         ),
