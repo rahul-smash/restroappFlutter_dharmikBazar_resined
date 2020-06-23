@@ -185,7 +185,7 @@ class ApiController {
         ApiConstants.getCategories;
 
     Response response = await Dio().get(url,options: new Options(responseType: ResponseType.plain));
-    //print(response);
+    print(url);
     CategoryResponse categoryResponse = CategoryResponse.fromJson(json.decode(response.data));
     //print("-------Categories.length ---${categoryResponse.categories.length}");
     try {

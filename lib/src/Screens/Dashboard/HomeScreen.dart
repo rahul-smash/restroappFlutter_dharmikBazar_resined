@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 200.0,
             width: Utils.getDeviceWidth(context),
             child: Carousel(
-              boxFit: BoxFit.cover,
+              boxFit: BoxFit.fitWidth,
               autoplay: true,
               animationCurve: Curves.fastOutSlowIn,
               animationDuration: Duration(milliseconds: 3000),
