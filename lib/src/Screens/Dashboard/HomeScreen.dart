@@ -124,7 +124,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body:Column(children: <Widget>[
             addBanners(),
             Expanded(
-            child: isLoading
+              child: isLoading
                 ? Center(child: CircularProgressIndicator()) : categoryResponse == null
                 ? SingleChildScrollView(child:Center(child: Text("")))
                 : Container(
