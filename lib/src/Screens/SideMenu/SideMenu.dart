@@ -38,25 +38,31 @@ class NavDrawerMenu extends StatefulWidget {
 }
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
-
+  List<dynamic> _drawerItems = List();
   _NavDrawerMenuState();
-
-  final _drawerItems = [
-    DrawerChildItem('Home', "images/home.png"),
-    DrawerChildItem('My Profile', "images/myprofile.png"),
-    DrawerChildItem('Delivery Address', "images/deliveryaddress.png"),
-    DrawerChildItem('My Orders', "images/my_order.png"),
-    DrawerChildItem('Loyality Points', "images/loyality.png"),
-    //DrawerChildItem('Book Now', "images/booknow.png"),
-    DrawerChildItem('My Favorites', "images/myfav.png"),
-    DrawerChildItem('About Us', "images/about.png"),
-    DrawerChildItem('Share', "images/refer.png"),
-    DrawerChildItem('Login', "images/sign_in.png"),
-  ];
 
   @override
   void initState() {
     super.initState();
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.HOME, "images/home.png"));
+    _drawerItems.add(DrawerChildItem(
+        DrawerChildConstants.MY_PROFILE, "images/myprofile.png"));
+    _drawerItems.add(DrawerChildItem(
+        DrawerChildConstants.DELIVERY_ADDRESS, "images/deliveryaddress.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.MY_ORDERS, "images/my_order.png"));
+    if (widget.store.loyality == "1")
+      _drawerItems.add(DrawerChildItem(
+          DrawerChildConstants.LOYALITY_POINTS, "images/loyality.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.MY_FAVORITES, "images/myfav.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about.png"));
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.SHARE, "images/refer.png"));
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
       _setSetUserId();
     } catch (e) {
@@ -116,29 +122,37 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         padding: EdgeInsets.only(left: 20),
         child: ListTile(
           leading: Image.asset(
-              index == _drawerItems.length - 1
+              item.title == DrawerChildConstants.LOGIN ||
+                  item.title == DrawerChildConstants.LOGOUT
                   ? AppConstant.isLoggedIn == false
                   ? 'images/sign_in.png'
                   : 'images/sign_out.png'
-                  : item.icon,color: left_menu_icon_colors,
+                  : item.icon,
+              color: left_menu_icon_colors,
               width: 30),
-          title: index == _drawerItems.length - 1
-              ? Text(AppConstant.isLoggedIn == false ? 'Login' : 'Logout',
-              style: TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
+          title: item.title == DrawerChildConstants.LOGIN ||
+              item.title == DrawerChildConstants.LOGOUT
+              ? Text(
+              AppConstant.isLoggedIn == false
+                  ? DrawerChildConstants.LOGIN
+                  : DrawerChildConstants.LOGOUT,
+              style:
+              TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
               : Text(item.title,
-              style: TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
+              style:
+              TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
           onTap: () {
-            _openPageForIndex(index, context);
+            _openPageForIndex(item, index, context);
           },
         ));
   }
 
-  _openPageForIndex(int pos, BuildContext context) {
-    switch (pos) {
-      case 0:
+  _openPageForIndex(DrawerChildItem item,int pos, BuildContext context) {
+    switch (item.title) {
+      case DrawerChildConstants.HOME:
         Navigator.pop(context);
         break;
-      case 1:
+      case DrawerChildConstants.MY_PROFILE:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -152,7 +166,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 2:
+      case DrawerChildConstants.DELIVERY_ADDRESS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -166,7 +180,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 3:
+      case DrawerChildConstants.MY_ORDERS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -180,7 +194,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 4:
+      case DrawerChildConstants.LOYALITY_POINTS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -192,7 +206,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         }
 
         break;
-      case 5:
+      case DrawerChildConstants.MY_FAVORITES:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -206,7 +220,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 6:
+      case DrawerChildConstants.ABOUT_US:
         Navigator.pop(context);
         Navigator.push(
           context,
@@ -216,7 +230,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         attributeMap["ScreenName"] = "AboutScreen";
         Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
         break;
-      case 7:
+      case DrawerChildConstants.SHARE:
         /*if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
@@ -237,7 +251,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         Utils.sendAnalyticsEvent("Clicked share",attributeMap);
 
         break;
-      case 8:
+      case DrawerChildConstants.LOGIN:
+      case DrawerChildConstants.LOGOUT:
         if (AppConstant.isLoggedIn) {
           _showDialog(context);
         } else {
@@ -356,3 +371,17 @@ class DrawerChildItem {
   String icon;
   DrawerChildItem(this.title, this.icon);
 }
+
+class DrawerChildConstants {
+  static const HOME = "Home";
+  static const MY_PROFILE = "My Profile";
+  static const DELIVERY_ADDRESS = "Delivery Address";
+  static const MY_ORDERS = "My Orders";
+  static const LOYALITY_POINTS = "Loyality Points";
+  static const MY_FAVORITES = "My Favorites";
+  static const ABOUT_US = "About Us";
+  static const SHARE = "Share";
+  static const LOGIN = "Login";
+  static const LOGOUT = "Logout";
+}
+
