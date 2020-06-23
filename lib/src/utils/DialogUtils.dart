@@ -258,38 +258,41 @@ class DialogUtils {
                                   style: TextStyle(color: Colors.black)),
                             ),
                             Expanded(
-                                child: RichText(
-                                    overflow: TextOverflow.visible,
-                                    text: (areaObject.discount == "0.00" ||
-                                            areaObject.discount == "0" ||
-                                            areaObject.discount == "0.0")
-                                        ? TextSpan(
-                                            text:
-                                                "${AppConstant.currency}${areaObject.price}",
-                                            style: TextStyle(
-                                                color: grayColorTitle,
-                                                fontWeight: FontWeight.w700),
-                                          )
-                                        : TextSpan(
-                                            text:
-                                                "${AppConstant.currency}${areaObject.price}",
-//                                                    "TOOOOOOOOOOOOOOOOOOOOOOOO Longggggggggggggggggggggggb TEXTTTTTTTTTTTTTTTTTTTTTTTT",
-                                            style: TextStyle(
-                                                color: grayColorTitle,
-                                                fontWeight: FontWeight.w700),
-                                            children: <TextSpan>[
-                                              TextSpan(text: " "),
-                                              TextSpan(
-                                                  text:
-                                                      "${AppConstant.currency}${areaObject.mrpPrice}",
-                                                  style: TextStyle(
-                                                      decoration: TextDecoration
-                                                          .lineThrough,
-                                                      color: grayColorTitle,
-                                                      fontWeight:
-                                                          FontWeight.w400)),
-                                            ],
-                                          )))
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: RichText(
+                                      overflow: TextOverflow.visible,
+                                      text: (areaObject.discount == "0.00" ||
+                                          areaObject.discount == "0" ||
+                                          areaObject.discount == "0.0")
+                                          ? TextSpan(
+                                        text:
+                                        "${AppConstant.currency}${areaObject.price}",
+                                        style: TextStyle(
+                                            color: grayColorTitle,
+                                            fontWeight: FontWeight.w700),
+                                      )
+                                          : TextSpan(
+                                        text:
+                                        "${AppConstant.currency}${areaObject.price}",
+                                        style: TextStyle(
+                                            color: grayColorTitle,
+                                            fontWeight: FontWeight.w700),
+                                        children: <TextSpan>[
+                                          TextSpan(text: " "),
+                                          TextSpan(
+                                              text:
+                                              "${AppConstant.currency}${areaObject.mrpPrice}",
+                                              style: TextStyle(
+                                                  decoration: TextDecoration
+                                                      .lineThrough,
+                                                  color: grayColorTitle,
+                                                  fontWeight:
+                                                  FontWeight.w400)),
+                                        ],
+                                      )),
+                                ),
+                            )
 //
                           ]),
                     ),
