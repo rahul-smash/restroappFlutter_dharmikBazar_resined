@@ -74,8 +74,6 @@ PODS:
     - Flutter
   - flutter_share (0.0.1):
     - Flutter
-  - flutter_web_view (0.0.1):
-    - Flutter
   - fluttertoast (0.0.2):
     - Flutter
   - FMDB (2.7.5):
@@ -123,6 +121,9 @@ PODS:
     - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (6.4.0):
     - GoogleUtilities/Logger
+  - keyboard_visibility (0.5.0):
+    - Flutter
+    - Reachability
   - location_permissions (2.0.5):
     - Flutter
   - nanopb (0.3.9011):
@@ -143,6 +144,10 @@ PODS:
     - razorpay-pod
   - Reachability (3.2)
   - shared_preferences (0.0.1):
+    - Flutter
+  - shared_preferences_macos (0.0.1):
+    - Flutter
+  - shared_preferences_web (0.0.1):
     - Flutter
   - sqflite (0.0.1):
     - Flutter
@@ -167,18 +172,20 @@ DEPENDENCIES:
   - flutter_local_notifications (from `.symlinks/plugins/flutter_local_notifications/ios`)
   - flutter_plugin_android_lifecycle (from `.symlinks/plugins/flutter_plugin_android_lifecycle/ios`)
   - flutter_share (from `.symlinks/plugins/flutter_share/ios`)
-  - flutter_web_view (from `.symlinks/plugins/flutter_web_view/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - geocoder (from `.symlinks/plugins/geocoder/ios`)
   - geolocator (from `.symlinks/plugins/geolocator/ios`)
   - google_api_availability (from `.symlinks/plugins/google_api_availability/ios`)
   - google_maps_flutter (from `.symlinks/plugins/google_maps_flutter/ios`)
+  - keyboard_visibility (from `.symlinks/plugins/keyboard_visibility/ios`)
   - location_permissions (from `.symlinks/plugins/location_permissions/ios`)
   - package_info (from `.symlinks/plugins/package_info/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - path_provider_macos (from `.symlinks/plugins/path_provider_macos/ios`)
   - razorpay_flutter (from `.symlinks/plugins/razorpay_flutter/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - shared_preferences_macos (from `.symlinks/plugins/shared_preferences_macos/ios`)
+  - shared_preferences_web (from `.symlinks/plugins/shared_preferences_web/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
   - url_launcher_macos (from `.symlinks/plugins/url_launcher_macos/ios`)
@@ -229,8 +236,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_plugin_android_lifecycle/ios"
   flutter_share:
     :path: ".symlinks/plugins/flutter_share/ios"
-  flutter_web_view:
-    :path: ".symlinks/plugins/flutter_web_view/ios"
   fluttertoast:
     :path: ".symlinks/plugins/fluttertoast/ios"
   geocoder:
@@ -241,6 +246,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/google_api_availability/ios"
   google_maps_flutter:
     :path: ".symlinks/plugins/google_maps_flutter/ios"
+  keyboard_visibility:
+    :path: ".symlinks/plugins/keyboard_visibility/ios"
   location_permissions:
     :path: ".symlinks/plugins/location_permissions/ios"
   package_info:
@@ -253,6 +260,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/razorpay_flutter/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
+  shared_preferences_macos:
+    :path: ".symlinks/plugins/shared_preferences_macos/ios"
+  shared_preferences_web:
+    :path: ".symlinks/plugins/shared_preferences_web/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
   url_launcher:
@@ -285,7 +296,6 @@ SPEC CHECKSUMS:
   flutter_local_notifications: 9e4738ce2471c5af910d961a6b7eadcf57c50186
   flutter_plugin_android_lifecycle: 47de533a02850f070f5696a623995e93eddcdb9b
   flutter_share: 4be0208963c60b537e6255ed2ce1faae61cd9ac2
-  flutter_web_view: 95e784768166c40b99e0801adff6ccc798bde237
   fluttertoast: b644586ef3b16f67fae9a1f8754cef6b2d6b634b
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   geocoder: 3cfab70531a0b367e917bafe82df4c30f6d4c45a
@@ -297,6 +307,7 @@ SPEC CHECKSUMS:
   GoogleDataTransportCCTSupport: 202d7cdf9c4a7d81a2bb7f7e7e1ba6faa421b1f2
   GoogleMaps: 7c8d66d70e4e8c300f43a7219d8fdaad7b325a9a
   GoogleUtilities: 29bd0d8f850efbd28cff6d99e8b7da1f8d236bcf
+  keyboard_visibility: 96a24de806fe6823c3ad956c01ba2ec6d056616f
   location_permissions: 4a49d4e5bec5b653643e551ab77963cc99bb0e4a
   nanopb: 18003b5e52dab79db540fe93fe9579f399bd1ccd
   package_info: 873975fc26034f0b863a300ad47e7f1ac6c7ec62
@@ -306,7 +317,9 @@ SPEC CHECKSUMS:
   razorpay-pod: 31dd24ddb70275d82be12527b45001f9bc9f1be2
   razorpay_flutter: 347215399cb0b826953fd44b88f0e4eba39695a0
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
-  shared_preferences: 1feebfa37bb57264736e16865e7ffae7fc99b523
+  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
+  shared_preferences_macos: f3f29b71ccbb56bf40c9dd6396c9acf15e214087
+  shared_preferences_web: 141cce0c3ed1a1c5bf2a0e44f52d31eeb66e5ea9
   sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
   url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
   url_launcher_macos: fd7894421cd39320dce5f292fc99ea9270b2a313

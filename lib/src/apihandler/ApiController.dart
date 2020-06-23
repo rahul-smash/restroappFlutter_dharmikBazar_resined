@@ -181,9 +181,9 @@ class ApiController {
   }
 
   static Future<CategoryResponse> getCategoriesApiRequest(String storeId) async {
-    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
+     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.getCategories;
-
+    print("catttttt  $url");
     Response response = await Dio().get(url,options: new Options(responseType: ResponseType.plain));
     print(url);
     CategoryResponse categoryResponse = CategoryResponse.fromJson(json.decode(response.data));
