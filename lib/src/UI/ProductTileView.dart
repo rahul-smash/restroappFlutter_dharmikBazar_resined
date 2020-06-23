@@ -508,6 +508,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
   void removeFromCartTable(String variant_Id) {
     try {
+      //print("------removeFromCartTable-------");
       String variantId;
       variantId = variant == null ? variant_Id : variant.id;
       databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {

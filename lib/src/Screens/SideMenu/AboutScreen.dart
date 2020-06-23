@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -13,7 +14,8 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'ContactUs.dart';
 
 class AboutScreen extends StatefulWidget {
-  AboutScreen();
+  StoreModel store;
+  AboutScreen(this.store);
 
   @override
   State<StatefulWidget> createState() {
@@ -23,20 +25,17 @@ class AboutScreen extends StatefulWidget {
 
 class _AboutScreenState extends State<AboutScreen> {
 
-  String aboutUs;
-  StoreModel store;
+  String aboutUs, aboutUsBanner="";
 
   @override
   void initState() {
     super.initState();
-    _aboutUsData();
-  }
-
-  _aboutUsData() async {
-    store = await SharedPrefs.getStore();
-    setState(() {
-      aboutUs = store.aboutUs;
-    });
+    print("aboutusBanner=${widget.store.aboutusBanner[0].image}");
+    try {
+      aboutUsBanner = widget.store.aboutusBanner[0].image;
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -48,11 +47,22 @@ class _AboutScreenState extends State<AboutScreen> {
       ),
       body: Container(
         child: SingleChildScrollView(
-          child: aboutUs == null
-              ? Container()
-              : Html(
-            data: aboutUs,
-            padding: EdgeInsets.all(10.0),
+          child: Column(
+            children: <Widget>[
+              Visibility(
+                child: CachedNetworkImage(
+                    imageUrl: aboutUsBanner,
+                    fit: BoxFit.fitWidth
+                ),
+                visible : widget.store.aboutusBanner == null ? false :true,
+              ),
+              widget.store.aboutUs == null
+                  ? Container()
+                  : Html(
+                data: widget.store.aboutUs,
+                padding: EdgeInsets.all(10.0),
+              ),
+            ],
           ),
         ),
       ),
@@ -97,9 +107,9 @@ class _AboutScreenState extends State<AboutScreen> {
                     textColor: Colors.black,
                     onPressed: () {
                       try {
-                        if (store != null) {
-                          String address = "${store.storeName}, ${store.location}"
-                              "${store.city}, ${store.state}, ${store.country}";
+                        if (widget.store != null) {
+                          String address = "${widget.store.storeName}, ${widget.store.location}"
+                              "${widget.store.city}, ${widget.store.state}, ${widget.store.country}";
                           print("address= ${address}");
                           MapsLauncher.launchQuery(address);
                         }

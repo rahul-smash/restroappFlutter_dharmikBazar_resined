@@ -95,15 +95,11 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                               Navigator.pop(context);
                               return;
                             }
-
-                            Utils.showProgressDialog(context);
-                            DeliveryAddressResponse deliveryAddressResponse = await ApiController.getAddressApiRequest();
-                            Utils.hideProgressDialog(context);
                             Navigator.pop(context);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => DeliveryAddressList(true,deliveryAddressResponse,OrderType.Delivery)),
+                                  builder: (context) => DeliveryAddressList(true,OrderType.Delivery)),
                             );
 
                           },

@@ -72,57 +72,6 @@ class _MyCartScreenState extends State<MyCartScreen> {
           child: Column(
             children: <Widget>[
               Divider(color: Colors.white, height: 2.0),
-              /*FutureBuilder(
-                future: databaseHelper.getCartItemList(),
-                builder: (context, projectSnap) {
-                  if (projectSnap.connectionState == ConnectionState.none &&
-                      projectSnap.hasData == null) {
-                    return Container();
-                  } else {
-                    if (projectSnap.hasData) {
-
-                      //print("--length---${projectSnap.data.length}----");
-                      eventBus.fire(updateCartCount());
-                      if(projectSnap.data.length == 0){
-
-                        return Container(
-                          child: Expanded(
-                            child: Center(
-                              child: Text("Empty Cart",
-                                  overflow: TextOverflow.ellipsis,
-                                  style: new TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 18.0,
-                                  )),
-                            ),
-                          ),
-                        );
-                      }else{
-                        return Expanded(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: projectSnap.data.length,
-                            itemBuilder: (context, index) {
-                              Product product = projectSnap.data[index];
-                              return ProductTileItem(product, () {
-                                bottomBar.state.updateTotalPrice();
-                                widget.callback();
-                              },ClassType.CART);
-                            },
-                          ),
-                        );
-                      }
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(
-                            backgroundColor: Colors.black26,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.black26)),
-                      );
-                    }
-                  }
-                },
-              ),*/
               isLoading ? Utils.getIndicatorView(): showCartList(),
             ],
           ),
@@ -168,6 +117,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
           itemBuilder: (context, index) {
             Product product = cartList[index];
             return ProductTileItem(product, () {
+              //print("----bottomBar.updateTotalPrice----");
               bottomBar.state.updateTotalPrice();
               widget.callback();
             },ClassType.CART);

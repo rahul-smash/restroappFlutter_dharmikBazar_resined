@@ -71,6 +71,8 @@ class Utils {
 
   static Future<void> showLoginDialog(BuildContext context) async {
     try {
+      //User Login with Mobile and OTP
+      // 1 = email and 0 = ph-no
       StoreModel model = await SharedPrefs.getStore();
       if(model.internationalOtp == "0"){
         Navigator.push(context,
@@ -211,6 +213,15 @@ class Utils {
     return MediaQuery.of(context).size.width;
   }
 
+  static Widget showDivider(BuildContext context){
+    return  Container(
+      width: MediaQuery.of(context).size.width,
+      height: 1,
+      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+      color: Color(0xFFDBDCDD),
+    );
+  }
+
   static Widget getEmptyView(String value){
     return  Container(
       child: Expanded(
@@ -312,10 +323,9 @@ class Utils {
     try {
       DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
       DateTime time = format.parse(date);
-      time.toLocal();
+      time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
-
-      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm');
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);

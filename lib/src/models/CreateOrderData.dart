@@ -27,6 +27,7 @@ class CreateOrderData {
 
   Map<String, dynamic> toJson() => {
     "success": success,
+    "message": message,
     "data": data.toJson(),
   };
 }

@@ -20,9 +20,8 @@ import '../BookOrder/ConfirmOrderScreen.dart';
 class DeliveryAddressList extends StatefulWidget {
 
   final bool showProceedBar;
-  DeliveryAddressResponse responsesData;
   OrderType delivery;
-  DeliveryAddressList(this.showProceedBar,this.responsesData,this.delivery);
+  DeliveryAddressList(this.showProceedBar,this.delivery);
 
   @override
   _AddDeliveryAddressState createState() => _AddDeliveryAddressState();
@@ -35,19 +34,24 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   Area radiusArea;
   Coordinates coordinates;
   bool isLoading =false;
+  DeliveryAddressResponse responsesData;
 
   @override
   void initState() {
     super.initState();
-    try {
-      addressList = widget.responsesData.data;
-      if(addressList.isNotEmpty){
-            isLoading = false;
-          }
-    } catch (e) {
-      print(e);
-    }
     coordinates = new Coordinates(0.0, 0.0);
+    callDeliverListApi();
+  }
+
+  callDeliverListApi(){
+    isLoading = true;
+    ApiController.getAddressApiRequest().then((responses){
+      setState(() {
+        isLoading = false;
+        responsesData = responses;
+        addressList = responsesData.data;
+      });
+    });
   }
 
   @override
@@ -73,11 +77,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
         ],
       ),
-      body: isLoading? Center(child: CircularProgressIndicator())
-          : addressList == null
+      body: isLoading ? Center(child:CircularProgressIndicator()) :addressList == null
           ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
-          : Column(
-        children: <Widget>[
+          : Column(children: <Widget>[
           Divider(color: Colors.white, height: 2.0),
           addCreateAddressButton(),
           addAddressList()
