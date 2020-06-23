@@ -178,7 +178,6 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                     bool status = Utils.checkStoreOpenTime(storeObject,OrderType.Delivery);
                     if(!status){
                       Utils.showToast("${storeObject.closehoursMessage}", false);
-                      Navigator.pop(context);
                       return;
                     }
 
@@ -192,14 +191,12 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                       if(storeArea != null && storeArea.data.isNotEmpty){
                         if(storeArea.data.length == 1 && storeArea.data[0].area.length == 1){
                           Area areaObject = storeArea.data[0].area[0];
-                          Navigator.pop(context);
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => StoreLocationScreen(areaObject,OrderType.PickUp)),
                           );
                         }else{
-                          Navigator.pop(context);
                           Navigator.push(context,
                             MaterialPageRoute(
                                 builder: (context) => PickUpOrderScreen(storeArea,OrderType.PickUp)),
@@ -214,10 +211,8 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                     bool status = Utils.checkStoreOpenTime(storeObject,OrderType.Delivery);
                     if(!status){
                       Utils.showToast("${storeObject.closehoursMessage}", false);
-                      Navigator.pop(context);
                       return;
                     }
-                    Navigator.pop(context);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
