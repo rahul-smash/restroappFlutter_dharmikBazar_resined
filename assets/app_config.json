@@ -1,7 +1,9 @@
 {
   "store_id": "393",
+  "primary_store_id": "811",
   "isGroceryApp": "true",
   "isAdminLogin": "false",
+  "isMultiStore": false,
   "currency": "\u20B9",
   "app_theme_color": "0xff75990B",
   "left_menu_icon_color": "0xffffffff",

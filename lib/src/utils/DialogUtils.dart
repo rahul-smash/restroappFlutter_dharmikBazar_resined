@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'AppConstants.dart';
 import 'Utils.dart';
 
 class DialogUtils {
@@ -241,7 +246,7 @@ class DialogUtils {
                       },
                     child: ListTile(
                       title: Text(areaObject.weight,style: TextStyle(color: Colors.black)),
-                      trailing: Text("₹ ${areaObject.price}",style: TextStyle(color: Colors.black)),
+                      trailing: Text("${AppConstant.currency}${areaObject.price}",style: TextStyle(color: Colors.black)),
                     ),
                   );
                 },
@@ -546,14 +551,163 @@ class DialogUtils {
     );
   }
 
+
+  static Future<BranchData> displayBranchDialog(BuildContext context,String title,
+      StoreBranchesModel branchesModel, BranchData selectedbranchData) async {
+
+    return await showDialog<BranchData>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+          },
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))
+            ),
+            title: Container(
+              child: Text(title,textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black),),
+            ),
+            content: Container(
+              width: double.maxFinite,
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: branchesModel.data.length,
+                separatorBuilder: (BuildContext context, int index) {
+
+                  return Divider();
+                },
+                itemBuilder: (context, index) {
+                  BranchData storeObject = branchesModel.data[index];
+                  return InkWell(
+                    onTap: () {
+                      SharedPrefs.storeSharedValue(AppConstant.branch_id, storeObject.id);
+                      Navigator.pop(context, storeObject);
+                    },
+                    child: ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Icon(Icons.location_on),
+                          Flexible(
+                            child: Text(storeObject.storeName,textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.black)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Cancel"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.pop(context);
+                  // true here means you clicked ok
+                },
+              ),
+
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+  static Future<bool> displayCommonDialog2(BuildContext context,String title,
+      String message,String button1, String button2) async {
+
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: (){
+            //print("onWillPop onWillPop");
+            Navigator.pop(context);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      child: Center(
+                        child: Text("${title}",textAlign: TextAlign.center,
+                          style: TextStyle(color: grayColorTitle,fontSize: 18),),
+                      ),
+                    ),
+                    Container(
+                        height: 1,
+                        color: Colors.black45,
+                        width: MediaQuery.of(context).size.width),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      child: Center(
+                        child: Text("${message}",textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,),),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('${button1}'),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, false);
+                              },
+                            ),
+                          ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('${button2}'),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )
+          ),
+        );
+      },
+    );
+  }
+
+
   static Future<void> openMap(StoreModel storeModel,double latitude, double longitude) async {
     String address = "${storeModel.storeName}, ${storeModel.location},"
         "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
     print("address= ${address}");
     //String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
     String googleUrl = 'https://www.google.com/maps/search/?api=1&query=$address';
-    if (await canLaunch(googleUrl)) {
-      await launch(googleUrl);
+    if (Platform.isIOS) {
+         googleUrl = 'http://maps.apple.com/?q=$address';
+    }
+
+    print("urlll ===> ${Uri.encodeFull(googleUrl)}");
+    if (await canLaunch(Uri.encodeFull(googleUrl))) {
+      print("launchedd");
+      await launch(Uri.encodeFull(googleUrl));
     } else {
       throw 'Could not open the map.';
     }

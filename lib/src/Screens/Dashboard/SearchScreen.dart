@@ -202,38 +202,6 @@ class _SearchScreenState extends BaseState<SearchScreen> {
             );
           },
         ) ,
-        /*child: ListView.builder(
-          itemCount: tagsList.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            String tagName = tagsList[index];
-            if(selctedTag == index){
-              chipSelectedColor = appTheme;
-              textColor = Color(0xFFFFFFFF);
-            }else{
-              chipSelectedColor = Color(0xFFBDBDBD);
-              textColor = Color(0xFF000000);
-            }
-            return Container(
-              margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
-              child: InkWell(
-                onTap: (){
-                  setState(() {
-                    selctedTag = index;
-                    //print("selctedTag= ${tagsList[selctedTag]}");
-                    controller.text = tagsList[selctedTag];
-                    callSearchAPI();
-                  });
-                },
-                child: Chip(
-                  autofocus: true,
-                  label: Text('${tagName}',style: TextStyle(color: textColor),),
-                  backgroundColor: chipSelectedColor,
-                ),
-              ),
-            );
-          },
-        )*/
     );
     return horizontalList;
   }
@@ -249,13 +217,13 @@ class _SearchScreenState extends BaseState<SearchScreen> {
         await ApiController.getSearchResults(controller.text);
         Utils.hideKeyboard(context);
         Utils.hideProgressDialog(context);
-        print("==subCategories= ${subCategoryResponse.subCategories.length}");
         if(subCategoryResponse == null || subCategoryResponse.subCategories.isEmpty){
           Utils.showToast("No result found.", false);
           setState(() {
             subCategory = null;
           });
         }else{
+          //print("==subCategories= ${subCategoryResponse.subCategories.length}");
           setState(() {
             subCategory = subCategoryResponse.subCategories.first;
           });

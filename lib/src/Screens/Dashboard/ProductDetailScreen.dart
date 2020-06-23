@@ -68,7 +68,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       weight = variant.weight;
     }
 
-    imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
+    imageUrl = widget.product.imageType == "0" ? widget.product.image300200: widget.product.imageUrl;
 
     if(weight.isEmpty){
       isVisible = false;
@@ -83,6 +83,18 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
+          actions: <Widget>[
+            InkWell(
+              onTap: (){
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: Padding(
+                padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
+                child: Icon(Icons.home, color: Colors.white,size: 30,),
+              ),
+            ),
+
+          ],
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
@@ -114,7 +126,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: 20.0, bottom: 10.0,left: 40,right: 40),
+          padding: EdgeInsets.only(top: 10.0, bottom: 10.0,left: 40,right: 40),
           child: imageUrl == "" ?
           Container(
             child: Center(
@@ -124,14 +136,18 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               : Padding(
               padding: EdgeInsets.all(0),
               child: Container(
-                child: AspectRatio(
+                /*child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: CachedNetworkImage(
                     imageUrl: "${imageUrl}", fit: BoxFit.cover
+                  ),
+                ),*/
+                child: Center(
+                  child: CachedNetworkImage(
+                    imageUrl: "${imageUrl}", fit: BoxFit.fitWidth,
                     //placeholder: (context, url) => CircularProgressIndicator(),
                     //errorWidget: (context, url, error) => Icon(Icons.error),
                   ),
-                  //child:Image.network(imageUrl, fit: BoxFit.cover),
                 ),
               )),
         ),
@@ -211,13 +227,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           ),
         ),
         Padding(
-          padding: const EdgeInsets.only(top: 5.0, left: 20.0, right: 20.0),
-          /*child: Text("${widget.product.description}",
-            style: TextStyle(
-                fontSize: 16.0,
-                color: Colors.black,
-                fontWeight: FontWeight.w400),
-          ),*/
+          padding: const EdgeInsets.only(top: 5.0, left: 10.0, right: 10.0),
           child: Html(data: "${widget.product.description}",
             padding: EdgeInsets.all(10.0),),
         ),
@@ -229,7 +239,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   Widget showTagsList(List<Variant> variants){
     Color chipSelectedColor, textColor;
 
-    print("---variants---${variants.length}---");
+    //print("---variants---${variants.length}---");
     Widget horizontalList = new Container(
       height: 50.0,
       //margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
@@ -295,7 +305,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
         child: showAddButton == true
             ? InkWell(onTap: (){
-          print("add onTap");
+          //print("add onTap");
           setState(() {
             counter ++ ;
             showAddButton = false;

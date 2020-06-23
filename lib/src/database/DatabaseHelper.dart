@@ -237,7 +237,7 @@ class DatabaseHelper {
         await dbClient.query(CART_Table, columns: columnsToSelect);
     // print the results
     if (resultList != null && resultList.isNotEmpty) {
-      print("--TotalPrice-result.length--- ${resultList.length}");
+      //print("--TotalPrice-result.length--- ${resultList.length}");
       resultList.forEach((row) {
         //print(row);
       });
@@ -301,7 +301,7 @@ class DatabaseHelper {
         cartList.add(product);
       });
     } else {
-      print("-empty cart-in db--");
+      //print("-empty cart-in db--");
     }
     return cartList;
   }
@@ -350,7 +350,7 @@ class DatabaseHelper {
     } else {
       //print("-empty cart-in db--");
     }
-    print("-Fav--List.length===>${cartList.length}--");
+    //print("-Fav--List.length===>${cartList.length}--");
     return cartList;
   }
 

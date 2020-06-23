@@ -4,6 +4,8 @@ class AppConstant {
   static String currency = "";//\u20B9
   static String appThemeColor = "appThemeColor";
 
+  static String branch_id = "branch_id";
+
   static final String isAdminLogin = "isAdminLogin";
   static final String deviceId = "DEVICE_ID";
   static final String deviceToken = "device_token";
@@ -11,6 +13,8 @@ class AppConstant {
       "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?v=1530129081";
 
   static String placeholderUrl = "";
+  static bool isRestroApp;
+
   static final String noInternet = "No intenet connection";
   static final String enterUsername = "Please enter username";
   static final String enterPassword = "Please enter password";
@@ -31,6 +35,8 @@ class AppConstant {
   static final String pleaseLogin = "Please login to proceed further";
   static final String selectAddress = "Please select delivery address";
   static final String deleteAddress = "Are you sure you want to delete this address?";
+  static final String cancelOrder = "Are you sure you want to Cancel this order?";
+  static final String emptyCartMsg = "Are you sure you want to clear cart?";
   static final String orderAdded = "Thank you for placing the order.\nWe will confirm your order soon.";
   static final String enterAddress = 'Enter Complete Address';
   static final String selectArea = 'Please select area';
@@ -38,7 +44,7 @@ class AppConstant {
   static final String pleaseEnterAddress = "Enter complete address";
   static final String enterZipCode = "Enter zipcode";
 
-  static final String txt_mobile = "Please enter your Mobile No. to proceed further";
+  static final String txt_mobile = "Login With Phone";
   static final String txt_Submit = "Submit";
   static final String pleaseFullname = "Enter FullName";
 
@@ -65,7 +71,7 @@ class AppConstant {
 
   static final String is24x7Open = 'is24x7Open';
   static final String DeliverySlot = 'deliverySlot';
-  static final String txtSendEmail = "SEND EMAIL";
+  static final String txtSendEmail = "Send Email";
   static final String app_OLD_VERISON = "APP_OLD_VERISON";
 
   static final String app_VERISON = "APP_VERISON";

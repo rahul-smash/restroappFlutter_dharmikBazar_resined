@@ -57,16 +57,20 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
   @override
   Widget build(BuildContext context) {
-    String discount,price,variantId,weight;
+    String discount,price,variantId,weight,mrpPrice;
     variantId = variant == null ? widget.product.variantId : variant.id;
     if(variant == null){
+      //print("====-variant == null====");
       discount = widget.product.discount.toString();
       price = widget.product.price.toString();
       weight = widget.product.weight;
+      mrpPrice = widget.product.mrpPrice;
     }else{
+      //print("==else==-variant == null====");
       discount = variant.discount.toString();
       price = variant.price.toString();
       weight = variant.weight;
+      mrpPrice = variant.mrpPrice;
     }
     String imageUrl = widget.product.imageType == "0" ? widget.product.image10080: widget.product.imageUrl;
     bool variantsVisibility;
@@ -83,7 +87,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
           children: [
             InkWell(
               onTap: () async {
-                print("----print-----");
+                //print("----print-----");
                 if(widget.product.description.isEmpty){
                   return;
                 }
@@ -131,7 +135,11 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             child: Row(
                               children: [
                                 SizedBox(width: 10),
-                                //addVegNonVegOption(),
+                                Visibility(
+                                  visible: AppConstant.isRestroApp,
+                                  child: addVegNonVegOption(),
+                                ),
+
                                 imageUrl == "" ? Container(
                                   width: 70.0,
                                   height: 80.0,
@@ -143,13 +151,15 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                       width: 70.0,
                                       height: 80.0,
                                       child: CachedNetworkImage(
-                                        imageUrl: "${imageUrl}",fit: BoxFit.cover
+                                          imageUrl: "${imageUrl}",
+                                          fit: BoxFit.fill
                                         //placeholder: (context, url) => CircularProgressIndicator(),
                                         //errorWidget: (context, url, error) => Icon(Icons.error),
                                       ),
                                       /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
                                           fit: BoxFit.cover),*/
                                     )),
+
                                 Flexible(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -168,6 +178,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                               onTap: () async {
                                                 int count = await databaseHelper.checkProductsExistInFavTable
                                                   (DatabaseHelper.Favorite_Table,widget.product.id);
+
+
                                                 Product product = widget.product;
                                                 print("--product.count-- ${count}");
                                                 if(count == 1){
@@ -237,6 +249,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 }
                                                 variant = await DialogUtils.displayVariantsDialog(context, "${widget.product.title}", widget.product.variants);
                                                 if(variant != null){
+                                                  /*print("variant.weight= ${variant.weight}");
+                                                  print("variant.discount= ${variant.discount}");
+                                                  print("variant.mrpPrice= ${variant.mrpPrice}");
+                                                  print("variant.price= ${variant.price}");*/
                                                   databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
                                                     //print("QUANTITY= ${cartDataObj.QUANTITY}");
                                                     cartData = cartDataObj;
@@ -282,10 +298,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 :
                                             Row(
                                               children: <Widget>[
-                                                Text("${AppConstant.currency}${widget.product.price}",
+                                                Text("${AppConstant.currency}${price}",
                                                   style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
                                                 Text(" "),
-                                                Text("${AppConstant.currency}${widget.product.mrpPrice}",
+                                                Text("${AppConstant.currency}${mrpPrice}",
                                                     style: TextStyle(decoration: TextDecoration.lineThrough,
                                                         color: grayColorTitle,fontWeight: FontWeight.w400)),
                                               ],
@@ -340,7 +356,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
               Container(
                 padding: const EdgeInsets.all(0.0),
                 width: 30.0, // you can adjust the width as you need
-                child: GestureDetector(onTap: () {
+                child: GestureDetector(
+                    onTap: () {
                   if (counter != 0) {
                     setState(() => counter--);
                     if (counter == 0) {
@@ -417,7 +434,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
     Color foodOption =
     widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
     return Padding(
-      padding: EdgeInsets.only(left: 7, right: 7),
+      padding: EdgeInsets.only(left: 0, right: 7),
       child: widget.product.nutrient == "None"? Container(): Container(
           decoration: new BoxDecoration(
             color: Colors.white,
@@ -492,6 +509,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
 
   void removeFromCartTable(String variant_Id) {
     try {
+      //print("------removeFromCartTable-------");
       String variantId;
       variantId = variant == null ? variant_Id : variant.id;
       databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {

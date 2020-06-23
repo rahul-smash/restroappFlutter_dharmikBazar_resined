@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/UI/CardOrderHistoryItems.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:flutter_pull_to_refresh/flutter_pull_to_refresh.dart';
 
 class MyOrderScreen extends StatefulWidget {
-  MyOrderScreen(BuildContext context);
+
+  StoreModel store;
+  MyOrderScreen(this.store);
 
   @override
   _MyOrderScreen createState() => new _MyOrderScreen();
@@ -53,7 +56,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
               itemBuilder: (context, index) {
                 //print("<---refreshOrderHistory------->");
                 OrderData orderHistoryData = ordersList[index];
-                return  CardOrderHistoryItems(orderHistoryData);
+                return  CardOrderHistoryItems(orderHistoryData,widget.store);
               }
           ),
         ),
@@ -102,7 +105,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
                             itemCount: orders.length,
                             itemBuilder: (context, index) {
                               OrderData orderHistoryData = orders[index];
-                              return CardOrderHistoryItems(orderHistoryData);
+                              return CardOrderHistoryItems(orderHistoryData,widget.store);
 
                             },
                           )),

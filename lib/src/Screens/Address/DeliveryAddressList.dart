@@ -20,9 +20,8 @@ import '../BookOrder/ConfirmOrderScreen.dart';
 class DeliveryAddressList extends StatefulWidget {
 
   final bool showProceedBar;
-  DeliveryAddressResponse responsesData;
   OrderType delivery;
-  DeliveryAddressList(this.showProceedBar,this.responsesData,this.delivery);
+  DeliveryAddressList(this.showProceedBar,this.delivery);
 
   @override
   _AddDeliveryAddressState createState() => _AddDeliveryAddressState();
@@ -35,15 +34,24 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   Area radiusArea;
   Coordinates coordinates;
   bool isLoading =false;
+  DeliveryAddressResponse responsesData;
 
   @override
   void initState() {
     super.initState();
-    addressList = widget.responsesData.data;
-    if(addressList.isNotEmpty){
-      isLoading = false;
-    }
     coordinates = new Coordinates(0.0, 0.0);
+    callDeliverListApi();
+  }
+
+  callDeliverListApi(){
+    isLoading = true;
+    ApiController.getAddressApiRequest().then((responses){
+      setState(() {
+        isLoading = false;
+        responsesData = responses;
+        addressList = responsesData.data;
+      });
+    });
   }
 
   @override
@@ -55,11 +63,23 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios),
             onPressed: () => Navigator.pop(context, false),
-          )),
-      body: isLoading? Center(child: CircularProgressIndicator()): addressList == null
+          ),
+        actions: <Widget>[
+          InkWell(
+            onTap: (){
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            child: Padding(
+              padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
+              child: Icon(Icons.home, color: Colors.white,size: 30,),
+            ),
+          ),
+
+        ],
+      ),
+      body: isLoading ? Center(child:CircularProgressIndicator()) :addressList == null
           ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
-          : Column(
-        children: <Widget>[
+          : Column(children: <Widget>[
           Divider(color: Colors.white, height: 2.0),
           addCreateAddressButton(),
           addAddressList()
@@ -205,8 +225,12 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text( area.firstName,
-                    style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 16.0),
+                  SizedBox(
+                    width: (Utils.getDeviceWidth(context)-100),
+                    child: Text("${area.firstName}",overflow: TextOverflow.ellipsis,
+                      maxLines: 1,style: TextStyle(fontWeight: FontWeight.bold,
+                          color: Colors.black,fontSize: 16.0),
+                    ),
                   ),
                   addAddressInfoRow(Icons.phone, area.mobile),
                   addAddressInfoRow(Icons.location_on, area.address),
@@ -248,10 +272,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: SizedBox(
-              width: (Utils.getDeviceWidth(context)-150),
+              width: (Utils.getDeviceWidth(context)-130),
               child: Text(
                   info,
-                  maxLines: 2,
+                  maxLines: 3,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: infoLabel)
               ),
@@ -282,10 +306,14 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     ));
                 print("-Edit-result--${result}-------");
                 if(result == true){
-                  Utils.showProgressDialog(context);
-                  DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
                   setState(() {
-                    Utils.hideProgressDialog(context);
+                    isLoading = true;
+                  });
+                  DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                  //Utils.hideProgressDialog(context);
+                  setState(() {
+                    //addressList = null;
+                    isLoading = false;
                     addressList = response.data;
                   });
                 }

@@ -14,6 +14,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:flutter/gestures.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 class LoginEmailScreen extends StatefulWidget {
 
@@ -27,163 +28,145 @@ class LoginEmailScreen extends StatefulWidget {
 class _LoginEmailScreenState extends State<LoginEmailScreen> {
 
   String menu;
-  StoreModel storeModel;
-
-  _LoginEmailScreenState(this.menu);
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  StoreModel storeModel;
+  KeyboardVisibilityNotification _keyboardVisibility = new KeyboardVisibilityNotification();
+  int _keyboardVisibilitySubscriberId;
+  bool _keyboardState;
 
+  _LoginEmailScreenState(this.menu);
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
+    _keyboardState = _keyboardVisibility.isKeyboardVisible;
+    _keyboardVisibilitySubscriberId = _keyboardVisibility.addNewListener(
+        onChange: (bool visible) {
+      setState(() {
+        _keyboardState = visible;
+        print("_keyboardState= ${_keyboardState}");
+      });
+    },
+    );
     SharedPrefs.getStore().then((value){
-       setState(() {
-         storeModel = value;
-       });
+      setState(() {
+        storeModel = value;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomPadding: false,
-      backgroundColor: Colors.white,
-      body: Container(
-        padding: EdgeInsets.only(left: 0),
+      backgroundColor: whiteColor,
+      resizeToAvoidBottomPadding: true,
+      appBar: AppBar(
+        centerTitle: true,
+        title: new Text('Login',style: new TextStyle(
+          color: Colors.white,
+        ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Utils.hideKeyboard(context);
+            return Navigator.pop(context, false);
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        reverse: true,
         child: Column(
           children: <Widget>[
-            Stack(
-              fit: StackFit.loose,
-              children: [addPageHeader(), addLoginFields()],
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                width: Utils.getDeviceWidth(context),
+                child: AppConstant.isRestroApp ?
+                Image.asset("images/login_restro_bg.jpg",fit: BoxFit.fitWidth,)
+                    :Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
+              ),
             ),
-            addLoginButton(),
-            //SocialLoginTabs(),
-            addSignUpButton()
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Container(
+                  color: _keyboardState ? whiteColor : Colors.transparent,
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Login With Email',
+                        style: TextStyle(fontFamily: 'Bold',fontSize: 24, color: colorText,),
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        style: TextStyle(fontSize: 18,fontFamily: 'Medium',color: colorInputText,),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(0),
+                          labelText: 'Email',
+                          labelStyle: TextStyle(fontFamily: 'Medium',color: colorText,fontSize: 14,
+                          ),
+                        ),
+                        inputFormatters: [new LengthLimitingTextInputFormatter(80)],
+                        controller: _usernameController,
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontFamily: 'Medium',
+                          color: colorInputText,
+                        ),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(0),
+                          labelText: 'Password',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Medium',
+                            color: colorText,
+                            fontSize: 14,
+                          ),
+                        ),
+                        keyboardType: TextInputType.visiblePassword,
+                        controller: _passwordController,
+                        obscureText: true,
+                      ),
+                      SizedBox(height: 10),
+                      MaterialButton(
+                        onPressed: () {
+                          print('@@ForgotPassword--clcik');
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => ForgotPasswordScreen(menu)),
+                          );
+                        },
+                        textColor: Colors.white,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('Forgot password?',
+                            style: TextStyle(
+                              fontFamily: 'Medium',fontSize: 14,color: orangeColor,),
+
+                          ),
+                        ),
+                      ),
+                      addLoginButton(),
+                      addSignUpButton()
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget addPageHeader() {
-    return Container(
-      height: 200,
-      width: MediaQuery.of(context).size.width,
-      child: Center(
-        child: SizedBox(
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-            child: CachedNetworkImage(
-                imageUrl: storeModel == null ? "" : storeModel.banner300200,
-                fit: BoxFit.cover
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget addLoginFields() {
-    return Container(
-      margin: EdgeInsets.only(top: 200),
-      padding: EdgeInsets.symmetric(horizontal: 10,vertical: 20,),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(5),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 8,
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 3,
-          )
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            'Login',
-            style: TextStyle(
-              fontFamily: 'Bold',
-              fontSize: 24,
-              color: colorText,
-            ),
-          ),
-          SizedBox(height: 10),
-          TextFormField(
-            style: TextStyle(
-              fontSize: 18,
-              fontFamily: 'Medium',
-              color: colorInputText,
-            ),
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.all(0),
-              labelText: 'Username',
-              labelStyle: TextStyle(
-                fontFamily: 'Medium',
-                color: colorText,
-                fontSize: 14,
-              ),
-            ),
-            inputFormatters: [new LengthLimitingTextInputFormatter(80)],
-            controller: _usernameController,
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextFormField(
-            style: TextStyle(
-              fontSize: 18,
-              fontFamily: 'Medium',
-              color: colorInputText,
-            ),
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.all(0),
-              labelText: 'Password',
-              labelStyle: TextStyle(
-                fontFamily: 'Medium',
-                color: colorText,
-                fontSize: 14,
-              ),
-            ),
-            keyboardType: TextInputType.visiblePassword,
-            controller: _passwordController,
-            obscureText: true,
-          ),
-          SizedBox(height: 15),
-
-          MaterialButton(
-            onPressed: () {
-              print('@@ForgotPassword--clcik');
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ForgotPasswordScreen(menu)),
-                //    MaterialPageRoute(builder: (context) => LoginScreen()),
-              );
-            },
-            textColor: Colors.white,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                'Forgot password?',
-                style: TextStyle(
-                  fontFamily: 'Medium',
-                  fontSize: 14,
-                  color: colorBlueText,
-
-                ),
-
-              ),
-            ),
-          ),
-          SizedBox(height: 10),
-        ],
-      ),
-    );
-  }
 
   Widget addLoginButton() {
     return InkWell(
@@ -201,12 +184,19 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
         child: Align(
           alignment: Alignment.center,
           child: Container(
-            color: appTheme,
+            decoration: new BoxDecoration(
+              color: orangeColor,
+              borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+              border: new Border.all(
+                color: Colors.white,
+                width: 1.0,
+              ),
+            ),
             padding: EdgeInsets.symmetric(
               vertical: 15,
             ),
             width: 200,
-            margin: EdgeInsets.only(top: 20),
+            margin: EdgeInsets.only(top: 10),
             child: Center(
               child: Text(
                 'LOGIN',
@@ -224,34 +214,32 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   }
 
   Widget addSignUpButton() {
-    return Expanded(
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: RichText(
-            text: TextSpan(
-              text: 'New User?',
-              style: TextStyle(
-                  fontFamily: 'Medium', fontSize: 16, color: appTheme),
-              children: [
-                TextSpan(
-                    text: ' Sign Up',
-                    style: TextStyle(
-                        fontFamily: 'Medium',
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: appTheme),
-                    recognizer: (TapGestureRecognizer()
-                      ..onTap = () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RegisterUser()),
-                        );
-                      })),
-              ],
-            ),
+    return Padding(
+      padding: const EdgeInsets.only(top:20 ,bottom: 5),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: RichText(
+          text: TextSpan(
+            text: 'Don\'t have an account?',
+            style: TextStyle(
+                fontFamily: 'Medium', fontSize: 16, color:Colors.grey),
+            children: [
+              TextSpan(
+                  text: ' Sign Up',
+                  style: TextStyle(
+                      fontFamily: 'Medium',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: orangeColor),
+                  recognizer: (TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RegisterUser()),
+                      );
+                    })),
+            ],
           ),
         ),
       ),
@@ -308,7 +296,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                 Utils.hideProgressDialog(context);
                 StoreResponse model = response;
                 if(model != null && model.success){
-                  Navigator.of(context).pushReplacement(CustomPageRoute(HomeScreen(model.store)));
+                  //Navigator.of(context).pushReplacement(CustomPageRoute(HomeScreen(model.store)));
                 }else{
                   Utils.showToast("Something went wrong!", false);
                 }

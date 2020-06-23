@@ -6,7 +6,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'dart:convert';
 
 class BookNowScreen extends StatefulWidget {
-  BookNowScreen(BuildContext context);
+  BookNowScreen();
 
   @override
   State<StatefulWidget> createState() {

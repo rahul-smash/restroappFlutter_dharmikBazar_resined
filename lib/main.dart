@@ -27,13 +27,28 @@ Future<void> main() async {
   String jsonResult =  await loadAsset();
   final parsed = json.decode(jsonResult);
   ConfigModel configObject = ConfigModel.fromJson(parsed);
-  //print(configObject.storeId);
-  //setAppThemeColors(configObject);
+  if (Platform.isIOS) {
+    IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
+    SharedPrefs.storeSharedValue(AppConstant.deviceId, iosDeviceInfo.identifierForVendor);
+  } else {
+    AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
+    SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.androidId);
+  }
 
-  // Set `enableInDevMode` to true to see reports while in debug mode
-  // This is only to be used for confirming that reports are being
-  // submitted as expected. It is not intended to be used for everyday
-  // development.
+  if(configObject.isGroceryApp == "true"){
+    AppConstant.isRestroApp = false;
+  }else{
+    AppConstant.isRestroApp = true;
+  }
+
+  String branch_id = await SharedPrefs.getStoreSharedValue(AppConstant.branch_id);
+  if(branch_id == null || branch_id.isEmpty){
+
+  }else if(branch_id.isNotEmpty){
+    configObject.storeId = branch_id;
+  }
+  //print(configObject.storeId);
+
   Crashlytics.instance.enableInDevMode = true;
   StoreResponse storeData = await ApiController.versionApiRequest("${configObject.storeId}");
   setAppThemeColors(storeData.store);
@@ -42,13 +57,6 @@ Future<void> main() async {
   SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "${isAdminLogin}");
 
 
-  if (Platform.isIOS) {
-    IosDeviceInfo iosDeviceInfo = await deviceInfo.iosInfo;
-    SharedPrefs.storeSharedValue(AppConstant.deviceId, iosDeviceInfo.identifierForVendor);
-  } else {
-    AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
-    SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.androidId);
-  }
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp]);
   // To turn off landscape mode
@@ -88,7 +96,7 @@ class ValueApp extends StatelessWidget {
     // define it once at root level.
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Restro App',
+      title: '${storeData.store.storeName}',
       theme: ThemeData(
         primaryColor: appTheme,
       ),

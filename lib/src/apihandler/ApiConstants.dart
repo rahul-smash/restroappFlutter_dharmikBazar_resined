@@ -10,6 +10,8 @@ class ApiConstants{
   static String getCategories = 'getCategories';
   static String getProducts = 'getSubCategoryProducts/';
 
+  static String getStoreBranches = 'getStoreBranches';
+
   static String search = 'searchProducts';
   static String getTagsList = 'getTagsList';
 
@@ -24,12 +26,15 @@ class ApiConstants{
   static String storeOffers = 'storeOffers';
   static String validateCoupon = 'validateAllCoupons';
   static String multipleTaxCalculation = 'multiple_tax_calculation';
+  static String stripeVerifyTransactionUrl = 'stripeVerifyTransaction?response=success';
+
 
   static String deliveryTimeSlot = 'deliveryTimeSlot';
   static String placeOrder = 'placeOrder';
   static String pickupPlaceOrder = 'pickupPlaceOrder';
   static String setStoreQuery = 'setStoreQuery';
   static String orderHistory = 'orderHistory';
+  static String getLoyalityPoints = 'getLoyalityPoints';
 
   static String login = 'userLogin';
   static String signUp = 'userSignup';

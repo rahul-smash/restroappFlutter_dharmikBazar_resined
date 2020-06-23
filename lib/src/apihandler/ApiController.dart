@@ -13,6 +13,7 @@ import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
@@ -20,6 +21,7 @@ import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/SearchTagsModel.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
+import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
 import 'package:restroapp/src/models/StripeVerifyModel.dart';
@@ -99,7 +101,7 @@ class ApiController {
       final parsed = json.decode(respStr);
       UserResponse userResponse = UserResponse.fromJson(parsed);
       if (userResponse.success) {
-        SharedPrefs.setUserLoggedIn(true);
+        //SharedPrefs.setUserLoggedIn(true);
         SharedPrefs.saveUser(userResponse.user);
       }
       Utils.showToast(userResponse.message, true);
@@ -185,7 +187,7 @@ class ApiController {
     Response response = await Dio().get(url,options: new Options(responseType: ResponseType.plain));
     //print(response);
     CategoryResponse categoryResponse = CategoryResponse.fromJson(json.decode(response.data));
-    print("-------Categories.length ---${categoryResponse.categories.length}");
+    //print("-------Categories.length ---${categoryResponse.categories.length}");
     try {
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.getCount(DatabaseHelper.Categories_Table).then((count) {
@@ -462,7 +464,7 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.validateCoupon;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    print("----url---${url}");
     try {
       request.fields.addAll({
         "coupon_code": couponCode,
@@ -495,7 +497,8 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.multipleTaxCalculation;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.multipleTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
     //print("----orderJson---${orderJson}");
@@ -512,7 +515,7 @@ class ApiController {
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print("----respStr---${respStr}");
+      print("--Tax--respStr---${respStr}");
       final parsed = json.decode(respStr);
 
       TaxCalculationResponse model = TaxCalculationResponse.fromJson(couponCode, parsed);
@@ -561,6 +564,41 @@ class ApiController {
         ApiConstants.placeOrder;*/
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     //print("==orderJson==${orderJson}====");
+    String encodedtaxDetail = "[]";
+    String encodedtaxLabel = "[]";
+    String encodedFixedTax = "[]";
+    try {
+      /*print("fixedTax= ${taxModel.fixedTax}");
+      print("taxLabel= ${taxModel.taxLabel}");
+      print("taxDetail= ${taxModel.taxDetail}");*/
+
+      try {
+        List jsonfixedTaxList = taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+        encodedFixedTax = jsonEncode(jsonfixedTaxList);
+        //print("encodedFixedTax= ${encodedFixedTax}");
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        List jsontaxDetailList = taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+        encodedtaxDetail = jsonEncode(jsontaxDetailList);
+        //print("encodedtaxDetail= ${encodedtaxDetail}");
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        List jsontaxLabelList = taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+        encodedtaxLabel = jsonEncode(jsontaxLabelList);
+        //print("encodedtaxLabel= ${encodedtaxLabel}");
+      } catch (e) {
+        print(e);
+      }
+    } catch (e) {
+      print(e);
+    }
+
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
@@ -586,13 +624,16 @@ class ApiController {
         "payment_id": razorpay_payment_id,
         "online_method": online_method,
         "delivery_time_slot": selectedDeliverSlotValue,
+        "store_fixed_tax_detail": encodedFixedTax,
+        "store_tax_rate_detail": encodedtaxLabel,
+        "calculated_tax_detail": encodedtaxDetail,
       });
 
-      print("----${url}");
-      print("--fields--${request.fields.toString()}--");
+      //print("----${url}");
+      //print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
-      print("--respStr--${respStr}--");
+      //print("--respStr--${respStr}--");
       final parsed = json.decode(respStr);
 
       ResponseModel model = ResponseModel.fromJson(parsed);
@@ -620,7 +661,7 @@ class ApiController {
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +ApiConstants.updateProfile;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    print("--url--${url}--");
     try {
       request.fields.addAll({
         "full_name": fullName,
@@ -630,7 +671,7 @@ class ApiController {
         "device_token": deviceToken,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
-
+      print("--fields--${request.fields.toString()}--");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("--respStr--${respStr}--");
@@ -845,7 +886,8 @@ class ApiController {
       CreateOrderData model = CreateOrderData.fromJson(parsed);
       return model;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      print('---catch-razorpayCreateOrder-----' + e.toString());
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }
@@ -967,6 +1009,7 @@ class ApiController {
 
       });
       print('--url===  $url');
+      print('--payment_request_id===  $payment_request_id');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('--response===  $respStr');
@@ -993,7 +1036,7 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
-
+      print("----respStr---${respStr}");
       SearchTagsModel storeArea = SearchTagsModel.fromJson(parsed);
       return storeArea;
 
@@ -1046,7 +1089,7 @@ class ApiController {
       final respStr = await response.stream.bytesToString();
 
       final parsed = json.decode(respStr);
-      print("---deliveryTimeSlot-respStr---${respStr}");
+      //print("---deliveryTimeSlot-respStr---${respStr}");
       DeliveryTimeSlotModel storeArea = DeliveryTimeSlotModel.fromJson(parsed);
       return storeArea;
 
@@ -1109,5 +1152,54 @@ class ApiController {
       return null;
     }
   }
+
+  static Future<StoreBranchesModel> multiStoreApiRequest(String storeId) async {
+    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
+        ApiConstants.getStoreBranches;
+
+    Response response = await Dio().get(url,
+        options:Options(responseType: ResponseType.plain));
+    print(url);
+    print(response.data);
+    StoreBranchesModel storeBranchesModel = StoreBranchesModel.fromJson(json.decode(response.data));
+    print("---storeBranchesModel ---${storeBranchesModel.data.length}");
+
+    return storeBranchesModel;
+  }
+
+  static Future<LoyalityPointsModel> getLoyalityPointsApiRequest() async {
+
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getLoyalityPoints;
+
+    print("----url--${url}");
+    print("--user.id--${user.id}");
+    try {
+      FormData formData = new FormData.fromMap({
+            "user_id": user.id,
+            "platform": Platform.isIOS ? "IOS" : "Android"
+          });
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(
+              contentType: "application/json",responseType: ResponseType.plain));
+      print(response.statusCode);
+      print(response.data);
+
+      LoyalityPointsModel storeData = LoyalityPointsModel.fromJson(json.decode(response.data));
+      print("-----LoyalityPointsModel ---${storeData.success}");
+
+      return storeData;
+
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
 
 }

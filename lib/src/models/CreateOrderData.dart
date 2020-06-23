@@ -11,19 +11,23 @@ String createOrderDataToJson(CreateOrderData data) => json.encode(data.toJson())
 class CreateOrderData {
   bool success;
   Data data;
+  String message;
 
   CreateOrderData({
     this.success,
     this.data,
+    this.message,
   });
 
   factory CreateOrderData.fromJson(Map<String, dynamic> json) => CreateOrderData(
     success: json["success"],
-    data: Data.fromJson(json["data"]),
+    data: json["data"] == null ? null :Data.fromJson(json["data"]),
+    message: json["message"],
   );
 
   Map<String, dynamic> toJson() => {
     "success": success,
+    "message": message,
     "data": data.toJson(),
   };
 }

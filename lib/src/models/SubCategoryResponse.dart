@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'TaxCalulationResponse.dart';
+
 class SubCategoryResponse {
   bool success;
   List<SubCategoryModel> subCategories;
@@ -115,6 +117,9 @@ class Product {
 
   String quantity;
   String productJson="";
+
+  TaxDetail taxDetail;
+  FixedTax fixedTax;
 
   Product({
     this.id,

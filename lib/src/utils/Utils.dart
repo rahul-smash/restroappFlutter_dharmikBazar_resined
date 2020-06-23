@@ -25,19 +25,19 @@ class Utils {
       if (shortLength) {
         Fluttertoast.showToast(
             msg: msg,
-            toastLength: Toast.LENGTH_SHORT,
+            toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.BOTTOM,
-            timeInSecForIos: 1,
-            backgroundColor: toastbgColor,
+            timeInSecForIosWeb: 1,
+            backgroundColor: toastbgColor.withOpacity(0.9),
             textColor: Colors.white,
             fontSize: 16.0);
       } else {
         Fluttertoast.showToast(
             msg: msg,
-            toastLength: Toast.LENGTH_SHORT,
+            toastLength: Toast.LENGTH_LONG,
             gravity: ToastGravity.BOTTOM,
-            timeInSecForIos: 1,
-            backgroundColor: toastbgColor,
+            timeInSecForIosWeb: 1,
+            backgroundColor: toastbgColor.withOpacity(0.9),
             textColor: Colors.white,
             fontSize: 16.0);
       }
@@ -69,7 +69,31 @@ class Utils {
     return regex.hasMatch(value);
   }
 
-  static void showLoginDialog(BuildContext context) {
+  static Future<void> showLoginDialog(BuildContext context) async {
+    try {
+      //User Login with Mobile and OTP
+      // 1 = email and 0 = ph-no
+      StoreModel model = await SharedPrefs.getStore();
+      if(model.internationalOtp == "0"){
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+        );
+        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        attributeMap["ScreenName"] = "LoginMobileScreen";
+        Utils.sendAnalyticsEvent("Clicked LoginMobileScreen",attributeMap);
+      }else{
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+        );
+        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        attributeMap["ScreenName"] = "LoginEmailScreen";
+        Utils.sendAnalyticsEvent("Clicked LoginEmailScreen",attributeMap);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+  static void showLoginDialog2(BuildContext context) {
     // flutter defined function
     showDialog(
       context: context,
@@ -189,6 +213,15 @@ class Utils {
     return MediaQuery.of(context).size.width;
   }
 
+  static Widget showDivider(BuildContext context){
+    return  Container(
+      width: MediaQuery.of(context).size.width,
+      height: 1,
+      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+      color: Color(0xFFDBDCDD),
+    );
+  }
+
   static Widget getEmptyView(String value){
     return  Container(
       child: Expanded(
@@ -290,10 +323,9 @@ class Utils {
     try {
       DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
       DateTime time = format.parse(date);
-      time.toLocal();
+      time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
-
-      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm');
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);
@@ -368,11 +400,32 @@ class Utils {
     return isStoreOpenToday;
   }
 
+
+
   static bool checkStoreOpenTime(StoreModel storeObject, OrderType deliveryType) {
     // in case of deliver ignore is24x7Open
     bool status = false;
     try {
-      if(storeObject.is24x7Open == "1" && deliveryType == OrderType.PickUp){
+      // user selct deliver  = is24x7Open ignore , if delivery slots is 1
+      //if delivery slots = 0 , is24x7Open == 0, proced aage, then check time
+      if(deliveryType ==  OrderType.Delivery){
+        if(storeObject.deliverySlot == "1"){
+          status = true;
+        }else if(storeObject.deliverySlot == "0" && storeObject.is24x7Open == "0"){
+          bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
+          if(isStoreOpenToday){
+            bool isStoreOpen = Utils.getDayOfWeek(storeObject);
+            status = isStoreOpen;
+          }else{
+            status = false;
+          }
+        }else if(storeObject.is24x7Open == "1"){
+          status = true;
+        }
+      }else{
+        if(deliveryType == OrderType.PickUp){
+
+          if(storeObject.is24x7Open == "1"){
             // 1 = means store open 24x7
             // 0 = not open for 24x7
             status = true;
@@ -387,11 +440,24 @@ class Utils {
               status = false;
             }
           }
+        }
+
+      }
       return status;
     } catch (e) {
       print(e);
       return true;
     }
+  }
+
+  static Widget getIndicatorView(){
+
+    return Center(
+      child: CircularProgressIndicator(
+          backgroundColor: Colors.black26,
+          valueColor:
+          AlwaysStoppedAnimation<Color>(Colors.black26)),
+    );
   }
 
   static Widget getEmptyView2(String value){

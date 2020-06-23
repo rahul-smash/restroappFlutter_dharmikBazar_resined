@@ -11,3 +11,8 @@ class updateCartCount {
 class refreshOrderHistory {
   refreshOrderHistory();
 }
+
+class onPageFinished {
+  String url;
+  onPageFinished(this.url);
+}

@@ -3,38 +3,33 @@ import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
-import 'package:maps_launcher/maps_launcher.dart';
-import 'package:package_info/package_info.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
-import 'package:restroapp/src/Screens/Offers/OfferScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
 import 'package:restroapp/src/UI/CategoryView.dart';
-import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
+import 'package:restroapp/src/models/ConfigModel.dart';
+import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:restroapp/src/utils/version_check.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-
 import 'SearchScreen.dart';
 
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
-  HomeScreen(this.store);
+  ConfigModel configObject;
+  HomeScreen(this.store, this.configObject);
 
   @override
   State<StatefulWidget> createState() {
@@ -55,6 +50,10 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isStoreClosed;
   final DatabaseHelper databaseHelper = new DatabaseHelper();
   int cartBadgeCount;
+  StoreBranchesModel storeBranchesModel;
+  BranchData branchData;
+  bool isLoading;
+  CategoryResponse categoryResponse;
 
   _HomeScreenState(this.store);
 
@@ -67,6 +66,8 @@ class _HomeScreenState extends State<HomeScreen> {
     cartBadgeCount = 0;
     getCartCount();
     listenCartChanges();
+    checkForMultiStore();
+    getCategoryApi();
     try {
       AppConstant.placeholderUrl = store.banner10080;
       //print("-----store.banners-----${store.banners.length}------");
@@ -81,42 +82,29 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     }
-    //Utils.getDayOfWeek(widget.store);
-  }
-  
-  bool checkIfStoreClosed(){
-    if(store.storeStatus == "0"){
-      //0 mean Store close
-      return true;
-    }else{
-      return false;
-    }
   }
 
-  Future<void> _setSetCurrentScreen() async {
-    await analytics.setCurrentScreen(
-      screenName: 'HomeScreen',
-      screenClassOverride: 'HomeScreenView',
-    );
-  }
-
-  getCartCount(){
-    databaseHelper.getCount(DatabaseHelper.CART_Table).then((value){
-      setState(() {
-        cartBadgeCount = value;
-      });
-      //print("--getCARTCount---${value}------");
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       key: _key,
       appBar: AppBar(
-        title: Text(store.storeName),
-        centerTitle: true,
+        title: widget.configObject.isMultiStore == false? Text(store.storeName) :
+        InkWell(
+          onTap: () async {
+            BranchData selectedStore = await DialogUtils.displayBranchDialog(context,
+                "Select Branch", storeBranchesModel,branchData);
+            logout(context,selectedStore);
+            },
+          child: Row(
+            children: <Widget>[
+              Text(branchData == null ? "" :branchData.storeName),
+              Icon(Icons.keyboard_arrow_down)
+            ],
+          ),
+        ),
+        centerTitle: widget.configObject.isMultiStore == true ? false : true,
         leading: new IconButton(
           icon: Image.asset('images/hamburger.png', width: 25),
           onPressed: _handleDrawer,
@@ -126,57 +114,30 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: <Widget>[
           addBanners(),
-          Container(
-            padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-            width: Utils.getDeviceWidth(context),
-            color: gridBackgroundCOlor,
-            child: Text('SHOP BY CATEGORY', style: TextStyle(color: Colors.black)),
-          ),
           Expanded(
-            child: FutureBuilder<CategoryResponse>(
-                future: ApiController.getCategoriesApiRequest(store.id),
-                builder: (context, projectSnap) {
-                  if (projectSnap.connectionState == ConnectionState.none &&
-                      projectSnap.hasData == null) {
-                    return Container();
-                  } else {
-                    if (projectSnap.hasData) {
-                      CategoryResponse response = projectSnap.data;
-                      if (response.success) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage("images/backgroundimg.png"),
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                          //color: Colors.transparent,
-                          child: GridView.count(
-                              crossAxisCount: 2,
-                              childAspectRatio: 1.2,
-                              padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-                              mainAxisSpacing: 5.0,
-                              crossAxisSpacing: 8.0,
-                              shrinkWrap: true,
-                              children: response.categories.map((CategoryModel model) {
+            child: isLoading
+                ? Center(child: CircularProgressIndicator()) : categoryResponse == null
+                ? SingleChildScrollView(child:Center(child: Text("")))
+                : Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("images/backgroundimg.png"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+              child: GridView.count(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1.2,
+                  padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+                  mainAxisSpacing: 5.0,
+                  crossAxisSpacing: 8.0,
+                  shrinkWrap: true,
+                  children: categoryResponse.categories.map((CategoryModel model) {
 
-                                return GridTile(child: CategoryView(model,widget.store));
-                              }).toList()),
-                        );
-                      } else {
-                        return Container();
-                      }
-                    } else {
-                      return Center(
-                        child: CircularProgressIndicator(
-                            backgroundColor: Colors.black26,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.black26)),
-                      );
-                    }
-                  }
-                }),
+                    return GridTile(child: CategoryView(model,widget.store));
+                  }).toList()),
+            ),
           ),
         ],
       ),
@@ -225,40 +186,47 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-                icon: Badge(
-                  showBadge: cartBadgeCount == 0 ? false : true,
-                  badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
-                  child: Image.asset('images/carticon.png', width: 24,
-                    fit: BoxFit.scaleDown,color: bottomBarIconColor),
-                ),
-                title: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
-                  child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
-                ),
-                ),
+              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,
+                  color: bottomBarIconColor),
+              title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
+            ),
             BottomNavigationBarItem(
-              icon: Image.asset('images/searchcion.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
+              icon: Image.asset('images/searchcion.png', width: 24,fit: BoxFit.scaleDown,
+                  color: bottomBarIconColor),
               title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
             ),
             BottomNavigationBarItem(
                 icon: Icon(Icons.shopping_cart, color: Colors.white,size: 0,),
                 title: Text(''),),
             BottomNavigationBarItem(
-              icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
+              icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,
+                  color: bottomBarIconColor),
                 title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
                 ),
             BottomNavigationBarItem(
-              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,color: bottomBarIconColor),
-                title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
-                )
+              icon: Badge(
+                showBadge: cartBadgeCount == 0 ? false : true,
+                badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
+                child: Image.asset('images/carticon.png', width: 24,
+                    fit: BoxFit.scaleDown,color: bottomBarIconColor),
+              ),
+              title: Padding(
+                padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
+              ),
+            ),
           ],
         ),
         Container(
+          padding:  EdgeInsets.all(10.0),
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: appTheme),
           margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: Image.asset("images/icon_home_categories.png",
-            height: 60, width: 60,
-          ),
+          //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: widget.configObject.isGroceryApp == "true" ?
+          Image.asset("images/groceryicon.png",height: 40, width: 40,color: whiteColor,)
+              :Image.asset("images/restauranticon.png",height: 40, width: 40,color: whiteColor),
         ),
       ],
     );
@@ -270,23 +238,30 @@ class _HomeScreenState extends State<HomeScreen> {
     }else{
       setState(() {
         _currentIndex = index;
-        if (_currentIndex == 0) {
-
-          Navigator.push(context,
-            MaterialPageRoute(builder: (context) => MyCartScreen(() {
-              getCartCount();
-            })),
-          );
+        if (_currentIndex == 4) {
+          if (AppConstant.isLoggedIn) {
+            Navigator.push(context,
+              MaterialPageRoute(builder: (context) => MyCartScreen(() {
+                getCartCount();
+              })),
+            );
+          }else{
+            Utils.showLoginDialog(context);
+          }
 
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "MyCartScreen";
           Utils.sendAnalyticsEvent("Clicked MyCartScreen",attributeMap);
         }
         if (_currentIndex == 1) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SearchScreen()),
-          );
+          if (AppConstant.isLoggedIn) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => SearchScreen()),
+            );
+          }else{
+            Utils.showLoginDialog(context);
+          }
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "SearchScreen";
           Utils.sendAnalyticsEvent("Clicked SearchScreen",attributeMap);
@@ -295,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (AppConstant.isLoggedIn) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MyOrderScreen(context)),
+              MaterialPageRoute(builder: (context) => MyOrderScreen(store)),
             );
             Map<String,dynamic> attributeMap = new Map<String,dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";
@@ -304,10 +279,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Utils.showLoginDialog(context);
           }
         }
-        if (_currentIndex == 4) {
+        if (_currentIndex == 0) {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ContactScreen()),
+            MaterialPageRoute(builder: (context) => ContactScreen(store)),
           );
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "ContactScreen";
@@ -336,6 +311,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void initFirebase() {
+    if(widget.configObject.isGroceryApp == "true"){
+      AppConstant.isRestroApp = false;
+    }else{
+      AppConstant.isRestroApp = true;
+    }
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         try {
@@ -406,8 +386,95 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void listenCartChanges() {
     eventBus.on<updateCartCount>().listen((event) {
-      print("<---Home----updateCartCount------->");
+      //print("<---Home----updateCartCount------->");
       getCartCount();
     });
   }
+
+  void checkForMultiStore() {
+    print("isMultiStore=${widget.configObject.isMultiStore}");
+    if(widget.configObject.isMultiStore){
+      ApiController.multiStoreApiRequest(widget.configObject.primaryStoreId).then((response){
+        //print("${storeBranchesModel.data.length}");
+        setState(() {
+          this.storeBranchesModel = response;
+          if(storeBranchesModel != null){
+            if(storeBranchesModel.data.isNotEmpty){
+              for (int i = 0; i < storeBranchesModel.data.length; i++) {
+                if(widget.store.id == storeBranchesModel.data[i].id){
+                  branchData =  storeBranchesModel.data[i];
+                  break;
+                }
+              }
+            }
+          }
+        });
+      });
+    }
+  }
+
+  bool checkIfStoreClosed(){
+    if(store.storeStatus == "0"){
+      //0 mean Store close
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  Future<void> _setSetCurrentScreen() async {
+    await analytics.setCurrentScreen(
+      screenName: 'HomeScreen',
+      screenClassOverride: 'HomeScreenView',
+    );
+  }
+
+  getCartCount(){
+    databaseHelper.getCount(DatabaseHelper.CART_Table).then((value){
+      setState(() {
+        cartBadgeCount = value;
+      });
+      //print("--getCARTCount---${value}------");
+    });
+  }
+
+  void getCategoryApi() {
+    isLoading = true;
+    ApiController.getCategoriesApiRequest(store.id).then((response){
+      setState(() {
+        isLoading = false;
+        this.categoryResponse = response;
+      });
+    });
+  }
+
+  Future logout(BuildContext context,BranchData selectedStore) async {
+    try {
+      Utils.showProgressDialog(context);
+      SharedPrefs.setUserLoggedIn(false);
+      SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
+      AppConstant.isLoggedIn = false;
+      DatabaseHelper databaseHelper = new DatabaseHelper();
+      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      eventBus.fire(updateCartCount());
+
+      StoreResponse storeData = await ApiController.versionApiRequest(selectedStore.id);
+      CategoryResponse categoryResponse = await ApiController.getCategoriesApiRequest(storeData.store.id);
+      setState(() {
+        this.store = storeData.store;
+        this.branchData = selectedStore;
+        this.categoryResponse = categoryResponse;
+        Utils.hideProgressDialog(context);
+      });
+    } catch (e) {
+      print(e);
+    }
+  }
+
+
+
 }
