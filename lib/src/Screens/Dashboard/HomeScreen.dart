@@ -4,6 +4,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
@@ -23,13 +24,15 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'ForceUpdate.dart';
 import 'SearchScreen.dart';
 
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
   ConfigModel configObject;
-  HomeScreen(this.store, this.configObject);
+  bool showForceUploadAlert;
+  HomeScreen(this.store, this.configObject,this.showForceUploadAlert);
 
   @override
   State<StatefulWidget> createState() {
@@ -79,6 +82,12 @@ class _HomeScreenState extends State<HomeScreen> {
           imgList.add(NetworkImage(imageUrl.isEmpty ? AppConstant.placeholderImageUrl : imageUrl),);
         }
       }
+      if(widget.showForceUploadAlert){
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          DialogUtils.showForceUpdateDialog(context, store.storeName,
+              store.forceDownload[0].forceDownloadMessage);
+        });
+      }
     } catch (e) {
       print(e);
     }
@@ -87,6 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       key: _key,
       appBar: AppBar(
@@ -111,10 +121,9 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
 
       ),
-      body: Column(
-        children: <Widget>[
-          addBanners(),
-          Expanded(
+      body:Column(children: <Widget>[
+            addBanners(),
+            Expanded(
             child: isLoading
                 ? Center(child: CircularProgressIndicator()) : categoryResponse == null
                 ? SingleChildScrollView(child:Center(child: Text("")))

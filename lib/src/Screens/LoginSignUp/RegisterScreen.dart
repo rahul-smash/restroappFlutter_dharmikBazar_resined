@@ -85,7 +85,7 @@ class _RegisterUserState extends State<RegisterUser> {
                       children: <Widget>[
                         TextFormField(
                           decoration: const InputDecoration(
-                            labelText: 'Name',
+                            labelText: 'Name *',
                           ),
                           controller: _usernameController,
                           inputFormatters: [new LengthLimitingTextInputFormatter(30)],
@@ -97,7 +97,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
-                            labelText: 'Phone',
+                            labelText: 'Phone *',
                           ),
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
@@ -112,7 +112,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
-                            labelText: 'Email',
+                            labelText: 'Email *',
                           ),
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -127,7 +127,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         TextFormField(
                           obscureText: true,
                           decoration: const InputDecoration(
-                            labelText: 'Password',
+                            labelText: 'Password *',
                           ),
                           controller: _passwordController,
                           keyboardType: TextInputType.visiblePassword,
@@ -140,7 +140,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         TextFormField(
                           obscureText: true,
                           decoration: const InputDecoration(
-                            labelText: 'Confirm Password',
+                            labelText: 'Confirm Password *',
                           ),
                           controller: _confirmpasswordController,
                           keyboardType: TextInputType.visiblePassword,

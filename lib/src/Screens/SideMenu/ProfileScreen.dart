@@ -88,9 +88,10 @@ class _ProfileState extends State<ProfileScreen> {
                         child: TextField(
                           controller: firstNameController,
                           decoration: InputDecoration(
-                            labelText: 'Full name',
+                            labelText: 'Full name *',
                           ),
-                          style: TextStyle(fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
+                          style: TextStyle(fontSize: 18,
+                              color: Color(0xFF495056),fontWeight: FontWeight.w500
                           ),
                         ),
 

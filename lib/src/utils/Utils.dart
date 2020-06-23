@@ -46,11 +46,12 @@ class Utils {
     }
   }
 
-  static Future<PackageInfo> getAppVersionDetails() async {
+  static Future<PackageInfo> getAppVersionDetails(StoreResponse storeData) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     SharedPrefs.storeSharedValue(AppConstant.appName, packageInfo.appName);
     SharedPrefs.storeSharedValue(AppConstant.old_appverion, packageInfo.version);
+
     return packageInfo;
   }
 
