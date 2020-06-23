@@ -151,7 +151,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                       width: 70.0,
                                       height: 80.0,
                                       child: CachedNetworkImage(
-                                        imageUrl: "${imageUrl}",fit: BoxFit.cover
+                                          imageUrl: "${imageUrl}",
+                                          fit: BoxFit.fill
                                         //placeholder: (context, url) => CircularProgressIndicator(),
                                         //errorWidget: (context, url, error) => Icon(Icons.error),
                                       ),

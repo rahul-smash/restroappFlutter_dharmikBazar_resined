@@ -14,6 +14,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:flutter/gestures.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 
 class LoginEmailScreen extends StatefulWidget {
 
@@ -30,12 +31,24 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   StoreModel storeModel;
+  KeyboardVisibilityNotification _keyboardVisibility = new KeyboardVisibilityNotification();
+  int _keyboardVisibilitySubscriberId;
+  bool _keyboardState;
 
   _LoginEmailScreenState(this.menu);
 
   @override
   void initState() {
     super.initState();
+    _keyboardState = _keyboardVisibility.isKeyboardVisible;
+    _keyboardVisibilitySubscriberId = _keyboardVisibility.addNewListener(
+        onChange: (bool visible) {
+      setState(() {
+        _keyboardState = visible;
+        print("_keyboardState= ${_keyboardState}");
+      });
+    },
+    );
     SharedPrefs.getStore().then((value){
       setState(() {
         storeModel = value;
@@ -48,88 +61,108 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
     return Scaffold(
       backgroundColor: whiteColor,
       resizeToAvoidBottomPadding: true,
-      body: Stack(
-        children: <Widget>[
-          Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: Utils.getDeviceWidth(context),
-              child: Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
+      appBar: AppBar(
+        centerTitle: true,
+        title: new Text('Login',style: new TextStyle(
+          color: Colors.white,
+        ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Utils.hideKeyboard(context);
+            return Navigator.pop(context, false);
+          },
+        ),
+      ),
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Column(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topCenter,
               child: Container(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text('Login With Email',
-                      style: TextStyle(fontFamily: 'Bold',fontSize: 24, color: colorText,),
-                    ),
-                    SizedBox(height: 10),
-                    TextFormField(
-                      style: TextStyle(fontSize: 18,fontFamily: 'Medium',color: colorInputText,),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(0),
-                        labelText: 'Email',
-                        labelStyle: TextStyle(fontFamily: 'Medium',color: colorText,fontSize: 14,
+                width: Utils.getDeviceWidth(context),
+                child: AppConstant.isRestroApp ?
+                Image.asset("images/login_restro_bg.jpg",fit: BoxFit.fitWidth,)
+                    :Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Container(
+                  color: _keyboardState ? whiteColor : Colors.transparent,
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Login With Email',
+                        style: TextStyle(fontFamily: 'Bold',fontSize: 24, color: colorText,),
+                      ),
+                      SizedBox(height: 10),
+                      TextFormField(
+                        style: TextStyle(fontSize: 18,fontFamily: 'Medium',color: colorInputText,),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(0),
+                          labelText: 'Email',
+                          labelStyle: TextStyle(fontFamily: 'Medium',color: colorText,fontSize: 14,
+                          ),
                         ),
+                        inputFormatters: [new LengthLimitingTextInputFormatter(80)],
+                        controller: _usernameController,
                       ),
-                      inputFormatters: [new LengthLimitingTextInputFormatter(80)],
-                      controller: _usernameController,
-                    ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    TextFormField(
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'Medium',
-                        color: colorInputText,
+                      SizedBox(
+                        height: 10,
                       ),
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.all(0),
-                        labelText: 'Password',
-                        labelStyle: TextStyle(
+                      TextFormField(
+                        style: TextStyle(
+                          fontSize: 18,
                           fontFamily: 'Medium',
-                          color: colorText,
-                          fontSize: 14,
+                          color: colorInputText,
                         ),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(0),
+                          labelText: 'Password',
+                          labelStyle: TextStyle(
+                            fontFamily: 'Medium',
+                            color: colorText,
+                            fontSize: 14,
+                          ),
+                        ),
+                        keyboardType: TextInputType.visiblePassword,
+                        controller: _passwordController,
+                        obscureText: true,
                       ),
-                      keyboardType: TextInputType.visiblePassword,
-                      controller: _passwordController,
-                      obscureText: true,
-                    ),
-                    SizedBox(height: 10),
-                    MaterialButton(
-                      onPressed: () {
-                        print('@@ForgotPassword--clcik');
-                        Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => ForgotPasswordScreen(menu)),
-                        );
-                      },
-                      textColor: Colors.white,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: Text('Forgot password?',
-                          style: TextStyle(
-                            fontFamily: 'Medium',fontSize: 14,color: orangeColor,),
+                      SizedBox(height: 10),
+                      MaterialButton(
+                        onPressed: () {
+                          print('@@ForgotPassword--clcik');
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => ForgotPasswordScreen(menu)),
+                          );
+                        },
+                        textColor: Colors.white,
+                        child: Align(
+                          alignment: Alignment.centerRight,
+                          child: Text('Forgot password?',
+                            style: TextStyle(
+                              fontFamily: 'Medium',fontSize: 14,color: orangeColor,),
 
+                          ),
                         ),
                       ),
-                    ),
-                    addLoginButton(),
-                    addSignUpButton()
-                  ],
+                      addLoginButton(),
+                      addSignUpButton()
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

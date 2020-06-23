@@ -10,7 +10,7 @@
   // Override point for customization after application launch.
   // Add the following line, with your API key
     //AIzaSyCwKXvgsBElyhqwj03ro9e-Lnu3fmRmpJI
-    [GMSServices provideAPIKey: @"AIzaSyDwWsP2a9qP7PA-aojp81sOGE_bJrSw6AM"];
+    [GMSServices provideAPIKey: @"AIzaSyBB1QThVluIt-PzfhPs3ZUWV_CZq8H4qXA"];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 

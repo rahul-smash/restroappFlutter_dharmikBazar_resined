@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -22,14 +23,13 @@ class LoginMobileScreen extends StatefulWidget {
 class _LoginMobileScreen extends State<LoginMobileScreen> {
 
   String menu;
-  _LoginMobileScreen(this.menu);
-
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   LoginMobile loginMobile = new LoginMobile();
   final phoneController = new TextEditingController();
-
   StoreModel store;
   String otpSkip;
+
+  _LoginMobileScreen(this.menu);
 
   @override
   void initState() {
@@ -50,25 +50,37 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
       backgroundColor: whiteColor,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-        centerTitle:  true,
+        centerTitle: true,
         title: new Text('Login',style: new TextStyle(
           color: Colors.white,
-        ),),
+        ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () {
+            Utils.hideKeyboard(context);
+            return Navigator.pop(context, false);
+          },
+        ),
       ),
-      body: Stack(
-        children: <Widget>[
-          Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: Utils.getDeviceWidth(context),
-              child: Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          reverse: true,
+          child: Column(
+            children: <Widget>[
+              Align(
+                alignment: Alignment.topCenter,
                 child: Container(
-                  margin: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  width: Utils.getDeviceWidth(context),
+                  child: AppConstant.isRestroApp ?
+                  Image.asset("images/login_restro_bg.jpg",fit: BoxFit.fitWidth,)
+                      :Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Form(
                       key: _formKey,
                       autovalidate: true,
@@ -103,7 +115,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                             },
                           ),
                           Container(
-                              padding: const EdgeInsets.only(left: 0.0, top: 0.0, right: 0.0),
+                              padding: const EdgeInsets.only(left: 0.0, top: 0.0, right: 20.0),
                               child: new RaisedButton(
                                 color: orangeColor,
                                 shape: RoundedRectangleBorder(
@@ -119,10 +131,11 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                         ],
                       )),
                 ),
-            ),
-          ),
+              ),
 
-        ],
+            ],
+          ),
+        ),
       ),
 
     );

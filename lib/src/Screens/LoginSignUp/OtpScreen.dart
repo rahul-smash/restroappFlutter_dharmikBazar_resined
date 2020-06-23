@@ -65,75 +65,100 @@ class _OtpScreen extends State<OtpScreen> {
   Widget build(BuildContext context) {
 
     return new Scaffold(
+      backgroundColor: whiteColor,
       appBar: new AppBar(
         centerTitle: true,
         title: new Text('Mobile Verification',style: new TextStyle(
           color: Colors.white,
         ),),
       ),
-      body: new SafeArea(
-          top: false,
-          bottom: false,
-          child: new Form(
-              key: _formKey,
-              autovalidate: true,
-              child: new ListView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                children: <Widget>[
-                  Container(
-                      padding: const EdgeInsets.only(top: 40.0),
-                      margin: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
-                      child: new Text(
-                        AppConstant.txt_OTP,
-                        style: new TextStyle(
-                          fontSize: 16.0,
-                          color: Colors.black,
-                        ),
-                      )),
-                  TextFormField(
-                    decoration: const InputDecoration(
-                      hintText: 'Enter OTP Number',
-                      //labelText: 'Enter OTP Number',
-                    ),
-                    keyboardType: TextInputType.phone,
-                    validator: (val) =>
-                    val.isEmpty ? AppConstant.enterOtp : null,
-                    inputFormatters: [
-                      WhitelistingTextInputFormatter.digitsOnly,
-                    ],
-                    onSaved: (val) {
-                      otpModel.otp = val;
-                    },
-                  ),
-                  Row(mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Column(
+          children: <Widget>[
+            Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                width: Utils.getDeviceWidth(context),
+                child: AppConstant.isRestroApp ?
+                Image.asset("images/login_restro_bg.jpg",fit: BoxFit.fitWidth,)
+                    :Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Form(
+                  key: _formKey,
+                  autovalidate: true,
+                  child: new ListView(
+                    shrinkWrap: true,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    children: <Widget>[
                       Container(
-                          padding: EdgeInsets.only( left: 0.0, top: 10.0, right: 20.0),
-                          child: new RaisedButton(
-                            color: appTheme,
-                            textColor: Colors.white,
-                            child: Text(_start != 0 ? "${_start} sec" : "Skip",style: TextStyle(
-                              color: Colors.white,
+                          padding: const EdgeInsets.only(top: 40.0),
+                          margin: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
+                          child: new Text(
+                            AppConstant.txt_OTP,
+                            style: new TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.black,
                             ),
-                            ),
-                            onPressed: onSkipButtonPressed,
                           )),
-                      Container(
-                          padding: EdgeInsets.only( left: 20.0, top: 10.0, right: 0.0),
-                          child: new RaisedButton(
-                            color: appTheme,
-                            textColor: Colors.white,
-                            child: const Text('Submit',style: TextStyle(
-                              color: Colors.white,
-                            ),
-                            ),
-                            onPressed: onSubmitClicked,
-                          )
+                      TextFormField(
+                        decoration: const InputDecoration(
+                          hintText: 'Enter OTP Number',
+                          //labelText: 'Enter OTP Number',
+                        ),
+                        keyboardType: TextInputType.phone,
+                        validator: (val) =>
+                        val.isEmpty ? AppConstant.enterOtp : null,
+                        inputFormatters: [
+                          WhitelistingTextInputFormatter.digitsOnly,
+                        ],
+                        onSaved: (val) {
+                          otpModel.otp = val;
+                        },
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                              padding: EdgeInsets.only( left: 0.0, top: 10.0, right: 20.0),
+                              child: new RaisedButton(
+                                color: orangeColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                textColor: Colors.white,
+                                child: Text(_start != 0 ? "${_start} sec" : "Skip",style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                                ),
+                                onPressed: onSkipButtonPressed,
+                              )),
+                          Container(
+                              padding: EdgeInsets.only( left: 20.0, top: 10.0, right: 0.0),
+                              child: new RaisedButton(
+                                color: orangeColor,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
+                                textColor: Colors.white,
+                                child: const Text('Submit',style: TextStyle(
+                                  color: Colors.white,
+                                ),
+                                ),
+                                onPressed: onSubmitClicked,
+                              )
+                          ),
+                        ],
                       ),
                     ],
-                  ),
-                ],
-              ))),
+                  )),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
