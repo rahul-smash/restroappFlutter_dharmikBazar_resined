@@ -79,7 +79,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
     return Scaffold(
         //resizeToAvoidBottomInset: false,
         appBar: AppBar(
-            title: Text('Delivery Addresses',style: new TextStyle(
+            title: Text(widget.selectedAddress != null ? "Edit Address"
+                : "Add Address",style: new TextStyle(
               color: Colors.white,
             ),),
             centerTitle: true,
@@ -97,19 +98,6 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      SizedBox(height: 20),
-                      Align(
-                        alignment: Alignment.center,
-                        child: new Text(
-                          widget.selectedAddress != null
-                              ? "Edit Address"
-                              : "Add Address",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              fontSize: 20.0),
-                        ),
-                      ),
                       SizedBox(height: 20),
                       Text(
                         "City",
