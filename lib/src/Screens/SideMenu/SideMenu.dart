@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
@@ -102,17 +103,21 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                   child: Icon(Icons.account_circle,size: 60, color: Colors.white,),
                 ),
               ),
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text('Welcome',
-                        style: TextStyle(color: leftMenuWelcomeTextColors,
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 5),
-                    Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
-                        style: TextStyle(color: leftMenuWelcomeTextColors, fontSize: 15)
-                    ),
-                  ])
+              Flexible(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Welcome',
+                          style: TextStyle(color: leftMenuWelcomeTextColors,
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 5),
+                      Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
+                          maxLines: 2, overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: leftMenuWelcomeTextColors, fontSize: 15)
+                      ),
+                    ]
+                ),
+              ),
             ])));
   }
 
