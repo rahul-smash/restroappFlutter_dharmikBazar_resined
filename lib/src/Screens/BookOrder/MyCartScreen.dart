@@ -100,12 +100,19 @@ class _MyCartScreenState extends State<MyCartScreen> {
       return Container(
         child: Expanded(
           child: Center(
-            child: Text("Empty Cart",
-                overflow: TextOverflow.ellipsis,
-                style: new TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 18.0,
-                )),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset("images/empty_cart.png",fit: BoxFit.fill,
+                  width: 100,height: 100,),
+                SizedBox(height: 10,),
+                Text("Your Cart is Empty",
+                    overflow: TextOverflow.ellipsis,
+                    style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 18.0,
+                    )),
+
+              ],
+            ),
           ),
         ),
       );
