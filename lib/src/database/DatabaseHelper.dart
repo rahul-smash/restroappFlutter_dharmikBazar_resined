@@ -20,10 +20,12 @@ class DatabaseHelper {
   static final String Products_Table = "products";
   static final String Favorite_Table = "favorite";
   static final String CART_Table = "cart";
+//  static final String Sub_Categories_product_Table = "sub_categories_products";
 
   // Database Columns
   static final String Favorite = "0";
   static final String ID = "id";
+  static final String TITLE = "title";
   static final String VARIENT_ID = "variant_id";
   static final String PRODUCT_ID = "product_id";
   static final String WEIGHT = "weight";
@@ -57,7 +59,8 @@ class DatabaseHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "RestroApp.db");
     // Open/create the database at a given path
-    var theDb = await openDatabase(path, version: 2, onCreate: _onCreate);
+    var theDb = await openDatabase(path,
+        version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -145,10 +148,49 @@ class DatabaseHelper {
         ")");
   }
 
+  void _onUpgrade(Database db, int oldVersion, int newVersion) async {
+//    if (newVersion > 2) {
+//      await db.execute(createSubCategoriesProductQuery());
+//    }
+  }
+
   Future<int> saveCategories(CategoryModel categoryModel) async {
     var dbClient = await db;
     int res = await dbClient.insert(Categories_Table, categoryModel.toMap());
     return res;
+  }
+
+  Future<List<CategoryModel>> getCategories() async {
+    List<CategoryModel> categoryList = new List();
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      ID,
+      TITLE,
+      "version",
+      "deleted",
+      "show_product_image",
+      "sort",
+      image_100_80,
+      image_300_200,
+      "sub_category",
+      "image"
+    ];
+
+    List<Map> resultList =
+        await dbClient.query(Categories_Table, columns: columnsToSelect);
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        CategoryModel categoryModel = CategoryModel();
+        categoryModel.id = row[ID].toString();
+        categoryModel.title = row[TITLE];
+        categoryModel.version = row["version"];
+        categoryModel.image300200 = row[image_300_200];
+        categoryList.add(categoryModel);
+      });
+    } else {
+      //print("-empty cart-in db--");
+    }
+    return categoryList;
   }
 
   Future<int> saveSubCategories(
@@ -157,6 +199,37 @@ class DatabaseHelper {
     int res = await dbClient.insert(
         Sub_Categories_Table, subCategories.toMap(cat_id));
     return res;
+  }
+
+  Future<List<SubCategory>> getSubCategories(String parent_id) async {
+    List<SubCategory> subCategoryList = new List();
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      "id",
+      "parent_id",
+      "title",
+      "version",
+      "status",
+      "deleted",
+      "sort"
+    ];
+
+    List<Map> resultList = await dbClient.query(Sub_Categories_Table,
+        columns: columnsToSelect,
+        where: 'parent_id = ?',
+        whereArgs: [parent_id]);
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        SubCategory subCategory = SubCategory();
+        subCategory.id = row[ID].toString();
+        subCategory.title = row[TITLE];
+        subCategory.version = row["version"];
+        subCategoryList.add(subCategory);
+      });
+    } else {
+      //print("-empty cart-in db--");
+    }
+    return subCategoryList;
   }
 
 //  Future<int> saveProducts(Product products, String favorite, String mrp_price,
@@ -174,21 +247,17 @@ class DatabaseHelper {
     return res;
   }
 
-
   Future<int> addProductToFavTable(Map<String, dynamic> row) async {
     var dbClient = await db;
     int res = await dbClient.insert(Favorite_Table, row);
     return res;
   }
 
-
-  Future<int> updateProductInCart(Map<String, dynamic> row, String variantId) async {
+  Future<int> updateProductInCart(
+      Map<String, dynamic> row, String variantId) async {
     var dbClient = await db;
-    return dbClient.update(CART_Table,
-        row,
-        where: "${VARIENT_ID} = ?",
-        whereArgs: [variantId]
-    );
+    return dbClient.update(CART_Table, row,
+        where: "${VARIENT_ID} = ?", whereArgs: [variantId]);
   }
 
   Future<CartData> getProductQuantitiy(String variantId) async {
@@ -197,13 +266,23 @@ class DatabaseHelper {
     //database connection
     var dbClient = await db;
     // get single row
-    List<String> columnsToSelect=[QUANTITY,VARIENT_ID,WEIGHT,MRP_PRICE,PRICE,DISCOUNT];
+    List<String> columnsToSelect = [
+      QUANTITY,
+      VARIENT_ID,
+      WEIGHT,
+      MRP_PRICE,
+      PRICE,
+      DISCOUNT
+    ];
 
     String whereClause = '${DatabaseHelper.VARIENT_ID} = ?';
 
     List<dynamic> whereArguments = [variantId];
 
-    List<Map> result = await dbClient.query(CART_Table, columns: columnsToSelect,where: whereClause,whereArgs: whereArguments);
+    List<Map> result = await dbClient.query(CART_Table,
+        columns: columnsToSelect,
+        where: whereClause,
+        whereArgs: whereArguments);
     // print the results
     if (result != null && result.isNotEmpty) {
       //print("---result.length--- ${result.length}");
@@ -270,9 +349,23 @@ class DatabaseHelper {
     List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
-      MRP_PRICE,PRICE,DISCOUNT,isFavorite,QUANTITY,Product_Name,
-      VARIENT_ID,WEIGHT,PRODUCT_ID,UNIT_TYPE,IS_TAX_ENABLE,nutrient,
-      description,imageType,imageUrl,image_100_80,image_300_200
+      MRP_PRICE,
+      PRICE,
+      DISCOUNT,
+      isFavorite,
+      QUANTITY,
+      Product_Name,
+      VARIENT_ID,
+      WEIGHT,
+      PRODUCT_ID,
+      UNIT_TYPE,
+      IS_TAX_ENABLE,
+      nutrient,
+      description,
+      imageType,
+      imageUrl,
+      image_100_80,
+      image_300_200
     ];
 
     List<Map> resultList =
@@ -306,24 +399,37 @@ class DatabaseHelper {
     return cartList;
   }
 
-
   Future<List<Product>> getFavouritesList() async {
     //print("------------getFavouritesList--------------");
     List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
-      MRP_PRICE,PRICE,DISCOUNT,isFavorite,QUANTITY,Product_Name,Product_Json,
-      VARIENT_ID,WEIGHT,PRODUCT_ID,UNIT_TYPE,IS_TAX_ENABLE,nutrient,
-      description,imageType,imageUrl,image_100_80,image_300_200
+      MRP_PRICE,
+      PRICE,
+      DISCOUNT,
+      isFavorite,
+      QUANTITY,
+      Product_Name,
+      Product_Json,
+      VARIENT_ID,
+      WEIGHT,
+      PRODUCT_ID,
+      UNIT_TYPE,
+      IS_TAX_ENABLE,
+      nutrient,
+      description,
+      imageType,
+      imageUrl,
+      image_100_80,
+      image_300_200
     ];
 
     //String whereClause = '${DatabaseHelper.isFavorite} = 1';
 
     List<Map> resultList =
-    await dbClient.query(Favorite_Table, columns: columnsToSelect);
+        await dbClient.query(Favorite_Table, columns: columnsToSelect);
 
     if (resultList != null && resultList.isNotEmpty) {
-
       resultList.forEach((row) {
         Product product = new Product();
         product.mrpPrice = row[MRP_PRICE];
@@ -366,8 +472,8 @@ class DatabaseHelper {
     return ((val * mod).round().toDouble() / mod);
   }
 
-
-  Future<int> checkProductsExistInFavTable(String table, String product_id) async {
+  Future<int> checkProductsExistInFavTable(
+      String table, String product_id) async {
     //database connection
     var dbClient = await db;
     List<Map> list = await dbClient
@@ -397,12 +503,14 @@ class DatabaseHelper {
 
   Future<int> deleteFav(String table, String product_Id) async {
     var dbClient = await db;
-    return await dbClient.delete(table, where: '$ID = ?', whereArgs: [product_Id]);
+    return await dbClient
+        .delete(table, where: '$ID = ?', whereArgs: [product_Id]);
   }
 
   Future<int> delete(String table, String variant_Id) async {
     var dbClient = await db;
-    return await dbClient.delete(table, where: '$VARIENT_ID = ?', whereArgs: [variant_Id]);
+    return await dbClient
+        .delete(table, where: '$VARIENT_ID = ?', whereArgs: [variant_Id]);
   }
 
   Future<int> deleteTable(String table) async {
@@ -414,4 +522,20 @@ class DatabaseHelper {
     var dbClient = await db;
     dbClient.close();
   }
+
+//  String createSubCategoriesProductQuery() {
+//    return "CREATE TABLE ${Sub_Categories_product_Table}("
+//        "id INTEGER PRIMARY KEY, "
+//        "title TEXT,"
+//        "version TEXT,"
+//        "parentId TEXT,"
+//        "status TEXT,"
+//        "deleted TEXT,"
+//        "sort TEXT,"
+//        "image_100_80 TEXT,"
+//        "image_300_200 TEXT,"
+//        "image TEXT,"
+//        "subCategoryId TEXT"
+//        ")";
+//  }
 }
