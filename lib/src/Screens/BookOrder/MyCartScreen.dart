@@ -5,6 +5,7 @@ import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
@@ -45,25 +46,28 @@ class _MyCartScreenState extends State<MyCartScreen> {
             onPressed: () => Navigator.pop(context),
           ),
         actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(right: 5),
-            child: IconButton(
-              icon: Image.asset('images/cancel_cart.png', width: 25),
-              onPressed: () async {
-                var result = await DialogUtils.displayCommonDialog2(context, "Clear Cart?",
-                    AppConstant.emptyCartMsg, "Cancel", "Yes");
-                if(result == true){
-                  print("Yes");
-                  setState(() {
-                    databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                    getCartListFromDB();
-                    eventBus.fire(updateCartCount());
-                    bottomBar.state.updateTotalPrice();
-                    widget.callback();
-                  });
+          Visibility(
+            visible: cartList.isEmpty ? false: true,
+            child: Padding(
+              padding: EdgeInsets.only(right: 5),
+              child: IconButton(
+                icon: Image.asset('images/cancel_cart.png', width: 25),
+                onPressed: () async {
+                  var result = await DialogUtils.displayCommonDialog2(context, "Clear Cart?",
+                      AppConstant.emptyCartMsg, "Cancel", "Yes");
+                  if(result == true){
+                    print("Yes");
+                    setState(() {
+                      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                      getCartListFromDB();
+                      eventBus.fire(updateCartCount());
+                      bottomBar.state.updateTotalPrice();
+                      widget.callback();
+                    });
 
-                }
-              },
+                  }
+                },
+              ),
             ),
           ),
         ],
