@@ -512,7 +512,7 @@ class ApiController {
         "order_detail": orderJson,
         "device_id": deviceId,
       });
-
+      print("--fields---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("--Tax--respStr---${respStr}");
