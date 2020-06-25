@@ -144,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   shrinkWrap: true,
                   children: categoryResponse.categories.map((CategoryModel model) {
 
-                    return GridTile(child: CategoryView(model,widget.store));
+                    return GridTile(child: CategoryView(model,store));
                   }).toList()),
             ),
           ),
