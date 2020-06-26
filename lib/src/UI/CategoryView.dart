@@ -12,7 +12,9 @@ class CategoryView extends StatelessWidget {
 
   final CategoryModel categoryModel;
   StoreModel store;
-  CategoryView(this.categoryModel, this.store);
+  int index;
+  bool isComingFromBaner;
+  CategoryView(this.categoryModel,this.store,this.isComingFromBaner,this.index);
 
   Widget build(BuildContext context) {
     return Container(
@@ -30,7 +32,7 @@ class CategoryView extends StatelessWidget {
                 if (categoryModel != null && categoryModel.subCategory.isNotEmpty) {
                   Navigator.push(context,
                     MaterialPageRoute(builder: (context) {
-                      return SubCategoryProductScreen(categoryModel);
+                      return SubCategoryProductScreen(categoryModel,isComingFromBaner,index);
                     }),
                   );
                   Map<String,dynamic> attributeMap = new Map<String,dynamic>();

@@ -5,6 +5,7 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:package_info/package_info.dart';
+import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
@@ -144,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   shrinkWrap: true,
                   children: categoryResponse.categories.map((CategoryModel model) {
 
-                    return GridTile(child: CategoryView(model,store));
+                    return GridTile(child: CategoryView(model,store,false,0));
                   }).toList()),
             ),
           ),
@@ -213,10 +214,22 @@ class _HomeScreenState extends State<HomeScreen> {
                           print("title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
                           if(categories.subCategory!= null){
                             for(int j=0; j<categories.subCategory.length;j++){
+                              SubCategory subCategory = categories.subCategory[j];
 
+                              if(subCategory.id == store.banners[position].subCategoryId){
+                                print("open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.banners[position].subCategoryId}");
+
+                                Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
+                                    return SubCategoryProductScreen(categories,true,j);
+                                  }),
+                                );
+
+                                break;
+                              }
                             }
                           }
-                          break;
+
                         }
                         //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
                       }

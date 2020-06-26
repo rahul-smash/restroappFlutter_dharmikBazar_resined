@@ -11,10 +11,12 @@ import 'package:restroapp/src/utils/Utils.dart';
 class SubCategoryProductScreen extends StatelessWidget{
 
   final CategoryModel categoryModel;
+  bool isComingFromBaner;
+  int index;
   final CartTotalPriceBottomBar bottomBar =
       CartTotalPriceBottomBar(ParentInfo.productList);
 
-  SubCategoryProductScreen(this.categoryModel);
+  SubCategoryProductScreen(this.categoryModel,this.isComingFromBaner,this.index);
 
 
   @override
@@ -22,6 +24,7 @@ class SubCategoryProductScreen extends StatelessWidget{
     //print("---subCategory.length--=${categoryModel.subCategory.length}");
     return DefaultTabController(
       length: categoryModel.subCategory.length,
+      initialIndex: isComingFromBaner ? index : index,
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
