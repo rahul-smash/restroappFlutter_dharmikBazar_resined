@@ -166,7 +166,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Carousel(
               boxFit: BoxFit.fitWidth,
               autoplay: true,
-              animationCurve: Curves.fastOutSlowIn,
+              animationCurve: Curves.ease,
               animationDuration: Duration(milliseconds: 3000),
               dotSize: 6.0,
               dotIncreasedColor: dotIncreasedColor,
@@ -176,6 +176,57 @@ class _HomeScreenState extends State<HomeScreen> {
               showIndicator: imgList.length == 1 ? false : true,
               indicatorBgPadding: 7.0,
               images: imgList,
+              onImageTap: (position){
+                print("onImageTap ${position}");
+                print("linkTo=${store.banners[position].linkTo}");
+                /*
+                then check category_id
+                or catgory_id -> subcategory_id
+                or
+                catgory_id -> subcategory_id->product_id
+                */
+                if(store.banners[position].linkTo.isNotEmpty){
+                  if(store.banners[position].linkTo == "category"){
+
+                    if(store.banners[position].categoryId == "0" &&
+                        store.banners[position].subCategoryId == "0" &&
+                        store.banners[position].productId == "0"){
+                      print("return");
+                      return;
+                    }
+
+                    if(store.banners[position].categoryId != "0" &&
+                     store.banners[position].subCategoryId != "0" &&
+                        store.banners[position].productId != "0"){
+                      // here we have to open the product detail
+                      print("open the product detail ${position}");
+
+                    }else if(store.banners[position].categoryId != "0" &&
+                        store.banners[position].subCategoryId != "0" &&
+                        store.banners[position].productId == "0"){
+                      //here open the banner sub category
+                      print("open the subCategory ${position}");
+
+                      for(int i=0; i<categoryResponse.categories.length; i++){
+                        CategoryModel categories = categoryResponse.categories[i];
+                        if(store.banners[position].categoryId == categories.id){
+                          print("title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+                          if(categories.subCategory!= null){
+                            for(int j=0; j<categories.subCategory.length;j++){
+
+                            }
+                          }
+                          break;
+                        }
+                        //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
+                      }
+                    }
+                  }
+                }
+                /*print("categoryId=${store.banners[position].categoryId}");
+                print("subCategoryId=${store.banners[position].subCategoryId}");
+                print("productId=${store.banners[position].productId}");*/
+              },
             ),
           ),
         ),
