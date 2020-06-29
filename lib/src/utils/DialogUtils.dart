@@ -853,6 +853,253 @@ class DialogUtils {
     );
   }
 
+
+  static Future<bool> showInviteEarnAlert(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {
+            //print("onWillPop onWillPop");
+            Navigator.pop(context,false);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Wrap(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: InkWell(
+                        onTap: (){
+                          Navigator.pop(context,false);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                          child: Icon(Icons.cancel,color: Colors.grey,),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 5),
+                      child: Center(
+                        child: Text(
+                          "Invite & Earn",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,
+                              fontSize: 18,fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Container(
+                          height: 3,
+                          color: appTheme,
+                          width: 20),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 35, 0, 30),
+                      child: Center(
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(text: "Please log in to share your",
+                            style: TextStyle( color: grayColorTitle,),
+                            children: <TextSpan>[
+                              TextSpan(text: "\nreferral code and earn a",
+                                  style: TextStyle(color: Colors.black,fontWeight:FontWeight.bold),),
+                              TextSpan(text:"\ndiscount coupon",
+                                  style: TextStyle(color: Colors.black,
+                                      fontWeight:FontWeight.bold),),
+                              TextSpan(text:"\non your next order.",
+                                style: TextStyle( color: grayColorTitle,),),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 40),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                            child: FlatButton(
+                              child: Text('Go For Login'),
+                              color: appTheme,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context,true);
+                                Utils.showLoginDialog(context);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        );
+      },
+    );
+  }
+
+  static Future<bool> showInviteEarnAlert2(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {
+            //print("onWillPop onWillPop");
+            //Navigator.pop(context,false);
+          },
+          child: Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              //title: Text(title,textAlign: TextAlign.center,),
+              child: Container(
+                margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Wrap(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: InkWell(
+                        onTap: (){
+                          Navigator.pop(context,false);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                          child: Icon(Icons.cancel,color: Colors.grey,),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 80.0,
+                        height: 80.0,
+                        padding:  EdgeInsets.all(5.0),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(0xffdbdbdb)),
+                        child: Padding(
+                          padding: EdgeInsets.all(10),
+                          child: Center(
+                            child: Stack(
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.all(0),
+                                  width: 80.0,
+                                  height: 80.0,
+                                  decoration: new BoxDecoration(
+                                    image: DecorationImage(
+                                        image: AssetImage("images/gift.png"),
+                                        fit: BoxFit.fill),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 5),
+                      child: Center(
+                        child: Text("Have a referral code?",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.black,
+                              fontSize: 18,fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Container(height: 3,color: appTheme,width: 20),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
+                      child: Center(
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(text: "Signup with the ",
+                            style: TextStyle( color: grayColorTitle,),
+                            children: <TextSpan>[
+                              TextSpan(text: "Referral code",
+                                style: TextStyle(color: Colors.black,
+                                    fontWeight:FontWeight.bold),),
+                              TextSpan(text:" and",
+                                style: TextStyle(color: grayColorTitle,
+                                    fontWeight:FontWeight.normal),),
+                              TextSpan(text:"\nearn a ",
+                                style: TextStyle( color: grayColorTitle,),),
+                              TextSpan(text:"Discount Coupon",
+                                style: TextStyle(color: Colors.black,
+                                    fontWeight:FontWeight.bold),),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('Sign up'),
+                              color: appTheme,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context,true);
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+
+
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                      child: Center(
+                        child: Container(
+                          margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          child: FlatButton(
+                            child: Text(
+                              'Skip',
+                              style: TextStyle(
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                            color: Colors.white,
+                            textColor: appTheme,
+                            onPressed: () {
+                              Navigator.pop(context, true);
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+
+                  ],
+                ),
+              )),
+        );
+      },
+    );
+  }
+
   static Future<void> openMap(
       StoreModel storeModel, double latitude, double longitude) async {
     String address = "${storeModel.storeName}, ${storeModel.location},"

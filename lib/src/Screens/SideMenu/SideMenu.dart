@@ -15,10 +15,12 @@ import 'package:restroapp/src/Screens/SideMenu/ReferEarn.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -152,7 +154,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         ));
   }
 
-  _openPageForIndex(DrawerChildItem item,int pos, BuildContext context) {
+  _openPageForIndex(DrawerChildItem item,int pos, BuildContext context) async {
     switch (item.title) {
       case DrawerChildConstants.HOME:
         Navigator.pop(context);
@@ -236,25 +238,29 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
         break;
       case DrawerChildConstants.SHARE:
-        /*if (AppConstant.isLoggedIn) {
+        if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ReferEarn()),
-            );
+
+            ReferEarnData referEarn = await ApiController.referEarn();
+            share(referEarn,widget.store);
+
           }else{
             Utils.showToast("Refer Earn is inactive!", true);
           }
         }else {
-          Utils.showLoginDialog(context);
-        }*/
-        share();
+          Navigator.pop(context);
+          var result = await DialogUtils.showInviteEarnAlert(context);
+          print("showInviteEarnAlert=${result}");
+        }
+        //share();
 
         Map<String,dynamic> attributeMap = new Map<String,dynamic>();
         attributeMap["ScreenName"] = "share apk url";
         Utils.sendAnalyticsEvent("Clicked share",attributeMap);
 
+        //DialogUtils.showInviteEarnAlert2(context);
+        
         break;
       case DrawerChildConstants.LOGIN:
       case DrawerChildConstants.LOGOUT:
@@ -320,12 +326,20 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     );
   }
 
-  Future<void> share() async {
-    await FlutterShare.share(
-        title: 'Kindly download',
-        text: 'Kindly download' + widget.store.storeName + 'app from',
-        linkUrl: widget.store.androidShareLink,
-        chooserTitle: 'Refer & Earn');
+  Future<void> share(ReferEarnData referEarn,StoreModel store) async {
+    if(store.isRefererFnEnable){
+      await FlutterShare.share(
+          title: '${store.storeName}',
+          linkUrl: referEarn.referEarn.sharedMessage,
+          chooserTitle: 'Refer & Earn');
+    }else{
+      await FlutterShare.share(
+          title: 'Kindly download',
+          text: 'Kindly download' + widget.store.storeName + 'app from',
+          linkUrl: widget.store.androidShareLink,
+          chooserTitle: 'Share');
+    }
+
   }
 
   Future logout(BuildContext context) async {
