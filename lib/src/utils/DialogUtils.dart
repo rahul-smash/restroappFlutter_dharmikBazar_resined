@@ -1000,7 +1000,7 @@ class DialogUtils {
                                   height: 80.0,
                                   decoration: new BoxDecoration(
                                     image: DecorationImage(
-                                        image: AssetImage("images/gift.png"),
+                                        image: AssetImage("images/gifticon.png"),
                                         fit: BoxFit.fill),
                                   ),
                                 ),
