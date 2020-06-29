@@ -3,7 +3,6 @@ import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
-import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -70,6 +69,18 @@ class ApiController {
           StoreResponse.fromJson(json.decode(response.data));
       print("-------store.success ---${storeData.success}");
       SharedPrefs.saveStore(storeData.store);
+      //check older version
+      String version = await SharedPrefs.getAPiDetailsVersion();
+      print("older version is $version");
+      if (version != storeData.store.version) {
+        //TODO: store version saved
+        print(
+            "version not matched older version is $version and new version is ${storeData.store.version}.");
+        SharedPrefs.saveAPiDetailsVersion(storeData.store.version);
+        DatabaseHelper databaseHelper = DatabaseHelper();
+        databaseHelper.clearDataBase();
+      }
+
       return storeData;
     } catch (e) {
       print(e);
@@ -188,10 +199,12 @@ class ApiController {
         ApiConstants.getCategories;
     CategoryResponse categoryResponse = CategoryResponse();
     DatabaseHelper databaseHelper = new DatabaseHelper();
-    int dbCount =
-        await databaseHelper.getCount(DatabaseHelper.Categories_Table);
+
     try {
-      if (dbCount == 0) {
+      int dbCount =
+          await databaseHelper.getCount(DatabaseHelper.Categories_Table);
+      bool isUseDB = dbCount == 0;
+      if (isUseDB) {
         print("database zero");
         print("catttttt  $url");
         Response response = await Dio()
@@ -215,8 +228,9 @@ class ApiController {
         List<CategoryModel> categoryList = await databaseHelper.getCategories();
         categoryResponse.categories = categoryList;
         for (var i = 0; i < categoryResponse.categories.length; i++) {
-          String parent_id= categoryResponse.categories[i].id;
-          categoryResponse.categories[i].subCategory= await databaseHelper.getSubCategories(parent_id);
+          String parent_id = categoryResponse.categories[i].id;
+          categoryResponse.categories[i].subCategory =
+              await databaseHelper.getSubCategories(parent_id);
         }
         categoryResponse.success = true;
       }
@@ -228,33 +242,81 @@ class ApiController {
 
   static Future<SubCategoryResponse> getSubCategoryProducts(
       String subCategoryId) async {
-    StoreModel store = await SharedPrefs.getStore();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String deviceId = prefs.getString(AppConstant.deviceId);
-    print("deviceID $deviceId");
-    String deviceToken = prefs.getString(AppConstant.deviceToken);
-    print("deviceToken $deviceToken");
+    DatabaseHelper databaseHelper = new DatabaseHelper();
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.getProducts +
-        subCategoryId;
-    print(url);
-    FormData formData = new FormData.fromMap({
-      "user_id": "",
-      "device_id": deviceId,
-      "device_token": deviceToken,
-      "platform": Platform.isIOS ? "IOS" : "Android"
-    });
-    Dio dio = new Dio();
-    Response response = await dio.post(url,
-        data: formData,
-        options: new Options(
-            contentType: "application/json", responseType: ResponseType.plain));
-    //print(response.data);
-    SubCategoryResponse subCategoryResponse =
-        SubCategoryResponse.fromJson(json.decode(response.data));
-    //print("-------store.success ---${storeData.success}");
-    //TODO: implement here
+    int dbProductCounts = await databaseHelper.getCountWithCondition(
+        DatabaseHelper.Products_Table, "category_ids", subCategoryId);
+    SubCategoryResponse subCategoryResponse = SubCategoryResponse();
+    try {
+      if (dbProductCounts == 0) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        print("deviceID $deviceId");
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+        print("deviceToken $deviceToken");
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.getProducts +
+            subCategoryId;
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "user_id": "",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android"
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                contentType: "application/json",
+                responseType: ResponseType.plain));
+        //print(response.data);
+        subCategoryResponse =
+            SubCategoryResponse.fromJson(json.decode(response.data));
+        for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
+          for (int j = 0;
+              j < subCategoryResponse.subCategories[i].products.length;
+              j++) {
+            databaseHelper.saveProducts(
+                subCategoryResponse.subCategories[i].products[j],
+                subCategoryResponse.subCategories[i].id);
+            for (int k = 0;
+                k <
+                    subCategoryResponse
+                        .subCategories[i].products[j].variants.length;
+                k++) {
+              databaseHelper.saveProductsVariant(
+                  subCategoryResponse.subCategories[i].products[j].variants[k]);
+            }
+          }
+        }
+        //print("-------store.success ---${storeData.success}");
+      } else {
+        print("database has values");
+        subCategoryResponse = SubCategoryResponse();
+        //prepare model object
+        List<SubCategoryModel> categoryList =
+            await databaseHelper.getALLSubCategories();
+
+        subCategoryResponse.subCategories = categoryList;
+        for (var i = 0; i < subCategoryResponse.subCategories.length; i++) {
+          String parent_id = subCategoryResponse.subCategories[i].id;
+          subCategoryResponse.subCategories[i].products =
+              await databaseHelper.getProducts(parent_id);
+          for (int j = 0;
+              j < subCategoryResponse.subCategories[i].products.length;
+              j++) {
+            subCategoryResponse.subCategories[i].products[j].variants =
+            await databaseHelper.getProductsVariants(subCategoryResponse.subCategories[i].products[j].id);
+          }
+        }
+        subCategoryResponse.success = true;
+      }
+    } catch (e) {
+      print(e);
+    }
 
     return subCategoryResponse;
   }

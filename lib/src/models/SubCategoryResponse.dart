@@ -18,7 +18,8 @@ class SubCategoryResponse {
             json["data"].map((x) => SubCategoryModel.fromJson(x))),
       );
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         "success": success,
         "data": new List<dynamic>.from(subCategories.map((x) => x.toJson())),
       };
@@ -37,7 +38,6 @@ class SubCategoryModel {
   String image;
   List<Product> products;
 
-
   SubCategoryModel({
     this.id,
     this.title,
@@ -50,7 +50,6 @@ class SubCategoryModel {
     this.image300200,
     this.image,
     this.products,
-
   });
 
   factory SubCategoryModel.fromJson(Map<String, dynamic> json) =>
@@ -65,10 +64,12 @@ class SubCategoryModel {
         image10080: json["image_100_80"],
         image300200: json["image_300_200"],
         image: json["image"],
-        products: new List<Product>.from(json["products"].map((x) => Product.fromJson(x))),
+        products: new List<Product>.from(
+            json["products"].map((x) => Product.fromJson(x))),
       );
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toJson() =>
+      {
         "id": id,
         "title": title,
         "version": version,
@@ -116,7 +117,7 @@ class Product {
   String isUnitType;
 
   String quantity;
-  String productJson="";
+  String productJson = "";
 
   TaxDetail taxDetail;
   FixedTax fixedTax;
@@ -175,10 +176,13 @@ class Product {
     product.image10080 = json["image_100_80"] ?? "";
     product.image300200 = json["image_300_200"] ?? "";
 
-    product.variants = List<Variant>.from(json["variants"].map((x) => Variant.fromJson(x)));
+    product.variants =
+    List<Variant>.from(json["variants"].map((x) => Variant.fromJson(x)));
     product.selectedVariant = SelectedVariant.fromJson(json["selectedVariant"]);
 
-    dynamic variant = json["variants"] != null ? json["variants"].length > 0 ? json["variants"].first : null: null;
+    dynamic variant = json["variants"] != null
+        ? json["variants"].length > 0 ? json["variants"].first : null
+        : null;
     product.variantId = variant == null ? null : variant["id"];
     product.weight = variant == null ? null : variant["weight"];
     product.mrpPrice = variant == null ? null : variant["mrp_price"];
@@ -188,7 +192,41 @@ class Product {
     return product;
   }
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap(String category_ids) {
+    var map = new Map<String, dynamic>();
+    map["id"] = id;
+    map["isfavorite"] = isFav;
+    map["store_id"] = storeId;
+    map["category_ids"] = categoryIds;
+    map["title"] = title;
+    map["brand"] = brand;
+    map["nutrient"] = nutrient;
+    map["description"] = description;
+    map["image"] = image;
+    map["image_type"] = imageType;
+    map["image_url"] = imageUrl;
+    map["show_price"] = showPrice;
+    map["isTaxEnable"] = isTaxEnable;
+    map["gst_tax_type"] = gstTaxType;
+    map["gst_tax_rate"] = gstTaxRate;
+    map["status"] = status;
+    map["sort"] = sort;
+    map["deleted"] = deleted.toString();
+    map["image_100_80"] = image10080;
+    map["image_300_200"] = image300200;
+    map["variants"] = jsonEncode(variants);
+    map["variantId"] = variants.first.id;
+    map["weight"] = variants.first.weight;
+    map["mrpPrice"] = variants.first.mrpPrice;
+    map["price"] = variants.first.price;
+    map["discount"] = variants.first.discount;
+    map["isUnitType"] = variants.first.unitType;
+
+    return map;
+  }
+
+  Map<String, dynamic> toJson() =>
+      {
         "id": id,
         "isFav": isFav,
         "store_id": storeId,
@@ -216,22 +254,22 @@ class Product {
   static List encodeToJson(List<Product> list) {
     List jsonList = List();
     list
-        .map((item) => jsonList.add({
-              "product_id": item.id,
-              "product_name": item.title,
-              "variant_id": item.variantId,
-              "isTaxEnable": item.isTaxEnable,
-              "quantity": item.quantity,
-              "price": item.price,
-              "weight": item.weight,
-              "mrp_price": item.mrpPrice,
-              "unit_type": item.isUnitType,
-            }))
+        .map((item) =>
+        jsonList.add({
+          "product_id": item.id,
+          "product_name": item.title,
+          "variant_id": item.variantId,
+          "isTaxEnable": item.isTaxEnable,
+          "quantity": item.quantity,
+          "price": item.price,
+          "weight": item.weight,
+          "mrp_price": item.mrpPrice,
+          "unit_type": item.isUnitType,
+        }))
         .toList();
     return jsonList;
   }
 }
-
 
 class SelectedVariant {
   String variantId;
@@ -262,35 +300,37 @@ class SelectedVariant {
     this.customField4,
   });
 
-  factory SelectedVariant.fromJson(Map<String, dynamic> json) => SelectedVariant(
-    variantId: json["variant_id"],
-    sku: json["sku"],
-    weight: json["weight"],
-    mrpPrice: json["mrp_price"],
-    price: json["price"],
-    discount: json["discount"],
-    unitType: json["unit_type"],
-    quantity: json["quantity"],
-    customField1: json["custom_field1"],
-    customField2: json["custom_field2"],
-    customField3: json["custom_field3"],
-    customField4: json["custom_field4"],
-  );
+  factory SelectedVariant.fromJson(Map<String, dynamic> json) =>
+      SelectedVariant(
+        variantId: json["variant_id"],
+        sku: json["sku"],
+        weight: json["weight"],
+        mrpPrice: json["mrp_price"],
+        price: json["price"],
+        discount: json["discount"],
+        unitType: json["unit_type"],
+        quantity: json["quantity"],
+        customField1: json["custom_field1"],
+        customField2: json["custom_field2"],
+        customField3: json["custom_field3"],
+        customField4: json["custom_field4"],
+      );
 
-  Map<String, dynamic> toJson() => {
-    "variant_id": variantId,
-    "sku": sku,
-    "weight": weight,
-    "mrp_price": mrpPrice,
-    "price": price,
-    "discount": discount,
-    "unit_type": unitType,
-    "quantity": quantity,
-    "custom_field1": customField1,
-    "custom_field2": customField2,
-    "custom_field3": customField3,
-    "custom_field4": customField4,
-  };
+  Map<String, dynamic> toJson() =>
+      {
+        "variant_id": variantId,
+        "sku": sku,
+        "weight": weight,
+        "mrp_price": mrpPrice,
+        "price": price,
+        "discount": discount,
+        "unit_type": unitType,
+        "quantity": quantity,
+        "custom_field1": customField1,
+        "custom_field2": customField2,
+        "custom_field3": customField3,
+        "custom_field4": customField4,
+      };
 }
 
 class Variant {
@@ -330,41 +370,64 @@ class Variant {
     this.isExportFromFile,
   });
 
-  factory Variant.fromJson(Map<String, dynamic> json) => Variant(
-    id: json["id"],
-    storeId: json["store_id"],
-    productId: json["product_id"],
-    sku: json["sku"],
-    weight: json["weight"],
-    mrpPrice: json["mrp_price"],
-    price: json["price"],
-    discount: json["discount"],
-    unitType: json["unit_type"],
-    customField1: json["custom_field1"],
-    customField2: json["custom_field2"],
-    customField3: json["custom_field3"],
-    customField4: json["custom_field4"],
-    orderBy: json["order_by"],
-    sort: json["sort"],
-    isExportFromFile: json["is_export_from_file"],
-  );
+  factory Variant.fromJson(Map<String, dynamic> json) =>
+      Variant(
+        id: json["id"],
+        storeId: json["store_id"],
+        productId: json["product_id"],
+        sku: json["sku"],
+        weight: json["weight"],
+        mrpPrice: json["mrp_price"],
+        price: json["price"],
+        discount: json["discount"],
+        unitType: json["unit_type"],
+        customField1: json["custom_field1"],
+        customField2: json["custom_field2"],
+        customField3: json["custom_field3"],
+        customField4: json["custom_field4"],
+        orderBy: json["order_by"],
+        sort: json["sort"],
+        isExportFromFile: json["is_export_from_file"],
+      );
 
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "store_id": storeId,
-    "product_id": productId,
-    "sku": sku,
-    "weight": weight,
-    "mrp_price": mrpPrice,
-    "price": price,
-    "discount": discount,
-    "unit_type": unitType,
-    "custom_field1": customField1,
-    "custom_field2": customField2,
-    "custom_field3": customField3,
-    "custom_field4": customField4,
-    "order_by": orderBy,
-    "sort": sort,
-    "is_export_from_file": isExportFromFile,
-  };
+  Map<String, dynamic> toJson() =>
+      {
+        "id": id,
+        "store_id": storeId,
+        "product_id": productId,
+        "sku": sku,
+        "weight": weight,
+        "mrp_price": mrpPrice,
+        "price": price,
+        "discount": discount,
+        "unit_type": unitType,
+        "custom_field1": customField1,
+        "custom_field2": customField2,
+        "custom_field3": customField3,
+        "custom_field4": customField4,
+        "order_by": orderBy,
+        "sort": sort,
+        "is_export_from_file": isExportFromFile,
+      };
+
+  Map<String, dynamic> toMap() {
+    var map = new Map<String, dynamic>();
+    map["id"] = id;
+    map["store_id"] = storeId;
+    map["product_id"] = productId;
+    map["sku"] = sku;
+    map["weight"] = weight;
+    map["mrp_price"] = mrpPrice;
+    map["price"] = price;
+    map["discount"] = discount;
+    map["unit_type"] = unitType;
+    map["custom_field1"] = customField1;
+    map["custom_field2"] = customField2;
+    map["custom_field3"] = customField3;
+    map["custom_field4"] = customField4;
+    map["order_by"] = orderBy;
+    map["sort"] = sort;
+    map["is_export_from_file"] = isExportFromFile;
+    return map;
+  }
 }

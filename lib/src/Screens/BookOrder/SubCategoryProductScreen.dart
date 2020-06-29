@@ -10,11 +10,11 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class SubCategoryProductScreen extends StatelessWidget {
   final CategoryModel categoryModel;
+
   SubCategoryProductScreen(this.categoryModel);
 
   final CartTotalPriceBottomBar bottomBar =
       CartTotalPriceBottomBar(ParentInfo.productList);
-
 
   @override
   Widget build(BuildContext context) {
@@ -32,23 +32,28 @@ class SubCategoryProductScreen extends StatelessWidget {
             isScrollable: categoryModel.subCategory.length == 1 ? false : true,
             labelColor: Colors.black,
             unselectedLabelColor: grayColorTitle,
-            indicatorColor: categoryModel.subCategory.length == 1 ? appTheme:orangeColor,
+            indicatorColor:
+                categoryModel.subCategory.length == 1 ? appTheme : orangeColor,
             indicatorWeight: 3,
             tabs: List.generate(categoryModel.subCategory.length, (int index) {
               bool isTabVisible;
-              if(categoryModel.subCategory.length == 1){
+              if (categoryModel.subCategory.length == 1) {
                 isTabVisible = false;
-              }else{
+              } else {
                 isTabVisible = true;
               }
               return Visibility(
                 visible: isTabVisible,
-                child: Tab(text: categoryModel.subCategory[index].title,),
+                child: Tab(
+                  text: categoryModel.subCategory[index].title,
+                ),
               );
             }),
           ),
-          Expanded(child: TabBarView(
-            children:List.generate(categoryModel.subCategory.length, (int index) {
+          Expanded(
+              child: TabBarView(
+            children:
+                List.generate(categoryModel.subCategory.length, (int index) {
               return getProductsWidget(categoryModel.subCategory[index].id);
             }),
           ))
@@ -70,19 +75,27 @@ class SubCategoryProductScreen extends StatelessWidget {
             SubCategoryResponse response = projectSnap.data;
 
             if (response.success) {
-              SubCategoryModel subCategory = response.subCategories.first;
+              //Check
+              SubCategoryModel subCategory = SubCategoryModel();
+//              SubCategoryModel subCategory =response.subCategories.first;
+              for (int i = 0; i < response.subCategories.length; i++) {
+                if (categoryModel.subCategory.first.id ==
+                    response.subCategories[i].id) {
+                  subCategory = response.subCategories[i];
+                  break;
+                }
+              }
               //print("products.length= ${subCategory.products.length}");
-              if(subCategory.products.length == 0){
+              if (subCategory.products.length == 0) {
                 return Utils.getEmptyView2("No Products found!");
-              }else{
+              } else {
                 return ListView.builder(
                   itemCount: subCategory.products.length,
                   itemBuilder: (context, index) {
                     Product product = subCategory.products[index];
                     return ProductTileItem(product, () {
-
                       bottomBar.state.updateTotalPrice();
-                    },ClassType.SubCategory);
+                    }, ClassType.SubCategory);
                   },
                 );
               }

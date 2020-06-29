@@ -20,6 +20,8 @@ class DatabaseHelper {
   static final String Products_Table = "products";
   static final String Favorite_Table = "favorite";
   static final String CART_Table = "cart";
+  static final String VARIANT_Table = "Variant";
+
 //  static final String Sub_Categories_product_Table = "sub_categories_products";
 
   // Database Columns
@@ -67,7 +69,8 @@ class DatabaseHelper {
   void _onCreate(Database db, int version) async {
     // When creating the db, create the tables
     await db.execute("CREATE TABLE ${Categories_Table}("
-        "id INTEGER PRIMARY KEY, "
+//        "id INTEGER PRIMARY KEY, "
+        "id TEXT, "
         "title TEXT, "
         "version TEXT, "
         "deleted TEXT, "
@@ -79,7 +82,8 @@ class DatabaseHelper {
         "image TEXT"
         ")");
     await db.execute("CREATE TABLE ${Sub_Categories_Table}("
-        "id INTEGER PRIMARY KEY, "
+//        "id INTEGER PRIMARY KEY, "
+        "id TEXT, "
         "parent_id TEXT, "
         "title TEXT, "
         "version TEXT, "
@@ -88,6 +92,37 @@ class DatabaseHelper {
         "sort TEXT"
         ")");
     await db.execute("CREATE TABLE ${Products_Table}("
+//        "id INTEGER PRIMARY KEY, "
+        "id TEXT, "
+        "store_id TEXT, "
+        "category_ids TEXT, "
+        "title TEXT, "
+        "brand TEXT, "
+        "nutrient TEXT, "
+        "description TEXT, "
+        "tags TEXT, "
+        "isfavorite TEXT, "
+        "image TEXT, "
+        "image_url TEXT, "
+        "status TEXT, "
+        "image_type TEXT, "
+        "show_price TEXT, "
+        "isTaxEnable TEXT, "
+        "image_100_80 TEXT, "
+        "image_300_200 TEXT, "
+        "gst_tax_rate TEXT, "
+        "gst_tax_type TEXT, "
+        "deleted TEXT, "
+        "sort TEXT, "
+        "variantId TEXT, "
+        "weight TEXT, "
+        "mrpPrice TEXT, "
+        "price TEXT, "
+        "discount TEXT, "
+        "isUnitType TEXT, "
+        "variants TEXT"
+        ")");
+    /* await db.execute("CREATE TABLE ${Products_Table}("
         "id INTEGER PRIMARY KEY, "
         "store_id TEXT, "
         "category_ids TEXT, "
@@ -103,6 +138,25 @@ class DatabaseHelper {
         "image_100_80 TEXT, "
         "image_300_200 TEXT, "
         "variants TEXT"
+        ")");*/
+    await db.execute("CREATE TABLE ${VARIANT_Table}("
+//        "id INTEGER PRIMARY KEY, "
+        "id TEXT, "
+        "store_id TEXT, "
+        "product_id TEXT,"
+        "sku TEXT, "
+        "weight TEXT, "
+        "mrp_price TEXT, "
+        "price TEXT, "
+        "discount TEXT, "
+        "unit_type TEXT, "
+        "custom_field1 TEXT, "
+        "custom_field2 TEXT, "
+        "custom_field3 TEXT, "
+        "custom_field4 TEXT, "
+        "order_by TEXT, "
+        "sort TEXT, "
+        "is_export_from_file TEXT"
         ")");
     await db.execute("CREATE TABLE ${CART_Table}("
         //"id INTEGER PRIMARY KEY, "
@@ -148,11 +202,7 @@ class DatabaseHelper {
         ")");
   }
 
-  void _onUpgrade(Database db, int oldVersion, int newVersion) async {
-//    if (newVersion > 2) {
-//      await db.execute(createSubCategoriesProductQuery());
-//    }
-  }
+  void _onUpgrade(Database db, int oldVersion, int newVersion) async {}
 
   Future<int> saveCategories(CategoryModel categoryModel) async {
     var dbClient = await db;
@@ -205,7 +255,7 @@ class DatabaseHelper {
     List<SubCategory> subCategoryList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
-      "id",
+      ID,
       "parent_id",
       "title",
       "version",
@@ -232,13 +282,180 @@ class DatabaseHelper {
     return subCategoryList;
   }
 
-//  Future<int> saveProducts(Product products, String favorite, String mrp_price,
-//      String price, String discount, String var_id) async {
-//    var dbClient = await db;
-//    int res = await dbClient.insert(Products_Table,
-//        products.toMap(favorite, mrp_price, price, discount, var_id));
-//    return res;
-//  }
+  Future<List<SubCategoryModel>> getALLSubCategories() async {
+    List<SubCategoryModel> subCategoryList = new List();
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      "id",
+      "parent_id",
+      "title",
+      "version",
+      "status",
+      "deleted",
+      "sort"
+    ];
+
+    List<Map> resultList =
+        await dbClient.query(Sub_Categories_Table, columns: columnsToSelect);
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        SubCategoryModel subCategory = SubCategoryModel();
+        subCategory.id = row[ID].toString();
+        subCategory.title = row[TITLE];
+        subCategory.parentId = row["parent_id"];
+        subCategory.version = row["version"];
+        subCategory.status = row["status"];
+        subCategory.deleted = row["deleted"];
+        subCategory.sort = row["sort"];
+
+        subCategoryList.add(subCategory);
+      });
+    } else {
+      //print("-empty cart-in db--");
+    }
+    return subCategoryList;
+  }
+
+  Future<int> saveProducts(Product products, String category_ids) async {
+    var dbClient = await db;
+    int res =
+        await dbClient.insert(Products_Table, products.toMap(category_ids));
+    return res;
+  }
+
+  Future<int> saveProductsVariant(Variant variant) async {
+    var dbClient = await db;
+    int res = await dbClient.insert(VARIANT_Table, variant.toMap());
+    return res;
+  }
+
+  Future<List<Product>> getProducts(String category_ids) async {
+    List<Product> productList = new List();
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      "id",
+      "store_id",
+      "category_ids",
+      "title",
+      "brand",
+      "nutrient",
+      "description",
+      "tags",
+      "isfavorite",
+      "image",
+      "image_url",
+      "status",
+      "image_type",
+      "show_price",
+      "isTaxEnable",
+      "image_100_80",
+      "image_300_200",
+      "gst_tax_rate",
+      "gst_tax_type",
+      "status",
+      "deleted",
+      "sort",
+      "variantId",
+      "weight",
+      "mrpPrice",
+      "price",
+      "discount",
+      "isUnitType",
+      "variants"
+    ];
+
+    List<Map> resultList = await dbClient.query(Products_Table,
+        columns: columnsToSelect,
+        where: 'category_ids = ?',
+        whereArgs: [category_ids]);
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        Product product = Product();
+        product.id = row["id"].toString();
+        product.isFav = row["isfavorite"];
+        product.storeId = row["store_id"];
+        product.categoryIds = row["category_ids"];
+        product.title = row["title"];
+        product.brand = row["brand"];
+        product.nutrient = row["nutrient"];
+        product.description = row["description"];
+        product.image = row["image"];
+        product.imageType = row["image_type"];
+        product.imageUrl = row["image_url"] ?? "";
+        product.showPrice = row["show_price"];
+        product.isTaxEnable = row["isTaxEnable"];
+        product.gstTaxType = row["gst_tax_type"];
+        product.gstTaxRate = row["gst_tax_rate"];
+        product.status = row["status"];
+        product.sort = row["sort"];
+        product.deleted = row["deleted"] == 'true';
+//        product.deleted = false;
+        product.image10080 = row["image_100_80"] ?? "";
+        product.image300200 = row["image_300_200"] ?? "";
+//        product.variants = jsonDecode(row["variants"]);
+        product.variantId = row["variantId"].toString();
+        product.weight = row["weight"];
+        product.mrpPrice = row["mrpPrice"];
+        product.price = row["price"];
+        product.discount = row["discount"];
+        product.isUnitType = row["isUnitType"];
+
+        productList.add(product);
+      });
+    } else {}
+    return productList;
+  }
+
+  Future<List<Variant>> getProductsVariants(String productID) async {
+    List<Variant> variantList = new List();
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      "id",
+      "store_id",
+      "product_id",
+      "sku",
+      "weight",
+      "mrp_price",
+      "price",
+      "discount",
+      "unit_type",
+      "custom_field1",
+      "custom_field2",
+      "custom_field3",
+      "custom_field4",
+      "order_by",
+      "sort",
+      "is_export_from_file"
+    ];
+
+    List<Map> resultList = await dbClient.query(VARIANT_Table,
+        columns: columnsToSelect,
+        where: 'product_id = ?',
+        whereArgs: [productID]);
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        Variant variant = Variant();
+        variant.id = row["id"].toString();
+        variant.storeId = row["store_id"];
+        variant.productId = row["product_id"];
+        variant.sku = row["sku"];
+        variant.weight = row["weight"];
+        variant.mrpPrice = row["mrp_price"];
+        variant.price = row["price"];
+        variant.discount = row["discount"];
+        variant.unitType = row["unit_type"];
+        variant.customField1 = row["custom_field1"];
+        variant.customField2 = row["custom_field2"];
+        variant.customField3 = row["custom_field3"];
+        variant.customField4 = row["custom_field4"];
+        variant.orderBy = row["order_by"];
+        variant.sort = row["sort"];
+        variant.isExportFromFile = row["is_export_from_file"];
+        variantList.add(variant);
+      });
+    }
+    return variantList;
+  }
 
   Future<int> addProductToCart(Map<String, dynamic> row) async {
     var dbClient = await db;
@@ -493,10 +710,31 @@ class DatabaseHelper {
     return count;
   }
 
-  Future<int> getCount(String table) async {
+  Future<int> getCount(String table,
+      [String condition, String conditionValue]) async {
     //database connection
     var dbClient = await db;
-    var x = await dbClient.rawQuery('SELECT COUNT (*) from $table');
+    var x;
+//    if (condition!=null) {
+//      x = await dbClient.rawQuery('SELECT COUNT (*) from $table where ${condition} = $conditionValue');
+//    } else {
+    x = await dbClient.rawQuery('SELECT COUNT (*) from $table');
+//    }
+    int count = Sqflite.firstIntValue(x);
+    return count;
+  }
+
+  Future<int> getCountWithCondition(
+      String table, String condition, String conditionValue) async {
+    //database connection
+    var dbClient = await db;
+    var x;
+    if (condition != null) {
+      x = await dbClient.rawQuery(
+          'SELECT COUNT (*) from $table where ${condition} = $conditionValue');
+    } else {
+      x = await dbClient.rawQuery('SELECT COUNT (*) from $table');
+    }
     int count = Sqflite.firstIntValue(x);
     return count;
   }
@@ -516,6 +754,15 @@ class DatabaseHelper {
   Future<int> deleteTable(String table) async {
     var dbClient = await db;
     return await dbClient.delete(table);
+  }
+
+  void clearDataBase() async {
+    var dbClient = await db;
+    dbClient.delete(Categories_Table);
+    dbClient.delete(Sub_Categories_Table);
+    dbClient.delete(Products_Table);
+    dbClient.delete(VARIANT_Table);
+    dbClient.delete(Favorite_Table);
   }
 
   Future close() async {
