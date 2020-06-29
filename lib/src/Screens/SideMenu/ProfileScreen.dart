@@ -25,6 +25,8 @@ class _ProfileState extends State<ProfileScreen> {
   final lastNameController = new TextEditingController();
   final emailController = new TextEditingController();
   final phoneController = new TextEditingController();
+  final referCodeController = new TextEditingController();
+
   File image;
   StoreModel storeModel;
   bool isEmailEditable = false;
@@ -96,11 +98,24 @@ class _ProfileState extends State<ProfileScreen> {
                         ),
 
                       ),
-                      Padding(
+                      /*Padding(
                         padding: const EdgeInsets.only(top: 30),
                         child: Text("Private Information",style: TextStyle(
                             fontSize: 16,color: Color(0xFF8F9396),fontWeight: FontWeight.w500),
                         ),
+                      ),*/
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10.0),
+                        child: TextField(
+                          controller: referCodeController,
+                          decoration: InputDecoration(
+                            labelText: 'Referral Code',
+                          ),
+                          style: TextStyle(fontSize: 18,
+                              color: Color(0xFF495056),fontWeight: FontWeight.w500
+                          ),
+                        ),
+
                       ),
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0),
@@ -184,7 +199,8 @@ class _ProfileState extends State<ProfileScreen> {
       form.save();
       Utils.showProgressDialog(context);
       ApiController.updateProfileRequest(firstNameController.text, emailController.text,
-          phoneController.text,widget.isComingFromOtpScreen,widget.id).then((response) {
+          phoneController.text,widget.isComingFromOtpScreen,widget.id,
+          referCodeController.text).then((response) {
         Utils.hideProgressDialog(context);
         if (response.success) {
           if(widget.isComingFromOtpScreen){

@@ -88,6 +88,17 @@ class _HomeScreenState extends State<HomeScreen> {
           DialogUtils.showForceUpdateDialog(context, store.storeName,
               store.forceDownload[0].forceDownloadMessage);
         });
+      }else{
+        if(!checkIfStoreClosed()){
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(AppConstant.showReferEarnAlert);
+            print("showReferEarnAlert=${showReferEarnAlert}");
+            if(showReferEarnAlert == null){
+              SharedPrefs.storeSharedValue(AppConstant.showReferEarnAlert, "true");
+              DialogUtils.showInviteEarnAlert2(context);
+            }
+          });
+        }
       }
     } catch (e) {
       print(e);
@@ -180,12 +191,6 @@ class _HomeScreenState extends State<HomeScreen> {
               onImageTap: (position){
                 print("onImageTap ${position}");
                 print("linkTo=${store.banners[position].linkTo}");
-                /*
-                then check category_id
-                or catgory_id -> subcategory_id
-                or
-                catgory_id -> subcategory_id->product_id
-                */
                 if(store.banners[position].linkTo.isNotEmpty){
                   if(store.banners[position].linkTo == "category"){
 

@@ -958,7 +958,7 @@ class DialogUtils {
         return WillPopScope(
           onWillPop: () {
             //print("onWillPop onWillPop");
-            //Navigator.pop(context,false);
+            Navigator.pop(context,false);
           },
           child: Dialog(
               shape: RoundedRectangleBorder(
@@ -1062,6 +1062,7 @@ class DialogUtils {
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context,true);
+                                Utils.showLoginDialog(context);
                               },
                             ),
                           )
@@ -1085,7 +1086,7 @@ class DialogUtils {
                             color: Colors.white,
                             textColor: appTheme,
                             onPressed: () {
-                              Navigator.pop(context, true);
+                              Navigator.pop(context, false);
                             },
                           ),
                         ),

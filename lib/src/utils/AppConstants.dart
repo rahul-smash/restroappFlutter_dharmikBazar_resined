@@ -6,6 +6,8 @@ class AppConstant {
 
   static String branch_id = "branch_id";
 
+  static String showReferEarnAlert = "showReferEarnAlert";
+
   static final String isAdminLogin = "isAdminLogin";
   static final String deviceId = "DEVICE_ID";
   static final String deviceToken = "device_token";

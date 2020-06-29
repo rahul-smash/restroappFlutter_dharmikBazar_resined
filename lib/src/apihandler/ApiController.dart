@@ -646,7 +646,7 @@ class ApiController {
   }
 
   static Future<UserResponse> updateProfileRequest(String fullName, String emailId,
-      String phoneNumber,bool isComingFromOtpScreen, String id) async {
+      String phoneNumber,bool isComingFromOtpScreen, String id,String user_refer_code) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     StoreModel store = await SharedPrefs.getStore();
     String userId;
@@ -666,6 +666,7 @@ class ApiController {
       request.fields.addAll({
         "full_name": fullName,
         "email": emailId,
+        "user_refer_code": user_refer_code,
         "user_id": userId,
         "device_id": deviceId,
         "device_token": deviceToken,
