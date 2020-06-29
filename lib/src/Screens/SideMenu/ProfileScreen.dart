@@ -223,6 +223,8 @@ class _ProfileState extends State<ProfileScreen> {
             SharedPrefs.saveUser(user);
             Navigator.pop(context);
           }
+        }else{
+          Utils.showToast(response.message, true);
         }
 
       });
