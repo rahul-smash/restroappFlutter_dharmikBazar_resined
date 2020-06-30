@@ -244,9 +244,16 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
 
-            ReferEarnData referEarn = await ApiController.referEarn();
-            share(referEarn,widget.store);
-
+            String referEarnMsg = await SharedPrefs.getStoreSharedValue(AppConstant.referEarnMsg);
+            if(referEarnMsg == null){
+              Utils.showProgressDialog(context);
+              ReferEarnData referEarn = await ApiController.referEarn();
+              Utils.hideProgressDialog(context);
+              SharedPrefs.storeSharedValue(AppConstant.referEarnMsg, referEarn.referEarn.sharedMessage);
+              share(referEarn.referEarn.sharedMessage,widget.store);
+            }else{
+              share(referEarnMsg,widget.store);
+            }
           }else{
             Utils.showToast("Refer Earn is inactive!", true);
             share(null,widget.store);
@@ -329,11 +336,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     );
   }
 
-  Future<void> share(ReferEarnData referEarn,StoreModel store) async {
+  Future<void> share(String referEarn,StoreModel store) async {
     if(referEarn != null && store.isRefererFnEnable){
       await FlutterShare.share(
           title: '${store.storeName}',
-          linkUrl: referEarn.referEarn.sharedMessage,
+          linkUrl: referEarn,
           chooserTitle: 'Refer & Earn');
     }else{
       await FlutterShare.share(
@@ -350,6 +357,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
       SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
+      SharedPrefs.removeKey(AppConstant.referEarnMsg);
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);

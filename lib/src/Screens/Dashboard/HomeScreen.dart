@@ -531,6 +531,8 @@ class _HomeScreenState extends State<HomeScreen> {
       Utils.showProgressDialog(context);
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
+      SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
+      SharedPrefs.removeKey(AppConstant.referEarnMsg);
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
