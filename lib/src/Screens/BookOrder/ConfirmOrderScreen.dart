@@ -760,6 +760,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
                             databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                             databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+                            eventBus.fire(updateCartCount());
                             Navigator.of(context).popUntil((route) => route.isFirst);
                           }else{
                             await updateTaxDetails(model.taxCalculation);
@@ -916,6 +917,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
           databaseHelper.deleteTable(DatabaseHelper.CART_Table);
           databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+          eventBus.fire(updateCartCount());
           Navigator.of(context).popUntil((route) => route.isFirst);
         }else{
           await updateTaxDetails(response.taxCalculation);
@@ -1122,6 +1124,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
               databaseHelper.deleteTable(DatabaseHelper.CART_Table);
               databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+              eventBus.fire(updateCartCount());
               Navigator.of(context).popUntil((route) => route.isFirst);
               return;
             }

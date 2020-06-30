@@ -31,6 +31,7 @@ class _ProfileState extends State<ProfileScreen> {
   StoreModel storeModel;
   bool isEmailEditable = false;
   bool isPhonereadOnly = true;
+  bool showReferralCodeView = false;
 
   @override
   initState() {
@@ -47,6 +48,11 @@ class _ProfileState extends State<ProfileScreen> {
       firstNameController.text = user.fullName;
       emailController.text = user.email;
       phoneController.text = user.phone;
+      if(storeModel.isRefererFnEnable){
+        showReferralCodeView = true;
+      }else{
+        showReferralCodeView = false;
+      }
       if(storeModel.internationalOtp == "0"){
         isEmailEditable = false;
       }else{
@@ -104,19 +110,23 @@ class _ProfileState extends State<ProfileScreen> {
                             fontSize: 16,color: Color(0xFF8F9396),fontWeight: FontWeight.w500),
                         ),
                       ),*/
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        child: TextField(
-                          controller: referCodeController,
-                          decoration: InputDecoration(
-                            labelText: 'Referral Code',
+                      Visibility(
+                        visible: showReferralCodeView,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: TextField(
+                            controller: referCodeController,
+                            decoration: InputDecoration(
+                              labelText: 'Referral Code',
+                            ),
+                            style: TextStyle(fontSize: 18,
+                                color: Color(0xFF495056),fontWeight: FontWeight.w500
+                            ),
                           ),
-                          style: TextStyle(fontSize: 18,
-                              color: Color(0xFF495056),fontWeight: FontWeight.w500
-                          ),
-                        ),
 
+                        ),
                       ),
+
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0),
                         child: TextField(

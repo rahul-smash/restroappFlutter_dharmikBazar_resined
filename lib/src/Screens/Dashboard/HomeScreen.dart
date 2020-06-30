@@ -88,18 +88,20 @@ class _HomeScreenState extends State<HomeScreen> {
           DialogUtils.showForceUpdateDialog(context, store.storeName,
               store.forceDownload[0].forceDownloadMessage);
         });
-      }/*else{
+      }else{
         if(!checkIfStoreClosed()){
           WidgetsBinding.instance.addPostFrameCallback((_) async {
-            String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(AppConstant.showReferEarnAlert);
-            print("showReferEarnAlert=${showReferEarnAlert}");
-            if(showReferEarnAlert == null){
-              SharedPrefs.storeSharedValue(AppConstant.showReferEarnAlert, "true");
-              DialogUtils.showInviteEarnAlert2(context);
+            if (!AppConstant.isLoggedIn) {
+              String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(AppConstant.showReferEarnAlert);
+              print("showReferEarnAlert=${showReferEarnAlert}");
+              if(showReferEarnAlert == null){
+                SharedPrefs.storeSharedValue(AppConstant.showReferEarnAlert, "true");
+                DialogUtils.showInviteEarnAlert2(context);
+              }
             }
           });
         }
-      }*/
+      }
     } catch (e) {
       print(e);
     }

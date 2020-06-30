@@ -240,30 +240,24 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
         break;
       case DrawerChildConstants.SHARE:
-        /*if (AppConstant.isLoggedIn) {
+        if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
 
-            String referEarnMsg = await SharedPrefs.getStoreSharedValue(AppConstant.referEarnMsg);
-            if(referEarnMsg == null){
-              Utils.showProgressDialog(context);
-              ReferEarnData referEarn = await ApiController.referEarn();
-              Utils.hideProgressDialog(context);
-              SharedPrefs.storeSharedValue(AppConstant.referEarnMsg, referEarn.referEarn.sharedMessage);
-              share(referEarn.referEarn.sharedMessage,widget.store);
-            }else{
-              share(referEarnMsg,widget.store);
-            }
+            Utils.showProgressDialog(context);
+            ReferEarnData referEarn = await ApiController.referEarn();
+            Utils.hideProgressDialog(context);
+            share2(referEarn.referEarn.sharedMessage,widget.store);
           }else{
             Utils.showToast("Refer Earn is inactive!", true);
-            share(null,widget.store);
+            share2(null,widget.store);
           }
         }else {
           Navigator.pop(context);
           var result = await DialogUtils.showInviteEarnAlert(context);
           print("showInviteEarnAlert=${result}");
-        }*/
-        share();
+        }
+        //share();
 
         Map<String,dynamic> attributeMap = new Map<String,dynamic>();
         attributeMap["ScreenName"] = "share apk url";
