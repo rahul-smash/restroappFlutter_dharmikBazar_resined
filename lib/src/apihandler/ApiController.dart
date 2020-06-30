@@ -75,7 +75,7 @@ class ApiController {
     return null;
   }
 
-  static Future<UserResponse> registerApiRequest(UserData user) async {
+  static Future<UserResponse> registerApiRequest(UserData user,String referralCode) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -92,6 +92,7 @@ class ApiController {
         "password": user.password,
         "device_id": deviceId,
         "device_token": deviceToken,
+        "user_refer_code":referralCode,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
