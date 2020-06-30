@@ -95,6 +95,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
       setState(() {
         cartList = response;
         isLoading = false;
+        eventBus.fire(updateCartCount());
       });
     });
   }
