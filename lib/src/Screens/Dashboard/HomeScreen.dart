@@ -88,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
           DialogUtils.showForceUpdateDialog(context, store.storeName,
               store.forceDownload[0].forceDownloadMessage);
         });
-      }else{
+      }/*else{
         if(!checkIfStoreClosed()){
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(AppConstant.showReferEarnAlert);
@@ -99,7 +99,7 @@ class _HomeScreenState extends State<HomeScreen> {
             }
           });
         }
-      }
+      }*/
     } catch (e) {
       print(e);
     }
@@ -191,6 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
               onImageTap: (position){
                 print("onImageTap ${position}");
                 print("linkTo=${store.banners[position].linkTo}");
+
                 if(store.banners[position].linkTo.isNotEmpty){
                   if(store.banners[position].linkTo == "category"){
 
@@ -238,7 +239,26 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                         //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
                       }
+                    }else if(store.banners[position].categoryId != "0" &&
+                        store.banners[position].subCategoryId == "0" &&
+                        store.banners[position].productId == "0"){
+                      print("open the Category ${position}");
+
+                      for(int i=0; i<categoryResponse.categories.length; i++){
+                        CategoryModel categories = categoryResponse.categories[i];
+                        if(store.banners[position].categoryId == categories.id){
+                          print("title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return SubCategoryProductScreen(categories, true, 0);
+                            }),
+                          );
+                          break;
+                        }
+                      }
+
                     }
+                    //-----------------------------------------------
                   }
                 }
                 /*print("categoryId=${store.banners[position].categoryId}");

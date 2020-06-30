@@ -240,7 +240,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
         break;
       case DrawerChildConstants.SHARE:
-        if (AppConstant.isLoggedIn) {
+        /*if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
 
@@ -262,8 +262,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           var result = await DialogUtils.showInviteEarnAlert(context);
           print("showInviteEarnAlert=${result}");
-        }
-        //share();
+        }*/
+        share();
 
         Map<String,dynamic> attributeMap = new Map<String,dynamic>();
         attributeMap["ScreenName"] = "share apk url";
@@ -336,7 +336,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     );
   }
 
-  Future<void> share(String referEarn,StoreModel store) async {
+  Future<void> share() async {
+    await FlutterShare.share(
+        title: 'Kindly download',
+        text: 'Kindly download' + widget.store.storeName + 'app from',
+        linkUrl: Platform.isIOS ? widget.store.iphoneShareLink :widget.store.androidShareLink,
+        chooserTitle: 'Share');
+  }
+
+  Future<void> share2(String referEarn,StoreModel store) async {
     if(referEarn != null && store.isRefererFnEnable){
       await FlutterShare.share(
           title: '${store.storeName}',
