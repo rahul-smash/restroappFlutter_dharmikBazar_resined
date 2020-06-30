@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -247,6 +249,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
           }else{
             Utils.showToast("Refer Earn is inactive!", true);
+            share(null,widget.store);
           }
         }else {
           Navigator.pop(context);
@@ -327,7 +330,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   }
 
   Future<void> share(ReferEarnData referEarn,StoreModel store) async {
-    if(store.isRefererFnEnable){
+    if(referEarn != null && store.isRefererFnEnable){
       await FlutterShare.share(
           title: '${store.storeName}',
           linkUrl: referEarn.referEarn.sharedMessage,
@@ -336,7 +339,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       await FlutterShare.share(
           title: 'Kindly download',
           text: 'Kindly download' + widget.store.storeName + 'app from',
-          linkUrl: widget.store.androidShareLink,
+          linkUrl: Platform.isIOS ? widget.store.iphoneShareLink :widget.store.androidShareLink,
           chooserTitle: 'Share');
     }
 

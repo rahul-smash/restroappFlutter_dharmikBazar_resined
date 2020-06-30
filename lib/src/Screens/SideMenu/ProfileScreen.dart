@@ -61,7 +61,7 @@ class _ProfileState extends State<ProfileScreen> {
     return new Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: new Text(widget.isComingFromOtpScreen == true ? 'SignUp' : "My Profile"),
+        title: new Text("My Profile"),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
