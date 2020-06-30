@@ -214,6 +214,7 @@ class Product {
     map["deleted"] = deleted.toString();
     map["image_100_80"] = image10080;
     map["image_300_200"] = image300200;
+    map["selectedVariant"] = jsonEncode(selectedVariant);
     map["variants"] = jsonEncode(variants);
     map["variantId"] = variants.first.id;
     map["weight"] = variants.first.weight;

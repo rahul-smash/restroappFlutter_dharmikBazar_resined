@@ -6,6 +6,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SubCategoryProductScreen extends StatelessWidget {
@@ -101,7 +102,8 @@ class SubCategoryProductScreen extends StatelessWidget {
               }
             } else {
               //print("no products.length=");
-              return Container();
+              return Utils.getEmptyView2(AppConstant.noInternet);
+//                return Utils.getEmptyView2("No Products found!");
             }
           } else {
             return Center(

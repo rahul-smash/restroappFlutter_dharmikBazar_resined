@@ -114,6 +114,7 @@ class DatabaseHelper {
         "gst_tax_type TEXT, "
         "deleted TEXT, "
         "sort TEXT, "
+        "selectedVariant TEXT, "
         "variantId TEXT, "
         "weight TEXT, "
         "mrpPrice TEXT, "
@@ -355,6 +356,7 @@ class DatabaseHelper {
       "status",
       "deleted",
       "sort",
+      "selectedVariant",
       "variantId",
       "weight",
       "mrpPrice",
@@ -388,6 +390,8 @@ class DatabaseHelper {
         product.gstTaxRate = row["gst_tax_rate"];
         product.status = row["status"];
         product.sort = row["sort"];
+        Map<String, dynamic> map = jsonDecode(row["selectedVariant"]);
+        product.selectedVariant=SelectedVariant.fromJson(map);
         product.deleted = row["deleted"] == 'true';
 //        product.deleted = false;
         product.image10080 = row["image_100_80"] ?? "";

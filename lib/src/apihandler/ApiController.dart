@@ -203,8 +203,8 @@ class ApiController {
     try {
       int dbCount =
           await databaseHelper.getCount(DatabaseHelper.Categories_Table);
-      bool isUseDB = dbCount == 0;
-      if (isUseDB) {
+      bool isNetworkAviable = await Utils.isNetworkAvailable();
+      if (dbCount == 0 && isNetworkAviable) {
         print("database zero");
         print("catttttt  $url");
         Response response = await Dio()
@@ -222,6 +222,9 @@ class ApiController {
             }
           }
         }
+      } else if (dbCount==0&& !isNetworkAviable) {
+        categoryResponse.success = false;
+        return categoryResponse;
       } else {
         print("database has values");
         //prepare model object
@@ -247,8 +250,9 @@ class ApiController {
     int dbProductCounts = await databaseHelper.getCountWithCondition(
         DatabaseHelper.Products_Table, "category_ids", subCategoryId);
     SubCategoryResponse subCategoryResponse = SubCategoryResponse();
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
     try {
-      if (dbProductCounts == 0) {
+      if (dbProductCounts == 0 && isNetworkAviable) {
         StoreModel store = await SharedPrefs.getStore();
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String deviceId = prefs.getString(AppConstant.deviceId);
@@ -292,7 +296,11 @@ class ApiController {
             }
           }
         }
+        return subCategoryResponse;
         //print("-------store.success ---${storeData.success}");
+      } else if (dbProductCounts==0 && !isNetworkAviable) {
+        subCategoryResponse.success = false;
+        return subCategoryResponse;
       } else {
         print("database has values");
         subCategoryResponse = SubCategoryResponse();
@@ -309,16 +317,16 @@ class ApiController {
               j < subCategoryResponse.subCategories[i].products.length;
               j++) {
             subCategoryResponse.subCategories[i].products[j].variants =
-            await databaseHelper.getProductsVariants(subCategoryResponse.subCategories[i].products[j].id);
+                await databaseHelper.getProductsVariants(
+                    subCategoryResponse.subCategories[i].products[j].id);
           }
         }
         subCategoryResponse.success = true;
+        return subCategoryResponse;
       }
     } catch (e) {
       print(e);
     }
-
-    return subCategoryResponse;
   }
 
   static Future<DeliveryAddressResponse> getAddressApiRequest() async {
