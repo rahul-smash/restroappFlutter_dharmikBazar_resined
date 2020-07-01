@@ -222,7 +222,7 @@ class ApiController {
             }
           }
         }
-      } else if (dbCount==0&& !isNetworkAviable) {
+      } else if (dbCount == 0 && !isNetworkAviable) {
         categoryResponse.success = false;
         return categoryResponse;
       } else {
@@ -279,26 +279,29 @@ class ApiController {
         //print(response.data);
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
-        for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
-          for (int j = 0;
-              j < subCategoryResponse.subCategories[i].products.length;
-              j++) {
-            databaseHelper.saveProducts(
-                subCategoryResponse.subCategories[i].products[j],
-                subCategoryResponse.subCategories[i].id);
-            for (int k = 0;
-                k <
-                    subCategoryResponse
-                        .subCategories[i].products[j].variants.length;
-                k++) {
-              databaseHelper.saveProductsVariant(
-                  subCategoryResponse.subCategories[i].products[j].variants[k]);
+        if (subCategoryResponse.success) {
+
+          for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
+            for (int j = 0;
+                j < subCategoryResponse.subCategories[i].products.length;
+                j++) {
+              databaseHelper.saveProducts(
+                  subCategoryResponse.subCategories[i].products[j],
+                  subCategoryResponse.subCategories[i].id);
+             /* for (int k = 0;
+                  k <
+                      subCategoryResponse
+                          .subCategories[i].products[j].variants.length;
+                  k++) {
+                databaseHelper.saveProductsVariant(subCategoryResponse
+                    .subCategories[i].products[j].variants[k]);
+              }*/
             }
           }
+          return subCategoryResponse;
         }
-        return subCategoryResponse;
         //print("-------store.success ---${storeData.success}");
-      } else if (dbProductCounts==0 && !isNetworkAviable) {
+      } else if (dbProductCounts == 0 && !isNetworkAviable) {
         subCategoryResponse.success = false;
         return subCategoryResponse;
       } else {
@@ -309,17 +312,18 @@ class ApiController {
             await databaseHelper.getALLSubCategories();
 
         subCategoryResponse.subCategories = categoryList;
+
         for (var i = 0; i < subCategoryResponse.subCategories.length; i++) {
           String parent_id = subCategoryResponse.subCategories[i].id;
           subCategoryResponse.subCategories[i].products =
               await databaseHelper.getProducts(parent_id);
-          for (int j = 0;
-              j < subCategoryResponse.subCategories[i].products.length;
-              j++) {
-            subCategoryResponse.subCategories[i].products[j].variants =
-                await databaseHelper.getProductsVariants(
-                    subCategoryResponse.subCategories[i].products[j].id);
-          }
+//          for (int j = 0;
+//              j < subCategoryResponse.subCategories[i].products.length;
+//              j++) {
+//            subCategoryResponse.subCategories[i].products[j].variants =
+//                await databaseHelper.getProductsVariants(
+//                    subCategoryResponse.subCategories[i].products[j].id);
+//          }
         }
         subCategoryResponse.success = true;
         return subCategoryResponse;
@@ -830,26 +834,31 @@ class ApiController {
   static Future<GetOrderHistory> getOrderHistory() async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
-
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.orderHistory;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
-    try {
-      request.fields.addAll({
-        "user_id": user.id,
-        "platform": Platform.isIOS ? "IOS" : "android",
-      });
-      print('--url===  $url');
-      print('--user.id=== ${user.id}');
-      final response = await request.send().timeout(Duration(seconds: timeout));
-      final respStr = await response.stream.bytesToString();
-      final parsed = json.decode(respStr);
-      print('--respStr===  $respStr');
-      GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
-      return getOrderHistory;
-    } catch (e) {
-      Utils.showToast(e.toString(), true);
+    if (isNetworkAvailable) {
+      try {
+        request.fields.addAll({
+          "user_id": user.id,
+          "platform": Platform.isIOS ? "IOS" : "android",
+        });
+        print('--url===  $url');
+        print('--user.id=== ${user.id}');
+        final response =
+            await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        final parsed = json.decode(respStr);
+        print('--respStr===  $respStr');
+        GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
+        return getOrderHistory;
+      } catch (e) {
+        Utils.showToast(e.toString(), true);
+        return null;
+      }
+    } else {
+      Utils.showToast(AppConstant.noInternet, true);
       return null;
     }
   }

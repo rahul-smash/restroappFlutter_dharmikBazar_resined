@@ -251,7 +251,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if(result != null && result == true){
             databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
             databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+            databaseHelper.deleteTable(DatabaseHelper.CART_Table);
             databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+            eventBus.fire(updateCartCount());
             Navigator.of(context).popUntil((route) => route.isFirst);
           }
         }

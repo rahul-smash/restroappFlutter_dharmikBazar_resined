@@ -20,9 +20,7 @@ class DatabaseHelper {
   static final String Products_Table = "products";
   static final String Favorite_Table = "favorite";
   static final String CART_Table = "cart";
-  static final String VARIANT_Table = "Variant";
-
-//  static final String Sub_Categories_product_Table = "sub_categories_products";
+//  static final String VARIANT_Table = "Variant";
 
   // Database Columns
   static final String Favorite = "0";
@@ -69,7 +67,6 @@ class DatabaseHelper {
   void _onCreate(Database db, int version) async {
     // When creating the db, create the tables
     await db.execute("CREATE TABLE ${Categories_Table}("
-//        "id INTEGER PRIMARY KEY, "
         "id TEXT, "
         "title TEXT, "
         "version TEXT, "
@@ -82,7 +79,6 @@ class DatabaseHelper {
         "image TEXT"
         ")");
     await db.execute("CREATE TABLE ${Sub_Categories_Table}("
-//        "id INTEGER PRIMARY KEY, "
         "id TEXT, "
         "parent_id TEXT, "
         "title TEXT, "
@@ -92,7 +88,6 @@ class DatabaseHelper {
         "sort TEXT"
         ")");
     await db.execute("CREATE TABLE ${Products_Table}("
-//        "id INTEGER PRIMARY KEY, "
         "id TEXT, "
         "store_id TEXT, "
         "category_ids TEXT, "
@@ -140,8 +135,8 @@ class DatabaseHelper {
         "image_300_200 TEXT, "
         "variants TEXT"
         ")");*/
-    await db.execute("CREATE TABLE ${VARIANT_Table}("
-//        "id INTEGER PRIMARY KEY, "
+
+   /* await db.execute("CREATE TABLE ${VARIANT_Table}("
         "id TEXT, "
         "store_id TEXT, "
         "product_id TEXT,"
@@ -158,7 +153,7 @@ class DatabaseHelper {
         "order_by TEXT, "
         "sort TEXT, "
         "is_export_from_file TEXT"
-        ")");
+        ")");*/
     await db.execute("CREATE TABLE ${CART_Table}("
         //"id INTEGER PRIMARY KEY, "
         "id INTEGER, "
@@ -324,11 +319,11 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<int> saveProductsVariant(Variant variant) async {
+  /*Future<int> saveProductsVariant(Variant variant) async {
     var dbClient = await db;
     int res = await dbClient.insert(VARIANT_Table, variant.toMap());
     return res;
-  }
+  }*/
 
   Future<List<Product>> getProducts(String category_ids) async {
     List<Product> productList = new List();
@@ -391,12 +386,14 @@ class DatabaseHelper {
         product.status = row["status"];
         product.sort = row["sort"];
         Map<String, dynamic> map = jsonDecode(row["selectedVariant"]);
-        product.selectedVariant=SelectedVariant.fromJson(map);
+        product.selectedVariant = SelectedVariant.fromJson(map);
         product.deleted = row["deleted"] == 'true';
-//        product.deleted = false;
         product.image10080 = row["image_100_80"] ?? "";
         product.image300200 = row["image_300_200"] ?? "";
-//        product.variants = jsonDecode(row["variants"]);
+        var parsedListJson = jsonDecode(row["variants"]);
+        List<Variant> variantsList =
+            List<Variant>.from(parsedListJson.map((i) => Variant.fromJson(i)));
+        product.variants = variantsList;
         product.variantId = row["variantId"].toString();
         product.weight = row["weight"];
         product.mrpPrice = row["mrpPrice"];
@@ -406,11 +403,11 @@ class DatabaseHelper {
 
         productList.add(product);
       });
-    } else {}
+    }
     return productList;
   }
 
-  Future<List<Variant>> getProductsVariants(String productID) async {
+  /*Future<List<Variant>> getProductsVariants(String productID) async {
     List<Variant> variantList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
@@ -459,7 +456,7 @@ class DatabaseHelper {
       });
     }
     return variantList;
-  }
+  }*/
 
   Future<int> addProductToCart(Map<String, dynamic> row) async {
     var dbClient = await db;
@@ -765,28 +762,13 @@ class DatabaseHelper {
     dbClient.delete(Categories_Table);
     dbClient.delete(Sub_Categories_Table);
     dbClient.delete(Products_Table);
-    dbClient.delete(VARIANT_Table);
     dbClient.delete(Favorite_Table);
+    dbClient.delete(CART_Table);
   }
+
 
   Future close() async {
     var dbClient = await db;
     dbClient.close();
   }
-
-//  String createSubCategoriesProductQuery() {
-//    return "CREATE TABLE ${Sub_Categories_product_Table}("
-//        "id INTEGER PRIMARY KEY, "
-//        "title TEXT,"
-//        "version TEXT,"
-//        "parentId TEXT,"
-//        "status TEXT,"
-//        "deleted TEXT,"
-//        "sort TEXT,"
-//        "image_100_80 TEXT,"
-//        "image_300_200 TEXT,"
-//        "image TEXT,"
-//        "subCategoryId TEXT"
-//        ")";
-//  }
 }
