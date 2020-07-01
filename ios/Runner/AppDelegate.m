@@ -10,6 +10,9 @@
   // Override point for customization after application launch.
   // Add the following line, with your API key
     //AIzaSyCwKXvgsBElyhqwj03ro9e-Lnu3fmRmpJI
+    if (@available(iOS 10.0, *)) {
+         [UNUserNotificationCenter currentNotificationCenter].delegate =  self;
+       }
     [GMSServices provideAPIKey: @"AIzaSyBB1QThVluIt-PzfhPs3ZUWV_CZq8H4qXA"];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
