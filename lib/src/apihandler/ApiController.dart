@@ -75,7 +75,7 @@ class ApiController {
     return null;
   }
 
-  static Future<UserResponse> registerApiRequest(UserData user) async {
+  static Future<UserResponse> registerApiRequest(UserData user,String referralCode) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -92,6 +92,7 @@ class ApiController {
         "password": user.password,
         "device_id": deviceId,
         "device_token": deviceToken,
+        "user_refer_code":referralCode,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -185,7 +186,7 @@ class ApiController {
         ApiConstants.getCategories;
     print("catttttt  $url");
     Response response = await Dio().get(url,options: new Options(responseType: ResponseType.plain));
-    //print(response);
+    print(url);
     CategoryResponse categoryResponse = CategoryResponse.fromJson(json.decode(response.data));
     //print("-------Categories.length ---${categoryResponse.categories.length}");
     try {
@@ -512,7 +513,7 @@ class ApiController {
         "order_detail": orderJson,
         "device_id": deviceId,
       });
-
+      print("--fields---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("--Tax--respStr---${respStr}");
@@ -646,7 +647,7 @@ class ApiController {
   }
 
   static Future<UserResponse> updateProfileRequest(String fullName, String emailId,
-      String phoneNumber,bool isComingFromOtpScreen, String id) async {
+      String phoneNumber,bool isComingFromOtpScreen, String id,String user_refer_code) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     StoreModel store = await SharedPrefs.getStore();
     String userId;
@@ -666,6 +667,7 @@ class ApiController {
       request.fields.addAll({
         "full_name": fullName,
         "email": emailId,
+        "user_refer_code": user_refer_code,
         "user_id": userId,
         "device_id": deviceId,
         "device_token": deviceToken,

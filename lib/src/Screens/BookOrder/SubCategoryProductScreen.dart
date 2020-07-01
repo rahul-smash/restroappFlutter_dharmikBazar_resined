@@ -8,12 +8,15 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
-class SubCategoryProductScreen extends StatelessWidget {
-  final CategoryModel categoryModel;
-  SubCategoryProductScreen(this.categoryModel);
+class SubCategoryProductScreen extends StatelessWidget{
 
+  final CategoryModel categoryModel;
+  bool isComingFromBaner;
+  int index;
   final CartTotalPriceBottomBar bottomBar =
       CartTotalPriceBottomBar(ParentInfo.productList);
+
+  SubCategoryProductScreen(this.categoryModel,this.isComingFromBaner,this.index);
 
 
   @override
@@ -21,6 +24,7 @@ class SubCategoryProductScreen extends StatelessWidget {
     //print("---subCategory.length--=${categoryModel.subCategory.length}");
     return DefaultTabController(
       length: categoryModel.subCategory.length,
+      initialIndex: isComingFromBaner ? index : index,
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -80,7 +84,7 @@ class SubCategoryProductScreen extends StatelessWidget {
                   itemBuilder: (context, index) {
                     Product product = subCategory.products[index];
                     return ProductTileItem(product, () {
-
+                      print('Current Index: ${DefaultTabController.of(context).index}');
                       bottomBar.state.updateTotalPrice();
                     },ClassType.SubCategory);
                   },

@@ -584,7 +584,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     }else{
                       var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
                           RedeemPointsScreen(widget.address, "" ,widget.isComingFromPickUpScreen,
-                              widget.areaId, (model) {
+                              widget.areaId, (model) async {
+                                await updateTaxDetails(model);
                                 setState(() {
                                   hideRemoveCouponFirstTime = false;
                                   taxModel = model;
@@ -642,8 +643,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) => AvailableOffersDialog(
-                          widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) {
-                        setState(() {
+                          widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) async {
+                        await updateTaxDetails(model);
+                            setState(() {
                           hideRemoveCouponFirstTime = false;
                           taxModel = model;
                           double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
@@ -758,8 +760,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
                             databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                             databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+                            eventBus.fire(updateCartCount());
                             Navigator.of(context).popUntil((route) => route.isFirst);
                           }else{
+                            await updateTaxDetails(model.taxCalculation);
                             setState(() {
                               taxModel = model.taxCalculation;
                               isCouponsApplied = true;
@@ -785,6 +789,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> updateTaxDetails(TaxCalculationModel taxModel) async {
+    widget.cartList = await databaseHelper.getCartItemList();
+    for(int i = 0; i < taxModel.taxDetail.length; i++){
+      Product product = Product();
+      product.taxDetail = taxModel.taxDetail[i];
+      widget.cartList.add(product);
+    }
+    for (var i = 0; i < taxModel.fixedTax.length; i++) {
+      Product product = Product();
+      product.fixedTax = taxModel.fixedTax[i];
+      widget.cartList.add(product);
+    }
   }
 
   String selectedDeliverSlotValue = "";
@@ -891,7 +909,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.showProgressDialog(context);
     databaseHelper.getCartItemsListToJson().then((json) {
       ApiController.multipleTaxCalculationRequest("", "0", "${shippingCharges}", json)
-          .then((response) {
+          .then((response) async {
         Utils.hideProgressDialog(context);
         Utils.hideKeyboard(context);
         if (response != null && !response.success) {
@@ -899,8 +917,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
           databaseHelper.deleteTable(DatabaseHelper.CART_Table);
           databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+          eventBus.fire(updateCartCount());
           Navigator.of(context).popUntil((route) => route.isFirst);
         }else{
+          await updateTaxDetails(response.taxCalculation);
           setState(() {
             hideRemoveCouponFirstTime = true;
             taxModel = response.taxCalculation;
@@ -1104,6 +1124,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
               databaseHelper.deleteTable(DatabaseHelper.CART_Table);
               databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+              eventBus.fire(updateCartCount());
               Navigator.of(context).popUntil((route) => route.isFirst);
               return;
             }

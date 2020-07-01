@@ -25,10 +25,13 @@ class _ProfileState extends State<ProfileScreen> {
   final lastNameController = new TextEditingController();
   final emailController = new TextEditingController();
   final phoneController = new TextEditingController();
+  final referCodeController = new TextEditingController();
+
   File image;
   StoreModel storeModel;
   bool isEmailEditable = false;
   bool isPhonereadOnly = true;
+  bool showReferralCodeView = false;
 
   @override
   initState() {
@@ -45,6 +48,11 @@ class _ProfileState extends State<ProfileScreen> {
       firstNameController.text = user.fullName;
       emailController.text = user.email;
       phoneController.text = user.phone;
+      if(storeModel.isRefererFnEnable){
+        showReferralCodeView = true;
+      }else{
+        showReferralCodeView = false;
+      }
       if(storeModel.internationalOtp == "0"){
         isEmailEditable = false;
       }else{
@@ -59,7 +67,7 @@ class _ProfileState extends State<ProfileScreen> {
     return new Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: new Text(widget.isComingFromOtpScreen == true ? 'SignUp' : "My Profile"),
+        title: new Text("My Profile"),
         centerTitle: true,
       ),
       body: SingleChildScrollView(
@@ -88,19 +96,37 @@ class _ProfileState extends State<ProfileScreen> {
                         child: TextField(
                           controller: firstNameController,
                           decoration: InputDecoration(
-                            labelText: 'Full name',
+                            labelText: 'Full name *',
                           ),
-                          style: TextStyle(fontSize: 18,color: Color(0xFF495056),fontWeight: FontWeight.w500
+                          style: TextStyle(fontSize: 18,
+                              color: Color(0xFF495056),fontWeight: FontWeight.w500
                           ),
                         ),
 
                       ),
-                      Padding(
+                      /*Padding(
                         padding: const EdgeInsets.only(top: 30),
                         child: Text("Private Information",style: TextStyle(
                             fontSize: 16,color: Color(0xFF8F9396),fontWeight: FontWeight.w500),
                         ),
+                      ),*/
+                      Visibility(
+                        visible: showReferralCodeView,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: TextField(
+                            controller: referCodeController,
+                            decoration: InputDecoration(
+                              labelText: 'Referral Code',
+                            ),
+                            style: TextStyle(fontSize: 18,
+                                color: Color(0xFF495056),fontWeight: FontWeight.w500
+                            ),
+                          ),
+
+                        ),
                       ),
+
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0),
                         child: TextField(
@@ -183,7 +209,8 @@ class _ProfileState extends State<ProfileScreen> {
       form.save();
       Utils.showProgressDialog(context);
       ApiController.updateProfileRequest(firstNameController.text, emailController.text,
-          phoneController.text,widget.isComingFromOtpScreen,widget.id).then((response) {
+          phoneController.text,widget.isComingFromOtpScreen,widget.id,
+          referCodeController.text).then((response) {
         Utils.hideProgressDialog(context);
         if (response.success) {
           if(widget.isComingFromOtpScreen){
@@ -206,6 +233,8 @@ class _ProfileState extends State<ProfileScreen> {
             SharedPrefs.saveUser(user);
             Navigator.pop(context);
           }
+        }else{
+          Utils.showToast(response.message, true);
         }
 
       });

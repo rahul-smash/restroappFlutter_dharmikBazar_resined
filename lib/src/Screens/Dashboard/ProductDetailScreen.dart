@@ -4,14 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_tags/flutter_tags.dart';
+import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
+import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+
+import 'HomeScreen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
 
@@ -35,6 +40,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   bool showAddButton;
   int selctedTag;
   bool isVisible = true;
+  double totalPrice = 0.00;
 
   @override
   initState() {
@@ -54,7 +60,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   Widget build(BuildContext context) {
-
     variantId = variant == null ? widget.product.variantId : variant.id;
     if(variant == null){
       discount = widget.product.discount.toString();
@@ -67,14 +72,10 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       price = variant.price.toString();
       weight = variant.weight;
     }
-
     imageUrl = widget.product.imageType == "0" ? widget.product.image300200: widget.product.imageUrl;
-
     if(weight.isEmpty){
       isVisible = false;
     }
-
-
     return WillPopScope(
       onWillPop: (){
         print("onWillPop onWillPop");
@@ -84,6 +85,23 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           actions: <Widget>[
+            /*InkWell(
+              onTap: () async {
+                totalPrice = await databaseHelper.getTotalPrice();
+                if (totalPrice == 0.0) {
+                  Utils.showToast(AppConstant.addItems, false);
+                }else{
+                  Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
+                    }),),
+                  );
+                }
+              },
+              child: Padding(
+                padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
+                child: Icon(Icons.shopping_cart, color: Colors.white,size: 30,),
+              ),
+            ),*/
             InkWell(
               onTap: (){
                 Navigator.of(context).popUntil((route) => route.isFirst);
@@ -93,7 +111,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                 child: Icon(Icons.home, color: Colors.white,size: 30,),
               ),
             ),
-
           ],
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),

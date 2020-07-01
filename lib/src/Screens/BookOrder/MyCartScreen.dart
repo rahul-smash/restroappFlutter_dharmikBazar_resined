@@ -5,6 +5,7 @@ import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
@@ -45,25 +46,28 @@ class _MyCartScreenState extends State<MyCartScreen> {
             onPressed: () => Navigator.pop(context),
           ),
         actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(right: 5),
-            child: IconButton(
-              icon: Image.asset('images/cancel_cart.png', width: 25),
-              onPressed: () async {
-                var result = await DialogUtils.displayCommonDialog2(context, "Clear Cart?",
-                    AppConstant.emptyCartMsg, "Cancel", "Yes");
-                if(result == true){
-                  print("Yes");
-                  setState(() {
-                    databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                    getCartListFromDB();
-                    eventBus.fire(updateCartCount());
-                    bottomBar.state.updateTotalPrice();
-                    widget.callback();
-                  });
+          Visibility(
+            visible: cartList.isEmpty ? false: true,
+            child: Padding(
+              padding: EdgeInsets.only(right: 5),
+              child: IconButton(
+                icon: Image.asset('images/cancel_cart.png', width: 25),
+                onPressed: () async {
+                  var result = await DialogUtils.displayCommonDialog2(context, "Clear Cart?",
+                      AppConstant.emptyCartMsg, "Cancel", "Yes");
+                  if(result == true){
+                    print("Yes");
+                    setState(() {
+                      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                      getCartListFromDB();
+                      eventBus.fire(updateCartCount());
+                      bottomBar.state.updateTotalPrice();
+                      widget.callback();
+                    });
 
-                }
-              },
+                  }
+                },
+              ),
             ),
           ),
         ],
@@ -91,6 +95,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
       setState(() {
         cartList = response;
         isLoading = false;
+        eventBus.fire(updateCartCount());
       });
     });
   }
@@ -100,12 +105,19 @@ class _MyCartScreenState extends State<MyCartScreen> {
       return Container(
         child: Expanded(
           child: Center(
-            child: Text("Empty Cart",
-                overflow: TextOverflow.ellipsis,
-                style: new TextStyle(
-                  fontWeight: FontWeight.w500,
-                  fontSize: 18.0,
-                )),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Image.asset("images/empty_cart.png",fit: BoxFit.fill,
+                  width: 100,height: 100,),
+                SizedBox(height: 10,),
+                Text("Your Cart is Empty",
+                    overflow: TextOverflow.ellipsis,
+                    style: new TextStyle(fontWeight: FontWeight.w500,fontSize: 18.0,
+                    )),
+
+              ],
+            ),
           ),
         ),
       );

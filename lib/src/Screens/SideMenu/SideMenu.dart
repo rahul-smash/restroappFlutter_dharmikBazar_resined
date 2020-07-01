@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
@@ -14,10 +17,12 @@ import 'package:restroapp/src/Screens/SideMenu/ReferEarn.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -38,25 +43,31 @@ class NavDrawerMenu extends StatefulWidget {
 }
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
-
+  List<dynamic> _drawerItems = List();
   _NavDrawerMenuState();
-
-  final _drawerItems = [
-    DrawerChildItem('Home', "images/home.png"),
-    DrawerChildItem('My Profile', "images/myprofile.png"),
-    DrawerChildItem('Delivery Address', "images/deliveryaddress.png"),
-    DrawerChildItem('My Orders', "images/my_order.png"),
-    DrawerChildItem('Loyality Points', "images/loyality.png"),
-    //DrawerChildItem('Book Now', "images/booknow.png"),
-    DrawerChildItem('My Favorites', "images/myfav.png"),
-    DrawerChildItem('About Us', "images/about.png"),
-    DrawerChildItem('Share', "images/refer.png"),
-    DrawerChildItem('Login', "images/sign_in.png"),
-  ];
 
   @override
   void initState() {
     super.initState();
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.HOME, "images/home.png"));
+    _drawerItems.add(DrawerChildItem(
+        DrawerChildConstants.MY_PROFILE, "images/myprofile.png"));
+    _drawerItems.add(DrawerChildItem(
+        DrawerChildConstants.DELIVERY_ADDRESS, "images/deliveryaddress.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.MY_ORDERS, "images/my_order.png"));
+    if (widget.store.loyality == "1")
+      _drawerItems.add(DrawerChildItem(
+          DrawerChildConstants.LOYALITY_POINTS, "images/loyality.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.MY_FAVORITES, "images/myfav.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about.png"));
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.SHARE, "images/refer.png"));
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
       _setSetUserId();
     } catch (e) {
@@ -96,17 +107,21 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                   child: Icon(Icons.account_circle,size: 60, color: Colors.white,),
                 ),
               ),
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text('Welcome',
-                        style: TextStyle(color: leftMenuWelcomeTextColors,
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 5),
-                    Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
-                        style: TextStyle(color: leftMenuWelcomeTextColors, fontSize: 15)
-                    ),
-                  ])
+              Flexible(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text('Welcome',
+                          style: TextStyle(color: leftMenuWelcomeTextColors,
+                              fontSize: 18, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 5),
+                      Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
+                          maxLines: 2, overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: leftMenuWelcomeTextColors, fontSize: 15)
+                      ),
+                    ]
+                ),
+              ),
             ])));
   }
 
@@ -116,29 +131,37 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         padding: EdgeInsets.only(left: 20),
         child: ListTile(
           leading: Image.asset(
-              index == _drawerItems.length - 1
+              item.title == DrawerChildConstants.LOGIN ||
+                  item.title == DrawerChildConstants.LOGOUT
                   ? AppConstant.isLoggedIn == false
                   ? 'images/sign_in.png'
                   : 'images/sign_out.png'
-                  : item.icon,color: left_menu_icon_colors,
+                  : item.icon,
+              color: left_menu_icon_colors,
               width: 30),
-          title: index == _drawerItems.length - 1
-              ? Text(AppConstant.isLoggedIn == false ? 'Login' : 'Logout',
-              style: TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
+          title: item.title == DrawerChildConstants.LOGIN ||
+              item.title == DrawerChildConstants.LOGOUT
+              ? Text(
+              AppConstant.isLoggedIn == false
+                  ? DrawerChildConstants.LOGIN
+                  : DrawerChildConstants.LOGOUT,
+              style:
+              TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
               : Text(item.title,
-              style: TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
+              style:
+              TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
           onTap: () {
-            _openPageForIndex(index, context);
+            _openPageForIndex(item, index, context);
           },
         ));
   }
 
-  _openPageForIndex(int pos, BuildContext context) {
-    switch (pos) {
-      case 0:
+  _openPageForIndex(DrawerChildItem item,int pos, BuildContext context) async {
+    switch (item.title) {
+      case DrawerChildConstants.HOME:
         Navigator.pop(context);
         break;
-      case 1:
+      case DrawerChildConstants.MY_PROFILE:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -152,7 +175,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 2:
+      case DrawerChildConstants.DELIVERY_ADDRESS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -166,7 +189,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 3:
+      case DrawerChildConstants.MY_ORDERS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -180,7 +203,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 4:
+      case DrawerChildConstants.LOYALITY_POINTS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -192,7 +215,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         }
 
         break;
-      case 5:
+      case DrawerChildConstants.MY_FAVORITES:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
           Navigator.push(
@@ -206,7 +229,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
-      case 6:
+      case DrawerChildConstants.ABOUT_US:
         Navigator.pop(context);
         Navigator.push(
           context,
@@ -216,28 +239,35 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         attributeMap["ScreenName"] = "AboutScreen";
         Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
         break;
-      case 7:
-        /*if (AppConstant.isLoggedIn) {
+      case DrawerChildConstants.SHARE:
+        if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
             Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ReferEarn()),
-            );
+
+            Utils.showProgressDialog(context);
+            ReferEarnData referEarn = await ApiController.referEarn();
+            Utils.hideProgressDialog(context);
+            share2(referEarn.referEarn.sharedMessage,widget.store);
           }else{
             Utils.showToast("Refer Earn is inactive!", true);
+            share2(null,widget.store);
           }
         }else {
-          Utils.showLoginDialog(context);
-        }*/
-        share();
+          Navigator.pop(context);
+          var result = await DialogUtils.showInviteEarnAlert(context);
+          print("showInviteEarnAlert=${result}");
+        }
+        //share();
 
         Map<String,dynamic> attributeMap = new Map<String,dynamic>();
         attributeMap["ScreenName"] = "share apk url";
         Utils.sendAnalyticsEvent("Clicked share",attributeMap);
 
+        //DialogUtils.showInviteEarnAlert2(context);
+        
         break;
-      case 8:
+      case DrawerChildConstants.LOGIN:
+      case DrawerChildConstants.LOGOUT:
         if (AppConstant.isLoggedIn) {
           _showDialog(context);
         } else {
@@ -304,14 +334,32 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     await FlutterShare.share(
         title: 'Kindly download',
         text: 'Kindly download' + widget.store.storeName + 'app from',
-        linkUrl: widget.store.androidShareLink,
-        chooserTitle: 'Refer & Earn');
+        linkUrl: Platform.isIOS ? widget.store.iphoneShareLink :widget.store.androidShareLink,
+        chooserTitle: 'Share');
+  }
+
+  Future<void> share2(String referEarn,StoreModel store) async {
+    if(referEarn != null && store.isRefererFnEnable){
+      await FlutterShare.share(
+          title: '${store.storeName}',
+          linkUrl: referEarn,
+          chooserTitle: 'Refer & Earn');
+    }else{
+      await FlutterShare.share(
+          title: 'Kindly download',
+          text: 'Kindly download' + widget.store.storeName + 'app from',
+          linkUrl: Platform.isIOS ? widget.store.iphoneShareLink :widget.store.androidShareLink,
+          chooserTitle: 'Share');
+    }
+
   }
 
   Future logout(BuildContext context) async {
     try {
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
+      SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
+      SharedPrefs.removeKey(AppConstant.referEarnMsg);
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
@@ -356,3 +404,17 @@ class DrawerChildItem {
   String icon;
   DrawerChildItem(this.title, this.icon);
 }
+
+class DrawerChildConstants {
+  static const HOME = "Home";
+  static const MY_PROFILE = "My Profile";
+  static const DELIVERY_ADDRESS = "Delivery Address";
+  static const MY_ORDERS = "My Orders";
+  static const LOYALITY_POINTS = "Loyality Points";
+  static const MY_FAVORITES = "My Favorites";
+  static const ABOUT_US = "About Us";
+  static const SHARE = "Share";
+  static const LOGIN = "Login";
+  static const LOGOUT = "Logout";
+}
+
