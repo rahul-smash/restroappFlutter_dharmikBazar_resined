@@ -91,6 +91,19 @@ class OrderDetailScreen extends StatelessWidget {
           child: Column(
             children: <Widget>[
               firstRow(item) ,
+              Padding(
+                padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
+                child: Row(
+                  children: <Widget>[
+                    Text('QTY : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
+                    Padding(
+                      padding: EdgeInsets.only(left: 75.0),
+                      child: Text("${item.quantity}",style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                    )
+
+                  ],
+                ),
+              ),
               secondRow(item),
               deviderLine(),
             ],
