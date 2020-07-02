@@ -144,7 +144,7 @@ class OrderDetailScreen extends StatelessWidget {
             height: 35,
             child: FlatButton(onPressed: (){
             },
-              child: Text("${item.quantity} kg",style: TextStyle(color: Color(0xFF15282F),fontSize: 13,),),
+              child: Text("${item.weight}",style: TextStyle(color: Color(0xFF15282F),fontSize: 13,),),
               color: Color(0xFFEAEEEF),
               shape:  RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(3.0),
