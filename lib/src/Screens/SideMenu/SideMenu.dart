@@ -65,7 +65,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     _drawerItems.add(
         DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about.png"));
     _drawerItems
-        .add(DrawerChildItem(DrawerChildConstants.SHARE, "images/refer.png"));
+        .add(DrawerChildItem(widget.store.isRefererFnEnable ? DrawerChildConstants.ReferEarn : DrawerChildConstants.SHARE, "images/refer.png"));
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
@@ -239,6 +239,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         attributeMap["ScreenName"] = "AboutScreen";
         Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
         break;
+      case DrawerChildConstants.ReferEarn:
       case DrawerChildConstants.SHARE:
         if (AppConstant.isLoggedIn) {
           if(widget.store.isRefererFnEnable){
@@ -254,8 +255,12 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           }
         }else {
           Navigator.pop(context);
-          var result = await DialogUtils.showInviteEarnAlert(context);
-          print("showInviteEarnAlert=${result}");
+          if(widget.store.isRefererFnEnable){
+            var result = await DialogUtils.showInviteEarnAlert(context);
+            print("showInviteEarnAlert=${result}");
+          }else{
+            share2(null,widget.store);
+          }
         }
         //share();
 
@@ -414,6 +419,7 @@ class DrawerChildConstants {
   static const MY_FAVORITES = "My Favorites";
   static const ABOUT_US = "About Us";
   static const SHARE = "Share";
+  static const ReferEarn = "Refer & Earn";
   static const LOGIN = "Login";
   static const LOGOUT = "Logout";
 }
