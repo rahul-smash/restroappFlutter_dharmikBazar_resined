@@ -155,10 +155,12 @@ class OrderDetailScreen extends StatelessWidget {
           child:  SizedBox(
             width: 80,
             height: 35,
-            child: FlatButton(onPressed: (){
-            },
+            child: FlatButton(
+              onPressed: (){
+
+                },
               child: Text("${item.weight}",style: TextStyle(color: Color(0xFF15282F),fontSize: 13,),),
-              color: Color(0xFFEAEEEF),
+              color: item.weight.isEmpty ? whiteColor :Color(0xFFEAEEEF),
               shape:  RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(3.0),
               ),
