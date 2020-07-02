@@ -27,6 +27,8 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'ForceUpdate.dart';
 import 'SearchScreen.dart';
+import 'dart:io';
+
 
 
 class HomeScreen extends StatefulWidget {
@@ -421,9 +423,17 @@ class _HomeScreenState extends State<HomeScreen> {
         try {
           print("------onMessage: $message");
           if(AppConstant.isLoggedIn){
-            String title = message['notification']['title'];
-            String body = message['notification']['body'];
-            showNotification(title,body,message);
+            if (Platform.isIOS){
+              print("iosssssssssssssssss");
+              String title = message['aps']['alert']['title'];
+              String body = message['aps']['alert']['body'];
+              showNotification(title,body,message);
+            }else{
+              print("androiddddddddddd");
+              String title = message['notification']['title'];
+              String body = message['notification']['body'];
+              showNotification(title,body,message);
+            }
           }
         } catch (e) {
           print(e);
