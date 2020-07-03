@@ -252,6 +252,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
             databaseHelper.deleteTable(DatabaseHelper.CART_Table);
             databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+            eventBus.fire(updateCartCount());
             Navigator.of(context).popUntil((route) => route.isFirst);
           }
         }
@@ -941,8 +942,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       print("----minAmount=${widget.address.minAmount}");
       print("----notAllow=${widget.address.notAllow}");
       print("--------------------------------------------");
+      int minAmount = 0;
       try {
-        int minAmount = double.parse(widget.address.minAmount).toInt();
+        try {
+          minAmount = double.parse(widget.address.minAmount).toInt();
+        } catch (e) {
+          print(e);
+        }
         double totalPrice = await databaseHelper.getTotalPrice();
         int mtotalPrice = totalPrice.round();
 
