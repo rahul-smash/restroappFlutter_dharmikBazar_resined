@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       }else{
         if(!checkIfStoreClosed()){
           WidgetsBinding.instance.addPostFrameCallback((_) async {
-            if (!AppConstant.isLoggedIn) {
+            if (!AppConstant.isLoggedIn && store.isRefererFnEnable) {
               String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(AppConstant.showReferEarnAlert);
               print("showReferEarnAlert=${showReferEarnAlert}");
               if(showReferEarnAlert == null){
