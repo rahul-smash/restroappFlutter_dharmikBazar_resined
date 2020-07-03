@@ -53,7 +53,7 @@ dependencies:
   dio: ^3.0.9  #latest version
   webview_flutter: ^0.3.22+1
   keyboard_visibility: ^0.5.6
-
+  #oauth1: ^1.0.1
 
 dev_dependencies:
   flutter_test:

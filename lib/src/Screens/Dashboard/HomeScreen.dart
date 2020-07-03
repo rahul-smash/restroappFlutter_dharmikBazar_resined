@@ -452,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token){
-      print("----token---- ${token}");
+      //print("----token---- ${token}");
       try {
         SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
       } catch (e) {
