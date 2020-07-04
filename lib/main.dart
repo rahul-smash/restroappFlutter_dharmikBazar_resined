@@ -16,7 +16,6 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'dart:io';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-//import 'package:oauth1/oauth1.dart' as oauth1;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -66,33 +65,6 @@ Future<void> main() async {
   }, onError: Crashlytics.instance.recordError);
 
 }
-
-/*void callOAuthApi() {
-// define platform (server)
-  var platform = new oauth1.Platform(
-      '', // temporary credentials request
-      '',     // resource owner authorization
-      '', // token credentials request
-      oauth1.SignatureMethods.hmacSha1              // signature method
-  );
-  const String apiKey = 'ck_789b63aee985c4569bfa5ae4724861ae5c74c337';
-  const String apiSecret = 'cs_0f0addbc9c16042d5689a4cfe6fbfd209b00d55b';
-  var clientCredentials = new oauth1.ClientCredentials(apiKey, apiSecret);
-
-  // create Authorization object with client credentials and platform definition
-  //var auth = new oauth1.Authorization(clientCredentials, platform);
-  var auth = new oauth1.Credentials(apiKey, apiSecret);
-  // yeah, you got token credentials
-  // create Client object
-  var client = new oauth1.Client(platform.signatureMethod, clientCredentials, auth);
-//
-  // now you can access to protected resources via client
-  client.get('http://demo2.signitydemo.in/foodemporium/wp-json/wc/v3/products/categories').then((res) {
-    print("res.body===${res.body}");
-    print("statusCode===${res.statusCode}");
-    print("headers===${res.headers}");
-  });
-}*/
 
 class ValueApp extends StatelessWidget {
 
