@@ -221,7 +221,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               SizedBox(
                 width: 120,
                 child: Padding(
-                  padding: EdgeInsets.only(top: 0.0, left: 20.0),
+                  padding: EdgeInsets.only(top: 0.0, left: 15.0),
                   child: Center(
                     child: Text("Available In ",
                         style: TextStyle( fontSize: 16.0,fontWeight: FontWeight.w400)),
@@ -240,7 +240,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         ),
         Padding(
           padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-          child:Text("Product Detail",style: TextStyle(fontSize: 16.0),
+          child:Text(widget.product.description.isEmpty ? "" : "Product Detail",style: TextStyle(fontSize: 16.0),
           ),
         ),
         Padding(

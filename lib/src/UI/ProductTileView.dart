@@ -88,9 +88,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
             InkWell(
               onTap: () async {
                 //print("----print-----");
-                if(widget.product.description.isEmpty){
-                  return;
-                }
                 if(widget.classType != ClassType.CART){
                   var result = await Navigator.push(context, new MaterialPageRoute(
                     builder: (BuildContext context) => ProductDetailsScreen(widget.product),
