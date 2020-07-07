@@ -121,7 +121,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             ),
                                             Padding(
                                               padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                              child: Text("Valid ${Utils.convertStringToDate2(offer.validFrom)} - ${Utils.convertStringToDate2(offer.validTo)}"),
+                                              child: Text("Valid Till- ${Utils.convertStringToDate2(offer.validTo)}"),
                                             ),
                                           ],
                                         ),

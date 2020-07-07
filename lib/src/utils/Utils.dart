@@ -295,7 +295,7 @@ class Utils {
   static convertStringToDate2(String dateObj){
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);
-    DateFormat formatter = new DateFormat('dd MMM');
+    DateFormat formatter = new DateFormat('dd MMM yyyy');
     String formatted = formatter.format(dateTime);
     //print(formatted);
     return formatted;
