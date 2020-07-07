@@ -65,6 +65,7 @@ class _ProfileState extends State<ProfileScreen> {
       }else{
         isEmailEditable = true;
         isPhonereadOnly = false;
+        showReferralCodeView = false;
       }
     });
   }
