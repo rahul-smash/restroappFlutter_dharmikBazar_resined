@@ -80,7 +80,7 @@ class SubCategoryProductScreen extends StatelessWidget {
               SubCategoryModel subCategory = SubCategoryModel();
 //              SubCategoryModel subCategory =response.subCategories.first;
               for (int i = 0; i < response.subCategories.length; i++) {
-                if (categoryModel.subCategory.first.id ==
+                if (subCategoryId ==
                     response.subCategories[i].id) {
                   subCategory = response.subCategories[i];
                   break;
