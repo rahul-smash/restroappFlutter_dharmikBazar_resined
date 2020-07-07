@@ -85,8 +85,8 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                   children: <Widget>[
                                     SizedBox(
                                       width: 60,
-                                      child: Text("${offer.name}",
-                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      child: Text("${getOfferName(offer)}",textAlign: TextAlign.center,
+                                        style: TextStyle(fontWeight: FontWeight.w400),
                                       ),
                                     ),
                                     Container(
@@ -214,4 +214,26 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
       }
     });
   }
+
+  getOfferName(OfferModel offer) {
+    /*
+    "discount_type": "3" == discount %oFF \n discount_upto black Uptp Rs100
+    "discount_type": "2" == and discount_upto  OFF
+    "discount_type": "1" == Uptp Rs100
+    */
+
+    String offerName = "";
+    if(offer.discount_type == "3"){
+      offerName = "${offer.discount}%\nOFF\nUpto ${AppConstant.currency}${offer.discount_upto}";
+    }
+    if(offer.discount_type == "2"){
+      offerName = "Upto ${AppConstant.currency}${offer.discount_upto}\nOFF";
+    }
+    if(offer.discount_type == "1"){
+      offerName = "Upto ${AppConstant.currency}${offer.discount_upto}\nOFF";
+    }
+    return offerName;
+  }
+
+
 }
