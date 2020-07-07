@@ -49,6 +49,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   @override
   void initState() {
     super.initState();
+    //print("isRefererFnEnable=${widget.store.isRefererFnEnable}");
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.HOME, "images/home.png"));
     _drawerItems.add(DrawerChildItem(
@@ -64,8 +65,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         DrawerChildItem(DrawerChildConstants.MY_FAVORITES, "images/myfav.png"));
     _drawerItems.add(
         DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about.png"));
-    _drawerItems
-        .add(DrawerChildItem(widget.store.isRefererFnEnable ? DrawerChildConstants.ReferEarn : DrawerChildConstants.SHARE, "images/refer.png"));
+    _drawerItems.add(DrawerChildItem(widget.store.isRefererFnEnable && AppConstant.isLoggedIn
+        ? DrawerChildConstants.ReferEarn
+        : DrawerChildConstants.SHARE, "images/refer.png"));
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
