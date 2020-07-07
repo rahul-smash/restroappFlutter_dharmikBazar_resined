@@ -168,7 +168,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProfileScreen(false,"")),
+            MaterialPageRoute(builder: (context) => ProfileScreen(false,"","")),
           );
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "ProfileScreen";

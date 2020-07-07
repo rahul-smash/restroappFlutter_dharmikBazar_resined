@@ -11,7 +11,8 @@ class ProfileScreen extends StatefulWidget {
 
   bool isComingFromOtpScreen;
   String id;
-  ProfileScreen(this.isComingFromOtpScreen,this.id);
+  String fullName;
+  ProfileScreen(this.isComingFromOtpScreen,this.id, String fullName);
 
   @override
   _ProfileState createState() => new _ProfileState();
@@ -49,10 +50,16 @@ class _ProfileState extends State<ProfileScreen> {
       emailController.text = user.email;
       phoneController.text = user.phone;
       if(storeModel.isRefererFnEnable){
-        showReferralCodeView = true;
+        if(widget.fullName.isEmpty){
+          showReferralCodeView = true;
+        }
       }else{
         showReferralCodeView = false;
       }
+      if(!widget.isComingFromOtpScreen){
+        showReferralCodeView = false;
+      }
+
       if(storeModel.internationalOtp == "0"){
         isEmailEditable = false;
       }else{
