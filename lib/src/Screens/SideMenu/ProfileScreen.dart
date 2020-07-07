@@ -11,7 +11,7 @@ class ProfileScreen extends StatefulWidget {
 
   bool isComingFromOtpScreen;
   String id;
-  String fullName;
+  String fullName ="";
   ProfileScreen(this.isComingFromOtpScreen,this.id, String fullName);
 
   @override
@@ -49,10 +49,9 @@ class _ProfileState extends State<ProfileScreen> {
       firstNameController.text = user.fullName;
       emailController.text = user.email;
       phoneController.text = user.phone;
-      if(storeModel.isRefererFnEnable){
-        if(widget.fullName.isEmpty){
-          showReferralCodeView = true;
-        }
+      print(storeModel.isRefererFnEnable);
+      if(storeModel.isRefererFnEnable && widget.fullName.isEmpty){
+        showReferralCodeView = true;
       }else{
         showReferralCodeView = false;
       }
@@ -67,11 +66,14 @@ class _ProfileState extends State<ProfileScreen> {
         isPhonereadOnly = false;
         showReferralCodeView = false;
       }
+
+      print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    //print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     return new Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(

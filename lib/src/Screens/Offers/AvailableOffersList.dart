@@ -117,7 +117,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             Text("to avail this offer",),
                                             Padding(
                                               padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                              child: Text("Min Booking -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
+                                              child: Text("Min order -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
                                             ),
                                             Padding(
                                               padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
