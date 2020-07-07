@@ -78,7 +78,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                 applyText = "Apply";
                               }
                               return Container(
-                                margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
                                 padding: EdgeInsets.fromLTRB(10, 10, 5, 10),
                                 color: Color(0xffffffff),
                                 child: Row(
@@ -119,10 +119,10 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                               padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                                               child: Text("Min Booking -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
                                             ),
-                                            /*Padding(
+                                            Padding(
                                               padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                               child: Text("Valid ${Utils.convertStringToDate2(offer.validFrom)} - ${Utils.convertStringToDate2(offer.validTo)}"),
-                                            ),*/
+                                            ),
                                           ],
                                         ),
                                       ),
