@@ -176,7 +176,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       ),
       body: Column(
         children: <Widget>[
-          addCommentWidget(context),
           Expanded(
             child: Column(children: [
               Expanded(
@@ -186,6 +185,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         ? Text("")
                         : ListView(
                             children: <Widget>[
+                              addCommentWidget(context),
                               showDeliverySlot(),
                               ListView.separated(
                                 separatorBuilder:
@@ -1388,75 +1388,76 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget getCommentedView(BuildContext context) {
-    return Flexible(
-        child: Column(
-      children: <Widget>[
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          verticalDirection: VerticalDirection.down,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-                child: new Text(
-              "Your Comment",
-              style: new TextStyle(
-                  fontFamily: 'bold',
-                  fontSize: 16.0,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold),
-            )),
-            InkWell(
-              onTap: () async {
-                String result =
-                    await DialogUtils.displayCommentDialog(context, comment);
-                comment = result;
-                setState(() {
-                  if (comment != "") {
-                    isCommentAdded = true;
-                  } else {
-                    isCommentAdded = false;
-                  }
-                });
-              },
-              child: Padding(
-                child: Icon(
-                  Icons.edit,
-                  size: 18.0,
-                ),
-                padding: EdgeInsets.only(right: 5, left: 5),
-              ),
-            ),
-            InkWell(
-              onTap: () {
-                setState(() {
-                  comment = "";
-                  isCommentAdded = false;
-                  Utils.showToast("Comment Deleted", true);
-                });
-              },
-              child: Padding(
-                child: Icon(Icons.delete, size: 18.0),
-                padding: EdgeInsets.only(right: 5, left: 5),
-              ),
-            ),
-          ],
-        ),
-        Container(
-          margin: EdgeInsets.only(top: 10),
-          child: Row(
+    return Wrap(children: <Widget>[
+      Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            verticalDirection: VerticalDirection.down,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Expanded(
-                child: new Text(
-                  comment,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+                  child: new Text(
+                "Your Comment",
+                style: new TextStyle(
+                    fontFamily: 'bold',
+                    fontSize: 16.0,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+              )),
+              InkWell(
+                onTap: () async {
+                  String result =
+                      await DialogUtils.displayCommentDialog(context, comment);
+                  comment = result;
+                  setState(() {
+                    if (comment != "") {
+                      isCommentAdded = true;
+                    } else {
+                      isCommentAdded = false;
+                    }
+                  });
+                },
+                child: Padding(
+                  child: Icon(
+                    Icons.edit,
+                    size: 18.0,
+                  ),
+                  padding: EdgeInsets.only(right: 5, left: 5),
                 ),
-              )
+              ),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    comment = "";
+                    isCommentAdded = false;
+                    Utils.showToast("Comment Deleted", true);
+                  });
+                },
+                child: Padding(
+                  child: Icon(Icons.delete, size: 18.0),
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                ),
+              ),
             ],
           ),
-        ),
-      ],
-    ));
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: new Text(
+                  comment,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      )
+    ]);
   }
 }
 
