@@ -88,6 +88,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           actions: <Widget>[
+
             /*InkWell(
               onTap: () async {
                 totalPrice = await databaseHelper.getTotalPrice();
