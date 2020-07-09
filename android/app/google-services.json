@@ -8,6 +8,194 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:f81cfd2d9734a5c935fd64",
+        "android_client_info": {
+          "package_name": "com.signity.asianmart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:5a12548acaaedbd835fd64",
+        "android_client_info": {
+          "package_name": "com.signity.firstfreshmarket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-v3ulh5cgik6ibkmvpnpq80qgrq2230t7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.signity.firstfreshmarket",
+            "certificate_hash": "27867ed4396aa35f8112256906c05ec41af0a07e"
+          }
+        },
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:2a6142c4d5f7bb7d35fd64",
+        "android_client_info": {
+          "package_name": "com.signity.frigosgourmet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:d93fb02dd3c0ae4c35fd64",
+        "android_client_info": {
+          "package_name": "com.signity.greenfieldfarms"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:56c40af8c76490a135fd64",
+        "android_client_info": {
+          "package_name": "com.signity.kanishkarestaurant"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:771670170221:android:2dc87b90ce47f10135fd64",
         "android_client_info": {
           "package_name": "com.signity.restroapp"
@@ -30,6 +218,517 @@
             {
               "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:294d3de9765ac13c35fd64",
+        "android_client_info": {
+          "package_name": "com.signity.rithegrocers"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:2c01218e88e5bfd835fd64",
+        "android_client_info": {
+          "package_name": "com.signity.sabsekum"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:a32ee3d1405822f735fd64",
+        "android_client_info": {
+          "package_name": "com.signity.shubhkirat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:f1aa79bf16c2f79535fd64",
+        "android_client_info": {
+          "package_name": "com.signity.solverissystems"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:6c8941d683d7c9c235fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.asanstore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:42880620f9fd18d635fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.greenfields"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:29cfc36aba87259c35fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.grocerycart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:353ddcc60a3861c235fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.kiranazworld"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:6dfba3b731a01e7d35fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.onewaygrocery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:9c5c0dc2b2ace5e835fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.savenshop"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:87c63b3ebfa2182935fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.sgcsupermart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:79a76ad59a1dbd0735fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.shriannapurnatraders"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:0b76d9d33b7c508435fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.sm_supermarket"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771670170221:android:00afe804c8bd194b35fd64",
+        "android_client_info": {
+          "package_name": "com.valueappz.stepupstore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgtg5EIvBsh7V_3wP94v3JoT147EuRkwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771670170221-6m363j2udokd4csfr1lceif5ljn0vrok.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "771670170221-rmbcsiba0cjc3mft96ljtbu23o8b2rm0.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.signity.firstfreshmarket"
+              }
             }
           ]
         }
