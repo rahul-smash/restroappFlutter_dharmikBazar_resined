@@ -323,7 +323,8 @@ class Utils {
     String formatted = date;
     try {
       DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
-      DateTime time = format.parse(date);
+      //UTC time true
+      DateTime time = format.parse(date,true);
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
       DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm');
