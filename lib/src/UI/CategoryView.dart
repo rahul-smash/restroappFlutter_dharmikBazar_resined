@@ -67,7 +67,7 @@ class CategoryView extends StatelessWidget {
               child: Center(
                 child: Text(categoryModel.title,textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
-                    style: new TextStyle(color: Colors.black, fontSize: 10.0)),
+                    style: new TextStyle(color: Colors.black)),
               ),
             ),
           ),
