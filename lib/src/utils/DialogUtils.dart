@@ -1255,4 +1255,39 @@ class DialogUtils {
           );
         });
   }
+
+  static Future<bool> showAreaRemovedDialog(BuildContext context,String area) async {
+    StoreModel storeModel = await SharedPrefs.getStore();
+    String storeName = storeModel.storeName;
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {},
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: Text(
+              storeName,
+              textAlign: TextAlign.center,
+            ),
+            content: Text(
+              AppConstant.deliveryAreaChanges,
+              textAlign: TextAlign.center,
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: Text("OK"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  // true here means you clicked ok
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
