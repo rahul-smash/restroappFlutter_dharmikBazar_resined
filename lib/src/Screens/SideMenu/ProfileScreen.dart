@@ -234,7 +234,7 @@ class _ProfileState extends State<ProfileScreen> {
   }
 
   void _submitForm() {
-    if (nameValidation()) {
+    if (!nameValidation()) {
       return;
     }
     if (!isValidEmail(emailController.text)) {
