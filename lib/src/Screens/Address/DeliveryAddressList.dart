@@ -47,8 +47,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     ApiController.getAddressApiRequest().then((responses) async {
       responsesData = responses;
       addressList = responsesData.data;
-      addressList = await Utils.checkDeletedAreaFromStore(context, addressList,
-          showDialogBool: true, hitApi: true);
+//      addressList = await Utils.checkDeletedAreaFromStore(context, addressList,
+//          showDialogBool: true, hitApi: false);
       setState(() {
         isLoading = false;
       });

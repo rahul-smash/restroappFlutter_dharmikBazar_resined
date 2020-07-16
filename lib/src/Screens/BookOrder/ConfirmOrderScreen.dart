@@ -1007,7 +1007,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       int length = responses.data.length;
       List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
           context, responses.data,
-          showDialogBool: true, hitApi: true);
+          showDialogBool: true, hitApi: false);
       if (length != responses.data.length) {
 //        print("Area deleted list.length${list.length}");
         Navigator.of(context).pop();
