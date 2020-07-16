@@ -538,7 +538,7 @@ class Utils {
           ApiController.deleteDeliveryAddressApiRequest(deletedItem.id);
         addressList.remove(deletedItem);
         addressList = await checkDeletedAreaFromStore(context, addressList,
-            showDialogBool: false, hitApi: hitApi, reverseCheck: reverseCheck);
+            showDialogBool: false, hitApi: hitApi);
       }
     }
     return addressList;
