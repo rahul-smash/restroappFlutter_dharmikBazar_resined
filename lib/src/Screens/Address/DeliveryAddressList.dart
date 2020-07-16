@@ -47,7 +47,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     ApiController.getAddressApiRequest().then((responses) async {
       responsesData = responses;
       addressList = responsesData.data;
-      addressList = await checkDeletedAreaFromStore(context, addressList, true);
+      addressList = await Utils.checkDeletedAreaFromStore(context, addressList,
+          showDialogBool: true, hitApi: true);
       setState(() {
         isLoading = false;
       });
@@ -449,36 +450,5 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         ),
       ),
     );
-  }
-
-  Future<List<DeliveryAddressData>> checkDeletedAreaFromStore(
-      BuildContext context,
-      List<DeliveryAddressData> addressList,
-      bool showDialogBool) async {
-    DeliveryAddressData deletedItem;
-
-    for (int i = 0; i < addressList.length; i++) {
-      if (addressList[i].isDeleted) {
-        deletedItem = addressList[i];
-        break;
-      }
-    }
-    if (deletedItem != null) {
-      bool results = false;
-      if (showDialogBool) {
-        results = await DialogUtils.showAreaRemovedDialog(
-            context, deletedItem.areaName);
-      } else {
-        results = true;
-      }
-      if (results) {
-        //Hit api
-        ApiController.deleteDeliveryAddressApiRequest(deletedItem.id);
-        addressList.remove(deletedItem);
-        addressList =
-            await checkDeletedAreaFromStore(context, addressList, false);
-      }
-    }
-    return addressList;
   }
 }

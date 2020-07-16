@@ -11,11 +11,15 @@ import 'package:package_info/package_info.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+
+import 'DialogUtils.dart';
 
 class Utils {
   static ProgressDialog pr;
@@ -46,16 +50,18 @@ class Utils {
     }
   }
 
-  static Future<PackageInfo> getAppVersionDetails(StoreResponse storeData) async {
+  static Future<PackageInfo> getAppVersionDetails(
+      StoreResponse storeData) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
     SharedPrefs.storeSharedValue(AppConstant.appName, packageInfo.appName);
-    SharedPrefs.storeSharedValue(AppConstant.old_appverion, packageInfo.version);
+    SharedPrefs.storeSharedValue(
+        AppConstant.old_appverion, packageInfo.version);
 
     return packageInfo;
   }
 
-  static void hideKeyboard(BuildContext context){
+  static void hideKeyboard(BuildContext context) {
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
@@ -75,25 +81,28 @@ class Utils {
       //User Login with Mobile and OTP
       // 1 = email and 0 = ph-no
       StoreModel model = await SharedPrefs.getStore();
-      if(model.internationalOtp == "0"){
-        Navigator.push(context,
+      if (model.internationalOtp == "0") {
+        Navigator.push(
+          context,
           MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
         );
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "LoginMobileScreen";
-        Utils.sendAnalyticsEvent("Clicked LoginMobileScreen",attributeMap);
-      }else{
-        Navigator.push(context,
+        Utils.sendAnalyticsEvent("Clicked LoginMobileScreen", attributeMap);
+      } else {
+        Navigator.push(
+          context,
           MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
         );
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "LoginEmailScreen";
-        Utils.sendAnalyticsEvent("Clicked LoginEmailScreen",attributeMap);
+        Utils.sendAnalyticsEvent("Clicked LoginEmailScreen", attributeMap);
       }
     } catch (e) {
       print(e);
     }
   }
+
   static void showLoginDialog2(BuildContext context) {
     // flutter defined function
     showDialog(
@@ -107,20 +116,22 @@ class Utils {
               child: new Text("YES"),
               onPressed: () {
                 Navigator.of(context).pop();
-                SharedPrefs.getStore().then((storeData){
+                SharedPrefs.getStore().then((storeData) {
                   StoreModel model = storeData;
                   //print("---internationalOtp--${model.internationalOtp}");
                   //User Login with Mobile and OTP
                   // 1 = email and 0 = ph-no
-                  if(model.internationalOtp == "0"){
+                  if (model.internationalOtp == "0") {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+                      MaterialPageRoute(
+                          builder: (context) => LoginMobileScreen("menu")),
                     );
-                  }else{
+                  } else {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+                      MaterialPageRoute(
+                          builder: (context) => LoginEmailScreen("menu")),
                     );
                   }
                 });
@@ -163,10 +174,10 @@ class Utils {
     //For normal dialog
     try {
       if (pr != null && pr.isShowing()) {
-            pr.hide();
+        pr.hide();
         pr = null;
-      }else{
-        if (pr != null){
+      } else {
+        if (pr != null) {
           pr.hide();
         }
       }
@@ -183,25 +194,28 @@ class Utils {
   static showFavIcon(String isFav) {
     Icon favIcon;
     //print("-showFavIcon- ${isFav}");
-    if(isFav == null){
+    if (isFav == null) {
       favIcon = Icon(Icons.favorite_border);
       return favIcon;
     }
-    if(isFav == "1"){
-      favIcon = Icon(Icons.favorite,color: orangeColor,);
-    }else if(isFav == "0"){
+    if (isFav == "1") {
+      favIcon = Icon(
+        Icons.favorite,
+        color: orangeColor,
+      );
+    } else if (isFav == "0") {
       favIcon = Icon(Icons.favorite_border);
     }
     return favIcon;
   }
 
-  static double calculateDistance(lat1, lon1, lat2, lon2){
+  static double calculateDistance(lat1, lon1, lat2, lon2) {
     try {
       var p = 0.017453292519943295;
       var c = cos;
-      var a = 0.5 - c((lat2 - lat1) * p)/2 +
-              c(lat1 * p) * c(lat2 * p) *
-                  (1 - c((lon2 - lon1) * p))/2;
+      var a = 0.5 -
+          c((lat2 - lat1) * p) / 2 +
+          c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
       return 12742 * asin(sqrt(a));
     } catch (e) {
       print(e);
@@ -209,13 +223,12 @@ class Utils {
     }
   }
 
-  static double getDeviceWidth(BuildContext context){
-
+  static double getDeviceWidth(BuildContext context) {
     return MediaQuery.of(context).size.width;
   }
 
-  static Widget showDivider(BuildContext context){
-    return  Container(
+  static Widget showDivider(BuildContext context) {
+    return Container(
       width: MediaQuery.of(context).size.width,
       height: 1,
       margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -223,8 +236,8 @@ class Utils {
     );
   }
 
-  static Widget getEmptyView(String value){
-    return  Container(
+  static Widget getEmptyView(String value) {
+    return Container(
       child: Expanded(
         child: Center(
           child: Text(value,
@@ -238,37 +251,32 @@ class Utils {
     );
   }
 
-  static Widget getImgPlaceHolder(){
+  static Widget getImgPlaceHolder() {
     return Padding(
-      padding: EdgeInsets.only(left: 10,right: 10),
+      padding: EdgeInsets.only(left: 10, right: 10),
       child: CachedNetworkImage(
-          imageUrl: "${AppConstant.placeholderUrl}",
-          fit: BoxFit.cover
-      ),
+          imageUrl: "${AppConstant.placeholderUrl}", fit: BoxFit.cover),
     );
   }
 
-  static Widget showVariantDropDown(ClassType classType, Product product){
+  static Widget showVariantDropDown(ClassType classType, Product product) {
     //print("variants = ${product.variants} and ${classType}");
 
-    if(classType == ClassType.CART){
-      return Icon(Icons.keyboard_arrow_down,
-          color: orangeColor,
-          size: 25);
-    }else{
-      bool isVariantNull= false;
-      if(product.variants != null){
-        if(product.variants.length == 1){
+    if (classType == ClassType.CART) {
+      return Icon(Icons.keyboard_arrow_down, color: orangeColor, size: 25);
+    } else {
+      bool isVariantNull = false;
+      if (product.variants != null) {
+        if (product.variants.length == 1) {
           isVariantNull = true;
         }
       }
       return Icon(Icons.keyboard_arrow_down,
-          color: isVariantNull ? whiteColor : orangeColor,
-          size: 25);
+          color: isVariantNull ? whiteColor : orangeColor, size: 25);
     }
   }
 
-  static String getDate(){
+  static String getDate() {
     var now = new DateTime.now();
     var formatter = new DateFormat('MMM yyyy');
     String formatted = formatter.format(now);
@@ -276,7 +284,7 @@ class Utils {
     return formatted;
   }
 
-  static String getCurrentDate(){
+  static String getCurrentDate() {
     var now = new DateTime.now();
     var formatter = new DateFormat('yyyy-MM-dd');
     String formatted = formatter.format(now);
@@ -284,7 +292,7 @@ class Utils {
     return formatted;
   }
 
-  static String getCurrentDateTime(){
+  static String getCurrentDateTime() {
     var now = new DateTime.now();
     var formatter = new DateFormat('dd-MM-yyyy hh:mm');
     String formatted = formatter.format(now);
@@ -292,7 +300,7 @@ class Utils {
     return formatted;
   }
 
-  static convertStringToDate2(String dateObj){
+  static convertStringToDate2(String dateObj) {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);
     DateFormat formatter = new DateFormat('dd MMM yyyy');
@@ -301,7 +309,7 @@ class Utils {
     return formatted;
   }
 
-  static convertStringToDate(String dateObj){
+  static convertStringToDate(String dateObj) {
     DateFormat dateFormat = DateFormat("dd MMM yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);
     DateFormat formatter = new DateFormat('dd MMM');
@@ -310,7 +318,7 @@ class Utils {
     return formatted;
   }
 
-  static convertDateFormat(String dateObj){
+  static convertDateFormat(String dateObj) {
     DateFormat dateFormat = DateFormat("dd MMM yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);
     DateFormat formatter = new DateFormat('yyyy-MM-dd');
@@ -319,12 +327,12 @@ class Utils {
     return formatted;
   }
 
-  static convertOrderDateTime(String date){
+  static convertOrderDateTime(String date) {
     String formatted = date;
     try {
       DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
       //UTC time true
-      DateTime time = format.parse(date,true);
+      DateTime time = format.parse(date, true);
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
       DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm');
@@ -336,13 +344,14 @@ class Utils {
     return formatted;
   }
 
-  static bool getDayOfWeek(StoreModel store){
+  static bool getDayOfWeek(StoreModel store) {
     bool isStoreOpen;
     DateFormat dateFormat = DateFormat("hh:mma");
     DateFormat apiDateFormat = new DateFormat("yyyy-MM-dd hh:mm a");
 
     var currentDate = DateTime.now();
-    print(currentDate.toString()); // prints something like 2019-12-10 10:02:22.287949
+    print(currentDate
+        .toString()); // prints something like 2019-12-10 10:02:22.287949
 
     String currentTime = apiDateFormat.format(currentDate);
     //currentTime = currentTime.replaceAll("AM", "am").replaceAll("PM","pm");
@@ -352,12 +361,16 @@ class Utils {
     print("currentTime=   ${currentTime}");
     print("----------------------------------------------");*/
 
-    String openhours_From = store.openhoursFrom.replaceAll("am", " AM").replaceAll("pm"," PM");
-    String openhours_To = store.openhoursTo.replaceAll("am", " AM").replaceAll("pm"," PM");
-   // print("--${getCurrentDate()}--openhoursFrom----${openhours_From} and ${openhours_To}");
+    String openhours_From =
+        store.openhoursFrom.replaceAll("am", " AM").replaceAll("pm", " PM");
+    String openhours_To =
+        store.openhoursTo.replaceAll("am", " AM").replaceAll("pm", " PM");
+    // print("--${getCurrentDate()}--openhoursFrom----${openhours_From} and ${openhours_To}");
 
-    String openhoursFrom = "${getCurrentDate()} ${openhours_From}";//"2020-06-02 09:30 AM";
-    String openhoursTo =   "${getCurrentDate()} ${openhours_To}";//"2020-06-02 06:30 PM";
+    String openhoursFrom =
+        "${getCurrentDate()} ${openhours_From}"; //"2020-06-02 09:30 AM";
+    String openhoursTo =
+        "${getCurrentDate()} ${openhours_To}"; //"2020-06-02 06:30 PM";
     String currentDateTime = currentTime; //"2020-06-02 08:30 AM";
 
     DateTime storeOpenTime = apiDateFormat.parse(openhoursFrom);
@@ -371,19 +384,19 @@ class Utils {
     //print("openhoursTo=     ${openhoursTo}");
     //print("currentDateTime= ${currentDateTime}");
     //print("----------------------------------------------");
-    if(currentTimeObj.isAfter(storeOpenTime) && currentTimeObj.isBefore(storeCloseTime)) {
+    if (currentTimeObj.isAfter(storeOpenTime) &&
+        currentTimeObj.isBefore(storeCloseTime)) {
       // do something
       //print("---if----isAfter---and --isBefore---}");
       isStoreOpen = true;
-    }else{
+    } else {
       //print("---else---else--else---else----else-------------}");
       isStoreOpen = false;
     }
     return isStoreOpen;
   }
 
-
-  static bool checkStoreOpenDays(StoreModel store){
+  static bool checkStoreOpenDays(StoreModel store) {
     bool isStoreOpenToday;
     var date = DateTime.now();
     //print(DateFormat('EEE').format(date)); // prints Tuesday
@@ -392,58 +405,57 @@ class Utils {
     List<String> storeOpenDaysList = store.storeOpenDays.split(",");
     //print("${dayName} and ${storeOpenDaysList}");
 
-    if(storeOpenDaysList.contains(dayName)){
+    if (storeOpenDaysList.contains(dayName)) {
       //print("true contains");
       isStoreOpenToday = true;
-    }else{
+    } else {
       //print("false contains");
       isStoreOpenToday = false;
     }
     return isStoreOpenToday;
   }
 
-
-
-  static bool checkStoreOpenTime(StoreModel storeObject, OrderType deliveryType) {
+  static bool checkStoreOpenTime(
+      StoreModel storeObject, OrderType deliveryType) {
     // in case of deliver ignore is24x7Open
     bool status = false;
     try {
       // user selct deliver  = is24x7Open ignore , if delivery slots is 1
       //if delivery slots = 0 , is24x7Open == 0, proced aage, then check time
-      if(deliveryType ==  OrderType.Delivery){
-        if(storeObject.deliverySlot == "1"){
+      if (deliveryType == OrderType.Delivery) {
+        if (storeObject.deliverySlot == "1") {
           status = true;
-        }else if(storeObject.deliverySlot == "0" && storeObject.is24x7Open == "0"){
+        } else if (storeObject.deliverySlot == "0" &&
+            storeObject.is24x7Open == "0") {
           bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
-          if(isStoreOpenToday){
+          if (isStoreOpenToday) {
             bool isStoreOpen = Utils.getDayOfWeek(storeObject);
             status = isStoreOpen;
-          }else{
+          } else {
             status = false;
           }
-        }else if(storeObject.is24x7Open == "1"){
+        } else if (storeObject.is24x7Open == "1") {
           status = true;
         }
-      }else{
-        if(deliveryType == OrderType.PickUp){
-
-          if(storeObject.is24x7Open == "1"){
+      } else {
+        if (deliveryType == OrderType.PickUp) {
+          if (storeObject.is24x7Open == "1") {
             // 1 = means store open 24x7
             // 0 = not open for 24x7
             status = true;
-          }else if (storeObject.openhoursFrom.isEmpty || storeObject.openhoursFrom.isEmpty) {
+          } else if (storeObject.openhoursFrom.isEmpty ||
+              storeObject.openhoursFrom.isEmpty) {
             status = true;
           } else {
             bool isStoreOpenToday = Utils.checkStoreOpenDays(storeObject);
-            if(isStoreOpenToday){
+            if (isStoreOpenToday) {
               bool isStoreOpen = Utils.getDayOfWeek(storeObject);
               status = isStoreOpen;
-            }else{
+            } else {
               status = false;
             }
           }
         }
-
       }
       return status;
     } catch (e) {
@@ -452,18 +464,16 @@ class Utils {
     }
   }
 
-  static Widget getIndicatorView(){
-
+  static Widget getIndicatorView() {
     return Center(
       child: CircularProgressIndicator(
           backgroundColor: Colors.black26,
-          valueColor:
-          AlwaysStoppedAnimation<Color>(Colors.black26)),
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
     );
   }
 
-  static Widget getEmptyView2(String value){
-    return  Container(
+  static Widget getEmptyView2(String value) {
+    return Container(
       child: Center(
         child: Text(value,
             overflow: TextOverflow.ellipsis,
@@ -477,16 +487,18 @@ class Utils {
 
   static FirebaseAnalytics analytics = FirebaseAnalytics();
   static FirebaseAnalyticsObserver observer =
-  FirebaseAnalyticsObserver(analytics: analytics);
+      FirebaseAnalyticsObserver(analytics: analytics);
 
-  static Future<void> setSetCurrentScreen(String screenName,String screenClassOverride) async {
+  static Future<void> setSetCurrentScreen(
+      String screenName, String screenClassOverride) async {
     await analytics.setCurrentScreen(
       screenName: '${screenName}',
       screenClassOverride: '${screenClassOverride}',
     );
   }
 
-  static Future<void> sendAnalyticsEvent(String name,Map<String, dynamic> parameters) async {
+  static Future<void> sendAnalyticsEvent(
+      String name, Map<String, dynamic> parameters) async {
     String eventName = name.replaceAll(" ", "_");
     await analytics.logEvent(
       name: '${eventName}',
@@ -500,20 +512,41 @@ class Utils {
     );
   }
 
+  static Future<List<DeliveryAddressData>> checkDeletedAreaFromStore(
+      BuildContext context, List<DeliveryAddressData> addressList,
+      {bool showDialogBool,
+      bool hitApi = false}) async {
+    DeliveryAddressData deletedItem;
+
+    for (int i = 0; i < addressList.length; i++) {
+      if (addressList[i].isDeleted) {
+        deletedItem = addressList[i];
+        break;
+      }
+    }
+    if (deletedItem != null) {
+      bool results = false;
+      if (showDialogBool) {
+        results = await DialogUtils.showAreaRemovedDialog(
+            context, deletedItem.areaName);
+      } else {
+        results = true;
+      }
+      if (results) {
+        //Hit api
+        if (hitApi)
+          ApiController.deleteDeliveryAddressApiRequest(deletedItem.id);
+        addressList.remove(deletedItem);
+        addressList = await checkDeletedAreaFromStore(context, addressList,
+            showDialogBool: false, hitApi: hitApi, reverseCheck: reverseCheck);
+      }
+    }
+    return addressList;
+  }
 }
 
+enum ClassType { CART, SubCategory, Favourites, Search }
 
+enum OrderType { Delivery, PickUp, Menu }
 
-
-enum ClassType {
-  CART,SubCategory,Favourites,Search
-}
-
-enum OrderType {
-  Delivery,PickUp,Menu
-}
-
-enum PaymentType {
-  COD,ONLINE,CANCEL
-}
-
+enum PaymentType { COD, ONLINE, CANCEL }
