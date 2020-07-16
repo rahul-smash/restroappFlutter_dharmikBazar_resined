@@ -77,7 +77,7 @@ class _ProfileState extends State<ProfileScreen> {
     //print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     return WillPopScope(
         onWillPop: () async {
-          return await nameValidation();
+          return await nameValidation()&& isValidEmail(emailController.text);
         },
         child: new Scaffold(
           backgroundColor: Colors.white,
@@ -221,7 +221,9 @@ class _ProfileState extends State<ProfileScreen> {
     if (input.trim().isEmpty) return true;
     final RegExp regex = new RegExp(
         r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
-    return regex.hasMatch(input);
+    bool isMatch= regex.hasMatch(input);
+   if(!isMatch) Utils.showToast("Please enter valid email", false);
+    return isMatch;
   }
 
   bool nameValidation() {
