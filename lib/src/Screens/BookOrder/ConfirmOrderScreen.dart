@@ -974,16 +974,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               } else {
                 selectedDeliverSlotValue = "";
               }
-
-              if (widget.paymentMode == "3") {
-                if (storeObject.paymentGateway == "Razorpay") {
-                  callOrderIdApi(storeObject);
-                } else if (storeObject.paymentGateway == "Stripe") {
-                  callStripeApi();
-                }
-              } else {
-                placeOrderApiCall("", "", "");
-              }
+              //The "performPlaceOrderOperation" are called in below method
+              checkDeliveryAreaDeleted(storeObject);
+//              performPlaceOrderOperation(storeObject);
             },
             child: Text(
               "Confirm Order",
@@ -993,6 +986,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ),
       ),
     );
+  }
+
+  performPlaceOrderOperation(StoreModel storeObject) {
+    if (widget.paymentMode == "3") {
+      if (storeObject.paymentGateway == "Razorpay") {
+        callOrderIdApi(storeObject);
+      } else if (storeObject.paymentGateway == "Stripe") {
+        callStripeApi();
+      }
+    } else {
+      placeOrderApiCall("", "", "");
+    }
+  }
+
+  checkDeliveryAreaDeleted(StoreModel storeObject) {
+    Utils.showProgressDialog(context);
+    ApiController.getAddressApiRequest().then((responses) async {
+      Utils.hideProgressDialog(context);
+      int length = responses.data.length;
+      List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
+          context, responses.data,
+          showDialogBool: true, hitApi: true);
+      if (length != responses.data.length) {
+//        print("Area deleted list.length${list.length}");
+        Navigator.of(context).pop();
+      } else {
+        performPlaceOrderOperation(storeObject);
+      }
+    });
   }
 
   Future<void> removeCoupon() async {
@@ -1447,7 +1469,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               children: <Widget>[
                 Expanded(
                   child: new Text(
-                  comment,
+                    comment,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
