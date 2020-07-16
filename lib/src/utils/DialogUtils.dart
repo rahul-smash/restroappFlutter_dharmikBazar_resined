@@ -1215,6 +1215,7 @@ class DialogUtils {
                                 padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
                                 child: TextField(
                                   textAlign: TextAlign.left,
+                                  maxLength: 250,
                                   keyboardType: TextInputType.multiline,
                                   maxLines: null,
                                   textCapitalization: TextCapitalization.sentences,
