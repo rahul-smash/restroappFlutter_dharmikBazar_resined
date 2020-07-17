@@ -14,6 +14,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
@@ -35,10 +36,12 @@ class ConfirmOrderScreen extends StatefulWidget {
   String paymentMode = "2"; // 2 = COD, 3 = Online Payment
   String areaId;
   OrderType deliveryType;
+  Area areaObject;
   List<Product> cartList = new List();
 
   ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen, this.areaId,
-      this.deliveryType);
+      this.deliveryType,
+      {this.areaObject});
 
   @override
   ConfirmOrderState createState() => ConfirmOrderState();
@@ -87,6 +90,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         //print("----notAllow=${widget.address.notAllow}");
         checkMinOrderAmount();
       }
+      checkMinOrderPickAmount();
     } catch (e) {
       print(e);
     }
@@ -925,6 +929,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   return;
                 }
               }
+              if (widget.deliveryType == OrderType.PickUp &&
+                  widget.areaObject != null) {
+                if (!minOrderCheck) {
+                  Utils.showToast(
+                      "Your order amount is to low. Minimum order amount is ${widget.address.minAmount}",
+                      false);
+                  return;
+                }
+              }
 
               if (storeModel.onlinePayment == "1") {
                 var result = await DialogUtils.displayPaymentDialog(
@@ -975,7 +988,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 selectedDeliverSlotValue = "";
               }
               //The "performPlaceOrderOperation" are called in below method
-              checkDeliveryAreaDeleted(storeObject,widget.address.id);
+              checkDeliveryAreaDeleted(storeObject, widget.address.id);
 //              performPlaceOrderOperation(storeObject);
             },
             child: Text(
@@ -1000,14 +1013,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  checkDeliveryAreaDeleted(StoreModel storeObject,String addressId) {
+  checkDeliveryAreaDeleted(StoreModel storeObject, String addressId) {
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses) async {
       Utils.hideProgressDialog(context);
       int length = responses.data.length;
       List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
           context, responses.data,
-          showDialogBool: true, hitApi: false,id:addressId);
+          showDialogBool: true, hitApi: false, id: addressId);
       if (length != responses.data.length) {
 //        print("Area deleted list.length${list.length}");
         Navigator.of(context).pop();
@@ -1099,6 +1112,61 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               this.totalPrice = totalPrice;
               shippingCharges = "0";
               widget.address.areaCharges = "0";
+            });
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  Future<void> checkMinOrderPickAmount() async {
+    if (widget.deliveryType == OrderType.PickUp && widget.areaObject != null) {
+      print("----minAmount=${widget.areaObject.minOrder}");
+      print("----notAllow=${widget.areaObject.notAllow}");
+      print("--------------------------------------------");
+      int minAmount = 0;
+      try {
+        try {
+          if (widget.areaObject.minOrder.isNotEmpty)
+            minAmount = double.parse(widget.areaObject.minOrder).toInt();
+        } catch (e) {
+          print(e);
+        }
+        double totalPrice = await databaseHelper.getTotalPrice();
+        int mtotalPrice = totalPrice.round();
+
+        print("----minAmount=${minAmount}");
+        print("--Cart--mtotalPrice=${mtotalPrice}");
+
+        if (!widget.areaObject.notAllow) {
+          if (mtotalPrice <= minAmount) {
+            print("---Cart-totalPrice is less than min amount----}");
+            // then Store will charge shipping charges.
+            minOrderCheck = false;
+            setState(() {
+              this.totalPrice = mtotalPrice.toDouble();
+            });
+          } else {
+            minOrderCheck = true;
+            setState(() {
+              this.totalPrice = mtotalPrice.toDouble();
+            });
+          }
+        } else {
+          if (mtotalPrice <= minAmount) {
+            print("---Cart-totalPrice is less than min amount----}");
+            // then Store will charge shipping charges.
+            setState(() {
+              this.totalPrice = totalPrice + int.parse(shippingCharges);
+            });
+          } else {
+            print("-Cart-totalPrice is greater than min amount---}");
+            //then Store will not charge shipping.
+            setState(() {
+              this.totalPrice = totalPrice;
+              shippingCharges = "0";
             });
           }
         }
