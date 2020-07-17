@@ -1000,14 +1000,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  checkDeliveryAreaDeleted(StoreModel storeObject,String id) {
+  checkDeliveryAreaDeleted(StoreModel storeObject,String addressId) {
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses) async {
       Utils.hideProgressDialog(context);
       int length = responses.data.length;
       List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
           context, responses.data,
-          showDialogBool: true, hitApi: false,id:id);
+          showDialogBool: true, hitApi: false,id:addressId);
       if (length != responses.data.length) {
 //        print("Area deleted list.length${list.length}");
         Navigator.of(context).pop();

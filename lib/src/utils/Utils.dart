@@ -516,14 +516,15 @@ class Utils {
       BuildContext context, List<DeliveryAddressData> addressList,
       {bool showDialogBool, bool hitApi = false, String id = ""}) async {
     DeliveryAddressData deletedItem;
-
+print(id);
     for (int i = 0; i < addressList.length; i++) {
+      print(addressList[i].id.compareTo(id) == 0 );
       if (id.isNotEmpty &&
-          addressList[i].id.compareTo(id) == 1 &&
+          addressList[i].id.compareTo(id) == 0 &&
           addressList[i].isDeleted) {
         deletedItem = addressList[i];
         break;
-      } else if (addressList[i].isDeleted) {
+      } else if (id.isEmpty &&addressList[i].isDeleted) {
         deletedItem = addressList[i];
         break;
       }
