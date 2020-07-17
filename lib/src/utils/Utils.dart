@@ -514,16 +514,21 @@ class Utils {
 
   static Future<List<DeliveryAddressData>> checkDeletedAreaFromStore(
       BuildContext context, List<DeliveryAddressData> addressList,
-      {bool showDialogBool,
-      bool hitApi = false}) async {
+      {bool showDialogBool, bool hitApi = false, String id = ""}) async {
     DeliveryAddressData deletedItem;
 
     for (int i = 0; i < addressList.length; i++) {
-      if (addressList[i].isDeleted) {
+      if (id.isNotEmpty &&
+          addressList[i].id.compareTo(id) == 1 &&
+          addressList[i].isDeleted) {
+        deletedItem = addressList[i];
+        break;
+      } else if (addressList[i].isDeleted) {
         deletedItem = addressList[i];
         break;
       }
     }
+
     if (deletedItem != null) {
       bool results = false;
       if (showDialogBool) {

@@ -975,7 +975,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 selectedDeliverSlotValue = "";
               }
               //The "performPlaceOrderOperation" are called in below method
-              checkDeliveryAreaDeleted(storeObject);
+              checkDeliveryAreaDeleted(storeObject,widget.address.id);
 //              performPlaceOrderOperation(storeObject);
             },
             child: Text(
@@ -1000,14 +1000,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  checkDeliveryAreaDeleted(StoreModel storeObject) {
+  checkDeliveryAreaDeleted(StoreModel storeObject,String id) {
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses) async {
       Utils.hideProgressDialog(context);
       int length = responses.data.length;
       List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
           context, responses.data,
-          showDialogBool: true, hitApi: false);
+          showDialogBool: true, hitApi: false,id:id);
       if (length != responses.data.length) {
 //        print("Area deleted list.length${list.length}");
         Navigator.of(context).pop();
