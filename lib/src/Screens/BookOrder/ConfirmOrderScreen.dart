@@ -974,9 +974,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               } else {
                 selectedDeliverSlotValue = "";
               }
-              //The "performPlaceOrderOperation" are called in below method
-              checkDeliveryAreaDeleted(storeObject,widget.address.id);
-//              performPlaceOrderOperation(storeObject);
+
+              if (widget.deliveryType == OrderType.Delivery) {
+                //The "performPlaceOrderOperation" are called in below method
+                checkDeliveryAreaDeleted(storeObject,
+                    addressId: widget.address.id);
+              } else if (widget.deliveryType == OrderType.PickUp) {
+                performPlaceOrderOperation(storeObject);
+              }
             },
             child: Text(
               "Confirm Order",
@@ -1000,14 +1005,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  checkDeliveryAreaDeleted(StoreModel storeObject,String addressId) {
+  checkDeliveryAreaDeleted(StoreModel storeObject, {String addressId = ""}) {
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses) async {
       Utils.hideProgressDialog(context);
       int length = responses.data.length;
       List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
           context, responses.data,
-          showDialogBool: true, hitApi: false,id:addressId);
+          showDialogBool: true, hitApi: false, id: addressId);
       if (length != responses.data.length) {
 //        print("Area deleted list.length${list.length}");
         Navigator.of(context).pop();
@@ -1296,6 +1301,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 } else {
                   //print("==result== ${result}");
                   await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                  eventBus.fire(updateCartCount());
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 }
               } else {
