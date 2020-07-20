@@ -933,7 +933,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.areaObject != null) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.address.minAmount}",
+                      "Your order amount is to low. Minimum order amount is ${widget.areaObject.minOrder}",
                       false);
                   return;
                 }
