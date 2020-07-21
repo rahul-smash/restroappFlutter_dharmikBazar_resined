@@ -1144,36 +1144,19 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
         print("----minAmount=${minAmount}");
         print("--Cart--mtotalPrice=${mtotalPrice}");
-
-        if (!widget.areaObject.notAllow) {
-          if (mtotalPrice <= minAmount) {
-            print("---Cart-totalPrice is less than min amount----}");
-            // then Store will charge shipping charges.
-            minOrderCheck = false;
-            setState(() {
-              this.totalPrice = mtotalPrice.toDouble();
-            });
-          } else {
-            minOrderCheck = true;
-            setState(() {
-              this.totalPrice = mtotalPrice.toDouble();
-            });
-          }
+        //TODO:In Future check here "not allow".
+        if (mtotalPrice <= minAmount) {
+          print("---Cart-totalPrice is less than min amount----}");
+          // then Store will charge shipping charges.
+          minOrderCheck = false;
+          setState(() {
+            this.totalPrice = mtotalPrice.toDouble();
+          });
         } else {
-          if (mtotalPrice <= minAmount) {
-            print("---Cart-totalPrice is less than min amount----}");
-            // then Store will charge shipping charges.
-            setState(() {
-              this.totalPrice = totalPrice + int.parse(shippingCharges);
-            });
-          } else {
-            print("-Cart-totalPrice is greater than min amount---}");
-            //then Store will not charge shipping.
-            setState(() {
-              this.totalPrice = totalPrice;
-              shippingCharges = "0";
-            });
-          }
+          minOrderCheck = true;
+          setState(() {
+            this.totalPrice = mtotalPrice.toDouble();
+          });
         }
       } catch (e) {
         print(e);
