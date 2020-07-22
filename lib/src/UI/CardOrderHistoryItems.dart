@@ -289,7 +289,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
     // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
 // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
     //Remove cancel button on processing status
-    if(/*status == "1" ||*/ status == "4" || status == "0"){
+    if(/*status == "1" || status == "4" ||*/ status == "0"){
       showCancelButton = true;
     }else{
       showCancelButton = false;
