@@ -74,8 +74,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       weight = variant.weight;
     }
     imageUrl = widget.product.imageType == "0"
-        ? widget.product.image300200
+        ? widget.product.image
         : widget.product.imageUrl;
+    //code changed due to blur images
+    /*imageUrl = widget.product.imageType == "0"
+        ? widget.product.image300200
+        : widget.product.imageUrl;*/
     if (weight.isEmpty) {
       isVisible = false;
     }
