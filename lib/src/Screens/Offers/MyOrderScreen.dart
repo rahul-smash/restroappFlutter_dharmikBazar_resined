@@ -62,8 +62,8 @@ class _MyOrderScreen extends State<MyOrderScreen> {
               itemBuilder: (context, index) {
                 //print("<---refreshOrderHistory------->");
                 OrderData orderHistoryData = ordersList[index];
-                return  CardOrderHistoryItems(orderHistoryData,widget.store);
-//                return  listItem(context,orderHistoryData);
+//                return  CardOrderHistoryItems(orderHistoryData,widget.store);
+                return  listItem(context,orderHistoryData);
               }
           ),
         ),
