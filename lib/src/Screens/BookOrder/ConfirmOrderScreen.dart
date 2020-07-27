@@ -61,6 +61,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   int selctedTag, selectedTimeSlot;
   List<Timeslot> timeslotList;
   bool isSlotSelected = false;
+
+  //Store provides instant delivery of the orders.
+  bool isInstantDelivery = false;
   bool minOrderCheck = true;
   bool isLoading = true;
   bool hideRemoveCouponFirstTime;
@@ -114,6 +117,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
                 deliverySlotModel = response;
+                print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+                isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
                 for (int i = 0;
                     i < deliverySlotModel.data.dateTimeCollection.length;
                     i++) {
@@ -968,7 +973,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 if (storeObject.deliverySlot == "0") {
                   selectedDeliverSlotValue = "";
                 } else {
-                  if (storeObject.deliverySlot == "1" && !isSlotSelected) {
+                  //Store provides instant delivery of the orders.
+                  print(isInstantDelivery);
+                  if (storeObject.deliverySlot == "1" && isInstantDelivery) {
+                    //Store provides instant delivery of the orders.
+                    selectedDeliverSlotValue = "";
+                  } else if (storeObject.deliverySlot == "1" &&
+                      !isSlotSelected &&
+                      !isInstantDelivery) {
                     Utils.showToast("Please select delivery slot", false);
                     return;
                   } else {
