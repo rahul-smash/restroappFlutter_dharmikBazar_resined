@@ -341,15 +341,15 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _currentIndex = index;
         if (_currentIndex == 4) {
-          if (AppConstant.isLoggedIn) {
+//          if (AppConstant.isLoggedIn) {
             Navigator.push(context,
               MaterialPageRoute(builder: (context) => MyCartScreen(() {
                 getCartCount();
               })),
             );
-          }else{
-            Utils.showLoginDialog(context);
-          }
+//          }else{
+//            Utils.showLoginDialog(context);
+//          }
 
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "MyCartScreen";
