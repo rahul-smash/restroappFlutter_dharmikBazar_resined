@@ -9,19 +9,23 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
-class SubCategoryProductScreen extends StatelessWidget {
+class SubCategoryProductScreen extends StatelessWidget{
+
   final CategoryModel categoryModel;
-
-  SubCategoryProductScreen(this.categoryModel);
-
+  bool isComingFromBaner;
+  int index;
   final CartTotalPriceBottomBar bottomBar =
       CartTotalPriceBottomBar(ParentInfo.productList);
+
+  SubCategoryProductScreen(this.categoryModel,this.isComingFromBaner,this.index);
+
 
   @override
   Widget build(BuildContext context) {
     //print("---subCategory.length--=${categoryModel.subCategory.length}");
     return DefaultTabController(
       length: categoryModel.subCategory.length,
+      initialIndex: isComingFromBaner ? index : index,
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -33,28 +37,23 @@ class SubCategoryProductScreen extends StatelessWidget {
             isScrollable: categoryModel.subCategory.length == 1 ? false : true,
             labelColor: Colors.black,
             unselectedLabelColor: grayColorTitle,
-            indicatorColor:
-                categoryModel.subCategory.length == 1 ? appTheme : orangeColor,
+            indicatorColor: categoryModel.subCategory.length == 1 ? appTheme:orangeColor,
             indicatorWeight: 3,
             tabs: List.generate(categoryModel.subCategory.length, (int index) {
               bool isTabVisible;
-              if (categoryModel.subCategory.length == 1) {
+              if(categoryModel.subCategory.length == 1){
                 isTabVisible = false;
-              } else {
+              }else{
                 isTabVisible = true;
               }
               return Visibility(
                 visible: isTabVisible,
-                child: Tab(
-                  text: categoryModel.subCategory[index].title,
-                ),
+                child: Tab(text: categoryModel.subCategory[index].title,),
               );
             }),
           ),
-          Expanded(
-              child: TabBarView(
-            children:
-                List.generate(categoryModel.subCategory.length, (int index) {
+          Expanded(child: TabBarView(
+            children:List.generate(categoryModel.subCategory.length, (int index) {
               return getProductsWidget(categoryModel.subCategory[index].id);
             }),
           ))
@@ -80,8 +79,7 @@ class SubCategoryProductScreen extends StatelessWidget {
               SubCategoryModel subCategory = SubCategoryModel();
 //              SubCategoryModel subCategory =response.subCategories.first;
               for (int i = 0; i < response.subCategories.length; i++) {
-                if (subCategoryId ==
-                    response.subCategories[i].id) {
+                if (subCategoryId == response.subCategories[i].id) {
                   subCategory = response.subCategories[i];
                   break;
                 }

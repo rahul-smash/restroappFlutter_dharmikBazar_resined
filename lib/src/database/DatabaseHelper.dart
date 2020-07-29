@@ -136,24 +136,6 @@ class DatabaseHelper {
         "variants TEXT"
         ")");*/
 
-   /* await db.execute("CREATE TABLE ${VARIANT_Table}("
-        "id TEXT, "
-        "store_id TEXT, "
-        "product_id TEXT,"
-        "sku TEXT, "
-        "weight TEXT, "
-        "mrp_price TEXT, "
-        "price TEXT, "
-        "discount TEXT, "
-        "unit_type TEXT, "
-        "custom_field1 TEXT, "
-        "custom_field2 TEXT, "
-        "custom_field3 TEXT, "
-        "custom_field4 TEXT, "
-        "order_by TEXT, "
-        "sort TEXT, "
-        "is_export_from_file TEXT"
-        ")");*/
     await db.execute("CREATE TABLE ${CART_Table}("
         //"id INTEGER PRIMARY KEY, "
         "id INTEGER, "
@@ -198,7 +180,9 @@ class DatabaseHelper {
         ")");
   }
 
-  void _onUpgrade(Database db, int oldVersion, int newVersion) async {}
+  void _onUpgrade(Database db, int oldVersion, int newVersion) async {
+//    db.execute("ALTER TABLE ${Products_Table} ADD COLUMN newCol TEXT;");
+  }
 
   Future<int> saveCategories(CategoryModel categoryModel) async {
     var dbClient = await db;

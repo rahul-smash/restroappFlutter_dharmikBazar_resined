@@ -3,6 +3,7 @@ import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
+import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -43,6 +44,7 @@ import 'dart:io';
 class ApiController {
   static final int timeout = 18;
 
+
   static Future<StoreResponse> versionApiRequest(String storeId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -52,21 +54,18 @@ class ApiController {
 
     print("----url--${url}");
     try {
-      FormData formData = new FormData.fromMap({
-        "device_id": deviceId,
-        "device_token": "${deviceToken}",
-        "platform": Platform.isIOS ? "IOS" : "Android"
-      });
+      FormData formData = new FormData.fromMap(
+              {"device_id": deviceId, "device_token":"${deviceToken}",
+                "platform": Platform.isIOS ? "IOS" : "Android"
+              });
       Dio dio = new Dio();
       Response response = await dio.post(url,
           data: formData,
           options: new Options(
-              contentType: "application/json",
-              responseType: ResponseType.plain));
+                  contentType: "application/json",responseType: ResponseType.plain));
       print(response.statusCode);
       //print(response.data);
-      StoreResponse storeData =
-          StoreResponse.fromJson(json.decode(response.data));
+      StoreResponse storeData = StoreResponse.fromJson(json.decode(response.data));
       print("-------store.success ---${storeData.success}");
       SharedPrefs.saveStore(storeData.store);
       //check older version
@@ -88,7 +87,7 @@ class ApiController {
     return null;
   }
 
-  static Future<UserResponse> registerApiRequest(UserData user) async {
+  static Future<UserResponse> registerApiRequest(UserData user,String referralCode) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -105,6 +104,7 @@ class ApiController {
         "password": user.password,
         "device_id": deviceId,
         "device_token": deviceToken,
+        "user_refer_code":referralCode,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -578,6 +578,7 @@ class ApiController {
       final parsed = json.decode(respStr);
       ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
       return model;
+
     } catch (e) {
       print("----respStr---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -609,7 +610,7 @@ class ApiController {
         "order_detail": orderJson,
         "device_id": deviceId,
       });
-
+      print("--fields---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("--Tax--respStr---${respStr}");
@@ -640,6 +641,7 @@ class ApiController {
       String razorpay_payment_id,
       String online_method,
       String selectedDeliverSlotValue) async {
+
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -753,12 +755,8 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> updateProfileRequest(
-      String fullName,
-      String emailId,
-      String phoneNumber,
-      bool isComingFromOtpScreen,
-      String id) async {
+  static Future<UserResponse> updateProfileRequest(String fullName, String emailId,
+      String phoneNumber,bool isComingFromOtpScreen, String id,String user_refer_code) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     StoreModel store = await SharedPrefs.getStore();
     String userId;
@@ -771,14 +769,14 @@ class ApiController {
 
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.updateProfile;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +ApiConstants.updateProfile;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("--url--${url}--");
     try {
       request.fields.addAll({
         "full_name": fullName,
         "email": emailId,
+        "user_refer_code": user_refer_code,
         "user_id": userId,
         "device_id": deviceId,
         "device_token": deviceToken,
@@ -970,7 +968,7 @@ class ApiController {
     try {
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-
+      print('@@respStr' + respStr);
       final parsed = json.decode(respStr);
 
       StoreRadiousResponse res = StoreRadiousResponse.fromJson(parsed);
@@ -980,6 +978,7 @@ class ApiController {
       return null;
     }
   }
+
 
   static Future<CreateOrderData> razorpayCreateOrderApi(String amount) async {
     StoreModel store = await SharedPrefs.getStore();
@@ -1034,12 +1033,15 @@ class ApiController {
     }
   }
 
-  static Future<AdminLoginModel> getAdminApiRequest(
-      String username, String password) async {
-    var url = ApiConstants.baseUrl + ApiConstants.storeLogin;
+
+  static Future<AdminLoginModel> getAdminApiRequest(String username,String password) async {
+    var url = ApiConstants.baseUrl+ApiConstants.storeLogin;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
-      request.fields.addAll({"email": username, "password": password});
+      request.fields.addAll({
+        "email": username,
+        "password": password
+      });
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('----respStr-----' + respStr);
@@ -1083,17 +1085,20 @@ class ApiController {
     }
   }
 
+
   static Future<StripeCheckOutModel> stripePaymentApi(String amount) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     UserModel user = await SharedPrefs.getUser();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.stripePaymentCheckout;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.stripePaymentCheckout;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     try {
-      request.fields.addAll(
-          {"customer_email": user.email, "amount": amount, "currency": "usd"});
+      request.fields.addAll({
+        "customer_email": user.email,
+        "amount": amount,
+        "currency":"usd"
+      });
       print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -1109,16 +1114,16 @@ class ApiController {
     }
   }
 
-  static Future<StripeVerifyModel> stripeVerifyTransactionApi(
-      String payment_request_id) async {
+
+  static Future<StripeVerifyModel> stripeVerifyTransactionApi(String payment_request_id) async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.stripeVerifyTransaction;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.stripeVerifyTransaction;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     try {
       request.fields.addAll({
         "payment_request_id": payment_request_id,
+
       });
       print('--url===  $url');
       print('--payment_request_id===  $payment_request_id');
