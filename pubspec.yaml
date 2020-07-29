@@ -8,7 +8,7 @@ description: A new Flutter application.
 # build by specifying --build-name and --build-number, respectively.
 # In Android, build-name is used as versionName while build-number used as versionCode.
 # Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# In iOS, build-name is used as CF./gradlew assembleDebugBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 version: 1.0.0+1
@@ -53,7 +53,6 @@ dependencies:
   dio: ^3.0.9  #latest version
   webview_flutter: ^0.3.22+1
   keyboard_visibility: ^0.5.6
-
 
 dev_dependencies:
   flutter_test:
@@ -121,6 +120,8 @@ flutter:
     - images/cancel_icon.png
     - images/login_img.jpg
     - images/login_restro_bg.jpg
+    - images/empty_cart.png
+    - images/gifticon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

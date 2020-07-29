@@ -13,7 +13,7 @@ class MobileVerified {
 
 class UserModelMobile {
   String id;
-  String fullName;
+  String fullName="";
   String fbId;
   String email;
   String decodedPassword;

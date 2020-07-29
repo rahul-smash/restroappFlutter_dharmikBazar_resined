@@ -29,6 +29,10 @@ class _RegisterUserState extends State<RegisterUser> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmpasswordController = TextEditingController();
+  final _referralCodeeController = TextEditingController();
+
+  bool showReferralCodeView = false;
+  StoreModel storeModel;
 
   @override
   void initState() {
@@ -42,6 +46,18 @@ class _RegisterUserState extends State<RegisterUser> {
         });
       },
     );
+
+    SharedPrefs.getStore().then((store){
+      this.storeModel = store;
+      if(storeModel.isRefererFnEnable){
+        showReferralCodeView = true;
+      }else{
+        showReferralCodeView = false;
+      }
+      setState(() {
+      });
+    });
+
   }
 
   @override
@@ -61,7 +77,7 @@ class _RegisterUserState extends State<RegisterUser> {
       ),
       body: Stack(
         children: <Widget>[
-          Align(
+          /*Align(
             alignment: Alignment.topCenter,
             child: Container(
               width: Utils.getDeviceWidth(context),
@@ -69,7 +85,7 @@ class _RegisterUserState extends State<RegisterUser> {
               Image.asset("images/login_restro_bg.jpg",fit: BoxFit.fitWidth,)
                   :Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
             ),
-          ),
+          ),*/
           Align(
             alignment: Alignment.bottomCenter,
             child: SafeArea(
@@ -85,7 +101,7 @@ class _RegisterUserState extends State<RegisterUser> {
                       children: <Widget>[
                         TextFormField(
                           decoration: const InputDecoration(
-                            labelText: 'Name',
+                            labelText: 'Name *',
                           ),
                           controller: _usernameController,
                           inputFormatters: [new LengthLimitingTextInputFormatter(30)],
@@ -97,7 +113,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
-                            labelText: 'Phone',
+                            labelText: 'Phone *',
                           ),
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
@@ -112,7 +128,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
-                            labelText: 'Email',
+                            labelText: 'Email *',
                           ),
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -124,10 +140,25 @@ class _RegisterUserState extends State<RegisterUser> {
                             userData.email = val.trim();
                           },*/
                         ),
+                        Visibility(
+                          visible: showReferralCodeView,
+                          child: TextFormField(
+                            decoration: const InputDecoration(
+                              labelText: 'Referral Code',
+                            ),
+                            controller: _referralCodeeController,
+                            inputFormatters: [new LengthLimitingTextInputFormatter(30)],
+                            /*validator: (val) =>
+                          val.isEmpty ? AppConstant.enterName : null,
+                          onSaved: (val) {
+                            userData.name = val.trim();
+                          },*/
+                          ),
+                        ),
                         TextFormField(
                           obscureText: true,
                           decoration: const InputDecoration(
-                            labelText: 'Password',
+                            labelText: 'Password *',
                           ),
                           controller: _passwordController,
                           keyboardType: TextInputType.visiblePassword,
@@ -140,7 +171,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         TextFormField(
                           obscureText: true,
                           decoration: const InputDecoration(
-                            labelText: 'Confirm Password',
+                            labelText: 'Confirm Password *',
                           ),
                           controller: _confirmpasswordController,
                           keyboardType: TextInputType.visiblePassword,
@@ -223,13 +254,20 @@ class _RegisterUserState extends State<RegisterUser> {
       return;
     }
 
+    String referralCode;
+    if(showReferralCodeView){
+      referralCode = _referralCodeeController.text.trim();
+    }else{
+      referralCode = "";
+    }
+
     if (userData.confirmPassword.trim() != userData.password.trim()) {
       Utils.showToast(AppConstant.passwordMatch, true);
     } else {
       Utils.isNetworkAvailable().then((isNetworkAvailable) async {
         if (isNetworkAvailable) {
           Utils.showProgressDialog(context);
-          ApiController.registerApiRequest(userData)
+          ApiController.registerApiRequest(userData,referralCode)
               .then((response) async {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {

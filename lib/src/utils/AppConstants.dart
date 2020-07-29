@@ -6,6 +6,10 @@ class AppConstant {
 
   static String branch_id = "branch_id";
 
+  static String showReferEarnAlert = "showReferEarnAlert";
+
+  static String referEarnMsg = "referEarnMsg";
+
   static final String isAdminLogin = "isAdminLogin";
   static final String deviceId = "DEVICE_ID";
   static final String deviceToken = "device_token";
@@ -99,6 +103,9 @@ class AppConstant {
 
   static final String aboutUs = "About Us";
   static final String txt_Refer = "Grab Discount";
+
+  static final String deliveryAreaChanges =
+      "We have changed our delivery areas and delivery charges .Please check and add new address";
 
   static final String txt_coupon_firebies = "Coupons and Freebies";
 

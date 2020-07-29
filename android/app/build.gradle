@@ -49,6 +49,11 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    gradle.buildFinished { buildResult ->
+        println "*************BUILD FINISHED*************"
+        println "build failure - " + buildResult.failure
+    }
 }
 
 flutter {

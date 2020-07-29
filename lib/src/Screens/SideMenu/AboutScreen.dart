@@ -30,8 +30,8 @@ class _AboutScreenState extends State<AboutScreen> {
   @override
   void initState() {
     super.initState();
-    print("aboutusBanner=${widget.store.aboutusBanner[0].image}");
     try {
+      print("aboutusBanner=${widget.store.aboutusBanner[0].image}");
       aboutUsBanner = widget.store.aboutusBanner[0].image;
     } catch (e) {
       print(e);

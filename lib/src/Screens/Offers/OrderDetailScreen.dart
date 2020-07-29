@@ -22,6 +22,18 @@ class OrderDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: new Text('My Orders'),
         centerTitle: true,
+        actions: <Widget>[
+          InkWell(
+            onTap: (){
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
+            child: Padding(
+              padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
+              child: Icon(Icons.home, color: Colors.white,size: 30,),
+            ),
+          ),
+
+        ],
       ),
       body:  SafeArea(
           child: Column(
@@ -79,6 +91,19 @@ class OrderDetailScreen extends StatelessWidget {
           child: Column(
             children: <Widget>[
               firstRow(item) ,
+              Padding(
+                padding: EdgeInsets.only(left: 12.0,top: 5.0,right: 10.0),
+                child: Row(
+                  children: <Widget>[
+                    Text('QTY : ',style: TextStyle(color: Color(0xFF7D8185),fontSize: 17)),
+                    Padding(
+                      padding: EdgeInsets.only(left: 75.0),
+                      child: Text("${item.quantity}",style: TextStyle(color: Color(0xFF15282F),fontSize: 16,fontWeight: FontWeight.w500)),
+                    )
+
+                  ],
+                ),
+              ),
               secondRow(item),
               deviderLine(),
             ],
@@ -129,11 +154,18 @@ class OrderDetailScreen extends StatelessWidget {
           padding: EdgeInsets.only(top: 15.0,right: 12.0),
           child:  SizedBox(
             width: 80,
-            height: 35,
-            child: FlatButton(onPressed: (){
-            },
-              child: Text("${item.quantity} kg",style: TextStyle(color: Color(0xFF15282F),fontSize: 13,),),
-              color: Color(0xFFEAEEEF),
+            //height: 35,
+            child: FlatButton(
+              onPressed: (){
+
+                },
+              child: Padding(
+                padding: EdgeInsets.only(top: 3.0,bottom: 3.0),
+                child: Text(item.weight,
+                  style: TextStyle(color: Color(0xFF15282F),fontSize: 13,),
+                ),
+              ),
+              color: item.weight.isEmpty ? whiteColor :Color(0xFFEAEEEF),
               shape:  RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(3.0),
               ),

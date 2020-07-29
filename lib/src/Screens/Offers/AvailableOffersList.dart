@@ -78,15 +78,15 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                 applyText = "Apply";
                               }
                               return Container(
-                                margin: EdgeInsets.fromLTRB(0, 15, 0, 0),
+                                margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
                                 padding: EdgeInsets.fromLTRB(10, 10, 5, 10),
                                 color: Color(0xffffffff),
                                 child: Row(
                                   children: <Widget>[
                                     SizedBox(
                                       width: 60,
-                                      child: Text("${offer.name}",
-                                        style: TextStyle(fontWeight: FontWeight.bold),
+                                      child: Text("${getOfferName(offer)}",textAlign: TextAlign.center,
+                                        style: TextStyle(fontWeight: FontWeight.w400),
                                       ),
                                     ),
                                     Container(
@@ -117,12 +117,12 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             Text("to avail this offer",),
                                             Padding(
                                               padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                              child: Text("Min Booking -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
+                                              child: Text("Min order -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
                                             ),
-                                            /*Padding(
+                                            Padding(
                                               padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                              child: Text("Valid ${Utils.convertStringToDate2(offer.validFrom)} - ${Utils.convertStringToDate2(offer.validTo)}"),
-                                            ),*/
+                                              child: Text("Valid Till- ${Utils.convertStringToDate2(offer.validTo)}"),
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -214,4 +214,26 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
       }
     });
   }
+
+  getOfferName(OfferModel offer) {
+    /*
+    "discount_type": "3" == discount %oFF \n discount_upto black Uptp Rs100
+    "discount_type": "2" == and discount_upto  OFF
+    "discount_type": "1" == Uptp Rs100
+    */
+
+    String offerName = "";
+    if(offer.discount_type == "3"){
+      offerName = "${offer.discount}%\nOFF\nUpto ${AppConstant.currency}${offer.discount_upto}";
+    }
+    if(offer.discount_type == "2"){
+      offerName = "Upto ${AppConstant.currency}${offer.discount_upto}\nOFF";
+    }
+    if(offer.discount_type == "1"){
+      offerName = "Upto ${AppConstant.currency}${offer.discount_upto}\nOFF";
+    }
+    return offerName;
+  }
+
+
 }

@@ -79,14 +79,28 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
     return Scaffold(
         //resizeToAvoidBottomInset: false,
         appBar: AppBar(
-            title: Text('Delivery Addresses',style: new TextStyle(
+            title: Text(widget.selectedAddress != null ? "Edit Address"
+                : "Add Address",style: new TextStyle(
               color: Colors.white,
             ),),
             centerTitle: true,
             leading: IconButton(
               icon: Icon(Icons.arrow_back_ios),
               onPressed: () => Navigator.pop(context),
-            )),
+            ),
+          actions: <Widget>[
+            InkWell(
+              onTap: (){
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: Padding(
+                padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
+                child: Icon(Icons.home, color: Colors.white,size: 30,),
+              ),
+            ),
+
+          ],
+        ),
         body: GestureDetector(
           onTap: (){
             FocusScope.of(context).requestFocus(FocusNode());
@@ -97,19 +111,6 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      SizedBox(height: 20),
-                      Align(
-                        alignment: Alignment.center,
-                        child: new Text(
-                          widget.selectedAddress != null
-                              ? "Edit Address"
-                              : "Add Address",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                              fontSize: 20.0),
-                        ),
-                      ),
                       SizedBox(height: 20),
                       Text(
                         "City",

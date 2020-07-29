@@ -4,19 +4,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_tags/flutter_tags.dart';
+import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
+import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
-class ProductDetailsScreen extends StatefulWidget {
+import 'HomeScreen.dart';
 
+class ProductDetailsScreen extends StatefulWidget {
   Product product;
-  ProductDetailsScreen(this. product);
+
+  ProductDetailsScreen(this.product);
 
   @override
   State<StatefulWidget> createState() {
@@ -25,16 +30,16 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsState extends State<ProductDetailsScreen> {
-
   DatabaseHelper databaseHelper = new DatabaseHelper();
   String imageUrl;
   Variant variant;
-  String discount,price,variantId,weight,mrpPrice;
+  String discount, price, variantId, weight, mrpPrice;
   int counter = 0;
   CartData cartData;
   bool showAddButton;
   int selctedTag;
   bool isVisible = true;
+  double totalPrice = 0.00;
 
   @override
   initState() {
@@ -45,7 +50,9 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   void getDataFromDB() {
-    databaseHelper.getProductQuantitiy(widget.product.variantId).then((cartDataObj) {
+    databaseHelper
+        .getProductQuantitiy(widget.product.variantId)
+        .then((cartDataObj) {
       cartData = cartDataObj;
       counter = int.parse(cartData.QUANTITY);
       showAddButton = counter == 0 ? true : false;
@@ -54,29 +61,30 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   Widget build(BuildContext context) {
-
     variantId = variant == null ? widget.product.variantId : variant.id;
-    if(variant == null){
+    if (variant == null) {
       discount = widget.product.discount.toString();
       mrpPrice = widget.product.mrpPrice.toString();
       price = widget.product.price.toString();
       weight = widget.product.weight;
-    }else{
+    } else {
       discount = variant.discount.toString();
       mrpPrice = variant.mrpPrice.toString();
       price = variant.price.toString();
       weight = variant.weight;
     }
-
-    imageUrl = widget.product.imageType == "0" ? widget.product.image300200: widget.product.imageUrl;
-
-    if(weight.isEmpty){
+    imageUrl = widget.product.imageType == "0"
+        ? widget.product.image
+        : widget.product.imageUrl;
+    //code changed due to blur images
+    /*imageUrl = widget.product.imageType == "0"
+        ? widget.product.image300200
+        : widget.product.imageUrl;*/
+    if (weight.isEmpty) {
       isVisible = false;
     }
-
-
     return WillPopScope(
-      onWillPop: (){
+      onWillPop: () {
         print("onWillPop onWillPop");
         Navigator.pop(context, variant);
       },
@@ -84,21 +92,43 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           actions: <Widget>[
-            InkWell(
-              onTap: (){
-                Navigator.of(context).popUntil((route) => route.isFirst);
+
+            /*InkWell(
+              onTap: () async {
+                totalPrice = await databaseHelper.getTotalPrice();
+                if (totalPrice == 0.0) {
+                  Utils.showToast(AppConstant.addItems, false);
+                }else{
+                  Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
+                    }),),
+                  );
+                }
               },
               child: Padding(
                 padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
-                child: Icon(Icons.home, color: Colors.white,size: 30,),
+                child: Icon(Icons.shopping_cart, color: Colors.white,size: 30,),
+              ),
+            ),*/
+            InkWell(
+              onTap: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: Padding(
+                padding:
+                    EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+                child: Icon(
+                  Icons.home,
+                  color: Colors.white,
+                  size: 30,
+                ),
               ),
             ),
-
           ],
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
-              return  Navigator.pop(context, variant);
+              return Navigator.pop(context, variant);
             },
           ),
           title: Text("${widget.product.title}"),
@@ -126,36 +156,41 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(top: 10.0, bottom: 10.0,left: 40,right: 40),
-          child: imageUrl == "" ?
-          Container(
-            child: Center(
-              child: Utils.getImgPlaceHolder(),
-            ),
-          )
+          padding:
+              EdgeInsets.only(top: 10.0, bottom: 10.0, left: 40, right: 40),
+          child: imageUrl == ""
+              ? Container(
+                  child: Center(
+                    child: Utils.getImgPlaceHolder(),
+                  ),
+                )
               : Padding(
-              padding: EdgeInsets.all(0),
-              child: Container(
-                /*child: AspectRatio(
+                  padding: EdgeInsets.all(0),
+                  child: Container(
+                    /*child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: CachedNetworkImage(
                     imageUrl: "${imageUrl}", fit: BoxFit.cover
                   ),
                 ),*/
-                child: Center(
-                  child: CachedNetworkImage(
-                    imageUrl: "${imageUrl}", fit: BoxFit.fitWidth,
-                    //placeholder: (context, url) => CircularProgressIndicator(),
-                    //errorWidget: (context, url, error) => Icon(Icons.error),
-                  ),
-                ),
-              )),
+                    child: Center(
+                      child: CachedNetworkImage(
+                        imageUrl: "${imageUrl}", fit: BoxFit.fitWidth,
+                        //placeholder: (context, url) => CircularProgressIndicator(),
+                        //errorWidget: (context, url, error) => Icon(Icons.error),
+                      ),
+                    ),
+                  )),
         ),
         //addDivideView(),
         Padding(
-          padding: const EdgeInsets.only(top: 15.0,left: 20),
-          child: Text("${widget.product.title}",
-            style: TextStyle(fontSize: 16.0,color: grayColorTitle,),
+          padding: const EdgeInsets.only(top: 15.0, left: 20),
+          child: Text(
+            "${widget.product.title}",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: grayColorTitle,
+            ),
             textAlign: TextAlign.center,
           ),
         ),
@@ -168,24 +203,37 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(top: 10.0, left: 20.0),
-                  child: (discount == "0.00" || discount == "0" || discount == "0.0")
-                      ? Text("${AppConstant.currency}${price}",
-                    style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w600),):
-                  Row(
-                    children: <Widget>[
-                      Text("${AppConstant.currency}${price}",
-                        style: TextStyle(color: grayColorTitle,fontWeight: FontWeight.w700),),
-                      Text(" "),
-                      Text("${AppConstant.currency}${mrpPrice}",
-                          style: TextStyle(decoration: TextDecoration.lineThrough,
-                              color: grayColorTitle,fontWeight: FontWeight.w400)),
-                    ],
-                  ),
+                  child: (discount == "0.00" ||
+                          discount == "0" ||
+                          discount == "0.0")
+                      ? Text(
+                          "${AppConstant.currency}${price}",
+                          style: TextStyle(
+                              color: grayColorTitle,
+                              fontWeight: FontWeight.w600),
+                        )
+                      : Row(
+                          children: <Widget>[
+                            Text(
+                              "${AppConstant.currency}${price}",
+                              style: TextStyle(
+                                  color: grayColorTitle,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            Text(" "),
+                            Text("${AppConstant.currency}${mrpPrice}",
+                                style: TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: grayColorTitle,
+                                    fontWeight: FontWeight.w400)),
+                          ],
+                        ),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
-                  child:Text("( Inclusive of all Taxes )",
-                    style: TextStyle(fontSize: 11.0,color: Colors.grey),
+                  child: Text(
+                    "( Inclusive of all Taxes )",
+                    style: TextStyle(fontSize: 11.0, color: Colors.grey),
                   ),
                 ),
               ],
@@ -204,10 +252,11 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               SizedBox(
                 width: 120,
                 child: Padding(
-                  padding: EdgeInsets.only(top: 0.0, left: 20.0),
+                  padding: EdgeInsets.only(top: 0.0, left: 15.0),
                   child: Center(
                     child: Text("Available In ",
-                        style: TextStyle( fontSize: 16.0,fontWeight: FontWeight.w400)),
+                        style: TextStyle(
+                            fontSize: 16.0, fontWeight: FontWeight.w400)),
                   ),
                 ),
               ),
@@ -223,175 +272,207 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         ),
         Padding(
           padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-          child:Text("Product Detail",style: TextStyle(fontSize: 16.0),
+          child: Text(
+            widget.product.description.isEmpty ? "" : "Product Detail",
+            style: TextStyle(fontSize: 16.0),
           ),
         ),
         Padding(
           padding: const EdgeInsets.only(top: 5.0, left: 10.0, right: 10.0),
-          child: Html(data: "${widget.product.description}",
-            padding: EdgeInsets.all(10.0),),
+          child: Html(
+            data: "${widget.product.description}",
+            padding: EdgeInsets.all(10.0),
+          ),
         ),
       ],
     );
   }
 
-
-  Widget showTagsList(List<Variant> variants){
+  Widget showTagsList(List<Variant> variants) {
     Color chipSelectedColor, textColor;
 
     //print("---variants---${variants.length}---");
     Widget horizontalList = new Container(
       height: 50.0,
       //margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: variants.length,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            Variant tagName = variants[index];
-            if(selctedTag == index){
-              chipSelectedColor = orangeColor;
-              textColor = Color(0xFFFFFFFF);
-            }else{
-              chipSelectedColor = Color(0xFFBDBDBD);
-              textColor = Color(0xFF000000);
-            }
-            return Container(
-              margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
-              child: InkWell(
-                onTap: (){
-                  setState(() {
-                    selctedTag = index;
-                    //print("selctedTag= ${tagsList[selctedTag]}");
-                    if(widget.product.variants.length != null && widget.product.variants.length == 1){
-                      return;
-                    }
-                    variant = tagName;
-                    if(variant != null){
-                      setState(() {
-                        databaseHelper.getProductQuantitiy(variant.id).then((cartDataObj) {
-                          //print("QUANTITY= ${cartDataObj.QUANTITY}");
-                          cartData = cartDataObj;
-                          counter = int.parse(cartData.QUANTITY);
-                          showAddButton = counter == 0 ? true : false;
-                          setState(() {});
-                        });
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: variants.length,
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          Variant tagName = variants[index];
+          if (selctedTag == index) {
+            chipSelectedColor =
+                variants[index].weight.trim() == "" ? whiteColor : orangeColor;
+            textColor = Color(0xFFFFFFFF);
+          } else {
+            chipSelectedColor = Color(0xFFBDBDBD);
+            textColor = Color(0xFF000000);
+          }
+          return Container(
+            margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  selctedTag = index;
+                  //print("selctedTag= ${tagsList[selctedTag]}");
+                  if (widget.product.variants.length != null &&
+                      widget.product.variants.length == 1) {
+                    return;
+                  }
+                  variant = tagName;
+                  if (variant != null) {
+                    setState(() {
+                      databaseHelper
+                          .getProductQuantitiy(variant.id)
+                          .then((cartDataObj) {
+                        //print("QUANTITY= ${cartDataObj.QUANTITY}");
+                        cartData = cartDataObj;
+                        counter = int.parse(cartData.QUANTITY);
+                        showAddButton = counter == 0 ? true : false;
+                        setState(() {});
                       });
-                    }
-                  });
-                },
-                child: Chip(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))),
-                  autofocus: true,
-                  label: Text('${tagName.weight}',style: TextStyle(color: textColor),),
-                  backgroundColor: chipSelectedColor,
+                    });
+                  }
+                });
+              },
+              child: Chip(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                autofocus: true,
+                label: Text(
+                  '${tagName.weight}',
+                  style: TextStyle(color: textColor),
                 ),
+                backgroundColor: chipSelectedColor,
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
+      ),
     );
     return horizontalList;
   }
 
   Widget addQuantityView() {
     return Container(
-        width: 100,
-        height: 30,
-        decoration: BoxDecoration(
-          color: showAddButton == false ? whiteColor : orangeColor,
-          borderRadius: BorderRadius.all(Radius.circular(5.0)),
-        ),
-        margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-        child: showAddButton == true
-            ? InkWell(onTap: (){
-          //print("add onTap");
-          setState(() {
-            counter ++ ;
-            showAddButton = false;
-            // insert/update to cart table
-            insertInCartTable(widget.product, counter);
-          });
-        },
-          child: Container(child: Center(child: Text("Add",style: TextStyle(color: whiteColor),),),),
-        )
-            :
-        Visibility(
-          visible: showAddButton == true ? false : true,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.all(0.0),
-                width: 30.0, // you can adjust the width as you need
-                child: GestureDetector(onTap: () {
-                  if (counter != 0) {
-                    setState(() => counter--);
-                    if (counter == 0) {
-                      // delete from cart table
-                      removeFromCartTable(widget.product.variantId);
-                    } else {
-                      // insert/update to cart table
-                      insertInCartTable(widget.product, counter);
-                    }
-                    //widget.callback();
-                  }
-                },
-                    child: Container(
-                      width: 35,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        color: grayColor,
-                        border: Border.all(color: grayColor, width: 1,),
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(5.0)),
-                      ),
-                      child: Icon(Icons.remove, color: Colors.white, size: 20),
-                    )
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                width: 30.0,
-                height: 30.0,
-                decoration: new BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: new BorderRadius.all(new Radius.circular(15.0)),
-                  border: new Border.all(
-                    color: Colors.white,
-                    width: 1.0,
+      width: 100,
+      height: 30,
+      decoration: BoxDecoration(
+        color: showAddButton == false ? whiteColor : orangeColor,
+        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+      ),
+      margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+      child: showAddButton == true
+          ? InkWell(
+              onTap: () {
+                //print("add onTap");
+                setState(() {
+                  counter++;
+                  showAddButton = false;
+                  // insert/update to cart table
+                  insertInCartTable(widget.product, counter);
+                });
+              },
+              child: Container(
+                child: Center(
+                  child: Text(
+                    "Add",
+                    style: TextStyle(color: whiteColor),
                   ),
                 ),
-                child: Center(child: Text("$counter",style: TextStyle(fontSize: 18),)),
               ),
-              Container(
-                padding: const EdgeInsets.all(0.0),
-                width: 30.0, // you can adjust the width as you need
-                child: GestureDetector(onTap: () {
-                  setState(() => counter++);
-                  if (counter == 0) {
-                    // delete from cart table
-                    removeFromCartTable(widget.product.variantId);
-                  } else {
-                    // insert/update to cart table
-                    insertInCartTable(widget.product, counter);
-                  }
-                },
-                  child: Container(
-                      width: 35,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        color: orangeColor,
-                        border: Border.all(color: orangeColor, width: 1,),
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(5.0)),
+            )
+          : Visibility(
+              visible: showAddButton == true ? false : true,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                    padding: const EdgeInsets.all(0.0),
+                    width: 30.0, // you can adjust the width as you need
+                    child: GestureDetector(
+                        onTap: () {
+                          if (counter != 0) {
+                            setState(() => counter--);
+                            if (counter == 0) {
+                              // delete from cart table
+                              removeFromCartTable(widget.product.variantId);
+                            } else {
+                              // insert/update to cart table
+                              insertInCartTable(widget.product, counter);
+                            }
+                            //widget.callback();
+                          }
+                        },
+                        child: Container(
+                          width: 35,
+                          height: 25,
+                          decoration: BoxDecoration(
+                            color: grayColor,
+                            border: Border.all(
+                              color: grayColor,
+                              width: 1,
+                            ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                          ),
+                          child:
+                              Icon(Icons.remove, color: Colors.white, size: 20),
+                        )),
+                  ),
+                  Container(
+                    margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                    width: 30.0,
+                    height: 30.0,
+                    decoration: new BoxDecoration(
+                      color: Colors.white,
+                      borderRadius:
+                          new BorderRadius.all(new Radius.circular(15.0)),
+                      border: new Border.all(
+                        color: Colors.white,
+                        width: 1.0,
                       ),
-                      child: Icon(Icons.add, color: Colors.white, size: 20)),
-                ),
+                    ),
+                    child: Center(
+                        child: Text(
+                      "$counter",
+                      style: TextStyle(fontSize: 18),
+                    )),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.all(0.0),
+                    width: 30.0, // you can adjust the width as you need
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() => counter++);
+                        if (counter == 0) {
+                          // delete from cart table
+                          removeFromCartTable(widget.product.variantId);
+                        } else {
+                          // insert/update to cart table
+                          insertInCartTable(widget.product, counter);
+                        }
+                      },
+                      child: Container(
+                          width: 35,
+                          height: 25,
+                          decoration: BoxDecoration(
+                            color: orangeColor,
+                            border: Border.all(
+                              color: orangeColor,
+                              width: 1,
+                            ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(5.0)),
+                          ),
+                          child:
+                              Icon(Icons.add, color: Colors.white, size: 20)),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ),
+            ),
     );
   }
 
@@ -415,7 +496,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       DatabaseHelper.PRICE: price,
       DatabaseHelper.DISCOUNT: discount,
       DatabaseHelper.UNIT_TYPE: isUnitType,
-
       DatabaseHelper.PRODUCT_ID: product.id,
       DatabaseHelper.isFavorite: product.isFav,
       DatabaseHelper.QUANTITY: quantity.toString(),
@@ -429,7 +509,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       DatabaseHelper.image_300_200: product.image300200,
     };
 
-    databaseHelper.checkIfProductsExistInDb(DatabaseHelper.CART_Table, variantId)
+    databaseHelper
+        .checkIfProductsExistInDb(DatabaseHelper.CART_Table, variantId)
         .then((count) {
       //print("-count-- ${count}");
       if (count == 0) {
@@ -462,7 +543,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       height: 1,
       width: MediaQuery.of(context).size.width,
       color: grayColor,
-      margin: EdgeInsets.only(top: 5.0, bottom: 10.0,left: 20,right: 20),
+      margin: EdgeInsets.only(top: 5.0, bottom: 10.0, left: 20, right: 20),
     );
   }
 }

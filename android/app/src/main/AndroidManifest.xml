@@ -14,11 +14,16 @@
 
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="My Home Grocery"
+        android:label="My Groceries"
         android:icon="@mipmap/ic_launcher">
         <!-- Add the following entry, with your API key -->
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCwKXvgsBElyhqwj03ro9e-Lnu3fmRmpJI"/>
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/ic_notification" />
+
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

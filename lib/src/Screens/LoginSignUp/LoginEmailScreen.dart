@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
-import 'package:restroapp/src/Screens/Dashboard/SplashScreen.dart';
+import 'package:restroapp/src/Screens/Dashboard/ForceUpdate.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
 import 'package:restroapp/src/UI/SocialLoginTabs.dart';

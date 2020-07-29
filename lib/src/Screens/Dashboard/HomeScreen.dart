@@ -4,6 +4,8 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:package_info/package_info.dart';
+import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
@@ -23,13 +25,17 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'ForceUpdate.dart';
 import 'SearchScreen.dart';
+import 'dart:io';
+
 
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
   ConfigModel configObject;
-  HomeScreen(this.store, this.configObject);
+  bool showForceUploadAlert;
+  HomeScreen(this.store, this.configObject,this.showForceUploadAlert);
 
   @override
   State<StatefulWidget> createState() {
@@ -79,6 +85,25 @@ class _HomeScreenState extends State<HomeScreen> {
           imgList.add(NetworkImage(imageUrl.isEmpty ? AppConstant.placeholderImageUrl : imageUrl),);
         }
       }
+      if(widget.showForceUploadAlert){
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          DialogUtils.showForceUpdateDialog(context, store.storeName,
+              store.forceDownload[0].forceDownloadMessage);
+        });
+      }else{
+        if(!checkIfStoreClosed()){
+          WidgetsBinding.instance.addPostFrameCallback((_) async {
+            if (!AppConstant.isLoggedIn && store.isRefererFnEnable) {
+              String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(AppConstant.showReferEarnAlert);
+              print("showReferEarnAlert=${showReferEarnAlert}");
+              if(showReferEarnAlert == null){
+                SharedPrefs.storeSharedValue(AppConstant.showReferEarnAlert, "true");
+                DialogUtils.showInviteEarnAlert2(context);
+              }
+            }
+          });
+        }
+      }
     } catch (e) {
       print(e);
     }
@@ -87,6 +112,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       key: _key,
       appBar: AppBar(
@@ -111,11 +137,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
 
       ),
-      body: Column(
-        children: <Widget>[
-          addBanners(),
-          Expanded(
-            child: isLoading
+      body:Column(children: <Widget>[
+            addBanners(),
+            Expanded(
+              child: isLoading
                 ? Center(child: CircularProgressIndicator()) : categoryResponse == null
                 ? SingleChildScrollView(child:Center(child: Text("")))
                 : Container(
@@ -135,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   shrinkWrap: true,
                   children: categoryResponse.categories.map((CategoryModel model) {
 
-                    return GridTile(child: CategoryView(model,widget.store));
+                    return GridTile(child: CategoryView(model,store,false,0));
                   }).toList()),
             ),
           ),
@@ -155,9 +180,9 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 200.0,
             width: Utils.getDeviceWidth(context),
             child: Carousel(
-              boxFit: BoxFit.cover,
+              boxFit: BoxFit.fitWidth,
               autoplay: true,
-              animationCurve: Curves.fastOutSlowIn,
+              animationCurve: Curves.ease,
               animationDuration: Duration(milliseconds: 3000),
               dotSize: 6.0,
               dotIncreasedColor: dotIncreasedColor,
@@ -167,6 +192,83 @@ class _HomeScreenState extends State<HomeScreen> {
               showIndicator: imgList.length == 1 ? false : true,
               indicatorBgPadding: 7.0,
               images: imgList,
+              onImageTap: (position){
+                print("onImageTap ${position}");
+                print("linkTo=${store.banners[position].linkTo}");
+
+                if(store.banners[position].linkTo.isNotEmpty){
+                  if(store.banners[position].linkTo == "category"){
+
+                    if(store.banners[position].categoryId == "0" &&
+                        store.banners[position].subCategoryId == "0" &&
+                        store.banners[position].productId == "0"){
+                      print("return");
+                      return;
+                    }
+
+                    if(store.banners[position].categoryId != "0" &&
+                     store.banners[position].subCategoryId != "0" &&
+                        store.banners[position].productId != "0"){
+                      // here we have to open the product detail
+                      print("open the product detail ${position}");
+
+                    }else if(store.banners[position].categoryId != "0" &&
+                        store.banners[position].subCategoryId != "0" &&
+                        store.banners[position].productId == "0"){
+                      //here open the banner sub category
+                      print("open the subCategory ${position}");
+
+                      for(int i=0; i<categoryResponse.categories.length; i++){
+                        CategoryModel categories = categoryResponse.categories[i];
+                        if(store.banners[position].categoryId == categories.id){
+                          print("title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+                          if(categories.subCategory!= null){
+                            for(int j=0; j<categories.subCategory.length;j++){
+                              SubCategory subCategory = categories.subCategory[j];
+
+                              if(subCategory.id == store.banners[position].subCategoryId){
+                                print("open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.banners[position].subCategoryId}");
+
+                                Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
+                                    return SubCategoryProductScreen(categories,true,j);
+                                  }),
+                                );
+
+                                break;
+                              }
+                            }
+                          }
+
+                        }
+                        //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
+                      }
+                    }else if(store.banners[position].categoryId != "0" &&
+                        store.banners[position].subCategoryId == "0" &&
+                        store.banners[position].productId == "0"){
+                      print("open the Category ${position}");
+
+                      for(int i=0; i<categoryResponse.categories.length; i++){
+                        CategoryModel categories = categoryResponse.categories[i];
+                        if(store.banners[position].categoryId == categories.id){
+                          print("title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+                          Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return SubCategoryProductScreen(categories, true, 0);
+                            }),
+                          );
+                          break;
+                        }
+                      }
+
+                    }
+                    //-----------------------------------------------
+                  }
+                }
+                /*print("categoryId=${store.banners[position].categoryId}");
+                print("subCategoryId=${store.banners[position].subCategoryId}");
+                print("productId=${store.banners[position].productId}");*/
+              },
             ),
           ),
         ),
@@ -239,15 +341,15 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _currentIndex = index;
         if (_currentIndex == 4) {
-          if (AppConstant.isLoggedIn) {
+//          if (AppConstant.isLoggedIn) {
             Navigator.push(context,
               MaterialPageRoute(builder: (context) => MyCartScreen(() {
                 getCartCount();
               })),
             );
-          }else{
-            Utils.showLoginDialog(context);
-          }
+//          }else{
+//            Utils.showLoginDialog(context);
+//          }
 
           Map<String,dynamic> attributeMap = new Map<String,dynamic>();
           attributeMap["ScreenName"] = "MyCartScreen";
@@ -321,9 +423,17 @@ class _HomeScreenState extends State<HomeScreen> {
         try {
           print("------onMessage: $message");
           if(AppConstant.isLoggedIn){
-            String title = message['notification']['title'];
-            String body = message['notification']['body'];
-            showNotification(title,body,message);
+            if (Platform.isIOS){
+              print("iosssssssssssssssss");
+              String title = message['aps']['alert']['title'];
+              String body = message['aps']['alert']['body'];
+              showNotification(title,body,message);
+            }else{
+              print("androiddddddddddd");
+              String title = message['notification']['title'];
+              String body = message['notification']['body'];
+              showNotification(title,body,message);
+            }
           }
         } catch (e) {
           print(e);
@@ -342,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> {
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token){
-      print("----token---- ${token}");
+      //print("----token---- ${token}");
       try {
         SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
       } catch (e) {
@@ -453,6 +563,8 @@ class _HomeScreenState extends State<HomeScreen> {
       Utils.showProgressDialog(context);
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
+      SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
+      SharedPrefs.removeKey(AppConstant.referEarnMsg);
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
