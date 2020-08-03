@@ -37,17 +37,17 @@ class _StoreLocationScreenWithMultiplePickState
   @override
   void initState() {
     super.initState();
-//    if (widget.areaObject != null) {
-//      lat = widget.areaObject.pickupLat;
-//      lng = widget.areaObject.pickupLng;
-//      center = LatLng(double.parse(lat), double.parse(lng));
-//      markers.addAll([
-//        Marker(
-//          markerId: MarkerId('value'),
-//          position: center,
-//        )
-//      ]);
-//    }
+    if (widget.areaObject != null) {
+      lat = widget.areaObject.pickupLat;
+      lng = widget.areaObject.pickupLng;
+      center = LatLng(double.parse(lat), double.parse(lng));
+      markers.addAll([
+        Marker(
+          markerId: MarkerId('value'),
+          position: center,
+        )
+      ]);
+    }
   }
 
   @override
@@ -75,7 +75,6 @@ class _StoreLocationScreenWithMultiplePickState
       ),
       body: Column(
         children: <Widget>[
-          //select city
           Align(
             alignment: Alignment.centerLeft,
             child: InkWell(
@@ -86,21 +85,20 @@ class _StoreLocationScreenWithMultiplePickState
                   widget.areaObject = null;
                 });
               },
-              child: Expanded(
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(10, 15, 0, 10),
-                  color: Colors.white,
-                  child: Text(
-                    widget.cityObject == null
-                        ? "Select City"
-                        : "${widget.cityObject.city.city}",
-                    textAlign: TextAlign.left,
-                  ),
+              child: Container(
+                padding: EdgeInsets.fromLTRB(10, 15, 0, 10),
+                color: Colors.white,
+                child: Text(
+                  widget.cityObject == null
+                      ? "Select City"
+                      : "City: ${widget.cityObject.city.city}",
+                  textAlign: TextAlign.left,
                 ),
               ),
             ),
           ),
           Divider(color: Colors.grey, height: 2.0),
+          //select city
           Container(
             margin: EdgeInsets.fromLTRB(0, 00, 0, 0),
             height: 50,
@@ -112,7 +110,6 @@ class _StoreLocationScreenWithMultiplePickState
                     widget.areaObject = await DialogUtils.displayAreaDialog(
                         context, "Select Area", widget.cityObject);
                     setState(() {
-                      //TODO:
                       lat = widget.areaObject.pickupLat;
                       lng = widget.areaObject.pickupLng;
                       center = LatLng(double.parse(lat), double.parse(lng));
@@ -134,7 +131,7 @@ class _StoreLocationScreenWithMultiplePickState
                       text: TextSpan(
                         text: widget.areaObject == null
                             ? "Select Pickup Area"
-                            : "${widget.areaObject.pickupAdd}",
+                            : "Area: ${widget.areaObject.pickupAdd}",
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -146,6 +143,8 @@ class _StoreLocationScreenWithMultiplePickState
               child: GoogleMap(
                 onMapCreated: (GoogleMapController controller) {
                   mapController = controller;
+                  Future.delayed(Duration(milliseconds: 1200)).then((onValue) =>
+                      controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(double.parse(lat), double.parse(lng)), 15)));
                 },
                 markers: markers,
                 scrollGesturesEnabled: true,
@@ -156,39 +155,43 @@ class _StoreLocationScreenWithMultiplePickState
                 initialCameraPosition: CameraPosition(
                     target: LatLng(double.parse(lat), double.parse(lng)),
                     zoom: 15),
+
               ),
             ),
           ),
-          Container(
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                        top: 10, left: 10, right: 10, bottom: 10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Address",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w500)),
-                        SizedBox(
-                          width: (Utils.getDeviceWidth(context) - 50),
-                          child: Text(
-                              widget.areaObject != null
-                                  ? "${widget.areaObject.pickupAdd}"
-                                  : "Select area",
-                              maxLines: 2,
+          Visibility(
+            visible: widget.areaObject == null ? false : true,
+            child: Container(
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          top: 10, left: 10, right: 10, bottom: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Address",
+                              maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.w400)),
-                        ),
-                      ],
+                                  fontSize: 18, fontWeight: FontWeight.w500)),
+                          SizedBox(
+                            width: (Utils.getDeviceWidth(context) - 50),
+                            child: Text(
+                                widget.areaObject != null
+                                    ? "${widget.areaObject.pickupAdd}"
+                                    : "Select area",
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w400)),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ]),
+                  ]),
+            ),
           ),
         ],
       ),
