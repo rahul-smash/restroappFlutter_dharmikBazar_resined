@@ -77,15 +77,26 @@ class _MyCartScreenState extends State<MyCartScreen> {
             children: <Widget>[
               Divider(color: Colors.white, height: 2.0),
               isLoading ? Utils.getIndicatorView(): showCartList(),
+              //TODO: add here
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SafeArea(
+                  child: Wrap(
+                    children: [
+                      bottomBar
+                    ],
+                  ),
+                ),
+              )
             ],
           ),
           onWillPop: () async {
             Navigator.pop(context);
             return new Future(() => false);
           }),
-      bottomNavigationBar: SafeArea(
-        child: bottomBar,
-      ),
+//      bottomNavigationBar: SafeArea(
+//        child: bottomBar,maintainBottomViewPadding: true,
+//      ),
     );
   }
 
