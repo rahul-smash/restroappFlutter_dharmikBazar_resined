@@ -88,6 +88,10 @@ class SubCategoryProductScreen extends StatelessWidget {
                   break;
                 }
               }
+              if (subCategory.products == null) {
+                return Container();
+              }
+
               //print("products.length= ${subCategory.products.length}");
               if (subCategory.products.length == 0) {
                 return Utils.getEmptyView2("No Products found!");
