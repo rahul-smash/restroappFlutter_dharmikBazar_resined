@@ -275,7 +275,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         child: new TextField(
                           controller: addressController,
                           keyboardType: TextInputType.multiline,
-                          maxLength: null,
+                          maxLength: 100,
                           maxLines: null,
                           decoration: new InputDecoration(
                               border: InputBorder.none,
