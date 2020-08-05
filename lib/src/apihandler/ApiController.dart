@@ -288,20 +288,13 @@ class ApiController {
               databaseHelper.saveProducts(
                   subCategoryResponse.subCategories[i].products[j],
                   subCategoryResponse.subCategories[i].id);
-             /* for (int k = 0;
-                  k <
-                      subCategoryResponse
-                          .subCategories[i].products[j].variants.length;
-                  k++) {
-                databaseHelper.saveProductsVariant(subCategoryResponse
-                    .subCategories[i].products[j].variants[k]);
-              }*/
             }
           }
           return subCategoryResponse;
         }
         //print("-------store.success ---${storeData.success}");
-      } else if (dbProductCounts == 0 && !isNetworkAviable) {
+      }
+      else if (dbProductCounts == 0 && !isNetworkAviable) {
         subCategoryResponse.success = false;
         return subCategoryResponse;
       } else {
@@ -309,7 +302,7 @@ class ApiController {
         subCategoryResponse = SubCategoryResponse();
         //prepare model object
         List<SubCategoryModel> categoryList =
-            await databaseHelper.getALLSubCategories();
+            await databaseHelper.getSubCategoriesFromID(subCategoryId);
 
         subCategoryResponse.subCategories = categoryList;
 

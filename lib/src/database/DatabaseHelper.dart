@@ -296,6 +296,42 @@ class DatabaseHelper {
     return subCategoryList;
   }
 
+  Future<List<SubCategoryModel>> getSubCategoriesFromID(String subCategoriesID) async {
+    List<SubCategoryModel> subCategoryList = new List();
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      "id",
+      "parent_id",
+      "title",
+      "version",
+      "status",
+      "deleted",
+      "sort"
+    ];
+
+    List<Map> resultList =
+        await dbClient.query(Sub_Categories_Table, columns: columnsToSelect,
+            where: 'id = ?',
+            whereArgs: [subCategoriesID]);
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        SubCategoryModel subCategory = SubCategoryModel();
+        subCategory.id = row[ID].toString();
+        subCategory.title = row[TITLE];
+        subCategory.parentId = row["parent_id"];
+        subCategory.version = row["version"];
+        subCategory.status = row["status"];
+        subCategory.deleted = row["deleted"];
+        subCategory.sort = row["sort"];
+
+        subCategoryList.add(subCategory);
+      });
+    } else {
+      //print("-empty cart-in db--");
+    }
+    return subCategoryList;
+  }
+
   Future<int> saveProducts(Product products, String category_ids) async {
     var dbClient = await db;
     int res =
