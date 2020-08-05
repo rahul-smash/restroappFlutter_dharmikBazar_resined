@@ -135,6 +135,7 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                                   controller.text = "";
                                   setState(() {
                                     subCategory = null;
+                                    productsList.clear();
                                   });
                                 });
                               }),
