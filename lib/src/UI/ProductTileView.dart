@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
@@ -155,25 +156,51 @@ class _ProductTileItemState extends State<ProductTileItem> {
                           visible: AppConstant.isRestroApp,
                           child: addVegNonVegOption(),
                         ),
-                        imageUrl == ""
-                            ? Container(
-                                width: 70.0,
-                                height: 80.0,
-                                child: Utils.getImgPlaceHolder(),
-                              )
-                            : Padding(
+                        Stack(
+                          children: <Widget>[
+                            imageUrl == ""
+                                ? Container(
+                              width: 70.0,
+                              height: 80.0,
+                              child: Utils.getImgPlaceHolder(),
+                            )
+                                : Padding(
                                 padding: EdgeInsets.only(left: 5, right: 20),
                                 child: Container(
                                   width: 70.0,
                                   height: 80.0,
                                   child: CachedNetworkImage(
                                       imageUrl: "${imageUrl}", fit: BoxFit.fill
-                                      //placeholder: (context, url) => CircularProgressIndicator(),
-                                      //errorWidget: (context, url, error) => Icon(Icons.error),
-                                      ),
+                                    //placeholder: (context, url) => CircularProgressIndicator(),
+                                    //errorWidget: (context, url, error) => Icon(Icons.error),
+                                  ),
                                   /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
                                           fit: BoxFit.cover),*/
                                 )),
+                            Visibility(
+                              visible:
+                              (discount == "0.00" || discount == "0" || discount == "0.0")
+                                  ? false
+                                  : true,
+                              child: Container(
+                                child: Text(
+                                  "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
+                                  style: TextStyle(color: Colors.white,fontSize: 10.0),
+                                ),
+                                margin: EdgeInsets.only(left: 5),
+                                padding: EdgeInsets.all(5),
+                                decoration: new BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  color: orangeColor,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(15.0),
+                                      bottomRight: Radius.circular(15.0)),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
                         Flexible(
                             child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,7 +353,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                     padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
                                     decoration: BoxDecoration(
                                       border: Border.all(
-                                        color:  weight.trim()==""?whiteColor:orangeColor,
+                                        color: weight.trim() == ""
+                                            ? whiteColor
+                                            : orangeColor,
                                         width: 1,
                                       ),
                                       borderRadius: BorderRadius.all(

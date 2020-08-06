@@ -92,7 +92,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           actions: <Widget>[
-
             /*InkWell(
               onTap: () async {
                 totalPrice = await databaseHelper.getTotalPrice();
@@ -155,33 +154,61 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Padding(
-          padding:
-              EdgeInsets.only(top: 10.0, bottom: 10.0, left: 40, right: 40),
-          child: imageUrl == ""
-              ? Container(
-                  child: Center(
-                    child: Utils.getImgPlaceHolder(),
-                  ),
-                )
-              : Padding(
-                  padding: EdgeInsets.all(0),
-                  child: Container(
-                    /*child: AspectRatio(
+        Stack(
+          children: <Widget>[
+            Padding(
+              padding:
+                  EdgeInsets.only(top: 10.0, bottom: 10.0, left: 40, right: 40),
+//              EdgeInsets.all(0),
+              child: imageUrl == ""
+                  ? Container(
+                      child: Center(
+                        child: Utils.getImgPlaceHolder(),
+                      ),
+                    )
+                  : Padding(
+                      padding: EdgeInsets.all(0),
+                      child: Container(
+                        /*child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: CachedNetworkImage(
                     imageUrl: "${imageUrl}", fit: BoxFit.cover
                   ),
                 ),*/
-                    child: Center(
-                      child: CachedNetworkImage(
-                        imageUrl: "${imageUrl}", fit: BoxFit.fitWidth,
-                        //placeholder: (context, url) => CircularProgressIndicator(),
-                        //errorWidget: (context, url, error) => Icon(Icons.error),
-                      ),
-                    ),
-                  )),
+                        child: Center(
+                          child: CachedNetworkImage(
+                            imageUrl: "${imageUrl}", fit: BoxFit.fitWidth,
+                            placeholder: (context, url) => CircularProgressIndicator(),
+                            errorWidget: (context, url, error) => Icon(Icons.error),
+                          ),
+                        ),
+                      )),
+            ),
+            Visibility(
+              visible:
+                  (discount == "0.00" || discount == "0" || discount == "0.0")
+                      ? false
+                      : true,
+              child: Container(
+                child: Text(
+                  "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
+                  style: TextStyle(color: Colors.white),
+                ),
+                margin: EdgeInsets.only(left: 10,top: 10),
+                padding: EdgeInsets.all(10),
+                decoration: new BoxDecoration(
+                  shape: BoxShape.rectangle,
+                  color: orangeColor,
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(15.0),
+                      bottomRight: Radius.circular(15.0)),
+                ),
+              ),
+            ),
+          ],
+          overflow: Overflow.clip,
         ),
+
         //addDivideView(),
         Padding(
           padding: const EdgeInsets.only(top: 15.0, left: 20),
