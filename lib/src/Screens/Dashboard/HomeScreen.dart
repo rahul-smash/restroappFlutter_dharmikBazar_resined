@@ -153,7 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
               child: GridView.count(
                   crossAxisCount: 2,
-                  childAspectRatio: 1.2,
+                  childAspectRatio: 1.1,
                   padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
                   mainAxisSpacing: 5.0,
                   crossAxisSpacing: 8.0,
@@ -503,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void checkForMultiStore() {
     print("isMultiStore=${widget.configObject.isMultiStore}");
-    if(widget.configObject.isMultiStore){
+    if(widget.configObject.isMultfiStore){
       ApiController.multiStoreApiRequest(widget.configObject.primaryStoreId).then((response){
         //print("${storeBranchesModel.data.length}");
         setState(() {
