@@ -503,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void checkForMultiStore() {
     print("isMultiStore=${widget.configObject.isMultiStore}");
-    if(widget.configObject.isMultfiStore){
+    if(widget.configObject.isMultiStore){
       ApiController.multiStoreApiRequest(widget.configObject.primaryStoreId).then((response){
         //print("${storeBranchesModel.data.length}");
         setState(() {
