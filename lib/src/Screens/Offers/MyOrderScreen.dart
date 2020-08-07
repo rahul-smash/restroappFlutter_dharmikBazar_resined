@@ -76,13 +76,13 @@ class _MyOrderScreen extends State<MyOrderScreen> {
   }
 
   Widget listItem(BuildContext context,OrderData cardOrderHistoryItems) {
-    bool showOrderType=false;
+    bool showOrderType=true;
 
-    if(widget.store.pickupFacility == "1" && widget.store.deliveryFacility == "1"){
-      showOrderType = true;
-    }else{
-      showOrderType = false;
-    }
+//    if(widget.store.pickupFacility == "1" && widget.store.deliveryFacility == "1"){
+//      showOrderType = true;
+//    }else{
+//      showOrderType = false;
+//    }
 
     return Container(
       color: Colors.white,
