@@ -231,7 +231,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
               //crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 5, 0,5),
+                  padding: const EdgeInsets.fromLTRB(0, 5, 0,10),
                   child: Text(
                     "Place Order",
                     style: TextStyle(color: Colors.white, fontSize: 18.0),
