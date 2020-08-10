@@ -130,7 +130,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                 });
                 databaseHelper
                     .checkProductsExistInFavTable(
-                        DatabaseHelper.Favorite_Table, variantId)
+                        DatabaseHelper.Favorite_Table, widget.product.id)
                     .then((favValue) {
                   //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
                   setState(() {
@@ -160,32 +160,36 @@ class _ProductTileItemState extends State<ProductTileItem> {
                           children: <Widget>[
                             imageUrl == ""
                                 ? Container(
-                              width: 70.0,
-                              height: 80.0,
-                              child: Utils.getImgPlaceHolder(),
-                            )
+                                    width: 70.0,
+                                    height: 80.0,
+                                    child: Utils.getImgPlaceHolder(),
+                                  )
                                 : Padding(
-                                padding: EdgeInsets.only(left: 5, right: 20),
-                                child: Container(
-                                  width: 70.0,
-                                  height: 80.0,
-                                  child: CachedNetworkImage(
-                                      imageUrl: "${imageUrl}", fit: BoxFit.fill
-                                    //placeholder: (context, url) => CircularProgressIndicator(),
-                                    //errorWidget: (context, url, error) => Icon(Icons.error),
-                                  ),
-                                  /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                                    padding:
+                                        EdgeInsets.only(left: 5, right: 20),
+                                    child: Container(
+                                      width: 70.0,
+                                      height: 80.0,
+                                      child: CachedNetworkImage(
+                                          imageUrl: "${imageUrl}",
+                                          fit: BoxFit.fill
+                                          //placeholder: (context, url) => CircularProgressIndicator(),
+                                          //errorWidget: (context, url, error) => Icon(Icons.error),
+                                          ),
+                                      /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
                                           fit: BoxFit.cover),*/
-                                )),
+                                    )),
                             Visibility(
-                              visible:
-                              (discount == "0.00" || discount == "0" || discount == "0.0")
+                              visible: (discount == "0.00" ||
+                                      discount == "0" ||
+                                      discount == "0.0")
                                   ? false
                                   : true,
                               child: Container(
                                 child: Text(
                                   "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
-                                  style: TextStyle(color: Colors.white,fontSize: 10.0),
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 10.0),
                                 ),
                                 margin: EdgeInsets.only(left: 5),
                                 padding: EdgeInsets.all(5),
@@ -200,7 +204,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             ),
                           ],
                         ),
-
                         Flexible(
                             child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
