@@ -791,4 +791,6 @@ class DatabaseHelper {
     var dbClient = await db;
     dbClient.close();
   }
+
+  void updateProductDetails(Product first) {}
 }

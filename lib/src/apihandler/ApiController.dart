@@ -44,7 +44,6 @@ import 'dart:io';
 class ApiController {
   static final int timeout = 18;
 
-
   static Future<StoreResponse> versionApiRequest(String storeId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -54,18 +53,21 @@ class ApiController {
 
     print("----url--${url}");
     try {
-      FormData formData = new FormData.fromMap(
-              {"device_id": deviceId, "device_token":"${deviceToken}",
-                "platform": Platform.isIOS ? "IOS" : "Android"
-              });
+      FormData formData = new FormData.fromMap({
+        "device_id": deviceId,
+        "device_token": "${deviceToken}",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
       Dio dio = new Dio();
       Response response = await dio.post(url,
           data: formData,
           options: new Options(
-                  contentType: "application/json",responseType: ResponseType.plain));
+              contentType: "application/json",
+              responseType: ResponseType.plain));
       print(response.statusCode);
       //print(response.data);
-      StoreResponse storeData = StoreResponse.fromJson(json.decode(response.data));
+      StoreResponse storeData =
+          StoreResponse.fromJson(json.decode(response.data));
       print("-------store.success ---${storeData.success}");
       SharedPrefs.saveStore(storeData.store);
       //check older version
@@ -87,7 +89,8 @@ class ApiController {
     return null;
   }
 
-  static Future<UserResponse> registerApiRequest(UserData user,String referralCode) async {
+  static Future<UserResponse> registerApiRequest(
+      UserData user, String referralCode) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -104,7 +107,7 @@ class ApiController {
         "password": user.password,
         "device_id": deviceId,
         "device_token": deviceToken,
-        "user_refer_code":referralCode,
+        "user_refer_code": referralCode,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -280,7 +283,6 @@ class ApiController {
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-
           for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
             for (int j = 0;
                 j < subCategoryResponse.subCategories[i].products.length;
@@ -293,8 +295,7 @@ class ApiController {
           return subCategoryResponse;
         }
         //print("-------store.success ---${storeData.success}");
-      }
-      else if (dbProductCounts == 0 && !isNetworkAviable) {
+      } else if (dbProductCounts == 0 && !isNetworkAviable) {
         subCategoryResponse.success = false;
         return subCategoryResponse;
       } else {
@@ -320,6 +321,47 @@ class ApiController {
         }
         subCategoryResponse.success = true;
         return subCategoryResponse;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<SubCategoryResponse> getSubCategoryProductDetail(
+      String productID) async {
+    SubCategoryResponse subCategoryResponse = SubCategoryResponse();
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        print("deviceID $deviceId");
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+        print("deviceToken $deviceToken");
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.getProductDetail;
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "user_id": "",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android",
+          "product_id": productID
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                contentType: "application/json",
+                responseType: ResponseType.plain));
+        print(response.data);
+        subCategoryResponse =
+            SubCategoryResponse.fromJson(json.decode(response.data));
+        if (subCategoryResponse.success) {
+          return subCategoryResponse;
+        }
       }
     } catch (e) {
       print(e);
@@ -571,7 +613,6 @@ class ApiController {
       final parsed = json.decode(respStr);
       ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
       return model;
-
     } catch (e) {
       print("----respStr---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -634,7 +675,6 @@ class ApiController {
       String razorpay_payment_id,
       String online_method,
       String selectedDeliverSlotValue) async {
-
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -748,8 +788,13 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> updateProfileRequest(String fullName, String emailId,
-      String phoneNumber,bool isComingFromOtpScreen, String id,String user_refer_code) async {
+  static Future<UserResponse> updateProfileRequest(
+      String fullName,
+      String emailId,
+      String phoneNumber,
+      bool isComingFromOtpScreen,
+      String id,
+      String user_refer_code) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     StoreModel store = await SharedPrefs.getStore();
     String userId;
@@ -762,7 +807,8 @@ class ApiController {
 
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +ApiConstants.updateProfile;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.updateProfile;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("--url--${url}--");
     try {
@@ -972,7 +1018,6 @@ class ApiController {
     }
   }
 
-
   static Future<CreateOrderData> razorpayCreateOrderApi(String amount) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -1026,15 +1071,12 @@ class ApiController {
     }
   }
 
-
-  static Future<AdminLoginModel> getAdminApiRequest(String username,String password) async {
-    var url = ApiConstants.baseUrl+ApiConstants.storeLogin;
+  static Future<AdminLoginModel> getAdminApiRequest(
+      String username, String password) async {
+    var url = ApiConstants.baseUrl + ApiConstants.storeLogin;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
-      request.fields.addAll({
-        "email": username,
-        "password": password
-      });
+      request.fields.addAll({"email": username, "password": password});
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('----respStr-----' + respStr);
@@ -1078,20 +1120,17 @@ class ApiController {
     }
   }
 
-
   static Future<StripeCheckOutModel> stripePaymentApi(String amount) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     UserModel user = await SharedPrefs.getUser();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.stripePaymentCheckout;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.stripePaymentCheckout;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     try {
-      request.fields.addAll({
-        "customer_email": user.email,
-        "amount": amount,
-        "currency":"usd"
-      });
+      request.fields.addAll(
+          {"customer_email": user.email, "amount": amount, "currency": "usd"});
       print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -1107,16 +1146,16 @@ class ApiController {
     }
   }
 
-
-  static Future<StripeVerifyModel> stripeVerifyTransactionApi(String payment_request_id) async {
+  static Future<StripeVerifyModel> stripeVerifyTransactionApi(
+      String payment_request_id) async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.stripeVerifyTransaction;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.stripeVerifyTransaction;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     try {
       request.fields.addAll({
         "payment_request_id": payment_request_id,
-
       });
       print('--url===  $url');
       print('--payment_request_id===  $payment_request_id');

@@ -7,6 +7,8 @@ import 'package:flutter_tags/flutter_tags.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
+import 'package:restroapp/src/apihandler/ApiConstants.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
@@ -20,6 +22,7 @@ import 'HomeScreen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   Product product;
+  bool isApiLoading = true;
 
   ProductDetailsScreen(this.product);
 
@@ -47,6 +50,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     selctedTag = 0;
     showAddButton = false;
     getDataFromDB();
+    getProductDetail(widget.product.id);
   }
 
   void getDataFromDB() {
@@ -177,9 +181,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                 ),*/
                         child: Center(
                           child: CachedNetworkImage(
-                            imageUrl: "${imageUrl}", fit: BoxFit.fitWidth,
-                            placeholder: (context, url) => CircularProgressIndicator(),
-                            errorWidget: (context, url, error) => Icon(Icons.error),
+                            imageUrl: "${imageUrl}",
+                            fit: BoxFit.fitWidth,
+                            placeholder: (context, url) =>
+                                CircularProgressIndicator(),
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error),
                           ),
                         ),
                       )),
@@ -194,7 +201,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                   "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
                   style: TextStyle(color: Colors.white),
                 ),
-                margin: EdgeInsets.only(left: 10,top: 10),
+                margin: EdgeInsets.only(left: 10, top: 10),
                 padding: EdgeInsets.all(10),
                 decoration: new BoxDecoration(
                   shape: BoxShape.rectangle,
@@ -297,13 +304,19 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           visible: isVisible,
           child: addDividerView(),
         ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-          child: Text(
-            widget.product.description.isEmpty ? "" : "Product Detail",
-            style: TextStyle(fontSize: 16.0),
-          ),
-        ),
+        !widget.isApiLoading
+            ? Padding(
+                padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                child: Text(
+                  widget.product.description.isEmpty ? "" : "Product Detail",
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(
+                    backgroundColor: Colors.black26,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+              ),
         Padding(
           padding: const EdgeInsets.only(top: 5.0, left: 10.0, right: 10.0),
           child: Html(
@@ -572,5 +585,16 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       color: grayColor,
       margin: EdgeInsets.only(top: 5.0, bottom: 10.0, left: 20, right: 20),
     );
+  }
+
+  void getProductDetail(String productID) {
+    ApiController.getSubCategoryProductDetail(productID).then((value) async {
+      setState(() {
+        widget.product = value.subCategories.first.products.first;
+        widget.isApiLoading = false;
+      });
+//      DatabaseHelper databaseHelper=new DatabaseHelper();
+//      databaseHelper.updateProductDetails(value.subCategories.first.products.first);
+    });
   }
 }
