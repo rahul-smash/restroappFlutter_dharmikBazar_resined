@@ -1,4 +1,3 @@
-
 import 'package:event_bus/event_bus.dart';
 
 /// The global [EventBus] object.
@@ -13,6 +12,7 @@ class refreshOrderHistory {
 }
 
 class onPageFinished {
-  String url;
+  String url, _orderId, _txnId;
   onPageFinished(this.url);
+  onPayTMPageFinished(this.url, this._orderId, this._txnId);
 }

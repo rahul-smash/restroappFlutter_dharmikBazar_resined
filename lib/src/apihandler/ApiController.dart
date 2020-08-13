@@ -11,6 +11,7 @@ import 'package:restroapp/src/models/AdminLoginModel.dart';
 import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
+import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
@@ -1348,5 +1349,47 @@ class ApiController {
       print(e);
     }
     return null;
+  }
+
+  static Future<CreatePaytmTxnTokenResponse> createPaytmTxnToken() async {
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        print("deviceID $deviceId");
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+        print("deviceToken $deviceToken");
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.createPaytmTxnToken;
+        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "customer_id": 123,
+          "customer_email": "rajini_22@gmail.com",
+          "customer_add": "170,phase1",
+          "customer_firstname": "sonu",
+          "customer_lastname": "sharma",
+          "customer_mobile": "9988097890",
+          "customer_pin": "160002",
+          "amount": 34.00
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                responseType: ResponseType.plain));
+        print(response.data);
+        CreatePaytmTxnTokenResponse  txnTokenResponse =
+        CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
+        if (txnTokenResponse.success) {
+          return txnTokenResponse;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }
