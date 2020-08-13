@@ -12,7 +12,15 @@ class refreshOrderHistory {
 }
 
 class onPageFinished {
-  String url, _orderId, _txnId;
+  String url;
+
   onPageFinished(this.url);
-  onPayTMPageFinished(this.url, this._orderId, this._txnId);
+}
+
+class onPayTMPageFinished {
+  String url;
+  String orderId;
+  String txnId;
+
+  onPayTMPageFinished(this.url, this.orderId, this.txnId);
 }

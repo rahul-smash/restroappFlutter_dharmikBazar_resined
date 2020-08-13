@@ -1502,9 +1502,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       callStripeVerificationApi(event.url);
     });
     eventBus.on<onPayTMPageFinished>().listen((event) {
-      print("<---onPayTMPageFinished------->");
-      callStripeVerificationApi(event.url);
+      callPaytmApi(event.url,event.orderId,event.txnId);
     });
+  }
+  void callPaytmApi(String url,String orderId,String txnID){
+    print("Moja kro");
   }
 
   void callStripeVerificationApi(String payment_request_id) {

@@ -1372,7 +1372,7 @@ class ApiController {
           "customer_add": "170,phase1",
           "customer_firstname": "sonu",
           "customer_lastname": "sharma",
-          "customer_mobile": "9988097890",
+          "customer_mobile": "9888311263",
           "customer_pin": "160002",
           "amount": 34.00
         });
