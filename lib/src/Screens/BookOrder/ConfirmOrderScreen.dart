@@ -80,15 +80,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   ConfirmOrderState({this.storeModel});
 
-  void paytmCheckOut() {
+  void paytmCheckOut(String address, String pin) {
+    if(widget.deliveryType == OrderType.Delivery) {
+      address = widget.address.address+" "+widget.address.areaName+" "+widget.address.city;
+      pin = widget.address.zipCode;
+    }else if(widget.deliveryType == OrderType.PickUp){
+      address = widget.areaObject.pickupAdd;
+      pin = 'NA';
+    }
+    print(
+        "amount ${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}"
+        " address $address zipCode $pin");
+    double amount = databaseHelper.roundOffPrice(
+        taxModel == null ? totalPrice : double.parse(taxModel.total), 2);
     Utils.showProgressDialog(context);
-    ApiController.createPaytmTxnToken().then((value) async {
+    ApiController.createPaytmTxnToken(address, pin, amount).then((value) async {
       Utils.hideProgressDialog(context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => PaytmWebView(value, storeModel)),
-      );
+      if (value.success)
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => PaytmWebView(value, storeModel)),
+        );
     });
   }
 
@@ -846,7 +859,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       activeColor: appTheme,
                       groupValue: widget._character,
                       onChanged: (PaymentType value) async {
-                        paytmCheckOut();
+                        paytmCheckOut("170,Phase 1", "160071");
                         setState(() {
                           widget._character = value;
                           if (value == PaymentType.ONLINE)
@@ -1501,12 +1514,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       print("<---onPageFinished------->");
       callStripeVerificationApi(event.url);
     });
+
     eventBus.on<onPayTMPageFinished>().listen((event) {
-      callPaytmApi(event.url,event.orderId,event.txnId);
+      callPaytmApi(event.url, event.orderId, event.txnId);
     });
   }
-  void callPaytmApi(String url,String orderId,String txnID){
-    print("Moja kro");
+
+  void callPaytmApi(String url, String orderId, String txnID) {
+    placeOrderApiCall(orderId, txnID, 'paytm');
   }
 
   void callStripeVerificationApi(String payment_request_id) {
