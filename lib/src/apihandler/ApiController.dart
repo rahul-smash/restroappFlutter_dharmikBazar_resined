@@ -1366,7 +1366,7 @@ class ApiController {
             ? user.fullName.substring(0, user.fullName.indexOf(" "))
             : user.fullName;
         String lastName = user.fullName.contains(" ") == true
-            ? user.fullName.substring(user.fullName.indexOf(" ")+1)
+            ? user.fullName.substring(user.fullName.indexOf(" "))
             : 'NA';
         print(firstName);
         print(lastName);

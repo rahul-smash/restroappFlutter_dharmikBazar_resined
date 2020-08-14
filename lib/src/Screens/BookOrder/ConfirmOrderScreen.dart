@@ -80,7 +80,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   ConfirmOrderState({this.storeModel});
 
-  void paytmCheckOut(String address, String pin) {
+  void paytmCheckOut() {
+    String address="NA",pin="NA";
     if(widget.deliveryType == OrderType.Delivery) {
       address = widget.address.address+" "+widget.address.areaName+" "+widget.address.city;
       pin = widget.address.zipCode;
@@ -859,7 +860,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       activeColor: appTheme,
                       groupValue: widget._character,
                       onChanged: (PaymentType value) async {
-                        paytmCheckOut("170,Phase 1", "160071");
+                        paytmCheckOut();
                         setState(() {
                           widget._character = value;
                           if (value == PaymentType.ONLINE)
@@ -1516,6 +1517,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     });
 
     eventBus.on<onPayTMPageFinished>().listen((event) {
+      print("Event Bus called");
       callPaytmApi(event.url, event.orderId, event.txnId);
     });
   }
