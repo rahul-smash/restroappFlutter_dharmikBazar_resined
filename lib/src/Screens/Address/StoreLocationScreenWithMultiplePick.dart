@@ -75,67 +75,72 @@ class _StoreLocationScreenWithMultiplePickState
       ),
       body: Column(
         children: <Widget>[
-          Align(
-            alignment: Alignment.centerLeft,
-            child: InkWell(
-              onTap: () async {
-                widget.cityObject = await DialogUtils.displayCityDialog(
-                    context, "Select City", widget.storeArea);
-                setState(() {
-                  widget.areaObject = null;
-                });
-              },
-              child: Container(
-                padding: EdgeInsets.fromLTRB(10, 15, 0, 10),
-                color: Colors.white,
-                child: Text(
-                  widget.cityObject == null
-                      ? "Select City"
-                      : "City: ${widget.cityObject.city.city}",
-                  textAlign: TextAlign.left,
-                ),
-              ),
-            ),
+          InkWell(
+            onTap: () async {
+              Datum result = await DialogUtils.displayCityDialog(
+                  context, "Select City", widget.storeArea);
+              if (result == null) {
+                return;
+              }
+              widget.cityObject = result;
+              setState(() {
+                widget.areaObject = null;
+              });
+            },
+            child: Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(10, 15, 0, 10),
+                  color: Colors.white,
+                  child: Text(
+                    widget.cityObject == null
+                        ? "Select City"
+                        : "City: ${widget.cityObject.city.city}",
+                    textAlign: TextAlign.left,
+                  ),
+                )),
           ),
           Divider(color: Colors.grey, height: 2.0),
-          //select city
-          Container(
-            margin: EdgeInsets.fromLTRB(0, 00, 0, 0),
-            height: 50,
-            color: Colors.white,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: InkWell(
-                  onTap: () async {
-                    widget.areaObject = await DialogUtils.displayAreaDialog(
-                        context, "Select Area", widget.cityObject);
-                    setState(() {
-                      lat = widget.areaObject.pickupLat;
-                      lng = widget.areaObject.pickupLng;
-                      center = LatLng(double.parse(lat), double.parse(lng));
-                      markers.remove(0);
-                      markers.addAll([
-                        Marker(
-                          markerId: MarkerId('value'),
-                          position: center,
-                        )
-                      ]);
-                    });
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        left: 10.0, right: 10, top: 5, bottom: 5),
-                    child: RichText(
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 2,
-                      text: TextSpan(
-                        text: widget.areaObject == null
-                            ? "Select Pickup Area"
-                            : "Area: ${widget.areaObject.pickupAdd}",
-                        style: TextStyle(color: Colors.black),
-                      ),
+          InkWell(
+            onTap: () async {
+              Area result = await DialogUtils.displayAreaDialog(
+                  context, "Select Area", widget.cityObject);
+              if (result == null) return;
+              widget.areaObject = result;
+              setState(() {
+                lat = widget.areaObject.pickupLat;
+                lng = widget.areaObject.pickupLng;
+                center = LatLng(double.parse(lat), double.parse(lng));
+                markers.remove(0);
+                markers.addAll([
+                  Marker(
+                    markerId: MarkerId('value'),
+                    position: center,
+                  )
+                ]);
+              });
+            },
+            child: Container(
+              margin: EdgeInsets.fromLTRB(0, 00, 0, 0),
+              height: 50,
+              color: Colors.white,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                  padding:
+                      EdgeInsets.only(left: 10.0, right: 10, top: 5, bottom: 5),
+                  child: RichText(
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    text: TextSpan(
+                      text: widget.areaObject == null
+                          ? "Select Pickup Area"
+                          : "Area: ${widget.areaObject.pickupAdd}",
+                      style: TextStyle(color: Colors.black),
                     ),
-                  )),
+                  ),
+                ),
+              ),
             ),
           ),
           Expanded(
@@ -144,7 +149,8 @@ class _StoreLocationScreenWithMultiplePickState
                 onMapCreated: (GoogleMapController controller) {
                   mapController = controller;
                   Future.delayed(Duration(milliseconds: 1200)).then((onValue) =>
-                      controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(double.parse(lat), double.parse(lng)), 15)));
+                      controller.animateCamera(CameraUpdate.newLatLngZoom(
+                          LatLng(double.parse(lat), double.parse(lng)), 15)));
                 },
                 markers: markers,
                 scrollGesturesEnabled: true,
@@ -155,7 +161,6 @@ class _StoreLocationScreenWithMultiplePickState
                 initialCameraPosition: CameraPosition(
                     target: LatLng(double.parse(lat), double.parse(lng)),
                     zoom: 15),
-
               ),
             ),
           ),
@@ -199,6 +204,7 @@ class _StoreLocationScreenWithMultiplePickState
         child: BottomAppBar(
           child: InkWell(
             onTap: () async {
+             StoreModel storeModel=await SharedPrefs.getStore();
               if (widget.areaObject.note.isEmpty) {
                 Navigator.pop(context);
                 Navigator.push(
@@ -210,6 +216,7 @@ class _StoreLocationScreenWithMultiplePickState
                             widget.areaObject.areaId,
                             widget.pickUp,
                             areaObject: widget.areaObject,
+                        storeModel: storeModel,
                           )),
                 );
               } else {
@@ -225,7 +232,7 @@ class _StoreLocationScreenWithMultiplePickState
                     MaterialPageRoute(
                         builder: (context) => ConfirmOrderScreen(
                             null, true, widget.areaObject.areaId, widget.pickUp,
-                            areaObject: widget.areaObject)),
+                            areaObject: widget.areaObject,storeModel: storeModel,)),
                   );
                 }
               }
