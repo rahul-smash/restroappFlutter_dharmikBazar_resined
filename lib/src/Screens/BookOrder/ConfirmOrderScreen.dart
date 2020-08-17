@@ -820,7 +820,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       }
     }
     return Visibility(
-      visible: false, //TODO: remove false according to design
+      visible: showOptions,
       child: Padding(
         padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
         child: Wrap(
@@ -1063,21 +1063,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 }
               }
 
-              if (storeModel.onlinePayment == "1") {
-                var result = await DialogUtils.displayPaymentDialog(
-                    context, "Select Payment", "");
-                //print("----result----${result}--");
-                if (result == null) {
-                  return;
-                }
-                if (result == PaymentType.ONLINE) {
-                  widget.paymentMode = "3";
-                } else {
-                  widget.paymentMode = "2"; //cod
-                }
-              } else {
-                widget.paymentMode = "2"; //cod
-              }
+//              if (storeModel.onlinePayment == "1") {
+//                var result = await DialogUtils.displayPaymentDialog(
+//                    context, "Select Payment", "");
+//                //print("----result----${result}--");
+//                if (result == null) {
+//                  return;
+//                }
+//                if (result == PaymentType.ONLINE) {
+//                  widget.paymentMode = "3";
+//                } else {
+//                  widget.paymentMode = "2"; //cod
+//                }
+//              } else {
+//                widget.paymentMode = "2"; //cod
+//              }
 
               print("----paymentMod----${widget.paymentMode}--");
               print("-paymentGateway----${storeObject.paymentGateway}-}-");
