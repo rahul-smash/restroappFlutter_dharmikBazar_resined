@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
@@ -30,7 +31,7 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+//import 'package:webview_flutter/webview_flutter.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
   bool isComingFromPickUpScreen;
@@ -80,12 +81,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   ConfirmOrderState({this.storeModel});
 
-  void paytmCheckOut() {
-    String address="NA",pin="NA";
-    if(widget.deliveryType == OrderType.Delivery) {
-      address = widget.address.address+" "+widget.address.areaName+" "+widget.address.city;
+  void callPaytmPayApi() {
+    String address = "NA", pin = "NA";
+    if (widget.deliveryType == OrderType.Delivery) {
+      address = widget.address.address +
+          " " +
+          widget.address.areaName +
+          " " +
+          widget.address.city;
       pin = widget.address.zipCode;
-    }else if(widget.deliveryType == OrderType.PickUp){
+    } else if (widget.deliveryType == OrderType.PickUp) {
       address = widget.areaObject.pickupAdd;
       pin = 'NA';
     }
@@ -815,7 +820,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       }
     }
     return Visibility(
-      visible: showOptions,
+      visible: false, //TODO: remove false according to design
       child: Padding(
         padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
         child: Wrap(
@@ -860,7 +865,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       activeColor: appTheme,
                       groupValue: widget._character,
                       onChanged: (PaymentType value) async {
-                        paytmCheckOut();
                         setState(() {
                           widget._character = value;
                           if (value == PaymentType.ONLINE)
@@ -1059,21 +1063,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 }
               }
 
-//              if (storeModel.onlinePayment == "1") {
-//                var result = await DialogUtils.displayPaymentDialog(
-//                    context, "Select Payment", "");
-//                //print("----result----${result}--");
-//                if (result == null) {
-//                  return;
-//                }
-//                if (result == PaymentType.ONLINE) {
-//                  widget.paymentMode = "3";
-//                } else {
-//                  widget.paymentMode = "2"; //cod
-//                }
-//              } else {
-//                widget.paymentMode = "2"; //cod
-//              }
+              if (storeModel.onlinePayment == "1") {
+                var result = await DialogUtils.displayPaymentDialog(
+                    context, "Select Payment", "");
+                //print("----result----${result}--");
+                if (result == null) {
+                  return;
+                }
+                if (result == PaymentType.ONLINE) {
+                  widget.paymentMode = "3";
+                } else {
+                  widget.paymentMode = "2"; //cod
+                }
+              } else {
+                widget.paymentMode = "2"; //cod
+              }
 
               print("----paymentMod----${widget.paymentMode}--");
               print("-paymentGateway----${storeObject.paymentGateway}-}-");
@@ -1133,15 +1137,48 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-  performPlaceOrderOperation(StoreModel storeObject) {
+  performPlaceOrderOperation(StoreModel storeObject) async {
     if (widget.paymentMode == "3") {
-      if (storeObject.paymentGateway == "Razorpay") {
-        callOrderIdApi(storeObject);
-      } else if (storeObject.paymentGateway == "Stripe") {
-        callStripeApi();
+      String paymentGateway = storeObject.paymentGateway;
+      if (storeObject.paymentGatewaySettings != null &&
+          storeObject.paymentGatewaySettings.isNotEmpty) {
+        //case only single gateway is comming
+        if (storeObject.paymentGatewaySettings.length == 1) {
+          paymentGateway =
+              storeObject.paymentGatewaySettings.first.paymentGateway;
+          callPaymentGateWay(paymentGateway, storeObject);
+        } else {
+          String result =
+              await DialogUtils.displayMultipleOnlinePaymentMethodDialog(
+                  context, storeObject);
+          if (result.isEmpty) {
+            Utils.hideProgressDialog(context);
+            return;
+          }
+          paymentGateway = result;
+          callPaymentGateWay(paymentGateway, storeObject);
+        }
+        return;
+      } else {
+        //case payment gateway setting list empty
+        callPaymentGateWay(paymentGateway, storeObject);
       }
     } else {
       placeOrderApiCall("", "", "");
+    }
+  }
+
+  callPaymentGateWay(String paymentGateway, StoreModel storeObject) {
+    switch (paymentGateway) {
+      case "Razorpay":
+        callOrderIdApi(storeObject);
+        break;
+      case "Stripe":
+        callStripeApi();
+        break;
+      case "Paytmpay":
+        callPaytmPayApi();
+        break;
     }
   }
 
@@ -1689,7 +1726,7 @@ class StripeWebView extends StatefulWidget {
 }
 
 class _StripeWebViewState extends State<StripeWebView> {
-  Completer<WebViewController> _controller = Completer<WebViewController>();
+  InAppWebViewController webView;
 
   @override
   Widget build(BuildContext context) {
@@ -1705,21 +1742,21 @@ class _StripeWebViewState extends State<StripeWebView> {
           centerTitle: true,
         ),
         body: Builder(builder: (BuildContext context) {
-          return WebView(
-            initialUrl: '${widget.stripeCheckOutModel.checkoutUrl}',
-            javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (WebViewController webViewController) {
-              _controller.complete(webViewController);
+          return InAppWebView(
+            initialUrl: "${widget.stripeCheckOutModel.checkoutUrl}",
+            initialHeaders: {},
+            initialOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                    debuggingEnabled: true,
+                    javaScriptEnabled: true,
+                    javaScriptCanOpenWindowsAutomatically: true)),
+            onWebViewCreated: (InAppWebViewController controller) {
+              webView = controller;
             },
-            navigationDelegate: (NavigationRequest request) {
-              //print('=======NavigationRequest======= $request}');
-              return NavigationDecision.navigate;
+            onLoadStart: (InAppWebViewController controller, String url) {
+              print('==1====onLoadStart======: $url');
             },
-            onPageStarted: (String url) {
-              //print('======Page started loading======: $url');
-            },
-            onPageFinished: (String url) {
-              print('======Page finished loading======: $url');
+            onLoadStop: (InAppWebViewController controller, String url) async {
               if (url
                   .contains("api/stripeVerifyTransaction?response=success")) {
                 eventBus.fire(onPageFinished(
@@ -1727,7 +1764,10 @@ class _StripeWebViewState extends State<StripeWebView> {
                 Navigator.pop(context);
               }
             },
-            gestureNavigationEnabled: false,
+            onProgressChanged:
+                (InAppWebViewController controller, int progress) {
+              //print('==3====onProgressChanged======: $progress');
+            },
           );
         }),
       ),
@@ -1737,7 +1777,7 @@ class _StripeWebViewState extends State<StripeWebView> {
 
 class PaytmWebView extends StatelessWidget {
   CreatePaytmTxnTokenResponse stripeCheckOutModel;
-  Completer<WebViewController> _controller = Completer<WebViewController>();
+  InAppWebViewController webView;
   StoreModel storeModel;
 
   PaytmWebView(this.stripeCheckOutModel, this.storeModel);
@@ -1754,21 +1794,19 @@ class PaytmWebView extends StatelessWidget {
           centerTitle: true,
         ),
         body: Builder(builder: (BuildContext context) {
-          return WebView(
-            initialUrl: '${stripeCheckOutModel.url}',
-            javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (WebViewController webViewController) {
-              _controller.complete(webViewController);
+          return InAppWebView(
+            initialUrl: "${stripeCheckOutModel.url}",
+            initialHeaders: {},
+            initialOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                    debuggingEnabled: true,
+                    javaScriptEnabled: true,
+                    javaScriptCanOpenWindowsAutomatically: true)),
+            onWebViewCreated: (InAppWebViewController controller) {
+              webView = controller;
             },
-            navigationDelegate: (NavigationRequest request) {
-              //print('=======NavigationRequest======= $request}');
-              return NavigationDecision.navigate;
-            },
-            onPageStarted: (String url) {
-              //print('======Page started loading======: $url');
-            },
-            onPageFinished: (String url) {
-              print('======Page finished loading======: $url');
+            onLoadStart: (InAppWebViewController controller, String url) {
+              print('==1====onLoadStart======: $url');
               if (url.contains("/api/paytmPaymentResult/orderId:")) {
                 String txnId =
                     url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
@@ -1785,7 +1823,13 @@ class PaytmWebView extends StatelessWidget {
                 Utils.showToast("Payment Failed", false);
               }
             },
-            gestureNavigationEnabled: false,
+            onLoadStop: (InAppWebViewController controller, String url) async {
+              print('==2====onLoadStop======: $url');
+            },
+            onProgressChanged:
+                (InAppWebViewController controller, int progress) {
+              //print('==3====onProgressChanged======: $progress');
+            },
           );
         }),
       ),
