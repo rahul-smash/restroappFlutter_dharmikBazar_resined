@@ -616,7 +616,7 @@ class _HomeScreenState extends State<HomeScreen> {
         dialIconEnable = false;
 
     if (store.homePageDisplayNumberType != null &&
-        store.homePageDisplayNumberType.isEmpty) {
+        store.homePageDisplayNumberType.isNotEmpty) {
       //0=>Contact Number,1=>App Icon,2=>None
       switch (store.homePageHeaderRight) {
         case "0":
@@ -625,19 +625,18 @@ class _HomeScreenState extends State<HomeScreen> {
           rightActionsEnable = true;
           break;
       }
-      //0=>Whats app, 1=>Phone Call
-      if (store.homePageDisplayNumberType.compareTo("0") == 0) {
-        whatIconEnable = true;
+      if (store.homePageDisplayNumber!=null&&
+          store.homePageDisplayNumber.isNotEmpty) {
+        //0=>Whats app, 1=>Phone Call
+        if (store.homePageDisplayNumberType.compareTo("0") == 0) {
+          whatIconEnable = true;
+        }
+        //0=>Whats app, 1=>Phone Call
+        if (store.homePageDisplayNumberType.compareTo("1") == 0) {
+          dialIconEnable = true;
+        }
       }
-      //0=>Whats app, 1=>Phone Call
-      if (store.homePageDisplayNumberType.compareTo("1") == 0) {
-        dialIconEnable = true;
-      }
-
     }
-    rightActionsEnable=true;
-    whatIconEnable=true;
-    dialIconEnable=true;
 
     return AppBar(
       title: widget.configObject.isMultiStore == false
@@ -646,7 +645,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 Visibility(
                   visible: store.homePageTitleStatus,
                   child: Text(
-                    store.storeName,
+                    store.homePageTitle != null
+                        ? store.homePageTitle
+                        : store.storeName,
                   ),
                 ),
                 Visibility(
@@ -693,8 +694,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-//                  FlutterOpenWhatsapp.sendSingleMessage(store.homePageDisplayNumber, "");
-                  FlutterOpenWhatsapp.sendSingleMessage("+919888311263", "");
+                  FlutterOpenWhatsapp.sendSingleMessage(
+                      store.homePageDisplayNumber, "");
                 },
               )),
         ),
@@ -704,8 +705,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.only(right: 8.0),
                 child: GestureDetector(
                   onTap: () {
-//                    _launchCaller(store.homePageDisplayNumber);
-                    _launchCaller("+919888311263");
+                    _launchCaller(store.homePageDisplayNumber);
                   },
                   child: Icon(
                     Icons.call,
