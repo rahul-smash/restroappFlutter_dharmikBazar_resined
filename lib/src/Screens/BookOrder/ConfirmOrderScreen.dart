@@ -84,12 +84,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void callPaytmPayApi() {
     String address = "NA", pin = "NA";
     if (widget.deliveryType == OrderType.Delivery) {
-      address = widget.address.address +
-          " " +
-          widget.address.areaName +
-          " " +
-          widget.address.city;
-      pin = widget.address.zipCode;
+      if (widget.address.address != null && widget.address.address.isNotEmpty)
+        address = widget.address.address +
+            " " +
+            widget.address.areaName +
+            " " +
+            widget.address.city;
+
+      if (widget.address.zipCode != null && widget.address.zipCode.isNotEmpty)
+        pin = widget.address.zipCode;
     } else if (widget.deliveryType == OrderType.PickUp) {
       address = widget.areaObject.pickupAdd;
       pin = 'NA';
@@ -102,12 +105,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.showProgressDialog(context);
     ApiController.createPaytmTxnToken(address, pin, amount).then((value) async {
       Utils.hideProgressDialog(context);
-      if (value.success)
+      if (value.success) {
         Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => PaytmWebView(value, storeModel)),
         );
+      } else {
+        Utils.showToast("Api Error", false);
+      }
     });
   }
 
@@ -1812,7 +1818,7 @@ class PaytmWebView extends StatelessWidget {
               print('==2====onLoadStop======: $url');
               if (url.contains("/api/paytmPaymentResult/orderId:")) {
                 String txnId =
-                url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
+                    url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
                 url = url.replaceAll("/TxnId:" + txnId, "");
                 String orderId = url
                     .substring(url.indexOf("/orderId:") + "/orderId:".length);
@@ -1825,7 +1831,6 @@ class PaytmWebView extends StatelessWidget {
                 Navigator.pop(context);
                 Utils.showToast("Payment Failed", false);
               }
-
             },
             onProgressChanged:
                 (InAppWebViewController controller, int progress) {
