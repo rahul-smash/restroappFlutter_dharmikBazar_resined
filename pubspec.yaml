@@ -54,6 +54,7 @@ dependencies:
 #  webview_flutter: ^0.3.22+1
   keyboard_visibility: ^0.5.6
   flutter_inappwebview: ^4.0.0+4
+  flutter_open_whatsapp: ^0.1.2
 
 dev_dependencies:
   flutter_test:
@@ -123,6 +124,7 @@ flutter:
     - images/login_restro_bg.jpg
     - images/empty_cart.png
     - images/gifticon.png
+    - images/whatsapp.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

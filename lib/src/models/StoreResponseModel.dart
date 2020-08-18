@@ -119,6 +119,15 @@ class StoreModel {
   List<PaymentGatewaySettings> paymentGatewaySettings;
   AppThemeColors appThemeColors;
 
+  //new keys added
+  bool homePageTitleStatus;
+  String homePageTitle;
+  bool homePageSubtitleStatus;
+  String homePageSubtitle;
+  String homePageHeaderRight; //0=>Contact Number,1=>App Icon,2=>None
+  String homePageDisplayNumber; //Dispaly Number On App Home Page
+  String homePageDisplayNumberType; //0=>Whats app, 1=>Phone Call
+
   StoreModel(
       {this.id,
       this.storeName,
@@ -216,7 +225,14 @@ class StoreModel {
       this.paymentGateway,
       this.paymentSetting,
       this.paymentGatewaySettings,
-      this.isRefererFnEnable});
+      this.isRefererFnEnable,
+      this.homePageTitleStatus,
+        this.homePageTitle,
+        this.homePageSubtitleStatus,
+        this.homePageSubtitle,
+        this.homePageHeaderRight,
+        this.homePageDisplayNumber,
+        this.homePageDisplayNumberType});
 
   StoreModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -359,6 +375,13 @@ class StoreModel {
     currencyAbbr = json['currency_abbr'];
     blDeviceIdUnique = json['bl_device_id_unique'];
     isRefererFnEnable = json['is_referer_fn_enable'];
+    homePageTitleStatus = json['home_page_title_status'];
+    homePageTitle = json['home_page_title'];
+    homePageSubtitleStatus = json['home_page_subtitle_status'];
+    homePageSubtitle = json['home_page_subtitle'];
+    homePageHeaderRight = json['home_page_header_right'];
+    homePageDisplayNumber = json['home_page_display_number'];
+    homePageDisplayNumberType = json['home_page_display_number_type'];
   }
 
   Map<String, dynamic> toJson() {
@@ -480,6 +503,14 @@ class StoreModel {
     data['currency_abbr'] = this.currencyAbbr;
     data['bl_device_id_unique'] = this.blDeviceIdUnique;
     data['is_referer_fn_enable'] = this.isRefererFnEnable;
+
+    data['home_page_title_status'] = this.homePageTitleStatus;
+    data['home_page_title'] = this.homePageTitle;
+    data['home_page_subtitle_status'] = this.homePageSubtitleStatus;
+    data['home_page_subtitle'] = this.homePageSubtitle;
+    data['home_page_header_right'] = this.homePageHeaderRight;
+    data['home_page_display_number'] = this.homePageDisplayNumber;
+    data['home_page_display_number_type'] = this.homePageDisplayNumberType;
     return data;
   }
 }
