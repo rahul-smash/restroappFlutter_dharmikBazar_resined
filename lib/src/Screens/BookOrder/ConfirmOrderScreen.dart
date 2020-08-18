@@ -1807,9 +1807,12 @@ class PaytmWebView extends StatelessWidget {
             },
             onLoadStart: (InAppWebViewController controller, String url) {
               print('==1====onLoadStart======: $url');
+            },
+            onLoadStop: (InAppWebViewController controller, String url) async {
+              print('==2====onLoadStop======: $url');
               if (url.contains("/api/paytmPaymentResult/orderId:")) {
                 String txnId =
-                    url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
+                url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
                 url = url.replaceAll("/TxnId:" + txnId, "");
                 String orderId = url
                     .substring(url.indexOf("/orderId:") + "/orderId:".length);
@@ -1822,9 +1825,7 @@ class PaytmWebView extends StatelessWidget {
                 Navigator.pop(context);
                 Utils.showToast("Payment Failed", false);
               }
-            },
-            onLoadStop: (InAppWebViewController controller, String url) async {
-              print('==2====onLoadStop======: $url');
+
             },
             onProgressChanged:
                 (InAppWebViewController controller, int progress) {
