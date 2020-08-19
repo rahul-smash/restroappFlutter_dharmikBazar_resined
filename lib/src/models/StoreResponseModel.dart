@@ -14,10 +14,11 @@ class StoreResponse {
       );
 
   Map<String, dynamic> toJson() => {
-    "success": success,
-    "store": store.toJson(),
-  };
+        "success": success,
+        "store": store.toJson(),
+      };
 }
+
 class StoreModel {
   String id;
   String storeName;
@@ -105,6 +106,7 @@ class StoreModel {
   List<Banners> banners;
   List<Banner> aboutusBanner;
   List<ForceDownload> forceDownload;
+
 /*  List<Geofencing> geofencing;*/
   List<AppLabels> appLabels;
   String banner10080;
@@ -116,108 +118,127 @@ class StoreModel {
   PaymentSetting paymentSetting;
   AppThemeColors appThemeColors;
 
+  //new keys added
+  bool homePageTitleStatus;
+  String homePageTitle;
+  bool homePageSubtitleStatus;
+  String homePageSubtitle;
+  String homePageHeaderRight; //0=>Contact Number,1=>App Icon,2=>None
+  String homePageDisplayNumber; //Dispaly Number On App Home Page
+  String homePageDisplayNumberType; //0=>Whats app, 1=>Phone Call
+
   StoreModel(
       {this.id,
-        this.storeName,
-        this.aboutusBanner,
-        this.location,
-        this.city,
-        this.state,
-        this.country,
-        this.zipcode,
-        this.lat,
-        this.lng,
-        this.appThemeColors,
-        this.contactPerson,
-        this.contactNumber,
-        this.contactEmail,
-        this.aboutUs,
-        this.otpSkip,
-        this.version,
-        this.currency,
-        this.showCurrency,
-        this.currency_unicode,
-        this.appShareLink,
-        this.androidShareLink,
-        this.iphoneShareLink,
-        this.theme,
-        this.webTheme,
-        this.type,
-        this.catType,
-        this.storeApp,
-        this.storeLogo,
-        this.favIcon,
-        this.bannerTime,
-        this.webCache,
-        this.currentGoldRate,
-        this.scoMetaTitle,
-        this.scoMetaDescription,
-        this.scoMetaKeywords,
-        this.planType,
-        this.updatedPlanType,
-        this.newPlanToBeUpdate,
-        this.laterUpdatePlanType,
-        this.paymentId,
-        this.payment,
-        this.gstNo,
-        this.laterUpdateDate,
-        this.deliveryArea,
-        this.modifiedPlanDate,
-        this.banner,
-        this.videoLink,
-        this.taxLabelName,
-        this.taxRate,
-        this.istaxenable,
-        this.taxDetail,
-        this.fixedTaxDetail,
-        this.storeStatus,
-        this.storeMsg,
-        this.masterCategory,
-        this.recommendedProducts,
-        this.deliverySlot,
-        this.geofencing,
-        this.loyality,
-        this.onlinePayment,
-        this.pickupFacility,
-        this.deliveryFacility,
-        this.inStore,
-        this.internationalOtp,
-        this.multipleStore,
-        this.webMenuSetting,
-        this.mobileNotifications,
-        this.emailNotifications,
-        this.smsNotifications,
-        this.gst,
-        this.gaCode,
-        this.categoryLayout,
-        this.radiusIn,
-        this.productImage,
-        this.deliverySlots,
-        this.is24x7Open,
-        this.openhoursFrom,
-        this.openhoursTo,
-        this.closehoursMessage,
-        this.storeOpenDays,
-        this.timeZone,
-        this.androidAppShare,
-        this.iphoneAppShare,
-        this.windowAppShare,
-        this.banners,
-        this.forceDownload,
-        /* this.geofencing,*/
-        this.appLabels,
-        this.banner10080,
-        this.banner300200,
-        this.currencyAbbr,
-        this.blDeviceIdUnique,
-        this.paymentGateway,
-        this.paymentSetting,
-        this.isRefererFnEnable});
+      this.storeName,
+      this.aboutusBanner,
+      this.location,
+      this.city,
+      this.state,
+      this.country,
+      this.zipcode,
+      this.lat,
+      this.lng,
+      this.appThemeColors,
+      this.contactPerson,
+      this.contactNumber,
+      this.contactEmail,
+      this.aboutUs,
+      this.otpSkip,
+      this.version,
+      this.currency,
+      this.showCurrency,
+      this.currency_unicode,
+      this.appShareLink,
+      this.androidShareLink,
+      this.iphoneShareLink,
+      this.theme,
+      this.webTheme,
+      this.type,
+      this.catType,
+      this.storeApp,
+      this.storeLogo,
+      this.favIcon,
+      this.bannerTime,
+      this.webCache,
+      this.currentGoldRate,
+      this.scoMetaTitle,
+      this.scoMetaDescription,
+      this.scoMetaKeywords,
+      this.planType,
+      this.updatedPlanType,
+      this.newPlanToBeUpdate,
+      this.laterUpdatePlanType,
+      this.paymentId,
+      this.payment,
+      this.gstNo,
+      this.laterUpdateDate,
+      this.deliveryArea,
+      this.modifiedPlanDate,
+      this.banner,
+      this.videoLink,
+      this.taxLabelName,
+      this.taxRate,
+      this.istaxenable,
+      this.taxDetail,
+      this.fixedTaxDetail,
+      this.storeStatus,
+      this.storeMsg,
+      this.masterCategory,
+      this.recommendedProducts,
+      this.deliverySlot,
+      this.geofencing,
+      this.loyality,
+      this.onlinePayment,
+      this.pickupFacility,
+      this.deliveryFacility,
+      this.inStore,
+      this.internationalOtp,
+      this.multipleStore,
+      this.webMenuSetting,
+      this.mobileNotifications,
+      this.emailNotifications,
+      this.smsNotifications,
+      this.gst,
+      this.gaCode,
+      this.categoryLayout,
+      this.radiusIn,
+      this.productImage,
+      this.deliverySlots,
+      this.is24x7Open,
+      this.openhoursFrom,
+      this.openhoursTo,
+      this.closehoursMessage,
+      this.storeOpenDays,
+      this.timeZone,
+      this.androidAppShare,
+      this.iphoneAppShare,
+      this.windowAppShare,
+      this.banners,
+      this.forceDownload,
+      /* this.geofencing,*/
+      this.appLabels,
+      this.banner10080,
+      this.banner300200,
+      this.currencyAbbr,
+      this.blDeviceIdUnique,
+      this.paymentGateway,
+      this.paymentSetting,
+      this.isRefererFnEnable,
+      this.homePageTitleStatus,
+        this.homePageTitle,
+        this.homePageSubtitleStatus,
+        this.homePageSubtitle,
+        this.homePageHeaderRight,
+        this.homePageDisplayNumber,
+        this.homePageDisplayNumberType});
 
   StoreModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     storeName = json['store_name'];
-    aboutusBanner = json["aboutus_banner"] == null ? null : List<Banner>.from(json["aboutus_banner"].map((x) => Banner.fromJson(x)));
+    aboutusBanner = json["aboutus_banner"] == null
+        ? null
+        : List<Banner>.from(
+            json["aboutus_banner"].map((x) => Banner.fromJson(x)));
     location = json['location'];
     city = json['city'];
     state = json['state'];
@@ -265,8 +286,8 @@ class StoreModel {
     taxRate = json['tax_rate'];
     istaxenable = json['istaxenable'];
     paymentGateway = json["payment_gateway"];
-    paymentSetting =  PaymentSetting.fromJson(json["payment_setting"]);
-    appThemeColors =  AppThemeColors.fromJson(json["app_theme_colors"]);
+    paymentSetting = PaymentSetting.fromJson(json["payment_setting"]);
+    appThemeColors = AppThemeColors.fromJson(json["app_theme_colors"]);
     /* if (json['tax_detail'] != null) {
       taxDetail = new List<Null>();
       json['tax_detail'].forEach((v) {
@@ -346,6 +367,13 @@ class StoreModel {
     currencyAbbr = json['currency_abbr'];
     blDeviceIdUnique = json['bl_device_id_unique'];
     isRefererFnEnable = json['is_referer_fn_enable'];
+    homePageTitleStatus = json['home_page_title_status'];
+    homePageTitle = json['home_page_title'];
+    homePageSubtitleStatus = json['home_page_subtitle_status'];
+    homePageSubtitle = json['home_page_subtitle'];
+    homePageHeaderRight = json['home_page_header_right'];
+    homePageDisplayNumber = json['home_page_display_number'];
+    homePageDisplayNumberType = json['home_page_display_number_type'];
   }
 
   Map<String, dynamic> toJson() {
@@ -463,6 +491,14 @@ class StoreModel {
     data['currency_abbr'] = this.currencyAbbr;
     data['bl_device_id_unique'] = this.blDeviceIdUnique;
     data['is_referer_fn_enable'] = this.isRefererFnEnable;
+
+    data['home_page_title_status'] = this.homePageTitleStatus;
+    data['home_page_title'] = this.homePageTitle;
+    data['home_page_subtitle_status'] = this.homePageSubtitleStatus;
+    data['home_page_subtitle'] = this.homePageSubtitle;
+    data['home_page_header_right'] = this.homePageHeaderRight;
+    data['home_page_display_number'] = this.homePageDisplayNumber;
+    data['home_page_display_number_type'] = this.homePageDisplayNumberType;
     return data;
   }
 }
@@ -477,19 +513,17 @@ class PaymentSetting {
   });
 
   factory PaymentSetting.fromJson(Map<String, dynamic> json) => PaymentSetting(
-    apiKey: json["api_key"],
-    secretKey: json["secret_key"],
-  );
+        apiKey: json["api_key"],
+        secretKey: json["secret_key"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "api_key": apiKey,
-    "secret_key": secretKey,
-  };
+        "api_key": apiKey,
+        "secret_key": secretKey,
+      };
 }
 
-
 class AppThemeColors {
-
   String id;
   String appThemeColor;
   String leftMenuIconColor;
@@ -519,36 +553,36 @@ class AppThemeColors {
   });
 
   factory AppThemeColors.fromJson(Map<String, dynamic> json) => AppThemeColors(
-    id: json["id"],
-    appThemeColor: json["app_theme_color"],
-    leftMenuIconColor: json["left_menu_icon_color"],
-    leftMenuBackgroundColor: json["left_menu_background_color"],
-    leftMenuTitleColor: json["left_menu_title_color"],
-    leftMenuUsernameColor: json["left_menu_username_color"],
-    bottomBarIconColor: json["bottom_bar_icon_color"],
-    bottomBarTextColor: json["bottom_bar_text_color"],
-    dotIncreasedColor: json["dot_increased_color"],
-    leftMenuHeaderBackgroundColor: json["left_menu_header_background_color"],
-    bottom_bar_background_color: json["bottom_bar_background_color"],
-    left_menu_label_Color: json["left_menu_label_color"],
-  );
+        id: json["id"],
+        appThemeColor: json["app_theme_color"],
+        leftMenuIconColor: json["left_menu_icon_color"],
+        leftMenuBackgroundColor: json["left_menu_background_color"],
+        leftMenuTitleColor: json["left_menu_title_color"],
+        leftMenuUsernameColor: json["left_menu_username_color"],
+        bottomBarIconColor: json["bottom_bar_icon_color"],
+        bottomBarTextColor: json["bottom_bar_text_color"],
+        dotIncreasedColor: json["dot_increased_color"],
+        leftMenuHeaderBackgroundColor:
+            json["left_menu_header_background_color"],
+        bottom_bar_background_color: json["bottom_bar_background_color"],
+        left_menu_label_Color: json["left_menu_label_color"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "app_theme_color": appThemeColor,
-    "left_menu_icon_color": leftMenuIconColor,
-    "left_menu_background_color": leftMenuBackgroundColor,
-    "left_menu_title_color": leftMenuTitleColor,
-    "left_menu_username_color": leftMenuUsernameColor,
-    "bottom_bar_icon_color": bottomBarIconColor,
-    "bottom_bar_text_color": bottomBarTextColor,
-    "dot_increased_color": dotIncreasedColor,
-    "left_menu_header_background_color": leftMenuHeaderBackgroundColor,
-    "bottom_bar_background_color": bottom_bar_background_color,
-    "left_menu_label_color": left_menu_label_Color,
-  };
+        "id": id,
+        "app_theme_color": appThemeColor,
+        "left_menu_icon_color": leftMenuIconColor,
+        "left_menu_background_color": leftMenuBackgroundColor,
+        "left_menu_title_color": leftMenuTitleColor,
+        "left_menu_username_color": leftMenuUsernameColor,
+        "bottom_bar_icon_color": bottomBarIconColor,
+        "bottom_bar_text_color": bottomBarTextColor,
+        "dot_increased_color": dotIncreasedColor,
+        "left_menu_header_background_color": leftMenuHeaderBackgroundColor,
+        "bottom_bar_background_color": bottom_bar_background_color,
+        "left_menu_label_color": left_menu_label_Color,
+      };
 }
-
 
 class Banner {
   Banner({
@@ -584,38 +618,38 @@ class Banner {
   String platform;
 
   factory Banner.fromJson(Map<String, dynamic> json) => Banner(
-    id: json["id"],
-    storeId: json["store_id"],
-    link: json["link"],
-    title: json["title"],
-    categoryId: json["category_id"],
-    subCategoryId: json["sub_category_id"],
-    productId: json["product_id"],
-    offerId: json["offer_id"],
-    image: json["image"],
-    linkTo: json["link_to"],
-    pageId: json["page_id"],
-    status: json["status"],
-    type: json["type"],
-    platform: json["platform"],
-  );
+        id: json["id"],
+        storeId: json["store_id"],
+        link: json["link"],
+        title: json["title"],
+        categoryId: json["category_id"],
+        subCategoryId: json["sub_category_id"],
+        productId: json["product_id"],
+        offerId: json["offer_id"],
+        image: json["image"],
+        linkTo: json["link_to"],
+        pageId: json["page_id"],
+        status: json["status"],
+        type: json["type"],
+        platform: json["platform"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "id": id,
-    "store_id": storeId,
-    "link": link,
-    "title": title,
-    "category_id": categoryId,
-    "sub_category_id": subCategoryId,
-    "product_id": productId,
-    "offer_id": offerId,
-    "image": image,
-    "link_to": linkTo,
-    "page_id": pageId,
-    "status": status,
-    "type": type,
-    "platform": platform,
-  };
+        "id": id,
+        "store_id": storeId,
+        "link": link,
+        "title": title,
+        "category_id": categoryId,
+        "sub_category_id": subCategoryId,
+        "product_id": productId,
+        "offer_id": offerId,
+        "image": image,
+        "link_to": linkTo,
+        "page_id": pageId,
+        "status": status,
+        "type": type,
+        "platform": platform,
+      };
 }
 
 class Banners {
@@ -634,17 +668,17 @@ class Banners {
 
   Banners(
       {this.id,
-        this.storeId,
-        this.link,
-        this.title,
-        this.categoryId,
-        this.subCategoryId,
-        this.productId,
-        this.offerId,
-        this.image,
-        this.linkTo,
-        this.pageId,
-        this.status});
+      this.storeId,
+      this.link,
+      this.title,
+      this.categoryId,
+      this.subCategoryId,
+      this.productId,
+      this.offerId,
+      this.image,
+      this.linkTo,
+      this.pageId,
+      this.status});
 
   Banners.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -688,10 +722,10 @@ class ForceDownload {
 
   ForceDownload(
       {this.iosAppVersion,
-        this.androidAppVerison,
-        this.windowAppVersion,
-        this.forceDownload,
-        this.forceDownloadMessage});
+      this.androidAppVerison,
+      this.windowAppVersion,
+      this.forceDownload,
+      this.forceDownloadMessage});
 
   ForceDownload.fromJson(Map<String, dynamic> json) {
     iosAppVersion = json['ios_app_version'];

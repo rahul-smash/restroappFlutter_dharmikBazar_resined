@@ -25,17 +25,18 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'ForceUpdate.dart';
 import 'SearchScreen.dart';
 import 'dart:io';
-
-
+import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
   ConfigModel configObject;
   bool showForceUploadAlert;
-  HomeScreen(this.store, this.configObject,this.showForceUploadAlert);
+
+  HomeScreen(this.store, this.configObject, this.showForceUploadAlert);
 
   @override
   State<StatefulWidget> createState() {
@@ -44,7 +45,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   StoreModel store;
   FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   List<NetworkImage> imgList = [];
@@ -52,7 +52,8 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   UserModel user;
   static FirebaseAnalytics analytics = FirebaseAnalytics();
-  static FirebaseAnalyticsObserver observer = FirebaseAnalyticsObserver(analytics: analytics);
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
   bool isStoreClosed;
   final DatabaseHelper databaseHelper = new DatabaseHelper();
   int cartBadgeCount;
@@ -82,22 +83,27 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         for (var i = 0; i < store.banners.length; i++) {
           String imageUrl = store.banners[i].image;
-          imgList.add(NetworkImage(imageUrl.isEmpty ? AppConstant.placeholderImageUrl : imageUrl),);
+          imgList.add(
+            NetworkImage(
+                imageUrl.isEmpty ? AppConstant.placeholderImageUrl : imageUrl),
+          );
         }
       }
-      if(widget.showForceUploadAlert){
+      if (widget.showForceUploadAlert) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           DialogUtils.showForceUpdateDialog(context, store.storeName,
               store.forceDownload[0].forceDownloadMessage);
         });
-      }else{
-        if(!checkIfStoreClosed()){
+      } else {
+        if (!checkIfStoreClosed()) {
           WidgetsBinding.instance.addPostFrameCallback((_) async {
             if (!AppConstant.isLoggedIn && store.isRefererFnEnable) {
-              String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(AppConstant.showReferEarnAlert);
+              String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(
+                  AppConstant.showReferEarnAlert);
               print("showReferEarnAlert=${showReferEarnAlert}");
-              if(showReferEarnAlert == null){
-                SharedPrefs.storeSharedValue(AppConstant.showReferEarnAlert, "true");
+              if (showReferEarnAlert == null) {
+                SharedPrefs.storeSharedValue(
+                    AppConstant.showReferEarnAlert, "true");
                 DialogUtils.showInviteEarnAlert2(context);
               }
             }
@@ -109,60 +115,40 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       key: _key,
-      appBar: AppBar(
-        title: widget.configObject.isMultiStore == false? Text(store.storeName) :
-        InkWell(
-          onTap: () async {
-            BranchData selectedStore = await DialogUtils.displayBranchDialog(context,
-                "Select Branch", storeBranchesModel,branchData);
-            logout(context,selectedStore);
-            },
-          child: Row(
-            children: <Widget>[
-              Text(branchData == null ? "" :branchData.storeName),
-              Icon(Icons.keyboard_arrow_down)
-            ],
-          ),
-        ),
-        centerTitle: widget.configObject.isMultiStore == true ? false : true,
-        leading: new IconButton(
-          icon: Image.asset('images/hamburger.png', width: 25),
-          onPressed: _handleDrawer,
-        ),
-
-      ),
-      body:Column(children: <Widget>[
-            addBanners(),
-            Expanded(
-              child: isLoading
-                ? Center(child: CircularProgressIndicator()) : categoryResponse == null
-                ? SingleChildScrollView(child:Center(child: Text("")))
-                : Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage("images/backgroundimg.png"),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-              child: GridView.count(
-                  crossAxisCount: 2,
-                  childAspectRatio: 1.1,
-                  padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
-                  mainAxisSpacing: 5.0,
-                  crossAxisSpacing: 8.0,
-                  shrinkWrap: true,
-                  children: categoryResponse.categories.map((CategoryModel model) {
-
-                    return GridTile(child: CategoryView(model,store,false,0));
-                  }).toList()),
-            ),
+      appBar: getAppBar(),
+      body: Column(
+        children: <Widget>[
+          addBanners(),
+          Expanded(
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : categoryResponse == null
+                    ? SingleChildScrollView(child: Center(child: Text("")))
+                    : Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage("images/backgroundimg.png"),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                        child: GridView.count(
+                            crossAxisCount: 2,
+                            childAspectRatio: 1.1,
+                            padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+                            mainAxisSpacing: 5.0,
+                            crossAxisSpacing: 8.0,
+                            shrinkWrap: true,
+                            children: categoryResponse.categories
+                                .map((CategoryModel model) {
+                              return GridTile(
+                                  child: CategoryView(model, store, false, 0));
+                            }).toList()),
+                      ),
           ),
         ],
       ),
@@ -172,6 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
   Widget addBanners() {
     return Stack(
       children: <Widget>[
@@ -192,46 +179,56 @@ class _HomeScreenState extends State<HomeScreen> {
               showIndicator: imgList.length == 1 ? false : true,
               indicatorBgPadding: 7.0,
               images: imgList,
-              onImageTap: (position){
+              onImageTap: (position) {
                 print("onImageTap ${position}");
                 print("linkTo=${store.banners[position].linkTo}");
 
-                if(store.banners[position].linkTo.isNotEmpty){
-                  if(store.banners[position].linkTo == "category"){
-
-                    if(store.banners[position].categoryId == "0" &&
+                if (store.banners[position].linkTo.isNotEmpty) {
+                  if (store.banners[position].linkTo == "category") {
+                    if (store.banners[position].categoryId == "0" &&
                         store.banners[position].subCategoryId == "0" &&
-                        store.banners[position].productId == "0"){
+                        store.banners[position].productId == "0") {
                       print("return");
                       return;
                     }
 
-                    if(store.banners[position].categoryId != "0" &&
-                     store.banners[position].subCategoryId != "0" &&
-                        store.banners[position].productId != "0"){
+                    if (store.banners[position].categoryId != "0" &&
+                        store.banners[position].subCategoryId != "0" &&
+                        store.banners[position].productId != "0") {
                       // here we have to open the product detail
                       print("open the product detail ${position}");
-
-                    }else if(store.banners[position].categoryId != "0" &&
+                    } else if (store.banners[position].categoryId != "0" &&
                         store.banners[position].subCategoryId != "0" &&
-                        store.banners[position].productId == "0"){
+                        store.banners[position].productId == "0") {
                       //here open the banner sub category
                       print("open the subCategory ${position}");
 
-                      for(int i=0; i<categoryResponse.categories.length; i++){
-                        CategoryModel categories = categoryResponse.categories[i];
-                        if(store.banners[position].categoryId == categories.id){
-                          print("title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
-                          if(categories.subCategory!= null){
-                            for(int j=0; j<categories.subCategory.length;j++){
-                              SubCategory subCategory = categories.subCategory[j];
+                      for (int i = 0;
+                          i < categoryResponse.categories.length;
+                          i++) {
+                        CategoryModel categories =
+                            categoryResponse.categories[i];
+                        if (store.banners[position].categoryId ==
+                            categories.id) {
+                          print(
+                              "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+                          if (categories.subCategory != null) {
+                            for (int j = 0;
+                                j < categories.subCategory.length;
+                                j++) {
+                              SubCategory subCategory =
+                                  categories.subCategory[j];
 
-                              if(subCategory.id == store.banners[position].subCategoryId){
-                                print("open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.banners[position].subCategoryId}");
+                              if (subCategory.id ==
+                                  store.banners[position].subCategoryId) {
+                                print(
+                                    "open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.banners[position].subCategoryId}");
 
-                                Navigator.push(context,
+                                Navigator.push(
+                                  context,
                                   MaterialPageRoute(builder: (context) {
-                                    return SubCategoryProductScreen(categories,true,j);
+                                    return SubCategoryProductScreen(
+                                        categories, true, j);
                                   }),
                                 );
 
@@ -239,28 +236,33 @@ class _HomeScreenState extends State<HomeScreen> {
                               }
                             }
                           }
-
                         }
                         //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
                       }
-                    }else if(store.banners[position].categoryId != "0" &&
+                    } else if (store.banners[position].categoryId != "0" &&
                         store.banners[position].subCategoryId == "0" &&
-                        store.banners[position].productId == "0"){
+                        store.banners[position].productId == "0") {
                       print("open the Category ${position}");
 
-                      for(int i=0; i<categoryResponse.categories.length; i++){
-                        CategoryModel categories = categoryResponse.categories[i];
-                        if(store.banners[position].categoryId == categories.id){
-                          print("title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
-                          Navigator.push(context,
+                      for (int i = 0;
+                          i < categoryResponse.categories.length;
+                          i++) {
+                        CategoryModel categories =
+                            categoryResponse.categories[i];
+                        if (store.banners[position].categoryId ==
+                            categories.id) {
+                          print(
+                              "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+                          Navigator.push(
+                            context,
                             MaterialPageRoute(builder: (context) {
-                              return SubCategoryProductScreen(categories, true, 0);
+                              return SubCategoryProductScreen(
+                                  categories, true, 0);
                             }),
                           );
                           break;
                         }
                       }
-
                     }
                     //-----------------------------------------------
                   }
@@ -288,72 +290,90 @@ class _HomeScreenState extends State<HomeScreen> {
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
-              icon: Image.asset('images/contacticon.png', width: 24,fit: BoxFit.scaleDown,
-                  color: bottomBarIconColor),
-              title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
+              icon: Image.asset('images/contacticon.png',
+                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+              title:
+                  Text('Contact', style: TextStyle(color: bottomBarTextColor)),
             ),
             BottomNavigationBarItem(
-              icon: Image.asset('images/searchcion.png', width: 24,fit: BoxFit.scaleDown,
-                  color: bottomBarIconColor),
-              title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
+              icon: Image.asset('images/searchcion.png',
+                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+              title:
+                  Text('Search', style: TextStyle(color: bottomBarTextColor)),
             ),
             BottomNavigationBarItem(
-                icon: Icon(Icons.shopping_cart, color: Colors.white,size: 0,),
-                title: Text(''),),
+              icon: Icon(
+                Icons.shopping_cart,
+                color: Colors.white,
+                size: 0,
+              ),
+              title: Text(''),
+            ),
             BottomNavigationBarItem(
-              icon: Image.asset('images/historyicon.png', width: 24,fit: BoxFit.scaleDown,
-                  color: bottomBarIconColor),
-                title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
-                ),
+              icon: Image.asset('images/historyicon.png',
+                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+              title: Text('My Orders',
+                  style: TextStyle(color: bottomBarTextColor)),
+            ),
             BottomNavigationBarItem(
               icon: Badge(
                 showBadge: cartBadgeCount == 0 ? false : true,
-                badgeContent: Text('${cartBadgeCount}',style: TextStyle(color: Colors.white)),
-                child: Image.asset('images/carticon.png', width: 24,
-                    fit: BoxFit.scaleDown,color: bottomBarIconColor),
+                badgeContent: Text('${cartBadgeCount}',
+                    style: TextStyle(color: Colors.white)),
+                child: Image.asset('images/carticon.png',
+                    width: 24,
+                    fit: BoxFit.scaleDown,
+                    color: bottomBarIconColor),
               ),
               title: Padding(
                 padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
-                child: Text('Cart', style: TextStyle(color: bottomBarTextColor)),
+                child:
+                    Text('Cart', style: TextStyle(color: bottomBarTextColor)),
               ),
             ),
           ],
         ),
         Container(
-          padding:  EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: appTheme),
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: appTheme),
           margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
           //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: widget.configObject.isGroceryApp == "true" ?
-          Image.asset("images/groceryicon.png",height: 40, width: 40,color: whiteColor,)
-              :Image.asset("images/restauranticon.png",height: 40, width: 40,color: whiteColor),
+          child: widget.configObject.isGroceryApp == "true"
+              ? Image.asset(
+                  "images/groceryicon.png",
+                  height: 40,
+                  width: 40,
+                  color: whiteColor,
+                )
+              : Image.asset("images/restauranticon.png",
+                  height: 40, width: 40, color: whiteColor),
         ),
       ],
     );
   }
 
   onTabTapped(int index) {
-    if(checkIfStoreClosed()){
+    if (checkIfStoreClosed()) {
       DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
-    }else{
+    } else {
       setState(() {
         _currentIndex = index;
         if (_currentIndex == 4) {
 //          if (AppConstant.isLoggedIn) {
-            Navigator.push(context,
-              MaterialPageRoute(builder: (context) => MyCartScreen(() {
-                getCartCount();
-              })),
-            );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MyCartScreen(() {
+                      getCartCount();
+                    })),
+          );
 //          }else{
 //            Utils.showLoginDialog(context);
 //          }
 
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "MyCartScreen";
-          Utils.sendAnalyticsEvent("Clicked MyCartScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked MyCartScreen", attributeMap);
         }
         if (_currentIndex == 1) {
           if (AppConstant.isLoggedIn) {
@@ -361,12 +381,12 @@ class _HomeScreenState extends State<HomeScreen> {
               context,
               MaterialPageRoute(builder: (context) => SearchScreen()),
             );
-          }else{
+          } else {
             Utils.showLoginDialog(context);
           }
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "SearchScreen";
-          Utils.sendAnalyticsEvent("Clicked SearchScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked SearchScreen", attributeMap);
         }
         if (_currentIndex == 3) {
           if (AppConstant.isLoggedIn) {
@@ -374,9 +394,9 @@ class _HomeScreenState extends State<HomeScreen> {
               context,
               MaterialPageRoute(builder: (context) => MyOrderScreen(store)),
             );
-            Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+            Map<String, dynamic> attributeMap = new Map<String, dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";
-            Utils.sendAnalyticsEvent("Clicked MyOrderScreen",attributeMap);
+            Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
           } else {
             Utils.showLoginDialog(context);
           }
@@ -386,9 +406,9 @@ class _HomeScreenState extends State<HomeScreen> {
             context,
             MaterialPageRoute(builder: (context) => ContactScreen(store)),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "ContactScreen";
-          Utils.sendAnalyticsEvent("Clicked ContactScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked ContactScreen", attributeMap);
         }
       });
     }
@@ -396,15 +416,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
   _handleDrawer() async {
     try {
-      if(checkIfStoreClosed()){
-        DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
-      }else{
+      if (checkIfStoreClosed()) {
+        DialogUtils.displayCommonDialog(
+            context, store.storeName, store.storeMsg);
+      } else {
         _key.currentState.openDrawer();
         //print("------_handleDrawer-------");
         if (AppConstant.isLoggedIn) {
           user = await SharedPrefs.getUser();
-          if(user != null)
-          setState(() {});
+          if (user != null) setState(() {});
         }
       }
     } catch (e) {
@@ -413,26 +433,26 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void initFirebase() {
-    if(widget.configObject.isGroceryApp == "true"){
+    if (widget.configObject.isGroceryApp == "true") {
       AppConstant.isRestroApp = false;
-    }else{
+    } else {
       AppConstant.isRestroApp = true;
     }
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
         try {
           print("------onMessage: $message");
-          if(AppConstant.isLoggedIn){
-            if (Platform.isIOS){
+          if (AppConstant.isLoggedIn) {
+            if (Platform.isIOS) {
               print("iosssssssssssssssss");
               String title = message['aps']['alert']['title'];
               String body = message['aps']['alert']['body'];
-              showNotification(title,body,message);
-            }else{
+              showNotification(title, body, message);
+            } else {
               print("androiddddddddddd");
               String title = message['notification']['title'];
               String body = message['notification']['body'];
-              showNotification(title,body,message);
+              showNotification(title, body, message);
             }
           }
         } catch (e) {
@@ -441,17 +461,15 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       onLaunch: (Map<String, dynamic> message) async {
         //print("onLaunch: $message");
-
       },
       onResume: (Map<String, dynamic> message) async {
         //print("onResume: $message");
-
       },
     );
 
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
-    _firebaseMessaging.getToken().then((token){
+    _firebaseMessaging.getToken().then((token) {
       //print("----token---- ${token}");
       try {
         SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
@@ -461,13 +479,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future showNotification(String title,String body, Map<String, dynamic> message) async {
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = new FlutterLocalNotificationsPlugin();
+  Future showNotification(
+      String title, String body, Map<String, dynamic> message) async {
+    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        new FlutterLocalNotificationsPlugin();
 
     String appName = await SharedPrefs.getStoreSharedValue(AppConstant.appName);
 
     var initializationSettingsAndroid =
-    AndroidInitializationSettings('ic_notification');
+        AndroidInitializationSettings('ic_notification');
     var initializationSettingsIOS = IOSInitializationSettings(
         onDidReceiveLocalNotification: onDidReceiveLocalNotification);
     var initializationSettings = InitializationSettings(
@@ -481,16 +501,16 @@ class _HomeScreenState extends State<HomeScreen> {
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-        0, title, body, platformChannelSpecifics,
-        payload: 'item x');
-
+    await flutterLocalNotificationsPlugin
+        .show(0, title, body, platformChannelSpecifics, payload: 'item x');
   }
+
   Future<void> onSelectNotification(String payload) async {
     debugPrint('onSelectNotification : ');
   }
-  Future<void> onDidReceiveLocalNotification(int id, String title,
-      String body, String payload) async {
+
+  Future<void> onDidReceiveLocalNotification(
+      int id, String title, String body, String payload) async {
     debugPrint('onDidReceiveLocalNotification : ');
   }
 
@@ -503,16 +523,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void checkForMultiStore() {
     print("isMultiStore=${widget.configObject.isMultiStore}");
-    if(widget.configObject.isMultiStore){
-      ApiController.multiStoreApiRequest(widget.configObject.primaryStoreId).then((response){
+    if (widget.configObject.isMultiStore) {
+      ApiController.multiStoreApiRequest(widget.configObject.primaryStoreId)
+          .then((response) {
         //print("${storeBranchesModel.data.length}");
         setState(() {
           this.storeBranchesModel = response;
-          if(storeBranchesModel != null){
-            if(storeBranchesModel.data.isNotEmpty){
+          if (storeBranchesModel != null) {
+            if (storeBranchesModel.data.isNotEmpty) {
               for (int i = 0; i < storeBranchesModel.data.length; i++) {
-                if(widget.store.id == storeBranchesModel.data[i].id){
-                  branchData =  storeBranchesModel.data[i];
+                if (widget.store.id == storeBranchesModel.data[i].id) {
+                  branchData = storeBranchesModel.data[i];
                   break;
                 }
               }
@@ -523,11 +544,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  bool checkIfStoreClosed(){
-    if(store.storeStatus == "0"){
+  bool checkIfStoreClosed() {
+    if (store.storeStatus == "0") {
       //0 mean Store close
       return true;
-    }else{
+    } else {
       return false;
     }
   }
@@ -539,8 +560,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  getCartCount(){
-    databaseHelper.getCount(DatabaseHelper.CART_Table).then((value){
+  getCartCount() {
+    databaseHelper.getCount(DatabaseHelper.CART_Table).then((value) {
       setState(() {
         cartBadgeCount = value;
       });
@@ -550,7 +571,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void getCategoryApi() {
     isLoading = true;
-    ApiController.getCategoriesApiRequest(store.id).then((response){
+    ApiController.getCategoriesApiRequest(store.id).then((response) {
       setState(() {
         isLoading = false;
         this.categoryResponse = response;
@@ -558,7 +579,7 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  Future logout(BuildContext context,BranchData selectedStore) async {
+  Future logout(BuildContext context, BranchData selectedStore) async {
     try {
       Utils.showProgressDialog(context);
       SharedPrefs.setUserLoggedIn(false);
@@ -574,8 +595,10 @@ class _HomeScreenState extends State<HomeScreen> {
       databaseHelper.deleteTable(DatabaseHelper.Products_Table);
       eventBus.fire(updateCartCount());
 
-      StoreResponse storeData = await ApiController.versionApiRequest(selectedStore.id);
-      CategoryResponse categoryResponse = await ApiController.getCategoriesApiRequest(storeData.store.id);
+      StoreResponse storeData =
+          await ApiController.versionApiRequest(selectedStore.id);
+      CategoryResponse categoryResponse =
+          await ApiController.getCategoriesApiRequest(storeData.store.id);
       setState(() {
         this.store = storeData.store;
         this.branchData = selectedStore;
@@ -587,6 +610,121 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Widget getAppBar() {
+    bool rightActionsEnable = false,
+        whatIconEnable = false,
+        dialIconEnable = false;
 
+    if (store.homePageDisplayNumberType != null &&
+        store.homePageDisplayNumberType.isNotEmpty) {
+      //0=>Contact Number,1=>App Icon,2=>None
+      switch (store.homePageHeaderRight) {
+        case "0":
+        case "1":
+        case "2":
+          rightActionsEnable = true;
+          break;
+      }
+      if (store.homePageDisplayNumber!=null&&
+          store.homePageDisplayNumber.isNotEmpty) {
+        //0=>Whats app, 1=>Phone Call
+        if (store.homePageDisplayNumberType.compareTo("0") == 0) {
+          whatIconEnable = true;
+        }
+        //0=>Whats app, 1=>Phone Call
+        if (store.homePageDisplayNumberType.compareTo("1") == 0) {
+          dialIconEnable = true;
+        }
+      }
+    }
 
+    return AppBar(
+      title: widget.configObject.isMultiStore == false
+          ? Column(
+              children: <Widget>[
+                Visibility(
+                  visible: store.homePageTitleStatus,
+                  child: Text(
+                    store.homePageTitle != null
+                        ? store.homePageTitle
+                        : store.storeName,
+                  ),
+                ),
+                Visibility(
+                  visible: store.homePageSubtitleStatus &&
+                      store.homePageSubtitle != null,
+                  child: Text(
+                    store.homePageSubtitle != null
+                        ? store.homePageSubtitle
+                        : "",
+                    style: TextStyle(fontSize: 13),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                  ),
+                )
+              ],
+            )
+          : InkWell(
+              onTap: () async {
+                BranchData selectedStore =
+                    await DialogUtils.displayBranchDialog(context,
+                        "Select Branch", storeBranchesModel, branchData);
+                logout(context, selectedStore);
+              },
+              child: Row(
+                children: <Widget>[
+                  Text(branchData == null ? "" : branchData.storeName),
+                  Icon(Icons.keyboard_arrow_down)
+                ],
+              ),
+            ),
+      centerTitle: widget.configObject.isMultiStore == true ? false : true,
+      leading: new IconButton(
+        icon: Image.asset('images/hamburger.png', width: 25),
+        onPressed: _handleDrawer,
+      ),
+      actions: <Widget>[
+        Visibility(
+          visible: rightActionsEnable && whatIconEnable,
+          child: Padding(
+              padding: EdgeInsets.only(right: 5.0),
+              child: IconButton(
+                icon: Image.asset(
+                  'images/whatsapp.png',
+                  width: 28,
+                  height: 25,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  FlutterOpenWhatsapp.sendSingleMessage(
+                      store.homePageDisplayNumber, "");
+                },
+              )),
+        ),
+        Visibility(
+            visible: rightActionsEnable && dialIconEnable,
+            child: Padding(
+                padding: EdgeInsets.only(right: 8.0),
+                child: GestureDetector(
+                  onTap: () {
+                    _launchCaller(store.homePageDisplayNumber);
+                  },
+                  child: Icon(
+                    Icons.call,
+                    size: 25.0,
+                    color: Colors.white,
+                  ),
+                )))
+      ],
+    );
+  }
+
+  _launchCaller(String call) async {
+    String url = "tel:${call}";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 }
