@@ -657,7 +657,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     store.homePageSubtitle != null
                         ? store.homePageSubtitle
                         : "",
-                    style: TextStyle(fontSize: 14),
+                    style: TextStyle(fontSize: 13),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
                   ),
                 )
               ],
