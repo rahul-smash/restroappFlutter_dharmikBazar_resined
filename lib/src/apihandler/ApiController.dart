@@ -674,7 +674,8 @@ class ApiController {
       String razorpay_order_id,
       String razorpay_payment_id,
       String online_method,
-      String selectedDeliverSlotValue) async {
+      String selectedDeliverSlotValue,
+      {String cart_saving = "0.00"}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -770,6 +771,7 @@ class ApiController {
         "store_fixed_tax_detail": encodedFixedTax,
         "store_tax_rate_detail": encodedtaxLabel,
         "calculated_tax_detail": encodedtaxDetail,
+        "cart_saving": cart_saving,
       });
 
       //print("----${url}");

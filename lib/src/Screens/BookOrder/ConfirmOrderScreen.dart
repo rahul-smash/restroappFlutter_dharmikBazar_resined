@@ -37,19 +37,21 @@ class ConfirmOrderScreen extends StatefulWidget {
   String areaId;
   OrderType deliveryType;
   Area areaObject;
+  StoreModel storeModel;
   List<Product> cartList = new List();
 
   ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen, this.areaId,
       this.deliveryType,
-      {this.areaObject});
+      {this.areaObject, this.paymentMode = "2", this.storeModel});
 
   @override
-  ConfirmOrderState createState() => ConfirmOrderState();
+  ConfirmOrderState createState() => ConfirmOrderState(storeModel: storeModel);
 }
 
 class ConfirmOrderState extends State<ConfirmOrderScreen> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   double totalPrice = 0.00;
+  double totalSavings = 0.00;
   TaxCalculationModel taxModel;
 
   //TextEditingController noteController = TextEditingController();
@@ -73,6 +75,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool isCommentAdded = false;
 
   String comment = "";
+
+  ConfirmOrderState({this.storeModel});
 
   @override
   void initState() {
@@ -117,7 +121,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
                 deliverySlotModel = response;
-                print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+                print(
+                    "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
                 isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
                 for (int i = 0;
                     i < deliverySlotModel.data.dateTimeCollection.length;
@@ -233,6 +238,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               child: Wrap(
                 children: [
                   addTotalPrice(),
+                  addTotalSavingPrice(),
                   addEnterCouponCodeView(),
                   addCouponCodeRow(),
                   addConfirmOrder()
@@ -598,6 +604,47 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ))
       ]),
     );
+  }
+
+  Widget addTotalSavingPrice() {
+    //calculate total savings
+    if (widget.cartList != null && widget.cartList.isNotEmpty) {
+      for (Product product in widget.cartList) {
+        if (product != null &&
+            product.mrpPrice != null &&
+            product.price != null &&
+            product.quantity != null)
+          totalSavings +=
+              (double.parse(product.mrpPrice) - double.parse(product.price)) *
+                  double.parse(product.quantity);
+      }
+
+      return Visibility(
+        visible: totalSavings != 0.00,
+        child: Container(
+            color: Colors.white,
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(15, 5, 10, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Total Saving",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: appTheme,
+                            fontSize: 16)),
+                    Text(
+                        "${AppConstant.currency}${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: appTheme,
+                            fontSize: 16)),
+                  ],
+                ))),
+      );
+    }else{
+      return Container();
+    }
   }
 
   Widget addCouponCodeRow() {
@@ -1342,7 +1389,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     payment_request_id,
                     payment_id,
                     onlineMethod,
-                    selectedDeliverSlotValue)
+                    selectedDeliverSlotValue,
+                    cart_saving: totalSavings.toStringAsFixed(2))
                 .then((response) async {
               Utils.hideProgressDialog(context);
               if (response == null) {
