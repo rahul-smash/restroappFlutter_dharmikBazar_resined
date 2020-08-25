@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
@@ -12,6 +14,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
+import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
@@ -28,7 +31,7 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+//import 'package:webview_flutter/webview_flutter.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
   bool isComingFromPickUpScreen;
@@ -39,6 +42,7 @@ class ConfirmOrderScreen extends StatefulWidget {
   Area areaObject;
   StoreModel storeModel;
   List<Product> cartList = new List();
+  PaymentType _character = PaymentType.COD;
 
   ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen, this.areaId,
       this.deliveryType,
@@ -77,6 +81,42 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   String comment = "";
 
   ConfirmOrderState({this.storeModel});
+
+  void callPaytmPayApi() {
+    String address = "NA", pin = "NA";
+    if (widget.deliveryType == OrderType.Delivery) {
+      if (widget.address.address != null && widget.address.address.isNotEmpty)
+        address = widget.address.address +
+            " " +
+            widget.address.areaName +
+            " " +
+            widget.address.city;
+
+      if (widget.address.zipCode != null && widget.address.zipCode.isNotEmpty)
+        pin = widget.address.zipCode;
+    } else if (widget.deliveryType == OrderType.PickUp) {
+      address = widget.areaObject.pickupAdd;
+      pin = 'NA';
+    }
+    print(
+        "amount ${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}"
+        " address $address zipCode $pin");
+    double amount = databaseHelper.roundOffPrice(
+        taxModel == null ? totalPrice : double.parse(taxModel.total), 2);
+    Utils.showProgressDialog(context);
+    ApiController.createPaytmTxnToken(address, pin, amount).then((value) async {
+      Utils.hideProgressDialog(context);
+      if (value.success) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => PaytmWebView(value, storeModel)),
+        );
+      } else {
+        Utils.showToast("Api Error", false);
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -121,8 +161,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
                 deliverySlotModel = response;
-                print(
-                    "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+                print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
                 isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
                 for (int i = 0;
                     i < deliverySlotModel.data.dateTimeCollection.length;
@@ -241,6 +280,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   addTotalSavingPrice(),
                   addEnterCouponCodeView(),
                   addCouponCodeRow(),
+                  addPaymentOptions(),
                   addConfirmOrder()
                 ],
               ),
@@ -287,7 +327,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               "${model.message}");
           if (result != null && result == true) {
             databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
-            databaseHelper.deleteTable(DatabaseHelper.CART_Table);
             databaseHelper.deleteTable(DatabaseHelper.CART_Table);
             databaseHelper.deleteTable(DatabaseHelper.Products_Table);
             eventBus.fire(updateCartCount());
@@ -759,7 +798,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     context: context,
                     builder: (BuildContext context) => AvailableOffersDialog(
                         widget.address,
-                        "",
+                        widget.paymentMode,
                         widget.isComingFromPickUpScreen,
                         widget.areaId, (model) async {
                       await updateTaxDetails(model);
@@ -810,6 +849,86 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 ],
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget addPaymentOptions() {
+    bool showOptions = false;
+//    if (storeModel != null) {
+//      return Container();
+//    }
+    if (widget.storeModel.onlinePayment != null) {
+      if (widget.storeModel.onlinePayment == "1") {
+        showOptions = true;
+      } else {
+        showOptions = false; //cod
+      }
+    }
+    return Visibility(
+      visible: showOptions,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+        child: Wrap(
+          children: <Widget>[
+            Utils.showDivider(context),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Text("Select Payment",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: appTheme,
+                      fontWeight: FontWeight.w600,
+                    )),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    Radio(
+                      value: PaymentType.COD,
+                      groupValue: widget._character,
+                      activeColor: appTheme,
+                      onChanged: (PaymentType value) async {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.COD)
+                            widget.paymentMode = "2";
+                        });
+                      },
+                    ),
+                    Text('COD',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ],
+                ),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    Radio(
+                      value: PaymentType.ONLINE,
+                      activeColor: appTheme,
+                      groupValue: widget._character,
+                      onChanged: (PaymentType value) async {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.ONLINE)
+                            widget.paymentMode = "3";
+                        });
+                      },
+                    ),
+                    Text('Online',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ],
+                )
+              ],
+            )
           ],
         ),
       ),
@@ -992,21 +1111,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 }
               }
 
-              if (storeModel.onlinePayment == "1") {
-                var result = await DialogUtils.displayPaymentDialog(
-                    context, "Select Payment", "");
-                //print("----result----${result}--");
-                if (result == null) {
-                  return;
-                }
-                if (result == PaymentType.ONLINE) {
-                  widget.paymentMode = "3";
-                } else {
-                  widget.paymentMode = "2"; //cod
-                }
-              } else {
-                widget.paymentMode = "2"; //cod
-              }
+//              if (storeModel.onlinePayment == "1") {
+//                var result = await DialogUtils.displayPaymentDialog(
+//                    context, "Select Payment", "");
+//                //print("----result----${result}--");
+//                if (result == null) {
+//                  return;
+//                }
+//                if (result == PaymentType.ONLINE) {
+//                  widget.paymentMode = "3";
+//                } else {
+//                  widget.paymentMode = "2"; //cod
+//                }
+//              } else {
+//                widget.paymentMode = "2"; //cod
+//              }
 
               print("----paymentMod----${widget.paymentMode}--");
               print("-paymentGateway----${storeObject.paymentGateway}-}-");
@@ -1066,15 +1185,48 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-  performPlaceOrderOperation(StoreModel storeObject) {
+  performPlaceOrderOperation(StoreModel storeObject) async {
     if (widget.paymentMode == "3") {
-      if (storeObject.paymentGateway == "Razorpay") {
-        callOrderIdApi(storeObject);
-      } else if (storeObject.paymentGateway == "Stripe") {
-        callStripeApi();
+      String paymentGateway = storeObject.paymentGateway;
+      if (storeObject.paymentGatewaySettings != null &&
+          storeObject.paymentGatewaySettings.isNotEmpty) {
+        //case only single gateway is comming
+        if (storeObject.paymentGatewaySettings.length == 1) {
+          paymentGateway =
+              storeObject.paymentGatewaySettings.first.paymentGateway;
+          callPaymentGateWay(paymentGateway, storeObject);
+        } else {
+          String result =
+              await DialogUtils.displayMultipleOnlinePaymentMethodDialog(
+                  context, storeObject);
+          if (result.isEmpty) {
+            Utils.hideProgressDialog(context);
+            return;
+          }
+          paymentGateway = result;
+          callPaymentGateWay(paymentGateway, storeObject);
+        }
+        return;
+      } else {
+        //case payment gateway setting list empty
+        callPaymentGateWay(paymentGateway, storeObject);
       }
     } else {
       placeOrderApiCall("", "", "");
+    }
+  }
+
+  callPaymentGateWay(String paymentGateway, StoreModel storeObject) {
+    switch (paymentGateway) {
+      case "Razorpay":
+        callOrderIdApi(storeObject);
+        break;
+      case "Stripe":
+        callStripeApi();
+        break;
+      case "Paytmpay":
+        callPaytmPayApi();
+        break;
     }
   }
 
@@ -1449,6 +1601,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       print("<---onPageFinished------->");
       callStripeVerificationApi(event.url);
     });
+
+    eventBus.on<onPayTMPageFinished>().listen((event) {
+      print("Event Bus called");
+      callPaytmApi(event.url, event.orderId, event.txnId);
+    });
+  }
+
+  void callPaytmApi(String url, String orderId, String txnID) {
+    placeOrderApiCall(orderId, txnID, 'paytm');
   }
 
   void callStripeVerificationApi(String payment_request_id) {
@@ -1614,7 +1775,7 @@ class StripeWebView extends StatefulWidget {
 }
 
 class _StripeWebViewState extends State<StripeWebView> {
-  Completer<WebViewController> _controller = Completer<WebViewController>();
+  InAppWebViewController webView;
 
   @override
   Widget build(BuildContext context) {
@@ -1630,21 +1791,21 @@ class _StripeWebViewState extends State<StripeWebView> {
           centerTitle: true,
         ),
         body: Builder(builder: (BuildContext context) {
-          return WebView(
-            initialUrl: '${widget.stripeCheckOutModel.checkoutUrl}',
-            javascriptMode: JavascriptMode.unrestricted,
-            onWebViewCreated: (WebViewController webViewController) {
-              _controller.complete(webViewController);
+          return InAppWebView(
+            initialUrl: "${widget.stripeCheckOutModel.checkoutUrl}",
+            initialHeaders: {},
+            initialOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                    debuggingEnabled: true,
+                    javaScriptEnabled: true,
+                    javaScriptCanOpenWindowsAutomatically: true)),
+            onWebViewCreated: (InAppWebViewController controller) {
+              webView = controller;
             },
-            navigationDelegate: (NavigationRequest request) {
-              //print('=======NavigationRequest======= $request}');
-              return NavigationDecision.navigate;
+            onLoadStart: (InAppWebViewController controller, String url) {
+              print('==1====onLoadStart======: $url');
             },
-            onPageStarted: (String url) {
-              //print('======Page started loading======: $url');
-            },
-            onPageFinished: (String url) {
-              print('======Page finished loading======: $url');
+            onLoadStop: (InAppWebViewController controller, String url) async {
               if (url
                   .contains("api/stripeVerifyTransaction?response=success")) {
                 eventBus.fire(onPageFinished(
@@ -1652,7 +1813,72 @@ class _StripeWebViewState extends State<StripeWebView> {
                 Navigator.pop(context);
               }
             },
-            gestureNavigationEnabled: false,
+            onProgressChanged:
+                (InAppWebViewController controller, int progress) {
+              //print('==3====onProgressChanged======: $progress');
+            },
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class PaytmWebView extends StatelessWidget {
+  CreatePaytmTxnTokenResponse stripeCheckOutModel;
+  InAppWebViewController webView;
+  StoreModel storeModel;
+
+  PaytmWebView(this.stripeCheckOutModel, this.storeModel);
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () {},
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Used for removing back buttoon.
+          title: Text('Payment'),
+          centerTitle: true,
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return InAppWebView(
+            initialUrl: "${stripeCheckOutModel.url}",
+            initialHeaders: {},
+            initialOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                    debuggingEnabled: true,
+                    javaScriptEnabled: true,
+                    javaScriptCanOpenWindowsAutomatically: true)),
+            onWebViewCreated: (InAppWebViewController controller) {
+              webView = controller;
+            },
+            onLoadStart: (InAppWebViewController controller, String url) {
+              print('==1====onLoadStart======: $url');
+            },
+            onLoadStop: (InAppWebViewController controller, String url) async {
+              print('==2====onLoadStop======: $url');
+              if (url.contains("/api/paytmPaymentResult/orderId:")) {
+                String txnId =
+                    url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
+                url = url.replaceAll("/TxnId:" + txnId, "");
+                String orderId = url
+                    .substring(url.indexOf("/orderId:") + "/orderId:".length);
+                print(txnId);
+                print(orderId);
+                eventBus.fire(
+                    onPayTMPageFinished(url, orderId = orderId, txnId = txnId));
+                Navigator.pop(context);
+              } else if (url.contains("api/paytmPaymentResult/failure:")) {
+                Navigator.pop(context);
+                Utils.showToast("Payment Failed", false);
+              }
+            },
+            onProgressChanged:
+                (InAppWebViewController controller, int progress) {
+              //print('==3====onProgressChanged======: $progress');
+            },
           );
         }),
       ),

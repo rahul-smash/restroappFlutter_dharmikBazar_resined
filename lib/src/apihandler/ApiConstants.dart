@@ -54,6 +54,8 @@ class ApiConstants{
   static String stripePaymentCheckout = 'stripePaymentCheckout';
   static String stripeVerifyTransaction = 'stripeVerifyTransaction';
 
+  static String createPaytmTxnToken = 'createPaytmTxnToken';
+
 
 
   static final String txt_mobile = "Please enter your Mobile No. to proceed further";

@@ -11,6 +11,7 @@ import 'package:restroapp/src/models/AdminLoginModel.dart';
 import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
+import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
@@ -1350,5 +1351,58 @@ class ApiController {
       print(e);
     }
     return null;
+  }
+
+  static Future<CreatePaytmTxnTokenResponse> createPaytmTxnToken(
+      String address, String pin, double amount) async {
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        UserModel user = await SharedPrefs.getUser();
+        String email = user.email==null?'NA':
+        user.email.isEmpty ? "NA" : user.email;
+//        address = "170,phase1";
+        String firstName = user.fullName.contains(" ") == true
+            ? user.fullName.substring(0, user.fullName.indexOf(" "))
+            : user.fullName;
+        String lastName = user.fullName.contains(" ") == true
+            ? user.fullName.substring(user.fullName.indexOf(" "))
+            : 'NA';
+        print(firstName);
+        print(lastName);
+        String mobile = user.phone;
+//        String pin = '160002';
+//        String amount = '34.00';
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.createPaytmTxnToken;
+        //TODO: remove this static url
+        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "customer_id": user.id,
+          "customer_email": email,
+          "customer_add": address,
+          "customer_firstname": firstName,
+          "customer_lastname": lastName,
+          "customer_mobile": mobile,
+          "customer_pin": pin,
+          "amount": amount
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(responseType: ResponseType.plain));
+        print(response.data);
+        CreatePaytmTxnTokenResponse txnTokenResponse =
+            CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
+        if (txnTokenResponse.success) {
+          return txnTokenResponse;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }
