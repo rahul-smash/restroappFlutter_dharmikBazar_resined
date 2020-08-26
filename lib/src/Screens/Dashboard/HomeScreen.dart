@@ -620,12 +620,16 @@ class _HomeScreenState extends State<HomeScreen> {
       //0=>Contact Number,1=>App Icon,2=>None
       switch (store.homePageHeaderRight) {
         case "0":
-        case "1":
-        case "2":
           rightActionsEnable = true;
           break;
+        case "1":
+          rightActionsEnable = true;
+          break;
+        case "2":
+          rightActionsEnable = false;
+          break;
       }
-      if (store.homePageDisplayNumber!=null&&
+      if (store.homePageDisplayNumber != null &&
           store.homePageDisplayNumber.isNotEmpty) {
         //0=>Whats app, 1=>Phone Call
         if (store.homePageDisplayNumberType.compareTo("0") == 0) {
