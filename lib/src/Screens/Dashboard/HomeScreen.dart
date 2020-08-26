@@ -170,6 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
               boxFit: BoxFit.fitWidth,
               autoplay: true,
               animationCurve: Curves.ease,
+              autoplayDuration: Duration(milliseconds: 5000),
               animationDuration: Duration(milliseconds: 3000),
               dotSize: 6.0,
               dotIncreasedColor: dotIncreasedColor,
