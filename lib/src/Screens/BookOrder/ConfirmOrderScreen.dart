@@ -647,16 +647,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addTotalSavingPrice() {
     //calculate total savings
+    double totalMRpPrice = 0;
     if (widget.cartList != null && widget.cartList.isNotEmpty) {
       for (Product product in widget.cartList) {
         if (product != null &&
             product.mrpPrice != null &&
             product.price != null &&
-            product.quantity != null)
+            product.quantity != null) {
           totalSavings +=
               (double.parse(product.mrpPrice) - double.parse(product.price)) *
                   double.parse(product.quantity);
+          totalMRpPrice += double.parse(product.mrpPrice);
+        }
       }
+      //Y is P% of X
+      //P% = Y/X
+      //P= (Y/X)*100
+      double totalSavedPercentage = (totalSavings/totalMRpPrice)*100;
 
       return Visibility(
         visible: totalSavings != 0.00,
@@ -667,13 +674,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text("Total Saving",
+                    Text("Total Savings",
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: appTheme,
                             fontSize: 16)),
                     Text(
-                        "${AppConstant.currency}${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}",
+                        "${AppConstant.currency}${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} ( ${totalSavedPercentage.toStringAsFixed(2)}%)",
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
                             color: appTheme,
@@ -681,7 +688,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   ],
                 ))),
       );
-    }else{
+    } else {
       return Container();
     }
   }
