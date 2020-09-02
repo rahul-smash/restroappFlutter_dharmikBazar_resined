@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +18,7 @@ import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/OrderDetailsModel.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -31,6 +33,7 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:webview_flutter/webview_flutter.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
@@ -323,7 +326,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           setState(() {
             isLoading = false;
           });
-
         } else {
           var result = await DialogUtils.displayCommonDialog(
               context,
@@ -671,7 +673,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 ],
               )));
     else
-     return Container();
+      return Container();
   }
 
   void calculateTotalSavings() {
@@ -686,7 +688,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           totalSavings +=
               (double.parse(product.mrpPrice) - double.parse(product.price)) *
                   double.parse(product.quantity);
-          totalMRpPrice += (double.parse(product.mrpPrice)*double.parse(product.quantity));
+          totalMRpPrice +=
+              (double.parse(product.mrpPrice) * double.parse(product.quantity));
         }
       }
       //Y is P% of X
@@ -695,8 +698,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       double totalSavedPercentage = (totalSavings / totalMRpPrice) * 100;
       totalSavingsText =
           "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
-      setState(() {
-      });
+      setState(() {});
     }
   }
 
@@ -1480,7 +1482,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
   }
 
-  void callOrderIdApi(StoreModel storeObject) {
+  void callOrderIdApi(StoreModel storeObject) async {
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total); //totalPrice ;
     print("=======1===${price}===total==${taxModel.total}======");
@@ -1489,15 +1491,43 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String mPrice =
         price.toString().substring(0, price.toString().indexOf('.'));
     print("=======mPrice===${mPrice}===========");
-    ApiController.razorpayCreateOrderApi(mPrice).then((response) {
-      CreateOrderData model = response;
-      if (model != null && response.success) {
-        print("----razorpayCreateOrderApi----${response.data.id}--");
-        openCheckout(model.data.id, storeObject);
-      } else {
-        Utils.showToast("${model.message}", true);
-        Utils.hideProgressDialog(context);
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    databaseHelper.getCartItemsListToJson().then((orderJson) {
+      if (orderJson == null) {
+        print("--orderjson == null-orderjson == null-");
+        return;
       }
+      String storeAddress="";
+      try {
+        storeAddress = "${storeModel.storeName}, ${storeModel.location},"
+            "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
+      } catch (e) {
+        print(e);
+      }
+
+      String userId=user.id;
+      OrderDetailsModel detailsModel = OrderDetailsModel(
+          shippingCharges, comment, totalPrice.toString(),
+          widget.paymentMode, taxModel, widget.address,
+          widget.isComingFromPickUpScreen, widget.areaId, widget.deliveryType,
+          "", "", deviceId,
+          "Razorpay", userId, deviceToken, storeAddress,
+          selectedDeliverSlotValue, totalSavingsText);
+      ApiController.razorpayCreateOrderApi(
+              mPrice, orderJson, detailsModel.orderDetails)
+          .then((response) {
+        CreateOrderData model = response;
+        if (model != null && response.success) {
+          print("----razorpayCreateOrderApi----${response.data.id}--");
+          openCheckout(model.data.id, storeObject);
+        } else {
+          Utils.showToast("${model.message}", true);
+          Utils.hideProgressDialog(context);
+        }
+      });
     });
   }
 

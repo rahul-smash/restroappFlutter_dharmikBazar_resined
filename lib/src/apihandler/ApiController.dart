@@ -1021,7 +1021,7 @@ class ApiController {
     }
   }
 
-  static Future<CreateOrderData> razorpayCreateOrderApi(String amount) async {
+  static Future<CreateOrderData> razorpayCreateOrderApi(String amount,String orderJson,dynamic detailsJson) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.razorpayCreateOrder;
@@ -1033,6 +1033,8 @@ class ApiController {
         "currency": "INR",
         "receipt": "Order",
         "payment_capture": "1",
+        "order_info": detailsJson, //JSONObject details
+        "orders": orderJson //cart jsonObject
       });
 
       final response = await request.send().timeout(Duration(seconds: timeout));
@@ -1361,8 +1363,8 @@ class ApiController {
         StoreModel store = await SharedPrefs.getStore();
         SharedPreferences prefs = await SharedPreferences.getInstance();
         UserModel user = await SharedPrefs.getUser();
-        String email = user.email==null?'NA':
-        user.email.isEmpty ? "NA" : user.email;
+        String email =
+            user.email == null ? 'NA' : user.email.isEmpty ? "NA" : user.email;
 //        address = "170,phase1";
         String firstName = user.fullName.contains(" ") == true
             ? user.fullName.substring(0, user.fullName.indexOf(" "))
