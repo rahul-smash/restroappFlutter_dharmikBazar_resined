@@ -56,6 +56,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   double totalPrice = 0.00;
   double totalSavings = 0.00;
+  String totalSavingsText = "";
   TaxCalculationModel taxModel;
 
   //TextEditingController noteController = TextEditingController();
@@ -161,7 +162,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
                 deliverySlotModel = response;
-                print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+                print(
+                    "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
                 isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
                 for (int i = 0;
                     i < deliverySlotModel.data.dateTimeCollection.length;
@@ -317,9 +319,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             product.fixedTax = model.taxCalculation.fixedTax[i];
             widget.cartList.add(product);
           }
+          calculateTotalSavings();
           setState(() {
             isLoading = false;
           });
+
         } else {
           var result = await DialogUtils.displayCommonDialog(
               context,
@@ -646,6 +650,31 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addTotalSavingPrice() {
+    if (totalSavings != 0.00)
+      return Container(
+          color: Colors.white,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(15, 5, 10, 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Total Savings",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: appTheme,
+                          fontSize: 16)),
+                  Text('${AppConstant.currency}$totalSavingsText',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: appTheme,
+                          fontSize: 16)),
+                ],
+              )));
+    else
+     return Container();
+  }
+
+  void calculateTotalSavings() {
     //calculate total savings
     double totalMRpPrice = 0;
     if (widget.cartList != null && widget.cartList.isNotEmpty) {
@@ -657,39 +686,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           totalSavings +=
               (double.parse(product.mrpPrice) - double.parse(product.price)) *
                   double.parse(product.quantity);
-          totalMRpPrice += double.parse(product.mrpPrice);
+          totalMRpPrice += (double.parse(product.mrpPrice)*double.parse(product.quantity));
         }
       }
       //Y is P% of X
       //P% = Y/X
       //P= (Y/X)*100
-      double totalSavedPercentage = (totalSavings/totalMRpPrice)*100;
-
-      return Visibility(
-        visible: totalSavings != 0.00,
-        child: Container(
-            color: Colors.white,
-            child: Padding(
-                padding: EdgeInsets.fromLTRB(15, 5, 10, 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Total Savings",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: appTheme,
-                            fontSize: 16)),
-                    Text(
-                        "${AppConstant.currency}${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} ( ${totalSavedPercentage.toStringAsFixed(2)}%)",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: appTheme,
-                            fontSize: 16)),
-                  ],
-                ))),
-      );
-    } else {
-      return Container();
+      double totalSavedPercentage = (totalSavings / totalMRpPrice) * 100;
+      totalSavingsText =
+          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
+      setState(() {
+      });
     }
   }
 
@@ -1549,7 +1556,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     payment_id,
                     onlineMethod,
                     selectedDeliverSlotValue,
-                    cart_saving: totalSavings.toStringAsFixed(2))
+                    cart_saving: totalSavingsText)
                 .then((response) async {
               Utils.hideProgressDialog(context);
               if (response == null) {
