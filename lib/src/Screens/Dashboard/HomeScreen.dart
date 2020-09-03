@@ -674,7 +674,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 BranchData selectedStore =
                     await DialogUtils.displayBranchDialog(context,
                         "Select Branch", storeBranchesModel, branchData);
-                logout(context, selectedStore);
+                if (selectedStore != null &&
+                    store.id.compareTo(selectedStore.id) != 0)
+                  logout(context, selectedStore);
               },
               child: Row(
                 children: <Widget>[
