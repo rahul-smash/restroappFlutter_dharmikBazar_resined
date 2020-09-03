@@ -1435,9 +1435,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       'order_id': razorpay_order_id,
       //'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
       'amount': (double.parse(taxModel.total) * 100),
-      'name': '${user.fullName}',
+      'name': '${storeModel.storeName}',
       'description': '',
-      'prefill': {'contact': '${user.phone}', 'email': '${user.email}'},
+      'prefill': {'contact': '${user.phone}', 'email': '${user.email}','name': '${user.fullName}'},
       /*'external': {
         'wallets': ['paytm']
       }*/
@@ -1495,6 +1495,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
+    //new changes
     databaseHelper.getCartItemsListToJson().then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
