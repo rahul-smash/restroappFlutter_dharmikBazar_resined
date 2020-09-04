@@ -117,7 +117,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                     children: <Widget>[
                       SizedBox(height: 20),
                       Text(
-                        "City",
+                        "City*",
                         style: TextStyle(color: infoLabel, fontSize: 17.0),
                       ),
                       Padding(
@@ -162,7 +162,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Divider(color: Colors.grey, height: 2.0),
                       SizedBox(height: 20),
                       Text(
-                        "Area",
+                        "Area*",
                         style: TextStyle(color: infoLabel, fontSize: 17.0),
                       ),
                       Padding(
@@ -264,6 +264,9 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       color: Colors.lightBlue,
                                       decoration: TextDecoration.underline,
                                     )),
+                                TextSpan(
+                                    text: '*',
+                                ),
                                 // can add more TextSpans here...
                               ],
                             ),
@@ -290,7 +293,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(
-                          "Full Name:",
+                          "Full Name:*",
                           style: TextStyle(color: infoLabel, fontSize: 17.0),
                         ),
                       ),

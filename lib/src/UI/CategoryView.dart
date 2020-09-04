@@ -45,8 +45,7 @@ class CategoryView extends StatelessWidget {
           }
         },
         child: Container(
-          decoration: BoxDecoration(shape: BoxShape.rectangle,color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(10))),
+          color: Colors.white,
           width: Utils.getDeviceWidth(context),
           margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
           child: Column(
