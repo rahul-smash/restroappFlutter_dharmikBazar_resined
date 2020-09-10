@@ -31,6 +31,8 @@ class OrderData {
   String shippingCharges;
   String tax;
   String cartSaving;
+  String couponType;
+  String couponCode;
   List<Null> storeTaxRateDetail;
   List<Null> calculatedTaxDetail;
   List<Null> storeFixedTaxDetail;
@@ -55,6 +57,8 @@ class OrderData {
     this.shippingCharges,
     this.tax,
     this.cartSaving,
+    this.couponType,
+    this.couponCode,
     this.storeTaxRateDetail,
     this.calculatedTaxDetail,
     this.storeFixedTaxDetail,
@@ -80,6 +84,8 @@ class OrderData {
     shippingCharges = json['shipping_charges'];
     tax = json['tax'];
     cartSaving = json['cart_saving'];
+    couponType = json['coupon_type'];
+    couponCode = json['coupon_code'];
     address = json['address'];
     if (json['order_items'] != null) {
       orderItems = new List<OrderItems>();

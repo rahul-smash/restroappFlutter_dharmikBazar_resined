@@ -366,7 +366,10 @@ class OrderDetailScreen extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.cartSaving != null &&orderHistoryData.cartSaving.isNotEmpty? true : false,
+                      visible: orderHistoryData.cartSaving != null &&
+                              orderHistoryData.cartSaving.isNotEmpty
+                          ? true
+                          : false,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
                         child: Row(
@@ -377,6 +380,29 @@ class OrderDetailScreen extends StatelessWidget {
                                     color: Color(0xFF737879), fontSize: 18)),
                             Text(
                                 "${AppConstant.currency} ${orderHistoryData.cartSaving}",
+                                style: TextStyle(
+                                    color: Color(0xFF749A00),
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Visibility(
+                      visible: orderHistoryData.couponCode != null &&
+                              orderHistoryData.couponCode.isNotEmpty
+                          ? true
+                          : false,
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text('Coupon Code Appied: ',
+                                style: TextStyle(
+                                    color: Color(0xFF737879), fontSize: 18)),
+                            Text(
+                                "${orderHistoryData.couponCode}",
                                 style: TextStyle(
                                     color: Color(0xFF749A00),
                                     fontSize: 18,
@@ -515,11 +541,12 @@ class OrderDetailScreen extends StatelessWidget {
   }
 
   String getDeliveryAddress() {
-    if(orderHistoryData.deliveryAddress!=null&&orderHistoryData.deliveryAddress.isNotEmpty)
-    return '${orderHistoryData.address} '
-        '${orderHistoryData.deliveryAddress.first.areaName} '
-        '${orderHistoryData.deliveryAddress.first.city} '
-        '${orderHistoryData.deliveryAddress.first.state}';
+    if (orderHistoryData.deliveryAddress != null &&
+        orderHistoryData.deliveryAddress.isNotEmpty)
+      return '${orderHistoryData.address} '
+          '${orderHistoryData.deliveryAddress.first.areaName} '
+          '${orderHistoryData.deliveryAddress.first.city} '
+          '${orderHistoryData.deliveryAddress.first.state}';
     else
       return orderHistoryData.address;
   }
