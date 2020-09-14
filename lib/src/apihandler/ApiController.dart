@@ -1380,7 +1380,7 @@ class ApiController {
         var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
             ApiConstants.createPaytmTxnToken;
         //TODO: remove this static url
-        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
+//        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
         print(url);
         FormData formData = new FormData.fromMap({
           "customer_id": user.id,
@@ -1401,10 +1401,13 @@ class ApiController {
             CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
         if (txnTokenResponse.success) {
           return txnTokenResponse;
+        }else{
+          return null;
         }
       }
     } catch (e) {
       print(e);
     }
+    return null;
   }
 }

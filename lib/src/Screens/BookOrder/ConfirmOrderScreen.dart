@@ -110,7 +110,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.showProgressDialog(context);
     ApiController.createPaytmTxnToken(address, pin, amount).then((value) async {
       Utils.hideProgressDialog(context);
-      if (value.success) {
+      if(value!=null&& value.success) {
         Navigator.push(
           context,
           MaterialPageRoute(
