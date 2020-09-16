@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
@@ -13,7 +12,6 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:flutter_tags/flutter_tags.dart';
 
 class SearchScreen extends StatefulWidget {
-
   @override
   _SearchScreenState createState() {
     return _SearchScreenState();
@@ -21,15 +19,15 @@ class SearchScreen extends StatefulWidget {
 }
 
 class _SearchScreenState extends BaseState<SearchScreen> {
-
   TextEditingController controller = TextEditingController();
   int selctedTag;
   List<String> tagsList = List();
+  List<SubCategoryModel> subCategoryList = List();
   SubCategoryModel subCategory;
+  List<Product> productsList = List();
   CartTotalPriceBottomBar bottomBar =
-  CartTotalPriceBottomBar(ParentInfo.searchList);
+      CartTotalPriceBottomBar(ParentInfo.searchList);
   bool isSearchEmpty;
-
 
   @override
   void initState() {
@@ -37,21 +35,20 @@ class _SearchScreenState extends BaseState<SearchScreen> {
     super.initState();
     selctedTag = -1;
     isSearchEmpty = true;
-    ApiController.searchTagsAPI().then((respons){
+    ApiController.searchTagsAPI().then((respons) {
       SearchTagsModel response = respons;
       setState(() {
         tagsList = response.data;
       });
     });
-
   }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async{
+      onWillPop: () async {
         //return a `Future` with false value so this route cant be popped or closed.
-        Navigator.pop(context,false);
+        Navigator.pop(context, false);
         return new Future(() {
           return false;
         });
@@ -71,10 +68,10 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                 //padding: EdgeInsets.all(5.0),
                 decoration: BoxDecoration(
                     color: searchGrayColor,
-                    borderRadius: BorderRadius.all(
-                        Radius.circular(5.0)),
-                    border: Border.all(color: searchGrayColor,)
-                ),
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    border: Border.all(
+                      color: searchGrayColor,
+                    )),
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                   child: Center(
@@ -82,11 +79,15 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           IconButton(
-                              icon: Icon(Icons.search,color: appTheme,),
+                              icon: Icon(
+                                Icons.search,
+                                color: appTheme,
+                              ),
                               onPressed: () {
-                                if(controller.text.trim().isEmpty){
-                                  Utils.showToast("Please enter some valid keyword", false);
-                                }else{
+                                if (controller.text.trim().isEmpty) {
+                                  Utils.showToast(
+                                      "Please enter some valid keyword", false);
+                                } else {
                                   selctedTag = -1;
                                   callSearchAPI();
                                 }
@@ -95,22 +96,22 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                             child: TextField(
                               textInputAction: TextInputAction.search,
                               onSubmitted: (value) {
-                                if(value.trim().isEmpty){
-                                  Utils.showToast("Please enter some valid keyword", false);
-                                }else{
+                                if (value.trim().isEmpty) {
+                                  Utils.showToast(
+                                      "Please enter some valid keyword", false);
+                                } else {
                                   selctedTag = -1;
                                   callSearchAPI();
                                 }
                               },
-                              onChanged: (text){
+                              onChanged: (text) {
                                 print("onChanged ${text}");
-                                if(text.trim().isEmpty){
+                                if (text.trim().isEmpty) {
                                   isSearchEmpty = true;
-                                }else{
+                                } else {
                                   isSearchEmpty = false;
                                 }
-                                setState(() {
-                                });
+                                setState(() {});
                               },
                               controller: controller,
                               cursorColor: Colors.black,
@@ -125,17 +126,20 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                             ),
                           ),
                           IconButton(
-                              icon: Icon(Icons.clear,color: appTheme,),
+                              icon: Icon(
+                                Icons.clear,
+                                color: appTheme,
+                              ),
                               onPressed: () {
                                 setState(() {
                                   controller.text = "";
                                   setState(() {
                                     subCategory = null;
+                                    productsList.clear();
                                   });
                                 });
                               }),
-                        ]
-                    ),
+                        ]),
                   ),
                 ),
               ),
@@ -144,16 +148,17 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                 child: showTagsList(),
               ),
               Expanded(
-                child: subCategory == null ? Utils.getEmptyView2("")
+                child: productsList.length == 0
+                    ? Utils.getEmptyView2("")
                     : ListView.builder(
-                  itemCount: subCategory.products.length,
-                  itemBuilder: (context, index) {
-                    Product product = subCategory.products[index];
-                    return ProductTileItem(product, () {
-                      bottomBar.state.updateTotalPrice();
-                    },ClassType.Search);
-                  },
-                ),
+                        itemCount: productsList.length,
+                        itemBuilder: (context, index) {
+                          Product product =productsList[index];
+                          return ProductTileItem(product, () {
+                            bottomBar.state.updateTotalPrice();
+                          }, ClassType.Search);
+                        },
+                      ),
               ),
             ],
           ),
@@ -163,75 +168,78 @@ class _SearchScreenState extends BaseState<SearchScreen> {
     );
   }
 
-  Widget showTagsList(){
+  Widget showTagsList() {
     Color chipSelectedColor, textColor;
     print("---selctedTag-${selctedTag}---");
     Widget horizontalList = new Container(
-        margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
-        //height: 150.0,
-        child: Tags(
-          itemCount: tagsList.length,
-          alignment: WrapAlignment.start,
-          //horizontalScroll: true,
-          itemBuilder: (int index){
-            String tagName = tagsList[index];
-            return ItemTags(
-              key: Key(index.toString()),
-              index: index,
-              elevation: 0.0,
-              borderRadius: BorderRadius.circular(5.0),
-              border: Border.all(
-                width: 1,
-                color: favGrayColor,
-              ),
+      margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
+      //height: 150.0,
+      child: Tags(
+        itemCount: tagsList.length,
+        alignment: WrapAlignment.start,
+        //horizontalScroll: true,
+        itemBuilder: (int index) {
+          String tagName = tagsList[index];
+          return ItemTags(
+            key: Key(index.toString()),
+            index: index,
+            elevation: 0.0,
+            borderRadius: BorderRadius.circular(5.0),
+            border: Border.all(
+              width: 1,
               color: favGrayColor,
-              activeColor: searchTagsColor,
-              textActiveColor: Colors.white,
-              singleItem: true,
-              splashColor: Colors.green,
-              combine: ItemTagsCombine.withTextBefore,
-              title: tagName,
-              onPressed: (item){
-                setState(() {
-                  selctedTag = index;
-                  //print("selctedTag= ${tagsList[selctedTag]}");
-                  controller.text = tagsList[selctedTag];
-                  callSearchAPI();
-                });
-              },
-            );
-          },
-        ) ,
+            ),
+            color: favGrayColor,
+            activeColor: searchTagsColor,
+            textActiveColor: Colors.white,
+            singleItem: true,
+            splashColor: Colors.green,
+            combine: ItemTagsCombine.withTextBefore,
+            title: tagName,
+            onPressed: (item) {
+              setState(() {
+                selctedTag = index;
+                //print("selctedTag= ${tagsList[selctedTag]}");
+                controller.text = tagsList[selctedTag];
+                callSearchAPI();
+              });
+            },
+          );
+        },
+      ),
     );
     return horizontalList;
   }
 
-
-  void callSearchAPI(){
+  void callSearchAPI() {
     Utils.hideKeyboard(context);
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
-      if(isNetworkAvailable){
+      if (isNetworkAvailable) {
         Utils.sendSearchAnalyticsEvent(controller.text);
         Utils.showProgressDialog(context);
         SubCategoryResponse subCategoryResponse =
-        await ApiController.getSearchResults(controller.text);
+            await ApiController.getSearchResults(controller.text);
         Utils.hideKeyboard(context);
         Utils.hideProgressDialog(context);
-        if(subCategoryResponse == null || subCategoryResponse.subCategories.isEmpty){
+        if (subCategoryResponse == null ||
+            subCategoryResponse.subCategories.isEmpty) {
           Utils.showToast("No result found.", false);
           setState(() {
             subCategory = null;
           });
-        }else{
+        } else {
           //print("==subCategories= ${subCategoryResponse.subCategories.length}");
           setState(() {
-            subCategory = subCategoryResponse.subCategories.first;
+            subCategoryList = subCategoryResponse.subCategories;
+            productsList.clear();
+            for (int i = 0; i < subCategoryList.length; i++) {
+              productsList.addAll(subCategoryList[i].products);
+            }
           });
         }
-      } else{
+      } else {
         Utils.showToast(AppConstant.noInternet, false);
       }
     });
   }
-
 }

@@ -259,40 +259,40 @@ class DialogUtils {
                                   style: TextStyle(color: Colors.black)),
                             ),
                             Expanded(
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: RichText(
-                                      overflow: TextOverflow.visible,
-                                      text: (areaObject.discount == "0.00" ||
-                                          areaObject.discount == "0" ||
-                                          areaObject.discount == "0.0")
-                                          ? TextSpan(
-                                        text:
-                                        "${AppConstant.currency}${areaObject.price}",
-                                        style: TextStyle(
-                                            color: grayColorTitle,
-                                            fontWeight: FontWeight.w700),
-                                      )
-                                          : TextSpan(
-                                        text:
-                                        "${AppConstant.currency}${areaObject.price}",
-                                        style: TextStyle(
-                                            color: grayColorTitle,
-                                            fontWeight: FontWeight.w700),
-                                        children: <TextSpan>[
-                                          TextSpan(text: " "),
-                                          TextSpan(
-                                              text:
-                                              "${AppConstant.currency}${areaObject.mrpPrice}",
-                                              style: TextStyle(
-                                                  decoration: TextDecoration
-                                                      .lineThrough,
-                                                  color: grayColorTitle,
-                                                  fontWeight:
-                                                  FontWeight.w400)),
-                                        ],
-                                      )),
-                                ),
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: RichText(
+                                    overflow: TextOverflow.visible,
+                                    text: (areaObject.discount == "0.00" ||
+                                            areaObject.discount == "0" ||
+                                            areaObject.discount == "0.0")
+                                        ? TextSpan(
+                                            text:
+                                                "${AppConstant.currency}${areaObject.price}",
+                                            style: TextStyle(
+                                                color: grayColorTitle,
+                                                fontWeight: FontWeight.w700),
+                                          )
+                                        : TextSpan(
+                                            text:
+                                                "${AppConstant.currency}${areaObject.price}",
+                                            style: TextStyle(
+                                                color: grayColorTitle,
+                                                fontWeight: FontWeight.w700),
+                                            children: <TextSpan>[
+                                              TextSpan(text: " "),
+                                              TextSpan(
+                                                  text:
+                                                      "${AppConstant.currency}${areaObject.mrpPrice}",
+                                                  style: TextStyle(
+                                                      decoration: TextDecoration
+                                                          .lineThrough,
+                                                      color: grayColorTitle,
+                                                      fontWeight:
+                                                          FontWeight.w400)),
+                                            ],
+                                          )),
+                              ),
                             )
 //
                           ]),
@@ -474,8 +474,6 @@ class DialogUtils {
       },
     );
   }
-
-
 
   static Future<bool> displayThankYouDialog(
       BuildContext context, String message) async {
@@ -781,7 +779,6 @@ class DialogUtils {
     );
   }
 
-
   static Future<bool> showForceUpdateDialog(
       BuildContext context, String title, String message) async {
     return await showDialog<bool>(
@@ -853,7 +850,6 @@ class DialogUtils {
     );
   }
 
-
   static Future<bool> showInviteEarnAlert(BuildContext context) async {
     return await showDialog<bool>(
       context: context,
@@ -862,7 +858,7 @@ class DialogUtils {
         return WillPopScope(
           onWillPop: () {
             //print("onWillPop onWillPop");
-            Navigator.pop(context,false);
+            Navigator.pop(context, false);
           },
           child: Dialog(
               shape: RoundedRectangleBorder(
@@ -875,12 +871,15 @@ class DialogUtils {
                     Align(
                       alignment: Alignment.centerRight,
                       child: InkWell(
-                        onTap: (){
-                          Navigator.pop(context,false);
+                        onTap: () {
+                          Navigator.pop(context, false);
                         },
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                          child: Icon(Icons.cancel,color: Colors.grey,),
+                          child: Icon(
+                            Icons.cancel,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ),
@@ -890,32 +889,45 @@ class DialogUtils {
                         child: Text(
                           "Invite & Earn",
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black,
-                              fontSize: 18,fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
                     Center(
-                      child: Container(
-                          height: 3,
-                          color: appTheme,
-                          width: 20),
+                      child: Container(height: 3, color: appTheme, width: 20),
                     ),
                     Padding(
                       padding: EdgeInsets.fromLTRB(0, 35, 0, 30),
                       child: Center(
                         child: RichText(
                           textAlign: TextAlign.center,
-                          text: TextSpan(text: "Please log in to share your",
-                            style: TextStyle( color: grayColorTitle,),
+                          text: TextSpan(
+                            text: "Please log in to share your",
+                            style: TextStyle(
+                              color: grayColorTitle,
+                            ),
                             children: <TextSpan>[
-                              TextSpan(text: "\nreferral code and earn a",
-                                  style: TextStyle(color: Colors.black,fontWeight:FontWeight.bold),),
-                              TextSpan(text:"\ndiscount coupon",
-                                  style: TextStyle(color: Colors.black,
-                                      fontWeight:FontWeight.bold),),
-                              TextSpan(text:"\non your next order.",
-                                style: TextStyle( color: grayColorTitle,),),
+                              TextSpan(
+                                text: "\nreferral code and earn a",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              TextSpan(
+                                text: "\ndiscount coupon",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              TextSpan(
+                                text: "\non your next order.",
+                                style: TextStyle(
+                                  color: grayColorTitle,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -934,7 +946,7 @@ class DialogUtils {
                               color: appTheme,
                               textColor: Colors.white,
                               onPressed: () {
-                                Navigator.pop(context,true);
+                                Navigator.pop(context, true);
                                 Utils.showLoginDialog(context);
                               },
                             ),
@@ -958,7 +970,7 @@ class DialogUtils {
         return WillPopScope(
           onWillPop: () {
             //print("onWillPop onWillPop");
-            Navigator.pop(context,false);
+            Navigator.pop(context, false);
           },
           child: Dialog(
               shape: RoundedRectangleBorder(
@@ -971,12 +983,15 @@ class DialogUtils {
                     Align(
                       alignment: Alignment.centerRight,
                       child: InkWell(
-                        onTap: (){
-                          Navigator.pop(context,false);
+                        onTap: () {
+                          Navigator.pop(context, false);
                         },
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                          child: Icon(Icons.cancel,color: Colors.grey,),
+                          child: Icon(
+                            Icons.cancel,
+                            color: Colors.grey,
+                          ),
                         ),
                       ),
                     ),
@@ -985,10 +1000,9 @@ class DialogUtils {
                       child: Container(
                         width: 80.0,
                         height: 80.0,
-                        padding:  EdgeInsets.all(5.0),
+                        padding: EdgeInsets.all(5.0),
                         decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Color(0xffdbdbdb)),
+                            shape: BoxShape.circle, color: Color(0xffdbdbdb)),
                         child: Padding(
                           padding: EdgeInsets.all(10),
                           child: Center(
@@ -1000,7 +1014,8 @@ class DialogUtils {
                                   height: 80.0,
                                   decoration: new BoxDecoration(
                                     image: DecorationImage(
-                                        image: AssetImage("images/gifticon.png"),
+                                        image:
+                                            AssetImage("images/gifticon.png"),
                                         fit: BoxFit.fill),
                                   ),
                                 ),
@@ -1010,39 +1025,57 @@ class DialogUtils {
                         ),
                       ),
                     ),
-
                     Padding(
                       padding: EdgeInsets.fromLTRB(10, 15, 10, 5),
                       child: Center(
-                        child: Text("Have a referral code?",
+                        child: Text(
+                          "Have a referral code?",
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.black,
-                              fontSize: 18,fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
                         ),
                       ),
                     ),
                     Center(
-                      child: Container(height: 3,color: appTheme,width: 20),
+                      child: Container(height: 3, color: appTheme, width: 20),
                     ),
                     Padding(
                       padding: EdgeInsets.fromLTRB(0, 20, 0, 20),
                       child: Center(
                         child: RichText(
                           textAlign: TextAlign.center,
-                          text: TextSpan(text: "Signup with the ",
-                            style: TextStyle( color: grayColorTitle,),
+                          text: TextSpan(
+                            text: "Signup with the ",
+                            style: TextStyle(
+                              color: grayColorTitle,
+                            ),
                             children: <TextSpan>[
-                              TextSpan(text: "Referral code",
-                                style: TextStyle(color: Colors.black,
-                                    fontWeight:FontWeight.bold),),
-                              TextSpan(text:" and",
-                                style: TextStyle(color: grayColorTitle,
-                                    fontWeight:FontWeight.normal),),
-                              TextSpan(text:"\nearn a ",
-                                style: TextStyle( color: grayColorTitle,),),
-                              TextSpan(text:"Discount Coupon",
-                                style: TextStyle(color: Colors.black,
-                                    fontWeight:FontWeight.bold),),
+                              TextSpan(
+                                text: "Referral code",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              TextSpan(
+                                text: " and",
+                                style: TextStyle(
+                                    color: grayColorTitle,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              TextSpan(
+                                text: "\nearn a ",
+                                style: TextStyle(
+                                  color: grayColorTitle,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "Discount Coupon",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold),
+                              ),
                             ],
                           ),
                         ),
@@ -1061,7 +1094,7 @@ class DialogUtils {
                               color: appTheme,
                               textColor: Colors.white,
                               onPressed: () {
-                                Navigator.pop(context,true);
+                                Navigator.pop(context, true);
                                 Utils.showLoginDialog(context);
                               },
                             ),
@@ -1069,8 +1102,6 @@ class DialogUtils {
                         ],
                       ),
                     ),
-
-
                     Padding(
                       padding: EdgeInsets.fromLTRB(0, 0, 0, 20),
                       child: Center(
@@ -1092,7 +1123,6 @@ class DialogUtils {
                         ),
                       ),
                     ),
-
                   ],
                 ),
               )),
@@ -1120,5 +1150,145 @@ class DialogUtils {
     } else {
       throw 'Could not open the map.';
     }
+  }
+
+  static Future<String> displayCommentDialog(
+      BuildContext context, String passedComment) async {
+    final commentController = TextEditingController();
+    commentController.text = passedComment.trim();
+    return await showDialog<String>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop: () {
+              Navigator.pop(context, passedComment.trim());
+            },
+            child: Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                //title: Text(title,textAlign: TextAlign.center,),
+                child: Container(
+                    margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: Container(
+                      child: Wrap(
+                        children: <Widget>[
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pop(context, passedComment.trim());
+                              },
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                                child: Icon(
+                                  Icons.cancel,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                            child: Text(
+                              "Your Comment",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ),
+                             Container(
+                              height: 120,
+                              margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
+                              decoration: new BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: new BorderRadius.all(
+                                    new Radius.circular(5.0)),
+                                border: new Border.all(
+                                  color: Colors.grey,
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+                                child: TextField(
+                                  textAlign: TextAlign.left,
+                                  maxLength: 250,
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: null,
+                                  textCapitalization: TextCapitalization.sentences,
+                                  controller: commentController,
+                                  decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.all(10.0),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Container(
+                                  margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  width: 130,
+                                  child: FlatButton(
+                                    child: Text('Submit'),
+                                    color: orangeColor,
+                                    textColor: Colors.white,
+                                    onPressed: () {
+                                      Utils.hideKeyboard(context);
+                                      Navigator.pop(
+                                          context, commentController.text.trim());
+                                    },
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ))),
+          );
+        });
+  }
+
+  static Future<bool> showAreaRemovedDialog(BuildContext context,String area) async {
+    StoreModel storeModel = await SharedPrefs.getStore();
+    String storeName = storeModel.storeName;
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {},
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: Text(
+              storeName,
+              textAlign: TextAlign.center,
+            ),
+            content: Text(
+              AppConstant.deliveryAreaChanges,
+              textAlign: TextAlign.center,
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: Text("OK"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  // true here means you clicked ok
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

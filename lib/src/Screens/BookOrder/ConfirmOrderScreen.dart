@@ -14,6 +14,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
@@ -30,25 +31,27 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
-
   bool isComingFromPickUpScreen;
   DeliveryAddressData address;
   String paymentMode = "2"; // 2 = COD, 3 = Online Payment
   String areaId;
   OrderType deliveryType;
+  Area areaObject;
   List<Product> cartList = new List();
 
-  ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen,this.areaId,this.deliveryType);
+  ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen, this.areaId,
+      this.deliveryType,
+      {this.areaObject});
 
   @override
   ConfirmOrderState createState() => ConfirmOrderState();
 }
 
 class ConfirmOrderState extends State<ConfirmOrderScreen> {
-
   DatabaseHelper databaseHelper = new DatabaseHelper();
   double totalPrice = 0.00;
   TaxCalculationModel taxModel;
+
   //TextEditingController noteController = TextEditingController();
   String shippingCharges = "0";
   static const platform = const MethodChannel("razorpay_flutter");
@@ -58,12 +61,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   int selctedTag, selectedTimeSlot;
   List<Timeslot> timeslotList;
   bool isSlotSelected = false;
-  bool minOrderCheck =true;
+
+  //Store provides instant delivery of the orders.
+  bool isInstantDelivery = false;
+  bool minOrderCheck = true;
   bool isLoading = true;
   bool hideRemoveCouponFirstTime;
   List<String> appliedCouponCodeList = List();
   List<String> appliedReddemPointsCodeList = List();
   TextEditingController couponCodeController = TextEditingController();
+  bool isCommentAdded = false;
+
+  String comment = "";
 
   @override
   void initState() {
@@ -72,10 +81,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     listenWebViewChanges();
     selctedTag = 0;
     hideRemoveCouponFirstTime = true;
+    print("You are on confirm order screen");
     //print("-deliveryType--${widget.deliveryType}---");
     try {
-      if(widget.address != null){
-        if(widget.address.areaCharges != null){
+      if (widget.address != null) {
+        if (widget.address.areaCharges != null) {
           shippingCharges = widget.address.areaCharges;
           //print("-shippingCharges--${widget.address.areaCharges}---");
         }
@@ -83,11 +93,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         //print("----notAllow=${widget.address.notAllow}");
         checkMinOrderAmount();
       }
+      checkMinOrderPickAmount();
     } catch (e) {
       print(e);
     }
     try {
-      if(widget.deliveryType == OrderType.PickUp){
+      if (widget.deliveryType == OrderType.PickUp) {
         databaseHelper.getTotalPrice().then((mTotalPrice) {
           setState(() {
             totalPrice = mTotalPrice;
@@ -98,25 +109,30 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       print(e);
     }
     try {
-      SharedPrefs.getStore().then((storeData){
+      SharedPrefs.getStore().then((storeData) {
         storeModel = storeData;
         checkLoyalityPointsOption();
-        if(widget.deliveryType == OrderType.Delivery){
-          if(storeModel.deliverySlot == "1"){
-            ApiController.deliveryTimeSlotApi().then((response){
+        if (widget.deliveryType == OrderType.Delivery) {
+          if (storeModel.deliverySlot == "1") {
+            ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
                 deliverySlotModel = response;
-                for(int i = 0; i < deliverySlotModel.data.dateTimeCollection.length; i++){
-                  timeslotList = deliverySlotModel.data.dateTimeCollection[i].timeslot;
-                  for(int j = 0; j < timeslotList.length; j++){
+                print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+                isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
+                for (int i = 0;
+                    i < deliverySlotModel.data.dateTimeCollection.length;
+                    i++) {
+                  timeslotList =
+                      deliverySlotModel.data.dateTimeCollection[i].timeslot;
+                  for (int j = 0; j < timeslotList.length; j++) {
                     Timeslot timeslot = timeslotList[j];
-                    if(timeslot.isEnable){
+                    if (timeslot.isEnable) {
                       selectedTimeSlot = j;
                       isSlotSelected = true;
                       break;
                     }
                   }
-                  if(isSlotSelected){
+                  if (isSlotSelected) {
                     selctedTag = i;
                     break;
                   }
@@ -144,61 +160,72 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
-          title: Text("Confirm Order"),
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.pop(context, false),
-          ),
+        title: Text("Confirm Order"),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context, false),
+        ),
         actions: <Widget>[
           InkWell(
-            onTap: (){
+            onTap: () {
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
             child: Padding(
-              padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
-              child: Icon(Icons.home, color: Colors.white,size: 30,),
+              padding:
+                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+              child: Icon(
+                Icons.home,
+                color: Colors.white,
+                size: 30,
+              ),
             ),
           ),
-
         ],
       ),
       body: Column(
         children: <Widget>[
           Expanded(
-            child: Column(
-                children: [
-                  Expanded(
-                    child: isLoading ? Utils.getIndicatorView() : widget.cartList==null ? Text("")
-                        :ListView(
-                      children: <Widget>[
-                        showDeliverySlot(),
-                        ListView.separated(
-                          separatorBuilder: (BuildContext context, int index) {
-                            if(widget.cartList[index].taxDetail == null ||
-                                widget.cartList[index].taxDetail == null){
-                              return Divider(color: Colors.grey, height: 1);
-                            }else{
-                              return Divider(color: Colors.white, height: 1);
-                            }
-                          },
-                          shrinkWrap: true,
-                          physics: ScrollPhysics(),
-                          itemCount: widget.cartList.length + 1,
-                          itemBuilder: (context, index) {
-                            if (index == widget.cartList.length) {
-                              return addItemPrice();
-                            } else {
-                              return addProductCart(widget.cartList[index]);
-                            }
-
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ]
-            ),
+            child: Column(children: [
+              Expanded(
+                child: isLoading
+                    ? Utils.getIndicatorView()
+                    : widget.cartList == null
+                        ? Text("")
+                        : ListView(
+                            children: <Widget>[
+                              addCommentWidget(context),
+                              showDeliverySlot(),
+                              ListView.separated(
+                                separatorBuilder:
+                                    (BuildContext context, int index) {
+                                  if (widget.cartList[index].taxDetail ==
+                                          null ||
+                                      widget.cartList[index].taxDetail ==
+                                          null) {
+                                    return Divider(
+                                        color: Colors.grey, height: 1);
+                                  } else {
+                                    return Divider(
+                                        color: Colors.white, height: 1);
+                                  }
+                                },
+                                shrinkWrap: true,
+                                physics: ScrollPhysics(),
+                                itemCount: widget.cartList.length + 1,
+                                itemBuilder: (context, index) {
+                                  if (index == widget.cartList.length) {
+                                    return addItemPrice();
+                                  } else {
+                                    return addProductCart(
+                                        widget.cartList[index]);
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
+              ),
+            ]),
           ),
           Align(
             alignment: Alignment.bottomCenter,
@@ -220,19 +247,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Future<void> multiTaxCalculationApi() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
-    if(!isNetworkAvailable){
+    if (!isNetworkAvailable) {
       Utils.showToast(AppConstant.noInternet, false);
       return;
     }
     isLoading = true;
     databaseHelper.getCartItemsListToJson().then((json) {
-      ApiController.multipleTaxCalculationRequest("", "0", "$shippingCharges", json).then((response) async {
+      ApiController.multipleTaxCalculationRequest(
+              "", "0", "$shippingCharges", json)
+          .then((response) async {
         //{"success":false,"message":"Some products are not available."}
         TaxCalculationResponse model = response;
-        if(model.success){
+        if (model.success) {
           taxModel = model.taxCalculation;
           widget.cartList = await databaseHelper.getCartItemList();
-          for(int i = 0; i < model.taxCalculation.taxDetail.length; i++){
+          for (int i = 0; i < model.taxCalculation.taxDetail.length; i++) {
             Product product = Product();
             product.taxDetail = model.taxCalculation.taxDetail[i];
             widget.cartList.add(product);
@@ -245,11 +274,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           setState(() {
             isLoading = false;
           });
-        }else{
-          var result = await DialogUtils.displayCommonDialog(context, storeModel == null ? ""
-              : storeModel.storeName, "${model.message}");
-          if(result != null && result == true){
+        } else {
+          var result = await DialogUtils.displayCommonDialog(
+              context,
+              storeModel == null ? "" : storeModel.storeName,
+              "${model.message}");
+          if (result != null && result == true) {
             databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+            databaseHelper.deleteTable(DatabaseHelper.CART_Table);
             databaseHelper.deleteTable(DatabaseHelper.CART_Table);
             databaseHelper.deleteTable(DatabaseHelper.Products_Table);
             eventBus.fire(updateCartCount());
@@ -260,14 +292,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     });
   }
 
-  Widget showDeliverySlot(){
+  Widget showDeliverySlot() {
     Color selectedSlotColor, textColor;
-    if(deliverySlotModel == null){
+    if (deliverySlotModel == null) {
       return Container();
-    }else{
+    } else {
       //print("--length = ${deliverySlotModel.data.dateTimeCollection.length}----");
-      if(deliverySlotModel.data != null && deliverySlotModel.data.dateTimeCollection != null &&
-          deliverySlotModel.data.dateTimeCollection.isNotEmpty){
+      if (deliverySlotModel.data != null &&
+          deliverySlotModel.data.dateTimeCollection != null &&
+          deliverySlotModel.data.dateTimeCollection.isNotEmpty) {
         return Padding(
           padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
           child: Align(
@@ -288,20 +321,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                       height: 1,
                       width: MediaQuery.of(context).size.width,
-                      color: Color(0xFFBDBDBD)
-                  ),
+                      color: Color(0xFFBDBDBD)),
                   Container(
                     //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                     height: 50.0,
                     child: ListView.builder(
-                      itemCount: deliverySlotModel.data.dateTimeCollection.length,
+                      itemCount:
+                          deliverySlotModel.data.dateTimeCollection.length,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
-                        DateTimeCollection slotsObject = deliverySlotModel.data.dateTimeCollection[index];
-                        if(selctedTag == index){
+                        DateTimeCollection slotsObject =
+                            deliverySlotModel.data.dateTimeCollection[index];
+                        if (selctedTag == index) {
                           selectedSlotColor = Color(0xFFEEEEEE);
                           textColor = Color(0xFFff4600);
-                        }else{
+                        } else {
                           selectedSlotColor = Color(0xFFFFFFFF);
                           textColor = Color(0xFF000000);
                         }
@@ -309,7 +343,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           color: selectedSlotColor,
                           margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
                           child: InkWell(
-                            onTap: (){
+                            onTap: () {
                               print("${slotsObject.timeslot.length}");
                               setState(() {
                                 selctedTag = index;
@@ -317,21 +351,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                 isSlotSelected = false;
                                 //selectedTimeSlot = 0;
                                 //print("timeslotList=${timeslotList.length}");
-                                for(int i = 0; i < timeslotList.length; i++){
+                                for (int i = 0; i < timeslotList.length; i++) {
                                   //print("isEnable=${timeslotList[i].isEnable}");
                                   Timeslot timeslot = timeslotList[i];
-                                  if(timeslot.isEnable){
+                                  if (timeslot.isEnable) {
                                     selectedTimeSlot = i;
                                     isSlotSelected = true;
                                     break;
                                   }
                                 }
-
                               });
                             },
                             child: Container(
                               child: Center(
-                                child: Text(' ${Utils.convertStringToDate(slotsObject.label)} ',
+                                child: Text(
+                                    ' ${Utils.convertStringToDate(slotsObject.label)} ',
                                     style: TextStyle(color: textColor)),
                               ),
                             ),
@@ -344,8 +378,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                       height: 1,
                       width: MediaQuery.of(context).size.width,
-                      color: Color(0xFFBDBDBD)
-                  ),
+                      color: Color(0xFFBDBDBD)),
                   Container(
                     //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                     height: 50.0,
@@ -358,12 +391,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
                         //selectedTimeSlot
                         Color textColor;
-                        if(!slotsObject.isEnable){
+                        if (!slotsObject.isEnable) {
                           textColor = Color(0xFFBDBDBD);
-                        }else{
+                        } else {
                           textColor = Color(0xFF000000);
                         }
-                        if(selectedTimeSlot == index && (slotsObject.isEnable)){
+                        if (selectedTimeSlot == index &&
+                            (slotsObject.isEnable)) {
                           textColor = Color(0xFFff4600);
                         }
 
@@ -371,22 +405,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           //color: selectedSlotColor,
                           margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
                           child: InkWell(
-                            onTap: (){
+                            onTap: () {
                               print("${slotsObject.label}");
-                              if(slotsObject.isEnable){
+                              if (slotsObject.isEnable) {
                                 setState(() {
                                   selectedTimeSlot = index;
                                 });
-                              }else{
+                              } else {
                                 Utils.showToast(slotsObject.innerText, false);
                               }
                             },
                             child: Container(
                               child: Center(
-                                child: Text('${slotsObject.isEnable == true ? slotsObject.label :
-                                "${slotsObject.label}(${slotsObject.innerText})"}',
-                                    style: TextStyle(color: textColor)
-                                ),
+                                child: Text(
+                                    '${slotsObject.isEnable == true ? slotsObject.label : "${slotsObject.label}(${slotsObject.innerText})"}',
+                                    style: TextStyle(color: textColor)),
                               ),
                             ),
                           ),
@@ -399,45 +432,44 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
           ),
         );
-      }else{
+      } else {
         return Container();
       }
     }
   }
 
   Widget addProductCart(Product product) {
-
-    if(product.taxDetail != null){
-
+    if (product.taxDetail != null) {
       return Container(
         child: Padding(
           padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("${product.taxDetail.label} (${product.taxDetail.rate}%)", style: TextStyle(color: Colors.black54)),
+              Text("${product.taxDetail.label} (${product.taxDetail.rate}%)",
+                  style: TextStyle(color: Colors.black54)),
               Text("${AppConstant.currency}${product.taxDetail.tax}",
                   style: TextStyle(color: Colors.black54)),
             ],
           ),
         ),
       );
-
-    }else if(product.fixedTax != null){
+    } else if (product.fixedTax != null) {
       return Container(
         child: Padding(
           padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("${product.fixedTax.fixedTaxLabel}", style: TextStyle(color: Colors.black54)),
+              Text("${product.fixedTax.fixedTaxLabel}",
+                  style: TextStyle(color: Colors.black54)),
               Text("${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
                   style: TextStyle(color: Colors.black54)),
             ],
           ),
         ),
       );
-    }else{
+    } else {
       return Container(
         padding: EdgeInsets.fromLTRB(15, 0, 20, 0),
         child: Row(
@@ -447,27 +479,31 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                    padding: EdgeInsets.only(top: 15),
-                    child: SizedBox(
-                      width: (Utils.getDeviceWidth(context)-150),
-                      child: Container(
-                        color: whiteColor,
-                        child: Text(product.title,maxLines: 2,overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
+                  padding: EdgeInsets.only(top: 15),
+                  child: SizedBox(
+                    width: (Utils.getDeviceWidth(context) - 150),
+                    child: Container(
+                      color: whiteColor,
+                      child: Text(product.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
+                  ),
                 ),
                 Visibility(
                   visible: product.weight.isEmpty ? false : true,
                   child: Padding(
                       padding: EdgeInsets.only(top: 10),
-                      child: Text("${product.weight}",style: TextStyle(color: orangeColor),)
-                  ),
+                      child: Text(
+                        "${product.weight}",
+                        style: TextStyle(color: orangeColor),
+                      )),
                 ),
                 Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
-                    child: Text("Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")
-                ),
+                    child: Text(
+                        "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")),
                 //
                 /*Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
@@ -482,7 +518,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ),
       );
     }
-
   }
 
   Widget addItemPrice() {
@@ -493,28 +528,31 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
         Visibility(
-          visible: widget.address == null? false : true,
+          visible: widget.address == null ? false : true,
           child: Padding(
             padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Delivery charges:", style: TextStyle(color: Colors.black54)),
-                Text("${AppConstant.currency}${widget.address == null? "0" : widget.address.areaCharges}",
+                Text("Delivery charges:",
+                    style: TextStyle(color: Colors.black54)),
+                Text(
+                    "${AppConstant.currency}${widget.address == null ? "0" : widget.address.areaCharges}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
           ),
         ),
         Visibility(
-          visible: taxModel == null? false : true,
+          visible: taxModel == null ? false : true,
           child: Padding(
             padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Discount:", style: TextStyle(color: Colors.black54)),
-                Text("${AppConstant.currency}${taxModel == null? "0" : taxModel.discount}",
+                Text(
+                    "${AppConstant.currency}${taxModel == null ? "0" : taxModel.discount}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
@@ -526,12 +564,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Items Price", style: TextStyle(color: Colors.black)),
-              Text("${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice-int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
+              Text(
+                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
                   style: TextStyle(color: Colors.black)),
             ],
           ),
         ),
-
       ]),
     );
   }
@@ -549,10 +587,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Total",style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                Text("${AppConstant.currency}${databaseHelper.roundOffPrice(
-                    taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}",
-                    style:TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text("Total",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ))
       ]),
@@ -560,136 +601,177 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addCouponCodeRow() {
-
     return Padding(
-        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
-        child: Container(
-          child: Wrap(
-            children: <Widget>[
-              Visibility(
-                visible: isloyalityPointsEnabled == true ? true : false,
-                child: InkWell(
-                  onTap: () async {
-                    //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
-                    //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-                    if(isCouponsApplied){
-                      Utils.showToast("Please remove Applied Coupon to Redeem Loyality Points", false);
-                      return;
-                    }
-                    if(appliedCouponCodeList.isNotEmpty){
-                      Utils.showToast("Please remove Applied Coupon to Redeem Points", false);
-                      return;
-                    }
-                    if (taxModel != null && appliedReddemPointsCodeList.isNotEmpty) {
-                      removeCoupon();
-                    }else{
-                      var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                          RedeemPointsScreen(widget.address, "" ,widget.isComingFromPickUpScreen,
-                              widget.areaId, (model) async {
-                                await updateTaxDetails(model);
-                                setState(() {
-                                  hideRemoveCouponFirstTime = false;
-                                  taxModel = model;
-                                  double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
-                                  taxModel.total = taxModelTotal.toString();
-                                  appliedReddemPointsCodeList.add(model.couponCode);
-                                  print("===discount=== ${model.discount}");
-                                  print("taxModel.total=${taxModel.total}");
-                                });
-                              },appliedReddemPointsCodeList),
-
-                        fullscreenDialog: true,
-                      ));
-                    }
-                  },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Container(
-                        height: 40.0,
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                        decoration:BoxDecoration(color: whiteColor,),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(appliedReddemPointsCodeList.isEmpty ? "Redeem Loyality Points" : "${taxModel.couponCode} Applied",
-                            textAlign : TextAlign.left,style: TextStyle(fontWeight: FontWeight.w600,
-                                color: appliedCouponCodeList.isEmpty ? isCouponsApplied ? appTheme.withOpacity(0.5) :appTheme : appTheme.withOpacity(0.5)),
-                          ),
-                        ),
-                      ),
-                      Icon(appliedReddemPointsCodeList.isNotEmpty ? Icons.cancel :Icons.keyboard_arrow_right),
-                    ],
-                  ),
-                ),
-              ),
-              Visibility(
-                visible: isloyalityPointsEnabled == true ? true : false,
-                child: Utils.showDivider(context),
-              ),
-              InkWell(
-                onTap: () {
-                  print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
-                  print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-                  if(isCouponsApplied){
-                    Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
+      padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+      child: Container(
+        child: Wrap(
+          children: <Widget>[
+            Visibility(
+              visible: isloyalityPointsEnabled == true ? true : false,
+              child: InkWell(
+                onTap: () async {
+                  //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                  //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                  if (isCouponsApplied) {
+                    Utils.showToast(
+                        "Please remove Applied Coupon to Redeem Loyality Points",
+                        false);
                     return;
                   }
-                  if(appliedReddemPointsCodeList.isNotEmpty){
-                    Utils.showToast("Please remove Applied Coupon to Avail Offers", false);
+                  if (appliedCouponCodeList.isNotEmpty) {
+                    Utils.showToast(
+                        "Please remove Applied Coupon to Redeem Points", false);
                     return;
                   }
-                  if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
+                  if (taxModel != null &&
+                      appliedReddemPointsCodeList.isNotEmpty) {
                     removeCoupon();
-                  }else{
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) => AvailableOffersDialog(
-                          widget.address, "" ,widget.isComingFromPickUpScreen,widget.areaId,(model) async {
-                        await updateTaxDetails(model);
+                  } else {
+                    var result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => RedeemPointsScreen(
+                              widget.address,
+                              "",
+                              widget.isComingFromPickUpScreen,
+                              widget.areaId, (model) async {
+                            await updateTaxDetails(model);
                             setState(() {
-                          hideRemoveCouponFirstTime = false;
-                          taxModel = model;
-                          double taxModelTotal = double.parse(taxModel.total) + int.parse(shippingCharges);
-                          taxModel.total = taxModelTotal.toString();
-                          appliedCouponCodeList.add(model.couponCode);
-                          print("===couponCode=== ${model.couponCode}");
-                          print("taxModel.total=${taxModel.total}");
-                        });
-                      },appliedCouponCodeList),
-                    );
+                              hideRemoveCouponFirstTime = false;
+                              taxModel = model;
+                              double taxModelTotal =
+                                  double.parse(taxModel.total) +
+                                      int.parse(shippingCharges);
+                              taxModel.total = taxModelTotal.toString();
+                              appliedReddemPointsCodeList.add(model.couponCode);
+                              print("===discount=== ${model.discount}");
+                              print("taxModel.total=${taxModel.total}");
+                            });
+                          }, appliedReddemPointsCodeList),
+                          fullscreenDialog: true,
+                        ));
                   }
-
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Container(
-                      margin: EdgeInsets.fromLTRB(isloyalityPointsEnabled ? 0 : 0, 0, 0, 0),
-                      height: 40,
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                      decoration: new BoxDecoration(color: whiteColor,),
+                      height: 40.0,
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                      ),
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(appliedCouponCodeList.isEmpty ? "Available Offers" : "${taxModel.couponCode} Applied",
-                            textAlign: TextAlign.left,
-                            style: TextStyle(fontWeight: FontWeight.w600,
-                                color: appliedReddemPointsCodeList.isEmpty ? isCouponsApplied ? appTheme.withOpacity(0.5) :appTheme : appTheme.withOpacity(0.5))
+                        child: Text(
+                          appliedReddemPointsCodeList.isEmpty
+                              ? "Redeem Loyality Points"
+                              : "${taxModel.couponCode} Applied",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: appliedCouponCodeList.isEmpty
+                                  ? isCouponsApplied
+                                      ? appTheme.withOpacity(0.5)
+                                      : appTheme
+                                  : appTheme.withOpacity(0.5)),
                         ),
                       ),
                     ),
-                    Icon(appliedCouponCodeList.isNotEmpty ? Icons.cancel :Icons.keyboard_arrow_right),
+                    Icon(appliedReddemPointsCodeList.isNotEmpty
+                        ? Icons.cancel
+                        : Icons.keyboard_arrow_right),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Visibility(
+              visible: isloyalityPointsEnabled == true ? true : false,
+              child: Utils.showDivider(context),
+            ),
+            InkWell(
+              onTap: () {
+                print(
+                    "appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                print(
+                    "appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                if (isCouponsApplied) {
+                  Utils.showToast(
+                      "Please remove Applied Coupon to Avail Offers", false);
+                  return;
+                }
+                if (appliedReddemPointsCodeList.isNotEmpty) {
+                  Utils.showToast(
+                      "Please remove Applied Coupon to Avail Offers", false);
+                  return;
+                }
+                if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
+                  removeCoupon();
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AvailableOffersDialog(
+                        widget.address,
+                        "",
+                        widget.isComingFromPickUpScreen,
+                        widget.areaId, (model) async {
+                      await updateTaxDetails(model);
+                      setState(() {
+                        hideRemoveCouponFirstTime = false;
+                        taxModel = model;
+                        double taxModelTotal = double.parse(taxModel.total) +
+                            int.parse(shippingCharges);
+                        taxModel.total = taxModelTotal.toString();
+                        appliedCouponCodeList.add(model.couponCode);
+                        print("===couponCode=== ${model.couponCode}");
+                        print("taxModel.total=${taxModel.total}");
+                      });
+                    }, appliedCouponCodeList),
+                  );
+                }
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(
+                        isloyalityPointsEnabled ? 0 : 0, 0, 0, 0),
+                    height: 40,
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    decoration: new BoxDecoration(
+                      color: whiteColor,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                          appliedCouponCodeList.isEmpty
+                              ? "Available Offers"
+                              : "${taxModel.couponCode} Applied",
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color: appliedReddemPointsCodeList.isEmpty
+                                  ? isCouponsApplied
+                                      ? appTheme.withOpacity(0.5)
+                                      : appTheme
+                                  : appTheme.withOpacity(0.5))),
+                    ),
+                  ),
+                  Icon(appliedCouponCodeList.isNotEmpty
+                      ? Icons.cancel
+                      : Icons.keyboard_arrow_right),
+                ],
+              ),
+            ),
+          ],
         ),
+      ),
     );
   }
 
   bool isCouponsApplied = false;
-  Widget addEnterCouponCodeView(){
 
+  Widget addEnterCouponCodeView() {
     return Padding(
       padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
       child: Row(
@@ -727,43 +809,59 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
               child: RaisedButton(
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5.0),
+                  borderRadius: BorderRadius.circular(5.0),
                 ),
                 padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                 textColor: Colors.white,
                 color: appTheme,
-                onPressed: () async{
+                onPressed: () async {
                   print("---Apply Coupon----");
-                  if(couponCodeController.text.trim().isEmpty){
-                  }else{
-                    print("--${appliedCouponCodeList.length}-and -${appliedReddemPointsCodeList.length}---");
-                    if(appliedCouponCodeList.isNotEmpty || appliedReddemPointsCodeList.isNotEmpty){
-                      Utils.showToast("Please remove the applied coupon first!", false);
+                  if (couponCodeController.text.trim().isEmpty) {
+                  } else {
+                    print(
+                        "--${appliedCouponCodeList.length}-and -${appliedReddemPointsCodeList.length}---");
+                    if (appliedCouponCodeList.isNotEmpty ||
+                        appliedReddemPointsCodeList.isNotEmpty) {
+                      Utils.showToast(
+                          "Please remove the applied coupon first!", false);
                       return;
                     }
-                    if(isCouponsApplied){
+                    if (isCouponsApplied) {
                       removeCoupon();
-                    }else{
+                    } else {
                       String couponCode = couponCodeController.text;
                       Utils.showProgressDialog(context);
                       Utils.hideKeyboard(context);
-                      databaseHelper.getCartItemsListToJson().then((json) async {
-                        ValidateCouponResponse couponModel = await ApiController.validateOfferApiRequest(couponCodeController.text,
-                            widget.paymentMode, json);
-                        if(couponModel.success){
+                      databaseHelper
+                          .getCartItemsListToJson()
+                          .then((json) async {
+                        ValidateCouponResponse couponModel =
+                            await ApiController.validateOfferApiRequest(
+                                couponCodeController.text,
+                                widget.paymentMode,
+                                json);
+                        if (couponModel.success) {
                           print("---success----");
                           Utils.showToast("${couponModel.message}", false);
-                          TaxCalculationResponse model = await ApiController.multipleTaxCalculationRequest(couponCodeController.text,
-                              couponModel.discountAmount, "0", json);
+                          TaxCalculationResponse model =
+                              await ApiController.multipleTaxCalculationRequest(
+                                  couponCodeController.text,
+                                  couponModel.discountAmount,
+                                  "0",
+                                  json);
                           Utils.hideProgressDialog(context);
                           if (model != null && !model.success) {
                             Utils.showToast(model.message, true);
-                            databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
-                            databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                            databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+                            databaseHelper
+                                .deleteTable(DatabaseHelper.Favorite_Table);
+                            databaseHelper
+                                .deleteTable(DatabaseHelper.CART_Table);
+                            databaseHelper
+                                .deleteTable(DatabaseHelper.Products_Table);
                             eventBus.fire(updateCartCount());
-                            Navigator.of(context).popUntil((route) => route.isFirst);
-                          }else{
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
+                          } else {
                             await updateTaxDetails(model.taxCalculation);
                             setState(() {
                               taxModel = model.taxCalculation;
@@ -771,19 +869,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               couponCodeController.text = couponCode;
                             });
                           }
-
-                        }else{
+                        } else {
                           Utils.showToast("${couponModel.message}", false);
                           Utils.hideProgressDialog(context);
                           Utils.hideKeyboard(context);
                         }
-
                       });
                     }
-
                   }
                 },
-                child: new Text(isCouponsApplied?"Remove Coupon":"Apply Coupon"),
+                child: new Text(
+                    isCouponsApplied ? "Remove Coupon" : "Apply Coupon"),
               ),
             ),
           ),
@@ -794,7 +890,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Future<void> updateTaxDetails(TaxCalculationModel taxModel) async {
     widget.cartList = await databaseHelper.getCartItemList();
-    for(int i = 0; i < taxModel.taxDetail.length; i++){
+    for (int i = 0; i < taxModel.taxDetail.length; i++) {
       Product product = Product();
       product.taxDetail = taxModel.taxDetail[i];
       widget.cartList.add(product);
@@ -807,14 +903,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   String selectedDeliverSlotValue = "";
+
   Widget addConfirmOrder() {
     return Container(
       height: 50.0,
       color: appTheme,
       child: InkWell(
-        onTap: () async {
-
-        },
+        onTap: () async {},
         child: ButtonTheme(
           minWidth: Utils.getDeviceWidth(context),
           child: RaisedButton(
@@ -823,33 +918,46 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             color: appTheme,
             onPressed: () async {
               StoreModel storeObject = await SharedPrefs.getStore();
-              bool status = Utils.checkStoreOpenTime(storeObject,widget.deliveryType);
+              bool status =
+                  Utils.checkStoreOpenTime(storeObject, widget.deliveryType);
               print("----checkStoreOpenTime----${status}--");
 
-              if(!status){
+              if (!status) {
                 Utils.showToast("${storeObject.closehoursMessage}", false);
                 return;
               }
-              if(widget.deliveryType == OrderType.Delivery && widget.address.notAllow){
-                if(!minOrderCheck){
-                  Utils.showToast("Your order amount is to low. Minimum order amount is ${widget.address.minAmount}", false);
+              if (widget.deliveryType == OrderType.Delivery &&
+                  widget.address.notAllow) {
+                if (!minOrderCheck) {
+                  Utils.showToast(
+                      "Your order amount is to low. Minimum order amount is ${widget.address.minAmount}",
+                      false);
+                  return;
+                }
+              }
+              if (widget.deliveryType == OrderType.PickUp &&
+                  widget.areaObject != null) {
+                if (!minOrderCheck) {
+                  Utils.showToast(
+                      "Your order amount is to low. Minimum order amount is ${widget.areaObject.minOrder}",
+                      false);
                   return;
                 }
               }
 
-
-              if(storeModel.onlinePayment == "1"){
-                var result = await DialogUtils.displayPaymentDialog(context, "Select Payment","");
+              if (storeModel.onlinePayment == "1") {
+                var result = await DialogUtils.displayPaymentDialog(
+                    context, "Select Payment", "");
                 //print("----result----${result}--");
-                if(result == null){
+                if (result == null) {
                   return;
                 }
-                if(result == PaymentType.ONLINE){
+                if (result == PaymentType.ONLINE) {
                   widget.paymentMode = "3";
-                }else{
+                } else {
                   widget.paymentMode = "2"; //cod
                 }
-              }else{
+              } else {
                 widget.paymentMode = "2"; //cod
               }
 
@@ -857,42 +965,52 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               print("-paymentGateway----${storeObject.paymentGateway}-}-");
 
               bool isNetworkAvailable = await Utils.isNetworkAvailable();
-              if(!isNetworkAvailable){
+              if (!isNetworkAvailable) {
                 Utils.showToast(AppConstant.noInternet, false);
                 return;
               }
 
-              if(widget.deliveryType == OrderType.Delivery){
-                if(storeObject.deliverySlot == "0"){
+              if (widget.deliveryType == OrderType.Delivery) {
+                if (storeObject.deliverySlot == "0") {
                   selectedDeliverSlotValue = "";
-                }else{
-                  if(storeObject.deliverySlot == "1" && !isSlotSelected){
+                } else {
+                  //Store provides instant delivery of the orders.
+                  print(isInstantDelivery);
+                  if (storeObject.deliverySlot == "1" && isInstantDelivery) {
+                    //Store provides instant delivery of the orders.
+                    selectedDeliverSlotValue = "";
+                  } else if (storeObject.deliverySlot == "1" &&
+                      !isSlotSelected &&
+                      !isInstantDelivery) {
                     Utils.showToast("Please select delivery slot", false);
                     return;
-                  }else{
-                    String slotDate = deliverySlotModel.data.dateTimeCollection[selctedTag].label;
-                    String timeSlot = deliverySlotModel.data.dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
-                    selectedDeliverSlotValue = "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
+                  } else {
+                    String slotDate = deliverySlotModel
+                        .data.dateTimeCollection[selctedTag].label;
+                    String timeSlot = deliverySlotModel
+                        .data
+                        .dateTimeCollection[selctedTag]
+                        .timeslot[selectedTimeSlot]
+                        .label;
+                    selectedDeliverSlotValue =
+                        "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
                     //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
                   }
                 }
-              }else{
+              } else {
                 selectedDeliverSlotValue = "";
               }
 
-              if(widget.paymentMode == "3"){
-                if(storeObject.paymentGateway == "Razorpay"){
-                  callOrderIdApi(storeObject);
-                }else if(storeObject.paymentGateway == "Stripe"){
-                  callStripeApi();
-                }
-              }else{
-                placeOrderApiCall("","","");
+              if (widget.deliveryType == OrderType.Delivery) {
+                //The "performPlaceOrderOperation" are called in below method
+                checkDeliveryAreaDeleted(storeObject,
+                    addressId: widget.address.id);
+              } else if (widget.deliveryType == OrderType.PickUp) {
+                performPlaceOrderOperation(storeObject);
               }
-
-
             },
-            child: Text("Confirm Order",
+            child: Text(
+              "Confirm Order",
               style: TextStyle(color: Colors.white, fontSize: 18.0),
             ),
           ),
@@ -901,15 +1019,45 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
+  performPlaceOrderOperation(StoreModel storeObject) {
+    if (widget.paymentMode == "3") {
+      if (storeObject.paymentGateway == "Razorpay") {
+        callOrderIdApi(storeObject);
+      } else if (storeObject.paymentGateway == "Stripe") {
+        callStripeApi();
+      }
+    } else {
+      placeOrderApiCall("", "", "");
+    }
+  }
+
+  checkDeliveryAreaDeleted(StoreModel storeObject, {String addressId = ""}) {
+    Utils.showProgressDialog(context);
+    ApiController.getAddressApiRequest().then((responses) async {
+      Utils.hideProgressDialog(context);
+      int length = responses.data.length;
+      List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
+          context, responses.data,
+          showDialogBool: true, hitApi: false, id: addressId);
+      if (length != responses.data.length) {
+//        print("Area deleted list.length${list.length}");
+        Navigator.of(context).pop();
+      } else {
+        performPlaceOrderOperation(storeObject);
+      }
+    });
+  }
+
   Future<void> removeCoupon() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
-    if(!isNetworkAvailable){
+    if (!isNetworkAvailable) {
       Utils.showToast(AppConstant.noInternet, false);
       return;
     }
     Utils.showProgressDialog(context);
     databaseHelper.getCartItemsListToJson().then((json) {
-      ApiController.multipleTaxCalculationRequest("", "0", "${shippingCharges}", json)
+      ApiController.multipleTaxCalculationRequest(
+              "", "0", "${shippingCharges}", json)
           .then((response) async {
         Utils.hideProgressDialog(context);
         Utils.hideKeyboard(context);
@@ -920,7 +1068,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           databaseHelper.deleteTable(DatabaseHelper.Products_Table);
           eventBus.fire(updateCartCount());
           Navigator.of(context).popUntil((route) => route.isFirst);
-        }else{
+        } else {
           await updateTaxDetails(response.taxCalculation);
           setState(() {
             hideRemoveCouponFirstTime = true;
@@ -931,14 +1079,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             couponCodeController.text = "";
           });
         }
-
       });
     });
   }
 
-
   Future<void> checkMinOrderAmount() async {
-    if(widget.deliveryType == OrderType.Delivery){
+    if (widget.deliveryType == OrderType.Delivery) {
       print("----minAmount=${widget.address.minAmount}");
       print("----notAllow=${widget.address.notAllow}");
       print("--------------------------------------------");
@@ -956,28 +1102,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         print("--Cart--mtotalPrice=${mtotalPrice}");
         print("----shippingCharges=${shippingCharges}");
 
-        if(widget.address.notAllow){
-          if(mtotalPrice <= minAmount){
+        if (widget.address.notAllow) {
+          if (mtotalPrice <= minAmount) {
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
             minOrderCheck = false;
             setState(() {
               this.totalPrice = mtotalPrice.toDouble();
             });
-          }else{
+          } else {
             minOrderCheck = true;
             setState(() {
               this.totalPrice = mtotalPrice.toDouble();
             });
           }
-        }else{
-          if(mtotalPrice <= minAmount){
+        } else {
+          if (mtotalPrice <= minAmount) {
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
             setState(() {
               this.totalPrice = totalPrice + int.parse(shippingCharges);
             });
-          }else{
+          } else {
             print("-Cart-totalPrice is greater than min amount---}");
             //then Store will not charge shipping.
             setState(() {
@@ -993,41 +1139,77 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
+  Future<void> checkMinOrderPickAmount() async {
+    if (widget.deliveryType == OrderType.PickUp && widget.areaObject != null) {
+      print("----minAmount=${widget.areaObject.minOrder}");
+      print("----notAllow=${widget.areaObject.notAllow}");
+      print("--------------------------------------------");
+      int minAmount = 0;
+      try {
+        try {
+          if (widget.areaObject.minOrder.isNotEmpty)
+            minAmount = double.parse(widget.areaObject.minOrder).toInt();
+        } catch (e) {
+          print(e);
+        }
+        double totalPrice = await databaseHelper.getTotalPrice();
+        int mtotalPrice = totalPrice.round();
+
+        print("----minAmount=${minAmount}");
+        print("--Cart--mtotalPrice=${mtotalPrice}");
+        //TODO:In Future check here "not allow".
+        if (mtotalPrice <= minAmount) {
+          print("---Cart-totalPrice is less than min amount----}");
+          // then Store will charge shipping charges.
+          minOrderCheck = false;
+          setState(() {
+            this.totalPrice = mtotalPrice.toDouble();
+          });
+        } else {
+          minOrderCheck = true;
+          setState(() {
+            this.totalPrice = mtotalPrice.toDouble();
+          });
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
 
   void callStripeApi() {
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total);
     price = price * 100;
     print("----taxModel.total----${taxModel.total}--");
-    String mPrice = price.toString().substring(0,price.toString().indexOf('.')).trim();
+    String mPrice =
+        price.toString().substring(0, price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
-    ApiController.stripePaymentApi(mPrice).then((response){
+    ApiController.stripePaymentApi(mPrice).then((response) {
       Utils.hideProgressDialog(context);
       print("----stripePaymentApi------");
-      if(response != null){
-        StripeCheckOutModel stripeCheckOutModel =response;
-        if(stripeCheckOutModel.success){
+      if (response != null) {
+        StripeCheckOutModel stripeCheckOutModel = response;
+        if (stripeCheckOutModel.success) {
           //launchWebView(stripeCheckOutModel);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => StripeWebView(stripeCheckOutModel,storeModel)),
+            MaterialPageRoute(
+                builder: (context) =>
+                    StripeWebView(stripeCheckOutModel, storeModel)),
           );
-
-        }else{
+        } else {
           Utils.showToast("${stripeCheckOutModel.message}!", true);
         }
-
-      }else{
+      } else {
         Utils.showToast("Something went wrong!", true);
       }
     });
-
-
   }
 
-
   String razorpay_orderId = "";
-  void openCheckout(String razorpay_order_id,StoreModel storeObject) async {
+
+  void openCheckout(String razorpay_order_id, StoreModel storeObject) async {
     Utils.hideProgressDialog(context);
     UserModel user = await SharedPrefs.getUser();
     //double price = totalPrice ;
@@ -1052,22 +1234,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-
   void _handlePaymentSuccess(PaymentSuccessResponse responseObj) {
     //Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId, timeInSecForIos: 4);
     Utils.showProgressDialog(context);
-    ApiController.razorpayVerifyTransactionApi(responseObj.orderId).then((response){
+    ApiController.razorpayVerifyTransactionApi(responseObj.orderId)
+        .then((response) {
       //print("----razorpayVerifyTransactionApi----${response}--");
-      if(response != null){
-
+      if (response != null) {
         RazorpayOrderData model = response;
-        if(model.success){
-          placeOrderApiCall(responseObj.orderId,model.data.id,"Razorpay");
-        }else{
+        if (model.success) {
+          placeOrderApiCall(responseObj.orderId, model.data.id, "Razorpay");
+        } else {
           Utils.showToast("Something went wrong!", true);
           Utils.hideProgressDialog(context);
         }
-      }else{
+      } else {
         Utils.showToast("Something went wrong!", true);
         Utils.hideProgressDialog(context);
       }
@@ -1075,10 +1256,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    Fluttertoast.showToast(msg:response.message,timeInSecForIosWeb: 4);
+    Fluttertoast.showToast(msg: response.message, timeInSecForIosWeb: 4);
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
-
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -1093,37 +1273,38 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     print("=======1===${price}===total==${taxModel.total}======");
     price = price * 100;
     print("=======2===${price}===========");
-    String mPrice = price.toString().substring(0 , price.toString().indexOf('.'));
+    String mPrice =
+        price.toString().substring(0, price.toString().indexOf('.'));
     print("=======mPrice===${mPrice}===========");
-    ApiController.razorpayCreateOrderApi(mPrice).then((response){
-
+    ApiController.razorpayCreateOrderApi(mPrice).then((response) {
       CreateOrderData model = response;
-      if(model != null && response.success){
+      if (model != null && response.success) {
         print("----razorpayCreateOrderApi----${response.data.id}--");
-        openCheckout(model.data.id,storeObject);
-
-      }else{
+        openCheckout(model.data.id, storeObject);
+      } else {
         Utils.showToast("${model.message}", true);
         Utils.hideProgressDialog(context);
       }
     });
   }
 
-  void placeOrderApiCall(String payment_request_id, String payment_id, String onlineMethod) {
+  void placeOrderApiCall(
+      String payment_request_id, String payment_id, String onlineMethod) {
     Utils.hideKeyboard(context);
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
         databaseHelper.getCartItemsListToJson().then((json) {
-          if(json == null){
+          if (json == null) {
             print("--json == null-json == null-");
             return;
           }
 
-          String couponCode = taxModel == null ? "" :taxModel.couponCode;
-          String discount = taxModel == null ? "0" :taxModel.discount;
+          String couponCode = taxModel == null ? "" : taxModel.couponCode;
+          String discount = taxModel == null ? "0" : taxModel.discount;
           Utils.showProgressDialog(context);
-          ApiController.multipleTaxCalculationRequest("${couponCode}",  "${discount}",
-              shippingCharges, json).then((response) {
+          ApiController.multipleTaxCalculationRequest(
+                  "${couponCode}", "${discount}", shippingCharges, json)
+              .then((response) {
             //Utils.hideProgressDialog(context);
             if (response != null && !response.success) {
               Utils.showToast(response.message, true);
@@ -1137,46 +1318,65 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
             taxModel = response.taxCalculation;
 
-            Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+            Map<String, dynamic> attributeMap = new Map<String, dynamic>();
             attributeMap["ScreenName"] = "Order Confirm Screen";
             attributeMap["action"] = "Place Order Request";
             attributeMap["totalPrice"] = "${totalPrice}";
             attributeMap["deliveryType"] = "${widget.deliveryType}";
             attributeMap["paymentMode"] = "${widget.paymentMode}";
             attributeMap["shippingCharges"] = "${shippingCharges}";
-            Utils.sendAnalyticsEvent("Clicked Place Order button",attributeMap);
+            Utils.sendAnalyticsEvent(
+                "Clicked Place Order button", attributeMap);
 
-            ApiController.placeOrderRequest(shippingCharges,"", totalPrice.toString(),
-                widget.paymentMode, taxModel, widget.address, json ,
-                widget.isComingFromPickUpScreen,widget.areaId ,widget.deliveryType,
-                payment_request_id,payment_id,onlineMethod,selectedDeliverSlotValue).then((response) async {
+            ApiController.placeOrderRequest(
+                    shippingCharges,
+                    comment,
+                    totalPrice.toString(),
+                    widget.paymentMode,
+                    taxModel,
+                    widget.address,
+                    json,
+                    widget.isComingFromPickUpScreen,
+                    widget.areaId,
+                    widget.deliveryType,
+                    payment_request_id,
+                    payment_id,
+                    onlineMethod,
+                    selectedDeliverSlotValue)
+                .then((response) async {
               Utils.hideProgressDialog(context);
-              if(response == null){
+              if (response == null) {
                 print("--response == null-response == null-");
                 return;
               }
               eventBus.fire(updateCartCount());
               print("${widget.deliveryType}");
               //print("Location = ${storeModel.lat},${storeModel.lng}");
-              if(widget.deliveryType == OrderType.PickUp){
-                bool result = await DialogUtils.displayPickUpDialog(context,storeModel);
-                if(result == true){
+              if (widget.deliveryType == OrderType.PickUp) {
+                bool result =
+                    await DialogUtils.displayPickUpDialog(context, storeModel);
+                if (result == true) {
                   //print("==result== ${result}");
                   await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                   Navigator.of(context).popUntil((route) => route.isFirst);
                   eventBus.fire(updateCartCount());
-                  DialogUtils.openMap(storeModel,double.parse(storeModel.lat), double.parse(storeModel.lng));
-                }else{
+                  DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
+                      double.parse(storeModel.lng));
+                } else {
                   //print("==result== ${result}");
                   await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                  eventBus.fire(updateCartCount());
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 }
-              }else{
-                bool result = await DialogUtils.displayThankYouDialog(context,response.success? AppConstant.orderAdded: response.message);
-                if(result == true){
+              } else {
+                bool result = await DialogUtils.displayThankYouDialog(
+                    context,
+                    response.success
+                        ? AppConstant.orderAdded
+                        : response.message);
+                if (result == true) {
                   await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                  Navigator.of(context)
-                      .popUntil((route) => route.isFirst);
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                   eventBus.fire(updateCartCount());
                 }
               }
@@ -1205,20 +1405,19 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void callStripeVerificationApi(String payment_request_id) {
     Utils.showProgressDialog(context);
-    ApiController.stripeVerifyTransactionApi(payment_request_id).then((response){
+    ApiController.stripeVerifyTransactionApi(payment_request_id)
+        .then((response) {
       Utils.hideProgressDialog(context);
-      if(response != null){
+      if (response != null) {
         StripeVerifyModel object = response;
-        if(object.success){
-
-          placeOrderApiCall(payment_request_id, object.paymentId,"Stripe");
-
-        }else{
-          Utils.showToast("Transaction is not completed, please try again!", true);
+        if (object.success) {
+          placeOrderApiCall(payment_request_id, object.paymentId, "Stripe");
+        } else {
+          Utils.showToast(
+              "Transaction is not completed, please try again!", true);
           Utils.hideProgressDialog(context);
         }
-
-      }else{
+      } else {
         Utils.showToast("Something went wrong!", true);
         Utils.hideProgressDialog(context);
       }
@@ -1226,13 +1425,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   bool isloyalityPointsEnabled = false;
+
   void checkLoyalityPointsOption() {
     //1 - enable, 0 means disable
     try {
       print("====-loyality===== ${storeModel.loyality}--");
-      if(storeModel.loyality != null && storeModel.loyality == "1"){
+      if (storeModel.loyality != null && storeModel.loyality == "1") {
         this.isloyalityPointsEnabled = true;
-      }else{
+      } else {
         this.isloyalityPointsEnabled = false;
       }
     } catch (e) {
@@ -1240,12 +1440,123 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
+  Widget addCommentWidget(BuildContext context) {
+    return !isCommentAdded
+        ? InkWell(
+            onTap: () async {
+              String result =
+                  await DialogUtils.displayCommentDialog(context, comment);
+              comment = result;
+              if (comment != "") {
+                setState(() {
+                  isCommentAdded = !isCommentAdded;
+                });
+              }
+            },
+            child: Container(
+                padding: const EdgeInsets.all(15.0),
+                child: Row(
+                  children: <Widget>[
+                    Padding(
+                      child: Icon(Icons.add, size: 18.0),
+                      padding: EdgeInsets.only(right: 3),
+                    ),
+                    new Text(
+                      "Add Comment",
+                      style: new TextStyle(
+                          fontSize: 16.0,
+                          fontFamily: 'Medium',
+                          color: Colors.black,
+                          fontWeight: FontWeight.w700),
+                    )
+                  ],
+                ),
+                color: grayLightColor),
+          )
+        : Container(
+            padding: const EdgeInsets.all(20.0),
+            child: getCommentedView(context),
+            color: grayLightColor);
+  }
+
+  Widget getCommentedView(BuildContext context) {
+    return Wrap(children: <Widget>[
+      Column(
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            verticalDirection: VerticalDirection.down,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                  child: new Text(
+                "Your Comment",
+                style: new TextStyle(
+                    fontFamily: 'bold',
+                    fontSize: 16.0,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold),
+              )),
+              InkWell(
+                onTap: () async {
+                  String result =
+                      await DialogUtils.displayCommentDialog(context, comment);
+                  comment = result;
+                  setState(() {
+                    if (comment != "") {
+                      isCommentAdded = true;
+                    } else {
+                      isCommentAdded = false;
+                    }
+                  });
+                },
+                child: Padding(
+                  child: Icon(
+                    Icons.edit,
+                    size: 18.0,
+                  ),
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    comment = "";
+                    isCommentAdded = false;
+                    Utils.showToast("Comment Deleted", true);
+                  });
+                },
+                child: Padding(
+                  child: Icon(Icons.delete, size: 18.0),
+                  padding: EdgeInsets.only(right: 5, left: 5),
+                ),
+              ),
+            ],
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 10),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: new Text(
+                    comment,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      )
+    ]);
+  }
 }
 
 class StripeWebView extends StatefulWidget {
-
   StripeCheckOutModel stripeCheckOutModel;
   StoreModel storeModel;
+
   StripeWebView(this.stripeCheckOutModel, this.storeModel);
 
   @override
@@ -1255,14 +1566,12 @@ class StripeWebView extends StatefulWidget {
 }
 
 class _StripeWebViewState extends State<StripeWebView> {
-
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
   @override
   Widget build(BuildContext context) {
-
     return WillPopScope(
-      onWillPop: (){
+      onWillPop: () {
         //print("onWillPop onWillPop");
       },
       child: Scaffold(
@@ -1288,8 +1597,10 @@ class _StripeWebViewState extends State<StripeWebView> {
             },
             onPageFinished: (String url) {
               print('======Page finished loading======: $url');
-              if(url.contains("api/stripeVerifyTransaction?response=success")){
-                eventBus.fire(onPageFinished(widget.stripeCheckOutModel.paymentRequestId));
+              if (url
+                  .contains("api/stripeVerifyTransaction?response=success")) {
+                eventBus.fire(onPageFinished(
+                    widget.stripeCheckOutModel.paymentRequestId));
                 Navigator.pop(context);
               }
             },
@@ -1299,6 +1610,4 @@ class _StripeWebViewState extends State<StripeWebView> {
       ),
     );
   }
-
-
 }

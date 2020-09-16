@@ -118,7 +118,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                   context,
                   MaterialPageRoute(
                       builder: (context) =>
-                          ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
+                          ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp,areaObject: widget.areaObject,)),
                 );
               }else{
                 var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",widget.areaObject.note,);
@@ -128,7 +128,7 @@ class _StoreLocationScreenState extends BaseState<StoreLocationScreen> {
                     context,
                     MaterialPageRoute(
                         builder: (context) =>
-                            ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp)),
+                            ConfirmOrderScreen(null,true, widget.areaObject.areaId,widget.pickUp,areaObject: widget.areaObject)),
                   );
                 }
               }

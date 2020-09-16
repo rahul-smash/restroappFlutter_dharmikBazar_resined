@@ -15,20 +15,19 @@ import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
-
   final DeliveryAddressData selectedAddress;
   final VoidCallback callback;
   String addressValue;
   Coordinates coordinates;
 
-  SaveDeliveryAddress(this.selectedAddress, this.callback,this.addressValue, this.coordinates);
+  SaveDeliveryAddress(
+      this.selectedAddress, this.callback, this.addressValue, this.coordinates);
 
   @override
   _SaveDeliveryAddressState createState() => _SaveDeliveryAddressState();
 }
 
 class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
-
   Area selectedArea;
   City selectedCity;
   TextEditingController addressController = new TextEditingController();
@@ -51,24 +50,23 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       selectedArea.area = widget.selectedAddress.areaName;
       addressController.text = widget.selectedAddress.address;
       zipCodeController.text = widget.selectedAddress.zipCode;
-      fullnameController.text = "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
+      fullnameController.text =
+          "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
 
       locationData = new LocationData();
       locationData.address = widget.selectedAddress.address;
       locationData.lat = widget.selectedAddress.lat.toString();
       locationData.lng = widget.selectedAddress.lng.toString();
-
-    }else{
+    } else {
       //print("-2222222222222222-------");
       locationData = new LocationData();
 
-      if(widget.addressValue != null && widget.addressValue.isNotEmpty){
+      if (widget.addressValue != null && widget.addressValue.isNotEmpty) {
         //print("-3333333333333333-------");
         locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
         locationData.lat = widget.coordinates.latitude.toString();
         locationData.lng = widget.coordinates.longitude.toString();
-
       }
     }
     //getLocation();
@@ -79,30 +77,36 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
     return Scaffold(
         //resizeToAvoidBottomInset: false,
         appBar: AppBar(
-            title: Text(widget.selectedAddress != null ? "Edit Address"
-                : "Add Address",style: new TextStyle(
+          title: Text(
+            widget.selectedAddress != null ? "Edit Address" : "Add Address",
+            style: new TextStyle(
               color: Colors.white,
-            ),),
-            centerTitle: true,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back_ios),
-              onPressed: () => Navigator.pop(context),
             ),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.pop(context),
+          ),
           actions: <Widget>[
             InkWell(
-              onTap: (){
+              onTap: () {
                 Navigator.of(context).popUntil((route) => route.isFirst);
               },
               child: Padding(
-                padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
-                child: Icon(Icons.home, color: Colors.white,size: 30,),
+                padding:
+                    EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+                child: Icon(
+                  Icons.home,
+                  color: Colors.white,
+                  size: 30,
+                ),
               ),
             ),
-
           ],
         ),
         body: GestureDetector(
-          onTap: (){
+          onTap: () {
             FocusScope.of(context).requestFocus(FocusNode());
           },
           child: SingleChildScrollView(
@@ -121,27 +125,27 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           child: InkWell(
                             onTap: () async {
                               Utils.showProgressDialog(context);
-                              StoreAreaResponse storeArea = await ApiController.getStoreAreaApiRequest();
+                              StoreAreaResponse storeArea =
+                                  await ApiController.getStoreAreaApiRequest();
                               Utils.hideProgressDialog(context);
                               List<Datum> data = storeArea.data;
-                              if(data.length == 1){
+                              if (data.length == 1) {
                                 setState(() {
                                   dataObject = data[0];
                                   selectedCity = dataObject.city;
                                 });
-                              }else{
+                              } else {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) =>
                                       CityDialog((area) {
-                                        setState(() {
-                                          dataObject = area;
-                                          selectedCity = dataObject.city;
-                                        });
-                                      }),
+                                    setState(() {
+                                      dataObject = area;
+                                      selectedCity = dataObject.city;
+                                    });
+                                  }),
                                 );
                               }
-
                             },
                             child: Container(
                                 width: MediaQuery.of(context).size.width,
@@ -164,28 +168,43 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Padding(
                           padding: EdgeInsets.fromLTRB(0, 20, 0, 5),
                           child: InkWell(
-                            onTap: () {
-                              if(dataObject == null){
+                            onTap: () async {
+                              if(selectedCity == null){
                                 Utils.showToast("Please select city first!", false);
                                 return ;
                               }
+                              if (dataObject == null) {
+                                Utils.showProgressDialog(context);
+                                StoreAreaResponse storeArea =
+                                    await ApiController
+                                        .getStoreAreaApiRequest();
+                                Utils.hideProgressDialog(context);
+                                List<Datum> data = storeArea.data;
+                                //find city
+                                for (int i = 0; i < data.length; i++) {
+                                  if (data[i].city.id == selectedCity.id) {
+                                    dataObject = data[i];
+                                    break;
+                                  }
+                                }
+                              }
+                              if (selectedCity == null) {}
                               print("-area.length-${dataObject.area.length}--");
-                              if(dataObject.area.length == 1){
+                              if (dataObject.area.length == 1) {
                                 setState(() {
                                   selectedArea = dataObject.area[0];
                                 });
-                              }else{
+                              } else {
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) =>
                                       AreaOptionDialog((area) {
-                                        setState(() {
-                                          selectedArea = area;
-                                        });
-                                      },dataObject),
+                                    setState(() {
+                                      selectedArea = area;
+                                    });
+                                  }, dataObject),
                                 );
                               }
-
                             },
                             child: Container(
                                 width: MediaQuery.of(context).size.width,
@@ -202,48 +221,53 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Divider(color: Colors.grey, height: 2.0),
                       SizedBox(height: 20),
                       InkWell(
-                          onTap: (){
-                            Geolocator().isLocationServiceEnabled().then((value) async {
-                              if(value == true){
-
+                          onTap: () {
+                            Geolocator()
+                                .isLocationServiceEnabled()
+                                .then((value) async {
+                              if (value == true) {
                                 var geoLocator = Geolocator();
-                                var status = await geoLocator.checkGeolocationPermissionStatus();
+                                var status = await geoLocator
+                                    .checkGeolocationPermissionStatus();
                                 print("--status--=${status}");
                                 /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){
                                   Utils.showToast("Please accept location permissions to get your location from settings!", false);
                                 }*/
 
-                                var result = await Navigator.push(context, new MaterialPageRoute(
-                                  builder: (BuildContext context) => SelectLocationOnMap(),
-                                  fullscreenDialog: true,)
-                                );
-                                if(result != null){
+                                var result = await Navigator.push(
+                                    context,
+                                    new MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          SelectLocationOnMap(),
+                                      fullscreenDialog: true,
+                                    ));
+                                if (result != null) {
                                   locationData = result;
-                                  if(locationData.address.isNotEmpty){
-                                    addressController.text = locationData.address;
+                                  if (locationData.address.isNotEmpty) {
+                                    addressController.text =
+                                        locationData.address;
                                   }
                                 }
-
-                              }else{
+                              } else {
                                 Utils.showToast("Please turn on gps!", false);
                               }
                             });
                           },
-                          child:Text.rich(
+                          child: Text.rich(
                             TextSpan(
                               text: 'Enter or Select Location - ',
-                              style: TextStyle(color: infoLabel,fontSize: 17),
+                              style: TextStyle(color: infoLabel, fontSize: 17),
                               children: <TextSpan>[
                                 TextSpan(
                                     text: 'Click here',
-                                    style: TextStyle(color :Colors.lightBlue,
+                                    style: TextStyle(
+                                      color: Colors.lightBlue,
                                       decoration: TextDecoration.underline,
                                     )),
                                 // can add more TextSpans here...
                               ],
                             ),
-                          )
-                      ),
+                          )),
                       SizedBox(height: 10),
                       Container(
                         color: Colors.grey[200],
@@ -251,7 +275,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         child: new TextField(
                           controller: addressController,
                           keyboardType: TextInputType.multiline,
-                          maxLength: null,
+                          maxLength: 100,
                           maxLines: null,
                           decoration: new InputDecoration(
                               border: InputBorder.none,
@@ -315,16 +339,17 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           height: 40.0,
                           child: RaisedButton(
                             shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(25.0),side: BorderSide(color: appTheme)),
-
+                                borderRadius: new BorderRadius.circular(25.0),
+                                side: BorderSide(color: appTheme)),
                             onPressed: () async {
-                              bool isNetworkAvailable = await Utils.isNetworkAvailable();
-                              if(!isNetworkAvailable){
+                              bool isNetworkAvailable =
+                                  await Utils.isNetworkAvailable();
+                              if (!isNetworkAvailable) {
                                 Utils.showToast(AppConstant.noInternet, false);
                                 return;
                               }
 
-                              if(selectedCity == null){
+                              if (selectedCity == null) {
                                 Utils.showToast(AppConstant.selectCity, false);
                                 return;
                               }
@@ -333,11 +358,13 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 return;
                               }
                               if (addressController.text.trim().isEmpty) {
-                                Utils.showToast(AppConstant.pleaseEnterAddress, false);
+                                Utils.showToast(
+                                    AppConstant.pleaseEnterAddress, false);
                                 return;
                               }
                               if (fullnameController.text.trim().isEmpty) {
-                                Utils.showToast(AppConstant.pleaseFullname, false);
+                                Utils.showToast(
+                                    AppConstant.pleaseFullname, false);
                                 return;
                               }
                               /*if(zipCodeController.text.trim().isEmpty) {
@@ -345,20 +372,27 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 return;
                               }*/
 
-                              print("--addressController---${addressController.text}---");
+                              print(
+                                  "--addressController---${addressController.text}---");
 
                               Utils.showProgressDialog(context);
                               ApiController.saveDeliveryAddressApiRequest(
-                                  widget.selectedAddress == null? "ADD": "EDIT",
-                                  zipCodeController.text,
-                                  addressController.text,
-                                  selectedArea.areaId,
-                                  selectedArea.area,
-                                  widget.selectedAddress == null? null: widget.selectedAddress.id,
-                                  fullnameController.text,
-                                  selectedCity.city,
-                                  selectedCity.id,
-                                  "${locationData.lat}","${locationData.lng}").then((response) {
+                                      widget.selectedAddress == null
+                                          ? "ADD"
+                                          : "EDIT",
+                                      zipCodeController.text,
+                                      addressController.text,
+                                      selectedArea.areaId,
+                                      selectedArea.area,
+                                      widget.selectedAddress == null
+                                          ? null
+                                          : widget.selectedAddress.id,
+                                      fullnameController.text,
+                                      selectedCity.city,
+                                      selectedCity.id,
+                                      "${locationData.lat}",
+                                      "${locationData.lng}")
+                                  .then((response) {
                                 Utils.hideProgressDialog(context);
                                 //print('@@REsonsesss'+response.toString());
                                 if (response != null && response.success) {
@@ -367,9 +401,10 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                   Utils.showToast(response.message, true);
                                   Navigator.pop(context, true);
                                   //Navigator.of(context, rootNavigator: true)..pop()..pop();
-                                }else{
+                                } else {
                                   print('Not @@response.success');
-                                  Utils.showToast("Error while saving address!", true);
+                                  Utils.showToast(
+                                      "Error while saving address!", true);
                                 }
                               });
                             },
@@ -385,26 +420,20 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   ))),
         ));
   }
-
-
 }
 
-
 class CityDialog extends StatefulWidget {
-
   final Function(Datum) callback;
+
   CityDialog(this.callback);
 
   @override
   CityDialogState createState() => CityDialogState();
 }
 
-
-class CityDialogState extends BaseState<CityDialog>{
-
+class CityDialogState extends BaseState<CityDialog> {
   @override
   Widget build(BuildContext context) {
-
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10.0),
@@ -419,7 +448,7 @@ class CityDialogState extends BaseState<CityDialog>{
           } else {
             if (projectSnap.hasData) {
               StoreAreaResponse response = projectSnap.data;
-              if(response != null && !response.success){
+              if (response != null && !response.success) {
                 Utils.showToast("No data found!", false);
               }
               if (response.success) {
@@ -444,7 +473,6 @@ class CityDialogState extends BaseState<CityDialog>{
   }
 
   Widget cityDialogContent(BuildContext context, List<Datum> data) {
-
     return Container(
       decoration: new BoxDecoration(
         color: Colors.white,
@@ -494,7 +522,7 @@ class CityDialogState extends BaseState<CityDialog>{
                       decoration: BoxDecoration(
                         border: Border(
                             bottom:
-                            BorderSide(width: 1.0, color: Colors.black)),
+                                BorderSide(width: 1.0, color: Colors.black)),
                         color: Colors.white,
                       ),
                       child: Center(child: Text(area.city.city)),
@@ -506,14 +534,12 @@ class CityDialogState extends BaseState<CityDialog>{
       ),
     );
   }
-
 }
 
-
 class AreaOptionDialog extends StatefulWidget {
-
   final Function(Area) callback;
   Datum dataObject;
+
   AreaOptionDialog(this.callback, this.dataObject);
 
   @override
@@ -521,7 +547,6 @@ class AreaOptionDialog extends StatefulWidget {
 }
 
 class AreaOptionDialogState extends State<AreaOptionDialog> {
-
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -583,7 +608,7 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
                       decoration: BoxDecoration(
                         border: Border(
                             bottom:
-                            BorderSide(width: 1.0, color: Colors.black)),
+                                BorderSide(width: 1.0, color: Colors.black)),
                         color: Colors.white,
                       ),
                       child: Center(child: Text(area.area)),

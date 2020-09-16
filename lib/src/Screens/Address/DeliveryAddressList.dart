@@ -18,22 +18,21 @@ import 'package:restroapp/src/utils/Utils.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
 class DeliveryAddressList extends StatefulWidget {
-
   final bool showProceedBar;
   OrderType delivery;
-  DeliveryAddressList(this.showProceedBar,this.delivery);
+
+  DeliveryAddressList(this.showProceedBar, this.delivery);
 
   @override
   _AddDeliveryAddressState createState() => _AddDeliveryAddressState();
 }
 
 class _AddDeliveryAddressState extends State<DeliveryAddressList> {
-
   int selectedIndex = 0;
   List<DeliveryAddressData> addressList = [];
   Area radiusArea;
   Coordinates coordinates;
-  bool isLoading =false;
+  bool isLoading = false;
   DeliveryAddressResponse responsesData;
 
   @override
@@ -43,13 +42,15 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     callDeliverListApi();
   }
 
-  callDeliverListApi(){
+  callDeliverListApi() {
     isLoading = true;
-    ApiController.getAddressApiRequest().then((responses){
+    ApiController.getAddressApiRequest().then((responses) async {
+      responsesData = responses;
+      addressList = responsesData.data;
+//      addressList = await Utils.checkDeletedAreaFromStore(context, addressList,
+//          showDialogBool: true, hitApi: false);
       setState(() {
         isLoading = false;
-        responsesData = responses;
-        addressList = responsesData.data;
       });
     });
   }
@@ -58,33 +59,41 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text("Delivery Addresses"),
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.pop(context, false),
-          ),
+        title: Text("Delivery Addresses"),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          onPressed: () => Navigator.pop(context, false),
+        ),
         actions: <Widget>[
           InkWell(
-            onTap: (){
+            onTap: () {
               Navigator.of(context).popUntil((route) => route.isFirst);
             },
             child: Padding(
-              padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
-              child: Icon(Icons.home, color: Colors.white,size: 30,),
+              padding:
+                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+              child: Icon(
+                Icons.home,
+                color: Colors.white,
+                size: 30,
+              ),
             ),
           ),
-
         ],
       ),
-      body: isLoading ? Center(child:CircularProgressIndicator()) :addressList == null
-          ? SingleChildScrollView(child:Center(child: Text("Something went wrong!")))
-          : Column(children: <Widget>[
-          Divider(color: Colors.white, height: 2.0),
-          addCreateAddressButton(),
-          addAddressList()
-        ],
-      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : addressList == null
+              ? SingleChildScrollView(
+                  child: Center(child: Text("Something went wrong!")))
+              : Column(
+                  children: <Widget>[
+                    Divider(color: Colors.white, height: 2.0),
+                    addCreateAddressButton(),
+                    addAddressList()
+                  ],
+                ),
       bottomNavigationBar: SafeArea(
         child: widget.showProceedBar ? addProceedBar() : Container(height: 5),
       ),
@@ -101,59 +110,68 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
           StoreModel store = await SharedPrefs.getStore();
           print("--deliveryArea->--${store.deliveryArea}-------");
-          if(store.deliveryArea == "0"){
-            var result = await Navigator.push(context, MaterialPageRoute(builder: (BuildContext context) =>
-                SaveDeliveryAddress(null, () {
-                  print("--Route-SaveDeliveryAddress-------");
-                },"",coordinates),
-              fullscreenDialog: true,
-            ));
+          if (store.deliveryArea == "0") {
+            var result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      SaveDeliveryAddress(null, () {
+                    print("--Route-SaveDeliveryAddress-------");
+                  }, "", coordinates),
+                  fullscreenDialog: true,
+                ));
             print("--result--${result}-------");
-            if(result == true){
+            if (result == true) {
               //Utils.showProgressDialog(context);
               setState(() {
                 isLoading = true;
               });
-              DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+              DeliveryAddressResponse response =
+                  await ApiController.getAddressApiRequest();
               //Utils.hideProgressDialog(context);
               setState(() {
                 //addressList = null;
                 isLoading = false;
                 addressList = response.data;
               });
-            }else{
+            } else {
               print("--result--else------");
             }
-
-          }else if(store.deliveryArea == "1"){
-            Utils.isNetworkAvailable().then((isConnected){
-              if(isConnected){
+          } else if (store.deliveryArea == "1") {
+            Utils.isNetworkAvailable().then((isConnected) {
+              if (isConnected) {
                 Utils.showProgressDialog(context);
                 ApiController.storeRadiusApi().then((response) async {
-
                   Utils.hideProgressDialog(context);
-                  if(response != null && response.success){
-                    StoreRadiousResponse data =response;
-                    Geolocator().isLocationServiceEnabled().then((isLocationServiceEnabled) async {
-                      print("----isLocationServiceEnabled----${isLocationServiceEnabled}--");
-                      if(isLocationServiceEnabled){
-
+                  if (response != null && response.success) {
+                    StoreRadiousResponse data = response;
+                    Geolocator()
+                        .isLocationServiceEnabled()
+                        .then((isLocationServiceEnabled) async {
+                      print(
+                          "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
+                      if (isLocationServiceEnabled) {
                         var geoLocator = Geolocator();
-                        var status = await geoLocator.checkGeolocationPermissionStatus();
+                        var status =
+                            await geoLocator.checkGeolocationPermissionStatus();
                         print("--status--=${status}");
 
-                        var result = await Navigator.push(context, new MaterialPageRoute(
-                          builder: (BuildContext context) => DragMarkerMap(data),
-                          fullscreenDialog: true,)
-                        );
-                        if(result != null){
+                        var result = await Navigator.push(
+                            context,
+                            new MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  DragMarkerMap(data),
+                              fullscreenDialog: true,
+                            ));
+                        if (result != null) {
                           radiusArea = result;
                           print("----radiusArea = result-------");
                           //Utils.showProgressDialog(context);
                           setState(() {
                             isLoading = true;
                           });
-                          DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                          DeliveryAddressResponse response =
+                              await ApiController.getAddressApiRequest();
                           //Utils.hideProgressDialog(context);
                           setState(() {
                             print("----setState-------");
@@ -162,30 +180,31 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                             addressList = response.data;
                           });
                         }
-
-                      }else{
+                      } else {
                         Utils.showToast("Please turn on gps!", false);
                       }
                     });
-                  }else{
+                  } else {
                     Utils.showToast("No data found!", false);
                   }
                 });
-
-
-              }else{
+              } else {
                 Utils.showToast(AppConstant.noInternet, false);
               }
             });
-
           }
-
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Icon(Icons.add_circle_outline,color: Colors.white,size: 35.0,),
-            Text("Add Delivery Address",style: TextStyle(color: Colors.white, fontSize: 18.0),
+            Icon(
+              Icons.add_circle_outline,
+              color: Colors.white,
+              size: 35.0,
+            ),
+            Text(
+              "Add Delivery Address",
+              style: TextStyle(color: Colors.white, fontSize: 18.0),
             ),
           ],
         ),
@@ -195,14 +214,14 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   Widget addAddressList() {
     //Utils.hideProgressDialog(context);
-    if(addressList.isEmpty){
+    if (addressList.isEmpty) {
       return Center(
         child: Container(
           margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
           child: Text("No Delivery Address found!"),
         ),
       );
-    }else{
+    } else {
       return Expanded(
         child: ListView.builder(
           shrinkWrap: true,
@@ -221,15 +240,20 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: Padding(
           padding: EdgeInsets.only(top: 10, left: 6),
           child: Column(children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
-                    width: (Utils.getDeviceWidth(context)-100),
-                    child: Text("${area.firstName}",overflow: TextOverflow.ellipsis,
-                      maxLines: 1,style: TextStyle(fontWeight: FontWeight.bold,
-                          color: Colors.black,fontSize: 16.0),
+                    width: (Utils.getDeviceWidth(context) - 100),
+                    child: Text(
+                      "${area.firstName}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 16.0),
                     ),
                   ),
                   addAddressInfoRow(Icons.phone, area.mobile),
@@ -257,7 +281,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
               child: Divider(color: Color(0xFFBDBDBD), thickness: 1.0),
             ),
-            addOperationBar(area,index)
+            addOperationBar(area, index)
           ])),
     );
   }
@@ -272,13 +296,11 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           Padding(
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             child: SizedBox(
-              width: (Utils.getDeviceWidth(context)-130),
-              child: Text(
-                  info,
+              width: (Utils.getDeviceWidth(context) - 130),
+              child: Text(info,
                   maxLines: 3,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(color: infoLabel)
-              ),
+                  style: TextStyle(color: infoLabel)),
             ),
           ),
         ],
@@ -294,22 +316,29 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         children: <Widget>[
           Flexible(
             child: InkWell(
-              child: Align(alignment: Alignment.center,
-                child:Text("Edit Address",style: TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),),
-              onTap:() async {
-                var result = await Navigator.push(context,
+              child: Align(
+                alignment: Alignment.center,
+                child: Text("Edit Address",
+                    style: TextStyle(
+                        color: infoLabel, fontWeight: FontWeight.w500)),
+              ),
+              onTap: () async {
+                var result = await Navigator.push(
+                    context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) =>SaveDeliveryAddress(area, () {
+                      builder: (BuildContext context) =>
+                          SaveDeliveryAddress(area, () {
                         print('@@---Edit---SaveDeliveryAddress----------');
-                      },"",coordinates),
+                      }, "", coordinates),
                       fullscreenDialog: true,
                     ));
                 print("-Edit-result--${result}-------");
-                if(result == true){
+                if (result == true) {
                   setState(() {
                     isLoading = true;
                   });
-                  DeliveryAddressResponse response = await ApiController.getAddressApiRequest();
+                  DeliveryAddressResponse response =
+                      await ApiController.getAddressApiRequest();
                   //Utils.hideProgressDialog(context);
                   setState(() {
                     //addressList = null;
@@ -325,25 +354,29 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             height: 30,
             width: 1,
           ),
-          Flexible(child: InkWell(
+          Flexible(
+              child: InkWell(
             child: Align(
               alignment: Alignment.center,
-              child: new Text("Remove Address",style: TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),
+              child: new Text("Remove Address",
+                  style:
+                      TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),
             ),
             onTap: () async {
               print("--selectedIndex ${selectedIndex} and ${index}");
-              var results = await DialogUtils.displayDialog(context,"Delete",AppConstant.deleteAddress,
-                  "Cancel","OK");
-              if(results == true){
+              var results = await DialogUtils.displayDialog(
+                  context, "Delete", AppConstant.deleteAddress, "Cancel", "OK");
+              if (results == true) {
                 Utils.showProgressDialog(context);
-                ApiController.deleteDeliveryAddressApiRequest(area.id).then((response) async {
+                ApiController.deleteDeliveryAddressApiRequest(area.id)
+                    .then((response) async {
                   Utils.hideProgressDialog(context);
                   if (response != null && response.success) {
                     print("---showDialogForDelete-----");
                     setState(() {
                       addressList.removeAt(index);
                       print("--selectedIndex ${selectedIndex} and ${index}");
-                      if(selectedIndex == index && addressList .isNotEmpty){
+                      if (selectedIndex == index && addressList.isNotEmpty) {
                         selectedIndex = 0;
                       }
                     });
@@ -375,23 +408,34 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           } else {
             print("minAmount=${addressList[selectedIndex].minAmount}");
             print("notAllow=${addressList[selectedIndex].notAllow}");
-            if(addressList[selectedIndex].note.isEmpty){
-              Navigator.push(context,
+            if (addressList[selectedIndex].note.isEmpty) {
+              Navigator.push(
+                context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
+                    builder: (context) => ConfirmOrderScreen(
+                        addressList[selectedIndex],
+                        false,
+                        "",
+                        widget.delivery)),
               );
-            }else{
-              var result = await DialogUtils.displayOrderConfirmationDialog(context, "Confirmation",addressList[selectedIndex].note,);
-              if(result == true){
-                Navigator.push(context,
+            } else {
+              var result = await DialogUtils.displayOrderConfirmationDialog(
+                context,
+                "Confirmation",
+                addressList[selectedIndex].note,
+              );
+              if (result == true) {
+                Navigator.push(
+                  context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          ConfirmOrderScreen(addressList[selectedIndex],false,"",widget.delivery)),
+                      builder: (context) => ConfirmOrderScreen(
+                          addressList[selectedIndex],
+                          false,
+                          "",
+                          widget.delivery)),
                 );
               }
             }
-
           }
         },
         child: Row(
@@ -407,6 +451,4 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       ),
     );
   }
-
-
 }

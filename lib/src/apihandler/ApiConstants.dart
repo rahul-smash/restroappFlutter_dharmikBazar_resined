@@ -9,6 +9,7 @@ class ApiConstants{
 
   static String getCategories = 'getCategories';
   static String getProducts = 'getSubCategoryProducts/';
+  static String getProductDetail = 'productDetail/';
 
   static String getStoreBranches = 'getStoreBranches';
 

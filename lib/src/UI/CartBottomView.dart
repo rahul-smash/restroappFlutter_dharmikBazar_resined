@@ -124,7 +124,6 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
 
   Widget addMyCartScreenBottom() {
     return Container(
-      height: 80.0,
       color: appTheme,
       child: Column(
         children: <Widget>[
@@ -206,7 +205,9 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                         Utils.showToast("No pickup data found!", true);
                       }
                     });
-                  }else if(delieveryAdress=="1"){
+                  }else {
+                    //by default delivery
+                    //issue reported :=When both delivery address and pickup address are off then user is not able to place order
                     StoreModel storeObject = await SharedPrefs.getStore();
                     bool status = Utils.checkStoreOpenTime(storeObject,OrderType.Delivery);
                     if(!status){
@@ -225,11 +226,12 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
               }
             },
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center ,//Center Row contents horizontally,
+              crossAxisAlignment: CrossAxisAlignment.center, //Center Row contents vertically,
               //crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+                  padding: const EdgeInsets.fromLTRB(0, 5, 0,10),
                   child: Text(
                     "Place Order",
                     style: TextStyle(color: Colors.white, fontSize: 18.0),

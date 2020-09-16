@@ -44,7 +44,6 @@ import 'dart:io';
 class ApiController {
   static final int timeout = 18;
 
-
   static Future<StoreResponse> versionApiRequest(String storeId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -54,20 +53,35 @@ class ApiController {
 
     print("----url--${url}");
     try {
-      FormData formData = new FormData.fromMap(
-              {"device_id": deviceId, "device_token":"${deviceToken}",
-                "platform": Platform.isIOS ? "IOS" : "Android"
-              });
+      FormData formData = new FormData.fromMap({
+        "device_id": deviceId,
+        "device_token": "${deviceToken}",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
       Dio dio = new Dio();
       Response response = await dio.post(url,
           data: formData,
           options: new Options(
-                  contentType: "application/json",responseType: ResponseType.plain));
+              contentType: "application/json",
+              responseType: ResponseType.plain));
       print(response.statusCode);
       //print(response.data);
-      StoreResponse storeData = StoreResponse.fromJson(json.decode(response.data));
+      StoreResponse storeData =
+          StoreResponse.fromJson(json.decode(response.data));
       print("-------store.success ---${storeData.success}");
       SharedPrefs.saveStore(storeData.store);
+      //check older version
+      String version = await SharedPrefs.getAPiDetailsVersion();
+      print("older version is $version");
+      if (version != storeData.store.version) {
+        //TODO: store version saved
+        print(
+            "version not matched older version is $version and new version is ${storeData.store.version}.");
+        SharedPrefs.saveAPiDetailsVersion(storeData.store.version);
+        DatabaseHelper databaseHelper = DatabaseHelper();
+        databaseHelper.clearDataBase();
+      }
+
       return storeData;
     } catch (e) {
       print(e);
@@ -75,7 +89,8 @@ class ApiController {
     return null;
   }
 
-  static Future<UserResponse> registerApiRequest(UserData user,String referralCode) async {
+  static Future<UserResponse> registerApiRequest(
+      UserData user, String referralCode) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -92,7 +107,7 @@ class ApiController {
         "password": user.password,
         "device_id": deviceId,
         "device_token": deviceToken,
-        "user_refer_code":referralCode,
+        "user_refer_code": referralCode,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -181,60 +196,176 @@ class ApiController {
     }
   }
 
-  static Future<CategoryResponse> getCategoriesApiRequest(String storeId) async {
-     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
+  static Future<CategoryResponse> getCategoriesApiRequest(
+      String storeId) async {
+    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.getCategories;
-    print("catttttt  $url");
-    Response response = await Dio().get(url,options: new Options(responseType: ResponseType.plain));
-    print(url);
-    CategoryResponse categoryResponse = CategoryResponse.fromJson(json.decode(response.data));
-    //print("-------Categories.length ---${categoryResponse.categories.length}");
+    CategoryResponse categoryResponse = CategoryResponse();
+    DatabaseHelper databaseHelper = new DatabaseHelper();
+
     try {
-      DatabaseHelper databaseHelper = new DatabaseHelper();
-      databaseHelper.getCount(DatabaseHelper.Categories_Table).then((count) {
-        if (count == 0) {
-          for (int i = 0; i < categoryResponse.categories.length; i++) {
-            CategoryModel model = categoryResponse.categories[i];
-            databaseHelper.saveCategories(model);
-            if (model.subCategory != null) {
-              for (int j = 0; j < model.subCategory.length; j++) {
-                databaseHelper.saveSubCategories(
-                    model.subCategory[j], model.id);
-              }
+      int dbCount =
+          await databaseHelper.getCount(DatabaseHelper.Categories_Table);
+      bool isNetworkAviable = await Utils.isNetworkAvailable();
+      if (dbCount == 0 && isNetworkAviable) {
+        print("database zero");
+        print("catttttt  $url");
+        Response response = await Dio()
+            .get(url, options: new Options(responseType: ResponseType.plain));
+        //print(response);
+        categoryResponse =
+            CategoryResponse.fromJson(json.decode(response.data));
+        //print("-------Categories.length ---${categoryResponse.categories.length}");
+        for (int i = 0; i < categoryResponse.categories.length; i++) {
+          CategoryModel model = categoryResponse.categories[i];
+          databaseHelper.saveCategories(model);
+          if (model.subCategory != null) {
+            for (int j = 0; j < model.subCategory.length; j++) {
+              databaseHelper.saveSubCategories(model.subCategory[j], model.id);
             }
           }
         }
-      });
+      } else if (dbCount == 0 && !isNetworkAviable) {
+        categoryResponse.success = false;
+        return categoryResponse;
+      } else {
+        print("database has values");
+        //prepare model object
+        List<CategoryModel> categoryList = await databaseHelper.getCategories();
+        categoryResponse.categories = categoryList;
+        for (var i = 0; i < categoryResponse.categories.length; i++) {
+          String parent_id = categoryResponse.categories[i].id;
+          categoryResponse.categories[i].subCategory =
+              await databaseHelper.getSubCategories(parent_id);
+        }
+        categoryResponse.success = true;
+      }
     } catch (e) {
       print(e);
     }
     return categoryResponse;
   }
 
+  static Future<SubCategoryResponse> getSubCategoryProducts(
+      String subCategoryId) async {
+    DatabaseHelper databaseHelper = new DatabaseHelper();
 
-  static Future<SubCategoryResponse> getSubCategoryProducts(String subCategoryId) async {
-    StoreModel store = await SharedPrefs.getStore();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String deviceId = prefs.getString(AppConstant.deviceId);
-    String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.getProducts +subCategoryId;
-    print(url);
-    FormData formData = new FormData.fromMap(
-        {
+    int dbProductCounts = await databaseHelper.getCountWithCondition(
+        DatabaseHelper.Products_Table, "category_ids", subCategoryId);
+    SubCategoryResponse subCategoryResponse = SubCategoryResponse();
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (dbProductCounts == 0 && isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        print("deviceID $deviceId");
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+        print("deviceToken $deviceToken");
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.getProducts +
+            subCategoryId;
+        print(url);
+        FormData formData = new FormData.fromMap({
           "user_id": "",
           "device_id": deviceId,
           "device_token": deviceToken,
           "platform": Platform.isIOS ? "IOS" : "Android"
         });
-    Dio dio = new Dio();
-    Response response = await dio.post(url, data: formData,
-        options: new Options(
-            contentType: "application/json",responseType: ResponseType.plain));
-    //print(response.data);
-    SubCategoryResponse subCategoryResponse = SubCategoryResponse.fromJson(json.decode(response.data));
-    //print("-------store.success ---${storeData.success}");
-    return subCategoryResponse;
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                contentType: "application/json",
+                responseType: ResponseType.plain));
+        //print(response.data);
+        subCategoryResponse =
+            SubCategoryResponse.fromJson(json.decode(response.data));
+        if (subCategoryResponse.success) {
+          for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
+            for (int j = 0;
+                j < subCategoryResponse.subCategories[i].products.length;
+                j++) {
+              databaseHelper.saveProducts(
+                  subCategoryResponse.subCategories[i].products[j],
+                  subCategoryResponse.subCategories[i].id);
+            }
+          }
+          return subCategoryResponse;
+        }
+        //print("-------store.success ---${storeData.success}");
+      } else if (dbProductCounts == 0 && !isNetworkAviable) {
+        subCategoryResponse.success = false;
+        return subCategoryResponse;
+      } else {
+        print("database has values");
+        subCategoryResponse = SubCategoryResponse();
+        //prepare model object
+        List<SubCategoryModel> categoryList =
+            await databaseHelper.getSubCategoriesFromID(subCategoryId);
+
+        subCategoryResponse.subCategories = categoryList;
+
+        for (var i = 0; i < subCategoryResponse.subCategories.length; i++) {
+          String parent_id = subCategoryResponse.subCategories[i].id;
+          subCategoryResponse.subCategories[i].products =
+              await databaseHelper.getProducts(parent_id);
+//          for (int j = 0;
+//              j < subCategoryResponse.subCategories[i].products.length;
+//              j++) {
+//            subCategoryResponse.subCategories[i].products[j].variants =
+//                await databaseHelper.getProductsVariants(
+//                    subCategoryResponse.subCategories[i].products[j].id);
+//          }
+        }
+        subCategoryResponse.success = true;
+        return subCategoryResponse;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<SubCategoryResponse> getSubCategoryProductDetail(
+      String productID) async {
+    SubCategoryResponse subCategoryResponse = SubCategoryResponse();
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        print("deviceID $deviceId");
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+        print("deviceToken $deviceToken");
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.getProductDetail;
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "user_id": "",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android",
+          "product_id": productID
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                contentType: "application/json",
+                responseType: ResponseType.plain));
+        print(response.data);
+        subCategoryResponse =
+            SubCategoryResponse.fromJson(json.decode(response.data));
+        if (subCategoryResponse.success) {
+          return subCategoryResponse;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 
   static Future<DeliveryAddressResponse> getAddressApiRequest() async {
@@ -288,7 +419,6 @@ class ApiController {
     }
   }
 
-
   static Future<StoreAreaResponse> getStoreAreaApiRequest() async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -301,8 +431,7 @@ class ApiController {
       print("----url---${url}");
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
-      StoreAreaResponse storeArea =
-      StoreAreaResponse.fromJson(parsed);
+      StoreAreaResponse storeArea = StoreAreaResponse.fromJson(parsed);
       return storeArea;
     } catch (e) {
       print("----catch---${e.toString()}");
@@ -484,7 +613,6 @@ class ApiController {
       final parsed = json.decode(respStr);
       ValidateCouponResponse model = ValidateCouponResponse.fromJson(parsed);
       return model;
-
     } catch (e) {
       print("----respStr---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -493,7 +621,10 @@ class ApiController {
   }
 
   static Future<TaxCalculationResponse> multipleTaxCalculationRequest(
-      String couponCode, String discount,String shipping,String orderJson) async {
+      String couponCode,
+      String discount,
+      String shipping,
+      String orderJson) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -519,7 +650,8 @@ class ApiController {
       print("--Tax--respStr---${respStr}");
       final parsed = json.decode(respStr);
 
-      TaxCalculationResponse model = TaxCalculationResponse.fromJson(couponCode, parsed);
+      TaxCalculationResponse model =
+          TaxCalculationResponse.fromJson(couponCode, parsed);
       return model;
     } catch (e) {
       print("--multipleTax--respStr---${e.toString()}");
@@ -528,16 +660,21 @@ class ApiController {
     }
   }
 
-  static Future<ResponseModel> placeOrderRequest(String shipping_charges,
+  static Future<ResponseModel> placeOrderRequest(
+      String shipping_charges,
       String note,
       String totalPrice,
       String paymentMethod,
       TaxCalculationModel taxModel,
       DeliveryAddressData address,
-      String orderJson, bool isComingFromPickUpScreen, String areaId,OrderType deliveryType,
-      String razorpay_order_id,String razorpay_payment_id,String online_method,
+      String orderJson,
+      bool isComingFromPickUpScreen,
+      String areaId,
+      OrderType deliveryType,
+      String razorpay_order_id,
+      String razorpay_payment_id,
+      String online_method,
       String selectedDeliverSlotValue) async {
-
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -545,17 +682,17 @@ class ApiController {
     String deviceToken = prefs.getString(AppConstant.deviceToken);
 
     var url;
-    if(deliveryType == OrderType.Delivery){
+    if (deliveryType == OrderType.Delivery) {
       url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
           ApiConstants.placeOrder;
-    }else{
+    } else {
       url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
           ApiConstants.pickupPlaceOrder;
     }
     String storeAddress = "";
     try {
       storeAddress = "${store.storeName}, ${store.location},"
-              "${store.city}, ${store.state}, ${store.country}, ${store.zipcode}";
+          "${store.city}, ${store.state}, ${store.country}, ${store.zipcode}";
       print("storeAddress= ${storeAddress}");
     } catch (e) {
       print(e);
@@ -574,7 +711,8 @@ class ApiController {
       print("taxDetail= ${taxModel.taxDetail}");*/
 
       try {
-        List jsonfixedTaxList = taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+        List jsonfixedTaxList =
+            taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
         encodedFixedTax = jsonEncode(jsonfixedTaxList);
         //print("encodedFixedTax= ${encodedFixedTax}");
       } catch (e) {
@@ -582,7 +720,8 @@ class ApiController {
       }
 
       try {
-        List jsontaxDetailList = taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+        List jsontaxDetailList =
+            taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
         encodedtaxDetail = jsonEncode(jsontaxDetailList);
         //print("encodedtaxDetail= ${encodedtaxDetail}");
       } catch (e) {
@@ -590,7 +729,8 @@ class ApiController {
       }
 
       try {
-        List jsontaxLabelList = taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+        List jsontaxLabelList =
+            taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
         encodedtaxLabel = jsonEncode(jsontaxLabelList);
         //print("encodedtaxLabel= ${encodedtaxLabel}");
       } catch (e) {
@@ -607,16 +747,18 @@ class ApiController {
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
-        "user_address": isComingFromPickUpScreen == true ? storeAddress : address.address,
+        "user_address":
+            isComingFromPickUpScreen == true ? storeAddress : address.address,
         "store_fixed_tax_detail": "",
         "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",
         "platform": Platform.isIOS ? "IOS" : "Android",
         "tax_rate": "0",
-        "total": /*taxModel == null ? '${totalPrice}' : */'${taxModel.total}',
+        "total": /*taxModel == null ? '${totalPrice}' : */ '${taxModel.total}',
         "user_id": user.id,
         "device_token": deviceToken,
-        "user_address_id": isComingFromPickUpScreen == true ? areaId : address.id,
+        "user_address_id":
+            isComingFromPickUpScreen == true ? areaId : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
         "payment_method": paymentMethod == "2" ? "COD" : "online",
@@ -646,21 +788,27 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> updateProfileRequest(String fullName, String emailId,
-      String phoneNumber,bool isComingFromOtpScreen, String id,String user_refer_code) async {
+  static Future<UserResponse> updateProfileRequest(
+      String fullName,
+      String emailId,
+      String phoneNumber,
+      bool isComingFromOtpScreen,
+      String id,
+      String user_refer_code) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     StoreModel store = await SharedPrefs.getStore();
     String userId;
-    if(isComingFromOtpScreen){
+    if (isComingFromOtpScreen) {
       userId = id;
-    }else{
+    } else {
       UserModel user = await SharedPrefs.getUser();
       userId = user.id;
     }
 
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +ApiConstants.updateProfile;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.updateProfile;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("--url--${url}--");
     try {
@@ -723,26 +871,31 @@ class ApiController {
   static Future<GetOrderHistory> getOrderHistory() async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
-
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.orderHistory;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
-    try {
-      request.fields.addAll({
-        "user_id": user.id,
-        "platform": Platform.isIOS ? "IOS" : "android",
-      });
-      print('--url===  $url');
-      print('--user.id=== ${user.id}');
-      final response = await request.send().timeout(Duration(seconds: timeout));
-      final respStr = await response.stream.bytesToString();
-      final parsed = json.decode(respStr);
-      print('--respStr===  $respStr');
-      GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
-      return getOrderHistory;
-    } catch (e) {
-      Utils.showToast(e.toString(), true);
+    if (isNetworkAvailable) {
+      try {
+        request.fields.addAll({
+          "user_id": user.id,
+          "platform": Platform.isIOS ? "IOS" : "android",
+        });
+        print('--url===  $url');
+        print('--user.id=== ${user.id}');
+        final response =
+            await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        final parsed = json.decode(respStr);
+        print('--respStr===  $respStr');
+        GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
+        return getOrderHistory;
+      } catch (e) {
+        Utils.showToast(e.toString(), true);
+        return null;
+      }
+    } else {
+      Utils.showToast(AppConstant.noInternet, true);
       return null;
     }
   }
@@ -783,8 +936,8 @@ class ApiController {
     }
   }
 
-  static Future<OtpVerified> otpVerified(OTPData otpData,LoginMobile phone) async {
-
+  static Future<OtpVerified> otpVerified(
+      OTPData otpData, LoginMobile phone) async {
     UserModelMobile userMobile = await SharedPrefs.getUserMobile();
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -865,7 +1018,6 @@ class ApiController {
     }
   }
 
-
   static Future<CreateOrderData> razorpayCreateOrderApi(String amount) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -894,7 +1046,8 @@ class ApiController {
     }
   }
 
-  static Future<RazorpayOrderData> razorpayVerifyTransactionApi(String razorpay_order_id) async {
+  static Future<RazorpayOrderData> razorpayVerifyTransactionApi(
+      String razorpay_order_id) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.razorpayVerifyTransaction;
@@ -918,15 +1071,12 @@ class ApiController {
     }
   }
 
-
-  static Future<AdminLoginModel> getAdminApiRequest(String username,String password) async {
-    var url = ApiConstants.baseUrl+ApiConstants.storeLogin;
+  static Future<AdminLoginModel> getAdminApiRequest(
+      String username, String password) async {
+    var url = ApiConstants.baseUrl + ApiConstants.storeLogin;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
-      request.fields.addAll({
-        "email": username,
-        "password": password
-      });
+      request.fields.addAll({"email": username, "password": password});
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('----respStr-----' + respStr);
@@ -970,20 +1120,17 @@ class ApiController {
     }
   }
 
-
   static Future<StripeCheckOutModel> stripePaymentApi(String amount) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     UserModel user = await SharedPrefs.getUser();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.stripePaymentCheckout;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.stripePaymentCheckout;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     try {
-      request.fields.addAll({
-        "customer_email": user.email,
-        "amount": amount,
-        "currency":"usd"
-      });
+      request.fields.addAll(
+          {"customer_email": user.email, "amount": amount, "currency": "usd"});
       print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -999,16 +1146,16 @@ class ApiController {
     }
   }
 
-
-  static Future<StripeVerifyModel> stripeVerifyTransactionApi(String payment_request_id) async {
+  static Future<StripeVerifyModel> stripeVerifyTransactionApi(
+      String payment_request_id) async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.stripeVerifyTransaction;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.stripeVerifyTransaction;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     try {
       request.fields.addAll({
         "payment_request_id": payment_request_id,
-
       });
       print('--url===  $url');
       print('--payment_request_id===  $payment_request_id');
@@ -1026,14 +1173,13 @@ class ApiController {
     }
   }
 
-
   static Future<SearchTagsModel> searchTagsAPI() async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.getTagsList;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.getTagsList;
 
     var request = new http.MultipartRequest("GET", Uri.parse(url));
     try {
-
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
 
@@ -1041,7 +1187,6 @@ class ApiController {
       print("----respStr---${respStr}");
       SearchTagsModel storeArea = SearchTagsModel.fromJson(parsed);
       return storeArea;
-
     } catch (e) {
       print("----catch---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -1055,7 +1200,8 @@ class ApiController {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-    var url=ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.search;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.search;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     try {
@@ -1072,7 +1218,8 @@ class ApiController {
       print("${respStr}");
 
       final parsed = json.decode(respStr);
-      SubCategoryResponse subCategoryResponse = SubCategoryResponse.fromJson(parsed);
+      SubCategoryResponse subCategoryResponse =
+          SubCategoryResponse.fromJson(parsed);
       return subCategoryResponse;
     } catch (e) {
       print(e.toString());
@@ -1080,13 +1227,12 @@ class ApiController {
     }
   }
 
-
   static Future<DeliveryTimeSlotModel> deliveryTimeSlotApi() async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.deliveryTimeSlot;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.deliveryTimeSlot;
     var request = new http.MultipartRequest("GET", Uri.parse(url));
     try {
-
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
 
@@ -1094,7 +1240,6 @@ class ApiController {
       //print("---deliveryTimeSlot-respStr---${respStr}");
       DeliveryTimeSlotModel storeArea = DeliveryTimeSlotModel.fromJson(parsed);
       return storeArea;
-
     } catch (e) {
       print("----catch---${e.toString()}");
       return null;
@@ -1107,10 +1252,14 @@ class ApiController {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     UserModel user = await SharedPrefs.getUser();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)+ApiConstants.orderCancel;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.orderCancel;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
-      request.fields.addAll({"user_id": user.id,"order_id": order_id,});
+      request.fields.addAll({
+        "user_id": user.id,
+        "order_id": order_id,
+      });
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('--response===  $respStr');
@@ -1144,10 +1293,9 @@ class ApiController {
       final parsed = json.decode(respStr);
 
       DeliveryAddressResponse deliveryAddressResponse =
-      DeliveryAddressResponse.fromJson(parsed);
+          DeliveryAddressResponse.fromJson(parsed);
       //print("----respStr---${deliveryAddressResponse.success}");
       return deliveryAddressResponse;
-
     } catch (e) {
       print("----catch---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -1159,18 +1307,18 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
         ApiConstants.getStoreBranches;
 
-    Response response = await Dio().get(url,
-        options:Options(responseType: ResponseType.plain));
+    Response response = await Dio()
+        .get(url, options: Options(responseType: ResponseType.plain));
     print(url);
     print(response.data);
-    StoreBranchesModel storeBranchesModel = StoreBranchesModel.fromJson(json.decode(response.data));
+    StoreBranchesModel storeBranchesModel =
+        StoreBranchesModel.fromJson(json.decode(response.data));
     print("---storeBranchesModel ---${storeBranchesModel.data.length}");
 
     return storeBranchesModel;
   }
 
   static Future<LoyalityPointsModel> getLoyalityPointsApiRequest() async {
-
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
@@ -1180,28 +1328,25 @@ class ApiController {
     print("----url--${url}");
     print("--user.id--${user.id}");
     try {
-      FormData formData = new FormData.fromMap({
-            "user_id": user.id,
-            "platform": Platform.isIOS ? "IOS" : "Android"
-          });
+      FormData formData = new FormData.fromMap(
+          {"user_id": user.id, "platform": Platform.isIOS ? "IOS" : "Android"});
       Dio dio = new Dio();
       Response response = await dio.post(url,
           data: formData,
           options: new Options(
-              contentType: "application/json",responseType: ResponseType.plain));
+              contentType: "application/json",
+              responseType: ResponseType.plain));
       print(response.statusCode);
       print(response.data);
 
-      LoyalityPointsModel storeData = LoyalityPointsModel.fromJson(json.decode(response.data));
+      LoyalityPointsModel storeData =
+          LoyalityPointsModel.fromJson(json.decode(response.data));
       print("-----LoyalityPointsModel ---${storeData.success}");
 
       return storeData;
-
     } catch (e) {
       print(e);
     }
     return null;
   }
-
-
 }

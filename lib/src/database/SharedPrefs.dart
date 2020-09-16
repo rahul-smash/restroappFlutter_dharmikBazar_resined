@@ -8,7 +8,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class SharedPrefs {
-
   static void saveStore(StoreModel model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     dynamic storeResponse = model.toJson();
@@ -53,7 +52,6 @@ class SharedPrefs {
     return sharedUser.getBool('isLoggedIn') ?? false;
   }
 
-
   static Future storeSharedValue(String key, String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(key, value);
@@ -70,7 +68,6 @@ class SharedPrefs {
     return sharedUser.getString(key);
   }
 
-
   static void saveUserMobile(UserModelMobile model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     dynamic userResponse = model.toJson();
@@ -84,6 +81,7 @@ class SharedPrefs {
     var user = UserModelMobile.fromJson(userMap);
     return user;
   }
+
   static void saveUserOTP(OtpVerified model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     dynamic userResponse = model.toJson();
@@ -107,8 +105,21 @@ class SharedPrefs {
 
   static Future<ReferEarn> getReferEarn() async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
-    Map<String, dynamic> userMap = json.decode(sharedUser.getString('referEarn'));
+    Map<String, dynamic> userMap =
+        json.decode(sharedUser.getString('referEarn'));
     var user = ReferEarn.fromJson(userMap);
     return user;
   }
+
+  static void saveAPiDetailsVersion(String version) async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    sharedUser.setString('api_details_version', version);
+  }
+
+  static Future<String> getAPiDetailsVersion() async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    String version = sharedUser.getString('api_details_version');
+    return version;
+  }
+
 }
