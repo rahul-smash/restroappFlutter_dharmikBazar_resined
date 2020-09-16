@@ -84,6 +84,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   String comment = "";
 
+  bool ispaytmSelected = false;
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() {
@@ -110,7 +112,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.showProgressDialog(context);
     ApiController.createPaytmTxnToken(address, pin, amount).then((value) async {
       Utils.hideProgressDialog(context);
-      if(value!=null&& value.success) {
+      if (value != null && value.success) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -909,8 +911,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       onChanged: (PaymentType value) async {
                         setState(() {
                           widget._character = value;
-                          if (value == PaymentType.COD)
+                          if (value == PaymentType.COD) {
                             widget.paymentMode = "2";
+                            ispaytmSelected = false;
+                          }
                         });
                       },
                     ),
@@ -931,12 +935,38 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       onChanged: (PaymentType value) async {
                         setState(() {
                           widget._character = value;
-                          if (value == PaymentType.ONLINE)
+                          if (value == PaymentType.ONLINE) {
                             widget.paymentMode = "3";
+                            ispaytmSelected = false;
+                          }
                         });
                       },
                     ),
                     Text('Online',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ],
+                ),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    Radio(
+                      value: PaymentType.ONLINE_PAYTM,
+                      activeColor: appTheme,
+                      groupValue: widget._character,
+                      onChanged: (PaymentType value) async {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.ONLINE_PAYTM) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = true;
+                          }
+                        });
+                      },
+                    ),
+                    Text('Paytm uiidssssuisdsjidcjdsjdsoijkcdslcjkldsk llksd jlks ',
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w600,
@@ -1437,7 +1467,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       'amount': (double.parse(taxModel.total) * 100),
       'name': '${storeModel.storeName}',
       'description': '',
-      'prefill': {'contact': '${user.phone}', 'email': '${user.email}','name': '${user.fullName}'},
+      'prefill': {
+        'contact': '${user.phone}',
+        'email': '${user.email}',
+        'name': '${user.fullName}'
+      },
       /*'external': {
         'wallets': ['paytm']
       }*/
@@ -1501,7 +1535,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         print("--orderjson == null-orderjson == null-");
         return;
       }
-      String storeAddress="";
+      String storeAddress = "";
       try {
         storeAddress = "${storeModel.storeName}, ${storeModel.location},"
             "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
@@ -1509,14 +1543,26 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         print(e);
       }
 
-      String userId=user.id;
+      String userId = user.id;
       OrderDetailsModel detailsModel = OrderDetailsModel(
-          shippingCharges, comment, totalPrice.toString(),
-          widget.paymentMode, taxModel, widget.address,
-          widget.isComingFromPickUpScreen, widget.areaId, widget.deliveryType,
-          "", "", deviceId,
-          "Razorpay", userId, deviceToken, storeAddress,
-          selectedDeliverSlotValue, totalSavingsText);
+          shippingCharges,
+          comment,
+          totalPrice.toString(),
+          widget.paymentMode,
+          taxModel,
+          widget.address,
+          widget.isComingFromPickUpScreen,
+          widget.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Razorpay",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedDeliverSlotValue,
+          totalSavingsText);
       ApiController.razorpayCreateOrderApi(
               mPrice, orderJson, detailsModel.orderDetails)
           .then((response) {

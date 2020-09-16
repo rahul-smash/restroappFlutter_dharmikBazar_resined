@@ -555,5 +555,5 @@ enum ClassType { CART, SubCategory, Favourites, Search }
 
 enum OrderType { Delivery, PickUp, Menu }
 
-enum PaymentType { COD, ONLINE, CANCEL }
+enum PaymentType { COD, ONLINE,ONLINE_PAYTM, CANCEL }
 enum RadioButtonEnum { SELECTD, UNSELECTED }
