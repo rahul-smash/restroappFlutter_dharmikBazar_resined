@@ -1021,7 +1021,8 @@ class ApiController {
     }
   }
 
-  static Future<CreateOrderData> razorpayCreateOrderApi(String amount,String orderJson,dynamic detailsJson) async {
+  static Future<CreateOrderData> razorpayCreateOrderApi(
+      String amount, String orderJson, dynamic detailsJson) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.razorpayCreateOrder;
@@ -1401,13 +1402,48 @@ class ApiController {
             CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
         if (txnTokenResponse.success) {
           return txnTokenResponse;
-        }else{
+        } else {
           return null;
         }
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
       }
     } catch (e) {
       print(e);
     }
     return null;
+  }
+
+  static void getFAQRequest() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAvailable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.faqs;
+        var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+          request.fields.addAll({
+            "method": "POST",
+            "device_id": deviceId,
+            "device_token": deviceToken,
+            "platform": Platform.isIOS ? "IOS" : "Android"
+          });
+          print("${url}");
+          final response = await request.send().timeout(Duration(seconds: timeout));
+          final respStr = await response.stream.bytesToString();
+          print("${respStr}");
+
+          final parsed = json.decode(respStr);
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    } catch (e) {
+      print(e);
+    }
   }
 }

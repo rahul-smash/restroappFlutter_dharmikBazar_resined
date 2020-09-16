@@ -56,6 +56,8 @@ class ApiConstants{
 
   static String createPaytmTxnToken = 'createPaytmTxnToken';
 
+  static String faqs = 'faqs';
+
 
 
   static final String txt_mobile = "Please enter your Mobile No. to proceed further";
