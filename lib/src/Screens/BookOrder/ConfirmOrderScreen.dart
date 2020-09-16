@@ -86,6 +86,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool ispaytmSelected = false;
 
+  bool isPayTmActive = false;
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() {
@@ -129,6 +131,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     super.initState();
     initRazorPay();
     listenWebViewChanges();
+    checkPaytmActive();
     selctedTag = 0;
     hideRemoveCouponFirstTime = true;
     print("You are on confirm order screen");
@@ -873,7 +876,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-  Widget addPaymentOptions() {
+  Widget addPaymentOptionsold() {
     bool showOptions = false;
 //    if (storeModel != null) {
 //      return Container();
@@ -966,7 +969,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         });
                       },
                     ),
-                    Text('Paytm uiidssssuisdsjidcjdsjdsoijkcdslcjkldsk llksd jlks ',
+                    Text('Paytm',
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.w600,
@@ -975,6 +978,123 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 )
               ],
             )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget addPaymentOptions() {
+    bool showOptions = false;
+//    if (storeModel != null) {
+//      return Container();
+//    }
+    if (widget.storeModel.onlinePayment != null) {
+      if (widget.storeModel.onlinePayment == "1") {
+        showOptions = true;
+      } else {
+        showOptions = false; //cod
+      }
+    } else {
+      if (isPayTmActive) {
+        showOptions = true;
+      }
+    }
+    return Visibility(
+      visible: showOptions,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            Utils.showDivider(context),
+            Container(
+              child: Text("Select Payment",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: appTheme,
+                    fontWeight: FontWeight.w600,
+                  )),
+            ),
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: <Widget>[
+                Radio(
+                  value: PaymentType.COD,
+                  groupValue: widget._character,
+                  activeColor: appTheme,
+                  onChanged: (PaymentType value) async {
+                    setState(() {
+                      widget._character = value;
+                      if (value == PaymentType.COD) {
+                        widget.paymentMode = "2";
+                        ispaytmSelected = false;
+                      }
+                    });
+                  },
+                ),
+                Text('COD',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    )),
+              ],
+            ),
+            Visibility(
+              visible: widget.storeModel.onlinePayment != null &&
+                  widget.storeModel.onlinePayment.compareTo('1') == 0,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE,
+                    activeColor: appTheme,
+                    groupValue: widget._character,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.ONLINE) {
+                          widget.paymentMode = "3";
+                          ispaytmSelected = false;
+                        }
+                      });
+                    },
+                  ),
+                  Text('Online',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: isPayTmActive,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE_PAYTM,
+                    activeColor: appTheme,
+                    groupValue: widget._character,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.ONLINE_PAYTM) {
+                          widget.paymentMode = "3";
+                          ispaytmSelected = true;
+                        }
+                      });
+                    },
+                  ),
+                  Text('Paytm',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -1233,29 +1353,53 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   performPlaceOrderOperation(StoreModel storeObject) async {
     if (widget.paymentMode == "3") {
-      String paymentGateway = storeObject.paymentGateway;
-      if (storeObject.paymentGatewaySettings != null &&
-          storeObject.paymentGatewaySettings.isNotEmpty) {
-        //case only single gateway is comming
-        if (storeObject.paymentGatewaySettings.length == 1) {
-          paymentGateway =
-              storeObject.paymentGatewaySettings.first.paymentGateway;
-          callPaymentGateWay(paymentGateway, storeObject);
-        } else {
-          String result =
-              await DialogUtils.displayMultipleOnlinePaymentMethodDialog(
-                  context, storeObject);
-          if (result.isEmpty) {
-            Utils.hideProgressDialog(context);
-            return;
+      if (ispaytmSelected) {
+        callPaymentGateWay("Paytmpay", storeObject);
+      } else {
+        String paymentGateway = storeObject.paymentGateway;
+        if (storeObject.paymentGatewaySettings != null &&
+            storeObject.paymentGatewaySettings.isNotEmpty) {
+          //case only single gateway is comming
+          if (storeObject.paymentGatewaySettings.length == 1) {
+            paymentGateway =
+                storeObject.paymentGatewaySettings.first.paymentGateway;
+          } else {
+            //remove paytm option
+            int indexToRemove = -1;
+            for (int i = 0;
+                i < storeObject.paymentGatewaySettings.length;
+                i++) {
+              if (storeObject.paymentGatewaySettings[i].paymentGateway
+                  .toLowerCase()
+                  .contains('paytm')) {
+                indexToRemove = i;
+                break;
+              }
+            }
+            if (indexToRemove != -1) {
+              storeObject.paymentGatewaySettings.removeAt(indexToRemove);
+            }
+            if (storeObject.paymentGatewaySettings.length == 1) {
+              paymentGateway =
+                  storeObject.paymentGatewaySettings.first.paymentGateway;
+              callPaymentGateWay(paymentGateway, storeObject);
+            } else {
+              String result =
+                  await DialogUtils.displayMultipleOnlinePaymentMethodDialog(
+                      context, storeObject);
+              if (result.isEmpty) {
+                Utils.hideProgressDialog(context);
+                return;
+              }
+              paymentGateway = result;
+              callPaymentGateWay(paymentGateway, storeObject);
+            }
           }
-          paymentGateway = result;
+          return;
+        } else {
+          //case payment gateway setting list empty
           callPaymentGateWay(paymentGateway, storeObject);
         }
-        return;
-      } else {
-        //case payment gateway setting list empty
-        callPaymentGateWay(paymentGateway, storeObject);
       }
     } else {
       placeOrderApiCall("", "", "");
@@ -1850,6 +1994,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ],
       )
     ]);
+  }
+
+  void checkPaytmActive() {
+    String paymentGateway = storeModel.paymentGateway;
+    if (storeModel.paymentGatewaySettings != null &&
+        storeModel.paymentGatewaySettings.isNotEmpty) {
+      //case only single gateway is comming
+      if (storeModel.paymentGatewaySettings.length == 1) {
+        paymentGateway = storeModel.paymentGatewaySettings.first.paymentGateway;
+        if (paymentGateway.toLowerCase().contains('paytm')) {
+          isPayTmActive = true;
+        }
+      } else {
+        for (int i = 0; i < storeModel.paymentGatewaySettings.length; i++) {
+          paymentGateway = storeModel.paymentGatewaySettings[i].paymentGateway;
+          if (paymentGateway.toLowerCase().contains('paytm')) {
+            isPayTmActive = true;
+            break;
+          }
+        }
+      }
+    } else {
+      if (paymentGateway.toLowerCase().contains('paytm')) {
+        isPayTmActive = true;
+      }
+    }
   }
 }
 
