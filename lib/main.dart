@@ -90,7 +90,6 @@ class ValueApp extends StatelessWidget {
     );
   }
 }
-
 Widget showHomeScreen(StoreResponse model,ConfigModel configObject,PackageInfo packageInfo) {
   String version = packageInfo.version;
   if (model.success) {
