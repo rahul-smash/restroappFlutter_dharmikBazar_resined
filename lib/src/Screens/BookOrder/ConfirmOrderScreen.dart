@@ -83,7 +83,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool isCommentAdded = false;
 
   String comment = "";
-
+  bool isDeliveryResponseFalse=false;
   bool ispaytmSelected = false;
 
   bool isPayTmActive = false;
@@ -171,6 +171,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if (storeModel.deliverySlot == "1") {
             ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
+                if (!response.success) {
+                  isDeliveryResponseFalse = true;
+                  return;
+                }
                 deliverySlotModel = response;
                 print(
                     "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
@@ -1291,7 +1295,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.address.notAllow) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.address.minAmount}",
+                      "Your order amount is too low. Minimum order amount is ${widget.address.minAmount}",
                       false);
                   return;
                 }
@@ -1300,7 +1304,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.areaObject != null) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.areaObject.minOrder}",
+                      "Your order amount is too low. Minimum order amount is ${widget.areaObject.minOrder}",
                       false);
                   return;
                 }
@@ -1337,7 +1341,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 } else {
                   //Store provides instant delivery of the orders.
                   print(isInstantDelivery);
-                  if (storeObject.deliverySlot == "1" && isInstantDelivery) {
+                  if (isDeliveryResponseFalse) {
+                    selectedDeliverSlotValue = "";
+                  } else if (storeObject.deliverySlot == "1" &&
+                      isInstantDelivery) {
                     //Store provides instant delivery of the orders.
                     selectedDeliverSlotValue = "";
                   } else if (storeObject.deliverySlot == "1" &&
