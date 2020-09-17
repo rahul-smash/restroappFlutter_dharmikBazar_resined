@@ -88,6 +88,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool isPayTmActive = false;
 
+  double totalMRpPrice = 0.0;
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() {
@@ -287,7 +289,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               child: Wrap(
                 children: [
                   addTotalPrice(),
-                  addTotalSavingPrice(),
                   addEnterCouponCodeView(),
                   addCouponCodeRow(),
                   addPaymentOptions(),
@@ -638,8 +639,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             height: 1,
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
+        addMRPPrice(),
+        addTotalSavingPrice(),
         Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+            padding: EdgeInsets.fromLTRB(15, totalSavings > 0 ? 5 : 10, 10, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -661,16 +664,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return Container(
           color: Colors.white,
           child: Padding(
-              padding: EdgeInsets.fromLTRB(15, 5, 10, 10),
+              padding: EdgeInsets.fromLTRB(15, 5, 10, 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Total Savings",
+                  Text("Cart Discount",
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: appTheme,
                           fontSize: 16)),
-                  Text('${AppConstant.currency}$totalSavingsText',
+                  Text('-${AppConstant.currency}$totalSavingsText',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: appTheme,
@@ -681,9 +684,34 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return Container();
   }
 
+  Widget addMRPPrice() {
+    if (totalSavings != 0.00)
+      return Container(
+          color: Colors.white,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(15, 10, 10, 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("MRP Price",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14)),
+                  Text('${AppConstant.currency}${totalMRpPrice.toStringAsFixed(2)}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14)),
+                ],
+              )));
+    else
+      return Container();
+  }
+
   void calculateTotalSavings() {
     //calculate total savings
-    double totalMRpPrice = 0;
+    totalMRpPrice = 0;
     if (widget.cartList != null && widget.cartList.isNotEmpty) {
       for (Product product in widget.cartList) {
         if (product != null &&
@@ -702,7 +730,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       //P= (Y/X)*100
       double totalSavedPercentage = (totalSavings / totalMRpPrice) * 100;
       totalSavingsText =
-          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
+//          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
+          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}";
       setState(() {});
     }
   }
@@ -1777,7 +1806,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     payment_id,
                     onlineMethod,
                     selectedDeliverSlotValue,
-                    cart_saving: totalSavingsText)
+                    cart_saving: totalSavings.toStringAsFixed(2))
                 .then((response) async {
               Utils.hideProgressDialog(context);
               if (response == null) {
