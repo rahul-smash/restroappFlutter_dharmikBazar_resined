@@ -290,10 +290,19 @@ class StoreModel {
     paymentGateway = json["payment_gateway"];
     paymentSetting = PaymentSetting.fromJson(json["payment_setting"]);
     if (json['payment_gateway_settings'] != null) {
-      paymentGatewaySettings = new List<PaymentGatewaySettings>();
-      json['payment_gateway_settings'].forEach((v) {
-        paymentGatewaySettings.add(new PaymentGatewaySettings.fromJson(v));
-      });
+      if (json['payment_gateway_settings'] is String) {
+        paymentGatewaySettings = null;
+      } else {
+        paymentGatewaySettings=
+        json["payment_gateway_settings"] == null ? null : List<
+            PaymentGatewaySettings>.from(
+            json["payment_gateway_settings"].map((x) =>
+                PaymentGatewaySettings.fromJson(x)));
+//    paymentGatewaySettings = new List<PaymentGatewaySettings>();
+//    json['payment_gateway_settings'].forEach((v) {
+//    paymentGatewaySettings.add(new PaymentGatewaySettings.fromJson(v));
+//    });
+      }
     }
     appThemeColors = AppThemeColors.fromJson(json["app_theme_colors"]);
     /* if (json['tax_detail'] != null) {

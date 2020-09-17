@@ -83,6 +83,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool isCommentAdded = false;
 
   String comment = "";
+  bool isDeliveryResponseFalse=false;
+  bool ispaytmSelected = false;
+
+  bool isPayTmActive = false;
+
+  double totalMRpPrice = 0.0;
 
   ConfirmOrderState({this.storeModel});
 
@@ -110,7 +116,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.showProgressDialog(context);
     ApiController.createPaytmTxnToken(address, pin, amount).then((value) async {
       Utils.hideProgressDialog(context);
-      if(value!=null&& value.success) {
+      if (value != null && value.success) {
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -127,6 +133,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     super.initState();
     initRazorPay();
     listenWebViewChanges();
+    checkPaytmActive();
     selctedTag = 0;
     hideRemoveCouponFirstTime = true;
     print("You are on confirm order screen");
@@ -164,6 +171,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if (storeModel.deliverySlot == "1") {
             ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
+                if (!response.success) {
+                  isDeliveryResponseFalse = true;
+                  return;
+                }
                 deliverySlotModel = response;
                 print(
                     "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
@@ -282,7 +293,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               child: Wrap(
                 children: [
                   addTotalPrice(),
-                  addTotalSavingPrice(),
                   addEnterCouponCodeView(),
                   addCouponCodeRow(),
                   addPaymentOptions(),
@@ -633,8 +643,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             height: 1,
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
+        addMRPPrice(),
+        addTotalSavingPrice(),
         Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+            padding: EdgeInsets.fromLTRB(15, totalSavings > 0 ? 5 : 10, 10, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -656,16 +668,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return Container(
           color: Colors.white,
           child: Padding(
-              padding: EdgeInsets.fromLTRB(15, 5, 10, 10),
+              padding: EdgeInsets.fromLTRB(15, 5, 10, 5),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Total Savings",
+                  Text("Cart Discount",
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: appTheme,
                           fontSize: 16)),
-                  Text('${AppConstant.currency}$totalSavingsText',
+                  Text('-${AppConstant.currency}$totalSavingsText',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: appTheme,
@@ -676,9 +688,34 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return Container();
   }
 
+  Widget addMRPPrice() {
+    if (totalSavings != 0.00)
+      return Container(
+          color: Colors.white,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(15, 10, 10, 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("MRP Price",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14)),
+                  Text('${AppConstant.currency}${totalMRpPrice.toStringAsFixed(2)}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14)),
+                ],
+              )));
+    else
+      return Container();
+  }
+
   void calculateTotalSavings() {
     //calculate total savings
-    double totalMRpPrice = 0;
+    totalMRpPrice = 0;
     if (widget.cartList != null && widget.cartList.isNotEmpty) {
       for (Product product in widget.cartList) {
         if (product != null &&
@@ -697,7 +734,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       //P= (Y/X)*100
       double totalSavedPercentage = (totalSavings / totalMRpPrice) * 100;
       totalSavingsText =
-          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
+//          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
+          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}";
       setState(() {});
     }
   }
@@ -871,7 +909,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-  Widget addPaymentOptions() {
+  Widget addPaymentOptionsold() {
     bool showOptions = false;
 //    if (storeModel != null) {
 //      return Container();
@@ -909,8 +947,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       onChanged: (PaymentType value) async {
                         setState(() {
                           widget._character = value;
-                          if (value == PaymentType.COD)
+                          if (value == PaymentType.COD) {
                             widget.paymentMode = "2";
+                            ispaytmSelected = false;
+                          }
                         });
                       },
                     ),
@@ -931,8 +971,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       onChanged: (PaymentType value) async {
                         setState(() {
                           widget._character = value;
-                          if (value == PaymentType.ONLINE)
+                          if (value == PaymentType.ONLINE) {
                             widget.paymentMode = "3";
+                            ispaytmSelected = false;
+                          }
                         });
                       },
                     ),
@@ -942,9 +984,150 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           fontWeight: FontWeight.w600,
                         )),
                   ],
+                ),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    Radio(
+                      value: PaymentType.ONLINE_PAYTM,
+                      activeColor: appTheme,
+                      groupValue: widget._character,
+                      onChanged: (PaymentType value) async {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.ONLINE_PAYTM) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = true;
+                          }
+                        });
+                      },
+                    ),
+                    Text('Paytm',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ],
                 )
               ],
             )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget addPaymentOptions() {
+    bool showOptions = false;
+//    if (storeModel != null) {
+//      return Container();
+//    }
+    if (widget.storeModel.onlinePayment != null) {
+      if (widget.storeModel.onlinePayment == "1") {
+        showOptions = true;
+      } else {
+        showOptions = false; //cod
+      }
+    } else {
+      if (isPayTmActive) {
+        showOptions = true;
+      }
+    }
+    return Visibility(
+      visible: showOptions,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            Utils.showDivider(context),
+            Container(
+              child: Text("Select Payment",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: appTheme,
+                    fontWeight: FontWeight.w600,
+                  )),
+            ),
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: <Widget>[
+                Radio(
+                  value: PaymentType.COD,
+                  groupValue: widget._character,
+                  activeColor: appTheme,
+                  onChanged: (PaymentType value) async {
+                    setState(() {
+                      widget._character = value;
+                      if (value == PaymentType.COD) {
+                        widget.paymentMode = "2";
+                        ispaytmSelected = false;
+                      }
+                    });
+                  },
+                ),
+                Text('COD',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.w600,
+                    )),
+              ],
+            ),
+            Visibility(
+              visible: widget.storeModel.onlinePayment != null &&
+                  widget.storeModel.onlinePayment.compareTo('1') == 0,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE,
+                    activeColor: appTheme,
+                    groupValue: widget._character,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.ONLINE) {
+                          widget.paymentMode = "3";
+                          ispaytmSelected = false;
+                        }
+                      });
+                    },
+                  ),
+                  Text('Online',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: isPayTmActive,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE_PAYTM,
+                    activeColor: appTheme,
+                    groupValue: widget._character,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.ONLINE_PAYTM) {
+                          widget.paymentMode = "3";
+                          ispaytmSelected = true;
+                        }
+                      });
+                    },
+                  ),
+                  Text('Paytm',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -1112,7 +1295,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.address.notAllow) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.address.minAmount}",
+                      "Your order amount is too low. Minimum order amount is ${widget.address.minAmount}",
                       false);
                   return;
                 }
@@ -1121,7 +1304,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.areaObject != null) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.areaObject.minOrder}",
+                      "Your order amount is too low. Minimum order amount is ${widget.areaObject.minOrder}",
                       false);
                   return;
                 }
@@ -1158,7 +1341,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 } else {
                   //Store provides instant delivery of the orders.
                   print(isInstantDelivery);
-                  if (storeObject.deliverySlot == "1" && isInstantDelivery) {
+                  if (isDeliveryResponseFalse) {
+                    selectedDeliverSlotValue = "";
+                  } else if (storeObject.deliverySlot == "1" &&
+                      isInstantDelivery) {
                     //Store provides instant delivery of the orders.
                     selectedDeliverSlotValue = "";
                   } else if (storeObject.deliverySlot == "1" &&
@@ -1203,29 +1389,53 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   performPlaceOrderOperation(StoreModel storeObject) async {
     if (widget.paymentMode == "3") {
-      String paymentGateway = storeObject.paymentGateway;
-      if (storeObject.paymentGatewaySettings != null &&
-          storeObject.paymentGatewaySettings.isNotEmpty) {
-        //case only single gateway is comming
-        if (storeObject.paymentGatewaySettings.length == 1) {
-          paymentGateway =
-              storeObject.paymentGatewaySettings.first.paymentGateway;
-          callPaymentGateWay(paymentGateway, storeObject);
-        } else {
-          String result =
-              await DialogUtils.displayMultipleOnlinePaymentMethodDialog(
-                  context, storeObject);
-          if (result.isEmpty) {
-            Utils.hideProgressDialog(context);
-            return;
+      if (ispaytmSelected) {
+        callPaymentGateWay("Paytmpay", storeObject);
+      } else {
+        String paymentGateway = storeObject.paymentGateway;
+        if (storeObject.paymentGatewaySettings != null &&
+            storeObject.paymentGatewaySettings.isNotEmpty) {
+          //case only single gateway is comming
+          if (storeObject.paymentGatewaySettings.length == 1) {
+            paymentGateway =
+                storeObject.paymentGatewaySettings.first.paymentGateway;
+          } else {
+            //remove paytm option
+            int indexToRemove = -1;
+            for (int i = 0;
+                i < storeObject.paymentGatewaySettings.length;
+                i++) {
+              if (storeObject.paymentGatewaySettings[i].paymentGateway
+                  .toLowerCase()
+                  .contains('paytm')) {
+                indexToRemove = i;
+                break;
+              }
+            }
+            if (indexToRemove != -1) {
+              storeObject.paymentGatewaySettings.removeAt(indexToRemove);
+            }
+            if (storeObject.paymentGatewaySettings.length == 1) {
+              paymentGateway =
+                  storeObject.paymentGatewaySettings.first.paymentGateway;
+              callPaymentGateWay(paymentGateway, storeObject);
+            } else {
+              String result =
+                  await DialogUtils.displayMultipleOnlinePaymentMethodDialog(
+                      context, storeObject);
+              if (result.isEmpty) {
+                Utils.hideProgressDialog(context);
+                return;
+              }
+              paymentGateway = result;
+              callPaymentGateWay(paymentGateway, storeObject);
+            }
           }
-          paymentGateway = result;
+          return;
+        } else {
+          //case payment gateway setting list empty
           callPaymentGateWay(paymentGateway, storeObject);
         }
-        return;
-      } else {
-        //case payment gateway setting list empty
-        callPaymentGateWay(paymentGateway, storeObject);
       }
     } else {
       placeOrderApiCall("", "", "");
@@ -1437,7 +1647,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       'amount': (double.parse(taxModel.total) * 100),
       'name': '${storeModel.storeName}',
       'description': '',
-      'prefill': {'contact': '${user.phone}', 'email': '${user.email}','name': '${user.fullName}'},
+      'prefill': {
+        'contact': '${user.phone}',
+        'email': '${user.email}',
+        'name': '${user.fullName}'
+      },
       /*'external': {
         'wallets': ['paytm']
       }*/
@@ -1501,7 +1715,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         print("--orderjson == null-orderjson == null-");
         return;
       }
-      String storeAddress="";
+      String storeAddress = "";
       try {
         storeAddress = "${storeModel.storeName}, ${storeModel.location},"
             "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
@@ -1509,14 +1723,26 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         print(e);
       }
 
-      String userId=user.id;
+      String userId = user.id;
       OrderDetailsModel detailsModel = OrderDetailsModel(
-          shippingCharges, comment, totalPrice.toString(),
-          widget.paymentMode, taxModel, widget.address,
-          widget.isComingFromPickUpScreen, widget.areaId, widget.deliveryType,
-          "", "", deviceId,
-          "Razorpay", userId, deviceToken, storeAddress,
-          selectedDeliverSlotValue, totalSavingsText);
+          shippingCharges,
+          comment,
+          totalPrice.toString(),
+          widget.paymentMode,
+          taxModel,
+          widget.address,
+          widget.isComingFromPickUpScreen,
+          widget.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Razorpay",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedDeliverSlotValue,
+          totalSavingsText);
       ApiController.razorpayCreateOrderApi(
               mPrice, orderJson, detailsModel.orderDetails)
           .then((response) {
@@ -1587,7 +1813,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     payment_id,
                     onlineMethod,
                     selectedDeliverSlotValue,
-                    cart_saving: totalSavingsText)
+                    cart_saving: totalSavings.toStringAsFixed(2))
                 .then((response) async {
               Utils.hideProgressDialog(context);
               if (response == null) {
@@ -1804,6 +2030,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ],
       )
     ]);
+  }
+
+  void checkPaytmActive() {
+    String paymentGateway = storeModel.paymentGateway;
+    if (storeModel.paymentGatewaySettings != null &&
+        storeModel.paymentGatewaySettings.isNotEmpty) {
+      //case only single gateway is comming
+      if (storeModel.paymentGatewaySettings.length == 1) {
+        paymentGateway = storeModel.paymentGatewaySettings.first.paymentGateway;
+        if (paymentGateway.toLowerCase().contains('paytm')) {
+          isPayTmActive = true;
+        }
+      } else {
+        for (int i = 0; i < storeModel.paymentGatewaySettings.length; i++) {
+          paymentGateway = storeModel.paymentGatewaySettings[i].paymentGateway;
+          if (paymentGateway.toLowerCase().contains('paytm')) {
+            isPayTmActive = true;
+            break;
+          }
+        }
+      }
+    } else {
+      if (paymentGateway.toLowerCase().contains('paytm')) {
+        isPayTmActive = true;
+      }
+    }
   }
 }
 
