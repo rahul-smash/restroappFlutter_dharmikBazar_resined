@@ -7,7 +7,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
-import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -74,6 +73,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   String comment = "";
 
+  bool isDeliveryResponseFalse=false;
+
   @override
   void initState() {
     super.initState();
@@ -116,8 +117,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if (storeModel.deliverySlot == "1") {
             ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
+                if (!response.success) {
+                  isDeliveryResponseFalse = true;
+                  return;
+                }
                 deliverySlotModel = response;
-                print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+                print(
+                    "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
                 isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
                 for (int i = 0;
                     i < deliverySlotModel.data.dateTimeCollection.length;
@@ -930,7 +936,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.address.notAllow) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.address.minAmount}",
+                      "Your order amount is too low. Minimum order amount is ${widget.address.minAmount}",
                       false);
                   return;
                 }
@@ -939,7 +945,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.areaObject != null) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.areaObject.minOrder}",
+                      "Your order amount is too low. Minimum order amount is ${widget.areaObject.minOrder}",
                       false);
                   return;
                 }
@@ -976,7 +982,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 } else {
                   //Store provides instant delivery of the orders.
                   print(isInstantDelivery);
-                  if (storeObject.deliverySlot == "1" && isInstantDelivery) {
+                  if (isDeliveryResponseFalse) {
+                    selectedDeliverSlotValue = "";
+                  } else if (storeObject.deliverySlot == "1" &&
+                      isInstantDelivery) {
                     //Store provides instant delivery of the orders.
                     selectedDeliverSlotValue = "";
                   } else if (storeObject.deliverySlot == "1" &&
