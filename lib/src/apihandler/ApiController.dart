@@ -14,6 +14,7 @@ import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/FAQModel.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
@@ -1414,7 +1415,7 @@ class ApiController {
     return null;
   }
 
-  static void getFAQRequest() async {
+  static Future<FaqModel> getFAQRequest() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     try {
       if (isNetworkAvailable) {
@@ -1437,13 +1438,15 @@ class ApiController {
           final response = await request.send().timeout(Duration(seconds: timeout));
           final respStr = await response.stream.bytesToString();
           print("${respStr}");
-
           final parsed = json.decode(respStr);
+          FaqModel model=FaqModel.fromJson(parsed);
+          return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
       }
     } catch (e) {
       print(e);
     }
+    return null;
   }
 }

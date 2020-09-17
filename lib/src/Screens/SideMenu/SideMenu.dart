@@ -1,8 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_share/flutter_share.dart';
@@ -10,11 +7,9 @@ import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
-import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/FAQScreen.dart';
-import 'package:restroapp/src/Screens/SideMenu/ReferEarn.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -25,7 +20,6 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
 import 'LoyalityPoints.dart';
@@ -73,7 +67,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             : DrawerChildConstants.SHARE,
         "images/refer.png"));
     _drawerItems
-        .add(DrawerChildItem(DrawerChildConstants.FAQ, "images/sign_in.png"));
+        .add(DrawerChildItem(DrawerChildConstants.FAQ, "images/about.png"));
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
@@ -327,6 +321,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         }
         break;
       case DrawerChildConstants.FAQ:
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => FAQScreen(widget.store)),
