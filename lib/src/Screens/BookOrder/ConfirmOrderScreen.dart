@@ -72,6 +72,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   List<Timeslot> timeslotList;
   bool isSlotSelected = false;
 
+  
   //Store provides instant delivery of the orders.
   bool isInstantDelivery = false;
   bool minOrderCheck = true;
