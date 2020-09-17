@@ -375,7 +375,7 @@ class OrderDetailScreen extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text('Total Saved: ',
+                            Text('Cart Discount: ',
                                 style: TextStyle(
                                     color: Color(0xFF737879), fontSize: 18)),
                             Text(
