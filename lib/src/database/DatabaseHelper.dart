@@ -783,7 +783,7 @@ class DatabaseHelper {
     dbClient.delete(Sub_Categories_Table);
     dbClient.delete(Products_Table);
     dbClient.delete(Favorite_Table);
-    dbClient.delete(CART_Table);
+//    dbClient.delete(CART_Table);
   }
 
 

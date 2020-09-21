@@ -149,7 +149,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           "",
           "",
           deviceId,
-          "Paytmpay",
+          "Paytm",
           userId,
           deviceToken,
           storeAddress,
