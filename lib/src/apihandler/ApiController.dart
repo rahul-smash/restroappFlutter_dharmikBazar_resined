@@ -1021,7 +1021,8 @@ class ApiController {
     }
   }
 
-  static Future<CreateOrderData> razorpayCreateOrderApi(String amount,String orderJson,dynamic detailsJson) async {
+  static Future<CreateOrderData> razorpayCreateOrderApi(
+      String amount, String orderJson, dynamic detailsJson) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.razorpayCreateOrder;
@@ -1355,8 +1356,8 @@ class ApiController {
     return null;
   }
 
-  static Future<CreatePaytmTxnTokenResponse> createPaytmTxnToken(
-      String address, String pin, double amount) async {
+  static Future<CreatePaytmTxnTokenResponse> createPaytmTxnToken(String address,
+      String pin, double amount, String orderJson, dynamic detailsJson) async {
     bool isNetworkAviable = await Utils.isNetworkAvailable();
     try {
       if (isNetworkAviable) {
@@ -1390,7 +1391,9 @@ class ApiController {
           "customer_lastname": lastName,
           "customer_mobile": mobile,
           "customer_pin": pin,
-          "amount": amount
+          "amount": amount,
+          "order_info": detailsJson, //JSONObject details
+          "orders": orderJson
         });
         Dio dio = new Dio();
         Response response = await dio.post(url,
@@ -1401,7 +1404,7 @@ class ApiController {
             CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
         if (txnTokenResponse.success) {
           return txnTokenResponse;
-        }else{
+        } else {
           return null;
         }
       }
