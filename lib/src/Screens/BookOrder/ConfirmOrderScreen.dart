@@ -93,7 +93,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   ConfirmOrderState({this.storeModel});
 
-  void callPaytmPayApi() {
+  void callPaytmPayApi() async{
     String address = "NA", pin = "NA";
     if (widget.deliveryType == OrderType.Delivery) {
       if (widget.address.address != null && widget.address.address.isNotEmpty)
@@ -109,24 +109,68 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       address = widget.areaObject.pickupAdd;
       pin = 'NA';
     }
+
+
     print(
         "amount ${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}"
         " address $address zipCode $pin");
     double amount = databaseHelper.roundOffPrice(
         taxModel == null ? totalPrice : double.parse(taxModel.total), 2);
     Utils.showProgressDialog(context);
-    ApiController.createPaytmTxnToken(address, pin, amount).then((value) async {
-      Utils.hideProgressDialog(context);
-      if (value != null && value.success) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => PaytmWebView(value, storeModel)),
-        );
-      } else {
-        Utils.showToast("Api Error", false);
+
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    //new changes
+    databaseHelper.getCartItemsListToJson().then((orderJson) {
+      if (orderJson == null) {
+        print("--orderjson == null-orderjson == null-");
+        return;
       }
+      String storeAddress = "";
+      try {
+        storeAddress = "${storeModel.storeName}, ${storeModel.location},"
+            "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
+      } catch (e) {
+        print(e);
+      }
+
+      String userId = user.id;
+      OrderDetailsModel detailsModel = OrderDetailsModel(
+          shippingCharges,
+          comment,
+          totalPrice.toString(),
+          widget.paymentMode,
+          taxModel,
+          widget.address,
+          widget.isComingFromPickUpScreen,
+          widget.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Paytm",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedDeliverSlotValue,
+          totalSavingsText);
+      ApiController.createPaytmTxnToken(address, pin, amount ,orderJson, detailsModel.orderDetails).then((value) async {
+        Utils.hideProgressDialog(context);
+        if (value != null && value.success) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PaytmWebView(value, storeModel)),
+          );
+        } else {
+          Utils.showToast("Api Error", false);
+        }
+      });
     });
+
+
   }
 
   @override

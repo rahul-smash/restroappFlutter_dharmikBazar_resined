@@ -79,9 +79,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       mrpPrice = variant.mrpPrice;
     }
     String imageUrl = widget.product.imageType == "0"
-        ? widget.product.image != null
-            ? widget.product.image
-            : widget.product.image10080
+        ? widget.product.image==null?widget.product.image10080:widget.product.image
         : widget.product.imageUrl;
     bool variantsVisibility;
     variantsVisibility = widget.classType == ClassType.CART
