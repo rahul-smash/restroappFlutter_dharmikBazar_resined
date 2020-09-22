@@ -1,6 +1,7 @@
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -54,12 +55,12 @@ class _FAQScreenState extends State<FAQScreen> {
       ),
       body: isLoadingApi
           ? Container(
-              color: appThemeLight,
+              color: grayLightColor,
               child: Center(child: CircularProgressIndicator()))
           : widget.faqData != null
               ? SafeArea(
                   child: Container(
-                    color: appThemeLight,
+                    color: grayLightColor,
                     margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: Column(
                       children: <Widget>[
@@ -70,13 +71,16 @@ class _FAQScreenState extends State<FAQScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
 //                              Expanded(child:
-                              Text(
+                              /*Text(
                                 "Category:",
                                 style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black),
-                              ),SizedBox(width: 50,),
+                              ),
+                              SizedBox(
+                                width: 50,
+                              ),*/
 //                              ),
                               Flexible(
                                   child: Container(
@@ -121,15 +125,46 @@ class _FAQScreenState extends State<FAQScreen> {
                             ],
                           ),
                         ),
-                        Container(
-                          margin: EdgeInsets.only(left: 20, right: 20),
-                          child: ListView.builder(
-                              itemBuilder: (context, index) =>
-                                  Card2(widget.faqCategoryList[index]),
-                              itemCount: widget.faqCategoryList.length,
-                              scrollDirection: Axis.vertical,
-                              shrinkWrap: true),
-                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(left: 20, right: 20),
+                            child: ListView.builder(
+                                itemBuilder: (context, index) {
+                                  return Container(
+                                    margin: EdgeInsets.all(5),
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          "Question: ${widget
+                                              .faqCategoryList[index].question}",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        Html(
+                                          data:
+                                              "${widget.faqCategoryList[index].answer}",
+                                          padding: EdgeInsets.only(top: 2),
+                                          defaultTextStyle: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w400,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                },
+                                /*Card2(widget.faqCategoryList[index])*/
+                                itemCount: widget.faqCategoryList.length,
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true),
+                          ),
+                        )
                       ],
                     ),
                   ),
