@@ -10,7 +10,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
-import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -171,6 +170,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
 
   }
+
 
   @override
   void initState() {
@@ -1443,6 +1443,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if (storeObject.paymentGatewaySettings.length == 1) {
             paymentGateway =
                 storeObject.paymentGatewaySettings.first.paymentGateway;
+            callPaymentGateWay(paymentGateway, storeObject);
           } else {
             //remove paytm option
             int indexToRemove = -1;
