@@ -218,7 +218,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 j++) {
                               SubCategory subCategory =
                                   categories.subCategory[j];
-
                               if (subCategory.id ==
                                   store.banners[position].subCategoryId) {
                                 print(
@@ -690,23 +689,23 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: _handleDrawer,
       ),
       actions: <Widget>[
-        Visibility(visible: AppConstant.isLoggedIn,
-        child: IconButton(
-          icon: Icon(
-            Icons.notifications,
-            size: 25.0,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) {
-                return NotificationScreen();
-              }),
-            );
-
-          },
-        )),
+        Visibility(
+            visible: AppConstant.isLoggedIn,
+            child: IconButton(
+              icon: Icon(
+                Icons.notifications,
+                size: 25.0,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return NotificationScreen();
+                  }),
+                );
+              },
+            )),
         Visibility(
           visible: rightActionsEnable && whatIconEnable,
           child: Padding(

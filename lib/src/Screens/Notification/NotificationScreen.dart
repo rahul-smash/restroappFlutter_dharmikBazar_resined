@@ -34,7 +34,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         title: new Text('Notifications'),
         centerTitle: true,
       ),
-      backgroundColor: Colors.white,
+      backgroundColor: grayLightColor,
       body: isLoadingApi
           ? Container(child: Center(child: CircularProgressIndicator()))
           : resposneModel != null
@@ -58,7 +58,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   _makeCard(int index) {
-    var cellbgColor = index % 2 == 0 ? appTheme.withOpacity(.5) : appThemeLight;
+    var cellbgColor = Colors.white/*index % 2 == 0 ? appTheme.withOpacity(.5) : appThemeLight*/;
     return InkWell(
       child: Container(
         decoration: BoxDecoration(
