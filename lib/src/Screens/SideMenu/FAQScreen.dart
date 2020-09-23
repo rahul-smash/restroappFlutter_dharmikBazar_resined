@@ -55,12 +55,12 @@ class _FAQScreenState extends State<FAQScreen> {
       ),
       body: isLoadingApi
           ? Container(
-              color: grayLightColor,
+              color: Colors.white,
               child: Center(child: CircularProgressIndicator()))
           : widget.faqData != null
               ? SafeArea(
                   child: Container(
-                    color: grayLightColor,
+                    color: Colors.white,
                     margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                     child: Column(
                       children: <Widget>[
@@ -71,14 +71,14 @@ class _FAQScreenState extends State<FAQScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: <Widget>[
 //                              Expanded(child:
-                              /*Text(
+                              Text(
                                 "Category:",
                                 style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black),
                               ),
-                              SizedBox(
+                              /*SizedBox(
                                 width: 50,
                               ),*/
 //                              ),
@@ -142,7 +142,7 @@ class _FAQScreenState extends State<FAQScreen> {
                                               .faqCategoryList[index].question}",
                                           style: TextStyle(
                                             fontSize: 16,
-                                            fontWeight: FontWeight.w400,
+                                            fontWeight: FontWeight.bold,
                                             color: Colors.black,
                                           ),
                                         ),
@@ -152,7 +152,7 @@ class _FAQScreenState extends State<FAQScreen> {
                                           padding: EdgeInsets.only(top: 2),
                                           defaultTextStyle: TextStyle(
                                             fontSize: 16,
-                                            fontWeight: FontWeight.w400,
+                                            fontWeight: FontWeight.normal,
                                           ),
                                         )
                                       ],

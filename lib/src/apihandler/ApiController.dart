@@ -1469,8 +1469,8 @@ class ApiController {
         var request = new http.MultipartRequest("POST", Uri.parse(url));
         print("user id ${user.id}");
         request.fields.addAll({
-          "user_id": "3246",
-//          "user_id": user.id,
+//          "user_id": "3246",
+          "user_id": user.id,
           "method": "POST",
           "device_id": deviceId,
           "device_token": deviceToken,

@@ -52,14 +52,24 @@ class Data {
     Map<String, List<FAQCategory>> faqCategoriesList = Map();
     List<String> keysList = List();
     json.keys;
+    keysList.add("All");
+    List<FAQCategory> allFaq=List();
     for (String jsonKey in json.keys) {
       keysList.add(jsonKey);
+
       List<FAQCategory> delivery = json[jsonKey] == null
           ? null
           : List<FAQCategory>.from(
               json[jsonKey].map((x) => FAQCategory.fromJson(x)));
+      allFaq.addAll(json[jsonKey] == null
+          ? null
+          : List<FAQCategory>.from(
+          json[jsonKey].map((x) => FAQCategory.fromJson(x))));
+
       faqCategoriesList.putIfAbsent(jsonKey, () => delivery);
     }
+    faqCategoriesList.putIfAbsent('All', () => allFaq);
+
     return Data(keysList, faqCategoriesList);
   }
 
