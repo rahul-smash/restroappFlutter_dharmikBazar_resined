@@ -88,12 +88,13 @@ class _FAQScreenState extends State<FAQScreen> {
                                 padding: EdgeInsets.only(left: 10),
 //                                    horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
-                                    color: Colors.white,
+                                  border: Border.all(color: grayColor),
                                     borderRadius: BorderRadius.circular(1)),
                                 child: DropdownButton<String>(
                                   isExpanded: true,
                                   elevation: 6,
                                   dropdownColor: Colors.white,
+//                                  underline: Utils.showDivider(context),
                                   underline: SizedBox(),
                                   icon: Icon(Icons.keyboard_arrow_down),
                                   value: widget.faqSelectedCategory,
@@ -138,7 +139,7 @@ class _FAQScreenState extends State<FAQScreen> {
                                           CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text(
-                                          "Question: ${widget
+                                          "${widget
                                               .faqCategoryList[index].question}",
                                           style: TextStyle(
                                             fontSize: 16,
