@@ -674,7 +674,8 @@ class ApiController {
       String razorpay_order_id,
       String razorpay_payment_id,
       String online_method,
-      String selectedDeliverSlotValue) async {
+      String selectedDeliverSlotValue,
+      {String cart_saving = "0.00"}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -770,6 +771,7 @@ class ApiController {
         "store_fixed_tax_detail": encodedFixedTax,
         "store_tax_rate_detail": encodedtaxLabel,
         "calculated_tax_detail": encodedtaxDetail,
+        "cart_saving": cart_saving,
       });
 
       //print("----${url}");
@@ -1018,7 +1020,8 @@ class ApiController {
     }
   }
 
-  static Future<CreateOrderData> razorpayCreateOrderApi(String amount) async {
+  static Future<CreateOrderData> razorpayCreateOrderApi(
+      String amount, String orderJson, dynamic detailsJson) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.razorpayCreateOrder;
@@ -1030,6 +1033,8 @@ class ApiController {
         "currency": "INR",
         "receipt": "Order",
         "payment_capture": "1",
+        "order_info": detailsJson, //JSONObject details
+        "orders": orderJson //cart jsonObject
       });
 
       final response = await request.send().timeout(Duration(seconds: timeout));
