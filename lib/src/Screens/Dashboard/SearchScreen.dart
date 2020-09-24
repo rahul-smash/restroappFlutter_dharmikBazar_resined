@@ -29,6 +29,9 @@ class _SearchScreenState extends BaseState<SearchScreen> {
       CartTotalPriceBottomBar(ParentInfo.searchList);
   bool isSearchEmpty;
 
+  ScrollController _scrollController;
+  GlobalKey tagskey;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -41,6 +44,8 @@ class _SearchScreenState extends BaseState<SearchScreen> {
         tagsList = response.data;
       });
     });
+    _scrollController = ScrollController();
+    tagskey = GlobalKey();
   }
 
   @override
@@ -59,109 +64,125 @@ class _SearchScreenState extends BaseState<SearchScreen> {
           title: Text("Search"),
           centerTitle: true,
         ),
-        body: Container(
-          child: Column(
-            children: <Widget>[
-              Container(
-                height: 40,
-                margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                //padding: EdgeInsets.all(5.0),
-                decoration: BoxDecoration(
+        body: Column(
+          children: <Widget>[
+            Container(
+              height: 40,
+              margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+              //padding: EdgeInsets.all(5.0),
+              decoration: BoxDecoration(
+                  color: searchGrayColor,
+                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                  border: Border.all(
                     color: searchGrayColor,
-                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    border: Border.all(
-                      color: searchGrayColor,
-                    )),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                  child: Center(
-                    child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                              icon: Icon(
-                                Icons.search,
-                                color: appTheme,
-                              ),
-                              onPressed: () {
-                                if (controller.text.trim().isEmpty) {
-                                  Utils.showToast(
-                                      "Please enter some valid keyword", false);
-                                } else {
-                                  selctedTag = -1;
-                                  callSearchAPI();
-                                }
-                              }),
-                          Flexible(
-                            child: TextField(
-                              textInputAction: TextInputAction.search,
-                              onSubmitted: (value) {
-                                if (value.trim().isEmpty) {
-                                  Utils.showToast(
-                                      "Please enter some valid keyword", false);
-                                } else {
-                                  selctedTag = -1;
-                                  callSearchAPI();
-                                }
-                              },
-                              onChanged: (text) {
-                                print("onChanged ${text}");
-                                if (text.trim().isEmpty) {
-                                  isSearchEmpty = true;
-                                } else {
-                                  isSearchEmpty = false;
-                                }
-                                setState(() {});
-                              },
-                              controller: controller,
-                              cursorColor: Colors.black,
-                              keyboardType: TextInputType.text,
-                              decoration: new InputDecoration(
-                                  border: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  errorBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
-                                  hintText: "Search"),
+                  )),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                child: Center(
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                            icon: Icon(
+                              Icons.search,
+                              color: appTheme,
                             ),
+                            onPressed: () {
+                              if (controller.text.trim().isEmpty) {
+                                Utils.showToast(
+                                    "Please enter some valid keyword",
+                                    false);
+                              } else {
+                                selctedTag = -1;
+                                callSearchAPI();
+                              }
+                            }),
+                        Flexible(
+                          child: TextField(
+                            textInputAction: TextInputAction.search,
+                            onSubmitted: (value) {
+                              if (value.trim().isEmpty) {
+                                Utils.showToast(
+                                    "Please enter some valid keyword",
+                                    false);
+                              } else {
+                                selctedTag = -1;
+                                callSearchAPI();
+                              }
+                            },
+                            onChanged: (text) {
+                              print("onChanged ${text}");
+                              if (text.trim().isEmpty) {
+                                isSearchEmpty = true;
+                              } else {
+                                isSearchEmpty = false;
+                              }
+                              setState(() {});
+                            },
+                            controller: controller,
+                            cursorColor: Colors.black,
+                            keyboardType: TextInputType.text,
+                            decoration: new InputDecoration(
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                enabledBorder: InputBorder.none,
+                                errorBorder: InputBorder.none,
+                                disabledBorder: InputBorder.none,
+                                hintText: "Search"),
                           ),
-                          IconButton(
-                              icon: Icon(
-                                Icons.clear,
-                                color: appTheme,
-                              ),
-                              onPressed: () {
+                        ),
+                        IconButton(
+                            icon: Icon(
+                              Icons.clear,
+                              color: appTheme,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                controller.text = "";
                                 setState(() {
-                                  controller.text = "";
-                                  setState(() {
-                                    subCategory = null;
-                                    productsList.clear();
-                                  });
+                                  subCategory = null;
+                                  productsList.clear();
                                 });
-                              }),
-                        ]),
-                  ),
+                              });
+                            }),
+                      ]),
                 ),
               ),
-              Container(
-                margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                child: showTagsList(),
+            ),
+            Expanded(child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              controller: _scrollController,
+              child: Container(
+                child: Column(
+                  children: <Widget>[
+
+                    Container(
+                      margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      child: showTagsList(),
+                    ),
+                    Container(
+                      key: tagskey,
+                    ),
+                    productsList.length == 0
+                        ? Utils.getEmptyView2("")
+                        : ListView.builder(
+//                  controller: _scrollController,
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: productsList.length,
+                      itemBuilder: (context, index) {
+                        Product product = productsList[index];
+                        return ProductTileItem(product, () {
+                          bottomBar.state.updateTotalPrice();
+                        }, ClassType.Search);
+                      },
+                    ),
+                  ],
+                ),
               ),
-              Expanded(
-                child: productsList.length == 0
-                    ? Utils.getEmptyView2("")
-                    : ListView.builder(
-                        itemCount: productsList.length,
-                        itemBuilder: (context, index) {
-                          Product product =productsList[index];
-                          return ProductTileItem(product, () {
-                            bottomBar.state.updateTotalPrice();
-                          }, ClassType.Search);
-                        },
-                      ),
-              ),
-            ],
-          ),
+            ),)
+
+          ],
         ),
         bottomNavigationBar: bottomBar,
       ),
@@ -235,6 +256,14 @@ class _SearchScreenState extends BaseState<SearchScreen> {
             for (int i = 0; i < subCategoryList.length; i++) {
               productsList.addAll(subCategoryList[i].products);
             }
+//            RenderBox box = tagskey.currentContext.findRenderObject();
+//            Offset position =
+//                box.localToGlobal(Offset.zero); //this is global position
+//            double y = position.dy;
+////            if(productsList.length>1)
+//            y = y - 200;
+//            _scrollController.animateTo(y,
+//                duration: Duration(milliseconds: 120), curve: Curves.ease);
           });
         }
       } else {
