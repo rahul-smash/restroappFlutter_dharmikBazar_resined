@@ -3,14 +3,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_share/flutter_share.dart';
 import 'package:flutter_tags/flutter_tags.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
+import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -41,7 +45,9 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   CartData cartData;
   bool showAddButton;
   int selctedTag;
+  StoreModel _storeModel;
   bool isVisible = true;
+  List<Product> _recommendedProducts = List();
   double totalPrice = 0.00;
 
   @override
@@ -96,23 +102,19 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           actions: <Widget>[
-            /*InkWell(
-              onTap: () async {
-                totalPrice = await databaseHelper.getTotalPrice();
-                if (totalPrice == 0.0) {
-                  Utils.showToast(AppConstant.addItems, false);
-                }else{
-                  Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
-                    }),),
-                  );
-                }
-              },
-              child: Padding(
-                padding: EdgeInsets.only(top: 0.0, bottom: 0.0,left: 0,right: 10),
-                child: Icon(Icons.shopping_cart, color: Colors.white,size: 30,),
-              ),
-            ),*/
+            Visibility(
+                visible: _checkVisibility(),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.share,
+                    size: 25.0,
+                    color: Colors.white,
+                  ),
+                  onPressed: () {
+                    share(widget.product,
+                        '${_storeModel.domain}/shop/product/${widget.product.id}');
+                  },
+                )),
             InkWell(
               onTap: () {
                 Navigator.of(context).popUntil((route) => route.isFirst);
@@ -304,26 +306,63 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           visible: isVisible,
           child: addDividerView(),
         ),
-        !widget.isApiLoading
-            ? Padding(
-                padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-                child: Text(
-                  widget.product.description.isEmpty ? "" : "Product Detail",
-                  style: TextStyle(fontSize: 16.0),
-                ),
+        !widget.isApiLoading &&
+                widget.product.description != null &&
+                widget.product.description.isNotEmpty
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                    child: Text(
+                      "Product Detail",
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 5.0, left: 10.0, right: 10.0),
+                    child: Html(
+                      data: "${widget.product.description}",
+                      padding: EdgeInsets.all(10.0),
+                    ),
+                  )
+                ],
               )
-            : Center(
-                child: CircularProgressIndicator(
-                    backgroundColor: Colors.black26,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
-              ),
-        Padding(
-          padding: const EdgeInsets.only(top: 5.0, left: 10.0, right: 10.0),
-          child: Html(
-            data: "${widget.product.description}",
-            padding: EdgeInsets.all(10.0),
-          ),
-        ),
+            : !widget.isApiLoading
+                ? Container()
+                : Center(
+                    child: CircularProgressIndicator(
+                        backgroundColor: Colors.black26,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.black26)),
+                  ),
+        _recommendedProducts.length > 0
+            ? Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  addDividerView(),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                    child: Text(
+                      "Recommended Products",
+                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  ListView.builder(
+                    itemCount: _recommendedProducts.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      Product product = _recommendedProducts[index];
+                      return ProductTileItem(product, () {
+//              bottomBar.state.updateTotalPrice();
+                      }, ClassType.SubCategory);
+                    },
+                  )
+                ],
+              )
+            : Container(),
       ],
     );
   }
@@ -587,14 +626,40 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     );
   }
 
-  void getProductDetail(String productID) {
-    ApiController.getSubCategoryProductDetail(productID).then((value) async {
+  void getProductDetail(String productID) async {
+    _storeModel = await SharedPrefs.getStore();
+    ApiController.getSubCategoryProductDetail(productID).then((value) {
       setState(() {
-        widget.product = value.subCategories.first.products.first;
+        Product product = value.subCategories.first.products.first;
+        widget.product.description = product.description;
         widget.isApiLoading = false;
       });
-//      DatabaseHelper databaseHelper=new DatabaseHelper();
-//      databaseHelper.updateProductDetails(value.subCategories.first.products.first);
     });
+
+    if (_storeModel != null &&
+        _storeModel.recommendedProducts.compareTo("1") == 0)
+      ApiController.getRecommendedProducts(productID).then((value) {
+        if (value != null && value.success) {
+          for (var list in value.data) {
+            _recommendedProducts.addAll(list.products);
+          }
+          setState(() {});
+        }
+      });
+  }
+
+  bool _checkVisibility() {
+    bool isVisible = false;
+    if (_storeModel != null &&
+        _storeModel.domain != null &&
+        _storeModel.domain.isNotEmpty) {
+      isVisible = true;
+    }
+    return isVisible;
+  }
+
+  Future<void> share(Product product, String link) async {
+    await FlutterShare.share(
+        title: product.title, text: 'You may like this ${product.title}', linkUrl: link, chooserTitle: 'Share');
   }
 }

@@ -58,6 +58,7 @@ class ApiConstants{
 
   static String faqs = 'faqs';
   static String allNotifications = 'allNotifications';
+  static String recommendedProduct = 'recommendedProduct';
 
 
 
