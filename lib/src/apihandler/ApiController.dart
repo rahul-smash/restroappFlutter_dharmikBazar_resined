@@ -634,7 +634,7 @@ class ApiController {
     String deviceId = prefs.getString(AppConstant.deviceId);
 
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-        ApiConstants.multipleTaxCalculation;
+        ApiConstants.multipleTaxCalculation_2;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
     //print("----orderJson---${orderJson}");
@@ -1384,7 +1384,7 @@ class ApiController {
         var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
             ApiConstants.createPaytmTxnToken;
         //TODO: remove this static url
-        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
+//        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
         print(url);
         FormData formData = new FormData.fromMap({
           "customer_id": user.id,
