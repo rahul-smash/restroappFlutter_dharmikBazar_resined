@@ -129,12 +129,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 : categoryResponse == null
                     ? SingleChildScrollView(child: Center(child: Text("")))
                     : Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("images/backgroundimg.png"),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                        color: grayLightColor,
+//                        decoration: BoxDecoration(
+//                          image: DecorationImage(
+//                            image: AssetImage("images/backgroundimg.png"),
+//                            fit: BoxFit.cover,
+//                          ),
+//                        ),
                         padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                         child: GridView.count(
                             crossAxisCount: 2,
