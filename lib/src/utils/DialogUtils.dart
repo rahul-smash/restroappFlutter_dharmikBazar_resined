@@ -443,7 +443,7 @@ class DialogUtils {
                 child: Wrap(
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
                       child: Center(
                         child: Text(
                           "${title}",
@@ -457,7 +457,7 @@ class DialogUtils {
                         color: Colors.black45,
                         width: MediaQuery.of(context).size.width),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
                       child: Center(
                         child: Text(
                           "${message}",

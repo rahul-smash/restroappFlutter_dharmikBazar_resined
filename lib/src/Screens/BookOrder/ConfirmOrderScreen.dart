@@ -570,17 +570,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addProductCart(Product product) {
     OrderDetail detail;
-    for (int i = 0; i < responseOrderDetail.length; i++) {
-      if (product.id.compareTo(responseOrderDetail[i].productId) == 0) {
-        detail = responseOrderDetail[i];
+    if (product.id != null)
+      for (int i = 0; i < responseOrderDetail.length; i++) {
+        if (product.id.compareTo(responseOrderDetail[i].productId) == 0) {
+          detail = responseOrderDetail[i];
+          break;
+        }
       }
-    }
-    String amountText = detail!=null? detail.productStatus.contains('out_of_stock')?
-        'Out of Stock'
-        :"${AppConstant.currency}${product.taxDetail.tax}"
-        :"${AppConstant.currency}${product.taxDetail.tax}";
+    Color containerColor =
+//        detail != null && detail.productStatus.contains('out_of_stock')
+//            ? grayLightColor:
+            Colors.transparent;
+
     if (product.taxDetail != null) {
       return Container(
+        color: containerColor,
         child: Padding(
           padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
           child: Row(
@@ -588,14 +592,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.taxDetail.label} (${product.taxDetail.rate}%)",
                   style: TextStyle(color: Colors.black54)),
-              Text(amountText,
-                  style: TextStyle(color:amountText.toLowerCase().compareTo("out of stock")==0?Colors.red:  Colors.black54)),
+              Text(
+                  detail != null &&
+                          detail.productStatus.contains('out_of_stock')
+                      ? 'Out of Stock'
+                      : "${AppConstant.currency}${product.taxDetail.tax}",
+                  style: TextStyle(
+                      color: detail != null &&
+                              detail.productStatus.contains('out_of_stock')
+                          ? Colors.red
+                          : Colors.black54)),
             ],
           ),
         ),
       );
     } else if (product.fixedTax != null) {
       return Container(
+        color: containerColor,
         child: Padding(
           padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
           child: Row(
@@ -603,14 +616,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.fixedTax.fixedTaxLabel}",
                   style: TextStyle(color: Colors.black54)),
-              Text("${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
-                  style: TextStyle(color: Colors.black54)),
+              Text(
+                  detail != null &&
+                          detail.productStatus.contains('out_of_stock')
+                      ? 'Out of Stock'
+                      : "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
+                  style: TextStyle(color:  detail != null &&
+                      detail.productStatus.contains('out_of_stock')
+                      ? Colors.red
+                      :Colors.black54)),
             ],
           ),
         ),
       );
     } else {
       return Container(
+        color: containerColor,
         padding: EdgeInsets.fromLTRB(15, 0, 20, 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -623,7 +644,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   child: SizedBox(
                     width: (Utils.getDeviceWidth(context) - 150),
                     child: Container(
-                      color: whiteColor,
                       child: Text(product.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -652,8 +672,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               ],
             ),
             Text(
-                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
-                style: TextStyle(fontSize: 16, color: Colors.black45)),
+                detail != null && detail.productStatus.contains('out_of_stock')
+                    ? 'Out of Stock'
+                    : "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: detail != null &&
+                            detail.productStatus.contains('out_of_stock')
+                        ? Colors.red
+                        : Colors.black45)),
           ],
         ),
       );
