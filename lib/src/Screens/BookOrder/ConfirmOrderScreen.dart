@@ -71,7 +71,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   List<Timeslot> timeslotList;
   bool isSlotSelected = false;
 
-  
   //Store provides instant delivery of the orders.
   bool isInstantDelivery = false;
   bool minOrderCheck = true;
@@ -83,16 +82,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool isCommentAdded = false;
 
   String comment = "";
-  bool isDeliveryResponseFalse=false;
+  bool isDeliveryResponseFalse = false;
   bool ispaytmSelected = false;
 
   bool isPayTmActive = false;
 
   double totalMRpPrice = 0.0;
+  List<OrderDetail> responseOrderDetail = List();
 
   ConfirmOrderState({this.storeModel});
 
-  void callPaytmPayApi() async{
+  void callPaytmPayApi() async {
     String address = "NA", pin = "NA";
     if (widget.deliveryType == OrderType.Delivery) {
       if (widget.address.address != null && widget.address.address.isNotEmpty)
@@ -108,7 +108,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       address = widget.areaObject.pickupAdd;
       pin = 'NA';
     }
-
 
     print(
         "amount ${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}"
@@ -155,7 +154,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           storeAddress,
           selectedDeliverSlotValue,
           totalSavingsText);
-      ApiController.createPaytmTxnToken(address, pin, amount ,orderJson, detailsModel.orderDetails).then((value) async {
+      ApiController.createPaytmTxnToken(
+              address, pin, amount, orderJson, detailsModel.orderDetails)
+          .then((value) async {
         Utils.hideProgressDialog(context);
         if (value != null && value.success) {
           Navigator.push(
@@ -168,10 +169,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         }
       });
     });
-
-
   }
-
 
   @override
   void initState() {
@@ -377,6 +375,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             product.fixedTax = model.taxCalculation.fixedTax[i];
             widget.cartList.add(product);
           }
+          if (model.taxCalculation.orderDetail != null &&
+              model.taxCalculation.orderDetail.isNotEmpty) {
+            responseOrderDetail = model.taxCalculation.orderDetail;
+            bool someProductsUpdated = false;
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('out_of_stock') ==
+                      0 ||
+                  responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('price_changed') ==
+                      0) {
+                someProductsUpdated = true;
+                break;
+              }
+            }
+            if (someProductsUpdated) {
+              DialogUtils.displayCommonDialog(
+                  context,
+                  storeModel == null ? "" : storeModel.storeName,
+                  "Some Cart items were updated. Please review the cart before procceeding.",
+                  buttonText: 'Procceed');
+            }
+          }
+
           calculateTotalSavings();
           setState(() {
             isLoading = false;
@@ -545,6 +569,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addProductCart(Product product) {
+    OrderDetail detail;
+    for (int i = 0; i < responseOrderDetail.length; i++) {
+      if (product.id.compareTo(responseOrderDetail[i].productId) == 0) {
+        detail = responseOrderDetail[i];
+      }
+    }
+    String amountText = detail!=null? detail.productStatus.contains('out_of_stock')?
+        'Out of Stock'
+        :"${AppConstant.currency}${product.taxDetail.tax}"
+        :"${AppConstant.currency}${product.taxDetail.tax}";
     if (product.taxDetail != null) {
       return Container(
         child: Padding(
@@ -554,8 +588,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.taxDetail.label} (${product.taxDetail.rate}%)",
                   style: TextStyle(color: Colors.black54)),
-              Text("${AppConstant.currency}${product.taxDetail.tax}",
-                  style: TextStyle(color: Colors.black54)),
+              Text(amountText,
+                  style: TextStyle(color:amountText.toLowerCase().compareTo("out of stock")==0?Colors.red:  Colors.black54)),
             ],
           ),
         ),
@@ -747,7 +781,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                           fontSize: 14)),
-                  Text('${AppConstant.currency}${totalMRpPrice.toStringAsFixed(2)}',
+                  Text(
+                      '${AppConstant.currency}${totalMRpPrice.toStringAsFixed(2)}',
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.black,

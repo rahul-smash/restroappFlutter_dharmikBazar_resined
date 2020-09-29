@@ -425,7 +425,7 @@ class DialogUtils {
   }
 
   static Future<bool> displayCommonDialog(
-      BuildContext context, String title, String message) async {
+      BuildContext context, String title, String message,{String buttonText='OK'}) async {
     return await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -443,7 +443,7 @@ class DialogUtils {
                 child: Wrap(
                   children: <Widget>[
                     Padding(
-                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      padding: EdgeInsets.fromLTRB(15, 15, 15, 15),
                       child: Center(
                         child: Text(
                           "${title}",
@@ -476,7 +476,7 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
-                              child: Text('OK'),
+                              child: Text('$buttonText'),
                               color: orangeColor,
                               textColor: Colors.white,
                               onPressed: () {
