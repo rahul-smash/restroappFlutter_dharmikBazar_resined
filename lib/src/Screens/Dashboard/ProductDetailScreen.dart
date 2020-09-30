@@ -53,11 +53,16 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
   bool _isProductOutOfStock=false;
 
+  int _current=0;
+
+  CarouselController _carouselController;
+
   @override
   initState() {
     super.initState();
     selctedTag = 0;
     showAddButton = false;
+    _carouselController= CarouselController();
     getDataFromDB();
     getProductDetail(widget.product.id);
   }
@@ -673,27 +678,62 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
  Widget _getImageView() {
     return widget.product.productImages!=null&&widget.product.productImages.isNotEmpty?
-    Container(
-      child: CarouselSlider.builder(
-        itemCount: widget.product.productImages.length,
-        options: CarouselOptions(
-          aspectRatio: 16 / 9,
-          height: 280,
-          initialPage: 0,
-          enableInfiniteScroll: true,
-          reverse: false,
-          autoPlay: false,
-          enlargeCenterPage: false,
-          autoPlayInterval: Duration(seconds: 3),
-          autoPlayAnimationDuration: Duration(milliseconds: 800),
-          autoPlayCurve: Curves.ease,
-          scrollDirection: Axis.horizontal,
-        ),
-        itemBuilder: (BuildContext context, int itemIndex) => Container(
-          child: _makeBanner(context, itemIndex),
+    Column(children: <Widget>[
+      Container(
+        child: CarouselSlider.builder(
+          itemCount: widget.product.productImages.length,
+          carouselController:  _carouselController,
+          options: CarouselOptions(
+            aspectRatio: 16 / 9,
+            height: 280,
+            initialPage: 0,
+            enableInfiniteScroll: false,
+            reverse: false,
+            autoPlay: false,
+            enlargeCenterPage: false,
+            autoPlayInterval: Duration(seconds: 3),
+            autoPlayAnimationDuration: Duration(milliseconds: 800),
+            autoPlayCurve: Curves.ease,
+            scrollDirection: Axis.horizontal,
+          ),
+          itemBuilder: (BuildContext context, int itemIndex) => Container(
+            child: _makeBanner(context, itemIndex),
+          ),
         ),
       ),
-    ) :
+      Visibility(
+          visible: widget.product.productImages.length > 1,
+          child: Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: widget.product.productImages.map((url) {
+                int index = widget.product.productImages.indexOf(url);
+                return _current == index
+                    ? Container(
+                  width: 7.0,
+                  height: 7.0,
+                  margin: EdgeInsets.symmetric(
+                      vertical: 0.0, horizontal: 2.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: dotIncreasedColor,
+                  ),
+                )
+                    : Container(
+                  width: 6.0,
+                  height: 6.0,
+                  margin: EdgeInsets.symmetric(
+                      vertical: 0.0, horizontal: 2.0),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color.fromRGBO(0, 0, 0, 0.4),
+                  ),
+                );
+              }).toList(),
+            ),
+          ))
+    ],) :
       imageUrl == ""
         ? Container(
 
@@ -728,10 +768,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       onTap: () {},
       child: Container(
         height: 280,
-          margin:
-          EdgeInsets.only(top: 15.0, bottom: 15.0, left: 7.5, right: 7.5),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
           child: Center(
             child: CachedNetworkImage(
               imageUrl: "${widget.product.productImages[_index].url}",
