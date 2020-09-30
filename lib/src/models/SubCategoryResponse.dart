@@ -226,7 +226,7 @@ class Product {
     map["price"] = variants.first.price;
     map["discount"] = variants.first.discount;
     map["isUnitType"] = variants.first.unitType;
-    map["product_images"]= productImages == null ? null : List<dynamic>.from(productImages.map((x) => x.toJson()));
+//    map["product_images"]= productImages == null ? null : List<dynamic>.from(productImages.map((x) => x.toJson()));
 
     return map;
   }
@@ -413,6 +413,9 @@ class Variant {
   String orderBy;
   String sort;
   String isExportFromFile;
+  String stockType;
+  String minStockAlert;
+  String stock;
 
   Variant({
     this.id,
@@ -431,6 +434,9 @@ class Variant {
     this.orderBy,
     this.sort,
     this.isExportFromFile,
+    this.stockType,
+    this.minStockAlert,
+    this.stock
   });
 
   factory Variant.fromJson(Map<String, dynamic> json) =>
@@ -451,6 +457,9 @@ class Variant {
         orderBy: json["order_by"],
         sort: json["sort"],
         isExportFromFile: json["is_export_from_file"],
+        stockType: json["stock_type"],
+        minStockAlert: json["min_stock_alert"],
+        stock: json["stock"],
       );
 
   Map<String, dynamic> toJson() =>
@@ -471,6 +480,9 @@ class Variant {
         "order_by": orderBy,
         "sort": sort,
         "is_export_from_file": isExportFromFile,
+        "stock_type": stockType,
+        "min_stock_alert": minStockAlert,
+        "stock": stock,
       };
 
   Map<String, dynamic> toMap() {
@@ -491,6 +503,9 @@ class Variant {
     map["order_by"] = orderBy;
     map["sort"] = sort;
     map["is_export_from_file"] = isExportFromFile;
+    map["stock_type"] = stockType;
+    map["min_stock_alert"] = minStockAlert;
+    map["stock"] = stock;
     return map;
   }
 }
