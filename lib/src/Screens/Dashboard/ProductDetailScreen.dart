@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -166,32 +167,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               padding:
                   EdgeInsets.only(top: 10.0, bottom: 10.0, left: 40, right: 40),
 //              EdgeInsets.all(0),
-              child: imageUrl == ""
-                  ? Container(
-                      child: Center(
-                        child: Utils.getImgPlaceHolder(),
-                      ),
-                    )
-                  : Padding(
-                      padding: EdgeInsets.all(0),
-                      child: Container(
-                        /*child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: CachedNetworkImage(
-                    imageUrl: "${imageUrl}", fit: BoxFit.cover
-                  ),
-                ),*/
-                        child: Center(
-                          child: CachedNetworkImage(
-                            imageUrl: "${imageUrl}",
-                            fit: BoxFit.fitWidth,
-                            placeholder: (context, url) =>
-                                CircularProgressIndicator(),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                          ),
-                        ),
-                      )),
+              child: _getImageView(),
             ),
             Visibility(
               visible:
@@ -302,16 +278,17 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
             ],
           ),
         ),
-        Visibility(
-          visible: isVisible,
-          child: addDividerView(),
-        ),
+
         !widget.isApiLoading &&
                 widget.product.description != null &&
                 widget.product.description.isNotEmpty
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  Visibility(
+                    visible: isVisible,
+                    child: addDividerView(),
+                  ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
                     child: Text(
@@ -346,7 +323,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                     padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
                     child: Text(
                       "Recommended Products",
-                      style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
                     ),
                   ),
                   ListView.builder(
@@ -631,6 +609,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     ApiController.getSubCategoryProductDetail(productID).then((value) {
       setState(() {
         Product product = value.subCategories.first.products.first;
+        widget.product.productImages = product.productImages;
         widget.product.description = product.description;
         widget.isApiLoading = false;
       });
@@ -660,6 +639,86 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
   Future<void> share(Product product, String link) async {
     await FlutterShare.share(
-        title: product.title, text: 'You may like this ${product.title}', linkUrl: link, chooserTitle: 'Share');
+        title: product.title,
+        text: 'You may like this ${product.title}',
+        linkUrl: link,
+        chooserTitle: 'Share');
   }
+
+ Widget _getImageView() {
+    return widget.product.productImages!=null&&widget.product.productImages.isNotEmpty?
+    Container(
+      child: CarouselSlider.builder(
+        itemCount: widget.product.productImages.length,
+        options: CarouselOptions(
+          aspectRatio: 16 / 9,
+          height: 280,
+          initialPage: 0,
+          enableInfiniteScroll: true,
+          reverse: false,
+          autoPlay: false,
+          enlargeCenterPage: false,
+          autoPlayInterval: Duration(seconds: 3),
+          autoPlayAnimationDuration: Duration(milliseconds: 800),
+          autoPlayCurve: Curves.ease,
+          scrollDirection: Axis.horizontal,
+        ),
+        itemBuilder: (BuildContext context, int itemIndex) => Container(
+          child: _makeBanner(context, itemIndex),
+        ),
+      ),
+    ) :
+      imageUrl == ""
+        ? Container(
+
+      child: Center(
+        child: Utils.getImgPlaceHolder(),
+      ),
+    )
+        : Padding(
+        padding: EdgeInsets.all(0),
+        child: Container(
+          /*child: AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: CachedNetworkImage(
+                    imageUrl: "${imageUrl}", fit: BoxFit.cover
+                  ),
+                ),*/
+          child: Center(
+            child: CachedNetworkImage(
+              imageUrl: "${imageUrl}",
+              height: 280,
+              fit: BoxFit.scaleDown,
+              placeholder: (context, url) =>
+                  CircularProgressIndicator(),
+              errorWidget: (context, url, error) =>
+                  Icon(Icons.error),
+            ),
+          ),
+        ));
+ }
+  Widget _makeBanner(BuildContext context, int _index) {
+    return InkWell(
+      onTap: () {},
+      child: Container(
+        height: 280,
+          margin:
+          EdgeInsets.only(top: 15.0, bottom: 15.0, left: 7.5, right: 7.5),
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+          child: Center(
+            child: CachedNetworkImage(
+              imageUrl: "${widget.product.productImages[_index].url}",
+              height: 280,
+              fit: BoxFit.scaleDown,
+              placeholder: (context, url) =>
+                  CircularProgressIndicator(),
+              errorWidget: (context, url, error) =>
+                  Icon(Icons.error),
+            ),
+          )
+      ),
+    );
+  }
+
 }

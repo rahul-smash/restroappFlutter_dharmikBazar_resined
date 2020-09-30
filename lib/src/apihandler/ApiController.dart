@@ -69,7 +69,7 @@ class ApiController {
               contentType: "application/json",
               responseType: ResponseType.plain));
       print(response.statusCode);
-      //print(response.data);
+      print(response.data);
       StoreResponse storeData =
           StoreResponse.fromJson(json.decode(response.data));
       print("-------store.success ---${storeData.success}");
