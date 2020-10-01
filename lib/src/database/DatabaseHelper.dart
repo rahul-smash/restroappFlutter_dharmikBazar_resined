@@ -549,21 +549,24 @@ class DatabaseHelper {
     this method will get all the data from cart table and it will calculate the cart total price
     for the item added in the cart by the user
   * */
-  Future<double> getTotalPrice() async {
+  Future<double> getTotalPrice(
+      {bool isOrderVariations = false,
+      List<OrderDetail> responseOrderDetail}) async {
     double totalPrice = 0.00;
     //database connection
     var dbClient = await db;
-    List<String> columnsToSelect = [MRP_PRICE, PRICE, DISCOUNT, QUANTITY];
+    List<String> columnsToSelect = [MRP_PRICE, PRICE, DISCOUNT, QUANTITY, 'id'];
     List<Map> resultList =
         await dbClient.query(CART_Table, columns: columnsToSelect);
     // print the results
     if (resultList != null && resultList.isNotEmpty) {
       //print("--TotalPrice-result.length--- ${resultList.length}");
-      resultList.forEach((row) {
-        //print(row);
-      });
+//      resultList.forEach((row) {
+//        //print(row);
+//      });
       String price = "0";
       String quantity = "0";
+      int id = 0;
       resultList.forEach((row) {
         price = row[PRICE];
         quantity = row[QUANTITY];
@@ -571,7 +574,21 @@ class DatabaseHelper {
           double total = int.parse(quantity) * double.parse(price);
           //print("-------total------${roundOffPrice(total,2)}");
           //print("-price ${price}---");
-          totalPrice = totalPrice + roundOffPrice(total, 2);
+          bool isProductOutOfStock = false;
+          if (isOrderVariations) {
+            InnerFor:
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                      .productStatus
+                      .contains('out_of_stock') &&
+                  int.parse(responseOrderDetail[i].variantId)==id) {
+                isProductOutOfStock = true;
+                break InnerFor;
+              }
+            }
+          }
+          if (!isProductOutOfStock)
+            totalPrice = totalPrice + roundOffPrice(total, 2);
         } catch (e) {
           print(e);
         }
@@ -720,7 +737,7 @@ class DatabaseHelper {
               break innerFor;
             }
           }
-          if(toBeRemovedProduct!=null){
+          if (toBeRemovedProduct != null) {
             productCartList.remove(toBeRemovedProduct);
           }
         }

@@ -203,7 +203,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     try {
       if (widget.deliveryType == OrderType.PickUp) {
-        databaseHelper.getTotalPrice().then((mTotalPrice) {
+        databaseHelper.getTotalPrice(isOrderVariations: isOrderVariations,responseOrderDetail: responseOrderDetail).then((mTotalPrice) {
           setState(() {
             totalPrice = mTotalPrice;
           });
@@ -599,11 +599,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.taxDetail.label} (${product.taxDetail.rate}%)",
                   style: TextStyle(color: Colors.black54)),
-              Text(
-                  detail != null &&
-                          detail.productStatus.contains('out_of_stock')
-                      ? 'Out of Stock'
-                      : "${AppConstant.currency}${product.taxDetail.tax}",
+            detail != null &&
+                detail.productStatus.contains('out_of_stock')
+                ? Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 1),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Padding(
+                    padding: EdgeInsets.all(3),
+                    child: Text(
+                      "Out of Stock",
+                      style:
+                      TextStyle(color: Colors.red),
+                    ),
+                  )):
+              Text("${AppConstant.currency}${product.taxDetail.tax}",
                   style: TextStyle(
                       color: detail != null &&
                               detail.productStatus.contains('out_of_stock')
@@ -623,11 +634,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.fixedTax.fixedTaxLabel}",
                   style: TextStyle(color: Colors.black54)),
-              Text(
-                  detail != null &&
-                          detail.productStatus.contains('out_of_stock')
-                      ? 'Out of Stock'
-                      : "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
+              detail != null &&
+                  detail.productStatus.contains('out_of_stock')
+                  ? Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 1),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Padding(
+                    padding: EdgeInsets.all(3),
+                    child: Text(
+                      "Out of Stock",
+                      style:
+                      TextStyle(color: Colors.red),
+                    ),
+                  )):
+              Text( "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
                   style: TextStyle(
                       color: detail != null &&
                               detail.productStatus.contains('out_of_stock')
@@ -679,10 +701,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 ),*/
               ],
             ),
-            Text(
-                detail != null && detail.productStatus.contains('out_of_stock')
-                    ? 'Out of Stock'
-                    : "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
+            detail != null &&
+                detail.productStatus.contains('out_of_stock')
+                ? Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.red, width: 1),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: Text(
+                    "Out of Stock",
+                    style:
+                    TextStyle(color: Colors.red),
+                  ),
+                )):
+            Text("${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
                 style: TextStyle(
                     fontSize: 16,
                     color: detail != null &&
@@ -1661,7 +1695,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         } catch (e) {
           print(e);
         }
-        double totalPrice = await databaseHelper.getTotalPrice();
+        double totalPrice = await databaseHelper.getTotalPrice(isOrderVariations: isOrderVariations,responseOrderDetail: responseOrderDetail);
         int mtotalPrice = totalPrice.round();
 
         print("----minAmount=${minAmount}");
@@ -1718,7 +1752,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         } catch (e) {
           print(e);
         }
-        double totalPrice = await databaseHelper.getTotalPrice();
+        double totalPrice = await databaseHelper.getTotalPrice(isOrderVariations: isOrderVariations,responseOrderDetail: responseOrderDetail);
         int mtotalPrice = totalPrice.round();
 
         print("----minAmount=${minAmount}");
