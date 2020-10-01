@@ -6,6 +6,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
@@ -20,6 +22,7 @@ class DatabaseHelper {
   static final String Products_Table = "products";
   static final String Favorite_Table = "favorite";
   static final String CART_Table = "cart";
+
 //  static final String VARIANT_Table = "Variant";
 
   // Database Columns
@@ -296,7 +299,8 @@ class DatabaseHelper {
     return subCategoryList;
   }
 
-  Future<List<SubCategoryModel>> getSubCategoriesFromID(String subCategoriesID) async {
+  Future<List<SubCategoryModel>> getSubCategoriesFromID(
+      String subCategoriesID) async {
     List<SubCategoryModel> subCategoryList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
@@ -309,10 +313,10 @@ class DatabaseHelper {
       "sort"
     ];
 
-    List<Map> resultList =
-        await dbClient.query(Sub_Categories_Table, columns: columnsToSelect,
-            where: 'id = ?',
-            whereArgs: [subCategoriesID]);
+    List<Map> resultList = await dbClient.query(Sub_Categories_Table,
+        columns: columnsToSelect,
+        where: 'id = ?',
+        whereArgs: [subCategoriesID]);
     if (resultList != null && resultList.isNotEmpty) {
       resultList.forEach((row) {
         SubCategoryModel subCategory = SubCategoryModel();
@@ -698,8 +702,30 @@ class DatabaseHelper {
     return cartList;
   }
 
-  Future<String> getCartItemsListToJson() async {
+  Future<String> getCartItemsListToJson(
+      {bool isOrderVariations = false,
+      List<OrderDetail> responseOrderDetail}) async {
     List<Product> productCartList = await getCartItemList();
+    if (isOrderVariations) {
+      for (int i = 0; i < responseOrderDetail.length; i++) {
+        if (responseOrderDetail[i].productStatus.contains('out_of_stock')) {
+          Product toBeRemovedProduct;
+          innerFor:
+          for (int j = 0; j < productCartList.length; j++) {
+            if (productCartList[i]
+                    .id
+                    .compareTo(responseOrderDetail[i].productId) ==
+                0) {
+              toBeRemovedProduct = productCartList[i];
+              break innerFor;
+            }
+          }
+          if(toBeRemovedProduct!=null){
+            productCartList.remove(toBeRemovedProduct);
+          }
+        }
+      }
+    }
     List jsonList = Product.encodeToJson(productCartList);
     String encodedDoughnut = jsonEncode(jsonList);
     return encodedDoughnut;
@@ -785,7 +811,6 @@ class DatabaseHelper {
     dbClient.delete(Favorite_Table);
 //    dbClient.delete(CART_Table);
   }
-
 
   Future close() async {
     var dbClient = await db;

@@ -90,6 +90,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   double totalMRpPrice = 0.0;
   List<OrderDetail> responseOrderDetail = List();
 
+  bool isOrderVariations = false;
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() async {
@@ -121,7 +123,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    databaseHelper.getCartItemsListToJson().then((orderJson) {
+    databaseHelper
+        .getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail)
+        .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
         return;
@@ -379,6 +385,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               model.taxCalculation.orderDetail.isNotEmpty) {
             responseOrderDetail = model.taxCalculation.orderDetail;
             bool someProductsUpdated = false;
+            isOrderVariations = model.taxCalculation.isChanged;
             for (int i = 0; i < responseOrderDetail.length; i++) {
               if (responseOrderDetail[i]
                           .productStatus
@@ -578,9 +585,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         }
       }
     Color containerColor =
-//        detail != null && detail.productStatus.contains('out_of_stock')
-//            ? grayLightColor:
-            Colors.transparent;
+        detail != null && detail.productStatus.contains('out_of_stock')
+            ? Colors.black12
+            : Colors.transparent;
 
     if (product.taxDetail != null) {
       return Container(
@@ -621,10 +628,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           detail.productStatus.contains('out_of_stock')
                       ? 'Out of Stock'
                       : "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
-                  style: TextStyle(color:  detail != null &&
-                      detail.productStatus.contains('out_of_stock')
-                      ? Colors.red
-                      :Colors.black54)),
+                  style: TextStyle(
+                      color: detail != null &&
+                              detail.productStatus.contains('out_of_stock')
+                          ? Colors.red
+                          : Colors.black54)),
             ],
           ),
         ),
@@ -829,11 +837,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             product.mrpPrice != null &&
             product.price != null &&
             product.quantity != null) {
-          totalSavings +=
-              (double.parse(product.mrpPrice) - double.parse(product.price)) *
-                  double.parse(product.quantity);
-          totalMRpPrice +=
-              (double.parse(product.mrpPrice) * double.parse(product.quantity));
+          bool isProductOutOfStock = false;
+          //check product is out of stock of not
+          if (isOrderVariations) {
+            InnnerFor:
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('out_of_stock') ==
+                      0 &&
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0) {
+                isProductOutOfStock = true;
+                break InnnerFor;
+              }
+            }
+          }
+          if (!isProductOutOfStock) {
+            totalSavings +=
+                (double.parse(product.mrpPrice) - double.parse(product.price)) *
+                    double.parse(product.quantity);
+            totalMRpPrice += (double.parse(product.mrpPrice) *
+                double.parse(product.quantity));
+          }
         }
       }
       //Y is P% of X
@@ -894,7 +919,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               print("===discount=== ${model.discount}");
                               print("taxModel.total=${taxModel.total}");
                             });
-                          }, appliedReddemPointsCodeList),
+                          }, appliedReddemPointsCodeList, isOrderVariations,
+                              responseOrderDetail),
                           fullscreenDialog: true,
                         ));
                   }
@@ -973,7 +999,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         print("===couponCode=== ${model.couponCode}");
                         print("taxModel.total=${taxModel.total}");
                       });
-                    }, appliedCouponCodeList),
+                    }, appliedCouponCodeList, isOrderVariations,
+                        responseOrderDetail),
                   );
                 }
               },
@@ -1305,7 +1332,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       Utils.showProgressDialog(context);
                       Utils.hideKeyboard(context);
                       databaseHelper
-                          .getCartItemsListToJson()
+                          .getCartItemsListToJson(
+                              isOrderVariations: isOrderVariations,
+                              responseOrderDetail: responseOrderDetail)
                           .then((json) async {
                         ValidateCouponResponse couponModel =
                             await ApiController.validateOfferApiRequest(
@@ -1588,7 +1617,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return;
     }
     Utils.showProgressDialog(context);
-    databaseHelper.getCartItemsListToJson().then((json) {
+    databaseHelper
+        .getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail)
+        .then((json) {
       ApiController.multipleTaxCalculationRequest(
               "", "0", "${shippingCharges}", json)
           .then((response) async {
@@ -1818,7 +1851,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    databaseHelper.getCartItemsListToJson().then((orderJson) {
+    databaseHelper
+        .getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail)
+        .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
         return;
@@ -1871,7 +1908,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.hideKeyboard(context);
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
-        databaseHelper.getCartItemsListToJson().then((json) {
+        databaseHelper
+            .getCartItemsListToJson(
+                isOrderVariations: isOrderVariations,
+                responseOrderDetail: responseOrderDetail)
+            .then((json) {
           if (json == null) {
             print("--json == null-json == null-");
             return;

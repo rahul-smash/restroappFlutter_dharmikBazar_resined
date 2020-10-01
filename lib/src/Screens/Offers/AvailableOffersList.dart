@@ -17,9 +17,12 @@ class AvailableOffersDialog extends StatefulWidget {
   bool isComingFromPickUpScreen;
   String areaId;
   List<String> appliedCouponCodeList;
+  bool isOrderVariations = false;
+  List<OrderDetail> responseOrderDetail=List();
 
   AvailableOffersDialog(this.address,this.paymentMode,
-      this.isComingFromPickUpScreen,this.areaId,this.callback,this.appliedCouponCodeList);
+      this.isComingFromPickUpScreen,this.areaId,this.callback,this.appliedCouponCodeList, this.isOrderVariations,
+       this.responseOrderDetail);
 
   @override
   AvailableOffersState createState() => AvailableOffersState();
@@ -149,7 +152,8 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             }else{
                                               if(widget.appliedCouponCodeList.isEmpty){
                                                 Utils.showProgressDialog(context);
-                                                databaseHelper.getCartItemsListToJson().then((json) {
+                                                databaseHelper.getCartItemsListToJson(isOrderVariations:widget.isOrderVariations,
+                                                  responseOrderDetail:widget.responseOrderDetail).then((json) {
                                                   validateCouponApi(offer.couponCode, json);
                                                 });
                                               }else{

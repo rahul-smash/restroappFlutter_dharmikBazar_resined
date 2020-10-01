@@ -18,9 +18,11 @@ class RedeemPointsScreen extends StatefulWidget {
   bool isComingFromPickUpScreen;
   String areaId;
   List<String> reddemPointsCodeList;
+  bool isOrderVariations=false;
+  List<OrderDetail> responseOrderDetail;
 
   RedeemPointsScreen(this.address,this.paymentMode, this.isComingFromPickUpScreen,
-      this.areaId,this.callback,this.reddemPointsCodeList);
+      this.areaId,this.callback,this.reddemPointsCodeList,this.isOrderVariations,this.responseOrderDetail);
 
   @override
   RedeemPointsScreenState createState() => RedeemPointsScreenState();
@@ -180,7 +182,7 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
                                       }else{
 
                                         if(widget.reddemPointsCodeList.isEmpty){
-                                          databaseHelper.getCartItemsListToJson().then((json) {
+                                          databaseHelper.getCartItemsListToJson(isOrderVariations:widget.isOrderVariations,responseOrderDetail: widget.responseOrderDetail).then((json) {
                                             validateCouponApi(loyalityData, json,);
                                           });
                                         }else{
