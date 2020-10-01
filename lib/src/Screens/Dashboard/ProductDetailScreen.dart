@@ -51,18 +51,20 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   List<Product> _recommendedProducts = List();
   double totalPrice = 0.00;
 
-  bool _isProductOutOfStock=false;
+  bool _isProductOutOfStock = false;
 
-  int _current=0;
+  int _current = 0;
 
   CarouselController _carouselController;
+
+  var _pageController;
 
   @override
   initState() {
     super.initState();
     selctedTag = 0;
     showAddButton = false;
-    _carouselController= CarouselController();
+    _carouselController = CarouselController();
     getDataFromDB();
     getProductDetail(widget.product.id);
   }
@@ -172,7 +174,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           children: <Widget>[
             Padding(
               padding:
-                  EdgeInsets.only(top: 10.0, bottom: 10.0, left: 40, right: 40),
+                  EdgeInsets.only(top: 10.0, bottom: 10.0, left: 0, right: 0),
 //              EdgeInsets.all(0),
               child: _getImageView(),
             ),
@@ -212,14 +214,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                         padding: EdgeInsets.all(5),
                         child: Text(
                           "Out of Stock",
-                          style:
-                          TextStyle(color: Colors.red, fontSize: 18),
+                          style: TextStyle(color: Colors.red, fontSize: 18),
                         ),
                       )),
                 ),
               ),
             )
-
           ],
           overflow: Overflow.clip,
         ),
@@ -442,126 +442,128 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   Widget addQuantityView() {
-    return Visibility(visible: !_isProductOutOfStock, child: Container(
-      width: 100,
-      height: 30,
-      decoration: BoxDecoration(
-        color: showAddButton == false ? whiteColor : orangeColor,
-        borderRadius: BorderRadius.all(Radius.circular(5.0)),
-      ),
-      margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-      child: showAddButton == true
-          ? InkWell(
-        onTap: () {
-          //print("add onTap");
-          setState(() {
-            counter++;
-            showAddButton = false;
-            // insert/update to cart table
-            insertInCartTable(widget.product, counter);
-          });
-        },
-        child: Container(
-          child: Center(
-            child: Text(
-              "Add",
-              style: TextStyle(color: whiteColor),
-            ),
-          ),
+    return Visibility(
+      visible: !_isProductOutOfStock,
+      child: Container(
+        width: 100,
+        height: 30,
+        decoration: BoxDecoration(
+          color: showAddButton == false ? whiteColor : orangeColor,
+          borderRadius: BorderRadius.all(Radius.circular(5.0)),
         ),
-      )
-          : Visibility(
-        visible: showAddButton == true ? false : true,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(
-                  onTap: () {
-                    if (counter != 0) {
-                      setState(() => counter--);
-                      if (counter == 0) {
-                        // delete from cart table
-                        removeFromCartTable(widget.product.variantId);
-                      } else {
-                        // insert/update to cart table
-                        insertInCartTable(widget.product, counter);
-                      }
-                      //widget.callback();
-                    }
-                  },
-                  child: Container(
-                    width: 35,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: grayColor,
-                      border: Border.all(
-                        color: grayColor,
-                        width: 1,
-                      ),
-                      borderRadius:
-                      BorderRadius.all(Radius.circular(5.0)),
-                    ),
-                    child:
-                    Icon(Icons.remove, color: Colors.white, size: 20),
-                  )),
-            ),
-            Container(
-              margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
-              width: 30.0,
-              height: 30.0,
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                borderRadius:
-                new BorderRadius.all(new Radius.circular(15.0)),
-                border: new Border.all(
-                  color: Colors.white,
-                  width: 1.0,
-                ),
-              ),
-              child: Center(
-                  child: Text(
-                    "$counter",
-                    style: TextStyle(fontSize: 18),
-                  )),
-            ),
-            Container(
-              padding: const EdgeInsets.all(0.0),
-              width: 30.0, // you can adjust the width as you need
-              child: GestureDetector(
+        margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+        child: showAddButton == true
+            ? InkWell(
                 onTap: () {
-                  setState(() => counter++);
-                  if (counter == 0) {
-                    // delete from cart table
-                    removeFromCartTable(widget.product.variantId);
-                  } else {
+                  //print("add onTap");
+                  setState(() {
+                    counter++;
+                    showAddButton = false;
                     // insert/update to cart table
                     insertInCartTable(widget.product, counter);
-                  }
+                  });
                 },
                 child: Container(
-                    width: 35,
-                    height: 25,
-                    decoration: BoxDecoration(
-                      color: orangeColor,
-                      border: Border.all(
-                        color: orangeColor,
-                        width: 1,
-                      ),
-                      borderRadius:
-                      BorderRadius.all(Radius.circular(5.0)),
+                  child: Center(
+                    child: Text(
+                      "Add",
+                      style: TextStyle(color: whiteColor),
                     ),
-                    child:
-                    Icon(Icons.add, color: Colors.white, size: 20)),
+                  ),
+                ),
+              )
+            : Visibility(
+                visible: showAddButton == true ? false : true,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.all(0.0),
+                      width: 30.0, // you can adjust the width as you need
+                      child: GestureDetector(
+                          onTap: () {
+                            if (counter != 0) {
+                              setState(() => counter--);
+                              if (counter == 0) {
+                                // delete from cart table
+                                removeFromCartTable(widget.product.variantId);
+                              } else {
+                                // insert/update to cart table
+                                insertInCartTable(widget.product, counter);
+                              }
+                              //widget.callback();
+                            }
+                          },
+                          child: Container(
+                            width: 35,
+                            height: 25,
+                            decoration: BoxDecoration(
+                              color: grayColor,
+                              border: Border.all(
+                                color: grayColor,
+                                width: 1,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            ),
+                            child: Icon(Icons.remove,
+                                color: Colors.white, size: 20),
+                          )),
+                    ),
+                    Container(
+                      margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                      width: 30.0,
+                      height: 30.0,
+                      decoration: new BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            new BorderRadius.all(new Radius.circular(15.0)),
+                        border: new Border.all(
+                          color: Colors.white,
+                          width: 1.0,
+                        ),
+                      ),
+                      child: Center(
+                          child: Text(
+                        "$counter",
+                        style: TextStyle(fontSize: 18),
+                      )),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(0.0),
+                      width: 30.0, // you can adjust the width as you need
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() => counter++);
+                          if (counter == 0) {
+                            // delete from cart table
+                            removeFromCartTable(widget.product.variantId);
+                          } else {
+                            // insert/update to cart table
+                            insertInCartTable(widget.product, counter);
+                          }
+                        },
+                        child: Container(
+                            width: 35,
+                            height: 25,
+                            decoration: BoxDecoration(
+                              color: orangeColor,
+                              border: Border.all(
+                                color: orangeColor,
+                                width: 1,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            ),
+                            child:
+                                Icon(Icons.add, color: Colors.white, size: 20)),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
-        ),
       ),
-    ),);
-
+    );
   }
 
   void insertInCartTable(Product product, int quantity) {
@@ -676,112 +678,115 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         chooserTitle: 'Share');
   }
 
- Widget _getImageView() {
-    return widget.product.productImages!=null&&widget.product.productImages.isNotEmpty?
-    Column(children: <Widget>[
-      Container(
-        child: CarouselSlider.builder(
-          itemCount: widget.product.productImages.length,
-          carouselController:  _carouselController,
-          options: CarouselOptions(
-            aspectRatio: 16 / 9,
-            height: 280,
-            initialPage: 0,
-            enableInfiniteScroll: false,
-            reverse: false,
-            autoPlay: false,
-            enlargeCenterPage: false,
-            autoPlayInterval: Duration(seconds: 3),
-            autoPlayAnimationDuration: Duration(milliseconds: 800),
-            autoPlayCurve: Curves.ease,
-            scrollDirection: Axis.horizontal,
-          ),
-          itemBuilder: (BuildContext context, int itemIndex) => Container(
-            child: _makeBanner(context, itemIndex),
-          ),
-        ),
-      ),
-      Visibility(
-          visible: widget.product.productImages.length > 1,
-          child: Padding(
-            padding: EdgeInsets.only(left: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: widget.product.productImages.map((url) {
-                int index = widget.product.productImages.indexOf(url);
-                return _current == index
-                    ? Container(
-                  width: 7.0,
-                  height: 7.0,
-                  margin: EdgeInsets.symmetric(
-                      vertical: 0.0, horizontal: 2.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: dotIncreasedColor,
+  Widget _getImageView() {
+    return widget.product.productImages != null &&
+            widget.product.productImages.isNotEmpty
+        ? Column(
+            children: <Widget>[
+              Container(
+                child: CarouselSlider.builder(
+                  itemCount: widget.product.productImages.length,
+                  carouselController: _carouselController,
+                  options: CarouselOptions(
+//                    aspectRatio: 16 / 9,
+                    height: 280,
+                    initialPage: 0,
+                    enableInfiniteScroll: false,
+                    reverse: false,
+                    autoPlay: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _current = index;
+                      });
+                    },
+                    enlargeCenterPage: false,
+                    autoPlayInterval: Duration(seconds: 3),
+                    autoPlayAnimationDuration: Duration(milliseconds: 800),
+                    autoPlayCurve: Curves.ease,
+                    scrollDirection: Axis.horizontal,
                   ),
-                )
-                    : Container(
-                  width: 6.0,
-                  height: 6.0,
-                  margin: EdgeInsets.symmetric(
-                      vertical: 0.0, horizontal: 2.0),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Color.fromRGBO(0, 0, 0, 0.4),
-                  ),
-                );
-              }).toList(),
-            ),
-          ))
-    ],) :
-      imageUrl == ""
-        ? Container(
-
-      child: Center(
-        child: Utils.getImgPlaceHolder(),
-      ),
-    )
-        : Padding(
-        padding: EdgeInsets.all(0),
-        child: Container(
-          /*child: AspectRatio(
+                  itemBuilder: (BuildContext context, int itemIndex) =>
+                      Container(
+                        child: _makeBanner(context, itemIndex),
+                      ),
+                ),
+              ),
+              Visibility(
+                  visible: widget.product.productImages.length > 1,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: widget.product.productImages.map((url) {
+                        int index = widget.product.productImages.indexOf(url);
+                        return _current == index
+                            ? Container(
+                                width: 7.0,
+                                height: 7.0,
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 0.0, horizontal: 2.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: dotIncreasedColor,
+                                ),
+                              )
+                            : Container(
+                                width: 6.0,
+                                height: 6.0,
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 0.0, horizontal: 2.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color.fromRGBO(0, 0, 0, 0.4),
+                                ),
+                              );
+                      }).toList(),
+                    ),
+                  ))
+            ],
+          )
+        : imageUrl == ""
+            ? Container(
+                child: Center(
+                  child: Utils.getImgPlaceHolder(),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.all(0),
+                child: Container(
+                  /*child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: CachedNetworkImage(
                     imageUrl: "${imageUrl}", fit: BoxFit.cover
                   ),
                 ),*/
-          child: Center(
-            child: CachedNetworkImage(
-              imageUrl: "${imageUrl}",
-              height: 280,
-              fit: BoxFit.scaleDown,
-              placeholder: (context, url) =>
-                  CircularProgressIndicator(),
-              errorWidget: (context, url, error) =>
-                  Icon(Icons.error),
-            ),
+                  child: Center(
+                    child: CachedNetworkImage(
+                      imageUrl: "${imageUrl}",
+                      height: 280,
+                      fit: BoxFit.scaleDown,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                    ),
+                  ),
+                ));
+  }
+
+  Widget _makeBanner(BuildContext context, int _index) {
+    return  Container(
+        height: 280,
+        child: Center(
+          child: CachedNetworkImage(
+            imageUrl: "${widget.product.productImages[_index].url}",
+            height: 280,
+            fit: BoxFit.scaleDown,
+            placeholder: (context, url) => CircularProgressIndicator(),
+            errorWidget: (context, url, error) => Icon(Icons.error),
           ),
         ));
- }
-  Widget _makeBanner(BuildContext context, int _index) {
-    return InkWell(
-      onTap: () {},
-      child: Container(
-        height: 280,
-          child: Center(
-            child: CachedNetworkImage(
-              imageUrl: "${widget.product.productImages[_index].url}",
-              height: 280,
-              fit: BoxFit.scaleDown,
-              placeholder: (context, url) =>
-                  CircularProgressIndicator(),
-              errorWidget: (context, url, error) =>
-                  Icon(Icons.error),
-            ),
-          )
-      ),
-    );
   }
+
   bool _checkOutOfStock() {
     _isProductOutOfStock = false;
 //1)min_alert
@@ -791,7 +796,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 //3)continue_selling -> no out of stock
 
     Variant selectedVariant =
-    variant != null ? variant : findVariant(widget.product.variantId);
+        variant != null ? variant : findVariant(widget.product.variantId);
     if (selectedVariant != null &&
         selectedVariant.stockType != null &&
         selectedVariant.stockType.isNotEmpty) {
@@ -823,6 +828,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     }
     return _isProductOutOfStock;
   }
+
   Variant findVariant(String variantId) {
     Variant foundVariant;
     if (widget.product.variants != null)
@@ -833,5 +839,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         }
       }
     return foundVariant;
+  }
+
+  PageController getPageController() {
+    //memory efficient
+    if (_pageController != null) _pageController.dispose();
+
+    return _pageController;
   }
 }
