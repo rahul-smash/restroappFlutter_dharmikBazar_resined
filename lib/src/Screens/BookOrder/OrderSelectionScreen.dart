@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
 import 'package:restroapp/src/Screens/Address/StoreLocationScreen.dart';
+import 'package:restroapp/src/Screens/Address/StoreLocationScreenWithMultiplePick.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -170,7 +171,8 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                                   Navigator.pop(context);
                                   Navigator.push(context,
                                     MaterialPageRoute(
-                                        builder: (context) => PickUpOrderScreen(storeArea,OrderType.PickUp)),
+//                                        builder: (context) => PickUpOrderScreen(storeArea,OrderType.PickUp)),
+                                        builder: (context) => StoreLocationScreenWithMultiplePick(storeArea,OrderType.PickUp)),
                                   );
                                 }
                               }else{

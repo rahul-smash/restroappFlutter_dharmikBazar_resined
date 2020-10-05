@@ -1,6 +1,7 @@
 class GetOrderHistory {
   bool success;
   List<OrderData> orders;
+
   GetOrderHistory();
 
   factory GetOrderHistory.fromJson(Map<String, dynamic> json) {
@@ -29,33 +30,42 @@ class OrderData {
   String orderFacility;
   String shippingCharges;
   String tax;
+  String cartSaving;
+  String couponType;
+  String couponCode;
   List<Null> storeTaxRateDetail;
   List<Null> calculatedTaxDetail;
   List<Null> storeFixedTaxDetail;
   String address;
   List<OrderItems> orderItems;
+  List<DeliveryAddress> deliveryAddress;
 
-  OrderData(
-      {this.orderId,
-      this.displayOrderId,
-      this.paid,
-      this.runnerId,
-      this.paymentMethod,
-      this.note,
-      this.deliveryTimeSlot,
-      this.orderDate,
-      this.status,
-      this.total,
-      this.discount,
-      this.checkout,
-      this.orderFacility,
-      this.shippingCharges,
-      this.tax,
-      this.storeTaxRateDetail,
-      this.calculatedTaxDetail,
-      this.storeFixedTaxDetail,
-      this.address,
-      this.orderItems});
+  OrderData({
+    this.orderId,
+    this.displayOrderId,
+    this.paid,
+    this.runnerId,
+    this.paymentMethod,
+    this.note,
+    this.deliveryTimeSlot,
+    this.orderDate,
+    this.status,
+    this.total,
+    this.discount,
+    this.checkout,
+    this.orderFacility,
+    this.shippingCharges,
+    this.tax,
+    this.cartSaving,
+    this.couponType,
+    this.couponCode,
+    this.storeTaxRateDetail,
+    this.calculatedTaxDetail,
+    this.storeFixedTaxDetail,
+    this.address,
+    this.orderItems,
+    this.deliveryAddress,
+  });
 
   OrderData.fromJson(Map<String, dynamic> json) {
     orderId = json['order_id'];
@@ -73,6 +83,9 @@ class OrderData {
     orderFacility = json['order_facility'];
     shippingCharges = json['shipping_charges'];
     tax = json['tax'];
+    cartSaving = json['cart_saving'];
+    couponType = json['coupon_type'];
+    couponCode = json['coupon_code'];
     address = json['address'];
     if (json['order_items'] != null) {
       orderItems = new List<OrderItems>();
@@ -80,6 +93,101 @@ class OrderData {
         orderItems.add(new OrderItems.fromJson(v));
       });
     }
+    if (json['delivery_address'] != null) {
+      deliveryAddress = new List<DeliveryAddress>();
+      json['delivery_address'].forEach((v) {
+        deliveryAddress.add(new DeliveryAddress.fromJson(v));
+      });
+    }
+  }
+}
+
+class DeliveryAddress {
+  String id;
+  String userId;
+  String storeId;
+  String firstName;
+  String lastName;
+  String mobile;
+  String email;
+  String address;
+  String areaId;
+  String areaName;
+  String city;
+  String state;
+  String zipcode;
+  String country;
+  String lat;
+  String lng;
+  String created;
+  String modified;
+  bool softdelete;
+
+  DeliveryAddress(
+      {this.id,
+      this.userId,
+      this.storeId,
+      this.firstName,
+      this.lastName,
+      this.mobile,
+      this.email,
+      this.address,
+      this.areaId,
+      this.areaName,
+      this.city,
+      this.state,
+      this.zipcode,
+      this.country,
+      this.lat,
+      this.lng,
+      this.created,
+      this.modified,
+      this.softdelete});
+
+  DeliveryAddress.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    userId = json['user_id'];
+    storeId = json['store_id'];
+    firstName = json['first_name'];
+    lastName = json['last_name'];
+    mobile = json['mobile'];
+    email = json['email'];
+    address = json['address'];
+    areaId = json['area_id'];
+    areaName = json['area_name'];
+    city = json['city'];
+    state = json['state'];
+    zipcode = json['zipcode'];
+    country = json['country'];
+    lat = json['lat'];
+    lng = json['lng'];
+    created = json['created'];
+    modified = json['modified'];
+    softdelete = json['softdelete'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['user_id'] = this.userId;
+    data['store_id'] = this.storeId;
+    data['first_name'] = this.firstName;
+    data['last_name'] = this.lastName;
+    data['mobile'] = this.mobile;
+    data['email'] = this.email;
+    data['address'] = this.address;
+    data['area_id'] = this.areaId;
+    data['area_name'] = this.areaName;
+    data['city'] = this.city;
+    data['state'] = this.state;
+    data['zipcode'] = this.zipcode;
+    data['country'] = this.country;
+    data['lat'] = this.lat;
+    data['lng'] = this.lng;
+    data['created'] = this.created;
+    data['modified'] = this.modified;
+    data['softdelete'] = this.softdelete;
+    return data;
   }
 }
 

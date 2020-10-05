@@ -516,15 +516,15 @@ class Utils {
       BuildContext context, List<DeliveryAddressData> addressList,
       {bool showDialogBool, bool hitApi = false, String id = ""}) async {
     DeliveryAddressData deletedItem;
-print(id);
+    print(id);
     for (int i = 0; i < addressList.length; i++) {
-      print(addressList[i].id.compareTo(id) == 0 );
+      print(addressList[i].id.compareTo(id) == 0);
       if (id.isNotEmpty &&
           addressList[i].id.compareTo(id) == 0 &&
           addressList[i].isDeleted) {
         deletedItem = addressList[i];
         break;
-      } else if (id.isEmpty &&addressList[i].isDeleted) {
+      } else if (id.isEmpty && addressList[i].isDeleted) {
         deletedItem = addressList[i];
         break;
       }
@@ -555,4 +555,5 @@ enum ClassType { CART, SubCategory, Favourites, Search }
 
 enum OrderType { Delivery, PickUp, Menu }
 
-enum PaymentType { COD, ONLINE, CANCEL }
+enum PaymentType { COD, ONLINE,ONLINE_PAYTM, CANCEL }
+enum RadioButtonEnum { SELECTD, UNSELECTED }

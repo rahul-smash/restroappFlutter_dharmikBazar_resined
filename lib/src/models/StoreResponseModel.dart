@@ -116,6 +116,7 @@ class StoreModel {
   bool isRefererFnEnable;
   String paymentGateway;
   PaymentSetting paymentSetting;
+  List<PaymentGatewaySettings> paymentGatewaySettings;
   AppThemeColors appThemeColors;
 
   //new keys added
@@ -223,6 +224,7 @@ class StoreModel {
       this.blDeviceIdUnique,
       this.paymentGateway,
       this.paymentSetting,
+      this.paymentGatewaySettings,
       this.isRefererFnEnable,
       this.homePageTitleStatus,
         this.homePageTitle,
@@ -287,6 +289,21 @@ class StoreModel {
     istaxenable = json['istaxenable'];
     paymentGateway = json["payment_gateway"];
     paymentSetting = PaymentSetting.fromJson(json["payment_setting"]);
+    if (json['payment_gateway_settings'] != null) {
+      if (json['payment_gateway_settings'] is String) {
+        paymentGatewaySettings = null;
+      } else {
+        paymentGatewaySettings=
+        json["payment_gateway_settings"] == null ? null : List<
+            PaymentGatewaySettings>.from(
+            json["payment_gateway_settings"].map((x) =>
+                PaymentGatewaySettings.fromJson(x)));
+//    paymentGatewaySettings = new List<PaymentGatewaySettings>();
+//    json['payment_gateway_settings'].forEach((v) {
+//    paymentGatewaySettings.add(new PaymentGatewaySettings.fromJson(v));
+//    });
+      }
+    }
     appThemeColors = AppThemeColors.fromJson(json["app_theme_colors"]);
     /* if (json['tax_detail'] != null) {
       taxDetail = new List<Null>();
@@ -430,6 +447,10 @@ class StoreModel {
     data['istaxenable'] = this.istaxenable;
     data['payment_gateway'] = this.paymentGateway;
     data['payment_setting'] = this.paymentSetting.toJson();
+    if (this.paymentGatewaySettings != null) {
+      data['payment_gateway_settings'] =
+          this.paymentGatewaySettings.map((v) => v.toJson()).toList();
+    }
     /*if (this.taxDetail != null) {
       data['tax_detail'] = this.taxDetail.map((v) => v.toJson()).toList();
     }
@@ -522,6 +543,29 @@ class PaymentSetting {
         "secret_key": secretKey,
       };
 }
+
+class PaymentGatewaySettings {
+  String apiKey;
+  String secretKey;
+  String paymentGateway;
+
+  PaymentGatewaySettings({this.apiKey, this.secretKey, this.paymentGateway});
+
+  PaymentGatewaySettings.fromJson(Map<String, dynamic> json) {
+    apiKey = json['api_key'];
+    secretKey = json['secret_key'];
+    paymentGateway = json['payment_gateway'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['api_key'] = this.apiKey;
+    data['secret_key'] = this.secretKey;
+    data['payment_gateway'] = this.paymentGateway;
+    return data;
+  }
+}
+
 
 class AppThemeColors {
   String id;
