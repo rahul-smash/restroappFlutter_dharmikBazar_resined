@@ -1373,6 +1373,40 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                 .popUntil((route) => route.isFirst);
                           } else {
                             await updateTaxDetails(model.taxCalculation);
+                            if (model.taxCalculation.orderDetail != null &&
+                                model.taxCalculation.orderDetail.isNotEmpty) {
+                              responseOrderDetail =
+                                  model.taxCalculation.orderDetail;
+                              bool someProductsUpdated = false;
+                              isOrderVariations =
+                                  model.taxCalculation.isChanged;
+                              for (int i = 0;
+                                  i < responseOrderDetail.length;
+                                  i++) {
+                                if (responseOrderDetail[i]
+                                            .productStatus
+                                            .compareTo('out_of_stock') ==
+                                        0 ||
+                                    responseOrderDetail[i]
+                                            .productStatus
+                                            .compareTo('price_changed') ==
+                                        0) {
+                                  someProductsUpdated = true;
+                                  break;
+                                }
+                              }
+                              if (someProductsUpdated) {
+                                DialogUtils.displayCommonDialog(
+                                    context,
+                                    storeModel == null
+                                        ? ""
+                                        : storeModel.storeName,
+                                    "Some Cart items were updated. Please review the cart before procceeding.",
+                                    buttonText: 'Procceed');
+                                constraints();
+                              }
+                            }
+                            calculateTotalSavings();
                             setState(() {
                               taxModel = model.taxCalculation;
                               isCouponsApplied = true;
@@ -1454,7 +1488,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   return;
                 }
               }
-
+            if(widget.cartList.length<=2&&checkThatItemIsInStocks(widget.cartList[0])){
+              DialogUtils.displayCommonDialog(
+                  context,
+                  storeModel == null ? "" : storeModel.storeName,
+                  "Some Cart items were updated. Please review the cart before procceeding.",
+                  buttonText: 'Ok');
+              return;
+            }
 //              if (storeModel.onlinePayment == "1") {
 //                var result = await DialogUtils.displayPaymentDialog(
 //                    context, "Select Payment", "");
@@ -1645,6 +1686,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           Navigator.of(context).popUntil((route) => route.isFirst);
         } else {
           await updateTaxDetails(response.taxCalculation);
+          if (response.taxCalculation.orderDetail != null &&
+              response.taxCalculation.orderDetail.isNotEmpty) {
+            responseOrderDetail = response.taxCalculation.orderDetail;
+            bool someProductsUpdated = false;
+            isOrderVariations = response.taxCalculation.isChanged;
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('out_of_stock') ==
+                      0 ||
+                  responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('price_changed') ==
+                      0) {
+                someProductsUpdated = true;
+                break;
+              }
+            }
+            if (someProductsUpdated) {
+              DialogUtils.displayCommonDialog(
+                  context,
+                  storeModel == null ? "" : storeModel.storeName,
+                  "Some Cart items were updated. Please review the cart before procceeding.",
+                  buttonText: 'Procceed');
+              constraints();
+            }
+          }
+          calculateTotalSavings();
+
           setState(() {
             hideRemoveCouponFirstTime = true;
             taxModel = response.taxCalculation;
@@ -1949,6 +2019,37 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             }
 
             taxModel = response.taxCalculation;
+            //only for COD case
+            if (onlineMethod.length > 0) {
+              if (response.taxCalculation.orderDetail != null &&
+                  response.taxCalculation.orderDetail.isNotEmpty) {
+                responseOrderDetail = response.taxCalculation.orderDetail;
+                bool someProductsUpdated = false;
+                isOrderVariations = response.taxCalculation.isChanged;
+                for (int i = 0; i < responseOrderDetail.length; i++) {
+                  if (responseOrderDetail[i]
+                              .productStatus
+                              .compareTo('out_of_stock') ==
+                          0 ||
+                      responseOrderDetail[i]
+                              .productStatus
+                              .compareTo('price_changed') ==
+                          0) {
+                    someProductsUpdated = true;
+                    break;
+                  }
+                }
+                if (someProductsUpdated) {
+                  DialogUtils.displayCommonDialog(
+                      context,
+                      storeModel == null ? "" : storeModel.storeName,
+                      "Some Cart items were updated. Please review the cart before procceeding.",
+                      buttonText: 'Procceed');
+                  constraints();
+                }
+              }
+              calculateTotalSavings();
+            }
 
             Map<String, dynamic> attributeMap = new Map<String, dynamic>();
             attributeMap["ScreenName"] = "Order Confirm Screen";
@@ -2254,6 +2355,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  bool checkThatItemIsInStocks(Product product) {
+    OrderDetail detail;
+    if (product.id != null)
+      for (int i = 0; i < responseOrderDetail.length; i++) {
+        if (responseOrderDetail[i]
+            .productStatus
+            .compareTo('out_of_stock')==0&&
+            product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
+            product.variantId.compareTo(responseOrderDetail[i].variantId) ==
+                0) {
+          detail = responseOrderDetail[i];
+          break;
+        }
+      }
+    return detail!=null;
   }
 }
 
