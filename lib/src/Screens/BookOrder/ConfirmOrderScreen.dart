@@ -1488,14 +1488,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   return;
                 }
               }
-            if(widget.cartList.length<=2&&checkThatItemIsInStocks(widget.cartList[0])){
-              DialogUtils.displayCommonDialog(
-                  context,
-                  storeModel == null ? "" : storeModel.storeName,
-                  "Some Cart items were updated. Please review the cart before procceeding.",
-                  buttonText: 'Ok');
-              return;
-            }
+              if (checkThatItemIsInStocks()) {
+                DialogUtils.displayCommonDialog(
+                    context,
+                    storeModel == null ? "" : storeModel.storeName,
+                    "Some Cart items were updated. Please review the cart before procceeding.",
+                    buttonText: 'Ok');
+                return;
+              }
 //              if (storeModel.onlinePayment == "1") {
 //                var result = await DialogUtils.displayPaymentDialog(
 //                    context, "Select Payment", "");
@@ -2357,21 +2357,26 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  bool checkThatItemIsInStocks(Product product) {
-    OrderDetail detail;
-    if (product.id != null)
-      for (int i = 0; i < responseOrderDetail.length; i++) {
-        if (responseOrderDetail[i]
-            .productStatus
-            .compareTo('out_of_stock')==0&&
-            product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
-            product.variantId.compareTo(responseOrderDetail[i].variantId) ==
-                0) {
-          detail = responseOrderDetail[i];
-          break;
+  bool checkThatItemIsInStocks() {
+    bool isAllItemsInOutOfStocks = true;
+    OutterLoop:
+    for (int j = 0; j < widget.cartList.length; j++) {
+      Product product = widget.cartList[j];
+      if (product.id != null)
+        for (int i = 0; i < responseOrderDetail.length; i++) {
+          if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
+                  0 &&
+              product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
+              product.variantId.compareTo(responseOrderDetail[i].variantId) ==
+                  0) {
+            isAllItemsInOutOfStocks = true;
+          } else {
+            isAllItemsInOutOfStocks = false;
+            break OutterLoop;
+          }
         }
-      }
-    return detail!=null;
+    }
+    return isAllItemsInOutOfStocks;
   }
 }
 

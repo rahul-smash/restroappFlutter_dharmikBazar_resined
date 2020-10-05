@@ -239,12 +239,13 @@ class DialogUtils {
   }
 
   static Future<Variant> displayVariantsDialog(
-      BuildContext context, String title, List<Variant> variants) async {
+      BuildContext context, String title, List<Variant> variants,{Variant selectedVariant}) async {
     return await showDialog<Variant>(
       context: context,
       builder: (BuildContext context) {
         return WillPopScope(
-          onWillPop: () {},
+          onWillPop: () {
+          },
           child: AlertDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
@@ -326,7 +327,7 @@ class DialogUtils {
                 child: new Text("Cancel"),
                 textColor: Colors.blue,
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context,selectedVariant);
                   // true here means you clicked ok
                 },
               ),

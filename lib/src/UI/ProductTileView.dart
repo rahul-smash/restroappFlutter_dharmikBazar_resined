@@ -39,6 +39,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
     showAddButton = false;
     //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
+    _checkOutOfStock(findNext: true);
   }
 
   void getDataFromDB() {
@@ -120,8 +121,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
                   weight = variant.weight;
                   variantId = variant.id;
                 } else {
-                  variantId = widget.product.variantId;
+                  variantId = variant==null? widget.product.variantId:variant.id;
                 }
+                _checkOutOfStock(findNext: false);
                 databaseHelper
                     .getProductQuantitiy(variantId)
                     .then((cartDataObj) {
@@ -206,22 +208,23 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             ),
                           ),
                           Visibility(
-                            visible: _checkOutOfStock(),
+                            visible: _isProductOutOfStock,
                             child: Container(
                               height: 80.0,
                               color: Colors.white54,
                               child: Center(
                                 child: Container(
                                     decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.red, width: 1),
+                                        border: Border.all(
+                                            color: Colors.red, width: 1),
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: EdgeInsets.all(2),
                                       child: Text(
                                         "Out of Stock",
-                                        style:
-                                        TextStyle(color: Colors.red, fontSize: 12),
+                                        style: TextStyle(
+                                            color: Colors.red, fontSize: 12),
                                       ),
                                     )),
                               ),
@@ -357,7 +360,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                       await DialogUtils.displayVariantsDialog(
                                           context,
                                           "${widget.product.title}",
-                                          widget.product.variants);
+                                          widget.product.variants,selectedVariant: variant);
                                   if (variant != null) {
                                     /*print("variant.weight= ${variant.weight}");
                                                   print("variant.discount= ${variant.discount}");
@@ -374,6 +377,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                       setState(() {});
                                     });
                                   }
+                                  _checkOutOfStock(findNext: false);
                                 },
                                 child: Container(
                                   padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
@@ -723,7 +727,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
     });
   }
 
-  bool _checkOutOfStock() {
+  _checkOutOfStock({bool findNext = false}) async {
     _isProductOutOfStock = false;
 //1)min_alert
 //if product min_stock_alert  number is less than or equal to the product stock -> make the product oos
@@ -762,6 +766,20 @@ class _ProductTileItemState extends State<ProductTileItem> {
           _isProductOutOfStock = false;
       }
     }
+
+    if (findNext &&
+        variant == null &&
+        selectedVariant != null &&
+        _isProductOutOfStock &&
+        widget.product.variants != null &&
+        widget.product.variants.isNotEmpty) {
+      //find next variant which is in the stocks
+      for (int i = 0; i < widget.product.variants.length; i++) {
+        variant = widget.product.variants[i];
+        await _checkOutOfStock(findNext: false);
+      }
+    }
+    if (mounted) setState(() {});
     return _isProductOutOfStock;
   }
 
