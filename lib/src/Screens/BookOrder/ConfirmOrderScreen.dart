@@ -187,31 +187,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     hideRemoveCouponFirstTime = true;
     print("You are on confirm order screen");
     //print("-deliveryType--${widget.deliveryType}---");
-    try {
-      if (widget.address != null) {
-        if (widget.address.areaCharges != null) {
-          shippingCharges = widget.address.areaCharges;
-          //print("-shippingCharges--${widget.address.areaCharges}---");
-        }
-        //print("----minAmount=${widget.address.minAmount}");
-        //print("----notAllow=${widget.address.notAllow}");
-        checkMinOrderAmount();
-      }
-      checkMinOrderPickAmount();
-    } catch (e) {
-      print(e);
-    }
-    try {
-      if (widget.deliveryType == OrderType.PickUp) {
-        databaseHelper.getTotalPrice(isOrderVariations: isOrderVariations,responseOrderDetail: responseOrderDetail).then((mTotalPrice) {
-          setState(() {
-            totalPrice = mTotalPrice;
-          });
-        });
-      }
-    } catch (e) {
-      print(e);
-    }
+    constraints();
     try {
       SharedPrefs.getStore().then((storeData) {
         storeModel = storeData;
@@ -405,6 +381,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   storeModel == null ? "" : storeModel.storeName,
                   "Some Cart items were updated. Please review the cart before procceeding.",
                   buttonText: 'Procceed');
+              constraints();
             }
           }
 
@@ -579,7 +556,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     OrderDetail detail;
     if (product.id != null)
       for (int i = 0; i < responseOrderDetail.length; i++) {
-        if (product.id.compareTo(responseOrderDetail[i].productId) == 0) {
+        if (product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
+            product.variantId.compareTo(responseOrderDetail[i].variantId) ==
+                0) {
           detail = responseOrderDetail[i];
           break;
         }
@@ -599,27 +578,25 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.taxDetail.label} (${product.taxDetail.rate}%)",
                   style: TextStyle(color: Colors.black54)),
-            detail != null &&
-                detail.productStatus.contains('out_of_stock')
-                ? Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red, width: 1),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Padding(
-                    padding: EdgeInsets.all(3),
-                    child: Text(
-                      "Out of Stock",
-                      style:
-                      TextStyle(color: Colors.red),
-                    ),
-                  )):
-              Text("${AppConstant.currency}${product.taxDetail.tax}",
-                  style: TextStyle(
-                      color: detail != null &&
-                              detail.productStatus.contains('out_of_stock')
-                          ? Colors.red
-                          : Colors.black54)),
+              detail != null && detail.productStatus.contains('out_of_stock')
+                  ? Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ))
+                  : Text("${AppConstant.currency}${product.taxDetail.tax}",
+                      style: TextStyle(
+                          color: detail != null &&
+                                  detail.productStatus.contains('out_of_stock')
+                              ? Colors.red
+                              : Colors.black54)),
             ],
           ),
         ),
@@ -634,27 +611,26 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.fixedTax.fixedTaxLabel}",
                   style: TextStyle(color: Colors.black54)),
-              detail != null &&
-                  detail.productStatus.contains('out_of_stock')
+              detail != null && detail.productStatus.contains('out_of_stock')
                   ? Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red, width: 1),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Padding(
-                    padding: EdgeInsets.all(3),
-                    child: Text(
-                      "Out of Stock",
-                      style:
-                      TextStyle(color: Colors.red),
-                    ),
-                  )):
-              Text( "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
-                  style: TextStyle(
-                      color: detail != null &&
-                              detail.productStatus.contains('out_of_stock')
-                          ? Colors.red
-                          : Colors.black54)),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ))
+                  : Text(
+                      "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
+                      style: TextStyle(
+                          color: detail != null &&
+                                  detail.productStatus.contains('out_of_stock')
+                              ? Colors.red
+                              : Colors.black54)),
             ],
           ),
         ),
@@ -701,28 +677,27 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 ),*/
               ],
             ),
-            detail != null &&
-                detail.productStatus.contains('out_of_stock')
+            detail != null && detail.productStatus.contains('out_of_stock')
                 ? Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red, width: 1),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5)),
-                child: Padding(
-                  padding: EdgeInsets.all(3),
-                  child: Text(
-                    "Out of Stock",
-                    style:
-                    TextStyle(color: Colors.red),
-                  ),
-                )):
-            Text("${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
-                style: TextStyle(
-                    fontSize: 16,
-                    color: detail != null &&
-                            detail.productStatus.contains('out_of_stock')
-                        ? Colors.red
-                        : Colors.black45)),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.red, width: 1),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Padding(
+                      padding: EdgeInsets.all(3),
+                      child: Text(
+                        "Out of Stock",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ))
+                : Text(
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: detail != null &&
+                                detail.productStatus.contains('out_of_stock')
+                            ? Colors.red
+                            : Colors.black45)),
           ],
         ),
       );
@@ -1695,7 +1670,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         } catch (e) {
           print(e);
         }
-        double totalPrice = await databaseHelper.getTotalPrice(isOrderVariations: isOrderVariations,responseOrderDetail: responseOrderDetail);
+        double totalPrice = await databaseHelper.getTotalPrice(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail);
         int mtotalPrice = totalPrice.round();
 
         print("----minAmount=${minAmount}");
@@ -1752,7 +1729,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         } catch (e) {
           print(e);
         }
-        double totalPrice = await databaseHelper.getTotalPrice(isOrderVariations: isOrderVariations,responseOrderDetail: responseOrderDetail);
+        double totalPrice = await databaseHelper.getTotalPrice(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail);
         int mtotalPrice = totalPrice.round();
 
         print("----minAmount=${minAmount}");
@@ -2238,6 +2217,42 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       if (paymentGateway.toLowerCase().contains('paytm')) {
         isPayTmActive = true;
       }
+    }
+  }
+
+  void constraints() {
+    try {
+      if (widget.address != null) {
+        if (widget.address.areaCharges != null) {
+          shippingCharges = widget.address.areaCharges;
+          //print("-shippingCharges--${widget.address.areaCharges}---");
+        }
+        //print("----minAmount=${widget.address.minAmount}");
+        //print("----notAllow=${widget.address.notAllow}");
+        checkMinOrderAmount();
+      }
+      checkMinOrderPickAmount();
+    } catch (e) {
+      print(e);
+    }
+    try {
+      if (widget.deliveryType == OrderType.PickUp) {
+        databaseHelper
+            .getTotalPrice(
+                isOrderVariations: isOrderVariations,
+                responseOrderDetail: responseOrderDetail)
+            .then((mTotalPrice) {
+          setState(() {
+            totalPrice = mTotalPrice;
+          });
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    if (mounted) {
+      setState(() {});
     }
   }
 }

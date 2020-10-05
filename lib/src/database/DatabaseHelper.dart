@@ -570,6 +570,7 @@ class DatabaseHelper {
       resultList.forEach((row) {
         price = row[PRICE];
         quantity = row[QUANTITY];
+        id = row['id'];
         try {
           double total = int.parse(quantity) * double.parse(price);
           //print("-------total------${roundOffPrice(total,2)}");
@@ -581,7 +582,7 @@ class DatabaseHelper {
               if (responseOrderDetail[i]
                       .productStatus
                       .contains('out_of_stock') &&
-                  int.parse(responseOrderDetail[i].variantId)==id) {
+                  int.parse(responseOrderDetail[i].productId)==id) {
                 isProductOutOfStock = true;
                 break InnerFor;
               }
@@ -729,11 +730,11 @@ class DatabaseHelper {
           Product toBeRemovedProduct;
           innerFor:
           for (int j = 0; j < productCartList.length; j++) {
-            if (productCartList[i]
+            if (productCartList[j]
                     .id
                     .compareTo(responseOrderDetail[i].productId) ==
-                0) {
-              toBeRemovedProduct = productCartList[i];
+                0&&productCartList[j].variantId.compareTo(responseOrderDetail[i].variantId)==0) {
+              toBeRemovedProduct = productCartList[j];
               break innerFor;
             }
           }
