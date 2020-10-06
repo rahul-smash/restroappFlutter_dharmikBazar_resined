@@ -183,6 +183,12 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
 
                                         if(widget.reddemPointsCodeList.isEmpty){
                                           databaseHelper.getCartItemsListToJson(isOrderVariations:widget.isOrderVariations,responseOrderDetail: widget.responseOrderDetail).then((json) {
+                                            if (json.length == 2) {
+                                              Utils.showToast(
+                                                  "All Items are out of stock.",
+                                                  true);
+                                              return;
+                                            }
                                             validateCouponApi(loyalityData, json,);
                                           });
                                         }else{
@@ -221,6 +227,8 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
       Utils.hideProgressDialog(context);
       if (response.success) {
         widget.callback(response.taxCalculation);
+      }else{
+        Utils.showToast(response.message, true);
       }
       Navigator.pop(context, true);
 

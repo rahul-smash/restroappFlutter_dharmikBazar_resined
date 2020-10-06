@@ -2359,24 +2359,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool checkThatItemIsInStocks() {
     bool isAllItemsInOutOfStocks = true;
-    OutterLoop:
     for (int j = 0; j < widget.cartList.length; j++) {
       Product product = widget.cartList[j];
-      if (product.id != null)
-        for (int i = 0; i < responseOrderDetail.length; i++) {
-          if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
-                  0 &&
-              product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
-              product.variantId.compareTo(responseOrderDetail[i].variantId) ==
-                  0) {
-            isAllItemsInOutOfStocks = true;
-          } else {
-            isAllItemsInOutOfStocks = false;
-            break OutterLoop;
-          }
+      if (product.id != null) {
+        //check product is out of stock
+        bool productOutOfStock = _checkIsProductISOutOfStock(product);
+        if (!productOutOfStock) {
+          isAllItemsInOutOfStocks = false;
+          break;
         }
+      }
     }
     return isAllItemsInOutOfStocks;
+  }
+
+  bool _checkIsProductISOutOfStock(Product product) {
+    bool productOutOfStock = false;
+    for (int i = 0; i < responseOrderDetail.length; i++) {
+      if (product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
+          product.variantId.compareTo(responseOrderDetail[i].variantId) == 0) {
+        if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
+            0) {
+          productOutOfStock = true;
+        } else {
+          productOutOfStock = false;
+        }
+        break;
+      }
+    }
+    return productOutOfStock;
   }
 }
 

@@ -489,7 +489,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
             ? InkWell(
                 onTap: () {
                   //print("add onTap");
-                  if (_checkStockQuantity(counter + 1)) {
+                  if (_checkStockQuantity(counter)) {
                     setState(() {});
                     counter++;
                     showAddButton = false;
@@ -568,7 +568,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                       width: 30.0, // you can adjust the width as you need
                       child: GestureDetector(
                         onTap: () {
-                          if (_checkStockQuantity(counter + 1)) {
+                          if (_checkStockQuantity(counter)) {
                             setState(() => counter++);
                             if (counter == 0) {
                               // delete from cart table
@@ -806,7 +806,28 @@ class _ProductTileItemState extends State<ProductTileItem> {
             } else if (stock <= counter) {
               isProductAvailable = false;
               Utils.showToast(
-                  "Only ${counter - 1} Items Available in Stocks", true);
+                  "Only ${counter} Items Available in Stocks", true);
+            } else {
+              isProductAvailable = true;
+            }
+          }
+          break;
+        case 'min_alert':
+          if (selectedVariant.stock != null &&
+              selectedVariant.minStockAlert != null) {
+            int stock = int.parse(selectedVariant.stock);
+            int minStockAlert = int.parse(selectedVariant.minStockAlert);
+            if (stock <= 0) {
+              isProductAvailable = false;
+              Utils.showToast("Out of Stock", true);
+            } else if (counter>=(stock-minStockAlert)) {
+              isProductAvailable = false;
+              Utils.showToast(
+                  "Only ${counter} Items Available in Stocks", true);
+            } else if (stock <= counter) {
+              isProductAvailable = false;
+              Utils.showToast(
+                  "Only ${counter} Items Available in Stocks", true);
             } else {
               isProductAvailable = true;
             }
