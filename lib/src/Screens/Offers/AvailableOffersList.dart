@@ -183,8 +183,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             } else {
                                               if (widget.appliedCouponCodeList
                                                   .isEmpty) {
-                                                Utils.showProgressDialog(
-                                                    context);
+
                                                 databaseHelper
                                                     .getCartItemsListToJson(
                                                         isOrderVariations: widget
@@ -248,6 +247,8 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
 
   void validateCouponApi(String couponCode, String json) {
     print("----couponCode-----=>${couponCode}");
+    Utils.showProgressDialog(
+        context);
     ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json)
         .then((validCouponModel) {
       if (validCouponModel != null && validCouponModel.success) {

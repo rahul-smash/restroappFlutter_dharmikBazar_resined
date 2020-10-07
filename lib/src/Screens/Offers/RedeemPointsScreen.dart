@@ -187,6 +187,7 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
                                               Utils.showToast(
                                                   "All Items are out of stock.",
                                                   true);
+                                              Utils.hideProgressDialog(context);
                                               return;
                                             }
                                             validateCouponApi(loyalityData, json,);
