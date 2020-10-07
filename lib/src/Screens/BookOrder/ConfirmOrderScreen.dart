@@ -1705,6 +1705,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   callPaymentGateWay(String paymentGateway, StoreModel storeObject) {
+    Utils.hideProgressDialog(context);
     switch (paymentGateway) {
       case "Razorpay":
         callOrderIdApi(storeObject);
