@@ -1574,7 +1574,82 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   performPlaceOrderOperation(StoreModel storeObject) async {
+    String json = await databaseHelper.getCartItemsListToJson(
+        isOrderVariations: isOrderVariations,
+        responseOrderDetail: responseOrderDetail);
+    if (json == null) {
+      print("--json == null-json == null-");
+      return;
+    }
+
+    String couponCode = taxModel == null ? "" : taxModel.couponCode;
+    String discount = taxModel == null ? "0" : taxModel.discount;
+    if (widget.deliveryType == OrderType.PickUp)
+      Utils.showProgressDialog(context);
+
+    TaxCalculationResponse response =
+        await ApiController.multipleTaxCalculationRequest(
+            "${couponCode}", "${discount}", shippingCharges, json);
+
+    if (response != null && !response.success) {
+      Utils.showToast(response.message, true);
+      databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      eventBus.fire(updateCartCount());
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      return;
+    }
+
+    taxModel = response.taxCalculation;
+
+    Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+    attributeMap["ScreenName"] = "Order Confirm Screen";
+    attributeMap["action"] = "Place Order Request";
+    attributeMap["totalPrice"] = "${totalPrice}";
+    attributeMap["deliveryType"] = "${widget.deliveryType}";
+    attributeMap["paymentMode"] = "${widget.paymentMode}";
+    attributeMap["shippingCharges"] = "${shippingCharges}";
+    Utils.sendAnalyticsEvent("Clicked Place Order button", attributeMap);
+    //only for COD case
+    if (response.taxCalculation.orderDetail != null &&
+        response.taxCalculation.orderDetail.isNotEmpty) {
+      responseOrderDetail = response.taxCalculation.orderDetail;
+      bool someProductsUpdated = false;
+      isOrderVariations = response.taxCalculation.isChanged;
+      for (int i = 0; i < responseOrderDetail.length; i++) {
+        if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
+                0 ||
+            responseOrderDetail[i].productStatus.compareTo('price_changed') ==
+                0) {
+          someProductsUpdated = true;
+          break;
+        }
+      }
+      if (someProductsUpdated) {
+        Utils.hideProgressDialog(context);
+        DialogUtils.displayCommonDialog(
+            context,
+            storeModel == null ? "" : storeModel.storeName,
+            "Some Cart items were updated. Please review the cart before procceeding.",
+            buttonText: 'Procceed');
+        constraints();
+        //remove coupon
+        setState(() {
+          hideRemoveCouponFirstTime = true;
+          taxModel = response.taxCalculation;
+          appliedCouponCodeList.clear();
+          appliedReddemPointsCodeList.clear();
+          isCouponsApplied = false;
+          couponCodeController.text = "";
+        });
+        return;
+      }
+    }
+    calculateTotalSavings();
+    //Choose payment
     if (widget.paymentMode == "3") {
+      Utils.hideProgressDialog(context);
       if (ispaytmSelected) {
         callPaymentGateWay("Paytmpay", storeObject);
       } else {
@@ -1646,7 +1721,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   checkDeliveryAreaDeleted(StoreModel storeObject, {String addressId = ""}) {
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses) async {
-      Utils.hideProgressDialog(context);
       int length = responses.data.length;
       List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
           context, responses.data,
@@ -2001,120 +2075,62 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             return;
           }
 
-          String couponCode = taxModel == null ? "" : taxModel.couponCode;
-          String discount = taxModel == null ? "0" : taxModel.discount;
-          Utils.showProgressDialog(context);
-          ApiController.multipleTaxCalculationRequest(
-                  "${couponCode}", "${discount}", shippingCharges, json)
-              .then((response) {
-            //Utils.hideProgressDialog(context);
-            if (response != null && !response.success) {
-              Utils.showToast(response.message, true);
-              databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
-              databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-              databaseHelper.deleteTable(DatabaseHelper.Products_Table);
-              eventBus.fire(updateCartCount());
-              Navigator.of(context).popUntil((route) => route.isFirst);
+//          String couponCode = taxModel == null ? "" : taxModel.couponCode;
+//          String discount = taxModel == null ? "0" : taxModel.discount;
+//          Utils.showProgressDialog(context);
+//          ApiController.multipleTaxCalculationRequest(
+//                  "${couponCode}", "${discount}", shippingCharges, json)
+//              .then((response) {
+          ApiController.placeOrderRequest(
+                  shippingCharges,
+                  comment,
+                  totalPrice.toString(),
+                  widget.paymentMode,
+                  taxModel,
+                  widget.address,
+                  json,
+                  widget.isComingFromPickUpScreen,
+                  widget.areaId,
+                  widget.deliveryType,
+                  payment_request_id,
+                  payment_id,
+                  onlineMethod,
+                  selectedDeliverSlotValue,
+                  cart_saving: totalSavings.toStringAsFixed(2))
+              .then((response) async {
+            Utils.hideProgressDialog(context);
+            if (response == null) {
+              print("--response == null-response == null-");
               return;
             }
-
-            taxModel = response.taxCalculation;
-            //only for COD case
-            if (onlineMethod.length > 0) {
-              if (response.taxCalculation.orderDetail != null &&
-                  response.taxCalculation.orderDetail.isNotEmpty) {
-                responseOrderDetail = response.taxCalculation.orderDetail;
-                bool someProductsUpdated = false;
-                isOrderVariations = response.taxCalculation.isChanged;
-                for (int i = 0; i < responseOrderDetail.length; i++) {
-                  if (responseOrderDetail[i]
-                              .productStatus
-                              .compareTo('out_of_stock') ==
-                          0 ||
-                      responseOrderDetail[i]
-                              .productStatus
-                              .compareTo('price_changed') ==
-                          0) {
-                    someProductsUpdated = true;
-                    break;
-                  }
-                }
-                if (someProductsUpdated) {
-                  DialogUtils.displayCommonDialog(
-                      context,
-                      storeModel == null ? "" : storeModel.storeName,
-                      "Some Cart items were updated. Please review the cart before procceeding.",
-                      buttonText: 'Procceed');
-                  constraints();
-                }
-              }
-              calculateTotalSavings();
-            }
-
-            Map<String, dynamic> attributeMap = new Map<String, dynamic>();
-            attributeMap["ScreenName"] = "Order Confirm Screen";
-            attributeMap["action"] = "Place Order Request";
-            attributeMap["totalPrice"] = "${totalPrice}";
-            attributeMap["deliveryType"] = "${widget.deliveryType}";
-            attributeMap["paymentMode"] = "${widget.paymentMode}";
-            attributeMap["shippingCharges"] = "${shippingCharges}";
-            Utils.sendAnalyticsEvent(
-                "Clicked Place Order button", attributeMap);
-
-            ApiController.placeOrderRequest(
-                    shippingCharges,
-                    comment,
-                    totalPrice.toString(),
-                    widget.paymentMode,
-                    taxModel,
-                    widget.address,
-                    json,
-                    widget.isComingFromPickUpScreen,
-                    widget.areaId,
-                    widget.deliveryType,
-                    payment_request_id,
-                    payment_id,
-                    onlineMethod,
-                    selectedDeliverSlotValue,
-                    cart_saving: totalSavings.toStringAsFixed(2))
-                .then((response) async {
-              Utils.hideProgressDialog(context);
-              if (response == null) {
-                print("--response == null-response == null-");
-                return;
-              }
-              eventBus.fire(updateCartCount());
-              print("${widget.deliveryType}");
-              //print("Location = ${storeModel.lat},${storeModel.lng}");
-              if (widget.deliveryType == OrderType.PickUp) {
-                bool result =
-                    await DialogUtils.displayPickUpDialog(context, storeModel);
-                if (result == true) {
-                  //print("==result== ${result}");
-                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                  eventBus.fire(updateCartCount());
-                  DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
-                      double.parse(storeModel.lng));
-                } else {
-                  //print("==result== ${result}");
-                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                  eventBus.fire(updateCartCount());
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
+            eventBus.fire(updateCartCount());
+            print("${widget.deliveryType}");
+            //print("Location = ${storeModel.lat},${storeModel.lng}");
+            if (widget.deliveryType == OrderType.PickUp) {
+              bool result =
+                  await DialogUtils.displayPickUpDialog(context, storeModel);
+              if (result == true) {
+                //print("==result== ${result}");
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                eventBus.fire(updateCartCount());
+                DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
+                    double.parse(storeModel.lng));
               } else {
-                bool result = await DialogUtils.displayThankYouDialog(
-                    context,
-                    response.success
-                        ? AppConstant.orderAdded
-                        : response.message);
-                if (result == true) {
-                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                  eventBus.fire(updateCartCount());
-                }
+                //print("==result== ${result}");
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                eventBus.fire(updateCartCount());
+                Navigator.of(context).popUntil((route) => route.isFirst);
               }
-            });
+            } else {
+              bool result = await DialogUtils.displayThankYouDialog(context,
+                  response.success ? AppConstant.orderAdded : response.message);
+              if (result == true) {
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                eventBus.fire(updateCartCount());
+              }
+            }
           });
         });
       } else {
