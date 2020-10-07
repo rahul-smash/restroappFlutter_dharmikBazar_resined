@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
@@ -207,7 +208,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => MyOrderScreen(widget.store)),
+                builder: (context) => MyOrderScreenVersion2(widget.store)),
           );
           Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "MyOrderScreen";

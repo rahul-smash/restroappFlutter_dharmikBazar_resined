@@ -9,6 +9,7 @@ import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
 import 'package:restroapp/src/UI/CategoryView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -391,7 +392,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (AppConstant.isLoggedIn) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MyOrderScreen(store)),
+              MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(store)),
             );
             Map<String, dynamic> attributeMap = new Map<String, dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";

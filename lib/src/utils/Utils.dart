@@ -335,7 +335,7 @@ class Utils {
       DateTime time = format.parse(date, true);
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
-      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm');
+      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm a');
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);
