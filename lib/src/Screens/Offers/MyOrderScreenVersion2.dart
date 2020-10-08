@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
 import 'package:restroapp/src/UI/CardOrderHistoryItems.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
@@ -82,7 +83,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => OrderDetailScreen(cardOrderHistoryItems),
+            builder: (context) => OrderDetailScreenVersion2(cardOrderHistoryItems),
           ),
         );
       },
@@ -332,65 +333,6 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
     } else {
       return status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
     }
-  }
-
-  Widget projectWidget() {
-    return FutureBuilder(
-      future: ApiController.getOrderHistory(),
-      builder: (context, projectSnap) {
-        if (projectSnap.connectionState == ConnectionState.none &&
-            projectSnap.hasData == null) {
-          return Container();
-        } else {
-          if (projectSnap.hasData) {
-            GetOrderHistory response = projectSnap.data;
-
-            if (response.success) {
-              List<OrderData> orders = response.orders;
-              if (orders.isEmpty) {
-                return Utils.getEmptyView("No data found");
-              } else {
-                return Container(
-                  decoration: new BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.rectangle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 10.0,
-                        offset: Offset(0.0, 10.0),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      Expanded(
-                          child: ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: orders.length,
-                        itemBuilder: (context, index) {
-                          OrderData orderHistoryData = orders[index];
-                          return CardOrderHistoryItems(
-                              orderHistoryData, widget.store);
-                        },
-                      )),
-                    ],
-                  ),
-                );
-              }
-            } else {
-              return Utils.getEmptyView2("No data found");
-            }
-          } else {
-            return Center(
-              child: CircularProgressIndicator(
-                  backgroundColor: Colors.black26,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
-            );
-          }
-        }
-      },
-    );
   }
 
   Future<Null> getOrderListApi() {
