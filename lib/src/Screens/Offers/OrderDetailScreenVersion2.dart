@@ -1,106 +1,120 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
+import 'package:restroapp/src/UI/ProgressBar.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
-class OrderDetailScreenVersion2 extends StatelessWidget {
+class OrderDetailScreenVersion2 extends StatefulWidget {
   final OrderData orderHistoryData;
 
   OrderDetailScreenVersion2(this.orderHistoryData);
 
+  @override
+  _OrderDetailScreenVersion2State createState() =>
+      _OrderDetailScreenVersion2State();
+}
+
+class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   var screenWidth;
+
   var mainContext;
+  String deliverySlotDate = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    deliverySlotDate = _generalizedDeliverySlotTime(widget.orderHistoryData);
+  }
 
   @override
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     mainContext = context;
-    String itemText = orderHistoryData.orderItems.length > 1
-        ? '${orderHistoryData.orderItems.length} Items, '
-        : '${orderHistoryData.orderItems.length} Item, ';
-    String orderFacility=orderHistoryData.orderFacility!=null?'${orderHistoryData.orderFacility}, ':'';
+    String itemText = widget.orderHistoryData.orderItems.length > 1
+        ? '${widget.orderHistoryData.orderItems.length} Items, '
+        : '${widget.orderHistoryData.orderItems.length} Item, ';
+    String orderFacility = widget.orderHistoryData.orderFacility != null
+        ? '${widget.orderHistoryData.orderFacility}, '
+        : '';
     return new Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xffDCDCDC),
       appBar: AppBar(
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text('Order - ${orderHistoryData.displayOrderId}'
-              ,style: TextStyle(),textAlign: TextAlign.left,),
-            Text('$orderFacility$itemText${AppConstant.currency} ${orderHistoryData.total}',style: TextStyle(fontSize: 13),
-                textAlign: TextAlign.center,
-                maxLines: 2,
-              ),
+            Text(
+              'Order - ${widget.orderHistoryData.displayOrderId}',
+              style: TextStyle(),
+              textAlign: TextAlign.left,
+            ),
+            Text(
+              '$orderFacility$itemText${AppConstant.currency} ${widget.orderHistoryData.total}',
+              style: TextStyle(fontSize: 13),
+              textAlign: TextAlign.center,
+              maxLines: 2,
+            ),
           ],
         ),
         centerTitle: false,
         actions: <Widget>[
-          InkWell(
-            onTap: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            child: Padding(
-              padding:
-                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
-              child: Icon(
-                Icons.home,
-                color: Colors.white,
-                size: 30,
-              ),
-            ),
-          ),
+          Visibility(
+            visible: showCancelButton(widget.orderHistoryData.status),
+            child: InkWell(
+                onTap: () async {
+                  var results = await DialogUtils.displayDialog(context,
+                      "Cancel Order?", AppConstant.cancelOrder, "Cancel", "OK");
+                  if (results == true) {
+                    Utils.showProgressDialog(context);
+                    CancelOrderModel cancelOrder =
+                        await ApiController.orderCancelApi(
+                            widget.orderHistoryData.orderId);
+                    if (cancelOrder != null && cancelOrder.success) {
+                      setState(() {
+                        widget.orderHistoryData.status = '6';
+                      });
+                    }
+                    try {
+                      Utils.showToast("${cancelOrder.data}", false);
+                    } catch (e) {
+                      print(e);
+                    }
+                    Utils.hideProgressDialog(context);
+                    eventBus.fire(refreshOrderHistory());
+                  }
+                },
+                child: Center(
+                  child: Padding(
+                      padding: EdgeInsets.only(right: 16, left: 16),
+                      child: Text(
+                        'Cancel',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w400),
+                      )),
+                )),
+          )
         ],
       ),
       body: SafeArea(
-        child: Column(
-          children: <Widget>[
-            Expanded(child: projectWidget()),
-          ],
-        ),
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          height: 50,
-          color: appTheme,
-          child: InkWell(
-            onTap: () {
-              bottomSheet(mainContext);
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: SingleChildScrollView(
+          child: Container(
+            color: Color(0xffDCDCDC),
+            child: Column(
               children: <Widget>[
-                Row(children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(left: 15.0, top: 4.0, bottom: 4),
-                    child: Text(
-                      "View Details",
-                      style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  SizedBox(width: 6),
-                  Image.asset(
-                    "images/topArrow.png",
-                    width: 15,
-                    height: 15,
-                  ),
-                ]),
-                Padding(
-                  padding: EdgeInsets.only(
-                    right: 10.0,
-                  ),
-                  child: Text(
-                    " ${AppConstant.currency} ${orderHistoryData.total}",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700),
-                    textAlign: TextAlign.right,
-                  ),
-                ),
+                firstRow(widget.orderHistoryData),
+                Container(
+                  color: Colors.white,
+                  margin: EdgeInsets.only(top: 10),
+                  height: 200,
+                  child: ProgressBar(),
+                )
               ],
             ),
           ),
@@ -109,116 +123,90 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
     );
   }
 
-  projectWidget() {
-    return ListView.builder(
-      scrollDirection: Axis.vertical,
-      itemCount: orderHistoryData.orderItems.length,
-      itemBuilder: (BuildContext ctx, int index) {
-        final item = orderHistoryData.orderItems[index];
-        return Container(
-          color: Colors.white,
-          child: Column(
-            children: <Widget>[
-              firstRow(item),
-              Padding(
-                padding: EdgeInsets.only(left: 12.0, top: 5.0, right: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Text('QTY : ',
-                        style:
-                            TextStyle(color: Color(0xFF7D8185), fontSize: 17)),
-                    Padding(
-                      padding: EdgeInsets.only(left: 75.0),
-                      child: Text("${item.quantity}",
-                          style: TextStyle(
-                              color: Color(0xFF15282F),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500)),
-                    )
-                  ],
-                ),
-              ),
-              secondRow(item),
-              deviderLine(),
-            ],
+  Widget firstRow(OrderData orderHistoryData) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Text(
+            'Delivery Address',
+            style: TextStyle(
+                fontSize: 14,
+                color: Color(0xFF7A7C80),
+                fontWeight: FontWeight.w300),
           ),
-        );
-      },
-    );
-  }
-
-  firstRow(OrderItems item) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        LimitedBox(
-          maxWidth: screenWidth - 100,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: 12.0, top: 20.0, right: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Text('Product Name : ',
-                        style:
-                            TextStyle(color: Color(0xFF7D8185), fontSize: 17)),
-                    Flexible(
-                      child: Text("${item.productName}",
-                          style: TextStyle(
-                              color: Color(0xFF15282F),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500)),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 12.0, top: 5.0, right: 10.0),
-                child: Row(
-                  children: <Widget>[
-                    Text('Price : ',
-                        style:
-                            TextStyle(color: Color(0xFF7D8185), fontSize: 17)),
-                    Padding(
-                      padding: EdgeInsets.only(left: 70.0),
-                      child: Text("${AppConstant.currency} ${item.price}",
-                          style: TextStyle(
-                              color: Color(0xFF15282F),
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500)),
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.only(top: 15.0, right: 12.0),
-          child: SizedBox(
-            width: 80,
-            //height: 35,
-            child: FlatButton(
-              onPressed: () {},
-              child: Padding(
-                padding: EdgeInsets.only(top: 3.0, bottom: 3.0),
-                child: Text(
-                  item.weight,
-                  style: TextStyle(
-                    color: Color(0xFF15282F),
-                    fontSize: 13,
+          Padding(
+            padding: EdgeInsets.only(top: 5),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    _getAddress(orderHistoryData),
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400),
                   ),
                 ),
-              ),
-              color: item.weight.isEmpty ? whiteColor : Color(0xFFEAEEEF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(3.0),
-              ),
+                SizedBox(
+                  width: 80,
+                ),
+                Container(
+                    margin: EdgeInsets.only(left: 3),
+                    padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xffD7D7D7)),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    ),
+                    child: Text('${orderHistoryData.orderFacility}',
+                        style:
+                            TextStyle(color: Color(0xFF968788), fontSize: 13))),
+              ],
             ),
           ),
-        )
-      ],
+          Padding(
+            padding: EdgeInsets.only(top: 15),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    deliverySlotDate,
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400),
+                  ),
+                ),
+                Visibility(
+                  visible: orderHistoryData.paymentMethod != null &&
+                      orderHistoryData.paymentMethod.trim().isNotEmpty,
+                  child: Container(
+                      margin: EdgeInsets.only(left: 6),
+                      padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xFFE6E6E6)),
+                        color: Color(0xFFE6E6E6),
+                        borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                      ),
+                      child: Text(
+                          '${orderHistoryData.paymentMethod.trim().toUpperCase()}',
+                          style: TextStyle(
+                              color: Color(0xFF39444D), fontSize: 13))),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -297,7 +285,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600)),
                           Text(
-                              "${AppConstant.currency} ${orderHistoryData.checkout}",
+                              "${AppConstant.currency} ${widget.orderHistoryData.checkout}",
                               style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 18,
@@ -306,8 +294,8 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.discount == "0.00" &&
-                              orderHistoryData.shippingCharges == "0.00"
+                      visible: widget.orderHistoryData.discount == "0.00" &&
+                              widget.orderHistoryData.shippingCharges == "0.00"
                           ? false
                           : true,
                       child: Padding(
@@ -316,8 +304,9 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible:
-                          orderHistoryData.discount == "0.00" ? false : true,
+                      visible: widget.orderHistoryData.discount == "0.00"
+                          ? false
+                          : true,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
                         child: Row(
@@ -327,7 +316,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                                 style: TextStyle(
                                     color: Color(0xFF737879), fontSize: 18)),
                             Text(
-                                "${AppConstant.currency} ${orderHistoryData.discount}",
+                                "${AppConstant.currency} ${widget.orderHistoryData.discount}",
                                 style: TextStyle(
                                     color: Colors.black,
                                     fontSize: 18,
@@ -337,7 +326,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.shippingCharges == "0.00"
+                      visible: widget.orderHistoryData.shippingCharges == "0.00"
                           ? false
                           : true,
                       child: Padding(
@@ -349,7 +338,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                                 style: TextStyle(
                                     color: Color(0xFF737879), fontSize: 18)),
                             Text(
-                                "${AppConstant.currency} ${orderHistoryData.shippingCharges}",
+                                "${AppConstant.currency} ${widget.orderHistoryData.shippingCharges}",
                                 style: TextStyle(
                                     color: Color(0xFF749A00),
                                     fontSize: 18,
@@ -359,7 +348,8 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.tax == "0.00" ? false : true,
+                      visible:
+                          widget.orderHistoryData.tax == "0.00" ? false : true,
                       child: Padding(
                         padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
                         child: Row(
@@ -369,7 +359,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                                 style: TextStyle(
                                     color: Color(0xFF737879), fontSize: 18)),
                             Text(
-                                "${AppConstant.currency} ${orderHistoryData.tax}",
+                                "${AppConstant.currency} ${widget.orderHistoryData.tax}",
                                 style: TextStyle(
                                     color: Color(0xFF749A00),
                                     fontSize: 18,
@@ -379,8 +369,8 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.cartSaving != null &&
-                              orderHistoryData.cartSaving.isNotEmpty
+                      visible: widget.orderHistoryData.cartSaving != null &&
+                              widget.orderHistoryData.cartSaving.isNotEmpty
                           ? true
                           : false,
                       child: Padding(
@@ -392,7 +382,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                                 style: TextStyle(
                                     color: Color(0xFF737879), fontSize: 18)),
                             Text(
-                                "${AppConstant.currency} ${orderHistoryData.cartSaving}",
+                                "${AppConstant.currency} ${widget.orderHistoryData.cartSaving}",
                                 style: TextStyle(
                                     color: Color(0xFF749A00),
                                     fontSize: 18,
@@ -402,8 +392,8 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.couponCode != null &&
-                              orderHistoryData.couponCode.isNotEmpty
+                      visible: widget.orderHistoryData.couponCode != null &&
+                              widget.orderHistoryData.couponCode.isNotEmpty
                           ? true
                           : false,
                       child: Padding(
@@ -414,8 +404,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                             Text('Coupon Code Appied: ',
                                 style: TextStyle(
                                     color: Color(0xFF737879), fontSize: 18)),
-                            Text(
-                                "${orderHistoryData.couponCode}",
+                            Text("${widget.orderHistoryData.couponCode}",
                                 style: TextStyle(
                                     color: Color(0xFF749A00),
                                     fontSize: 18,
@@ -425,7 +414,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.orderFacility == "Pickup"
+                      visible: widget.orderHistoryData.orderFacility == "Pickup"
                           ? false
                           : true,
                       child: Padding(
@@ -434,7 +423,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.orderFacility == "Pickup"
+                      visible: widget.orderHistoryData.orderFacility == "Pickup"
                           ? false
                           : true,
                       child: Padding(
@@ -447,7 +436,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                       ),
                     ),
                     Visibility(
-                      visible: orderHistoryData.orderFacility == "Pickup"
+                      visible: widget.orderHistoryData.orderFacility == "Pickup"
                           ? false
                           : true,
                       child: Padding(
@@ -487,7 +476,7 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
                               right: 10.0,
                             ),
                             child: Text(
-                              " ${AppConstant.currency} ${orderHistoryData.total}",
+                              " ${AppConstant.currency} ${widget.orderHistoryData.total}",
                               style: TextStyle(
                                   fontSize: 16,
                                   color: Colors.white,
@@ -510,6 +499,19 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
       height: 10,
       color: Color(0xFFDBDCDD),
     );
+  }
+
+  bool showCancelButton(status) {
+    bool showCancelButton;
+    // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
+// 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
+    //Remove cancel button on processing status
+    if (/*status == "1" || status == "4" ||*/ status == "0") {
+      showCancelButton = true;
+    } else {
+      showCancelButton = false;
+    }
+    return showCancelButton;
   }
 
   deviderLine() {
@@ -554,13 +556,54 @@ class OrderDetailScreenVersion2 extends StatelessWidget {
   }
 
   String getDeliveryAddress() {
-    if (orderHistoryData.deliveryAddress != null &&
-        orderHistoryData.deliveryAddress.isNotEmpty)
-      return '${orderHistoryData.address} '
-          '${orderHistoryData.deliveryAddress.first.areaName} '
-          '${orderHistoryData.deliveryAddress.first.city} '
-          '${orderHistoryData.deliveryAddress.first.state}';
+    if (widget.orderHistoryData.deliveryAddress != null &&
+        widget.orderHistoryData.deliveryAddress.isNotEmpty)
+      return '${widget.orderHistoryData.address} '
+          '${widget.orderHistoryData.deliveryAddress.first.areaName} '
+          '${widget.orderHistoryData.deliveryAddress.first.city} '
+          '${widget.orderHistoryData.deliveryAddress.first.state}';
     else
-      return orderHistoryData.address;
+      return widget.orderHistoryData.address;
+  }
+
+  String _getAddress(OrderData orderHistoryData) {
+    String name = '${orderHistoryData.deliveryAddress.first.firstName}';
+    String address = ', ${orderHistoryData.address}';
+    String area = ', ${orderHistoryData.deliveryAddress.first.areaName}';
+    String city = ', ${orderHistoryData.deliveryAddress.first.city}';
+    String ZipCode = ', ${orderHistoryData.deliveryAddress.first.zipcode}';
+    return '$name$address$area$city$ZipCode';
+  }
+
+  String _generalizedDeliverySlotTime(OrderData orderHistoryData) {
+    if (orderHistoryData.deliveryTimeSlot != null &&
+        orderHistoryData.deliveryTimeSlot.isNotEmpty) {
+      int dateEndIndex = orderHistoryData.deliveryTimeSlot.indexOf(' ');
+      String date =
+          orderHistoryData.deliveryTimeSlot.substring(0, dateEndIndex);
+      String convertedDate = convertOrderDateTime(date);
+      String returnedDate =
+          orderHistoryData.deliveryTimeSlot.replaceFirst(' ', ' | ');
+      return returnedDate.replaceAll(date, convertedDate);
+    } else {
+      return '';
+    }
+  }
+
+  String convertOrderDateTime(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
   }
 }

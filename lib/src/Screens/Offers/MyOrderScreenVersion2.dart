@@ -158,12 +158,12 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                         margin: EdgeInsets.only(left: 3),
                         padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
                         decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
+                          border: Border.all(color: Color(0xffD7D7D7)),
                           borderRadius: BorderRadius.all(Radius.circular(5.0)),
                         ),
                         child: Text('${cardOrderHistoryItems.orderFacility}',
                             style: TextStyle(
-                                color: Color(0xFF39444D), fontSize: 13))),
+                                color: Color(0xFF968788), fontSize: 13))),
                   ),
                   Visibility(
                     visible: cardOrderHistoryItems.paymentMethod != null &&

@@ -2351,7 +2351,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     try {
       if (widget.address != null) {
         if (widget.address.areaCharges != null) {
-          shippingCharges = widget.address.areaCharges;
+          if (responseOrderDetail.isNotEmpty && checkThatItemIsInStocks())
+            shippingCharges = '0';
+          else {
+            shippingCharges = widget.address.areaCharges;
+          }
           //print("-shippingCharges--${widget.address.areaCharges}---");
         }
         //print("----minAmount=${widget.address.minAmount}");
@@ -2377,7 +2381,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     } catch (e) {
       print(e);
     }
-
+    if (responseOrderDetail.isNotEmpty &&
+        checkThatItemIsInStocks() &&
+        taxModel != null) {
+      shippingCharges = '0';
+      taxModel.total = '0';
+      totalPrice=0;
+    }
     if (mounted) {
       setState(() {});
     }
