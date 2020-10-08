@@ -1611,42 +1611,51 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     attributeMap["paymentMode"] = "${widget.paymentMode}";
     attributeMap["shippingCharges"] = "${shippingCharges}";
     Utils.sendAnalyticsEvent("Clicked Place Order button", attributeMap);
-    //only for COD case
-    if (response.taxCalculation.orderDetail != null &&
-        response.taxCalculation.orderDetail.isNotEmpty) {
-      responseOrderDetail = response.taxCalculation.orderDetail;
-      bool someProductsUpdated = false;
-      isOrderVariations = response.taxCalculation.isChanged;
-      for (int i = 0; i < responseOrderDetail.length; i++) {
-        if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
-                0 ||
-            responseOrderDetail[i].productStatus.compareTo('price_changed') ==
-                0) {
-          someProductsUpdated = true;
-          break;
-        }
-      }
-      if (someProductsUpdated) {
-        Utils.hideProgressDialog(context);
-        DialogUtils.displayCommonDialog(
-            context,
-            storeModel == null ? "" : storeModel.storeName,
-            "Some Cart items were updated. Please review the cart before procceeding.",
-            buttonText: 'Procceed');
-        constraints();
-        //remove coupon
-        setState(() {
-          hideRemoveCouponFirstTime = true;
-          taxModel = response.taxCalculation;
-          appliedCouponCodeList.clear();
-          appliedReddemPointsCodeList.clear();
-          isCouponsApplied = false;
-          couponCodeController.text = "";
-        });
-        return;
-      }
-    }
-    calculateTotalSavings();
+
+//    if (response.taxCalculation.orderDetail != null &&
+//        response.taxCalculation.orderDetail.isNotEmpty) {
+//      responseOrderDetail = response.taxCalculation.orderDetail;
+//      bool someProductsUpdated = false;
+//      bool previousValue=isOrderVariations;
+//      isOrderVariations = response.taxCalculation.isChanged;
+//      for (int i = 0; i < responseOrderDetail.length; i++) {
+//        if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
+//                0 ||
+//            responseOrderDetail[i].productStatus.compareTo('price_changed') ==
+//                0) {
+//          someProductsUpdated = true;
+//          break;
+//        }
+//      }
+//      //check any variation made
+//      if(previousValue){
+//        //check current value=
+//        if(!isOrderVariations){
+//          someProductsUpdated=true;
+//        }
+//      }
+//
+//      if (someProductsUpdated) {
+//        Utils.hideProgressDialog(context);
+//        DialogUtils.displayCommonDialog(
+//            context,
+//            storeModel == null ? "" : storeModel.storeName,
+//            "Some Cart items were updated. Please review the cart before procceeding.",
+//            buttonText: 'ok');
+//        constraints();
+//        //remove coupon
+//        setState(() {
+//          hideRemoveCouponFirstTime = true;
+//          taxModel = response.taxCalculation;
+//          appliedCouponCodeList.clear();
+//          appliedReddemPointsCodeList.clear();
+//          isCouponsApplied = false;
+//          couponCodeController.text = "";
+//        });
+//        return;
+//      }
+//    }
+//    calculateTotalSavings();
     //Choose payment
     if (widget.paymentMode == "3") {
       Utils.hideProgressDialog(context);
