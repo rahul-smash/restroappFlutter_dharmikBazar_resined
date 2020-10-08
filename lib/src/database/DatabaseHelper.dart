@@ -555,7 +555,7 @@ class DatabaseHelper {
     double totalPrice = 0.00;
     //database connection
     var dbClient = await db;
-    List<String> columnsToSelect = [MRP_PRICE, PRICE, DISCOUNT, QUANTITY, 'id'];
+    List<String> columnsToSelect = [MRP_PRICE, PRICE, DISCOUNT, QUANTITY, 'id',VARIENT_ID];
     List<Map> resultList =
         await dbClient.query(CART_Table, columns: columnsToSelect);
     // print the results
@@ -567,10 +567,12 @@ class DatabaseHelper {
       String price = "0";
       String quantity = "0";
       int id = 0;
+      String varientID='0';
       resultList.forEach((row) {
         price = row[PRICE];
         quantity = row[QUANTITY];
         id = row['id'];
+        varientID = row[VARIENT_ID];
         try {
           double total = int.parse(quantity) * double.parse(price);
           //print("-------total------${roundOffPrice(total,2)}");
@@ -582,7 +584,7 @@ class DatabaseHelper {
               if (responseOrderDetail[i]
                       .productStatus
                       .contains('out_of_stock') &&
-                  int.parse(responseOrderDetail[i].productId)==id) {
+                  int.parse(responseOrderDetail[i].productId)==id&&responseOrderDetail[i].variantId.compareTo(varientID)==0) {
                 isProductOutOfStock = true;
                 break InnerFor;
               }
