@@ -107,12 +107,13 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           child: Container(
             color: Color(0xffDCDCDC),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 firstRow(widget.orderHistoryData),
                 Container(
                   color: Colors.white,
                   margin: EdgeInsets.only(top: 10),
-                  height: 200,
+                  width: Utils.getDeviceWidth(context),
                   child: ProgressBar(),
                 )
               ],

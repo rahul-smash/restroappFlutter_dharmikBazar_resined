@@ -152,48 +152,51 @@ class AnimatedBar extends StatelessWidget {
     return Container(
       child: AnimatedBuilder(
         animation: controller,
-        builder: (BuildContext context, Widget child) => Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Container(
-              width: dotSize,
-              height: dotSize,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(dotSize / 2),
-                  color: dotOneColor.value),
-            ),
-            Container(
-              height: 30,
-              width: 2,
-              child: LinearProgressIndicator(
-                backgroundColor: grayLightColor,
-                value: progressBarOne.value,
-                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-              ),
-            ),
-            Container(
-              width: dotSize,
-              height: dotSize,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(dotSize / 2),
-                  color: dotTwoColor.value),
-            ),
-            Container(
-              height: 30,
-              width: 2,
-              child: LinearProgressIndicator(
-                backgroundColor: grayLightColor,
-                value: progressBarTwo.value,
-                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-              ),
-            ),
-            Container(
-              width: dotSize,
-              height: dotSize,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(dotSize / 2),
-                  color: dotThreeColor.value),
-            ),
+        builder: (BuildContext context, Widget child) => Padding(
+            padding: EdgeInsets.all(16),
+            child: Flexible(
+                child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  width: dotSize,
+                  height: dotSize,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(dotSize / 2),
+                      color: dotOneColor.value),
+                ),
+                Container(
+                  height: 30,
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColor,
+                    value: progressBarOne.value,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Container(
+                  width: dotSize,
+                  height: dotSize,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(dotSize / 2),
+                      color: dotTwoColor.value),
+                ),
+                Container(
+                  height: 30,
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColor,
+                    value: progressBarTwo.value,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Container(
+                  width: dotSize,
+                  height: dotSize,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(dotSize / 2),
+                      color: dotThreeColor.value),
+                ),
 
 //            Container(
 //              margin: EdgeInsets.only(top: 5),
@@ -216,8 +219,8 @@ class AnimatedBar extends StatelessWidget {
 //                ],
 //              ),
 //            )
-          ],
-        ),
+              ],
+            ))),
       ),
     );
   }
