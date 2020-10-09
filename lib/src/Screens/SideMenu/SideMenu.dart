@@ -61,7 +61,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     _drawerItems.add(
         DrawerChildItem(DrawerChildConstants.MY_FAVORITES, "images/myfav.png"));
     _drawerItems.add(
-        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about.png"));
+        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about_image.png"));
     _drawerItems.add(DrawerChildItem(
         widget.store.isRefererFnEnable && AppConstant.isLoggedIn
             ? DrawerChildConstants.ReferEarn
