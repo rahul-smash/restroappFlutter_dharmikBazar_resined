@@ -344,6 +344,26 @@ class Utils {
     return formatted;
   }
 
+  static convertNotificationDateTime(String date, {bool onlyTime = false}) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("dd MMM yyyy hh:mm a");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      if (onlyTime) {
+        formatter = new DateFormat('hh:mm a');
+      }
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
   static bool getDayOfWeek(StoreModel store) {
     bool isStoreOpen;
     DateFormat dateFormat = DateFormat("hh:mma");
@@ -555,5 +575,5 @@ enum ClassType { CART, SubCategory, Favourites, Search }
 
 enum OrderType { Delivery, PickUp, Menu }
 
-enum PaymentType { COD, ONLINE,ONLINE_PAYTM, CANCEL }
+enum PaymentType { COD, ONLINE, ONLINE_PAYTM, CANCEL }
 enum RadioButtonEnum { SELECTD, UNSELECTED }

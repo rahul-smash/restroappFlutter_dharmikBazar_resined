@@ -1,5 +1,6 @@
-class TaxCalculationResponse {
+import 'dart:convert';
 
+class TaxCalculationResponse {
   bool success;
   String message;
 
@@ -7,10 +8,13 @@ class TaxCalculationResponse {
 
   TaxCalculationResponse({this.success, this.taxCalculation});
 
-  TaxCalculationResponse.fromJson(String couponCode, Map<String, dynamic> json) {
+  TaxCalculationResponse.fromJson(
+      String couponCode, Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
-    taxCalculation = json['data'] != null ? TaxCalculationModel.fromJson(couponCode, json['data']): null;
+    taxCalculation = json['data'] != null
+        ? TaxCalculationModel.fromJson(couponCode, json['data'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -25,7 +29,6 @@ class TaxCalculationResponse {
 }
 
 class TaxCalculationModel {
-
   String total;
   String itemSubTotal;
   String tax;
@@ -36,6 +39,8 @@ class TaxCalculationModel {
   List<TaxDetail> taxDetail;
   List<TaxLabel> taxLabel;
   List<FixedTax> fixedTax;
+  List<OrderDetail> orderDetail;
+  bool isChanged;
 
   TaxCalculationModel(
       {this.total,
@@ -47,7 +52,8 @@ class TaxCalculationModel {
       this.fixedTaxAmount,
       this.taxDetail,
       this.taxLabel,
-      this.fixedTax});
+      this.fixedTax,
+      this.orderDetail,this.isChanged});
 
   factory TaxCalculationModel.fromJson(
       String couponCode, Map<String, dynamic> json) {
@@ -78,6 +84,12 @@ class TaxCalculationModel {
         model.fixedTax.add(new FixedTax.fromJson(v));
       });
     }
+
+    if (json["order_detail"] != null) {
+      model.orderDetail = List<OrderDetail>.from(
+          json["order_detail"].map((x) => OrderDetail.fromJson(x)));
+    }
+     model.isChanged=json['is_changed']==null?false:json['is_changed'];
     return model;
   }
 
@@ -98,6 +110,10 @@ class TaxCalculationModel {
     if (this.fixedTax != null) {
       data['fixed_Tax'] = this.fixedTax.map((v) => v.toJson()).toList();
     }
+    if (this.orderDetail != null) {
+      data["order_detail"] = this.orderDetail.map((v) => v.toJson()).toList();
+    }
+    data['is_changed']=this.isChanged;
     return data;
   }
 }
@@ -122,6 +138,117 @@ class TaxDetail {
     data['tax'] = this.tax;
     return data;
   }
+}
+
+class OrderDetail {
+  OrderDetail({
+    this.productId,
+    this.productName,
+    this.variantId,
+    this.isTaxEnable,
+    this.quantity,
+    this.price,
+    this.weight,
+    this.mrpPrice,
+    this.unitType,
+    this.productStatus,
+    this.discount,
+    this.productType,
+    this.newMrpPrice,
+    this.newDiscount,
+    this.newPrice,
+  });
+
+  String productId;
+  String productName;
+  String variantId;
+  String isTaxEnable;
+  dynamic quantity;
+  String price;
+  String weight;
+  String mrpPrice;
+  String unitType;
+  String productStatus;
+  String discount;
+  int productType;
+  String newMrpPrice;
+  String newDiscount;
+  String newPrice;
+
+  OrderDetail copyWith({
+    String productId,
+    String productName,
+    String variantId,
+    String isTaxEnable,
+    dynamic quantity,
+    String price,
+    String weight,
+    String mrpPrice,
+    String unitType,
+    String productStatus,
+    String discount,
+    int productType,
+    String newMrpPrice,
+    String newDiscount,
+    String newPrice,
+  }) =>
+      OrderDetail(
+        productId: productId ?? this.productId,
+        productName: productName ?? this.productName,
+        variantId: variantId ?? this.variantId,
+        isTaxEnable: isTaxEnable ?? this.isTaxEnable,
+        quantity: quantity ?? this.quantity,
+        price: price ?? this.price,
+        weight: weight ?? this.weight,
+        mrpPrice: mrpPrice ?? this.mrpPrice,
+        unitType: unitType ?? this.unitType,
+        productStatus: productStatus ?? this.productStatus,
+        discount: discount ?? this.discount,
+        productType: productType ?? this.productType,
+        newMrpPrice: newMrpPrice ?? this.newMrpPrice,
+        newDiscount: newDiscount ?? this.newDiscount,
+        newPrice: newPrice ?? this.newPrice,
+      );
+
+  factory OrderDetail.fromRawJson(String str) => OrderDetail.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory OrderDetail.fromJson(Map<String, dynamic> json) => OrderDetail(
+    productId: json["product_id"] == null ? null : json["product_id"],
+    productName: json["product_name"] == null ? null : json["product_name"],
+    variantId: json["variant_id"] == null ? null : json["variant_id"],
+    isTaxEnable: json["isTaxEnable"] == null ? null : json["isTaxEnable"],
+    quantity: json["quantity"],
+    price: json["price"] == null ? null : json["price"],
+    weight: json["weight"] == null ? null : json["weight"],
+    mrpPrice: json["mrp_price"] == null ? null : json["mrp_price"],
+    unitType: json["unit_type"] == null ? null : json["unit_type"],
+    productStatus: json["product_status"] == null ? null : json["product_status"],
+    discount: json["discount"] == null ? null : json["discount"],
+    productType: json["product_type"] == null ? null : json["product_type"],
+    newMrpPrice: json["new_mrp_price"] == null ? null : json["new_mrp_price"],
+    newDiscount: json["new_discount"] == null ? null : json["new_discount"],
+    newPrice: json["new_price"] == null ? null : json["new_price"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "product_id": productId == null ? null : productId,
+    "product_name": productName == null ? null : productName,
+    "variant_id": variantId == null ? null : variantId,
+    "isTaxEnable": isTaxEnable == null ? null : isTaxEnable,
+    "quantity": quantity,
+    "price": price == null ? null : price,
+    "weight": weight == null ? null : weight,
+    "mrp_price": mrpPrice == null ? null : mrpPrice,
+    "unit_type": unitType == null ? null : unitType,
+    "product_status": productStatus == null ? null : productStatus,
+    "discount": discount == null ? null : discount,
+    "product_type": productType == null ? null : productType,
+    "new_mrp_price": newMrpPrice == null ? null : newMrpPrice,
+    "new_discount": newDiscount == null ? null : newDiscount,
+    "new_price": newPrice == null ? null : newPrice,
+  };
 }
 
 class TaxLabel {

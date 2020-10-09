@@ -121,6 +121,7 @@ class Product {
 
   TaxDetail taxDetail;
   FixedTax fixedTax;
+  List<ProductImage> productImages;
 
   Product({
     this.id,
@@ -151,6 +152,7 @@ class Product {
     this.isUnitType,
     this.variants,
     this.selectedVariant,
+    this.productImages
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -189,6 +191,8 @@ class Product {
     product.price = variant == null ? null : variant["price"];
     product.discount = variant == null ? null : variant["discount"];
     product.isUnitType = variant == null ? null : variant["unit_type"];
+    product.productImages= json["product_images"] == null ? null : List<ProductImage>.from(json["product_images"].map((x) => ProductImage.fromJson(x)));
+
     return product;
   }
 
@@ -222,6 +226,7 @@ class Product {
     map["price"] = variants.first.price;
     map["discount"] = variants.first.discount;
     map["isUnitType"] = variants.first.unitType;
+//    map["product_images"]= productImages == null ? null : List<dynamic>.from(productImages.map((x) => x.toJson()));
 
     return map;
   }
@@ -270,6 +275,63 @@ class Product {
         .toList();
     return jsonList;
   }
+}
+
+class ProductImage {
+  ProductImage({
+    this.id,
+    this.url,
+    this.type,
+    this.productId,
+    this.image10080,
+    this.image300200,
+  });
+
+  String id;
+  String url;
+  String type;
+  String productId;
+  String image10080;
+  String image300200;
+
+  ProductImage copyWith({
+    String id,
+    String url,
+    String type,
+    String productId,
+    String image10080,
+    String image300200,
+  }) =>
+      ProductImage(
+        id: id ?? this.id,
+        url: url ?? this.url,
+        type: type ?? this.type,
+        productId: productId ?? this.productId,
+        image10080: image10080 ?? this.image10080,
+        image300200: image300200 ?? this.image300200,
+      );
+
+  factory ProductImage.fromRawJson(String str) => ProductImage.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory ProductImage.fromJson(Map<String, dynamic> json) => ProductImage(
+    id: json["id"] == null ? null : json["id"],
+    url: json["url"] == null ? null : json["url"],
+    type: json["type"] == null ? null : json["type"],
+    productId: json["product_id"] == null ? null : json["product_id"],
+    image10080: json["image_100_80"] == null ? null : json["image_100_80"],
+    image300200: json["image_300_200"] == null ? null : json["image_300_200"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id == null ? null : id,
+    "url": url == null ? null : url,
+    "type": type == null ? null : type,
+    "product_id": productId == null ? null : productId,
+    "image_100_80": image10080 == null ? null : image10080,
+    "image_300_200": image300200 == null ? null : image300200,
+  };
 }
 
 class SelectedVariant {
@@ -351,6 +413,9 @@ class Variant {
   String orderBy;
   String sort;
   String isExportFromFile;
+  String stockType;
+  String minStockAlert;
+  String stock;
 
   Variant({
     this.id,
@@ -369,6 +434,9 @@ class Variant {
     this.orderBy,
     this.sort,
     this.isExportFromFile,
+    this.stockType,
+    this.minStockAlert,
+    this.stock
   });
 
   factory Variant.fromJson(Map<String, dynamic> json) =>
@@ -389,6 +457,9 @@ class Variant {
         orderBy: json["order_by"],
         sort: json["sort"],
         isExportFromFile: json["is_export_from_file"],
+        stockType: json["stock_type"],
+        minStockAlert: json["min_stock_alert"],
+        stock: json["stock"],
       );
 
   Map<String, dynamic> toJson() =>
@@ -409,6 +480,9 @@ class Variant {
         "order_by": orderBy,
         "sort": sort,
         "is_export_from_file": isExportFromFile,
+        "stock_type": stockType,
+        "min_stock_alert": minStockAlert,
+        "stock": stock,
       };
 
   Map<String, dynamic> toMap() {
@@ -429,6 +503,9 @@ class Variant {
     map["order_by"] = orderBy;
     map["sort"] = sort;
     map["is_export_from_file"] = isExportFromFile;
+    map["stock_type"] = stockType;
+    map["min_stock_alert"] = minStockAlert;
+    map["stock"] = stock;
     return map;
   }
 }

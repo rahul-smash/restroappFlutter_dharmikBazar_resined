@@ -27,6 +27,7 @@ class ApiConstants{
   static String storeOffers = 'storeOffers';
   static String validateCoupon = 'validateAllCoupons';
   static String multipleTaxCalculation = 'multiple_tax_calculation';
+  static String multipleTaxCalculation_2 = 'multiple_tax_calculation_new';
   static String stripeVerifyTransactionUrl = 'stripeVerifyTransaction?response=success';
 
 
@@ -55,6 +56,10 @@ class ApiConstants{
   static String stripeVerifyTransaction = 'stripeVerifyTransaction';
 
   static String createPaytmTxnToken = 'createPaytmTxnToken';
+
+  static String faqs = 'faqs';
+  static String allNotifications = 'allNotifications';
+  static String recommendedProduct = 'recommendedProduct';
 
 
 

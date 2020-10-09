@@ -137,6 +137,7 @@ void setStoreCurrency(StoreModel store,ConfigModel configObject) {
 void setAppThemeColors(StoreModel store) {
   AppThemeColors appThemeColors = store.appThemeColors;
   appTheme = Color(int.parse(appThemeColors.appThemeColor));
+  appThemeLight=appTheme.withOpacity(0.1);
 
   left_menu_header_bkground = Color(int.parse(appThemeColors.leftMenuHeaderBackgroundColor));
   left_menu_icon_colors = Color(int.parse(appThemeColors.leftMenuIconColor));

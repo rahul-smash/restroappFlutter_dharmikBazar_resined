@@ -128,6 +128,10 @@ class StoreModel {
   String homePageDisplayNumber; //Dispaly Number On App Home Page
   String homePageDisplayNumberType; //0=>Whats app, 1=>Phone Call
 
+  String domain;
+  String poweredByText;
+  String poweredByLink;
+
   StoreModel(
       {this.id,
       this.storeName,
@@ -232,7 +236,7 @@ class StoreModel {
         this.homePageSubtitle,
         this.homePageHeaderRight,
         this.homePageDisplayNumber,
-        this.homePageDisplayNumberType});
+        this.homePageDisplayNumberType,this.domain,this.poweredByText,this.poweredByLink});
 
   StoreModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -391,6 +395,9 @@ class StoreModel {
     homePageHeaderRight = json['home_page_header_right'];
     homePageDisplayNumber = json['home_page_display_number'];
     homePageDisplayNumberType = json['home_page_display_number_type'];
+    domain=json["domain"];
+    poweredByText=json["powered_by_text"];
+    poweredByLink=json["powered_by_link"];
   }
 
   Map<String, dynamic> toJson() {
@@ -520,6 +527,9 @@ class StoreModel {
     data['home_page_header_right'] = this.homePageHeaderRight;
     data['home_page_display_number'] = this.homePageDisplayNumber;
     data['home_page_display_number_type'] = this.homePageDisplayNumberType;
+    data['domain']=this.domain;
+    data['powered_by_text']=this.poweredByText;
+    data['powered_by_link']=this.poweredByLink;
     return data;
   }
 }

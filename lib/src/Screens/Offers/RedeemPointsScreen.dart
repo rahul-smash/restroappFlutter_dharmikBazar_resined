@@ -18,9 +18,11 @@ class RedeemPointsScreen extends StatefulWidget {
   bool isComingFromPickUpScreen;
   String areaId;
   List<String> reddemPointsCodeList;
+  bool isOrderVariations=false;
+  List<OrderDetail> responseOrderDetail;
 
   RedeemPointsScreen(this.address,this.paymentMode, this.isComingFromPickUpScreen,
-      this.areaId,this.callback,this.reddemPointsCodeList);
+      this.areaId,this.callback,this.reddemPointsCodeList,this.isOrderVariations,this.responseOrderDetail);
 
   @override
   RedeemPointsScreenState createState() => RedeemPointsScreenState();
@@ -180,7 +182,14 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
                                       }else{
 
                                         if(widget.reddemPointsCodeList.isEmpty){
-                                          databaseHelper.getCartItemsListToJson().then((json) {
+                                          databaseHelper.getCartItemsListToJson(isOrderVariations:widget.isOrderVariations,responseOrderDetail: widget.responseOrderDetail).then((json) {
+                                            if (json.length == 2) {
+                                              Utils.showToast(
+                                                  "All Items are out of stock.",
+                                                  true);
+                                              Utils.hideProgressDialog(context);
+                                              return;
+                                            }
                                             validateCouponApi(loyalityData, json,);
                                           });
                                         }else{
@@ -219,6 +228,8 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
       Utils.hideProgressDialog(context);
       if (response.success) {
         widget.callback(response.taxCalculation);
+      }else{
+        Utils.showToast(response.message, true);
       }
       Navigator.pop(context, true);
 

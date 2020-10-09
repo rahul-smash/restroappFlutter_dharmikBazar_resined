@@ -1,8 +1,5 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_share/flutter_share.dart';
@@ -10,10 +7,9 @@ import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
-import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
-import 'package:restroapp/src/Screens/SideMenu/ReferEarn.dart';
+import 'package:restroapp/src/Screens/SideMenu/FAQScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -24,16 +20,15 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
 import 'LoyalityPoints.dart';
 import 'ProfileScreen.dart';
 
 class NavDrawerMenu extends StatefulWidget {
-
   final StoreModel store;
   final String userName;
+
   NavDrawerMenu(this.store, this.userName);
 
   @override
@@ -44,6 +39,7 @@ class NavDrawerMenu extends StatefulWidget {
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
   List<dynamic> _drawerItems = List();
+
   _NavDrawerMenuState();
 
   @override
@@ -64,10 +60,14 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     _drawerItems.add(
         DrawerChildItem(DrawerChildConstants.MY_FAVORITES, "images/myfav.png"));
     _drawerItems.add(
-        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about.png"));
-    _drawerItems.add(DrawerChildItem(widget.store.isRefererFnEnable && AppConstant.isLoggedIn
-        ? DrawerChildConstants.ReferEarn
-        : DrawerChildConstants.SHARE, "images/refer.png"));
+        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about_image.png"));
+    _drawerItems.add(DrawerChildItem(
+        widget.store.isRefererFnEnable && AppConstant.isLoggedIn
+            ? DrawerChildConstants.ReferEarn
+            : DrawerChildConstants.SHARE,
+        "images/refer.png"));
+    _drawerItems
+        .add(DrawerChildItem(DrawerChildConstants.FAQ, "images/about.png"));
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
@@ -76,7 +76,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       print(e);
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -93,8 +92,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                     ? createHeaderInfoItem()
                     : createDrawerItem(index - 1, context));
               }),
-        )
-    );
+        ));
   }
 
   Widget createHeaderInfoItem() {
@@ -106,7 +104,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
               Padding(
                 padding: EdgeInsets.only(left: 0, right: 20),
                 child: Center(
-                  child: Icon(Icons.account_circle,size: 60, color: Colors.white,),
+                  child: Icon(
+                    Icons.account_circle,
+                    size: 60,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Flexible(
@@ -114,15 +116,20 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text('Welcome',
-                          style: TextStyle(color: leftMenuWelcomeTextColors,
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              color: leftMenuWelcomeTextColors,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
                       SizedBox(height: 5),
-                      Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
-                          maxLines: 2, overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: leftMenuWelcomeTextColors, fontSize: 15)
-                      ),
-                    ]
-                ),
+                      Text(
+                          AppConstant.isLoggedIn == false
+                              ? ''
+                              : widget.userName,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: leftMenuWelcomeTextColors, fontSize: 15)),
+                    ]),
               ),
             ])));
   }
@@ -134,31 +141,31 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         child: ListTile(
           leading: Image.asset(
               item.title == DrawerChildConstants.LOGIN ||
-                  item.title == DrawerChildConstants.LOGOUT
+                      item.title == DrawerChildConstants.LOGOUT
                   ? AppConstant.isLoggedIn == false
-                  ? 'images/sign_in.png'
-                  : 'images/sign_out.png'
+                      ? 'images/sign_in.png'
+                      : 'images/sign_out.png'
                   : item.icon,
               color: left_menu_icon_colors,
               width: 30),
           title: item.title == DrawerChildConstants.LOGIN ||
-              item.title == DrawerChildConstants.LOGOUT
+                  item.title == DrawerChildConstants.LOGOUT
               ? Text(
-              AppConstant.isLoggedIn == false
-                  ? DrawerChildConstants.LOGIN
-                  : DrawerChildConstants.LOGOUT,
-              style:
-              TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
+                  AppConstant.isLoggedIn == false
+                      ? DrawerChildConstants.LOGIN
+                      : DrawerChildConstants.LOGOUT,
+                  style:
+                      TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
               : Text(item.title,
-              style:
-              TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
+                  style:
+                      TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
           onTap: () {
             _openPageForIndex(item, index, context);
           },
         ));
   }
 
-  _openPageForIndex(DrawerChildItem item,int pos, BuildContext context) async {
+  _openPageForIndex(DrawerChildItem item, int pos, BuildContext context) async {
     switch (item.title) {
       case DrawerChildConstants.HOME:
         Navigator.pop(context);
@@ -168,11 +175,12 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProfileScreen(false,"","")),
+            MaterialPageRoute(
+                builder: (context) => ProfileScreen(false, "", "")),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "ProfileScreen";
-          Utils.sendAnalyticsEvent("Clicked ProfileScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
@@ -182,11 +190,13 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => DeliveryAddressList(false,OrderType.Menu)),
+            MaterialPageRoute(
+                builder: (context) =>
+                    DeliveryAddressList(false, OrderType.Menu)),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "DeliveryAddressList";
-          Utils.sendAnalyticsEvent("Clicked DeliveryAddressList",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
@@ -196,11 +206,12 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MyOrderScreen(widget.store)),
+            MaterialPageRoute(
+                builder: (context) => MyOrderScreen(widget.store)),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "MyOrderScreen";
-          Utils.sendAnalyticsEvent("Clicked MyOrderScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
         } else {
           Utils.showLoginDialog(context);
         }
@@ -210,9 +221,10 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => LoyalityPointsScreen(widget.store)),
+            MaterialPageRoute(
+                builder: (context) => LoyalityPointsScreen(widget.store)),
           );
-        }else {
+        } else {
           Utils.showLoginDialog(context);
         }
 
@@ -222,12 +234,12 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Favourites(() { })),
+            MaterialPageRoute(builder: (context) => Favourites(() {})),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "Favourites";
-          Utils.sendAnalyticsEvent("Clicked Favourites",attributeMap);
-        }else {
+          Utils.sendAnalyticsEvent("Clicked Favourites", attributeMap);
+        } else {
           Utils.showLoginDialog(context);
         }
         break;
@@ -237,41 +249,41 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           context,
           MaterialPageRoute(builder: (context) => AboutScreen(widget.store)),
         );
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "AboutScreen";
-        Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
+        Utils.sendAnalyticsEvent("Clicked AboutScreen", attributeMap);
         break;
       case DrawerChildConstants.ReferEarn:
       case DrawerChildConstants.SHARE:
         if (AppConstant.isLoggedIn) {
-          if(widget.store.isRefererFnEnable){
+          if (widget.store.isRefererFnEnable) {
             Navigator.pop(context);
 
             Utils.showProgressDialog(context);
             ReferEarnData referEarn = await ApiController.referEarn();
             Utils.hideProgressDialog(context);
-            share2(referEarn.referEarn.sharedMessage,widget.store);
-          }else{
+            share2(referEarn.referEarn.sharedMessage, widget.store);
+          } else {
             Utils.showToast("Refer Earn is inactive!", true);
-            share2(null,widget.store);
+            share2(null, widget.store);
           }
-        }else {
+        } else {
           Navigator.pop(context);
-          if(widget.store.isRefererFnEnable){
+          if (widget.store.isRefererFnEnable) {
             var result = await DialogUtils.showInviteEarnAlert(context);
             print("showInviteEarnAlert=${result}");
-          }else{
-            share2(null,widget.store);
+          } else {
+            share2(null, widget.store);
           }
         }
         //share();
 
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "share apk url";
-        Utils.sendAnalyticsEvent("Clicked share",attributeMap);
+        Utils.sendAnalyticsEvent("Clicked share", attributeMap);
 
         //DialogUtils.showInviteEarnAlert2(context);
-        
+
         break;
       case DrawerChildConstants.LOGIN:
       case DrawerChildConstants.LOGOUT:
@@ -279,30 +291,44 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           _showDialog(context);
         } else {
           Navigator.pop(context);
-          SharedPrefs.getStore().then((storeData){
+          SharedPrefs.getStore().then((storeData) {
             StoreModel model = storeData;
             print("---internationalOtp--${model.internationalOtp}");
             //User Login with Mobile and OTP = 0
             // 1 = email and 0 = ph-no
-            if(model.internationalOtp == "0"){
+            if (model.internationalOtp == "0") {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+                MaterialPageRoute(
+                    builder: (context) => LoginMobileScreen("menu")),
               );
-              Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+              Map<String, dynamic> attributeMap = new Map<String, dynamic>();
               attributeMap["ScreenName"] = "LoginMobileScreen";
-              Utils.sendAnalyticsEvent("Clicked LoginMobileScreen",attributeMap);
-            }else{
+              Utils.sendAnalyticsEvent(
+                  "Clicked LoginMobileScreen", attributeMap);
+            } else {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+                MaterialPageRoute(
+                    builder: (context) => LoginEmailScreen("menu")),
               );
-              Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+              Map<String, dynamic> attributeMap = new Map<String, dynamic>();
               attributeMap["ScreenName"] = "LoginEmailScreen";
-              Utils.sendAnalyticsEvent("Clicked LoginEmailScreen",attributeMap);
+              Utils.sendAnalyticsEvent(
+                  "Clicked LoginEmailScreen", attributeMap);
             }
           });
         }
+        break;
+      case DrawerChildConstants.FAQ:
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => FAQScreen(widget.store)),
+        );
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+        attributeMap["ScreenName"] = "FAQ";
+        Utils.sendAnalyticsEvent("Clicked AboutScreen", attributeMap);
         break;
     }
   }
@@ -341,24 +367,27 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     await FlutterShare.share(
         title: 'Kindly download',
         text: 'Kindly download' + widget.store.storeName + 'app from',
-        linkUrl: Platform.isIOS ? widget.store.iphoneShareLink :widget.store.androidShareLink,
+        linkUrl: Platform.isIOS
+            ? widget.store.iphoneShareLink
+            : widget.store.androidShareLink,
         chooserTitle: 'Share');
   }
 
-  Future<void> share2(String referEarn,StoreModel store) async {
-    if(referEarn != null && store.isRefererFnEnable){
+  Future<void> share2(String referEarn, StoreModel store) async {
+    if (referEarn != null && store.isRefererFnEnable) {
       await FlutterShare.share(
           title: '${store.storeName}',
           linkUrl: referEarn,
           chooserTitle: 'Refer & Earn');
-    }else{
+    } else {
       await FlutterShare.share(
           title: 'Kindly download',
           text: 'Kindly download' + widget.store.storeName + 'app from',
-          linkUrl: Platform.isIOS ? widget.store.iphoneShareLink :widget.store.androidShareLink,
+          linkUrl: Platform.isIOS
+              ? widget.store.iphoneShareLink
+              : widget.store.androidShareLink,
           chooserTitle: 'Share');
     }
-
   }
 
   Future logout(BuildContext context) async {
@@ -389,26 +418,27 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   Future<void> _setSetUserId() async {
     try {
-      if(AppConstant.isLoggedIn){
+      if (AppConstant.isLoggedIn) {
         UserModel user = await SharedPrefs.getUser();
         await Utils.analytics.setUserId('${user.id}');
         await Utils.analytics.setUserProperty(name: "userid", value: user.id);
-        await Utils.analytics.setUserProperty(name: "useremail", value: user.email);
-        await Utils.analytics.setUserProperty(name: "userfullName", value: user.fullName);
-        await Utils.analytics.setUserProperty(name: "userphone", value: user.phone);
+        await Utils.analytics
+            .setUserProperty(name: "useremail", value: user.email);
+        await Utils.analytics
+            .setUserProperty(name: "userfullName", value: user.fullName);
+        await Utils.analytics
+            .setUserProperty(name: "userphone", value: user.phone);
       }
     } catch (e) {
       print(e);
     }
   }
-
 }
-
-
 
 class DrawerChildItem {
   String title;
   String icon;
+
   DrawerChildItem(this.title, this.icon);
 }
 
@@ -421,8 +451,8 @@ class DrawerChildConstants {
   static const MY_FAVORITES = "My Favorites";
   static const ABOUT_US = "About Us";
   static const SHARE = "Share";
+  static const FAQ = "FAQ";
   static const ReferEarn = "Refer & Earn";
   static const LOGIN = "Login";
   static const LOGOUT = "Logout";
 }
-

@@ -10,30 +10,38 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class AvailableOffersDialog extends StatefulWidget {
-
   final DeliveryAddressData address;
   final String paymentMode; // 2 = COD, 3 = Online Payment
   final Function(TaxCalculationModel) callback;
   bool isComingFromPickUpScreen;
   String areaId;
   List<String> appliedCouponCodeList;
+  bool isOrderVariations = false;
+  List<OrderDetail> responseOrderDetail = List();
 
-  AvailableOffersDialog(this.address,this.paymentMode,
-      this.isComingFromPickUpScreen,this.areaId,this.callback,this.appliedCouponCodeList);
+  AvailableOffersDialog(
+      this.address,
+      this.paymentMode,
+      this.isComingFromPickUpScreen,
+      this.areaId,
+      this.callback,
+      this.appliedCouponCodeList,
+      this.isOrderVariations,
+      this.responseOrderDetail);
 
   @override
   AvailableOffersState createState() => AvailableOffersState();
 }
 
 class AvailableOffersState extends State<AvailableOffersDialog> {
-
   DatabaseHelper databaseHelper = new DatabaseHelper();
   String area_id_value;
 
   @override
   void initState() {
     super.initState();
-    area_id_value = widget.isComingFromPickUpScreen ? widget.areaId : widget.address.areaId;
+    area_id_value =
+        widget.isComingFromPickUpScreen ? widget.areaId : widget.address.areaId;
   }
 
   @override
@@ -54,7 +62,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
           child: Column(
             children: <Widget>[
               FutureBuilder(
-                future:ApiController.storeOffersApiRequest(area_id_value),
+                future: ApiController.storeOffersApiRequest(area_id_value),
                 builder: (context, projectSnap) {
                   if (projectSnap.connectionState == ConnectionState.none &&
                       projectSnap.hasData == null) {
@@ -72,9 +80,10 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                               OfferModel offer = offerList[index];
 
                               String applyText;
-                              if(widget.appliedCouponCodeList.contains(offer.couponCode)){
+                              if (widget.appliedCouponCodeList
+                                  .contains(offer.couponCode)) {
                                 applyText = "Applied";
-                              }else{
+                              } else {
                                 applyText = "Apply";
                               }
                               return Container(
@@ -85,43 +94,60 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                   children: <Widget>[
                                     SizedBox(
                                       width: 60,
-                                      child: Text("${getOfferName(offer)}",textAlign: TextAlign.center,
-                                        style: TextStyle(fontWeight: FontWeight.w400),
+                                      child: Text(
+                                        "${getOfferName(offer)}",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w400),
                                       ),
                                     ),
                                     Container(
                                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                                         height: 60,
-                                        child: VerticalDivider(color: Colors.grey)
-                                    ),
+                                        child: VerticalDivider(
+                                            color: Colors.grey)),
                                     Expanded(
                                       child: Padding(
-                                        padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 5, 0, 5),
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: <Widget>[
                                             Row(
                                               children: <Widget>[
-                                                Text("Use code",),
+                                                Text(
+                                                  "Use code",
+                                                ),
                                                 Padding(
-                                                  padding: EdgeInsets.fromLTRB(5, 0, 0, 3),
+                                                  padding: EdgeInsets.fromLTRB(
+                                                      5, 0, 0, 3),
                                                   child: SizedBox(
                                                     width: 80,
-                                                    child: Text("${offer.couponCode}",
-                                                      style: TextStyle(color: orangeColor,),
+                                                    child: Text(
+                                                      "${offer.couponCode}",
+                                                      style: TextStyle(
+                                                        color: orangeColor,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                            Text("to avail this offer",),
-                                            Padding(
-                                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                              child: Text("Min order -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
+                                            Text(
+                                              "to avail this offer",
                                             ),
                                             Padding(
-                                              padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                              child: Text("Valid Till- ${Utils.convertStringToDate2(offer.validTo)}"),
+                                              padding: EdgeInsets.fromLTRB(
+                                                  0, 10, 0, 0),
+                                              child: Text(
+                                                  "Min order -  ${AppConstant.currency}${offer.minimumOrderAmount}"),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  0, 5, 0, 5),
+                                              child: Text(
+                                                  "Valid Till- ${Utils.convertStringToDate2(offer.validTo)}"),
                                             ),
                                           ],
                                         ),
@@ -129,35 +155,57 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                     ),
                                     Container(
                                       child: Padding(
-                                        padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        padding:
+                                            EdgeInsets.fromLTRB(0, 0, 0, 0),
                                         child: RaisedButton(
-                                          padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                          padding:
+                                              EdgeInsets.fromLTRB(0, 0, 0, 0),
                                           textColor: Colors.black,
                                           color: Color(0xffdbdbdb),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(18.0),
+                                            borderRadius:
+                                                BorderRadius.circular(18.0),
                                             //side: BorderSide(color: Colors.red)
                                           ),
                                           onPressed: () async {
-                                            bool isNetworkAvailable = await Utils.isNetworkAvailable();
-                                            if(!isNetworkAvailable){
-                                              Utils.showToast(AppConstant.noInternet, false);
+                                            bool isNetworkAvailable =
+                                                await Utils
+                                                    .isNetworkAvailable();
+                                            if (!isNetworkAvailable) {
+                                              Utils.showToast(
+                                                  AppConstant.noInternet,
+                                                  false);
                                               return;
                                             }
-                                            if(widget.appliedCouponCodeList.contains(offer.couponCode)){
+                                            if (widget.appliedCouponCodeList
+                                                .contains(offer.couponCode)) {
                                               //Utils.showToast("Already Applied this Coupon", false);
-                                            }else{
-                                              if(widget.appliedCouponCodeList.isEmpty){
-                                                Utils.showProgressDialog(context);
-                                                databaseHelper.getCartItemsListToJson().then((json) {
-                                                  validateCouponApi(offer.couponCode, json);
+                                            } else {
+                                              if (widget.appliedCouponCodeList
+                                                  .isEmpty) {
+
+                                                databaseHelper
+                                                    .getCartItemsListToJson(
+                                                        isOrderVariations: widget
+                                                            .isOrderVariations,
+                                                        responseOrderDetail: widget
+                                                            .responseOrderDetail)
+                                                    .then((json) {
+                                                  if (json.length == 2) {
+                                                    Utils.showToast(
+                                                        "All Items are out of stock.",
+                                                        true);
+                                                    return;
+                                                  }
+                                                  validateCouponApi(
+                                                      offer.couponCode, json);
                                                 });
-                                              }else{
-                                                Utils.showToast("Please remove the applied coupon first!", false);
+                                              } else {
+                                                Utils.showToast(
+                                                    "Please remove the applied coupon first!",
+                                                    false);
                                               }
-
                                             }
-
                                           },
                                           child: new Text("${applyText}"),
                                         ),
@@ -171,17 +219,22 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                         );
                       } else {
                         return Container(
-                          margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                            margin: EdgeInsets.fromLTRB(0, 50, 0, 0),
                             child: Center(
-                              child: Text(response.message,textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.black45, fontSize: 18.0,)),
-                        ));
+                              child: Text(response.message,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.black45,
+                                    fontSize: 18.0,
+                                  )),
+                            ));
                       }
                     } else {
                       return Center(
                         child: CircularProgressIndicator(
                             backgroundColor: Colors.black26,
-                            valueColor:AlwaysStoppedAnimation<Color>(Colors.black26)),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.black26)),
                       );
                     }
                   }
@@ -189,19 +242,21 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
               ),
             ],
           ),
-        )
-    );
+        ));
   }
 
   void validateCouponApi(String couponCode, String json) {
     print("----couponCode-----=>${couponCode}");
-    ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json).then((validCouponModel) {
-      if (validCouponModel != null &&validCouponModel.success) {
-
+    Utils.showProgressDialog(
+        context);
+    ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json)
+        .then((validCouponModel) {
+      if (validCouponModel != null && validCouponModel.success) {
         Utils.showToast(validCouponModel.message, true);
         print("-discountAmount-=${validCouponModel.discountAmount}-");
-        ApiController.multipleTaxCalculationRequest(couponCode,
-            validCouponModel.discountAmount, "0", json).then((response) async {
+        ApiController.multipleTaxCalculationRequest(
+                couponCode, validCouponModel.discountAmount, "0", json)
+            .then((response) async {
           Utils.hideProgressDialog(context);
           if (response.success) {
             widget.callback(response.taxCalculation);
@@ -223,17 +278,16 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
     */
 
     String offerName = "";
-    if(offer.discount_type == "3"){
-      offerName = "${offer.discount}%\nOFF\nUpto ${AppConstant.currency}${offer.discount_upto}";
+    if (offer.discount_type == "3") {
+      offerName =
+          "${offer.discount}%\nOFF\nUpto ${AppConstant.currency}${offer.discount_upto}";
     }
-    if(offer.discount_type == "2"){
+    if (offer.discount_type == "2") {
       offerName = "Upto ${AppConstant.currency}${offer.discount_upto}\nOFF";
     }
-    if(offer.discount_type == "1"){
+    if (offer.discount_type == "1") {
       offerName = "Upto ${AppConstant.currency}${offer.discount_upto}\nOFF";
     }
     return offerName;
   }
-
-
 }
