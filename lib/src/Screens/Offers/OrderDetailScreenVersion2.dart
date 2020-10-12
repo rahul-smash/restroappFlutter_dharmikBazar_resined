@@ -28,7 +28,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   var mainContext;
   String deliverySlotDate = '';
 
-  String _totalCartSaving = '0';
+  String _totalCartSaving = '0', _totalPrice = '0';
 
   @override
   void initState() {
@@ -47,6 +47,10 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     double _totalSaving = _cartSaving + _couponDiscount;
     _totalCartSaving =
         _totalSaving != 0 ? _totalSaving.toStringAsFixed(2) : '0';
+    double _totalPriceVar =
+        double.parse(widget.orderHistoryData.total) + _totalSaving;
+
+    _totalPrice = _totalPriceVar.toString();
   }
 
   @override
@@ -127,9 +131,170 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 firstRow(widget.orderHistoryData),
                 Container(
                   color: Colors.white,
-                  margin: EdgeInsets.only(top: 10),
+                  margin: EdgeInsets.only(top: 5),
+                  padding: EdgeInsets.all(16),
                   width: Utils.getDeviceWidth(context),
-                  height: 120,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        'Track Order',
+                        style: TextStyle(fontSize: 18),
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Container(
+                            height: 25,
+                            margin: EdgeInsets.only(left: 4, top: 5),
+                            width: 2,
+                            child: LinearProgressIndicator(
+                              backgroundColor: grayLightColor,
+                              value: 100,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(appTheme),
+                            ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10 / 2),
+                                    color: appTheme),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                  child: Text(
+                                'Order Placed',
+                                style: TextStyle(fontSize: 16),
+                              )),
+                              Text('12-Oct-2020')
+                            ],
+                          )
+                        ],
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Container(
+                            height: 30,
+                            margin: EdgeInsets.only(
+                              left: 4,
+                            ),
+                            width: 2,
+                            child: LinearProgressIndicator(
+                              backgroundColor: grayLightColor,
+                              value: 100,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(appTheme),
+                            ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10 / 2),
+                                    color: appTheme),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                  child: Text(
+                                'Order Confirmed',
+                                style: TextStyle(fontSize: 16),
+                              )),
+                              Text('Pending')
+                            ],
+                          )
+                        ],
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Container(
+                            height: 30,
+                            margin: EdgeInsets.only(
+                              left: 4,
+                            ),
+                            width: 2,
+                            child: LinearProgressIndicator(
+                              backgroundColor: grayLightColor,
+                              value: 100,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(appTheme),
+                            ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10 / 2),
+                                    color: appTheme),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                  child: Text(
+                                'Order Confirmed',
+                                style: TextStyle(fontSize: 16),
+                              )),
+                              Text('Pending')
+                            ],
+                          )
+                        ],
+                      ),
+                      Stack(
+                        children: <Widget>[
+                          Container(
+                            height: 15,
+                            margin: EdgeInsets.only(
+                              left: 4,
+                            ),
+                            width: 2,
+                            child: LinearProgressIndicator(
+                              backgroundColor: grayLightColor,
+                              value: 100,
+                              valueColor:
+                                  AlwaysStoppedAnimation<Color>(appTheme),
+                            ),
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10 / 2),
+                                    color: appTheme),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Expanded(
+                                  child: Text(
+                                'Order Confirmed',
+                                style: TextStyle(fontSize: 16),
+                              )),
+                              Text('Pending')
+                            ],
+                          )
+                        ],
+                      ),
+                      SizedBox(
+                        height: 16,
+                      ),
+                    ],
+                  ),
                 ),
                 secondRow(widget.orderHistoryData)
               ],
@@ -280,8 +445,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                       fontWeight: FontWeight.w400,
                                     )),
                               ),
-                              Text(
-                                  "${AppConstant.currency} ${int.parse('120')}",
+                              Text("${AppConstant.currency} ${_totalPrice}",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 16,
@@ -310,13 +474,13 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                   Text(
                                       "${AppConstant.currency} ${orderHistoryData.cartSaving != null ? orderHistoryData.cartSaving : '0.00'}",
                                       style: TextStyle(
-                                          color: Colors.black,
+                                          color: Color(0xff74BA33),
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500))
                                 ],
                               ))),
                       Visibility(
-                          visible: orderHistoryData.discount != '0.00' ,
+                          visible: orderHistoryData.discount != '0.00',
                           child: Padding(
                               padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
@@ -336,7 +500,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                   Text(
                                       "${AppConstant.currency} ${orderHistoryData.discount != null ? orderHistoryData.discount : '0.00'}",
                                       style: TextStyle(
-                                          color: Colors.black,
+                                          color: Color(0xff74BA33),
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500))
                                 ],
@@ -370,7 +534,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                 ],
                               ))),
                       Visibility(
-                          visible: orderHistoryData.tax == "0.00" ? false : true,
+                          visible:
+                              orderHistoryData.tax == "0.00" ? false : true,
                           child: Padding(
                               padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
