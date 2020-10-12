@@ -905,6 +905,38 @@ class ApiController {
       return null;
     }
   }
+  static Future<GetOrderHistory> getOrderDetail(String orderID) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.orderDetailHistory;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    if (isNetworkAvailable) {
+      try {
+        request.fields.addAll({
+          "user_id": user.id,
+          "order_id": orderID,
+          "platform": Platform.isIOS ? "IOS" : "android",
+        });
+        print('--url===  $url');
+        print('--user.id=== ${user.id}');
+        final response =
+            await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        final parsed = json.decode(respStr);
+        print('--respStr===  $respStr');
+        GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
+        return getOrderHistory;
+      } catch (e) {
+        Utils.showToast(e.toString(), true);
+        return null;
+      }
+    } else {
+      Utils.showToast(AppConstant.noInternet, true);
+      return null;
+    }
+  }
 
   static Future<MobileVerified> mobileVerification(
       LoginMobile loginData) async {

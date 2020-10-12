@@ -114,7 +114,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   color: Colors.white,
                   margin: EdgeInsets.only(top: 10),
                   width: Utils.getDeviceWidth(context),
-//                  child: ProgressBar(),
+                  height: 200,
                 )
               ],
             ),
@@ -212,45 +212,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   }
 
   secondRow(OrderItems item) {
-    return Visibility(
-      visible: true,
-      child: Padding(
-        padding: EdgeInsets.only(bottom: 10, top: 20),
-        child: Visibility(
-          visible: item.status == "2" ? true : false,
-          child: Padding(
-            padding: EdgeInsets.only(left: 12.0, top: 5.0, right: 10.0),
-            child: Row(
-              children: <Widget>[
-                Text('Status : ',
-                    style: TextStyle(color: Color(0xFF7D8185), fontSize: 17)),
-                Padding(
-                  padding: EdgeInsets.only(left: 15.0),
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                        color: getStatusColor(item.status)),
-                  ),
-                ),
-                Visibility(
-                  visible: item.status == "2" ? true : false,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 5.0),
-                    child: Text(getStatus(item.status),
-                        style: TextStyle(
-                            color: Color(0xFF15282F),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
+    return Container();
   }
 
   bottomSheet(context) {

@@ -39,6 +39,7 @@ class OrderData {
   String address;
   List<OrderItems> orderItems;
   List<DeliveryAddress> deliveryAddress;
+  String rating;
 
   OrderData({
     this.orderId,
@@ -50,6 +51,7 @@ class OrderData {
     this.deliveryTimeSlot,
     this.orderDate,
     this.status,
+    this.rating,
     this.total,
     this.discount,
     this.checkout,
@@ -86,6 +88,7 @@ class OrderData {
     cartSaving = json['cart_saving'];
     couponType = json['coupon_type'];
     couponCode = json['coupon_code'];
+    rating = json['rating'];
     address = json['address'];
     if (json['order_items'] != null) {
       orderItems = new List<OrderItems>();
