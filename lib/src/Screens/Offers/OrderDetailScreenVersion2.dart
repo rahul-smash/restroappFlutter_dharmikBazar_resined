@@ -114,7 +114,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   color: Colors.white,
                   margin: EdgeInsets.only(top: 10),
                   width: Utils.getDeviceWidth(context),
-                  child: ProgressBar(),
+//                  child: ProgressBar(),
                 )
               ],
             ),
