@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:restroapp/src/UI/ProgressBar.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -27,11 +28,25 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   var mainContext;
   String deliverySlotDate = '';
 
+  String _totalCartSaving = '0';
+
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     deliverySlotDate = _generalizedDeliverySlotTime(widget.orderHistoryData);
+    calculateSaving();
+  }
+
+  calculateSaving() {
+    double _cartSaving = widget.orderHistoryData.cartSaving != null
+        ? double.parse(widget.orderHistoryData.cartSaving)
+        : 0;
+    double _couponDiscount = widget.orderHistoryData.discount != null
+        ? double.parse(widget.orderHistoryData.discount)
+        : 0;
+    double _totalSaving = _cartSaving + _couponDiscount;
+    _totalCartSaving =
+        _totalSaving != 0 ? _totalSaving.toStringAsFixed(2) : '0';
   }
 
   @override
@@ -114,8 +129,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   color: Colors.white,
                   margin: EdgeInsets.only(top: 10),
                   width: Utils.getDeviceWidth(context),
-                  height: 200,
-                )
+                  height: 120,
+                ),
+                secondRow(widget.orderHistoryData)
               ],
             ),
           ),
@@ -211,8 +227,359 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     );
   }
 
-  secondRow(OrderItems item) {
-    return Container();
+  secondRow(OrderData orderHistoryData) {
+    String itemText = orderHistoryData.orderItems.length > 1
+        ? '${orderHistoryData.orderItems.length} Items '
+        : '${orderHistoryData.orderItems.length} Item ';
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            itemText,
+            style: TextStyle(color: Colors.black, fontSize: 14),
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: orderHistoryData.orderItems.length,
+              itemBuilder: (context, index) {
+                return listItem(context, orderHistoryData, index);
+              }),
+          Container(
+            height: 3,
+            color: Color(0xFFE1E1E1),
+          ),
+          Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(bottom: 0, top: 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                          padding: EdgeInsets.only(top: 0, bottom: 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
+                              Flexible(
+                                child: Text('Total',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w400,
+                                    )),
+                              ),
+                              Text(
+                                  "${AppConstant.currency} ${int.parse('120')}",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500))
+                            ],
+                          )),
+                      Visibility(
+                          visible: orderHistoryData.cartSaving != null &&
+                              (orderHistoryData.cartSaving != '0.00'),
+                          child: Padding(
+                              padding: EdgeInsets.only(top: 16, bottom: 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Text('MRP Discount',
+                                        style: TextStyle(
+                                          color: Color(0xff74BA33),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
+                                  Text(
+                                      "${AppConstant.currency} ${orderHistoryData.cartSaving != null ? orderHistoryData.cartSaving : '0.00'}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500))
+                                ],
+                              ))),
+                      Visibility(
+                          visible: orderHistoryData.discount != '0.00' ,
+                          child: Padding(
+                              padding: EdgeInsets.only(top: 16, bottom: 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Text('Coupon Discount',
+                                        style: TextStyle(
+                                          color: Color(0xff74BA33),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
+                                  Text(
+                                      "${AppConstant.currency} ${orderHistoryData.discount != null ? orderHistoryData.discount : '0.00'}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500))
+                                ],
+                              ))),
+                      Visibility(
+                          visible: orderHistoryData.shippingCharges == "0.00"
+                              ? false
+                              : true,
+                          child: Padding(
+                              padding: EdgeInsets.only(top: 16, bottom: 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Text('Delivery Chargers',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
+                                  Text(
+                                      "${AppConstant.currency} ${orderHistoryData.shippingCharges}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500))
+                                ],
+                              ))),
+                      Visibility(
+                          visible: orderHistoryData.tax == "0.00" ? false : true,
+                          child: Padding(
+                              padding: EdgeInsets.only(top: 16, bottom: 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Text('Tax',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
+                                  Text(
+                                      "${AppConstant.currency} ${orderHistoryData.tax}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500))
+                                ],
+                              ))),
+                      Container(
+                        margin: EdgeInsets.only(top: 16, bottom: 16),
+                        color: Color(0xFFE1E1E1),
+                        height: 1,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: <Widget>[
+                          Flexible(
+                            child: Text('Payable Amount',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.w500,
+                                )),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: <Widget>[
+                              Text(
+                                  "${AppConstant.currency} ${orderHistoryData.total}",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w500)),
+                              Visibility(
+                                visible:
+                                    !(_totalCartSaving.compareTo('0') == 0),
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: 3),
+                                  child: Text(
+                                      "Cart Saving ${AppConstant.currency} ${_totalCartSaving}",
+                                      style: TextStyle(
+                                          color: Color(0xff74BA33),
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w400)),
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget listItem(
+      BuildContext context, OrderData cardOrderHistoryItems, int index) {
+    return Container(
+      color: Colors.white,
+      padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Flexible(
+                child: Text(
+                    '${cardOrderHistoryItems.orderItems[index].productName}',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 16)),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Container(
+                      margin: EdgeInsets.only(right: 3),
+                      padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Color(0xFFE6E6E6)),
+                        color: Color(0xFFE6E6E6),
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      ),
+                      child: Text(
+                          '${cardOrderHistoryItems.orderItems[index].quantity}',
+                          style: TextStyle(color: Colors.black, fontSize: 12))),
+                  Text('X ${cardOrderHistoryItems.orderItems[index].price}',
+                      style: TextStyle(
+                        color: Color(0xFF818387),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w300,
+                      )),
+                ],
+              ),
+            ],
+          ),
+          Padding(
+            padding: EdgeInsets.only(bottom: 0, top: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Flexible(
+                      child: Text(
+                          'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
+                          style: TextStyle(
+                            color: Color(0xFF818387),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w300,
+                          )),
+                    ),
+                    Text(
+                        "${AppConstant.currency} ${int.parse(cardOrderHistoryItems.orderItems[index].quantity) * double.parse(cardOrderHistoryItems.orderItems[index].price)}",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500))
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(top: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Visibility(
+                        visible: true,
+                        child: Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: InkWell(
+                            child: RatingBar(
+                              initialRating: 1,
+                              minRating: 1,
+                              itemSize: 26,
+                              direction: Axis.horizontal,
+                              allowHalfRating: true,
+                              itemCount: 5,
+                              itemPadding:
+                                  EdgeInsets.symmetric(horizontal: 2.0),
+                              itemBuilder: (context, _) => Icon(
+                                Icons.star,
+                                color: orangeColor,
+                              ),
+                              ignoreGestures: true,
+                              onRatingUpdate: (rating) {},
+                            ),
+                            onTap: () {
+                              bottomSheet(context);
+                            },
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          Visibility(
+            visible: index != cardOrderHistoryItems.orderItems.length - 1,
+            child: Container(
+              color: Color(0xFFE1E1E1),
+              height: 1,
+            ),
+          )
+        ],
+      ),
+    );
   }
 
   bottomSheet(context) {
