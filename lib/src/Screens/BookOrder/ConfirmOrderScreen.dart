@@ -840,6 +840,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void calculateTotalSavings() {
     //calculate total savings
     totalMRpPrice = 0;
+    totalSavings = 0;
     if (widget.cartList != null && widget.cartList.isNotEmpty) {
       for (Product product in widget.cartList) {
         if (product != null &&
