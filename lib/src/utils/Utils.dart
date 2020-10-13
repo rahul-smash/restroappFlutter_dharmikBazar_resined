@@ -344,6 +344,23 @@ class Utils {
     return formatted;
   }
 
+  static convertOrderDate(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM, yyyy');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
   static convertNotificationDateTime(String date, {bool onlyTime = false}) {
     String formatted = date;
     try {

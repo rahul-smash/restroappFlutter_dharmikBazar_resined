@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -38,19 +39,26 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   }
 
   calculateSaving() {
-    double _cartSaving = widget.orderHistoryData.cartSaving != null
-        ? double.parse(widget.orderHistoryData.cartSaving)
-        : 0;
-    double _couponDiscount = widget.orderHistoryData.discount != null
-        ? double.parse(widget.orderHistoryData.discount)
-        : 0;
-    double _totalSaving = _cartSaving + _couponDiscount;
-    _totalCartSaving =
-        _totalSaving != 0 ? _totalSaving.toStringAsFixed(2) : '0';
-    double _totalPriceVar =
-        double.parse(widget.orderHistoryData.total) + _totalSaving;
+    try {
+      double _cartSaving = widget.orderHistoryData.cartSaving != null
+          ? double.parse(widget.orderHistoryData.cartSaving)
+          : 0;
+      double _couponDiscount = widget.orderHistoryData.discount != null
+          ? double.parse(widget.orderHistoryData.discount)
+          : 0;
+      double _totalSaving = _cartSaving + _couponDiscount;
+      _totalCartSaving =
+          _totalSaving != 0 ? _totalSaving.toStringAsFixed(2) : '0';
+      double _totalPriceVar =
+          double.parse(widget.orderHistoryData.total) + _totalSaving;
 
-    _totalPrice = _totalPriceVar.toString();
+      _totalPrice = _totalPriceVar.toString();
+    } catch (e) {
+      double _totalPriceVar = double.parse(widget.orderHistoryData.total);
+
+      _totalPrice = _totalPriceVar.toString();
+      print(e.toString());
+    }
   }
 
   @override
@@ -144,152 +152,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                       SizedBox(
                         height: 16,
                       ),
-                      Stack(
-                        children: <Widget>[
-                          Container(
-                            height: 25,
-                            margin: EdgeInsets.only(left: 4, top: 5),
-                            width: 2,
-                            child: LinearProgressIndicator(
-                              backgroundColor: grayLightColor,
-                              value: 100,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(appTheme),
-                            ),
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10 / 2),
-                                    color: appTheme),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Expanded(
-                                  child: Text(
-                                'Order Placed',
-                                style: TextStyle(fontSize: 16),
-                              )),
-                              Text('12-Oct-2020')
-                            ],
-                          )
-                        ],
-                      ),
-                      Stack(
-                        children: <Widget>[
-                          Container(
-                            height: 30,
-                            margin: EdgeInsets.only(
-                              left: 4,
-                            ),
-                            width: 2,
-                            child: LinearProgressIndicator(
-                              backgroundColor: grayLightColor,
-                              value: 100,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(appTheme),
-                            ),
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10 / 2),
-                                    color: appTheme),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Expanded(
-                                  child: Text(
-                                'Order Confirmed',
-                                style: TextStyle(fontSize: 16),
-                              )),
-                              Text('Pending')
-                            ],
-                          )
-                        ],
-                      ),
-                      Stack(
-                        children: <Widget>[
-                          Container(
-                            height: 30,
-                            margin: EdgeInsets.only(
-                              left: 4,
-                            ),
-                            width: 2,
-                            child: LinearProgressIndicator(
-                              backgroundColor: grayLightColor,
-                              value: 100,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(appTheme),
-                            ),
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10 / 2),
-                                    color: appTheme),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Expanded(
-                                  child: Text(
-                                'Order Confirmed',
-                                style: TextStyle(fontSize: 16),
-                              )),
-                              Text('Pending')
-                            ],
-                          )
-                        ],
-                      ),
-                      Stack(
-                        children: <Widget>[
-                          Container(
-                            height: 15,
-                            margin: EdgeInsets.only(
-                              left: 4,
-                            ),
-                            width: 2,
-                            child: LinearProgressIndicator(
-                              backgroundColor: grayLightColor,
-                              value: 100,
-                              valueColor:
-                                  AlwaysStoppedAnimation<Color>(appTheme),
-                            ),
-                          ),
-                          Row(
-                            children: <Widget>[
-                              Container(
-                                width: 10,
-                                height: 10,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10 / 2),
-                                    color: appTheme),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Expanded(
-                                  child: Text(
-                                'Order Confirmed',
-                                style: TextStyle(fontSize: 16),
-                              )),
-                              Text('Pending')
-                            ],
-                          )
-                        ],
-                      ),
+                      _getTrackWidget(),
                       SizedBox(
                         height: 16,
                       ),
@@ -705,8 +568,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           padding: EdgeInsets.only(top: 5),
                           child: InkWell(
                             child: RatingBar(
-                              initialRating: 1,
-                              minRating: 1,
+                              initialRating: 0,
+                              minRating: 0,
                               itemSize: 26,
                               direction: Axis.horizontal,
                               allowHalfRating: true,
@@ -721,7 +584,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                               onRatingUpdate: (rating) {},
                             ),
                             onTap: () {
-                              bottomSheet(context);
+                              bottomSheet(context, cardOrderHistoryItems,  index);
                             },
                           ),
                         ),
@@ -747,243 +610,164 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     );
   }
 
-  bottomSheet(context) {
+  bottomSheet(context,OrderData cardOrderHistoryItems, int index) {
+    double _rating=0;
+    final commentController = TextEditingController();
     showModalBottomSheet(
         context: context,
-        isScrollControlled: false,
+        isScrollControlled: true,
         builder: (BuildContext bc) {
           return SafeArea(
             child: Container(
-              margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child: Wrap(
-                  //crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(
-                          left: screenWidth - 40, top: 5, bottom: 10),
-                      child: GestureDetector(
-                        onTap: () {
-                          Navigator.pop(mainContext);
-                        },
-                        child: Image.asset('images/close.png'),
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(15, 10, 15, 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Text('Item Price : ',
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600)),
-                          Text(
-                              "${AppConstant.currency} ${widget.orderHistoryData.checkout}",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.orderHistoryData.discount == "0.00" &&
-                              widget.orderHistoryData.shippingCharges == "0.00"
-                          ? false
-                          : true,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                        child: sheetDeviderLine(),
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.orderHistoryData.discount == "0.00"
-                          ? false
-                          : true,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text('Discount : ',
-                                style: TextStyle(
-                                    color: Color(0xFF737879), fontSize: 18)),
-                            Text(
-                                "${AppConstant.currency} ${widget.orderHistoryData.discount}",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.orderHistoryData.shippingCharges == "0.00"
-                          ? false
-                          : true,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text('Delivery Fee: ',
-                                style: TextStyle(
-                                    color: Color(0xFF737879), fontSize: 18)),
-                            Text(
-                                "${AppConstant.currency} ${widget.orderHistoryData.shippingCharges}",
-                                style: TextStyle(
-                                    color: Color(0xFF749A00),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible:
-                          widget.orderHistoryData.tax == "0.00" ? false : true,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text('Tax: ',
-                                style: TextStyle(
-                                    color: Color(0xFF737879), fontSize: 18)),
-                            Text(
-                                "${AppConstant.currency} ${widget.orderHistoryData.tax}",
-                                style: TextStyle(
-                                    color: Color(0xFF749A00),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.orderHistoryData.cartSaving != null &&
-                              widget.orderHistoryData.cartSaving.isNotEmpty
-                          ? true
-                          : false,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text('Cart Discount: ',
-                                style: TextStyle(
-                                    color: Color(0xFF737879), fontSize: 18)),
-                            Text(
-                                "${AppConstant.currency} ${widget.orderHistoryData.cartSaving}",
-                                style: TextStyle(
-                                    color: Color(0xFF749A00),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.orderHistoryData.couponCode != null &&
-                              widget.orderHistoryData.couponCode.isNotEmpty
-                          ? true
-                          : false,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text('Coupon Code Appied: ',
-                                style: TextStyle(
-                                    color: Color(0xFF737879), fontSize: 18)),
-                            Text("${widget.orderHistoryData.couponCode}",
-                                style: TextStyle(
-                                    color: Color(0xFF749A00),
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w600)),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.orderHistoryData.orderFacility == "Pickup"
-                          ? false
-                          : true,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
-                        child: bottomDeviderView(),
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.orderHistoryData.orderFacility == "Pickup"
-                          ? false
-                          : true,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 0),
-                        child: Text('Delivery Address',
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style:
-                                TextStyle(color: Colors.black, fontSize: 16)),
-                      ),
-                    ),
-                    Visibility(
-                      visible: widget.orderHistoryData.orderFacility == "Pickup"
-                          ? false
-                          : true,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(15, 10, 15, 20),
-                        child: Text(getDeliveryAddress(),
-                            style: TextStyle(
-                                color: Color(0xFF737879), fontSize: 16)),
-                      ),
-                    ),
-                    Container(
-                      height: 50,
-                      color: appTheme,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: <Widget>[
-                          Row(children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: 15.0, top: 4.0, bottom: 4),
-                              child: Text(
-                                "View Details",
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ),
-                            SizedBox(width: 6),
-                            Image.asset(
-                              "images/topArrow.png",
-                              width: 15,
-                              height: 15,
-                            ),
-                          ]),
-                          Padding(
-                            padding: EdgeInsets.only(
-                              right: 10.0,
-                            ),
-                            child: Text(
-                              " ${AppConstant.currency} ${widget.orderHistoryData.total}",
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700),
-                              textAlign: TextAlign.right,
+              color: Colors.white,
+                margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                child: Container(
+                  child: Wrap(children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                            child: Icon(
+                              Icons.cancel,
+                              color: Colors.grey,
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ]),
-            ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                        child: Text(
+                          "Rating",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Text(
+                        "(Select a start amount)",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 5),
+                        color: orangeColor,
+                        width: 50,
+                        height: 3,
+                      ),
+                      Padding(padding: EdgeInsets.only(top: 20),child:  Text(
+                        "Product Name",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Color(0xff797C82),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400),
+                      ),),
+                      Padding(padding: EdgeInsets.only(top: 5),child:  Text(
+                        "${cardOrderHistoryItems.orderItems[index].productName}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400),
+                      ),),
+                      SizedBox(height: 10,),
+                      RatingBar(
+                        initialRating: _rating,
+                        minRating: 0,
+                        itemSize: 35,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: orangeColor,
+                        ),
+                        onRatingUpdate: (rating) {
+                        },
+                      ),
+                      Container(
+                        height: 120,
+                        margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
+                        decoration: new BoxDecoration(
+                          color: grayLightColor,
+                          borderRadius:
+                              new BorderRadius.all(new Radius.circular(3.0)),
+//                          border: new Border.all(
+//                            color: Colors.grey,
+//                            width: 1.0,
+//                          ),
+                        ),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+                          child: TextField(
+                            textAlign: TextAlign.left,
+                            maxLength: 250,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            textCapitalization: TextCapitalization.sentences,
+                            controller: commentController,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(10.0),
+                              border: InputBorder.none,
+                              fillColor: grayLightColor,
+                              hintText: 'Write your Review...'
+                            ),
+                          ),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 0, bottom: 16,left: 16,right: 16),
+                        color: Color(0xFFE1E1E1),
+                        height: 1,
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 0, bottom: 16,left: 16,right: 16),
+                        decoration: BoxDecoration(
+                          color: Color(0xffF8F7FF),
+                          borderRadius:
+                              new BorderRadius.all(new Radius.circular(3.0)),
+                        ),
+                        height: 100,
+                        width: 120,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              width: 130,
+                              child: FlatButton(
+                                child: Text('Submit'),
+                                color: orangeColor,
+                                textColor: Colors.white,
+                                onPressed: () {
+                                  Utils.hideKeyboard(context);
+                                  Navigator.pop(
+                                      context, commentController.text.trim());
+                                },
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  )]),
+                )),
           );
         });
   }
@@ -1100,5 +884,983 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     }
 
     return formatted;
+  }
+
+  Widget _getTrackWidget() {
+    // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
+    // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
+
+    switch (widget.orderHistoryData.status) {
+      case '0':
+        return Column(
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 25,
+                  margin: EdgeInsets.only(left: 4, top: 5),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Placed',
+                      style: TextStyle(fontSize: 16),
+                    )),
+                    Text(
+                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 0,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: grayLightColorSecondary),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Confirmed',
+                      style: TextStyle(
+                          fontSize: 16, color: grayLightColorSecondary),
+                    )),
+                    Text(
+                      'Pending',
+                      style: TextStyle(
+                          color: grayLightColorSecondary, fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 0,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: grayLightColorSecondary),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Shipped',
+                      style: TextStyle(
+                          fontSize: 16, color: grayLightColorSecondary),
+                    )),
+                    Text(
+                      'Pending',
+                      style: TextStyle(
+                          color: grayLightColorSecondary, fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 15,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 0,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: grayLightColorSecondary),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Delivered',
+                      style: TextStyle(
+                          fontSize: 16, color: grayLightColorSecondary),
+                    )),
+                    Text(
+                      'Pending',
+                      style: TextStyle(
+                          color: grayLightColorSecondary, fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ],
+        );
+        break;
+      case '1':
+        return Column(
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 25,
+                  margin: EdgeInsets.only(left: 4, top: 5),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Placed',
+                      style: TextStyle(fontSize: 16),
+                    )),
+                    Text(
+                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Confirmed',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    )),
+                    Text(
+                      'Done',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 0,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: grayLightColorSecondary),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Shipped',
+                      style: TextStyle(
+                          fontSize: 16, color: grayLightColorSecondary),
+                    )),
+                    Text(
+                      'Pending',
+                      style: TextStyle(
+                          color: grayLightColorSecondary, fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 15,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 0,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: grayLightColorSecondary),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Delivered',
+                      style: TextStyle(
+                          fontSize: 16, color: grayLightColorSecondary),
+                    )),
+                    Text(
+                      'Pending',
+                      style: TextStyle(
+                          color: grayLightColorSecondary, fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ],
+        );
+        break;
+      case '2':
+        return Column(
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 25,
+                  margin: EdgeInsets.only(left: 4, top: 5),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Placed',
+                      style: TextStyle(fontSize: 16),
+                    )),
+                    Text(
+                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 15,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: Colors.red),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Rejected',
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                    )),
+                  ],
+                )
+              ],
+            ),
+          ],
+        );
+        break;
+      case '4':
+      case '7':
+        return Column(
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 25,
+                  margin: EdgeInsets.only(left: 4, top: 5),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Placed',
+                      style: TextStyle(fontSize: 16),
+                    )),
+                    Text(
+                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Confirmed',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    )),
+                    Text(
+                      'Done',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Shipped',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    )),
+                    Text(
+                      'Done',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 15,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 0,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: grayLightColorSecondary),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Delivered',
+                      style: TextStyle(
+                          fontSize: 16, color: grayLightColorSecondary),
+                    )),
+                    Text(
+                      'Pending',
+                      style: TextStyle(
+                          color: grayLightColorSecondary, fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ],
+        );
+        break;
+      case '5':
+        return Column(
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 25,
+                  margin: EdgeInsets.only(left: 4, top: 5),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Placed',
+                      style: TextStyle(fontSize: 16),
+                    )),
+                    Text(
+                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Confirmed',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    )),
+                    Text(
+                      'Done',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 30,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Shipped',
+                      style: TextStyle(
+                        fontSize: 16,
+                      ),
+                    )),
+                    Text(
+                      'Done',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 15,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Delivered',
+                      style: TextStyle(fontSize: 16),
+                    )),
+                    Text(
+                      'Done',
+                      style: TextStyle(fontSize: 16),
+                    )
+                  ],
+                )
+              ],
+            ),
+          ],
+        );
+        break;
+      case '6':
+        return Column(
+          children: <Widget>[
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 25,
+                  margin: EdgeInsets.only(left: 4, top: 5),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: appTheme),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Placed',
+                      style: TextStyle(fontSize: 16),
+                    )),
+                    Text(
+                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
+                  ],
+                )
+              ],
+            ),
+            Stack(
+              children: <Widget>[
+                Container(
+                  height: 15,
+                  margin: EdgeInsets.only(
+                    left: 4,
+                  ),
+                  width: 2,
+                  child: LinearProgressIndicator(
+                    backgroundColor: grayLightColorSecondary,
+                    value: 100,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+                  ),
+                ),
+                Row(
+                  children: <Widget>[
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10 / 2),
+                          color: Colors.red),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Expanded(
+                        child: Text(
+                      'Order Cancelled',
+                      style: TextStyle(fontSize: 16, color: Colors.red),
+                    )),
+                  ],
+                )
+              ],
+            ),
+          ],
+        );
+        break;
+    }
+
+    return Column(
+      children: <Widget>[
+        Stack(
+          children: <Widget>[
+            Container(
+              height: 25,
+              margin: EdgeInsets.only(left: 4, top: 5),
+              width: 2,
+              child: LinearProgressIndicator(
+                backgroundColor: grayLightColorSecondary,
+                value: 100,
+                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+              ),
+            ),
+            Row(
+              children: <Widget>[
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10 / 2),
+                      color: appTheme),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                    child: Text(
+                  'Order Placed',
+                  style: TextStyle(fontSize: 16),
+                )),
+                Text(
+                    '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
+              ],
+            )
+          ],
+        ),
+        Stack(
+          children: <Widget>[
+            Container(
+              height: 30,
+              margin: EdgeInsets.only(
+                left: 4,
+              ),
+              width: 2,
+              child: LinearProgressIndicator(
+                backgroundColor: grayLightColorSecondary,
+                value: 0,
+                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+              ),
+            ),
+            Row(
+              children: <Widget>[
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10 / 2),
+                      color: grayLightColorSecondary),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                    child: Text(
+                  'Order Confirmed',
+                  style:
+                      TextStyle(fontSize: 16, color: grayLightColorSecondary),
+                )),
+                Text(
+                  'Pending',
+                  style:
+                      TextStyle(color: grayLightColorSecondary, fontSize: 16),
+                )
+              ],
+            )
+          ],
+        ),
+        Stack(
+          children: <Widget>[
+            Container(
+              height: 30,
+              margin: EdgeInsets.only(
+                left: 4,
+              ),
+              width: 2,
+              child: LinearProgressIndicator(
+                backgroundColor: grayLightColorSecondary,
+                value: 0,
+                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+              ),
+            ),
+            Row(
+              children: <Widget>[
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10 / 2),
+                      color: grayLightColorSecondary),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                    child: Text(
+                  'Order Shipped',
+                  style:
+                      TextStyle(fontSize: 16, color: grayLightColorSecondary),
+                )),
+                Text(
+                  'Pending',
+                  style:
+                      TextStyle(color: grayLightColorSecondary, fontSize: 16),
+                )
+              ],
+            )
+          ],
+        ),
+        Stack(
+          children: <Widget>[
+            Container(
+              height: 15,
+              margin: EdgeInsets.only(
+                left: 4,
+              ),
+              width: 2,
+              child: LinearProgressIndicator(
+                backgroundColor: grayLightColorSecondary,
+                value: 0,
+                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
+              ),
+            ),
+            Row(
+              children: <Widget>[
+                Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10 / 2),
+                      color: grayLightColorSecondary),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                    child: Text(
+                  'Order Delivered',
+                  style:
+                      TextStyle(fontSize: 16, color: grayLightColorSecondary),
+                )),
+                Text(
+                  'Pending',
+                  style:
+                      TextStyle(color: grayLightColorSecondary, fontSize: 16),
+                )
+              ],
+            )
+          ],
+        ),
+      ],
+    );
   }
 }

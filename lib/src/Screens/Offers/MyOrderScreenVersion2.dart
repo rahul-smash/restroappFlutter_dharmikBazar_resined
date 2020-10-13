@@ -196,6 +196,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
   }
 
   thirdRow(OrderData cardOrderHistoryItems, bool showOrderType) {
+    double _rating= cardOrderHistoryItems.rating!=null?double.parse(cardOrderHistoryItems.rating):0;
     return Padding(
       padding: EdgeInsets.only(top: 10),
       child: Row(
@@ -222,7 +223,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                             fontWeight: FontWeight.w400)),
                   )
                 ]),
-                Visibility(visible: false,child:  Padding(
+                Visibility(visible: _rating!=0,child:  Padding(
                   padding: EdgeInsets.only(top: 5),
                   child: Row(children: <Widget>[
                     RatingBar(
@@ -237,10 +238,11 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                         Icons.star,
                         color: orangeColor,
                       ),
+                      ignoreGestures: true,
                       onRatingUpdate: (rating) {
-                        setState(() {
-                          _rating = rating;
-                        });
+//                        setState(() {
+//                          _rating = rating;
+//                        });
                       },
                     ),
                     Container(
@@ -266,7 +268,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                   color: Color(0xFFFD5401),
                   borderRadius: BorderRadius.circular(5)),
               child: Text(
-                "View Order",
+              _getButtonStatus(cardOrderHistoryItems),
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -328,10 +330,17 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
     // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
     // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
     // status 1, 4, 0     =>show cancel btn
-    if (status == "0") {
-      return Color(0xFFA1BF4C);
-    } else {
-      return status == "1" ? Color(0xFFA0C057) : Color(0xFFCF0000);
+
+    switch(status){
+      case '0':
+      case '1':
+      case '4':
+      case '5':
+      case '7':
+      return Color(0xFFA1BF4C);break;
+      case '2':
+      case '6':
+      default:return Color(0xFFCF0000);
     }
   }
 
@@ -346,5 +355,33 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
         }
       });
     });
+  }
+
+  String _getButtonStatus(OrderData cardOrderHistoryItems) {
+    // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
+    // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
+    String title="View Order";
+    switch(cardOrderHistoryItems.status){
+      case '0':
+      case '1':
+      case '4':
+      title="Track Order";
+      break;
+      case '5':
+        if(cardOrderHistoryItems.rating!=null&&cardOrderHistoryItems.rating!='0'&&cardOrderHistoryItems.rating!='0.00'
+        &&cardOrderHistoryItems.rating!='0.0'){
+          title="View Order";
+        }else{
+          title="Rate Us";
+        }
+        break;
+      case '7':
+
+      case '2':
+      case '6':
+        title='View Order';
+        break;
+    }
+    return title;
   }
 }
