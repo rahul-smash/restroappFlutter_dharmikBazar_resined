@@ -34,8 +34,6 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
 
   String _totalCartSaving = '0', _totalPrice = '0';
   File _image;
-  PersistentBottomSheetController _controller; // <------ Instance variable
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   bool isLoading = true;
 
@@ -54,24 +52,24 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
 
     return ApiController.getOrderDetail(widget.orderHistoryData.orderId)
         .then((respone) {
-      setState(() {
-        if (respone != null &&
-            respone.success &&
-            respone.orders != null &&
-            respone.orders.isNotEmpty) {
-          widget.orderHistoryData = respone.orders.first;
-          deliverySlotDate =
-              _generalizedDeliverySlotTime(widget.orderHistoryData);
-          calculateSaving();
-        }
-        if (!isLoading) {
-          Utils.hideProgressDialog(context);
-        }
-        setState(() {
-          isLoading = false;
-          this.isLoading = isLoading;
-        });
-      });
+      if (respone != null &&
+          respone.success &&
+          respone.orders != null &&
+          respone.orders.isNotEmpty) {
+        widget.orderHistoryData = respone.orders.first;
+        deliverySlotDate =
+            _generalizedDeliverySlotTime(widget.orderHistoryData);
+        calculateSaving();
+      }
+
+      if (!isLoading) {
+        Utils.hideProgressDialog(context);
+      }
+      isLoading = false;
+      this.isLoading = isLoading;
+      if (mounted) {
+        setState(() {});
+      }
     });
   }
 
@@ -676,7 +674,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     double _rating = 0;
     _image = null;
     final commentController = TextEditingController();
-    _controller = await showModalBottomSheet(
+     await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         builder: (BuildContext bc) {
@@ -968,12 +966,17 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   }
 
   String _getAddress(OrderData orderHistoryData) {
-    String name = '${orderHistoryData.deliveryAddress.first.firstName}';
-    String address = ', ${orderHistoryData.address}';
-    String area = ', ${orderHistoryData.deliveryAddress.first.areaName}';
-    String city = ', ${orderHistoryData.deliveryAddress.first.city}';
-    String ZipCode = ', ${orderHistoryData.deliveryAddress.first.zipcode}';
-    return '$name$address$area$city$ZipCode';
+    if(orderHistoryData.deliveryAddress!=null&&orderHistoryData.deliveryAddress.isNotEmpty) {
+      String name = '${orderHistoryData.deliveryAddress.first.firstName}';
+      String address = ', ${orderHistoryData.deliveryAddress.first.address}';
+      String area = ', ${orderHistoryData.deliveryAddress.first.areaName}';
+      String city = ', ${orderHistoryData.deliveryAddress.first.city}';
+      String ZipCode = ', ${orderHistoryData.deliveryAddress.first.zipcode}';
+      return '$name$address$area$city$ZipCode';
+    }else{
+      String address = '${orderHistoryData.address}';
+      return address;
+    }
   }
 
   String _generalizedDeliverySlotTime(OrderData orderHistoryData) {

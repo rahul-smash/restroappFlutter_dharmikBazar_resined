@@ -26,8 +26,6 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
   List<OrderData> ordersList = List();
   bool isLoading;
 
-  double _rating = 1;
-
   @override
   void initState() {
     super.initState();
@@ -347,6 +345,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
   Future<Null> getOrderListApi() {
     isLoading = true;
     return ApiController.getOrderHistory().then((respone) {
+      if(mounted)
       setState(() {
         isLoading = false;
         ordersList = respone.orders;

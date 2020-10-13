@@ -9,6 +9,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -252,20 +253,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           onPressed: () => Navigator.pop(context, false),
         ),
         actions: <Widget>[
-          InkWell(
-            onTap: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            child: Padding(
-              padding:
-                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
-              child: Icon(
-                Icons.home,
-                color: Colors.white,
-                size: 30,
-              ),
-            ),
-          ),
+//          InkWell(
+//            onTap: () {
+//              Navigator.of(context).popUntil((route) => route.isFirst);
+//            },
+//            child: Padding(
+//              padding:
+//                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+//              child: Icon(
+//                Icons.home,
+//                color: Colors.white,
+//                size: 30,
+//              ),
+//            ),
+//          ),
         ],
       ),
       body: Column(
@@ -2132,6 +2133,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 eventBus.fire(updateCartCount());
                 Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(storeModel)),
+                );
               }
             } else {
               bool result = await DialogUtils.displayThankYouDialog(context,
@@ -2140,6 +2145,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 eventBus.fire(updateCartCount());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(storeModel)),
+                );
               }
             }
           });
@@ -2387,7 +2396,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         taxModel != null) {
       shippingCharges = '0';
       taxModel.total = '0';
-      totalPrice=0;
+      totalPrice = 0;
     }
     if (mounted) {
       setState(() {});

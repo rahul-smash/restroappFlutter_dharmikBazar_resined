@@ -406,7 +406,7 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
-                              child: Text('OK'),
+                              child: Text('Rate your purchase'),
                               color: orangeColor,
                               textColor: Colors.white,
                               onPressed: () {
@@ -548,7 +548,7 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
-                              child: Text('OK'),
+                              child: Text('Rate your purchase'),
                               color: orangeColor,
                               textColor: Colors.white,
                               onPressed: () {
