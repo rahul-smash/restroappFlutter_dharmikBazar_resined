@@ -760,7 +760,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                               minRating: 0,
                               itemSize: 35,
                               direction: Axis.horizontal,
-                              allowHalfRating: true,
+                              allowHalfRating: false,
                               itemCount: 5,
                               itemPadding:
                                   EdgeInsets.symmetric(horizontal: 2.0),
