@@ -25,10 +25,13 @@ class MyOrderScreenVersion2 extends StatefulWidget {
 class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
   List<OrderData> ordersList = List();
   bool isLoading;
+  bool isRatingEnable = false;
 
   @override
   void initState() {
     super.initState();
+    isRatingEnable = widget.store.reviewRatingDisplay != null &&
+        widget.store.reviewRatingDisplay.compareTo('1') == 0;
     getOrderListApi();
   }
 
@@ -81,7 +84,8 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => OrderDetailScreenVersion2(cardOrderHistoryItems),
+            builder: (context) =>
+                OrderDetailScreenVersion2(cardOrderHistoryItems,isRatingEnable),
           ),
         );
       },
@@ -194,7 +198,9 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
   }
 
   thirdRow(OrderData cardOrderHistoryItems, bool showOrderType) {
-    double _rating= cardOrderHistoryItems.rating!=null?double.parse(cardOrderHistoryItems.rating):0;
+    double _rating = cardOrderHistoryItems.rating != null
+        ? double.parse(cardOrderHistoryItems.rating)
+        : 0;
     return Padding(
       padding: EdgeInsets.only(top: 10),
       child: Row(
@@ -221,41 +227,45 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                             fontWeight: FontWeight.w400)),
                   )
                 ]),
-                Visibility(visible: _rating!=0,child:  Padding(
-                  padding: EdgeInsets.only(top: 5),
-                  child: Row(children: <Widget>[
-                    RatingBar(
-                      initialRating: _rating,
-                      minRating: 1,
-                      itemSize: 26,
-                      direction: Axis.horizontal,
-                      allowHalfRating: true,
-                      itemCount: 5,
-                      itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
-                      itemBuilder: (context, _) => Icon(
-                        Icons.star,
-                        color: orangeColor,
-                      ),
-                      ignoreGestures: true,
-                      onRatingUpdate: (rating) {
-//                        setState(() {
-//                          _rating = rating;
-//                        });
-                      },
-                    ),
-                    Container(
-                        margin: EdgeInsets.only(left: 6),
-                        padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0xFFE6E6E6)),
-                          color: Color(0xFFE6E6E6),
-                          borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                Visibility(
+                  visible: isRatingEnable &&
+                      cardOrderHistoryItems.status == '5' &&
+                      _rating != 0,
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 5),
+                    child: Row(children: <Widget>[
+                      RatingBar(
+                        initialRating: _rating,
+                        minRating: 1,
+                        itemSize: 26,
+                        direction: Axis.horizontal,
+                        allowHalfRating: true,
+                        itemCount: 5,
+                        itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
+                        itemBuilder: (context, _) => Icon(
+                          Icons.star,
+                          color: orangeColor,
                         ),
-                        child: Text('${_rating}',
-                            style: TextStyle(
-                                color: Color(0xFF39444D), fontWeight: FontWeight.w500,fontSize: 13)))
-                  ]),
-                ),)
+                        ignoreGestures: true,
+                        onRatingUpdate: (rating) {},
+                      ),
+                      Container(
+                          margin: EdgeInsets.only(left: 6),
+                          padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xFFE6E6E6)),
+                            color: Color(0xFFE6E6E6),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0)),
+                          ),
+                          child: Text('${_rating}',
+                              style: TextStyle(
+                                  color: Color(0xFF39444D),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 13)))
+                    ]),
+                  ),
+                )
               ],
             ),
           ),
@@ -266,7 +276,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                   color: Color(0xFFFD5401),
                   borderRadius: BorderRadius.circular(5)),
               child: Text(
-              _getButtonStatus(cardOrderHistoryItems),
+                _getButtonStatus(cardOrderHistoryItems),
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
@@ -329,56 +339,63 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
     // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
     // status 1, 4, 0     =>show cancel btn
 
-    switch(status){
+    switch (status) {
       case '0':
       case '1':
       case '4':
       case '5':
       case '7':
-      return Color(0xFFA1BF4C);break;
+        return Color(0xFFA1BF4C);
+        break;
       case '2':
       case '6':
-      default:return Color(0xFFCF0000);
+      default:
+        return Color(0xFFCF0000);
     }
   }
 
   Future<Null> getOrderListApi() {
     isLoading = true;
     return ApiController.getOrderHistory().then((respone) {
-      if(mounted)
-      setState(() {
-        isLoading = false;
-        ordersList = respone.orders;
-        if (ordersList.isEmpty) {
-          //Utils.showToast("No data found!", false);
-        }
-      });
+      if (mounted)
+        setState(() {
+          isLoading = false;
+          ordersList = respone.orders;
+          if (ordersList.isEmpty) {
+            //Utils.showToast("No data found!", false);
+          }
+        });
     });
   }
 
   String _getButtonStatus(OrderData cardOrderHistoryItems) {
     // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
     // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
-    String title="View Order";
-    switch(cardOrderHistoryItems.status){
+    String title = "View Order";
+    switch (cardOrderHistoryItems.status) {
       case '0':
       case '1':
       case '4':
-      title="Track Order";
-      break;
+        if (cardOrderHistoryItems.orderFacility.toLowerCase().contains('pick')) {
+          title = "View Order";
+        } else
+          title = "Track Order";
+        break;
       case '5':
-        if(cardOrderHistoryItems.rating!=null&&cardOrderHistoryItems.rating!='0'&&cardOrderHistoryItems.rating!='0.00'
-        &&cardOrderHistoryItems.rating!='0.0'){
-          title="View Order";
-        }else{
-          title="Rate Us";
+        if (cardOrderHistoryItems.rating != null &&
+            cardOrderHistoryItems.rating != '0' &&
+            cardOrderHistoryItems.rating != '0.00' &&
+            cardOrderHistoryItems.rating != '0.0') {
+          title = "View Order";
+        } else {
+          title = "Rate Us";
         }
         break;
       case '7':
 
       case '2':
       case '6':
-        title='View Order';
+        title = 'View Order';
         break;
     }
     return title;

@@ -253,20 +253,40 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           onPressed: () => Navigator.pop(context, false),
         ),
         actions: <Widget>[
-//          InkWell(
-//            onTap: () {
-//              Navigator.of(context).popUntil((route) => route.isFirst);
-//            },
-//            child: Padding(
-//              padding:
-//                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
-//              child: Icon(
-//                Icons.home,
-//                color: Colors.white,
-//                size: 30,
-//              ),
-//            ),
-//          ),
+          InkWell(
+            onTap: () async {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+//              bool result =
+//                  await DialogUtils.displayPickUpDialog(context, storeModel);
+//              if (result == true) {
+//                //print("==result== ${result}");
+//                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+//                Navigator.of(context).popUntil((route) => route.isFirst);
+//                eventBus.fire(updateCartCount());
+//                DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
+//                    double.parse(storeModel.lng));
+//              } else {
+//                //print("==result== ${result}");
+//                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+//                eventBus.fire(updateCartCount());
+//                Navigator.of(context).popUntil((route) => route.isFirst);
+//                Navigator.push(
+//                  context,
+//                  MaterialPageRoute(
+//                      builder: (context) => MyOrderScreenVersion2(storeModel)),
+//                );
+//              }
+            },
+            child: Padding(
+              padding:
+                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+              child: Icon(
+                Icons.home,
+                color: Colors.white,
+                size: 30,
+              ),
+            ),
+          ),
         ],
       ),
       body: Column(
@@ -2133,10 +2153,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 eventBus.fire(updateCartCount());
                 Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(storeModel)),
-                );
+//                Navigator.push(
+//                  context,
+//                  MaterialPageRoute(
+//                      builder: (context) => MyOrderScreenVersion2(storeModel)),
+//                );
               }
             } else {
               bool result = await DialogUtils.displayThankYouDialog(context,
@@ -2145,10 +2166,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 eventBus.fire(updateCartCount());
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(storeModel)),
-                );
+//                Navigator.push(
+//                  context,
+//                  MaterialPageRoute(
+//                      builder: (context) => MyOrderScreenVersion2(storeModel)),
+//                );
               }
             }
           });
