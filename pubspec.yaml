@@ -56,7 +56,7 @@ dependencies:
   flutter_inappwebview: ^4.0.0+4
   flutter_open_whatsapp: ^0.1.2
   flutter_rating_bar: ^3.0.1+1
-  image_picker: ^0.6.0+9
+  image_picker: ^0.6.7+11
   compressimage: ^0.1.1
 
 dev_dependencies:
@@ -129,6 +129,7 @@ flutter:
     - images/empty_cart.png
     - images/gifticon.png
     - images/whatsapp.png
+    - images/placeHolder.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

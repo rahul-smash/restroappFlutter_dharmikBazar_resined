@@ -1,12 +1,15 @@
+import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:restroapp/src/UI/ProgressBar.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -14,7 +17,7 @@ import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class OrderDetailScreenVersion2 extends StatefulWidget {
-  final OrderData orderHistoryData;
+  OrderData orderHistoryData;
 
   OrderDetailScreenVersion2(this.orderHistoryData);
 
@@ -30,12 +33,46 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   String deliverySlotDate = '';
 
   String _totalCartSaving = '0', _totalPrice = '0';
+  File _image;
+  PersistentBottomSheetController _controller; // <------ Instance variable
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  bool isLoading = true;
+
+  String userId = ''; // <---- Another instance variable
 
   @override
   void initState() {
     super.initState();
-    deliverySlotDate = _generalizedDeliverySlotTime(widget.orderHistoryData);
-    calculateSaving();
+    getOrderListApi();
+  }
+
+  Future<Null> getOrderListApi({bool isLoading = true}) async {
+    this.isLoading = isLoading;
+    UserModel user = await SharedPrefs.getUser();
+    userId = user.id;
+
+    return ApiController.getOrderDetail(widget.orderHistoryData.orderId)
+        .then((respone) {
+      setState(() {
+        if (respone != null &&
+            respone.success &&
+            respone.orders != null &&
+            respone.orders.isNotEmpty) {
+          widget.orderHistoryData = respone.orders.first;
+          deliverySlotDate =
+              _generalizedDeliverySlotTime(widget.orderHistoryData);
+          calculateSaving();
+        }
+        if (!isLoading) {
+          Utils.hideProgressDialog(context);
+        }
+        setState(() {
+          isLoading = false;
+          this.isLoading = isLoading;
+        });
+      });
+    });
   }
 
   calculateSaving() {
@@ -71,101 +108,123 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     String orderFacility = widget.orderHistoryData.orderFacility != null
         ? '${widget.orderHistoryData.orderFacility}, '
         : '';
-    return new Scaffold(
-      backgroundColor: Color(0xffDCDCDC),
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Order - ${widget.orderHistoryData.displayOrderId}',
-              style: TextStyle(),
-              textAlign: TextAlign.left,
+    return isLoading
+        ? Scaffold(
+            appBar: AppBar(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Order Details',
+                    style: TextStyle(),
+                    textAlign: TextAlign.left,
+                  ),
+                ],
+              ),
+              centerTitle: false,
             ),
-            Text(
-              '$orderFacility$itemText${AppConstant.currency} ${widget.orderHistoryData.total}',
-              style: TextStyle(fontSize: 13),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-            ),
-          ],
-        ),
-        centerTitle: false,
-        actions: <Widget>[
-          Visibility(
-            visible: showCancelButton(widget.orderHistoryData.status),
-            child: InkWell(
-                onTap: () async {
-                  var results = await DialogUtils.displayDialog(context,
-                      "Cancel Order?", AppConstant.cancelOrder, "Cancel", "OK");
-                  if (results == true) {
-                    Utils.showProgressDialog(context);
-                    CancelOrderModel cancelOrder =
-                        await ApiController.orderCancelApi(
-                            widget.orderHistoryData.orderId);
-                    if (cancelOrder != null && cancelOrder.success) {
-                      setState(() {
-                        widget.orderHistoryData.status = '6';
-                      });
-                    }
-                    try {
-                      Utils.showToast("${cancelOrder.data}", false);
-                    } catch (e) {
-                      print(e);
-                    }
-                    Utils.hideProgressDialog(context);
-                    eventBus.fire(refreshOrderHistory());
-                  }
-                },
-                child: Center(
-                  child: Padding(
-                      padding: EdgeInsets.only(right: 16, left: 16),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w400),
-                      )),
-                )),
+            body: Center(child: CircularProgressIndicator()),
           )
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            color: Color(0xffDCDCDC),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                firstRow(widget.orderHistoryData),
-                Container(
-                  color: Colors.white,
-                  margin: EdgeInsets.only(top: 5),
-                  padding: EdgeInsets.all(16),
-                  width: Utils.getDeviceWidth(context),
+        : new Scaffold(
+            backgroundColor: Color(0xffDCDCDC),
+            appBar: AppBar(
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(
+                    'Order - ${widget.orderHistoryData.displayOrderId}',
+                    style: TextStyle(),
+                    textAlign: TextAlign.left,
+                  ),
+                  Text(
+                    '$orderFacility$itemText${AppConstant.currency} ${widget.orderHistoryData.total}',
+                    style: TextStyle(fontSize: 13),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                  ),
+                ],
+              ),
+              centerTitle: false,
+              actions: <Widget>[
+                Visibility(
+                  visible: showCancelButton(widget.orderHistoryData.status),
+                  child: InkWell(
+                      onTap: () async {
+                        var results = await DialogUtils.displayDialog(
+                            context,
+                            "Cancel Order?",
+                            AppConstant.cancelOrder,
+                            "Cancel",
+                            "OK");
+                        if (results == true) {
+                          Utils.showProgressDialog(context);
+                          CancelOrderModel cancelOrder =
+                              await ApiController.orderCancelApi(
+                                  widget.orderHistoryData.orderId);
+                          if (cancelOrder != null && cancelOrder.success) {
+                            setState(() {
+                              widget.orderHistoryData.status = '6';
+                            });
+                          }
+                          try {
+                            Utils.showToast("${cancelOrder.data}", false);
+                          } catch (e) {
+                            print(e);
+                          }
+//                          Utils.hideProgressDialog(context);
+                          eventBus.fire(refreshOrderHistory());
+                          getOrderListApi(isLoading: false);
+                        }
+                      },
+                      child: Center(
+                        child: Padding(
+                            padding: EdgeInsets.only(right: 16, left: 16),
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                  fontSize: 14, fontWeight: FontWeight.w400),
+                            )),
+                      )),
+                )
+              ],
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Container(
+                  color: Color(0xffDCDCDC),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        'Track Order',
-                        style: TextStyle(fontSize: 18),
+                      firstRow(widget.orderHistoryData),
+                      Container(
+                        color: Colors.white,
+                        margin: EdgeInsets.only(top: 5),
+                        padding: EdgeInsets.all(16),
+                        width: Utils.getDeviceWidth(context),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              'Track Order',
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            SizedBox(
+                              height: 16,
+                            ),
+                            _getTrackWidget(),
+                            SizedBox(
+                              height: 16,
+                            ),
+                          ],
+                        ),
                       ),
-                      SizedBox(
-                        height: 16,
-                      ),
-                      _getTrackWidget(),
-                      SizedBox(
-                        height: 16,
-                      ),
+                      secondRow(widget.orderHistoryData)
                     ],
                   ),
                 ),
-                secondRow(widget.orderHistoryData)
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
   }
 
   Widget firstRow(OrderData orderHistoryData) {
@@ -480,6 +539,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
 
   Widget listItem(
       BuildContext context, OrderData cardOrderHistoryItems, int index) {
+    double findRating = _findRating(cardOrderHistoryItems, index);
     return Container(
       color: Colors.white,
       padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -568,7 +628,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           padding: EdgeInsets.only(top: 5),
                           child: InkWell(
                             child: RatingBar(
-                              initialRating: 0,
+                              initialRating: findRating,
                               minRating: 0,
                               itemSize: 26,
                               direction: Axis.horizontal,
@@ -584,7 +644,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                               onRatingUpdate: (rating) {},
                             ),
                             onTap: () {
-                              bottomSheet(context, cardOrderHistoryItems,  index);
+                              if (findRating == 0)
+                                bottomSheet(
+                                    context, cardOrderHistoryItems, index);
                             },
                           ),
                         ),
@@ -610,163 +672,214 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     );
   }
 
-  bottomSheet(context,OrderData cardOrderHistoryItems, int index) {
-    double _rating=0;
+  bottomSheet(context, OrderData cardOrderHistoryItems, int index) async {
+    double _rating = 0;
+    _image = null;
     final commentController = TextEditingController();
-    showModalBottomSheet(
+    _controller = await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
         builder: (BuildContext bc) {
           return SafeArea(
             child: Container(
-              color: Colors.white,
+                color: Colors.white,
                 margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
                 child: Container(
                   child: Wrap(children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
-                            child: Icon(
-                              Icons.cancel,
-                              color: Colors.grey,
+                    Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                              child: Icon(
+                                Icons.cancel,
+                                color: Colors.grey,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                        child: Text(
-                          "Rating",
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                          child: Text(
+                            "Rating",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        Text(
+                          "(Select a start amount)",
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400),
                         ),
-                      ),
-                      Text(
-                        "(Select a start amount)",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 5),
-                        color: orangeColor,
-                        width: 50,
-                        height: 3,
-                      ),
-                      Padding(padding: EdgeInsets.only(top: 20),child:  Text(
-                        "Product Name",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Color(0xff797C82),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400),
-                      ),),
-                      Padding(padding: EdgeInsets.only(top: 5),child:  Text(
-                        "${cardOrderHistoryItems.orderItems[index].productName}",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400),
-                      ),),
-                      SizedBox(height: 10,),
-                      RatingBar(
-                        initialRating: _rating,
-                        minRating: 0,
-                        itemSize: 35,
-                        direction: Axis.horizontal,
-                        allowHalfRating: true,
-                        itemCount: 5,
-                        itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
-                        itemBuilder: (context, _) => Icon(
-                          Icons.star,
+                        Container(
+                          margin: EdgeInsets.only(top: 5),
                           color: orangeColor,
+                          width: 50,
+                          height: 3,
                         ),
-                        onRatingUpdate: (rating) {
-                        },
-                      ),
-                      Container(
-                        height: 120,
-                        margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
-                        decoration: new BoxDecoration(
-                          color: grayLightColor,
-                          borderRadius:
-                              new BorderRadius.all(new Radius.circular(3.0)),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text(
+                            "Product Name",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff797C82),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: Text(
+                            "${cardOrderHistoryItems.orderItems[index].productName}",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        RatingBar(
+                          initialRating: _rating,
+                          minRating: 0,
+                          itemSize: 35,
+                          direction: Axis.horizontal,
+                          allowHalfRating: true,
+                          itemCount: 5,
+                          itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: orangeColor,
+                          ),
+                          onRatingUpdate: (rating) {
+                            _rating = rating;
+                          },
+                        ),
+                        Container(
+                          height: 120,
+                          margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
+                          decoration: new BoxDecoration(
+                            color: grayLightColor,
+                            borderRadius:
+                                new BorderRadius.all(new Radius.circular(3.0)),
 //                          border: new Border.all(
 //                            color: Colors.grey,
 //                            width: 1.0,
 //                          ),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
-                          child: TextField(
-                            textAlign: TextAlign.left,
-                            maxLength: 250,
-                            keyboardType: TextInputType.multiline,
-                            maxLines: null,
-                            textCapitalization: TextCapitalization.sentences,
-                            controller: commentController,
-                            decoration: InputDecoration(
-                              contentPadding: EdgeInsets.all(10.0),
-                              border: InputBorder.none,
-                              fillColor: grayLightColor,
-                              hintText: 'Write your Review...'
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+                            child: TextField(
+                              textAlign: TextAlign.left,
+                              maxLength: 250,
+                              keyboardType: TextInputType.multiline,
+                              maxLines: null,
+                              textCapitalization: TextCapitalization.sentences,
+                              controller: commentController,
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  border: InputBorder.none,
+                                  fillColor: grayLightColor,
+                                  hintText: 'Write your Review...'),
                             ),
                           ),
                         ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 0, bottom: 16,left: 16,right: 16),
-                        color: Color(0xFFE1E1E1),
-                        height: 1,
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 0, bottom: 16,left: 16,right: 16),
-                        decoration: BoxDecoration(
-                          color: Color(0xffF8F7FF),
-                          borderRadius:
-                              new BorderRadius.all(new Radius.circular(3.0)),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: 0, bottom: 16, left: 16, right: 16),
+                          color: Color(0xFFE1E1E1),
+                          height: 1,
                         ),
-                        height: 100,
-                        width: 120,
-                      ),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Container(
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              width: 130,
-                              child: FlatButton(
-                                child: Text('Submit'),
-                                color: orangeColor,
-                                textColor: Colors.white,
-                                onPressed: () {
-                                  Utils.hideKeyboard(context);
-                                  Navigator.pop(
-                                      context, commentController.text.trim());
-                                },
+                        Container(
+                          width: double.maxFinite,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              InkWell(
+                                  onTap: () {
+                                    showAlertDialog(context);
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                        top: 0, bottom: 6, left: 16, right: 16),
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            "images/placeHolder.png"),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    height: 100,
+                                    width: 120,
+                                    child: _image != null
+                                        ? Image.file(
+                                            _image,
+                                            fit: BoxFit.scaleDown,
+                                          )
+                                        : null,
+                                  )),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, left: 18, bottom: 30),
+                                child: Text(
+                                  "File Size limit - 1MB",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400),
+                                ),
                               ),
-                            )
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  )]),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                width: 130,
+                                child: FlatButton(
+                                  child: Text('Submit'),
+                                  color: orangeColor,
+                                  textColor: Colors.white,
+                                  onPressed: () {
+                                    if (_rating == 0) {
+                                      Utils.showToast(
+                                          'Please give some rating .', true);
+                                      return;
+                                    }
+                                    Utils.hideKeyboard(context);
+                                    Navigator.pop(context);
+                                    postRating(
+                                        cardOrderHistoryItems, index, _rating,
+                                        desc: commentController.text.trim(),imageFile:_image);
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  ]),
                 )),
           );
         });
@@ -1862,5 +1975,90 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         ),
       ],
     );
+  }
+
+  showAlertDialog(BuildContext context) {
+    SimpleDialog dialog = SimpleDialog(
+      title: const Text('Choose option'),
+      children: <Widget>[
+        SimpleDialogOption(
+          child: Text(
+            'Camera',
+            style: TextStyle(fontSize: 16.0),
+          ),
+          onPressed: () async {
+            Navigator.of(context).pop();
+            var image =
+                await ImagePicker().getImage(source: ImageSource.camera);
+            _controller.setState(() {
+              if (image == null) {
+                print("---image == null----");
+              } else {
+                _image = File(image.path);
+              }
+            });
+            setState(() {});
+          },
+        ),
+        SimpleDialogOption(
+          child: Text(
+            'Gallery',
+            style: TextStyle(fontSize: 16.0),
+          ),
+          onPressed: () async {
+            Navigator.of(context).pop();
+            var image =
+                await ImagePicker().getImage(source: ImageSource.gallery);
+            _controller.setState(() {
+              if (image == null) {
+                print("---image == null----");
+              } else {
+                print("---image.length----${image.path}");
+                _image = File(image.path);
+              }
+            });
+          },
+        ),
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return dialog;
+      },
+    );
+  }
+
+  double _findRating(OrderData cardOrderHistoryItems, int index) {
+    double foundRating = 0;
+    List<Review> reviewList = cardOrderHistoryItems.orderItems[index].review;
+
+    if (reviewList != null && reviewList.isNotEmpty) {
+      for (int i = 0; i < reviewList.length; i++) {
+        if (userId.compareTo(reviewList[i].userId) == 0) {
+          foundRating = double.parse(reviewList[i].rating);
+        }
+      }
+    }
+    return foundRating;
+  }
+
+  void postRating(OrderData cardOrderHistoryItems, int index, double _rating,
+      {String desc = "",File imageFile}) {
+    Utils.showProgressDialog(context);
+    ApiController.postProductRating(
+            cardOrderHistoryItems.orderId,
+            cardOrderHistoryItems.orderItems[index].productId,
+            _rating.toString(),
+            desc: desc,imageFile: imageFile)
+        .then((value) {
+      if (value != null && value.success) {
+        //Hit event Bus
+        eventBus.fire(refreshOrderHistory());
+        getOrderListApi(isLoading: false);
+      }
+    });
   }
 }

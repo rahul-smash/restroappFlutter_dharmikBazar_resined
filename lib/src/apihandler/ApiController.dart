@@ -1,3 +1,4 @@
+import 'package:compressimage/compressimage.dart';
 import 'package:dio/dio.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
@@ -20,6 +21,7 @@ import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/ProductRatingResponse.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/RecommendedProductsResponse.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
@@ -905,6 +907,7 @@ class ApiController {
       return null;
     }
   }
+
   static Future<GetOrderHistory> getOrderDetail(String orderID) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -928,6 +931,61 @@ class ApiController {
         print('--respStr===  $respStr');
         GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
         return getOrderHistory;
+      } catch (e) {
+        Utils.showToast(e.toString(), true);
+        return null;
+      }
+    } else {
+      Utils.showToast(AppConstant.noInternet, true);
+      return null;
+    }
+  }
+
+  static Future<ProductRatingResponse> postProductRating(
+      String orderID, String productID, String rating,
+      {String desc = '', File imageFile}) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.reviewRating;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    if (isNetworkAvailable) {
+      if (imageFile != null) {
+        //print("====FILE SIZE BEFORE: " + imageFile.lengthSync().toString());
+        await CompressImage.compress(
+            imageSrc: imageFile.path,
+            desiredQuality: 80); //desiredQuality ranges from 0 to 100
+        //print("====FILE SIZE  AFTER: " + imageFile.lengthSync().toString());
+      }
+      try {
+        request.fields.addAll({
+          "user_id": user.id,
+          "order_id": orderID,
+          "platform": Platform.isIOS ? "IOS" : "android",
+          "product_id": productID,
+          "rating": rating,
+          "description": desc
+        });
+        if (imageFile != null) {
+          DateTime currentDate = DateTime.now();
+          var multipartFile = http.MultipartFile.fromBytes(
+            'image',
+            await imageFile.readAsBytes(),
+            filename: "Image_$currentDate",
+          );
+          request.files.add(multipartFile);
+        }
+        print('--url===  $url');
+        print('--user.id=== ${user.id}');
+        final response =
+            await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        final parsed = json.decode(respStr);
+        print('--respStr===  $respStr');
+        ProductRatingResponse ratingResponse =
+            ProductRatingResponse.fromJson(parsed);
+        return ratingResponse;
       } catch (e) {
         Utils.showToast(e.toString(), true);
         return null;
@@ -1526,7 +1584,8 @@ class ApiController {
     return null;
   }
 
-  static Future<RecommendedProductsResponse> getRecommendedProducts(String productID) async {
+  static Future<RecommendedProductsResponse> getRecommendedProducts(
+      String productID) async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     try {
       if (isNetworkAvailable) {
@@ -1552,7 +1611,7 @@ class ApiController {
         print("${respStr}");
         final parsed = json.decode(respStr);
         RecommendedProductsResponse model =
-        RecommendedProductsResponse.fromJson(parsed);
+            RecommendedProductsResponse.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
