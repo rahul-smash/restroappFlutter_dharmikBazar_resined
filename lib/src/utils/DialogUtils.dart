@@ -124,8 +124,7 @@ class DialogUtils {
       context: context,
       builder: (BuildContext context) {
         return WillPopScope(
-          onWillPop: () {
-          },
+          onWillPop: () {},
           child: AlertDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
@@ -146,7 +145,7 @@ class DialogUtils {
                   return InkWell(
                     onTap: () {
                       Navigator.pop(context, areaObject);
-                      },
+                    },
                     child: ListTile(
                       title: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -154,7 +153,8 @@ class DialogUtils {
                           children: <Widget>[
                             Expanded(
                               child: Text(areaObject.city.city,
-                                  style: TextStyle(color: Colors.black,fontSize: 16)),
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 16)),
                             ),
                           ]),
                     ),
@@ -167,7 +167,7 @@ class DialogUtils {
                 child: new Text("Cancel"),
                 textColor: Colors.blue,
                 onPressed: () {
-                  Navigator.pop(context,null);
+                  Navigator.pop(context, null);
                   // true here means you clicked ok
                 },
               ),
@@ -213,7 +213,8 @@ class DialogUtils {
                           children: <Widget>[
                             Expanded(
                               child: Text(object.pickupAdd,
-                                  style: TextStyle(color: Colors.black,fontSize: 16)),
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 16)),
                             ),
                           ]),
                     ),
@@ -221,13 +222,12 @@ class DialogUtils {
                 },
               ),
             ),
-
             actions: <Widget>[
               new FlatButton(
                 child: new Text("Cancel"),
                 textColor: Colors.blue,
                 onPressed: () {
-                  Navigator.pop(context,null);
+                  Navigator.pop(context, null);
                   // true here means you clicked ok
                 },
               ),
@@ -239,13 +239,13 @@ class DialogUtils {
   }
 
   static Future<Variant> displayVariantsDialog(
-      BuildContext context, String title, List<Variant> variants,{Variant selectedVariant}) async {
+      BuildContext context, String title, List<Variant> variants,
+      {Variant selectedVariant}) async {
     return await showDialog<Variant>(
       context: context,
       builder: (BuildContext context) {
         return WillPopScope(
-          onWillPop: () {
-          },
+          onWillPop: () {},
           child: AlertDialog(
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
@@ -327,7 +327,7 @@ class DialogUtils {
                 child: new Text("Cancel"),
                 textColor: Colors.blue,
                 onPressed: () {
-                  Navigator.pop(context,selectedVariant);
+                  Navigator.pop(context, selectedVariant);
                   // true here means you clicked ok
                 },
               ),
@@ -338,9 +338,9 @@ class DialogUtils {
     );
   }
 
-  static Future<bool> displayPickUpDialog(
+  static Future<String> displayPickUpDialog(
       BuildContext context, StoreModel storeModel) async {
-    return await showDialog<bool>(
+    return await showDialog<String>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
@@ -387,8 +387,9 @@ class DialogUtils {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                          Expanded(
+                              child: Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: FlatButton(
                               child: Text(
                                 'Guide Me',
@@ -399,21 +400,32 @@ class DialogUtils {
                               color: Colors.white,
                               textColor: orangeColor,
                               onPressed: () {
-                                Navigator.pop(context, true);
+                                Navigator.pop(context, 'true');
                               },
                             ),
-                          ),
+                          )),
                           Container(
-                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: FlatButton(
                               child: Text('Ok'),
                               color: orangeColor,
                               textColor: Colors.white,
                               onPressed: () {
-                                Navigator.pop(context, false);
+                                Navigator.pop(context, 'false');
                               },
                             ),
-                          )
+                          ),
+                          Expanded(
+                              child: Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('Rate Your purchase'),
+                              textColor: orangeColor,
+                              onPressed: () {
+                                Navigator.pop(context, 'order');
+                              },
+                            ),
+                          ))
                         ],
                       ),
                     ),
@@ -426,7 +438,8 @@ class DialogUtils {
   }
 
   static Future<bool> displayCommonDialog(
-      BuildContext context, String title, String message,{String buttonText='OK'}) async {
+      BuildContext context, String title, String message,
+      {String buttonText = 'OK'}) async {
     return await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -496,9 +509,9 @@ class DialogUtils {
     );
   }
 
-  static Future<bool> displayThankYouDialog(
+  static Future<String> displayThankYouDialog(
       BuildContext context, String message) async {
-    return await showDialog<bool>(
+    return await showDialog<String>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
@@ -545,17 +558,31 @@ class DialogUtils {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
+                          SizedBox(width: 50,),
                           Container(
-                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
-                              child: Text('Ok'),
-                              color: orangeColor,
-                              textColor: Colors.white,
-                              onPressed: () {
-                                Navigator.pop(context, true);
-                              },
+                              margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                              child: FlatButton(
+//                              child: Text('Rate your purchase'),
+                                child: Text('Ok'),
+                                color: orangeColor,
+                                textColor: Colors.white,
+                                onPressed: () {
+                                  Navigator.pop(context, 'true');
+                                },
+                              ),
                             ),
-                          )
+                          Expanded(
+                            child: Container(
+                              margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              child: FlatButton(
+                                child: Text('Rate Your purchase'),
+                                textColor: orangeColor,
+                                onPressed: () {
+                                  Navigator.pop(context, 'order');
+                                },
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1308,10 +1335,12 @@ class DialogUtils {
                     return Divider();
                   },
                   itemBuilder: (context, index) {
-                    PaymentGatewaySettings paymentGatewaySettings = storeObject.paymentGatewaySettings[index];
+                    PaymentGatewaySettings paymentGatewaySettings =
+                        storeObject.paymentGatewaySettings[index];
                     return InkWell(
                       onTap: () {
-                        Navigator.pop(context, paymentGatewaySettings.paymentGateway);
+                        Navigator.pop(
+                            context, paymentGatewaySettings.paymentGateway);
                       },
                       child: ListTile(
                         title: Row(
@@ -1319,7 +1348,8 @@ class DialogUtils {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
                               Expanded(
-                                child: Text(paymentGatewaySettings.paymentGateway,
+                                child: Text(
+                                    paymentGatewaySettings.paymentGateway,
                                     style: TextStyle(color: Colors.black)),
                               ),
                             ]),
@@ -1333,7 +1363,7 @@ class DialogUtils {
                   child: new Text("Cancel"),
                   textColor: Colors.blue,
                   onPressed: () {
-                    Navigator.pop(context,"");
+                    Navigator.pop(context, "");
                     // true here means you clicked ok
                   },
                 ),

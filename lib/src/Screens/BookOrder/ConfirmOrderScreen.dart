@@ -2139,38 +2139,51 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             print("${widget.deliveryType}");
             //print("Location = ${storeModel.lat},${storeModel.lng}");
             if (widget.deliveryType == OrderType.PickUp) {
-              bool result =
+              String result =
                   await DialogUtils.displayPickUpDialog(context, storeModel);
-              if (result == true) {
+              if (result == 'true') {
                 //print("==result== ${result}");
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 eventBus.fire(updateCartCount());
                 DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
                     double.parse(storeModel.lng));
-              } else {
+              } else if(result == 'false'){
                 //print("==result== ${result}");
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 eventBus.fire(updateCartCount());
                 Navigator.of(context).popUntil((route) => route.isFirst);
-//                Navigator.push(
-//                  context,
-//                  MaterialPageRoute(
-//                      builder: (context) => MyOrderScreenVersion2(storeModel)),
-//                );
+              }else if(result=='order'){
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                eventBus.fire(updateCartCount());
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MyOrderScreenVersion2(storeModel)),
+                );
+
+              }else{
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                eventBus.fire(updateCartCount());
+                Navigator.of(context).popUntil((route) => route.isFirst);
               }
             } else {
-              bool result = await DialogUtils.displayThankYouDialog(context,
+              String result = await DialogUtils.displayThankYouDialog(context,
                   response.success ? AppConstant.orderAdded : response.message);
-              if (result == true) {
+              if (result == 'true') {
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 eventBus.fire(updateCartCount());
-//                Navigator.push(
-//                  context,
-//                  MaterialPageRoute(
-//                      builder: (context) => MyOrderScreenVersion2(storeModel)),
-//                );
+              }else{
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                eventBus.fire(updateCartCount());
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MyOrderScreenVersion2(storeModel)),
+                );
               }
             }
           });
