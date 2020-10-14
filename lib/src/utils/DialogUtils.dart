@@ -338,9 +338,9 @@ class DialogUtils {
     );
   }
 
-  static Future<String> displayPickUpDialog(
+  static Future<bool> displayPickUpDialog(
       BuildContext context, StoreModel storeModel) async {
-    return await showDialog<String>(
+    return await showDialog<bool>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
@@ -387,9 +387,8 @@ class DialogUtils {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          Expanded(
-                              child: Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
                             child: FlatButton(
                               child: Text(
                                 'Guide Me',
@@ -400,32 +399,21 @@ class DialogUtils {
                               color: Colors.white,
                               textColor: orangeColor,
                               onPressed: () {
-                                Navigator.pop(context, 'true');
-                              },
-                            ),
-                          )),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            child: FlatButton(
-                              child: Text('Ok'),
-                              color: orangeColor,
-                              textColor: Colors.white,
-                              onPressed: () {
-                                Navigator.pop(context, 'false');
+                                Navigator.pop(context, true);
                               },
                             ),
                           ),
-                          Expanded(
-                              child: Container(
-                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
-                              child: Text('Rate Your purchase'),
-                              textColor: orangeColor,
+                              child: Text('OK'),
+                              color: orangeColor,
+                              textColor: Colors.white,
                               onPressed: () {
-                                Navigator.pop(context, 'order');
+                                Navigator.pop(context, false);
                               },
                             ),
-                          ))
+                          )
                         ],
                       ),
                     ),
@@ -509,9 +497,9 @@ class DialogUtils {
     );
   }
 
-  static Future<String> displayThankYouDialog(
+  static Future<bool> displayThankYouDialog(
       BuildContext context, String message) async {
-    return await showDialog<String>(
+    return await showDialog<bool>(
       context: context,
       barrierDismissible: true,
       builder: (BuildContext context) {
@@ -558,31 +546,17 @@ class DialogUtils {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          SizedBox(width: 50,),
                           Container(
-                              margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                              child: FlatButton(
-//                              child: Text('Rate your purchase'),
-                                child: Text('Ok'),
-                                color: orangeColor,
-                                textColor: Colors.white,
-                                onPressed: () {
-                                  Navigator.pop(context, 'true');
-                                },
-                              ),
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('OK'),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context, true);
+                              },
                             ),
-                          Expanded(
-                            child: Container(
-                              margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              child: FlatButton(
-                                child: Text('Rate Your purchase'),
-                                textColor: orangeColor,
-                                onPressed: () {
-                                  Navigator.pop(context, 'order');
-                                },
-                              ),
-                            ),
-                          ),
+                          )
                         ],
                       ),
                     ),

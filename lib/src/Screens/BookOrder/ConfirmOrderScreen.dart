@@ -9,7 +9,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
-import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -254,28 +253,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         ),
         actions: <Widget>[
           InkWell(
-            onTap: () async {
+            onTap: () {
               Navigator.of(context).popUntil((route) => route.isFirst);
-//              bool result =
-//                  await DialogUtils.displayPickUpDialog(context, storeModel);
-//              if (result == true) {
-//                //print("==result== ${result}");
-//                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-//                Navigator.of(context).popUntil((route) => route.isFirst);
-//                eventBus.fire(updateCartCount());
-//                DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
-//                    double.parse(storeModel.lng));
-//              } else {
-//                //print("==result== ${result}");
-//                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-//                eventBus.fire(updateCartCount());
-//                Navigator.of(context).popUntil((route) => route.isFirst);
-//                Navigator.push(
-//                  context,
-//                  MaterialPageRoute(
-//                      builder: (context) => MyOrderScreenVersion2(storeModel)),
-//                );
-//              }
             },
             child: Padding(
               padding:
@@ -2139,51 +2118,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             print("${widget.deliveryType}");
             //print("Location = ${storeModel.lat},${storeModel.lng}");
             if (widget.deliveryType == OrderType.PickUp) {
-              String result =
+              bool result =
                   await DialogUtils.displayPickUpDialog(context, storeModel);
-              if (result == 'true') {
+              if (result == true) {
                 //print("==result== ${result}");
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 eventBus.fire(updateCartCount());
                 DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
                     double.parse(storeModel.lng));
-              } else if(result == 'false'){
+              } else {
                 //print("==result== ${result}");
-                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                eventBus.fire(updateCartCount());
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              }else if(result=='order'){
-                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                eventBus.fire(updateCartCount());
-                Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MyOrderScreenVersion2(storeModel)),
-                );
-
-              }else{
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 eventBus.fire(updateCartCount());
                 Navigator.of(context).popUntil((route) => route.isFirst);
               }
             } else {
-              String result = await DialogUtils.displayThankYouDialog(context,
+              bool result = await DialogUtils.displayThankYouDialog(context,
                   response.success ? AppConstant.orderAdded : response.message);
-              if (result == 'true') {
+              if (result == true) {
                 await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 eventBus.fire(updateCartCount());
-              }else{
-                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                Navigator.of(context).popUntil((route) => route.isFirst);
-                eventBus.fire(updateCartCount());
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => MyOrderScreenVersion2(storeModel)),
-                );
               }
             }
           });
@@ -2431,7 +2387,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         taxModel != null) {
       shippingCharges = '0';
       taxModel.total = '0';
-      totalPrice = 0;
+      totalPrice=0;
     }
     if (mounted) {
       setState(() {});
