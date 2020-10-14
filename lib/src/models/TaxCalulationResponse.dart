@@ -157,6 +157,10 @@ class OrderDetail {
     this.newMrpPrice,
     this.newDiscount,
     this.newPrice,
+    this.cgst,
+    this.sgst,
+    this.igst,
+    this.gst_type,this.hsn_code,
   });
 
   String productId;
@@ -174,6 +178,11 @@ class OrderDetail {
   String newMrpPrice;
   String newDiscount;
   String newPrice;
+  int cgst;
+  int sgst;
+  int igst;
+  String gst_type;
+  String hsn_code;
 
   OrderDetail copyWith({
     String productId,
@@ -191,6 +200,11 @@ class OrderDetail {
     String newMrpPrice,
     String newDiscount,
     String newPrice,
+    int cgst,
+    int sgst,
+    int igst,
+    String gst_type,
+    String hsn_code,
   }) =>
       OrderDetail(
         productId: productId ?? this.productId,
@@ -208,6 +222,11 @@ class OrderDetail {
         newMrpPrice: newMrpPrice ?? this.newMrpPrice,
         newDiscount: newDiscount ?? this.newDiscount,
         newPrice: newPrice ?? this.newPrice,
+        cgst: cgst ?? this.cgst,
+        sgst: sgst ?? this.sgst,
+        igst: igst ?? this.igst,
+        gst_type : gst_type ?? this.gst_type,
+        hsn_code : hsn_code ?? this.hsn_code,
       );
 
   factory OrderDetail.fromRawJson(String str) => OrderDetail.fromJson(json.decode(str));
@@ -230,6 +249,11 @@ class OrderDetail {
     newMrpPrice: json["new_mrp_price"] == null ? null : json["new_mrp_price"],
     newDiscount: json["new_discount"] == null ? null : json["new_discount"],
     newPrice: json["new_price"] == null ? null : json["new_price"],
+    cgst: json["cgst"] == null ? 0 : json["cgst"],
+    sgst: json["sgst"] == null ? 0 : json["sgst"],
+    igst: json["igst"] == null ? 0 : json["igst"],
+    gst_type: json["gst_type"] == null ? null : json["gst_type"],
+    hsn_code: json["hsn_code"] == null ? "" : json["hsn_code"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -248,7 +272,49 @@ class OrderDetail {
     "new_mrp_price": newMrpPrice == null ? null : newMrpPrice,
     "new_discount": newDiscount == null ? null : newDiscount,
     "new_price": newPrice == null ? null : newPrice,
+    "cgst": cgst == null ? 0 : cgst,
+    "sgst": sgst == null ? 0 : sgst,
+    "igst": igst == null ? 0 : igst,
+    "gst_type": gst_type == null ? null : gst_type,
+    "hsn_code": hsn_code == null ? "" : hsn_code,
   };
+
+  static List encodeToJson(List<OrderDetail> list,{bool removeOutOfStockProducts=false}) {
+    List jsonList = List();
+
+      for(int i=0;i<list.length;i++){
+        OrderDetail item=list[i];
+        bool addProduct=true;
+        if(removeOutOfStockProducts&&item.productStatus.compareTo('out_of_stock')==0){
+          addProduct=false;
+        }
+        if(addProduct)
+        jsonList.add({
+          "product_id": item.productId == null ? null : item.productId,
+          "product_name": item.productName == null ? null : item.productName,
+          "variant_id": item.variantId == null ? null : item.variantId,
+          "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
+          "quantity": item.quantity,
+          "price": item.price == null ? null : item.price,
+          "weight": item.weight == null ? null : item.weight,
+          "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
+          "unit_type": item.unitType == null ? null : item.unitType,
+          "product_status": item.productStatus == null ? null : item.productStatus,
+          "discount": item.discount == null ? null : item.discount,
+          "product_type": item.productType == null ? null : item.productType,
+          "new_mrp_price": item.newMrpPrice == null ? null : item.newMrpPrice,
+          "new_discount": item.newDiscount == null ? null : item.newDiscount,
+          "new_price": item.newPrice == null ? null : item.newPrice,
+          "cgst": item.cgst == null ? 0 : item.cgst,
+          "sgst": item.sgst == null ? 0 : item.sgst,
+          "igst": item.igst == null ? 0 : item.igst,
+          "gst_type": item.gst_type == null ? null : item.gst_type,
+          "hsn_code":item. hsn_code == null ? "" : item.hsn_code,
+        });
+      }
+
+    return jsonList;
+  }
 }
 
 class TaxLabel {

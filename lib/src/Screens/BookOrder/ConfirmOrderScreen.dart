@@ -123,7 +123,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    databaseHelper
+    Utils
         .getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail)
@@ -2019,7 +2019,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    databaseHelper
+    Utils
         .getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail)
@@ -2076,11 +2076,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.hideKeyboard(context);
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
-        databaseHelper
+        /*databaseHelper
+            .getCartItemsListToJson(
+                isOrderVariations: isOrderVariations,
+                responseOrderDetail: responseOrderDetail)
+            .then((json) {*/
+        Utils
             .getCartItemsListToJson(
                 isOrderVariations: isOrderVariations,
                 responseOrderDetail: responseOrderDetail)
             .then((json) {
+
+
           if (json == null) {
             print("--json == null-json == null-");
             return;

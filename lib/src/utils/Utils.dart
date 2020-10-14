@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -16,6 +17,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 
@@ -585,6 +587,13 @@ class Utils {
       }
     }
     return addressList;
+  }
+ static Future<String> getCartItemsListToJson(
+      {bool isOrderVariations = true,
+        List<OrderDetail> responseOrderDetail}) async {
+    List jsonList = OrderDetail.encodeToJson(responseOrderDetail);
+    String encodedDoughnut = jsonEncode(jsonList);
+    return encodedDoughnut;
   }
 }
 
