@@ -87,12 +87,13 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           _totalSaving != 0 ? _totalSaving.toStringAsFixed(2) : '0';
       double _totalPriceVar =
           double.parse(widget.orderHistoryData.total) + _totalSaving;
-
-      _totalPrice = _totalPriceVar.toString();
+      if (_totalSaving != 0)
+        _totalPrice = _totalPriceVar.toStringAsFixed(2);
+      else {
+        _totalPrice = widget.orderHistoryData.total;
+      }
     } catch (e) {
-      double _totalPriceVar = double.parse(widget.orderHistoryData.total);
-
-      _totalPrice = _totalPriceVar.toString();
+      _totalPrice = widget.orderHistoryData.total;
       print(e.toString());
     }
   }
@@ -109,6 +110,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         : '';
     return isLoading
         ? Scaffold(
+            resizeToAvoidBottomInset: false,
             appBar: AppBar(
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,7 +237,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
-            'Delivery Address',
+            orderHistoryData.orderFacility.toLowerCase().contains('pick')
+                ? 'PickUp Address'
+                : 'Delivery Address',
             style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF7A7C80),
@@ -342,7 +346,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           ),
           Container(
             color: Colors.white,
-            padding: EdgeInsets.all(16),
+            padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -351,8 +355,68 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      Visibility(
+                          visible: orderHistoryData.shippingCharges == "0.00"
+                              ? false
+                              : true,
+                          child: Padding(
+                              padding: EdgeInsets.only(top: 16, bottom: 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Text('Delivery Charges',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
+                                  Text(
+                                      "${AppConstant.currency} ${orderHistoryData.shippingCharges}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500))
+                                ],
+                              ))),
+                      Visibility(
+                          visible:
+                              orderHistoryData.tax == "0.00" ? false : true,
+                          child: Padding(
+                              padding: EdgeInsets.only(
+                                  top:
+                                      orderHistoryData.shippingCharges == "0.00"
+                                          ? 16
+                                          : 0,
+                                  bottom: 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Text('Tax',
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
+                                  Text(
+                                      "${AppConstant.currency} ${orderHistoryData.tax}",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500))
+                                ],
+                              ))),
                       Padding(
-                          padding: EdgeInsets.only(top: 0, bottom: 0),
+                          padding: EdgeInsets.only(top: 16, bottom: 0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             mainAxisSize: MainAxisSize.max,
@@ -366,7 +430,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                       fontWeight: FontWeight.w400,
                                     )),
                               ),
-                              Text("${AppConstant.currency} ${_totalPrice}",
+                              Text(
+                                  "${AppConstant.currency} ${_totalPrice}",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 16,
@@ -422,61 +487,6 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                       "${AppConstant.currency} ${orderHistoryData.discount != null ? orderHistoryData.discount : '0.00'}",
                                       style: TextStyle(
                                           color: Color(0xff74BA33),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500))
-                                ],
-                              ))),
-                      Visibility(
-                          visible: orderHistoryData.shippingCharges == "0.00"
-                              ? false
-                              : true,
-                          child: Padding(
-                              padding: EdgeInsets.only(top: 16, bottom: 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Flexible(
-                                    child: Text('Delivery Charges',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  Text(
-                                      "${AppConstant.currency} ${orderHistoryData.shippingCharges}",
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500))
-                                ],
-                              ))),
-                      Visibility(
-                          visible:
-                              orderHistoryData.tax == "0.00" ? false : true,
-                          child: Padding(
-                              padding: EdgeInsets.only(top: 16, bottom: 0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Flexible(
-                                    child: Text('Tax',
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400,
-                                        )),
-                                  ),
-                                  Text(
-                                      "${AppConstant.currency} ${orderHistoryData.tax}",
-                                      style: TextStyle(
-                                          color: Colors.black,
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500))
                                 ],
@@ -602,7 +612,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           )),
                     ),
                     Text(
-                        "${AppConstant.currency} ${int.parse(cardOrderHistoryItems.orderItems[index].quantity) * double.parse(cardOrderHistoryItems.orderItems[index].price)}",
+                        "${AppConstant.currency} ${(double.parse(cardOrderHistoryItems.orderItems[index].quantity) * double.parse(cardOrderHistoryItems.orderItems[index].price)).toStringAsFixed(2)}",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,
@@ -683,212 +693,208 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           return StatefulBuilder(
             builder: (BuildContext context, setState) {
               return SafeArea(
+                  child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
                 child: Container(
-                    color: Colors.white,
-                    margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: Container(
-                      child: Wrap(children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
-                                  child: Icon(
-                                    Icons.cancel,
-                                    color: Colors.grey,
-                                  ),
+                  color: Colors.white,
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: Wrap(children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                              child: Icon(
+                                Icons.cancel,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                          child: Text(
+                            "Rating",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+//                            Text(
+//                              "(Select a star amount)",
+//                              textAlign: TextAlign.center,
+//                              style: TextStyle(
+//                                  color: Colors.black,
+//                                  fontSize: 16,
+//                                  fontWeight: FontWeight.w400),
+//                            ),
+                        Container(
+                          margin: EdgeInsets.only(top: 5),
+                          color: orangeColor,
+                          width: 50,
+                          height: 3,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text(
+                            "Product Name",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff797C82),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: Text(
+                            "${cardOrderHistoryItems.orderItems[index].productName}",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        RatingBar(
+                          initialRating: _rating,
+                          minRating: 0,
+                          itemSize: 35,
+                          direction: Axis.horizontal,
+                          allowHalfRating: false,
+                          itemCount: 5,
+                          itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: orangeColor,
+                          ),
+                          onRatingUpdate: (rating) {
+                            _rating = rating;
+                          },
+                        ),
+                        Container(
+                          height: 120,
+                          margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
+                          decoration: new BoxDecoration(
+                            color: grayLightColor,
+                            borderRadius:
+                                new BorderRadius.all(new Radius.circular(3.0)),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+                            child: TextField(
+                              textAlign: TextAlign.left,
+                              maxLength: 250,
+                              keyboardType: TextInputType.text,
+                              maxLines: null,
+                              textCapitalization: TextCapitalization.sentences,
+                              controller: commentController,
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  border: InputBorder.none,
+                                  fillColor: grayLightColor,
+                                  hintText: 'Write your Review...'),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: 0, bottom: 16, left: 16, right: 16),
+                          color: Color(0xFFE1E1E1),
+                          height: 1,
+                        ),
+                        Container(
+                          width: double.maxFinite,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              InkWell(
+                                  onTap: () {
+                                    showAlertDialog(context, setState);
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                        top: 0, bottom: 6, left: 16, right: 16),
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            "images/placeHolder.png"),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    height: 100,
+                                    width: 120,
+                                    child: _image != null
+                                        ? Padding(
+                                            padding: EdgeInsets.all(5),
+                                            child: Image.file(
+                                              _image,
+                                              fit: BoxFit.cover,
+                                            ))
+                                        : null,
+                                  )),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, left: 18, bottom: 30),
+                                child: Text(
+                                  "File Size limit - 1MB",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                              child: Text(
-                                "Rating",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ),
-                            Text(
-                              "(Select a star amount)",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 5),
-                              color: orangeColor,
-                              width: 50,
-                              height: 3,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 20),
-                              child: Text(
-                                "Product Name",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Color(0xff797C82),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 5),
-                              child: Text(
-                                "${cardOrderHistoryItems.orderItems[index].productName}",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            RatingBar(
-                              initialRating: _rating,
-                              minRating: 0,
-                              itemSize: 35,
-                              direction: Axis.horizontal,
-                              allowHalfRating: false,
-                              itemCount: 5,
-                              itemPadding:
-                                  EdgeInsets.symmetric(horizontal: 2.0),
-                              itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: orangeColor,
-                              ),
-                              onRatingUpdate: (rating) {
-                                _rating = rating;
-                              },
-                            ),
-                            Container(
-                              height: 120,
-                              margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
-                              decoration: new BoxDecoration(
-                                color: grayLightColor,
-                                borderRadius: new BorderRadius.all(
-                                    new Radius.circular(3.0)),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
-                                child: TextField(
-                                  textAlign: TextAlign.left,
-                                  maxLength: 250,
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  textCapitalization:
-                                      TextCapitalization.sentences,
-                                  controller: commentController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10.0),
-                                      border: InputBorder.none,
-                                      fillColor: grayLightColor,
-                                      hintText: 'Write your Review...'),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                width: 130,
+                                child: FlatButton(
+                                  child: Text('Submit'),
+                                  color: orangeColor,
+                                  textColor: Colors.white,
+                                  onPressed: () {
+                                    if (_rating == 0) {
+                                      Utils.showToast(
+                                          'Please give some rating .', true);
+                                      return;
+                                    }
+                                    Utils.hideKeyboard(context);
+                                    Navigator.pop(context);
+                                    postRating(
+                                        cardOrderHistoryItems, index, _rating,
+                                        desc: commentController.text.trim(),
+                                        imageFile: _image);
+                                  },
                                 ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  top: 0, bottom: 16, left: 16, right: 16),
-                              color: Color(0xFFE1E1E1),
-                              height: 1,
-                            ),
-                            Container(
-                              width: double.maxFinite,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  InkWell(
-                                      onTap: () {
-                                        showAlertDialog(context, setState);
-                                      },
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                            top: 0,
-                                            bottom: 6,
-                                            left: 16,
-                                            right: 16),
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: AssetImage(
-                                                "images/placeHolder.png"),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        height: 100,
-                                        width: 120,
-                                        child: _image != null
-                                            ? Padding(
-                                                padding: EdgeInsets.all(5),
-                                                child: Image.file(
-                                                  _image,
-                                                  fit: BoxFit.cover,
-                                                ))
-                                            : null,
-                                      )),
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                        top: 0, left: 18, bottom: 30),
-                                    child: Text(
-                                      "File Size limit - 1MB",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                    width: 130,
-                                    child: FlatButton(
-                                      child: Text('Submit'),
-                                      color: orangeColor,
-                                      textColor: Colors.white,
-                                      onPressed: () {
-                                        if (_rating == 0) {
-                                          Utils.showToast(
-                                              'Please give some rating .',
-                                              true);
-                                          return;
-                                        }
-                                        Utils.hideKeyboard(context);
-                                        Navigator.pop(context);
-                                        postRating(cardOrderHistoryItems, index,
-                                            _rating,
-                                            desc: commentController.text.trim(),
-                                            imageFile: _image);
-                                      },
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      ]),
-                    )),
-              );
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  ]),
+                ),
+              ));
             },
           );
         });
@@ -1344,7 +1350,11 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     ),
                     Expanded(
                         child: Text(
-                          !widget.orderHistoryData.orderFacility.toLowerCase().contains('pick')? 'Order Delivered':'Order Picked',
+                      !widget.orderHistoryData.orderFacility
+                              .toLowerCase()
+                              .contains('pick')
+                          ? 'Order Delivered'
+                          : 'Order Picked',
                       style: TextStyle(
                           fontSize: 16, color: grayLightColorSecondary),
                     )),
