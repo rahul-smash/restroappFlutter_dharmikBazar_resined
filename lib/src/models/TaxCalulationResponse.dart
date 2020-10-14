@@ -160,7 +160,8 @@ class OrderDetail {
     this.cgst,
     this.sgst,
     this.igst,
-    this.gst_type,this.hsn_code,
+    this.gst_type,
+    this.hsn_code,
   });
 
   String productId;
@@ -178,9 +179,9 @@ class OrderDetail {
   String newMrpPrice;
   String newDiscount;
   String newPrice;
-  int cgst;
-  int sgst;
-  int igst;
+  dynamic cgst;
+  dynamic sgst;
+  dynamic igst;
   String gst_type;
   String hsn_code;
 
@@ -200,9 +201,9 @@ class OrderDetail {
     String newMrpPrice,
     String newDiscount,
     String newPrice,
-    int cgst,
-    int sgst,
-    int igst,
+    dynamic cgst,
+    dynamic sgst,
+    dynamic igst,
     String gst_type,
     String hsn_code,
   }) =>
