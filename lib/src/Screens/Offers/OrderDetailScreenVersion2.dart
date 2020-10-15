@@ -1024,843 +1024,29 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
     // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
 
-    switch (widget.orderHistoryData.status) {
-      case '0':
-        return Column(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 25,
-                  margin: EdgeInsets.only(left: 4, top: 5),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Placed',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Text(
-                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
-                  ],
-                )
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 30,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 0,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: grayLightColorSecondary),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Confirmed',
-                      style: TextStyle(
-                          fontSize: 16, color: grayLightColorSecondary),
-                    )),
-                    Text(
-                      'Pending',
-                      style: TextStyle(
-                          color: grayLightColorSecondary, fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-            Visibility(
-              visible: !widget.orderHistoryData.orderFacility
-                  .toLowerCase()
-                  .contains('pick'),
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    height: 30,
-                    margin: EdgeInsets.only(
-                      left: 4,
-                    ),
-                    width: 2,
-                    child: LinearProgressIndicator(
-                      backgroundColor: grayLightColorSecondary,
-                      value: 0,
-                      valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                    ),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10 / 2),
-                            color: grayLightColorSecondary),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(
-                          child: Text(
-                        'Order Shipped',
-                        style: TextStyle(
-                            fontSize: 16, color: grayLightColorSecondary),
-                      )),
-                      Text(
-                        'Pending',
-                        style: TextStyle(
-                            color: grayLightColorSecondary, fontSize: 16),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 15,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 0,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: grayLightColorSecondary),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      !widget.orderHistoryData.orderFacility
-                              .toLowerCase()
-                              .contains('pick')
-                          ? 'Order Delivered'
-                          : 'Order Picked',
-                      style: TextStyle(
-                          fontSize: 16, color: grayLightColorSecondary),
-                    )),
-                    Text(
-                      'Pending',
-                      style: TextStyle(
-                          color: grayLightColorSecondary, fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ],
-        );
-        break;
-      case '1':
-        return Column(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 25,
-                  margin: EdgeInsets.only(left: 4, top: 5),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Placed',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Text(
-                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
-                  ],
-                )
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 30,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Confirmed',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    )),
-                    Text(
-                      'Done',
-                      style: TextStyle(fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-            Visibility(
-                visible: !widget.orderHistoryData.orderFacility
-                    .toLowerCase()
-                    .contains('pick'),
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      height: 30,
-                      margin: EdgeInsets.only(
-                        left: 4,
-                      ),
-                      width: 2,
-                      child: LinearProgressIndicator(
-                        backgroundColor: grayLightColorSecondary,
-                        value: 0,
-                        valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                      ),
-                    ),
-                    Row(
-                      children: <Widget>[
-                        Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10 / 2),
-                              color: grayLightColorSecondary),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Expanded(
-                            child: Text(
-                          'Order Shipped',
-                          style: TextStyle(
-                              fontSize: 16, color: grayLightColorSecondary),
-                        )),
-                        Text(
-                          'Pending',
-                          style: TextStyle(
-                              color: grayLightColorSecondary, fontSize: 16),
-                        )
-                      ],
-                    )
-                  ],
-                )),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 15,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 0,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: grayLightColorSecondary),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      !widget.orderHistoryData.orderFacility
-                              .toLowerCase()
-                              .contains('pick')
-                          ? 'Order Delivered'
-                          : 'Order Picked',
-                      style: TextStyle(
-                          fontSize: 16, color: grayLightColorSecondary),
-                    )),
-                    Text(
-                      'Pending',
-                      style: TextStyle(
-                          color: grayLightColorSecondary, fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ],
-        );
-        break;
-      case '2':
-        return Column(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 25,
-                  margin: EdgeInsets.only(left: 4, top: 5),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Placed',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Text(
-                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
-                  ],
-                )
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 15,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: Colors.red),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Rejected',
-                      style: TextStyle(fontSize: 16, color: Colors.red),
-                    )),
-                  ],
-                )
-              ],
-            ),
-          ],
-        );
-        break;
-      case '4':
-      case '7':
-        return Column(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 25,
-                  margin: EdgeInsets.only(left: 4, top: 5),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Placed',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Text(
-                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
-                  ],
-                )
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 30,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Confirmed',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    )),
-                    Text(
-                      'Done',
-                      style: TextStyle(fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 30,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Shipped',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    )),
-                    Text(
-                      'Done',
-                      style: TextStyle(fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 15,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 0,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: grayLightColorSecondary),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Delivered',
-                      style: TextStyle(
-                          fontSize: 16, color: grayLightColorSecondary),
-                    )),
-                    Text(
-                      'Pending',
-                      style: TextStyle(
-                          color: grayLightColorSecondary, fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ],
-        );
-        break;
-      case '5':
-        return Column(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 25,
-                  margin: EdgeInsets.only(left: 4, top: 5),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Placed',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Text(
-                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
-                  ],
-                )
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 30,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Confirmed',
-                      style: TextStyle(
-                        fontSize: 16,
-                      ),
-                    )),
-                    Text(
-                      'Done',
-                      style: TextStyle(fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-            Visibility(
-              visible: !widget.orderHistoryData.orderFacility
-                  .toLowerCase()
-                  .contains('pick'),
-              child: Stack(
-                children: <Widget>[
-                  Container(
-                    height: 30,
-                    margin: EdgeInsets.only(
-                      left: 4,
-                    ),
-                    width: 2,
-                    child: LinearProgressIndicator(
-                      backgroundColor: grayLightColorSecondary,
-                      value: 100,
-                      valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                    ),
-                  ),
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10 / 2),
-                            color: appTheme),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(
-                          child: Text(
-                        'Order Shipped',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      )),
-                      Text(
-                        'Done',
-                        style: TextStyle(fontSize: 16),
-                      )
-                    ],
-                  )
-                ],
-              ),
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 15,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      !widget.orderHistoryData.orderFacility
-                              .toLowerCase()
-                              .contains('pick')
-                          ? 'Order Delivered'
-                          : 'Order Picked',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Text(
-                      'Done',
-                      style: TextStyle(fontSize: 16),
-                    )
-                  ],
-                )
-              ],
-            ),
-          ],
-        );
-        break;
-      case '6':
-        return Column(
-          children: <Widget>[
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 25,
-                  margin: EdgeInsets.only(left: 4, top: 5),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: appTheme),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Placed',
-                      style: TextStyle(fontSize: 16),
-                    )),
-                    Text(
-                        '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
-                  ],
-                )
-              ],
-            ),
-            Stack(
-              children: <Widget>[
-                Container(
-                  height: 15,
-                  margin: EdgeInsets.only(
-                    left: 4,
-                  ),
-                  width: 2,
-                  child: LinearProgressIndicator(
-                    backgroundColor: grayLightColorSecondary,
-                    value: 100,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-                  ),
-                ),
-                Row(
-                  children: <Widget>[
-                    Container(
-                      width: 10,
-                      height: 10,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10 / 2),
-                          color: Colors.red),
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Expanded(
-                        child: Text(
-                      'Order Cancelled',
-                      style: TextStyle(fontSize: 16, color: Colors.red),
-                    )),
-                  ],
-                )
-              ],
-            ),
-          ],
-        );
-        break;
-    }
+//    bool isPickup =widget.orderHistoryData.orderFacility.contains('Pick');
 
-    return Column(
+    Color orderPlaced=Colors.black;
+    Color orderConfirmed= widget.orderHistoryData.status=='1'||
+        widget.orderHistoryData.status=='4'||
+        widget.orderHistoryData.status=='5'? Colors.black:grayLightColorSecondary;
+
+    Color orderShipped=  widget.orderHistoryData.status=='4'||
+        widget.orderHistoryData.status=='5'? Colors.black:grayLightColorSecondary;
+    Color orderDelivered=  widget.orderHistoryData.status=='2'|| widget.orderHistoryData.status=='6'?Colors.red:
+        widget.orderHistoryData.status=='5'? Colors.black:grayLightColorSecondary;
+
+    double orderPlacedProgress=100;
+    double orderConfirmedProgress= widget.orderHistoryData.status=='1'||
+        widget.orderHistoryData.status=='4'||
+        widget.orderHistoryData.status=='5'? 100:0;
+
+    double orderShippedProgress=  widget.orderHistoryData.status=='4'||
+        widget.orderHistoryData.status=='5'? 100:0;
+    double orderDeliveredProgress=  widget.orderHistoryData.status=='2'|| widget.orderHistoryData.status=='6'?100:
+        widget.orderHistoryData.status=='5'? 100:0;
+    bool isOrderCanceledOrRejected=widget.orderHistoryData.status=='2'|| widget.orderHistoryData.status=='6'? true:false;
+   return  Column(
       children: <Widget>[
         Stack(
           children: <Widget>[
@@ -1870,7 +1056,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
               width: 2,
               child: LinearProgressIndicator(
                 backgroundColor: grayLightColorSecondary,
-                value: 100,
+                value: orderPlacedProgress,
                 valueColor: AlwaysStoppedAnimation<Color>(appTheme),
               ),
             ),
@@ -1888,16 +1074,16 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 ),
                 Expanded(
                     child: Text(
-                  'Order Placed',
-                  style: TextStyle(fontSize: 16),
-                )),
+                      'Order Placed',
+                      style: TextStyle(fontSize: 16,color: orderPlaced),
+                    )),
                 Text(
-                    '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}')
+                    '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}',style: TextStyle(color: orderPlaced),)
               ],
             )
           ],
         ),
-        Stack(
+        Visibility(visible: !isOrderCanceledOrRejected,child:  Stack(
           children: <Widget>[
             Container(
               height: 30,
@@ -1907,7 +1093,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
               width: 2,
               child: LinearProgressIndicator(
                 backgroundColor: grayLightColorSecondary,
-                value: 0,
+                value: orderConfirmedProgress,
                 valueColor: AlwaysStoppedAnimation<Color>(appTheme),
               ),
             ),
@@ -1918,66 +1104,71 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   height: 10,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10 / 2),
-                      color: grayLightColorSecondary),
+                      color: orderConfirmed==Colors.black?appTheme:grayLightColorSecondary),
                 ),
                 SizedBox(
                   width: 5,
                 ),
                 Expanded(
                     child: Text(
-                  'Order Confirmed',
-                  style:
-                      TextStyle(fontSize: 16, color: grayLightColorSecondary),
-                )),
+                      'Order Confirmed',
+                      style: TextStyle(
+                          fontSize: 16, color: orderConfirmed),
+                    )),
                 Text(
-                  'Pending',
-                  style:
-                      TextStyle(color: grayLightColorSecondary, fontSize: 16),
+                  orderConfirmed==Colors.black?'Done': 'Pending',
+                  style: TextStyle(
+                      color: orderConfirmed, fontSize: 16),
                 )
               ],
             )
           ],
-        ),
-        Stack(
-          children: <Widget>[
-            Container(
-              height: 30,
-              margin: EdgeInsets.only(
-                left: 4,
-              ),
-              width: 2,
-              child: LinearProgressIndicator(
-                backgroundColor: grayLightColorSecondary,
-                value: 0,
-                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-              ),
-            ),
-            Row(
-              children: <Widget>[
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10 / 2),
-                      color: grayLightColorSecondary),
+        ),),
+        Visibility(
+          visible: !isOrderCanceledOrRejected&& !widget.orderHistoryData.orderFacility
+              .toLowerCase()
+              .contains('pick'),
+          child: Stack(
+            children: <Widget>[
+              Container(
+                height: 30,
+                margin: EdgeInsets.only(
+                  left: 4,
                 ),
-                SizedBox(
-                  width: 5,
+                width: 2,
+                child: LinearProgressIndicator(
+                  backgroundColor: grayLightColorSecondary,
+                  value: orderShippedProgress,
+                  valueColor: AlwaysStoppedAnimation<Color>(appTheme),
                 ),
-                Expanded(
-                    child: Text(
-                  'Order Shipped',
-                  style:
-                      TextStyle(fontSize: 16, color: grayLightColorSecondary),
-                )),
-                Text(
-                  'Pending',
-                  style:
-                      TextStyle(color: grayLightColorSecondary, fontSize: 16),
-                )
-              ],
-            )
-          ],
+              ),
+              Row(
+                children: <Widget>[
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10 / 2),
+                        color: orderShipped==Colors.black?appTheme:grayLightColorSecondary),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Expanded(
+                      child: Text(
+                        'Order Shipped',
+                        style: TextStyle(
+                            fontSize: 16, color: orderShipped),
+                      )),
+                  Text(
+                    orderShipped==Colors.black?'Done': 'Pending',
+                    style: TextStyle(
+                        color: orderShipped, fontSize: 16),
+                  )
+                ],
+              )
+            ],
+          ),
         ),
         Stack(
           children: <Widget>[
@@ -1989,7 +1180,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
               width: 2,
               child: LinearProgressIndicator(
                 backgroundColor: grayLightColorSecondary,
-                value: 0,
+                value: orderDeliveredProgress,
                 valueColor: AlwaysStoppedAnimation<Color>(appTheme),
               ),
             ),
@@ -2000,21 +1191,26 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   height: 10,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10 / 2),
-                      color: grayLightColorSecondary),
+                      color: orderDelivered==Colors.black?appTheme:orderDelivered),
                 ),
                 SizedBox(
                   width: 5,
                 ),
                 Expanded(
-                    child: Text(
-                  'Order Delivered',
-                  style:
-                      TextStyle(fontSize: 16, color: grayLightColorSecondary),
-                )),
+                    child: Text( isOrderCanceledOrRejected? widget.orderHistoryData.status=='2'?'Order Rejected':
+                    'Order Canceled':
+                      !widget.orderHistoryData.orderFacility
+                          .toLowerCase()
+                          .contains('pick')
+                          ? 'Order Delivered'
+                          : 'Order Picked',
+                      style: TextStyle(
+                          fontSize: 16, color: orderDelivered),
+                    )),
                 Text(
-                  'Pending',
-                  style:
-                      TextStyle(color: grayLightColorSecondary, fontSize: 16),
+                  orderDelivered==Colors.black||orderDelivered==Colors.red?'Done': 'Pending',
+                  style: TextStyle(
+                      color: orderDelivered, fontSize: 16),
                 )
               ],
             )
@@ -2022,6 +1218,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         ),
       ],
     );
+
+
   }
 
   showAlertDialog(BuildContext context, setState) {

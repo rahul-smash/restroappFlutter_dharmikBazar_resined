@@ -117,7 +117,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                     children: <Widget>[
                       SizedBox(height: 20),
                       Text(
-                        "City*",
+                        "Town/City*",
                         style: TextStyle(color: infoLabel, fontSize: 17.0),
                       ),
                       Padding(
@@ -162,7 +162,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Divider(color: Colors.grey, height: 2.0),
                       SizedBox(height: 20),
                       Text(
-                        "Area*",
+                        "Area/Society Name*",
                         style: TextStyle(color: infoLabel, fontSize: 17.0),
                       ),
                       Padding(
@@ -170,7 +170,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           child: InkWell(
                             onTap: () async {
                               if(selectedCity == null){
-                                Utils.showToast("Please select city first!", false);
+                                Utils.showToast("Please select Town/City first!", false);
                                 return ;
                               }
                               if (dataObject == null) {
@@ -274,11 +274,9 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       SizedBox(height: 10),
                       Container(
                         color: Colors.grey[200],
-                        height: 100.0,
                         child: new TextField(
                           controller: addressController,
                           keyboardType: TextInputType.multiline,
-                          maxLength: 100,
                           maxLines: null,
                           decoration: new InputDecoration(
                               border: InputBorder.none,
@@ -286,7 +284,29 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               focusedBorder: InputBorder.none,
                               contentPadding: EdgeInsets.only(
                                   left: 10, bottom: 10, top: 10, right: 10),
-                              hintText: AppConstant.enterAddress),
+                              hintText:'' /*AppConstant.enterAddress*/),
+                        ),
+                      ),
+                      Divider(color: Colors.grey, height: 2.0),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text(
+                          "Address line2/House/flat no",
+                          style: TextStyle(color: infoLabel, fontSize: 17.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 0),
+                        child: Container(
+                          child: new TextField(
+                            controller: fullnameController,
+                            keyboardType: TextInputType.multiline,
+                            decoration: new InputDecoration(
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                    left: 0, bottom: 0, top: 0, right: 0)),
+                          ),
                         ),
                       ),
                       Divider(color: Colors.grey, height: 2.0),
