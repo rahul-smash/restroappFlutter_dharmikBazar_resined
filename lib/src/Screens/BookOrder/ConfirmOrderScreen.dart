@@ -97,12 +97,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void callPaytmPayApi() async {
     String address = "NA", pin = "NA";
     if (widget.deliveryType == OrderType.Delivery) {
-      if (widget.address.address != null && widget.address.address.isNotEmpty)
-        address = widget.address.address +
-            " " +
-            widget.address.areaName +
-            " " +
-            widget.address.city;
+      if (widget.address.address2 != null &&
+          widget.address.address2.isNotEmpty) {
+        if (widget.address.address != null &&
+            widget.address.address.isNotEmpty) {
+          address = widget.address.address + ", "+ widget.address.address2+
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        }else{
+          address = widget.address.address2 +
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        }
+      } else {
+        if (widget.address.address != null &&
+            widget.address.address.isNotEmpty) {
+          address = widget.address.address +
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        }
+      }
 
       if (widget.address.zipCode != null && widget.address.zipCode.isNotEmpty)
         pin = widget.address.zipCode;
@@ -2387,7 +2407,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         taxModel != null) {
       shippingCharges = '0';
       taxModel.total = '0';
-      totalPrice=0;
+      totalPrice = 0;
     }
     if (mounted) {
       setState(() {});

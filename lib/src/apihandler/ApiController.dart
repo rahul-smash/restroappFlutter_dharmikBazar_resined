@@ -478,7 +478,7 @@ class ApiController {
       String city,
       String cityId,
       String lat,
-      String lng) async {
+      String lng,{String address2=''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
@@ -501,7 +501,8 @@ class ApiController {
         "lng": "${lng}",
         "area_id": areaId,
         "first_name": fullname,
-        "email": user.email
+        "email": user.email,
+        "address2":address2
       });
 
       if (addressId != null) {
@@ -755,7 +756,12 @@ class ApiController {
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
         "user_address":
-            isComingFromPickUpScreen == true ? storeAddress : address.address,
+            isComingFromPickUpScreen == true ? storeAddress :
+            address.address2!=null&&address.address2.trim().isNotEmpty?
+            '${address.address!=null&&address.address.trim().isNotEmpty?
+            '${address.address}, ${address.address}'
+                :"${address.address2}"}'
+                : address.address,
         "store_fixed_tax_detail": "",
         "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",

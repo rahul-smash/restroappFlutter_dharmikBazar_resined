@@ -33,6 +33,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   TextEditingController addressController = new TextEditingController();
   TextEditingController zipCodeController = new TextEditingController();
   TextEditingController fullnameController = new TextEditingController();
+  TextEditingController address2Controller = new TextEditingController();
   LocationData locationData;
   Datum dataObject;
 
@@ -49,6 +50,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       selectedArea.areaId = widget.selectedAddress.areaId;
       selectedArea.area = widget.selectedAddress.areaName;
       addressController.text = widget.selectedAddress.address;
+      address2Controller.text = widget.selectedAddress.address2;
       zipCodeController.text = widget.selectedAddress.zipCode;
       fullnameController.text =
           "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
@@ -65,6 +67,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
         //print("-3333333333333333-------");
         locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
+        address2Controller.text = widget.addressValue;
         locationData.lat = widget.coordinates.latitude.toString();
         locationData.lng = widget.coordinates.longitude.toString();
       }
@@ -255,7 +258,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           },
                           child: Text.rich(
                             TextSpan(
-                              text: 'Enter or Select Location - ',
+                              text: 'Enter Address or Select Location - ',
                               style: TextStyle(color: infoLabel, fontSize: 17),
                               children: <TextSpan>[
                                 TextSpan(
@@ -274,9 +277,11 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       SizedBox(height: 10),
                       Container(
                         color: Colors.grey[200],
+                        height: 100.0,
                         child: new TextField(
                           controller: addressController,
-                          keyboardType: TextInputType.multiline,
+                          keyboardType: TextInputType.text,
+                          maxLength: 100,
                           maxLines: null,
                           decoration: new InputDecoration(
                               border: InputBorder.none,
@@ -299,8 +304,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         padding: EdgeInsets.only(bottom: 0),
                         child: Container(
                           child: new TextField(
-                            controller: fullnameController,
-                            keyboardType: TextInputType.multiline,
+                            controller: address2Controller,
+                            keyboardType: TextInputType.text,
                             decoration: new InputDecoration(
                                 border: InputBorder.none,
                                 focusedBorder: InputBorder.none,
@@ -322,7 +327,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         child: Container(
                           child: new TextField(
                             controller: fullnameController,
-                            keyboardType: TextInputType.multiline,
+                            keyboardType: TextInputType.text,
                             decoration: new InputDecoration(
                                 border: InputBorder.none,
                                 focusedBorder: InputBorder.none,
@@ -380,7 +385,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 Utils.showToast(AppConstant.selectArea, false);
                                 return;
                               }
-                              if (addressController.text.trim().isEmpty) {
+                              if (addressController.text.trim().isEmpty
+                                  &&address2Controller.text.trim().isEmpty) {
                                 Utils.showToast(
                                     AppConstant.pleaseEnterAddress, false);
                                 return;
