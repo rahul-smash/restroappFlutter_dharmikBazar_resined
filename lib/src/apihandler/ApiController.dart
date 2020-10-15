@@ -759,7 +759,7 @@ class ApiController {
             isComingFromPickUpScreen == true ? storeAddress :
             address.address2!=null&&address.address2.trim().isNotEmpty?
             '${address.address!=null&&address.address.trim().isNotEmpty?
-            '${address.address}, ${address.address}'
+            '${address.address}, ${address.address2}'
                 :"${address.address2}"}'
                 : address.address,
         "store_fixed_tax_detail": "",

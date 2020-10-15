@@ -420,7 +420,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       selectedCity.city,
                                       selectedCity.id,
                                       "${locationData.lat}",
-                                      "${locationData.lng}")
+                                      "${locationData.lng}",address2: address2Controller.text)
                                   .then((response) {
                                 Utils.hideProgressDialog(context);
                                 //print('@@REsonsesss'+response.toString());
