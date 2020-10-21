@@ -1202,15 +1202,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     if(widget.storeModel != null){
       if(widget.storeModel.cod == "1"){
         showCOD = true;
+        widget.paymentMode = "2";
       }else if(widget.storeModel.cod == "0"){
         showCOD = false;
       }
       if (widget.storeModel.onlinePayment == "0" && widget.storeModel.cod == "0") {
         showCOD = true;
+        showOptions = true;
+        widget.paymentMode = "2";
+      }
+      if(widget.storeModel.cod == "0" && widget.storeModel.onlinePayment == "1"){
+        widget._character = PaymentType.ONLINE;
+        widget.paymentMode = "3";
       }
     }
 
 
+    print("onlinePayment=${widget.storeModel.onlinePayment} and cod=${widget.storeModel.cod}");
 
     return Visibility(
       visible: showOptions,
@@ -2138,7 +2146,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 //                  "${couponCode}", "${discount}", shippingCharges, json)
 //              .then((response) {
 
-          print("-taxModel-${taxModel}");
+          print("-paymentMode-${widget.paymentMode}");
 
           ApiController.placeOrderRequest(
                   shippingCharges,
