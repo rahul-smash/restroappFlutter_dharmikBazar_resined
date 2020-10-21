@@ -150,7 +150,7 @@ class OrderDetail {
     this.price,
     this.weight,
     this.mrpPrice,
-    this.unitType,
+    //this.unitType,
     this.productStatus,
     this.discount,
     this.productType,
@@ -168,7 +168,7 @@ class OrderDetail {
   String price;
   String weight;
   String mrpPrice;
-  String unitType;
+  String unitType = "";
   String productStatus;
   String discount;
   int productType;
@@ -186,7 +186,7 @@ class OrderDetail {
     String price,
     String weight,
     String mrpPrice,
-    String unitType,
+    //String unitType,
     String productStatus,
     String discount,
     int productType,
@@ -204,7 +204,7 @@ class OrderDetail {
         price: price ?? this.price,
         weight: weight ?? this.weight,
         mrpPrice: mrpPrice ?? this.mrpPrice,
-        unitType: unitType ?? this.unitType,
+        //unitType: unitType ?? this.unitType,
         productStatus: productStatus ?? this.productStatus,
         discount: discount ?? this.discount,
         productType: productType ?? this.productType,
@@ -227,7 +227,7 @@ class OrderDetail {
     price: json["price"] == null ? null : json["price"],
     weight: json["weight"] == null ? null : json["weight"],
     mrpPrice: json["mrp_price"] == null ? null : json["mrp_price"],
-    unitType: json["unit_type"] == null ? null : json["unit_type"],
+    //unitType: json["unit_type"] == null ? null : json["unit_type"],
     productStatus: json["product_status"] == null ? null : json["product_status"],
     discount: json["discount"] == null ? null : json["discount"],
     productType: json["product_type"] == null ? null : json["product_type"],
@@ -246,7 +246,7 @@ class OrderDetail {
     "price": price == null ? null : price,
     "weight": weight == null ? null : weight,
     "mrp_price": mrpPrice == null ? null : mrpPrice,
-    "unit_type": unitType == null ? null : unitType,
+    //"unit_type": unitType == null ? null : unitType,
     "product_status": productStatus == null ? null : productStatus,
     "discount": discount == null ? null : discount,
     "product_type": productType == null ? null : productType,
