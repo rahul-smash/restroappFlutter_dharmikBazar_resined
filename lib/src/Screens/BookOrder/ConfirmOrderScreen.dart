@@ -1183,6 +1183,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addPaymentOptions() {
     bool showOptions = false;
+    bool showCOD = true;
 //    if (storeModel != null) {
 //      return Container();
 //    }
@@ -1197,6 +1198,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         showOptions = true;
       }
     }
+
+    if(widget.storeModel != null){
+      if(widget.storeModel.cod == "1"){
+        showCOD = true;
+      }else if(widget.storeModel.cod == "0"){
+        showCOD = false;
+      }
+      if (widget.storeModel.onlinePayment == "0" && widget.storeModel.cod == "0") {
+        showCOD = true;
+      }
+    }
+
+
+
     return Visibility(
       visible: showOptions,
       child: Padding(
@@ -1213,29 +1228,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     fontWeight: FontWeight.w600,
                   )),
             ),
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: PaymentType.COD,
-                  groupValue: widget._character,
-                  activeColor: appTheme,
-                  onChanged: (PaymentType value) async {
-                    setState(() {
-                      widget._character = value;
-                      if (value == PaymentType.COD) {
-                        widget.paymentMode = "2";
-                        ispaytmSelected = false;
-                      }
-                    });
-                  },
-                ),
-                Text('COD',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    )),
-              ],
+            Visibility(
+              visible: showCOD,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.COD,
+                    groupValue: widget._character,
+                    activeColor: appTheme,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.COD) {
+                          widget.paymentMode = "2";
+                          ispaytmSelected = false;
+                        }
+                      });
+                    },
+                  ),
+                  Text('COD',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
             ),
             Visibility(
               visible: widget.storeModel.onlinePayment != null &&

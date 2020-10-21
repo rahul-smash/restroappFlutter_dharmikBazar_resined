@@ -42,6 +42,7 @@ class StoreModel {
   String androidShareLink;
   String iphoneShareLink;
   String theme;
+  String cod;
   String webTheme;
   String type;
   String catType;
@@ -141,6 +142,7 @@ class StoreModel {
       this.city,
       this.state,
       this.country,
+      this.cod,
       this.zipcode,
       this.lat,
       this.lng,
@@ -251,6 +253,7 @@ class StoreModel {
     state = json['state'];
     country = json['country'];
     zipcode = json['zipcode'];
+    cod = json['cod'];
     lat = json['lat'];
     lng = json['lng'];
     contactPerson = json['contact_person'];
@@ -406,6 +409,7 @@ class StoreModel {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['store_name'] = this.storeName;
+    data['cod'] = this.cod;
     data['location'] = this.location;
     data['city'] = this.city;
     data['state'] = this.state;
