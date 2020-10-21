@@ -157,6 +157,7 @@ class OrderDetail {
     this.newMrpPrice,
     this.newDiscount,
     this.newPrice,
+    this.gst_state,
   });
 
   String productId;
@@ -174,6 +175,7 @@ class OrderDetail {
   String newMrpPrice;
   String newDiscount;
   String newPrice;
+  String gst_state;
 
   OrderDetail copyWith({
     String productId,
@@ -191,6 +193,7 @@ class OrderDetail {
     String newMrpPrice,
     String newDiscount,
     String newPrice,
+    String gst_state,
   }) =>
       OrderDetail(
         productId: productId ?? this.productId,
@@ -208,6 +211,7 @@ class OrderDetail {
         newMrpPrice: newMrpPrice ?? this.newMrpPrice,
         newDiscount: newDiscount ?? this.newDiscount,
         newPrice: newPrice ?? this.newPrice,
+        gst_state: newPrice ?? this.gst_state,
       );
 
   factory OrderDetail.fromRawJson(String str) => OrderDetail.fromJson(json.decode(str));
@@ -230,6 +234,7 @@ class OrderDetail {
     newMrpPrice: json["new_mrp_price"] == null ? null : json["new_mrp_price"],
     newDiscount: json["new_discount"] == null ? null : json["new_discount"],
     newPrice: json["new_price"] == null ? null : json["new_price"],
+    gst_state: json["gst_state"] == null ? null : json["gst_state"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -248,6 +253,7 @@ class OrderDetail {
     "new_mrp_price": newMrpPrice == null ? null : newMrpPrice,
     "new_discount": newDiscount == null ? null : newDiscount,
     "new_price": newPrice == null ? null : newPrice,
+    "gst_state": gst_state == null ? null : gst_state,
   };
 }
 

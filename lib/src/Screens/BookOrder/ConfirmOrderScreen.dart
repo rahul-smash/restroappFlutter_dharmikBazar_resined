@@ -2112,6 +2112,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 //          ApiController.multipleTaxCalculationRequest(
 //                  "${couponCode}", "${discount}", shippingCharges, json)
 //              .then((response) {
+
           ApiController.placeOrderRequest(
                   shippingCharges,
                   comment,
