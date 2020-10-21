@@ -133,6 +133,7 @@ class StoreModel {
   String poweredByText;
   String poweredByLink;
   String reviewRatingDisplay;
+  String allowCustomerForGst;
 
   StoreModel(
       {this.id,
@@ -239,7 +240,13 @@ class StoreModel {
         this.homePageSubtitle,
         this.homePageHeaderRight,
         this.homePageDisplayNumber,
-        this.homePageDisplayNumberType,this.domain,this.poweredByText,this.poweredByLink,this.reviewRatingDisplay});
+        this.homePageDisplayNumberType,
+        this.domain,
+        this.poweredByText,
+        this.poweredByLink,
+        this.reviewRatingDisplay,
+        this.allowCustomerForGst,
+      });
 
   StoreModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -403,6 +410,7 @@ class StoreModel {
     poweredByText=json["powered_by_text"];
     poweredByLink=json["powered_by_link"];
     reviewRatingDisplay=json["review_rating_display"]==null?null:json["review_rating_display"];
+    allowCustomerForGst=json["allow_customer_for_gst"]==null?null:json["allow_customer_for_gst"];
   }
 
   Map<String, dynamic> toJson() {
@@ -537,6 +545,7 @@ class StoreModel {
     data['powered_by_text']=this.poweredByText;
     data['powered_by_link']=this.poweredByLink;
     data['review_rating_display']=this.reviewRatingDisplay;
+    data['allow_customer_for_gst']=this.allowCustomerForGst;
     return data;
   }
 }

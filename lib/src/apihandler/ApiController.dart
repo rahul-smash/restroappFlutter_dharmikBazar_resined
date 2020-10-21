@@ -633,6 +633,7 @@ class ApiController {
       String shipping,
       String orderJson) async {
     StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
 
@@ -646,6 +647,7 @@ class ApiController {
       request.fields.addAll({
         "fixed_discount_amount": "${discount}",
         "tax": "0",
+        "user_id": user.id,
         "discount": "0",
         "shipping": shipping,
         "order_detail": orderJson,
@@ -808,7 +810,8 @@ class ApiController {
       String phoneNumber,
       bool isComingFromOtpScreen,
       String id,
-      String user_refer_code) async {
+      String user_refer_code,
+      String gstNumber) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     StoreModel store = await SharedPrefs.getStore();
     String userId;
@@ -833,6 +836,7 @@ class ApiController {
         "user_id": userId,
         "device_id": deviceId,
         "device_token": deviceToken,
+        "gst_number": gstNumber,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
       print("--fields--${request.fields.toString()}--");
