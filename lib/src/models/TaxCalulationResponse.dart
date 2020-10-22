@@ -158,6 +158,7 @@ class OrderDetail {
     this.newDiscount,
     this.newPrice,
     this.gst_state,
+    this.gst_tax_rate,
     this.cgst,
     this.sgst,
     this.igst,
@@ -181,6 +182,7 @@ class OrderDetail {
   String newDiscount;
   String newPrice;
   String gst_state;
+  String gst_tax_rate;
   dynamic cgst;
   dynamic sgst;
   dynamic igst;
@@ -204,6 +206,7 @@ class OrderDetail {
     String newDiscount,
     String newPrice,
     String gst_state,
+    String gst_tax_rate,
     dynamic cgst,
     dynamic sgst,
     dynamic igst,
@@ -226,7 +229,8 @@ class OrderDetail {
         newMrpPrice: newMrpPrice ?? this.newMrpPrice,
         newDiscount: newDiscount ?? this.newDiscount,
         newPrice: newPrice ?? this.newPrice,
-        gst_state: newPrice ?? this.gst_state,
+        gst_state: gst_state ?? this.gst_state,
+        gst_tax_rate: gst_tax_rate ?? this.gst_tax_rate,
         cgst: cgst ?? this.cgst,
         sgst: sgst ?? this.sgst,
         igst: igst ?? this.igst,
@@ -255,6 +259,7 @@ class OrderDetail {
     newDiscount: json["new_discount"] == null ? null : json["new_discount"],
     newPrice: json["new_price"] == null ? null : json["new_price"],
     gst_state: json["gst_state"] == null ? null : json["gst_state"],
+    gst_tax_rate: json["gst_tax_rate"] == null ? null : json["gst_tax_rate"],
     cgst: json["cgst"] == null ? 0 : json["cgst"],
     sgst: json["sgst"] == null ? 0 : json["sgst"],
     igst: json["igst"] == null ? 0 : json["igst"],
@@ -279,6 +284,7 @@ class OrderDetail {
     "new_discount": newDiscount == null ? null : newDiscount,
     "new_price": newPrice == null ? null : newPrice,
     "gst_state": gst_state == null ? null : gst_state,
+    "gst_tax_rate": gst_tax_rate == null ? null : gst_tax_rate,
     "cgst": cgst == null ? 0 : cgst,
     "sgst": sgst == null ? 0 : sgst,
     "igst": igst == null ? 0 : igst,
@@ -312,6 +318,8 @@ class OrderDetail {
           "new_mrp_price": item.newMrpPrice == null ? null : item.newMrpPrice,
           "new_discount": item.newDiscount == null ? null : item.newDiscount,
           "new_price": item.newPrice == null ? null : item.newPrice,
+          "gst_state": item.gst_state == null ? null : item.gst_state,
+          "gst_tax_rate": item.gst_tax_rate == null ? null : item.gst_tax_rate,
           "cgst": item.cgst == null ? 0 : item.cgst,
           "sgst": item.sgst == null ? 0 : item.sgst,
           "igst": item.igst == null ? 0 : item.igst,
