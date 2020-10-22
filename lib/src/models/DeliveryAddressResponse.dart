@@ -33,6 +33,7 @@ class DeliveryAddressData {
   String mobile;
   String email;
   String address;
+  String address2;
   String areaId;
   String areaName;
   String city;
@@ -58,6 +59,7 @@ class DeliveryAddressData {
     this.mobile,
     this.email,
     this.address,
+    this.address2,
     this.areaId,
     this.areaName,
     this.city,
@@ -87,6 +89,7 @@ class DeliveryAddressData {
         mobile: json["mobile"],
         email: json["email"],
         address: json["address"],
+        address2: json["address2"],
         areaId: json["area_id"],
         areaName: json["area_name"],
         city: json["city"],
@@ -113,6 +116,7 @@ class DeliveryAddressData {
         "mobile": mobile,
         "email": email,
         "address": address,
+        "address2": address2,
         "area_id": areaId,
         "area_name": areaName,
         "city": city,

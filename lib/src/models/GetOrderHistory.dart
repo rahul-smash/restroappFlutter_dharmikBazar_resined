@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class GetOrderHistory {
   bool success;
   List<OrderData> orders;
@@ -39,6 +41,7 @@ class OrderData {
   String address;
   List<OrderItems> orderItems;
   List<DeliveryAddress> deliveryAddress;
+  String rating;
 
   OrderData({
     this.orderId,
@@ -50,6 +53,7 @@ class OrderData {
     this.deliveryTimeSlot,
     this.orderDate,
     this.status,
+    this.rating,
     this.total,
     this.discount,
     this.checkout,
@@ -86,6 +90,7 @@ class OrderData {
     cartSaving = json['cart_saving'];
     couponType = json['coupon_type'];
     couponCode = json['coupon_code'];
+    rating = json['rating'];
     address = json['address'];
     if (json['order_items'] != null) {
       orderItems = new List<OrderItems>();
@@ -217,6 +222,7 @@ class OrderItems {
   String productImage;
   String productBrand;
   List<Null> gst;
+  List<Review> review;
 
   OrderItems(
       {this.id,
@@ -273,6 +279,9 @@ class OrderItems {
     if (json['gst'] != null) {
       gst = new List<Null>();
     }
+    review = json["review"] == null
+        ? null
+        : List<Review>.from(json["review"].map((x) => Review.fromJson(x)));
   }
 
   Map<String, dynamic> toJson() {
@@ -301,6 +310,104 @@ class OrderItems {
     data['category_id'] = this.categoryId;
     data['product_image'] = this.productImage;
     data['product_brand'] = this.productBrand;
+    data["review"] = review == null
+        ? null
+        : List<dynamic>.from(review.map((x) => x.toJson()));
     return data;
   }
+}
+
+class Review {
+  Review({
+    this.id,
+    this.storeId,
+    this.userId,
+    this.title,
+    this.description,
+    this.productId,
+    this.rating,
+    this.image,
+    this.orderId,
+    this.platform,
+    this.created,
+    this.modified,
+  });
+
+  String id;
+  String storeId;
+  String userId;
+  String title;
+  String description;
+  String productId;
+  String rating;
+  String image;
+  String orderId;
+  String platform;
+  DateTime created;
+  DateTime modified;
+
+  Review copyWith({
+    String id,
+    String storeId,
+    String userId,
+    String title,
+    String description,
+    String productId,
+    String rating,
+    String image,
+    String orderId,
+    String platform,
+    DateTime created,
+    DateTime modified,
+  }) =>
+      Review(
+        id: id ?? this.id,
+        storeId: storeId ?? this.storeId,
+        userId: userId ?? this.userId,
+        title: title ?? this.title,
+        description: description ?? this.description,
+        productId: productId ?? this.productId,
+        rating: rating ?? this.rating,
+        image: image ?? this.image,
+        orderId: orderId ?? this.orderId,
+        platform: platform ?? this.platform,
+        created: created ?? this.created,
+        modified: modified ?? this.modified,
+      );
+
+  factory Review.fromRawJson(String str) => Review.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory Review.fromJson(Map<String, dynamic> json) => Review(
+        id: json["id"] == null ? null : json["id"],
+        storeId: json["store_id"] == null ? null : json["store_id"],
+        userId: json["user_id"] == null ? null : json["user_id"],
+        title: json["title"] == null ? null : json["title"],
+        description: json["description"] == null ? null : json["description"],
+        productId: json["product_id"] == null ? null : json["product_id"],
+        rating: json["rating"] == null ? null : json["rating"],
+        image: json["image"] == null ? null : json["image"],
+        orderId: json["order_id"] == null ? null : json["order_id"],
+        platform: json["platform"] == null ? null : json["platform"],
+        created:
+            json["created"] == null ? null : DateTime.parse(json["created"]),
+        modified:
+            json["modified"] == null ? null : DateTime.parse(json["modified"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id == null ? null : id,
+        "store_id": storeId == null ? null : storeId,
+        "user_id": userId == null ? null : userId,
+        "title": title == null ? null : title,
+        "description": description == null ? null : description,
+        "product_id": productId == null ? null : productId,
+        "rating": rating == null ? null : rating,
+        "image": image == null ? null : image,
+        "order_id": orderId == null ? null : orderId,
+        "platform": platform == null ? null : platform,
+        "created": created == null ? null : created.toIso8601String(),
+        "modified": modified == null ? null : modified.toIso8601String(),
+      };
 }

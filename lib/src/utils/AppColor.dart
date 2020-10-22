@@ -36,5 +36,6 @@ Color whiteColor = Color(0xffffffff);
 Color toastbgColor = Color(0xff656565);
 Color grayColorTitle = Color(0xff474d54);
 Color grayLightColor = Color(0xFFEEEEEE);
+Color grayLightColorSecondary = Color(0xFFDCDCDC);
 
 

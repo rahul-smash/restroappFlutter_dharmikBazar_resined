@@ -9,6 +9,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class ProfileScreen extends StatefulWidget {
   bool isComingFromOtpScreen;
+
   String id;
   String fullName = "";
 
@@ -21,12 +22,13 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileState extends State<ProfileScreen> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   UserModel user;
-
+  bool showGstNumber=false;
   final firstNameController = new TextEditingController();
   final lastNameController = new TextEditingController();
   final emailController = new TextEditingController();
   final phoneController = new TextEditingController();
   final referCodeController = new TextEditingController();
+  final gstCodeController = new TextEditingController();
 
   File image;
   StoreModel storeModel;
@@ -58,7 +60,11 @@ class _ProfileState extends State<ProfileScreen> {
       if (!widget.isComingFromOtpScreen) {
         showReferralCodeView = false;
       }
-
+      if(storeModel.allowCustomerForGst!=null&& storeModel.allowCustomerForGst.toLowerCase()=='yes'){
+        showGstNumber=true;
+      }else{
+        showGstNumber=false;
+      }
       if (storeModel.internationalOtp == "0") {
         isEmailEditable = false;
       } else {
@@ -77,7 +83,7 @@ class _ProfileState extends State<ProfileScreen> {
     //print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     return WillPopScope(
         onWillPop: () async {
-          return await nameValidation()&& isValidEmail(emailController.text);
+          return await nameValidation() && isValidEmail(emailController.text);
         },
         child: new Scaffold(
           backgroundColor: Colors.white,
@@ -174,6 +180,22 @@ class _ProfileState extends State<ProfileScreen> {
                                   fontWeight: FontWeight.w500),
                             ),
                           ),
+                          Visibility(
+                            visible: widget.isComingFromOtpScreen&&showGstNumber,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 15.0),
+                              child: TextField(
+                                controller: gstCodeController,
+                                decoration: InputDecoration(
+                                  labelText: 'Enter Your GST number',
+                                ),
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Color(0xFF495056),
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                          ),
                           Padding(
                             padding: const EdgeInsets.only(
                                 top: 35.0, left: 20, right: 20),
@@ -221,8 +243,8 @@ class _ProfileState extends State<ProfileScreen> {
     if (input.trim().isEmpty) return true;
     final RegExp regex = new RegExp(
         r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
-    bool isMatch= regex.hasMatch(input);
-   if(!isMatch) Utils.showToast("Please enter valid email", false);
+    bool isMatch = regex.hasMatch(input);
+    if (!isMatch) Utils.showToast("Please enter valid email", false);
     return isMatch;
   }
 
@@ -241,7 +263,8 @@ class _ProfileState extends State<ProfileScreen> {
     }
     if (!isValidEmail(emailController.text)) {
       Utils.showToast("Please enter valid email", false);
-      return;}
+      return;
+    }
     final FormState form = _formKey.currentState;
     if (!form.validate()) {
     } else {
@@ -253,7 +276,7 @@ class _ProfileState extends State<ProfileScreen> {
               phoneController.text,
               widget.isComingFromOtpScreen,
               widget.id,
-              referCodeController.text)
+              referCodeController.text,gstCodeController.text)
           .then((response) {
         Utils.hideProgressDialog(context);
         if (response.success) {

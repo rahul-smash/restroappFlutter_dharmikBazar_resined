@@ -257,7 +257,11 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     ),
                   ),
                   addAddressInfoRow(Icons.phone, area.mobile),
-                  addAddressInfoRow(Icons.location_on, area.address),
+                  addAddressInfoRow(Icons.location_on,  area.address2!=null&&area.address2.trim().isNotEmpty?
+                  '${area.address!=null&&area.address.trim().isNotEmpty?
+                  '${area.address}, ${area.address2}'
+                      :"${area.address2}"}'
+                      : area.address,),
                   addAddressInfoRow(Icons.email, area.email),
                 ],
               ),

@@ -51,11 +51,14 @@ dependencies:
   maps_launcher: ^1.2.0
   flutter_pull_to_refresh: ^1.0.0
   dio: ^3.0.9  #latest version
-#  webview_flutter: ^0.3.22+1
+#  webview_flutter: ^1.0.3
+  webview_flutter: ^0.3.22+1
   keyboard_visibility: ^0.5.6
-  flutter_inappwebview: ^4.0.0+4
+#  flutter_inappwebview: ^4.0.0+4
   flutter_open_whatsapp: ^0.1.2
-  expandable: ^4.1.4
+  flutter_rating_bar: ^3.0.1+1
+  image_picker: ^0.6.7+11
+  compressimage: ^0.1.1
 
 dev_dependencies:
   flutter_test:
@@ -127,6 +130,7 @@ flutter:
     - images/empty_cart.png
     - images/gifticon.png
     - images/whatsapp.png
+    - images/placeHolder.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

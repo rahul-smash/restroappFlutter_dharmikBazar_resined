@@ -33,6 +33,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   TextEditingController addressController = new TextEditingController();
   TextEditingController zipCodeController = new TextEditingController();
   TextEditingController fullnameController = new TextEditingController();
+  TextEditingController address2Controller = new TextEditingController();
   LocationData locationData;
   Datum dataObject;
 
@@ -49,6 +50,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       selectedArea.areaId = widget.selectedAddress.areaId;
       selectedArea.area = widget.selectedAddress.areaName;
       addressController.text = widget.selectedAddress.address;
+      address2Controller.text = widget.selectedAddress.address2;
       zipCodeController.text = widget.selectedAddress.zipCode;
       fullnameController.text =
           "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
@@ -65,6 +67,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
         //print("-3333333333333333-------");
         locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
+        address2Controller.text = widget.addressValue;
         locationData.lat = widget.coordinates.latitude.toString();
         locationData.lng = widget.coordinates.longitude.toString();
       }
@@ -117,7 +120,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                     children: <Widget>[
                       SizedBox(height: 20),
                       Text(
-                        "City*",
+                        "Town/City*",
                         style: TextStyle(color: infoLabel, fontSize: 17.0),
                       ),
                       Padding(
@@ -162,7 +165,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Divider(color: Colors.grey, height: 2.0),
                       SizedBox(height: 20),
                       Text(
-                        "Area*",
+                        "Area/Society Name*",
                         style: TextStyle(color: infoLabel, fontSize: 17.0),
                       ),
                       Padding(
@@ -170,7 +173,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           child: InkWell(
                             onTap: () async {
                               if(selectedCity == null){
-                                Utils.showToast("Please select city first!", false);
+                                Utils.showToast("Please select Town/City first!", false);
                                 return ;
                               }
                               if (dataObject == null) {
@@ -255,7 +258,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           },
                           child: Text.rich(
                             TextSpan(
-                              text: 'Enter or Select Location - ',
+                              text: 'Enter Address or Select Location - ',
                               style: TextStyle(color: infoLabel, fontSize: 17),
                               children: <TextSpan>[
                                 TextSpan(
@@ -277,7 +280,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         height: 100.0,
                         child: new TextField(
                           controller: addressController,
-                          keyboardType: TextInputType.multiline,
+                          keyboardType: TextInputType.text,
                           maxLength: 100,
                           maxLines: null,
                           decoration: new InputDecoration(
@@ -286,7 +289,29 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               focusedBorder: InputBorder.none,
                               contentPadding: EdgeInsets.only(
                                   left: 10, bottom: 10, top: 10, right: 10),
-                              hintText: AppConstant.enterAddress),
+                              hintText:'' /*AppConstant.enterAddress*/),
+                        ),
+                      ),
+                      Divider(color: Colors.grey, height: 2.0),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: Text(
+                          "Address line2/House/flat no",
+                          style: TextStyle(color: infoLabel, fontSize: 17.0),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(bottom: 0),
+                        child: Container(
+                          child: new TextField(
+                            controller: address2Controller,
+                            keyboardType: TextInputType.text,
+                            decoration: new InputDecoration(
+                                border: InputBorder.none,
+                                focusedBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                    left: 0, bottom: 0, top: 0, right: 0)),
+                          ),
                         ),
                       ),
                       Divider(color: Colors.grey, height: 2.0),
@@ -302,7 +327,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         child: Container(
                           child: new TextField(
                             controller: fullnameController,
-                            keyboardType: TextInputType.multiline,
+                            keyboardType: TextInputType.text,
                             decoration: new InputDecoration(
                                 border: InputBorder.none,
                                 focusedBorder: InputBorder.none,
@@ -360,7 +385,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 Utils.showToast(AppConstant.selectArea, false);
                                 return;
                               }
-                              if (addressController.text.trim().isEmpty) {
+                              if (addressController.text.trim().isEmpty
+                                  &&address2Controller.text.trim().isEmpty) {
                                 Utils.showToast(
                                     AppConstant.pleaseEnterAddress, false);
                                 return;
@@ -394,7 +420,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       selectedCity.city,
                                       selectedCity.id,
                                       "${locationData.lat}",
-                                      "${locationData.lng}")
+                                      "${locationData.lng}",address2: address2Controller.text)
                                   .then((response) {
                                 Utils.hideProgressDialog(context);
                                 //print('@@REsonsesss'+response.toString());

@@ -42,6 +42,7 @@ class StoreModel {
   String androidShareLink;
   String iphoneShareLink;
   String theme;
+  String cod;
   String webTheme;
   String type;
   String catType;
@@ -131,6 +132,8 @@ class StoreModel {
   String domain;
   String poweredByText;
   String poweredByLink;
+  String reviewRatingDisplay;
+  String allowCustomerForGst;
 
   StoreModel(
       {this.id,
@@ -140,6 +143,7 @@ class StoreModel {
       this.city,
       this.state,
       this.country,
+      this.cod,
       this.zipcode,
       this.lat,
       this.lng,
@@ -236,7 +240,13 @@ class StoreModel {
         this.homePageSubtitle,
         this.homePageHeaderRight,
         this.homePageDisplayNumber,
-        this.homePageDisplayNumberType,this.domain,this.poweredByText,this.poweredByLink});
+        this.homePageDisplayNumberType,
+        this.domain,
+        this.poweredByText,
+        this.poweredByLink,
+        this.reviewRatingDisplay,
+        this.allowCustomerForGst,
+      });
 
   StoreModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -250,6 +260,7 @@ class StoreModel {
     state = json['state'];
     country = json['country'];
     zipcode = json['zipcode'];
+    cod = json['cod'];
     lat = json['lat'];
     lng = json['lng'];
     contactPerson = json['contact_person'];
@@ -398,12 +409,15 @@ class StoreModel {
     domain=json["domain"];
     poweredByText=json["powered_by_text"];
     poweredByLink=json["powered_by_link"];
+    reviewRatingDisplay=json["review_rating_display"]==null?null:json["review_rating_display"];
+    allowCustomerForGst=json["allow_customer_for_gst"]==null?null:json["allow_customer_for_gst"];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
     data['store_name'] = this.storeName;
+    data['cod'] = this.cod;
     data['location'] = this.location;
     data['city'] = this.city;
     data['state'] = this.state;
@@ -530,6 +544,8 @@ class StoreModel {
     data['domain']=this.domain;
     data['powered_by_text']=this.poweredByText;
     data['powered_by_link']=this.poweredByLink;
+    data['review_rating_display']=this.reviewRatingDisplay;
+    data['allow_customer_for_gst']=this.allowCustomerForGst;
     return data;
   }
 }

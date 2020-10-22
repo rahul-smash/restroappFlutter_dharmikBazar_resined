@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+//import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
@@ -33,7 +33,7 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-//import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
   bool isComingFromPickUpScreen;
@@ -97,12 +97,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void callPaytmPayApi() async {
     String address = "NA", pin = "NA";
     if (widget.deliveryType == OrderType.Delivery) {
-      if (widget.address.address != null && widget.address.address.isNotEmpty)
-        address = widget.address.address +
-            " " +
-            widget.address.areaName +
-            " " +
-            widget.address.city;
+      if (widget.address.address2 != null &&
+          widget.address.address2.isNotEmpty) {
+        if (widget.address.address != null &&
+            widget.address.address.isNotEmpty) {
+          address = widget.address.address + ", "+ widget.address.address2+
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        }else{
+          address = widget.address.address2 +
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        }
+      } else {
+        if (widget.address.address != null &&
+            widget.address.address.isNotEmpty) {
+          address = widget.address.address +
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        }
+      }
 
       if (widget.address.zipCode != null && widget.address.zipCode.isNotEmpty)
         pin = widget.address.zipCode;
@@ -123,7 +143,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    databaseHelper
+    Utils
         .getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail)
@@ -564,11 +584,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         }
       }
     Color containerColor =
-        detail != null && detail.productStatus.contains('out_of_stock')
-            ? Colors.black12
-            : Colors.transparent;
-   String mrpPrice = detail != null && detail.productStatus.contains('price_changed')? detail.newMrpPrice:product.mrpPrice;
-   String price = detail != null && detail.productStatus.contains('price_changed')? detail.newPrice:product.price;
+    detail != null && detail.productStatus.contains('out_of_stock')
+        ? Colors.black12
+        : Colors.transparent;
+    String mrpPrice = detail != null && detail.productStatus.contains('price_changed')? detail.newMrpPrice:product.mrpPrice;
+    String price = detail != null && detail.productStatus.contains('price_changed')? detail.newPrice:product.price;
 
     if (product.taxDetail != null) {
       return Container(
@@ -582,23 +602,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   style: TextStyle(color: Colors.black54)),
               detail != null && detail.productStatus.contains('out_of_stock')
                   ? Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.red, width: 1),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Padding(
-                        padding: EdgeInsets.all(3),
-                        child: Text(
-                          "Out of Stock",
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ))
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 1),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Padding(
+                    padding: EdgeInsets.all(3),
+                    child: Text(
+                      "Out of Stock",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ))
                   : Text("${AppConstant.currency}${product.taxDetail.tax}",
-                      style: TextStyle(
-                          color: detail != null &&
-                                  detail.productStatus.contains('out_of_stock')
-                              ? Colors.red
-                              : Colors.black54)),
+                  style: TextStyle(
+                      color: detail != null &&
+                          detail.productStatus.contains('out_of_stock')
+                          ? Colors.red
+                          : Colors.black54)),
             ],
           ),
         ),
@@ -615,24 +635,24 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   style: TextStyle(color: Colors.black54)),
               detail != null && detail.productStatus.contains('out_of_stock')
                   ? Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.red, width: 1),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Padding(
-                        padding: EdgeInsets.all(3),
-                        child: Text(
-                          "Out of Stock",
-                          style: TextStyle(color: Colors.red),
-                        ),
-                      ))
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.red, width: 1),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Padding(
+                    padding: EdgeInsets.all(3),
+                    child: Text(
+                      "Out of Stock",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ))
                   : Text(
-                      "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
-                      style: TextStyle(
-                          color: detail != null &&
-                                  detail.productStatus.contains('out_of_stock')
-                              ? Colors.red
-                              : Colors.black54)),
+                  "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
+                  style: TextStyle(
+                      color: detail != null &&
+                          detail.productStatus.contains('out_of_stock')
+                          ? Colors.red
+                          : Colors.black54)),
             ],
           ),
         ),
@@ -681,25 +701,25 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
             detail != null && detail.productStatus.contains('out_of_stock')
                 ? Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.red, width: 1),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5)),
-                    child: Padding(
-                      padding: EdgeInsets.all(3),
-                      child: Text(
-                        "Out of Stock",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ))
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.red, width: 1),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: Text(
+                    "Out of Stock",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ))
                 : Text(
-                    "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: detail != null &&
-                                detail.productStatus.contains('out_of_stock')
-                            ? Colors.red
-                            : Colors.black45)),
+                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}",
+                style: TextStyle(
+                    fontSize: 16,
+                    color: detail != null &&
+                        detail.productStatus.contains('out_of_stock')
+                        ? Colors.red
+                        : Colors.black45)),
           ],
         ),
       );
@@ -879,8 +899,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           }
 
           if (!isProductOutOfStock) {
-            String mrpPrice=detail!=null&&detail.productStatus.contains('price_changed')?detail.mrpPrice:product.mrpPrice;
-            String price=detail!=null&&detail.productStatus.contains('price_changed')?detail.price:product.price;
+            String mrpPrice=detail!=null&&detail.productStatus.contains('price_changed')?detail.newMrpPrice:product.mrpPrice;
+            String price=detail!=null&&detail.productStatus.contains('price_changed')?detail.newPrice:product.price;
             totalSavings +=
                 (double.parse(mrpPrice) - double.parse(price)) *
                     double.parse(product.quantity);
@@ -1181,6 +1201,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addPaymentOptions() {
     bool showOptions = false;
+    bool showCOD = true;
 //    if (storeModel != null) {
 //      return Container();
 //    }
@@ -1195,6 +1216,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         showOptions = true;
       }
     }
+
+    if(widget.storeModel != null){
+      if(widget.storeModel.cod == "1"){
+        showCOD = true;
+        widget.paymentMode = "2";
+      }else if(widget.storeModel.cod == "0"){
+        showCOD = false;
+      }
+      if (widget.storeModel.onlinePayment == "0" && widget.storeModel.cod == "0") {
+        showCOD = true;
+        showOptions = true;
+        widget.paymentMode = "2";
+      }
+      if(widget.storeModel.cod == "0" && widget.storeModel.onlinePayment == "1"){
+        widget._character = PaymentType.ONLINE;
+        widget.paymentMode = "3";
+      }
+    }
+
+
+    print("onlinePayment=${widget.storeModel.onlinePayment} and cod=${widget.storeModel.cod}");
+
     return Visibility(
       visible: showOptions,
       child: Padding(
@@ -1211,29 +1254,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     fontWeight: FontWeight.w600,
                   )),
             ),
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: <Widget>[
-                Radio(
-                  value: PaymentType.COD,
-                  groupValue: widget._character,
-                  activeColor: appTheme,
-                  onChanged: (PaymentType value) async {
-                    setState(() {
-                      widget._character = value;
-                      if (value == PaymentType.COD) {
-                        widget.paymentMode = "2";
-                        ispaytmSelected = false;
-                      }
-                    });
-                  },
-                ),
-                Text('COD',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                    )),
-              ],
+            Visibility(
+              visible: showCOD,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.COD,
+                    groupValue: widget._character,
+                    activeColor: appTheme,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.COD) {
+                          widget.paymentMode = "2";
+                          ispaytmSelected = false;
+                        }
+                      });
+                    },
+                  ),
+                  Text('COD',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
             ),
             Visibility(
               visible: widget.storeModel.onlinePayment != null &&
@@ -2037,7 +2083,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    databaseHelper
+    Utils
         .getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail)
@@ -2094,11 +2140,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.hideKeyboard(context);
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
-        databaseHelper
+        /*databaseHelper
+            .getCartItemsListToJson(
+                isOrderVariations: isOrderVariations,
+                responseOrderDetail: responseOrderDetail)
+            .then((json) {*/
+        Utils
             .getCartItemsListToJson(
                 isOrderVariations: isOrderVariations,
                 responseOrderDetail: responseOrderDetail)
             .then((json) {
+
+
           if (json == null) {
             print("--json == null-json == null-");
             return;
@@ -2110,6 +2163,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 //          ApiController.multipleTaxCalculationRequest(
 //                  "${couponCode}", "${discount}", shippingCharges, json)
 //              .then((response) {
+
+          print("-paymentMode-${widget.paymentMode}");
+
           ApiController.placeOrderRequest(
                   shippingCharges,
                   comment,
@@ -2405,7 +2461,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         taxModel != null) {
       shippingCharges = '0';
       taxModel.total = '0';
-      totalPrice=0;
+      totalPrice = 0;
     }
     if (mounted) {
       setState(() {});
@@ -2445,8 +2501,128 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     return productOutOfStock;
   }
 }
-
+/*Code for ios*/
 class StripeWebView extends StatefulWidget {
+  StripeCheckOutModel stripeCheckOutModel;
+  StoreModel storeModel;
+
+  StripeWebView(this.stripeCheckOutModel, this.storeModel);
+
+  @override
+  _StripeWebViewState createState() {
+    return _StripeWebViewState();
+  }
+}
+
+class _StripeWebViewState extends State<StripeWebView> {
+  Completer<WebViewController> _controller = Completer<WebViewController>();
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () {
+        //print("onWillPop onWillPop");
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Used for removing back buttoon.
+          title: Text('Payment'),
+          centerTitle: true,
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return WebView(
+            initialUrl: '${widget.stripeCheckOutModel.checkoutUrl}',
+            javascriptMode: JavascriptMode.unrestricted,
+            onWebViewCreated: (WebViewController webViewController) {
+              _controller.complete(webViewController);
+            },
+            navigationDelegate: (NavigationRequest request) {
+              //print('=======NavigationRequest======= $request}');
+              return NavigationDecision.navigate;
+            },
+            onPageStarted: (String url) {
+              //print('======Page started loading======: $url');
+            },
+            onPageFinished: (String url) {
+              print('======Page finished loading======: $url');
+              if (url
+                  .contains("api/stripeVerifyTransaction?response=success")) {
+                eventBus.fire(onPageFinished(
+                    widget.stripeCheckOutModel.paymentRequestId));
+                Navigator.pop(context);
+              }
+            },
+            gestureNavigationEnabled: false,
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class PaytmWebView extends StatelessWidget {
+  CreatePaytmTxnTokenResponse stripeCheckOutModel;
+  StoreModel storeModel;
+  Completer<WebViewController> _controller = Completer<WebViewController>();
+
+  PaytmWebView(this.stripeCheckOutModel, this.storeModel);
+
+  @override
+  Widget build(BuildContext context) {
+     WillPopScope(
+      onWillPop: () {
+        //print("onWillPop onWillPop");
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Used for removing back buttoon.
+          title: Text('Payment'),
+          centerTitle: true,
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return WebView(
+            initialUrl: '${stripeCheckOutModel.url}',
+            javascriptMode: JavascriptMode.unrestricted,
+            onWebViewCreated: (WebViewController webViewController) {
+              _controller.complete(webViewController);
+            },
+            navigationDelegate: (NavigationRequest request) {
+              //print('=======NavigationRequest======= $request}');
+              return NavigationDecision.navigate;
+            },
+            onPageStarted: (String url) {
+              //print('======Page started loading======: $url');
+            },
+            onPageFinished: (String url) {
+              print('==2====onLoadStop======: $url');
+              if (url.contains("/api/paytmPaymentResult/orderId:")) {
+                String txnId =
+                url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
+                url = url.replaceAll("/TxnId:" + txnId, "");
+                String orderId = url
+                    .substring(url.indexOf("/orderId:") + "/orderId:".length);
+                print(txnId);
+                print(orderId);
+                eventBus.fire(
+                    onPayTMPageFinished(url, orderId = orderId, txnId = txnId));
+                Navigator.pop(context);
+              } else if (url.contains("api/paytmPaymentResult/failure:")) {
+                Navigator.pop(context);
+                Utils.showToast("Payment Failed", false);
+              }
+            },
+            gestureNavigationEnabled: false,
+          );
+        }),
+      ),
+    );
+  }
+}
+
+/*Code for android*/
+/*class StripeWebView extends StatefulWidget {
   StripeCheckOutModel stripeCheckOutModel;
   StoreModel storeModel;
 
@@ -2568,4 +2744,4 @@ class PaytmWebView extends StatelessWidget {
       ),
     );
   }
-}
+}*/

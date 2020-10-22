@@ -602,7 +602,7 @@ class DatabaseHelper {
             }
           }
           if (!isProductOutOfStock) {
-            double price=detail!=null&&detail.productStatus.contains('price_changed')?double.parse(detail.price):total;
+            double price=detail!=null&&detail.productStatus.contains('price_changed')?double.parse(detail.newPrice):total;
             totalPrice = totalPrice + roundOffPrice(price, 2);
           }
         } catch (e) {
@@ -768,8 +768,8 @@ class DatabaseHelper {
                 .compareTo(responseOrderDetail[i].productId) ==
                 0
                 &&productCartList[j].variantId.compareTo(responseOrderDetail[i].variantId)==0) {
-              productCartList[j].mrpPrice=responseOrderDetail[i].mrpPrice;
-              productCartList[j].price=responseOrderDetail[i].price;
+              productCartList[j].mrpPrice=responseOrderDetail[i].newMrpPrice;
+              productCartList[j].price=responseOrderDetail[i].newPrice;
             }
         }
         }
