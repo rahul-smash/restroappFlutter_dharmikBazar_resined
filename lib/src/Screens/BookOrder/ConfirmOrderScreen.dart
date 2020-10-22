@@ -567,6 +567,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         detail != null && detail.productStatus.contains('out_of_stock')
             ? Colors.black12
             : Colors.transparent;
+   String mrpPrice = detail != null && detail.productStatus.contains('price_changed')? detail.newMrpPrice:product.mrpPrice;
+   String price = detail != null && detail.productStatus.contains('price_changed')? detail.newPrice:product.price;
 
     if (product.taxDetail != null) {
       return Container(
@@ -669,7 +671,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
                     child: Text(
-                        "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")),
+                        "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(price).toStringAsFixed(2)}")),
                 //
                 /*Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
@@ -691,7 +693,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       ),
                     ))
                 : Text(
-                    "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}",
                     style: TextStyle(
                         fontSize: 16,
                         color: detail != null &&
@@ -749,7 +751,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("Items Price", style: TextStyle(color: Colors.black)),
               Text(
-                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
+//                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
+                  "${AppConstant.currency}${taxModel==null? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2):
+                  taxModel.itemSubTotal}",
                   style: TextStyle(color: Colors.black)),
             ],
           ),
@@ -848,6 +852,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             product.price != null &&
             product.quantity != null) {
           bool isProductOutOfStock = false;
+          OrderDetail detail;
           //check product is out of stock of not
           if (isOrderVariations) {
             InnnerFor:
@@ -856,17 +861,30 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           .productStatus
                           .compareTo('out_of_stock') ==
                       0 &&
-                  responseOrderDetail[i].productId.compareTo(product.id) == 0) {
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0
+                  &&responseOrderDetail[i].variantId.compareTo(product.variantId) == 0) {
                 isProductOutOfStock = true;
+                break InnnerFor;
+              }
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('price_changed') ==
+                      0 &&
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0
+                  &&responseOrderDetail[i].variantId.compareTo(product.variantId) == 0) {
+                detail=responseOrderDetail[i];
                 break InnnerFor;
               }
             }
           }
+
           if (!isProductOutOfStock) {
+            String mrpPrice=detail!=null&&detail.productStatus.contains('price_changed')?detail.mrpPrice:product.mrpPrice;
+            String price=detail!=null&&detail.productStatus.contains('price_changed')?detail.price:product.price;
             totalSavings +=
-                (double.parse(product.mrpPrice) - double.parse(product.price)) *
+                (double.parse(mrpPrice) - double.parse(price)) *
                     double.parse(product.quantity);
-            totalMRpPrice += (double.parse(product.mrpPrice) *
+            totalMRpPrice += (double.parse(mrpPrice) *
                 double.parse(product.quantity));
           }
         }

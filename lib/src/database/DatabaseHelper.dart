@@ -577,6 +577,7 @@ class DatabaseHelper {
           double total = int.parse(quantity) * double.parse(price);
           //print("-------total------${roundOffPrice(total,2)}");
           //print("-price ${price}---");
+          OrderDetail detail;
           bool isProductOutOfStock = false;
           if (isOrderVariations) {
             InnerFor:
@@ -584,14 +585,26 @@ class DatabaseHelper {
               if (responseOrderDetail[i]
                       .productStatus
                       .contains('out_of_stock') &&
-                  int.parse(responseOrderDetail[i].productId)==id&&responseOrderDetail[i].variantId.compareTo(varientID)==0) {
+                  int.parse(responseOrderDetail[i].productId)==id
+                  &&responseOrderDetail[i].variantId.compareTo(varientID)==0) {
                 isProductOutOfStock = true;
+                break InnerFor;
+              }
+              if (responseOrderDetail[i]
+                  .productStatus
+                  .compareTo('price_changed') ==
+                  0 &&
+                  int.parse(responseOrderDetail[i].productId)==id
+                  &&responseOrderDetail[i].variantId.compareTo(varientID)==0) {
+                detail=responseOrderDetail[i];
                 break InnerFor;
               }
             }
           }
-          if (!isProductOutOfStock)
-            totalPrice = totalPrice + roundOffPrice(total, 2);
+          if (!isProductOutOfStock) {
+            double price=detail!=null&&detail.productStatus.contains('price_changed')?double.parse(detail.price):total;
+            totalPrice = totalPrice + roundOffPrice(price, 2);
+          }
         } catch (e) {
           print(e);
         }
@@ -743,6 +756,22 @@ class DatabaseHelper {
           if (toBeRemovedProduct != null) {
             productCartList.remove(toBeRemovedProduct);
           }
+        }
+
+        if (responseOrderDetail[i]
+            .productStatus
+            .compareTo('price_changed') ==
+            0) {
+          for (int j = 0; j < productCartList.length; j++){
+            if (productCartList[j]
+                .id
+                .compareTo(responseOrderDetail[i].productId) ==
+                0
+                &&productCartList[j].variantId.compareTo(responseOrderDetail[i].variantId)==0) {
+              productCartList[j].mrpPrice=responseOrderDetail[i].mrpPrice;
+              productCartList[j].price=responseOrderDetail[i].price;
+            }
+        }
         }
       }
     }
