@@ -3,11 +3,27 @@ import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class SharedPrefs {
+
+  static void saveUserWallet(WalleModel model) async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    dynamic storeResponse = model.toJson();
+    String jsonString = jsonEncode(storeResponse);
+    sharedUser.setString('user_wallet', jsonString);
+  }
+
+  static Future<WalleModel> getUserWallet() async {
+    SharedPreferences sharedUser = await SharedPreferences.getInstance();
+    Map<String, dynamic> storeMap = json.decode(sharedUser.getString('user_wallet'));
+    var user = WalleModel.fromJson(storeMap);
+    return user;
+  }
+
   static void saveStore(StoreModel model) async {
     SharedPreferences sharedUser = await SharedPreferences.getInstance();
     dynamic storeResponse = model.toJson();

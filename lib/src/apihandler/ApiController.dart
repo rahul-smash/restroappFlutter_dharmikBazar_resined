@@ -636,6 +636,7 @@ class ApiController {
       String orderJson) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
+    WalleModel userWallet = await SharedPrefs.getUserWallet();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
 
@@ -650,6 +651,7 @@ class ApiController {
         "fixed_discount_amount": "${discount}",
         "tax": "0",
         "user_id": user.id,
+        "user_wallet":userWallet == null ? "0" : userWallet.data.userWallet,
         "discount": "0",
         "shipping": shipping,
         "order_detail": orderJson,
@@ -1654,8 +1656,8 @@ class ApiController {
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
-        WalleModel model =
-        WalleModel.fromJson(parsed);
+        WalleModel model = WalleModel.fromJson(parsed);
+        SharedPrefs.saveUserWallet(model);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);

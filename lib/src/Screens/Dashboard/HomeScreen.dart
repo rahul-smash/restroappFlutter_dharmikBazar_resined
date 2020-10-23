@@ -75,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     listenCartChanges();
     checkForMultiStore();
     getCategoryApi();
+    ApiController.getUserWallet();
     try {
       AppConstant.placeholderUrl = store.banner10080;
       //print("-----store.banners-----${store.banners.length}------");

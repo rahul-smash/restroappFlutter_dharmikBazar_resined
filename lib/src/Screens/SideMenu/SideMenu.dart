@@ -79,7 +79,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     }
     if(AppConstant.isLoggedIn){
       ApiController.getUserWallet().then((response){
-        this.walleModel = response;
+        setState(() {
+          this.walleModel = response;
+        });
       });
     }
 
@@ -165,7 +167,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                 children: [
                   Text("Wallet Balance",
                       style:TextStyle(color: leftMenuLabelTextColors, fontSize: 16)),
-                  Text(AppConstant.isLoggedIn? "${AppConstant.currency} 0" : "",
+                  Text(AppConstant.isLoggedIn
+                      ? walleModel == null ? "${AppConstant.currency}" :"${AppConstant.currency} ${walleModel.data.userWallet}"
+                      : "",
                       style:TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
                 ],
               ),
