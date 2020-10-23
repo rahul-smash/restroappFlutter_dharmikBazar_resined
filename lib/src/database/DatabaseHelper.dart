@@ -193,6 +193,34 @@ class DatabaseHelper {
     return res;
   }
 
+  /*Future<void> batchInsertCategorys(List<StoreCategories> storeCategorieslist)  async {
+    // Insert some records in a transaction
+    //print("-----------batchInsertCategorys---------------");
+    Database db = await _instance.db;
+    db.transaction((txn) async {
+      Batch batch = txn.batch();
+      for (StoreCategories category in storeCategorieslist) {
+        Map<String, dynamic> row = {
+          DatabaseHelper.ID: category.id,
+          DatabaseHelper.Title: category.title,
+          DatabaseHelper.Slug: category.slug,
+          DatabaseHelper.Description: category.description,
+          DatabaseHelper.Status: category.status.toString(),
+          DatabaseHelper.Image_id: category.imageId.toString(),
+          DatabaseHelper.Image_thumbnail: category.imageThumbnail,
+        };
+        batch.insert(CategoryTable, row);
+        if(category.service != null){
+          if(category.service.isNotEmpty){
+            batchInsertServices(category.service,category.id);
+          }
+        }
+      }
+      batch.commit();
+    });
+    //print("------------batchInsertCategorys----batch.commit();-----------");
+  }*/
+
   Future<List<CategoryModel>> getCategories() async {
     List<CategoryModel> categoryList = new List();
     var dbClient = await db;

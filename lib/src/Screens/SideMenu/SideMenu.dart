@@ -16,6 +16,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -40,7 +41,7 @@ class NavDrawerMenu extends StatefulWidget {
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
   List<dynamic> _drawerItems = List();
-
+  WalleModel walleModel;
   _NavDrawerMenuState();
 
   @override
@@ -76,6 +77,12 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     } catch (e) {
       print(e);
     }
+    if(AppConstant.isLoggedIn){
+      ApiController.getUserWallet().then((response){
+        this.walleModel = response;
+      });
+    }
+
   }
 
   @override
@@ -90,8 +97,14 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
               itemCount: _drawerItems.length + 1,
               itemBuilder: (BuildContext context, int index) {
                 return (index == 0
-                    ? createHeaderInfoItem()
-                    : createDrawerItem(index - 1, context));
+                    ? Container(
+                  child: Column(
+                    children: [
+                      createHeaderInfoItem(),
+                      showUserWalletView(),
+                    ],
+                  ),
+                )  : createDrawerItem(index - 1, context));
               }),
         ));
   }
@@ -132,7 +145,34 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                               color: leftMenuWelcomeTextColors, fontSize: 15)),
                     ]),
               ),
-            ])));
+            ])
+        )
+    );
+  }
+
+  Widget showUserWalletView(){
+
+    return Visibility(
+      visible: widget.store.wallet_setting == "1" ? true : false,
+      child: Container(
+        child: Padding(
+            padding: EdgeInsets.only(left: 20),
+            child: ListTile(
+              leading: Icon(Icons.account_balance_wallet,color: left_menu_icon_colors,
+                  size: 30),
+              title: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Wallet Balance",
+                      style:TextStyle(color: leftMenuLabelTextColors, fontSize: 16)),
+                  Text(AppConstant.isLoggedIn? "${AppConstant.currency} 0" : "",
+                      style:TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
+                ],
+              ),
+            )
+        ),
+      ),
+    );
   }
 
   Widget createDrawerItem(int index, BuildContext context) {
