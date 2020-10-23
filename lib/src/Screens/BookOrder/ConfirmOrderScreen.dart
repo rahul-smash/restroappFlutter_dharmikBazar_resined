@@ -351,6 +351,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
+
+
   Future<void> multiTaxCalculationApi() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
@@ -728,56 +730,123 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addItemPrice() {
     return Container(
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-            height: 1,
-            color: Colors.black45,
-            width: MediaQuery.of(context).size.width),
-        Visibility(
-          visible: widget.address == null ? false : true,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Delivery charges:",
-                    style: TextStyle(color: Colors.black54)),
-                Text(
-                    "${AppConstant.currency}${widget.address == null ? "0" : widget.address.areaCharges}",
-                    style: TextStyle(color: Colors.black54)),
-              ],
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+                height: 1,
+                color: Colors.black45,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width),
+            Visibility(
+              visible: widget.address == null ? false : true,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Delivery charges:",
+                        style: TextStyle(color: Colors.black54)),
+                    Text(
+                        "${AppConstant.currency}${widget.address == null
+                            ? "0"
+                            : widget.address.areaCharges}",
+                        style: TextStyle(color: Colors.black54)),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-        Visibility(
-          visible: taxModel == null ? false : true,
-          child: Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text("Discount:", style: TextStyle(color: Colors.black54)),
-                Text(
-                    "${AppConstant.currency}${taxModel == null ? "0" : taxModel.discount}",
-                    style: TextStyle(color: Colors.black54)),
-              ],
+            Visibility(
+              visible: taxModel == null ? false : true,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text("Discount:", style: TextStyle(color: Colors.black54)),
+                    Text(
+                        "${AppConstant.currency}${taxModel == null
+                            ? "0"
+                            : taxModel.discount}",
+                        style: TextStyle(color: Colors.black54)),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Items Price", style: TextStyle(color: Colors.black)),
-              Text(
+            Padding(
+              padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Items Price", style: TextStyle(color: Colors.black)),
+                  Text(
 //                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
-                  "${AppConstant.currency}${taxModel==null? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2):
-                  taxModel.itemSubTotal}",
-                  style: TextStyle(color: Colors.black)),
-            ],
-          ),
-        ),
+                      "${AppConstant.currency}${taxModel == null
+                          ? databaseHelper.roundOffPrice(
+                          (totalPrice - int.parse(shippingCharges)), 2)
+                          .toStringAsFixed(2)
+                          :
+                      taxModel.itemSubTotal}",
+                      style: TextStyle(color: Colors.black)),
+                ],
+              ),
+            ),
+            Container(
+                height: 1,
+                color: Colors.black45,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width),
+            Visibility(
+              visible: true,
+              child: Container(
+                child: Padding(
+                    padding: EdgeInsets.only(left: 0,top:10,bottom: 10),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          child: Checkbox(
+                            checkColor: Colors.white,  // color of tick Mark
+                            activeColor: appTheme,
+                            value: true,
+                            onChanged: (value) {
+                              print("onChanged Checkbox ${value}");
+                            },
+                          ),
+                        ),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("My Wallet",
+                                  style:TextStyle(color: Colors.black, fontSize: 16,fontWeight: FontWeight.bold)),
+                              Text("Remaining Balance: ${AppConstant.currency}234",
+                                  style:TextStyle(color: Colors.black, fontSize: 15)),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(right: 5,top:0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Text("You Used",
+                                  style:TextStyle(color: Colors.black, fontSize: 16)),
+                              Text("${AppConstant.currency}34",
+                                  style:TextStyle(color: Colors.black, fontSize: 15)),
+                            ],
+                          ),
+                        ),
+
+                      ],
+                    )
+                ),
+              ),
+            ),
       ]),
     );
   }
