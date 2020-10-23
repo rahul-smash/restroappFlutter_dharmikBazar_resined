@@ -1486,7 +1486,7 @@ class ApiController {
         var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
             ApiConstants.createPaytmTxnToken;
         //TODO: remove this static url
-        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
+//        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
         print(url);
         FormData formData = new FormData.fromMap({
           "customer_id": user.id,
