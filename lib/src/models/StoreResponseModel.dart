@@ -26,6 +26,7 @@ class StoreModel {
   String city;
   String state;
   String country;
+  String wallet_setting;
   String zipcode;
   String lat;
   String lng;
@@ -140,6 +141,7 @@ class StoreModel {
       this.storeName,
       this.aboutusBanner,
       this.location,
+      this.wallet_setting,
       this.city,
       this.state,
       this.country,
@@ -263,6 +265,7 @@ class StoreModel {
     cod = json['cod'];
     lat = json['lat'];
     lng = json['lng'];
+    wallet_setting = json['wallet_setting'];
     contactPerson = json['contact_person'];
     contactNumber = json['contact_number'];
     contactEmail = json['contact_email'];
@@ -429,6 +432,7 @@ class StoreModel {
     data['contact_number'] = this.contactNumber;
     data['contact_email'] = this.contactEmail;
     data['about_us'] = this.aboutUs;
+    data['wallet_setting'] = this.wallet_setting;
     data['otp_skip'] = this.otpSkip;
     data['app_theme_colors'] = this.appThemeColors;
     data['version'] = this.version;

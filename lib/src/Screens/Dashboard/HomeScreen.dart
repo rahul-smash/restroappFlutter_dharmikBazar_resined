@@ -425,6 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //print("------_handleDrawer-------");
         if (AppConstant.isLoggedIn) {
           user = await SharedPrefs.getUser();
+          print("user.id=${user.id}");
           if (user != null) setState(() {});
         }
       }

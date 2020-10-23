@@ -195,7 +195,7 @@ class DatabaseHelper {
 
   /*Future<void> batchInsertCategorys(List<StoreCategories> storeCategorieslist)  async {
     // Insert some records in a transaction
-    //print("------------batchInsertCategorys---------------");
+    //print("-----------batchInsertCategorys---------------");
     Database db = await _instance.db;
     db.transaction((txn) async {
       Batch batch = txn.batch();

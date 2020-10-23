@@ -39,6 +39,7 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -1632,4 +1633,37 @@ class ApiController {
     }
     return null;
   }
+
+  static Future<WalleModel> getUserWallet() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAvailable) {
+        StoreModel store = await SharedPrefs.getStore();
+        UserModel user = await SharedPrefs.getUser();
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.userWallet;
+        var request = new http.MultipartRequest("POST", Uri.parse(url));
+        request.fields.addAll({
+          "user_id": store.id,
+          "store_id": user.id,
+        });
+        print("${url}");
+        final response =
+        await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        print("${respStr}");
+        final parsed = json.decode(respStr);
+        WalleModel model =
+        WalleModel.fromJson(parsed);
+        return model;
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
 }
