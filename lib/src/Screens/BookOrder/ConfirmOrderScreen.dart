@@ -92,6 +92,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool isOrderVariations = false;
 
+  bool showCOD=true;
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() async {
@@ -251,6 +253,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       print(e);
     }
     multiTaxCalculationApi();
+
+    if(widget.storeModel != null){
+      if(widget.storeModel.cod == "1"){
+        showCOD = true;
+        widget.paymentMode = "2";
+      }else if(widget.storeModel.cod == "0"){
+        showCOD = false;
+      }
+      if (widget.storeModel.onlinePayment == "0" && widget.storeModel.cod == "0") {
+        showCOD = true;
+        widget.paymentMode = "2";
+      }
+      if(widget.storeModel.cod == "0" && widget.storeModel.onlinePayment == "1"){
+        widget._character = PaymentType.ONLINE;
+        widget.paymentMode = "3";
+      }
+    }
   }
 
   @override
@@ -1201,10 +1220,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addPaymentOptions() {
     bool showOptions = false;
-    bool showCOD = true;
-//    if (storeModel != null) {
-//      return Container();
-//    }
     if (widget.storeModel.onlinePayment != null) {
       if (widget.storeModel.onlinePayment == "1") {
         showOptions = true;
@@ -1216,27 +1231,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         showOptions = true;
       }
     }
-
-    if(widget.storeModel != null){
-      if(widget.storeModel.cod == "1"){
-        showCOD = true;
-        widget.paymentMode = "2";
-      }else if(widget.storeModel.cod == "0"){
-        showCOD = false;
-      }
-      if (widget.storeModel.onlinePayment == "0" && widget.storeModel.cod == "0") {
-        showCOD = true;
-        showOptions = true;
-        widget.paymentMode = "2";
-      }
-      if(widget.storeModel.cod == "0" && widget.storeModel.onlinePayment == "1"){
-        widget._character = PaymentType.ONLINE;
-        widget.paymentMode = "3";
-      }
-    }
-
-
-    print("onlinePayment=${widget.storeModel.onlinePayment} and cod=${widget.storeModel.cod}");
 
     return Visibility(
       visible: showOptions,
@@ -2570,7 +2564,7 @@ class PaytmWebView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     WillPopScope(
+    return WillPopScope(
       onWillPop: () {
         //print("onWillPop onWillPop");
       },
