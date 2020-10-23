@@ -235,7 +235,7 @@ class ApiController {
         categoryResponse.success = false;
         return categoryResponse;
       } else {
-        print("database has values");
+        print("1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
         //prepare model object
         List<CategoryModel> categoryList = await databaseHelper.getCategories();
         categoryResponse.categories = categoryList;
@@ -245,6 +245,7 @@ class ApiController {
               await databaseHelper.getSubCategories(parent_id);
         }
         categoryResponse.success = true;
+        print("2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
       }
     } catch (e) {
       print(e);
