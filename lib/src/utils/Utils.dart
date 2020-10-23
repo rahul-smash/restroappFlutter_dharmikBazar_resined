@@ -591,7 +591,7 @@ class Utils {
  static Future<String> getCartItemsListToJson(
       {bool isOrderVariations = true,
         List<OrderDetail> responseOrderDetail}) async {
-    List jsonList = OrderDetail.encodeToJson(responseOrderDetail);
+    List jsonList = OrderDetail.encodeToJson(responseOrderDetail,removeOutOfStockProducts:true);
     String encodedDoughnut = jsonEncode(jsonList);
     return encodedDoughnut;
   }

@@ -53,7 +53,8 @@ class TaxCalculationModel {
       this.taxDetail,
       this.taxLabel,
       this.fixedTax,
-      this.orderDetail,this.isChanged});
+      this.orderDetail,
+      this.isChanged});
 
   factory TaxCalculationModel.fromJson(
       String couponCode, Map<String, dynamic> json) {
@@ -89,7 +90,7 @@ class TaxCalculationModel {
       model.orderDetail = List<OrderDetail>.from(
           json["order_detail"].map((x) => OrderDetail.fromJson(x)));
     }
-     model.isChanged=json['is_changed']==null?false:json['is_changed'];
+    model.isChanged = json['is_changed'] == null ? false : json['is_changed'];
     return model;
   }
 
@@ -113,7 +114,7 @@ class TaxCalculationModel {
     if (this.orderDetail != null) {
       data["order_detail"] = this.orderDetail.map((v) => v.toJson()).toList();
     }
-    data['is_changed']=this.isChanged;
+    data['is_changed'] = this.isChanged;
     return data;
   }
 }
@@ -234,74 +235,87 @@ class OrderDetail {
         cgst: cgst ?? this.cgst,
         sgst: sgst ?? this.sgst,
         igst: igst ?? this.igst,
-        gst_type : gst_type ?? this.gst_type,
-        hsn_code : hsn_code ?? this.hsn_code,
+        gst_type: gst_type ?? this.gst_type,
+        hsn_code: hsn_code ?? this.hsn_code,
       );
 
-  factory OrderDetail.fromRawJson(String str) => OrderDetail.fromJson(json.decode(str));
+  factory OrderDetail.fromRawJson(String str) =>
+      OrderDetail.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
   factory OrderDetail.fromJson(Map<String, dynamic> json) => OrderDetail(
-    productId: json["product_id"] == null ? null : json["product_id"],
-    productName: json["product_name"] == null ? null : json["product_name"],
-    variantId: json["variant_id"] == null ? null : json["variant_id"],
-    isTaxEnable: json["isTaxEnable"] == null ? null : json["isTaxEnable"],
-    quantity: json["quantity"],
-    price: json["price"] == null ? null : json["price"],
-    weight: json["weight"] == null ? null : json["weight"],
-    mrpPrice: json["mrp_price"] == null ? null : json["mrp_price"],
-    //unitType: json["unit_type"] == null ? null : json["unit_type"],
-    productStatus: json["product_status"] == null ? null : json["product_status"],
-    discount: json["discount"] == null ? null : json["discount"],
-    productType: json["product_type"] == null ? null : json["product_type"],
-    newMrpPrice: json["new_mrp_price"] == null ? null : json["new_mrp_price"],
-    newDiscount: json["new_discount"] == null ? null : json["new_discount"],
-    newPrice: json["new_price"] == null ? null : json["new_price"],
-    gst_state: json["gst_state"] == null ? null : json["gst_state"],
-    gst_tax_rate: json["gst_tax_rate"] == null ? null : json["gst_tax_rate"],
-    cgst: json["cgst"] == null ? 0 : json["cgst"],
-    sgst: json["sgst"] == null ? 0 : json["sgst"],
-    igst: json["igst"] == null ? 0 : json["igst"],
-    gst_type: json["gst_type"] == null ? null : json["gst_type"],
-    hsn_code: json["hsn_code"] == null ? "" : json["hsn_code"],
-  );
+        productId: json["product_id"] == null ? null : json["product_id"],
+        productName: json["product_name"] == null ? null : json["product_name"],
+        variantId: json["variant_id"] == null ? null : json["variant_id"],
+        isTaxEnable: json["isTaxEnable"] == null ? null : json["isTaxEnable"],
+        quantity: json["quantity"],
+        price: json["price"] == null ? null : json["price"],
+        weight: json["weight"] == null ? null : json["weight"],
+        mrpPrice: json["mrp_price"] == null ? null : json["mrp_price"],
+        //unitType: json["unit_type"] == null ? null : json["unit_type"],
+        productStatus:
+            json["product_status"] == null ? null : json["product_status"],
+        discount: json["discount"] == null ? null : json["discount"],
+        productType: json["product_type"] == null ? null : json["product_type"],
+        newMrpPrice:
+            json["new_mrp_price"] == null ? null : json["new_mrp_price"],
+        newDiscount: json["new_discount"] == null ? null : json["new_discount"],
+        newPrice: json["new_price"] == null ? null : json["new_price"],
+        gst_state: json["gst_state"] == null ? null : json["gst_state"],
+        gst_tax_rate:
+            json["gst_tax_rate"] == null ? null : json["gst_tax_rate"],
+        cgst: json["cgst"] == null ? 0 : json["cgst"],
+        sgst: json["sgst"] == null ? 0 : json["sgst"],
+        igst: json["igst"] == null ? 0 : json["igst"],
+        gst_type: json["gst_type"] == null ? null : json["gst_type"],
+        hsn_code: json["hsn_code"] == null ? "" : json["hsn_code"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "product_id": productId == null ? null : productId,
-    "product_name": productName == null ? null : productName,
-    "variant_id": variantId == null ? null : variantId,
-    "isTaxEnable": isTaxEnable == null ? null : isTaxEnable,
-    "quantity": quantity,
-    "price": price == null ? null : price,
-    "weight": weight == null ? null : weight,
-    "mrp_price": mrpPrice == null ? null : mrpPrice,
-    //"unit_type": unitType == null ? null : unitType,
-    "product_status": productStatus == null ? null : productStatus,
-    "discount": discount == null ? null : discount,
-    "product_type": productType == null ? null : productType,
-    "new_mrp_price": newMrpPrice == null ? null : newMrpPrice,
-    "new_discount": newDiscount == null ? null : newDiscount,
-    "new_price": newPrice == null ? null : newPrice,
-    "gst_state": gst_state == null ? null : gst_state,
-    "gst_tax_rate": gst_tax_rate == null ? null : gst_tax_rate,
-    "cgst": cgst == null ? 0 : cgst,
-    "sgst": sgst == null ? 0 : sgst,
-    "igst": igst == null ? 0 : igst,
-    "gst_type": gst_type == null ? null : gst_type,
-    "hsn_code": hsn_code == null ? "" : hsn_code,
-  };
+        "product_id": productId == null ? null : productId,
+        "product_name": productName == null ? null : productName,
+        "variant_id": variantId == null ? null : variantId,
+        "isTaxEnable": isTaxEnable == null ? null : isTaxEnable,
+        "quantity": quantity,
+        "price": price == null ? null : price,
+        "weight": weight == null ? null : weight,
+        "mrp_price": mrpPrice == null ? null : mrpPrice,
+        //"unit_type": unitType == null ? null : unitType,
+        "product_status": productStatus == null ? null : productStatus,
+        "discount": discount == null ? null : discount,
+        "product_type": productType == null ? null : productType,
+        "new_mrp_price": newMrpPrice == null ? null : newMrpPrice,
+        "new_discount": newDiscount == null ? null : newDiscount,
+        "new_price": newPrice == null ? null : newPrice,
+        "gst_state": gst_state == null ? null : gst_state,
+        "gst_tax_rate": gst_tax_rate == null ? null : gst_tax_rate,
+        "cgst": cgst == null ? 0 : cgst,
+        "sgst": sgst == null ? 0 : sgst,
+        "igst": igst == null ? 0 : igst,
+        "gst_type": gst_type == null ? null : gst_type,
+        "hsn_code": hsn_code == null ? "" : hsn_code,
+      };
 
-  static List encodeToJson(List<OrderDetail> list,{bool removeOutOfStockProducts=false}) {
+  static List encodeToJson(List<OrderDetail> list,
+      {bool removeOutOfStockProducts = false}) {
     List jsonList = List();
 
-      for(int i=0;i<list.length;i++){
-        OrderDetail item=list[i];
-        bool addProduct=true;
-        if(removeOutOfStockProducts&&item.productStatus.compareTo('out_of_stock')==0){
-          addProduct=false;
-        }
-        if(addProduct)
+    for (int i = 0; i < list.length; i++) {
+      OrderDetail item = list[i];
+      bool addProduct = true;
+      if (removeOutOfStockProducts &&
+          item.productStatus.compareTo('out_of_stock') == 0) {
+        addProduct = false;
+      }
+      item.price = list[i].productStatus.compareTo('price_changed') == 0
+          ? list[i].newPrice
+          : item.price;
+      item.mrpPrice = list[i].productStatus.compareTo('price_changed') == 0
+          ? list[i].newMrpPrice
+          : item.mrpPrice;
+
+      if (addProduct)
         jsonList.add({
           "product_id": item.productId == null ? null : item.productId,
           "product_name": item.productName == null ? null : item.productName,
@@ -312,7 +326,8 @@ class OrderDetail {
           "weight": item.weight == null ? null : item.weight,
           "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
           "unit_type": item.unitType == null ? null : item.unitType,
-          "product_status": item.productStatus == null ? null : item.productStatus,
+          "product_status":
+              item.productStatus == null ? null : item.productStatus,
           "discount": item.discount == null ? null : item.discount,
           "product_type": item.productType == null ? null : item.productType,
           "new_mrp_price": item.newMrpPrice == null ? null : item.newMrpPrice,
@@ -324,9 +339,9 @@ class OrderDetail {
           "sgst": item.sgst == null ? 0 : item.sgst,
           "igst": item.igst == null ? 0 : item.igst,
           "gst_type": item.gst_type == null ? null : item.gst_type,
-          "hsn_code":item. hsn_code == null ? "" : item.hsn_code,
+          "hsn_code": item.hsn_code == null ? "" : item.hsn_code,
         });
-      }
+    }
 
     return jsonList;
   }
