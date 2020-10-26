@@ -65,7 +65,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                       children: [
                         Container(
                           margin: EdgeInsets.fromLTRB(10, 20, 10, 10),
-                          child: Text("Transcations",style: TextStyle(color: blue2,fontSize: 16)),
+                          child: Text("Transcations",style: TextStyle(color: Colors.black,fontSize: 16)),
                         ),
                         ListView.builder(
                           itemBuilder: (context, index) {
