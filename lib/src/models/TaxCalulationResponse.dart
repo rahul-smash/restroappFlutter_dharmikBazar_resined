@@ -36,6 +36,7 @@ class TaxCalculationModel {
   String shipping;
   String couponCode;
   String fixedTaxAmount;
+  String wallet_refund;
   List<TaxDetail> taxDetail;
   List<TaxLabel> taxLabel;
   List<FixedTax> fixedTax;
@@ -46,6 +47,7 @@ class TaxCalculationModel {
       {this.total,
       this.itemSubTotal,
       this.tax,
+      this.wallet_refund,
       this.discount,
       this.shipping,
       this.couponCode,
@@ -65,6 +67,7 @@ class TaxCalculationModel {
     model.tax = json['tax'];
     model.discount = json['discount'];
     model.shipping = json['shipping'];
+    model.wallet_refund = json['wallet_refund'];
     model.couponCode = couponCode;
     model.fixedTaxAmount = json['fixed_tax_amount'];
     if (json['tax_detail'] != null) {
@@ -102,6 +105,7 @@ class TaxCalculationModel {
     data['discount'] = this.discount;
     data['shipping'] = this.shipping;
     data['fixed_tax_amount'] = this.fixedTaxAmount;
+    data['wallet_refund'] = this.wallet_refund;
     if (this.taxDetail != null) {
       data['tax_detail'] = this.taxDetail.map((v) => v.toJson()).toList();
     }

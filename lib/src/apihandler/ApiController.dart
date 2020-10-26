@@ -758,6 +758,7 @@ class ApiController {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
         "note": note,
+        "wallet_refund": taxModel == null ? "0" : "${taxModel.wallet_refund}",
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
@@ -1645,11 +1646,13 @@ class ApiController {
 
         var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
             ApiConstants.userWallet;
+
         var request = new http.MultipartRequest("POST", Uri.parse(url));
         request.fields.addAll({
-          "user_id": store.id,
-          "store_id": user.id,
+          "user_id": user.id,
+          "store_id": store.id,
         });
+        //print("fields=${request.fields.toString()}");
         print("${url}");
         final response =
         await request.send().timeout(Duration(seconds: timeout));

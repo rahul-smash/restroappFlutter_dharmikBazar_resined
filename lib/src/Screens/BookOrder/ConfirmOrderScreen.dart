@@ -27,6 +27,7 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -371,7 +372,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
 
-
+  WalleModel userWalleModel;
   Future<void> multiTaxCalculationApi() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
@@ -379,6 +380,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return;
     }
     isLoading = true;
+    userWalleModel = await SharedPrefs.getUserWallet();
     databaseHelper.getCartItemsListToJson().then((json) {
       ApiController.multipleTaxCalculationRequest(
               "", "0", "$shippingCharges", json)
@@ -803,11 +805,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   Text(
 //                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
                       "${AppConstant.currency}${taxModel == null
-                          ? databaseHelper.roundOffPrice(
-                          (totalPrice - int.parse(shippingCharges)), 2)
-                          .toStringAsFixed(2)
-                          :
-                      taxModel.itemSubTotal}",
+                          ? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)
+                          : taxModel.itemSubTotal}",
                       style: TextStyle(color: Colors.black)),
                 ],
               ),
@@ -820,30 +819,26 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     .size
                     .width),
             Visibility(
-              visible: true,
+              visible: widget.storeModel.wallet_setting == "1" ? true : false,
               child: Container(
                 child: Padding(
                     padding: EdgeInsets.only(left: 0,top:10,bottom: 10),
                     child: Row(
                       children: [
                         Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                          child: Checkbox(
-                            checkColor: Colors.white,  // color of tick Mark
-                            activeColor: appTheme,
-                            value: true,
-                            onChanged: (value) {
-                              print("onChanged Checkbox ${value}");
-                            },
-                          ),
+                          padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                          child: Icon(Icons.done,color: appTheme,size: 30,),
                         ),
+
+
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text("My Wallet",
                                   style:TextStyle(color: Colors.black, fontSize: 16,fontWeight: FontWeight.bold)),
-                              Text("Remaining Balance: ${AppConstant.currency}234",
+                              Text(taxModel == null ? "Remaining Balance: ${AppConstant.currency}"
+                                  :"Remaining Balance: ${AppConstant.currency} ${userWalleModel == null ? "" : userWalleModel.data.userWallet}",
                                   style:TextStyle(color: Colors.black, fontSize: 15)),
                             ],
                           ),
@@ -855,8 +850,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             children: [
                               Text("You Used",
                                   style:TextStyle(color: Colors.black, fontSize: 16)),
-                              Text("${AppConstant.currency}34",
-                                  style:TextStyle(color: Colors.black, fontSize: 15)),
+                              Text("${AppConstant.currency} ${taxModel == null ? "0.00" :taxModel.wallet_refund}",
+                                  style:TextStyle(color: appTheme, fontSize: 15)),
                             ],
                           ),
                         ),
@@ -2563,6 +2558,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     return productOutOfStock;
   }
+
+
 }
 /*Code for ios*/
 class StripeWebView extends StatefulWidget {
