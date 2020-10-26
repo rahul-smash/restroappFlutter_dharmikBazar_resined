@@ -838,7 +838,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               Text("My Wallet",
                                   style:TextStyle(color: Colors.black, fontSize: 16,fontWeight: FontWeight.bold)),
                               Text(taxModel == null ? "Remaining Balance: ${AppConstant.currency}"
-                                  :"Remaining Balance: ${AppConstant.currency} ${userWalleModel == null ? "" : userWalleModel.data.userWallet}",
+                                  :"Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
                                   style:TextStyle(color: Colors.black, fontSize: 15)),
                             ],
                           ),
@@ -863,6 +863,19 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
       ]),
     );
+  }
+
+  String getUserRemaningWallet(){
+    double balance = (double.parse(userWalleModel.data.userWallet) - double.parse(taxModel.itemSubTotal));
+    //print("balance=${balance}");
+    if(balance > 0.0){
+      // USer balance is greater than zero.
+      return "${balance}";
+    }else{
+      // USer balance is less than or equal to zero.
+      return "0.00";
+    }
+    //return "${userWalleModel == null ? "" : userWalleModel.data.userWallet}";
   }
 
   Widget addTotalPrice() {

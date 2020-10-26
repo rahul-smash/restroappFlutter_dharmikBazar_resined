@@ -67,7 +67,7 @@ class TaxCalculationModel {
     model.tax = json['tax'];
     model.discount = json['discount'];
     model.shipping = json['shipping'];
-    model.wallet_refund = json['wallet_refund'];
+    model.wallet_refund = json['wallet_refund'].toString();
     model.couponCode = couponCode;
     model.fixedTaxAmount = json['fixed_tax_amount'];
     if (json['tax_detail'] != null) {
