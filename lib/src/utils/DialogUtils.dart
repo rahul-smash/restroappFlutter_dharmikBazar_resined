@@ -802,7 +802,8 @@ class DialogUtils {
   }
 
   static Future<bool> showForceUpdateDialog(
-      BuildContext context, String title, String message) async {
+      BuildContext context, String title, String message,
+      {StoreModel storeModel}) async {
     return await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -853,11 +854,27 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
-                              child: Text('OK'),
+                              child: Text('Update'),
                               color: orangeColor,
                               textColor: Colors.white,
                               onPressed: () {
-                                SystemNavigator.pop();
+                                String urlString = "";
+                                if (Platform.isIOS) {
+                                  urlString = storeModel.iphoneShareLink;
+                                } else if (Platform.isAndroid) {
+                                  urlString = storeModel.androidShareLink;
+                                } else if (Platform.isWindows) {
+                                  urlString = storeModel.appShareLink;
+                                } else if (Platform.isLinux) {
+                                  urlString = storeModel.appShareLink;
+                                } else if (Platform.isMacOS) {
+                                  urlString = storeModel.appShareLink;
+                                }
+                                if (urlString.isNotEmpty)
+                                  launch(urlString);
+                                else {
+                                  SystemNavigator.pop();
+                                }
                               },
                             ),
                           )

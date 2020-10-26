@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (widget.showForceUploadAlert) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           DialogUtils.showForceUpdateDialog(context, store.storeName,
-              store.forceDownload[0].forceDownloadMessage);
+              store.forceDownload[0].forceDownloadMessage,storeModel: store);
         });
       } else {
         if (!checkIfStoreClosed()) {
