@@ -758,7 +758,7 @@ class ApiController {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
         "note": note,
-        "wallet_refund": taxModel == null ? "0" : "${taxModel.wallet_refund}",
+        "wallet_refund": store.wallet_setting == "0" ? "" : taxModel == null ? "0" : "${taxModel.wallet_refund}" ,
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,

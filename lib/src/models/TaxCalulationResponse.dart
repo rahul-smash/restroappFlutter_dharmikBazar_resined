@@ -36,7 +36,7 @@ class TaxCalculationModel {
   String shipping;
   String couponCode;
   String fixedTaxAmount;
-  String wallet_refund;
+  String wallet_refund ="0" ;
   List<TaxDetail> taxDetail;
   List<TaxLabel> taxLabel;
   List<FixedTax> fixedTax;
