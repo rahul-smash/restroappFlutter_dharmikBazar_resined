@@ -160,8 +160,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         child: Padding(
             padding: EdgeInsets.only(left: 20),
             child: ListTile(
-              leading: Icon(Icons.account_balance_wallet,color: left_menu_icon_colors,
-                  size: 30),
+              //leading: Icon(Icons.account_balance_wallet,color: left_menu_icon_colors, size: 30),
+              leading: Image.asset("images/walleticon.png",color: left_menu_icon_colors,
+                height: 30,width: 30,),
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
