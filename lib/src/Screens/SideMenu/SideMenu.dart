@@ -26,6 +26,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 
 import 'LoyalityPoints.dart';
 import 'ProfileScreen.dart';
+import 'WalletHistory.dart';
 
 class NavDrawerMenu extends StatefulWidget {
   final StoreModel store;
@@ -84,7 +85,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         });
       });
     }
-
   }
 
   @override
@@ -153,28 +153,52 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   }
 
   Widget showUserWalletView(){
-
     return Visibility(
       visible: widget.store.wallet_setting == "1" ? true : false,
-      child: Container(
-        child: Padding(
-            padding: EdgeInsets.only(left: 20),
-            child: ListTile(
-              //leading: Icon(Icons.account_balance_wallet,color: left_menu_icon_colors, size: 30),
-              leading: Image.asset("images/walleticon.png",color: left_menu_icon_colors,
-                height: 30,width: 30,),
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Wallet Balance",
-                      style:TextStyle(color: leftMenuLabelTextColors, fontSize: 16)),
-                  Text(AppConstant.isLoggedIn
-                      ? walleModel == null ? "${AppConstant.currency}" :"${AppConstant.currency} ${walleModel.data.userWallet}"
-                      : "",
-                      style:TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
-                ],
+      child: InkWell(
+        onTap: () async {
+          print("showUserWalletView");
+          bool isNetworkAvailable = await Utils.isNetworkAvailable();
+          if (!isNetworkAvailable) {
+            Utils.showToast(AppConstant.noInternet, false);
+            return;
+          }
+          if (AppConstant.isLoggedIn) {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => WalletHistoryScreen()
               ),
-            )
+            );
+            Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+            attributeMap["WalletHistory"] = "WalletHistoryScreen";
+            Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
+          } else {
+            Utils.showLoginDialog(context);
+          }
+
+        },
+        child: Container(
+          child: Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: ListTile(
+                //leading: Icon(Icons.account_balance_wallet,color: left_menu_icon_colors, size: 30),
+                leading: Image.asset("images/walleticon.png",color: left_menu_icon_colors,
+                  height: 30,width: 30,),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Wallet Balance",
+                        style:TextStyle(color: leftMenuLabelTextColors, fontSize: 16)),
+                    Text(AppConstant.isLoggedIn
+                        ? walleModel == null ? "${AppConstant.currency}" :"${AppConstant.currency} ${walleModel.data.userWallet}"
+                        : "",
+                        style:TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
+                  ],
+                ),
+              )
+          ),
         ),
       ),
     );

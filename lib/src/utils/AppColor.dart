@@ -38,4 +38,8 @@ Color grayColorTitle = Color(0xff474d54);
 Color grayLightColor = Color(0xFFEEEEEE);
 Color grayLightColorSecondary = Color(0xFFDCDCDC);
 
+Color blue1 = Color(0xFF5f049c);
+Color blue2 = Color(0xFF997bc6);
+
+
 

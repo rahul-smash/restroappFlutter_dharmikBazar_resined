@@ -52,6 +52,30 @@ class Utils {
     }
   }
 
+  static Widget getEmptyView1(String value) {
+    return Container(
+      child: Center(
+        child: Text(value,
+            overflow: TextOverflow.ellipsis,
+            style: new TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
+            )),
+      ),
+    );
+  }
+
+  static Widget showIndicator() {
+    return Container(
+      child: Center(
+        child: CircularProgressIndicator(
+            backgroundColor: Colors.black26,
+            valueColor:
+            AlwaysStoppedAnimation<Color>(Colors.black26)),
+      ),
+    );
+  }
+
   static Future<PackageInfo> getAppVersionDetails(
       StoreResponse storeData) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -229,6 +253,10 @@ class Utils {
     return MediaQuery.of(context).size.width;
   }
 
+  static double getDeviceHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height;
+  }
+
   static Widget showDivider(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -355,6 +383,24 @@ class Utils {
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
       DateFormat formatter = new DateFormat('dd MMM, yyyy');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
+
+  static convertWalletDate(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM, yyyy hh:mm:aa');
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);
