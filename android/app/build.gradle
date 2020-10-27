@@ -21,8 +21,18 @@ if (flutterVersionName == null) {
     flutterVersionName = '1.0'
 }
 
+def centreDetails = [
+        applicationId  : PACKAGE_NAME,// The name shown on the Android Launcher.
+        name           : APPLICATION_NAME,// The name shown on the Android Launcher.
+        keyAlias       : keyAlias,
+        keyPassword    : keyPassword,
+        storeFileLocal : storeFileLocal,
+        storePassword  : storePassword,
+]
+
 apply plugin: 'com.android.application'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
+
 
 android {
     compileSdkVersion 29
@@ -33,20 +43,29 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId "com.signity.restroapp"
+        applicationId centreDetails.applicationId
         // applicationId "com.signity.hungerbits"
         minSdkVersion 19
         targetSdkVersion 29
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        resValue "string", "appName", centreDetails.name
+    }
+    signingConfigs {
+        release {
+            keyAlias centreDetails.keyAlias
+            keyPassword centreDetails.keyPassword
+            storeFile file(centreDetails.storeFileLocal)
+            storePassword centreDetails.storePassword
+        }
     }
 
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
         }
     }
 
