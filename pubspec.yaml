@@ -134,6 +134,13 @@ flutter:
     - images/walleticon.png
     - images/cashbackicon.png
     - images/orderrefund.png
+    - images/emptywalletbalancegreaphics.png
+    - images/walletbalancegreaphics.png
+    - images/fbicon.png
+    - images/linkedinicon.png
+    - images/twittericon.png
+    - images/whatsappicon.png
+    - images/youtubeicon.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
