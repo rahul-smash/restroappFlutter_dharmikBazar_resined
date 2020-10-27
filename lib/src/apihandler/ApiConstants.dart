@@ -64,7 +64,7 @@ class ApiConstants{
   static String orderDetailHistory = 'orderDetailHistory';
   static String reviewRating = 'review_rating';
   static String userWallet = 'user_wallet';
-
+  static String socialLinking = 'social_linking';
 
 
   static final String txt_mobile = "Please enter your Mobile No. to proceed further";

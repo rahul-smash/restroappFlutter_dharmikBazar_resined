@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
@@ -15,6 +16,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
+import 'package:restroapp/src/models/SocialModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -41,9 +43,12 @@ class NavDrawerMenu extends StatefulWidget {
 }
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
+
   List<dynamic> _drawerItems = List();
+  SocialModel socialModel;
   WalleModel walleModel;
   double iconHeight = 25;
+
   _NavDrawerMenuState();
 
   @override
@@ -86,6 +91,10 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         });
       });
     }
+
+    ApiController.getStoreSocialOptions().then((value){
+      this.socialModel = value;
+    });
   }
 
   @override
@@ -125,17 +134,58 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                         child: Text("Follow Us On",style: TextStyle(color: Colors.white),),
                       ),
 
-                      Image.asset("images/fbicon.png",width: iconHeight,height: iconHeight,),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        child: Image.asset("images/twittericon.png",width: iconHeight,height: iconHeight,),
+                      InkWell(
+                        onTap: (){
+                          if(socialModel != null){
+                            if(socialModel.data.facebook.isNotEmpty)
+                            Utils.launchURL(socialModel.data.facebook);
+                          }
+                        },
+                        child: Image.asset("images/fbicon.png",width: iconHeight,height: iconHeight,),
                       ),
-                      Image.asset("images/linkedinicon.png",width: iconHeight,height: iconHeight,),
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                        child: Image.asset("images/youtubeicon.png",width: iconHeight,height: iconHeight,),
+                      InkWell(
+                        onTap: (){
+                          if(socialModel != null){
+                            if(socialModel.data.twitter.isNotEmpty)
+                              Utils.launchURL(socialModel.data.twitter);
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Image.asset("images/twittericon.png",width: iconHeight,height: iconHeight,),
+                        ),
                       ),
-                      Image.asset("images/whatsappicon.png",width: iconHeight,height: iconHeight,),
+                      InkWell(
+                        onTap: (){
+                          if(socialModel != null){
+                            if(socialModel.data.linkedin.isNotEmpty)
+                              Utils.launchURL(socialModel.data.linkedin);
+                          }
+                        },
+                        child: Image.asset("images/linkedinicon.png",width: iconHeight,height: iconHeight,),
+                      ),
+                      InkWell(
+                        onTap: (){
+                          if(socialModel != null){
+                            if(socialModel.data.youtube.isNotEmpty)
+                              Utils.launchURL(socialModel.data.youtube);
+                          }
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Image.asset("images/youtubeicon.png",width: iconHeight,height: iconHeight,),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: (){
+                          if(socialModel != null){
+                            if(socialModel.data.whatsapp.isNotEmpty)
+                              FlutterOpenWhatsapp.sendSingleMessage(
+                                  socialModel.data.whatsapp, "");
+                          }
+                        },
+                        child: Image.asset("images/whatsappicon.png",width: iconHeight,height: iconHeight,),
+                      ),
                     ],
                   ),
                 ),

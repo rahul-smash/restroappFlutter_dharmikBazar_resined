@@ -26,6 +26,7 @@ import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/RecommendedProductsResponse.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/SearchTagsModel.dart';
+import 'package:restroapp/src/models/SocialModel.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
@@ -1661,6 +1662,41 @@ class ApiController {
         final parsed = json.decode(respStr);
         WalleModel model = WalleModel.fromJson(parsed);
         SharedPrefs.saveUserWallet(model);
+        return model;
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<SocialModel> getStoreSocialOptions() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    try {
+      if (isNetworkAvailable) {
+        StoreModel store = await SharedPrefs.getStore();
+        UserModel user = await SharedPrefs.getUser();
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.socialLinking;
+
+        var request = new http.MultipartRequest("POST", Uri.parse(url));
+        request.fields.addAll({
+          "device_id": deviceId,
+          "platform": Platform.isIOS ? "IOS" : "Android"
+        });
+        //print("fields=${request.fields.toString()}");
+        print("${url}");
+        final response =
+        await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        print("${respStr}");
+        final parsed = json.decode(respStr);
+        SocialModel model = SocialModel.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
