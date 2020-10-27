@@ -102,7 +102,7 @@ task runScript {
         println sdf.format(date)
         def dateString =sdf.format(date)
         String app_nameNew = buildName.trim() +"_"+ dateString+ ".apk"
-        def dst = new File('/home/signity/Desktop', app_nameNew)
+        def dst = new File('/home/automation/apk', app_nameNew)
         if (dst.exists()) {
             dst.delete()
             src.withInputStream { stream -> dst << stream }
