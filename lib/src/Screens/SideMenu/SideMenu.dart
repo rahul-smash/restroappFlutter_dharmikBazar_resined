@@ -43,6 +43,7 @@ class NavDrawerMenu extends StatefulWidget {
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
   List<dynamic> _drawerItems = List();
   WalleModel walleModel;
+  double iconHeight = 25;
   _NavDrawerMenuState();
 
   @override
@@ -94,21 +95,55 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           canvasColor: left_menu_background_color,
         ),
         child: Drawer(
-          child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: _drawerItems.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                return (index == 0
-                    ? Container(
-                  child: Column(
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView.builder(
+                    padding: EdgeInsets.zero,
+                    itemCount: _drawerItems.length + 1,
+                    itemBuilder: (BuildContext context, int index) {
+                      return (index == 0
+                          ? Container(
+                        child: Column(
+                          children: [
+                            createHeaderInfoItem(),
+                            showUserWalletView(),
+                          ],
+                        ),
+                      )  : createDrawerItem(index - 1, context));
+                    }),
+              ),
+
+              Container(
+                color: appTheme,
+                height: 40,
+                child: Center(
+                  child: Row(
                     children: [
-                      createHeaderInfoItem(),
-                      showUserWalletView(),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        child: Text("Follow Us On",style: TextStyle(color: Colors.white),),
+                      ),
+
+                      Image.asset("images/fbicon.png",width: iconHeight,height: iconHeight,),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        child: Image.asset("images/twittericon.png",width: iconHeight,height: iconHeight,),
+                      ),
+                      Image.asset("images/linkedinicon.png",width: iconHeight,height: iconHeight,),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                        child: Image.asset("images/youtubeicon.png",width: iconHeight,height: iconHeight,),
+                      ),
+                      Image.asset("images/whatsappicon.png",width: iconHeight,height: iconHeight,),
                     ],
                   ),
-                )  : createDrawerItem(index - 1, context));
-              }),
-        ));
+                ),
+              )
+            ],
+          )
+        )
+    );
   }
 
   Widget createHeaderInfoItem() {
@@ -168,7 +203,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => WalletHistoryScreen()
+                  builder: (context) => WalletViewWidget()
               ),
             );
             Map<String, dynamic> attributeMap = new Map<String, dynamic>();
