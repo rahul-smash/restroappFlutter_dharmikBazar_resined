@@ -179,9 +179,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                       InkWell(
                         onTap: (){
                           if(socialModel != null){
-                            if(socialModel.data.whatsapp.isNotEmpty)
-                              FlutterOpenWhatsapp.sendSingleMessage(
-                                  socialModel.data.whatsapp, "");
+                            if(socialModel.data.instagram.isNotEmpty)
+                              Utils.launchURL(socialModel.data.instagram);
                           }
                         },
                         child: Image.asset("images/whatsappicon.png",width: iconHeight,height: iconHeight,),
