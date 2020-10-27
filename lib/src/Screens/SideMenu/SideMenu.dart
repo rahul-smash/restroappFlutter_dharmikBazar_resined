@@ -203,7 +203,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => WalletViewWidget()
+                  builder: (context) => WalletHistoryScreen()
               ),
             );
             Map<String, dynamic> attributeMap = new Map<String, dynamic>();

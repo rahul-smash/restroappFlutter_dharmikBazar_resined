@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
@@ -33,6 +32,15 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
 
     return Scaffold(
       backgroundColor: Colors.grey[200],
+      appBar: AppBar(
+        backgroundColor: appTheme,
+        title: Text("Wallet Balance",style:TextStyle(color: Colors.white,),),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: walleModel == null
           ? Utils.showIndicator()
           : SafeArea(
@@ -42,85 +50,74 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
 
               Column(
                 children: [
-                  Container(
-                    width: double.infinity,
-                    color: blue1,
-                    height: 180.0,
-                  ),
+                  Expanded(
+                    child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.white, width: 1),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5)
+                        ),
+                        margin: EdgeInsets.only(top: 130,left: 15,right: 15),
+                        child: ListView(
+                          children: [
+                            Container(
+                              margin: EdgeInsets.fromLTRB(10, 20, 10, 10),
+                              child: Text("Transcations",style: TextStyle(color: Colors.black,fontSize: 16)),
+                            ),
+                            ListView.builder(
+                              itemBuilder: (context, index) {
 
-                ],
-              ),
-
-              Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white, width: 1),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5)
+                                return Container(
+                                  margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                                  child: Column(
+                                    children: [
+                                      showWalletView(walleModel.data.walletHistory[index]),
+                                      SizedBox(height: 15,),
+                                      Utils.showDivider(context),
+                                    ],
+                                  ),
+                                );
+                              },
+                              itemCount: walleModel.data.walletHistory.length,
+                              shrinkWrap: true,
+                            ),
+                          ],
+                        )
                     ),
-                    height: Utils.getDeviceHeight(context)-180,
-                    margin: EdgeInsets.only(top: 150,left: 15,right: 15),
-                    child: ListView(
-                      children: [
-                        Container(
-                          margin: EdgeInsets.fromLTRB(10, 20, 10, 10),
-                          child: Text("Transcations",style: TextStyle(color: Colors.black,fontSize: 16)),
-                        ),
-                        ListView.builder(
-                          itemBuilder: (context, index) {
-
-                            return Container(
-                              margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                              child: Column(
-                                children: [
-                                  showWalletView(walleModel.data.walletHistory[index]),
-                                  SizedBox(height: 15,),
-                                  Utils.showDivider(context),
-                                ],
-                              ),
-                            );
-                          },
-                          itemCount: walleModel.data.walletHistory.length,
-                          shrinkWrap: true,
-                        ),
-                      ],
-                    )
-                  ),
+                  )
                 ],
               ),
 
               Container(
-                margin: EdgeInsets.fromLTRB(20, 80, 10, 0),
+                margin: EdgeInsets.fromLTRB(20, 30, 10, 0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Wallet Balance",style: TextStyle(color: blue2,fontSize: 16),),
+                    Text("Wallet Balance",
+                      style: TextStyle(color: Colors.black54,fontSize: 16),),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("${AppConstant.currency}",
-                            style: TextStyle(color: Colors.white)),
+                        Padding(
+                          child: Text("${AppConstant.currency}",
+                              style: TextStyle(color: Colors.black,fontSize: 16)),
+                          padding: EdgeInsets.fromLTRB(0, 1, 0, 0),
+                        ),
                         Text("${walleModel.data.userWallet}",
-                            style: TextStyle(color: Colors.white,fontSize: 24)),
+                            style: TextStyle(color: Colors.black,fontSize: 24)),
                       ],
                     )
                   ],
                 )
               ),
 
-              Row(
-                children: [
-                  Padding(
-                    child: InkWell(
-                      onTap: (){
-                        Navigator.pop(context);
-                      },
-                      child: Icon(Icons.arrow_back,color: Colors.white,size: 30,),
-                      //child: Image.asset("images/back.png",width: 25,height: 25,),
-                    ),
-                    padding: EdgeInsets.fromLTRB(20, 15, 0, 10),
-                  ),
-                ],
+
+              Container(
+                margin: EdgeInsets.fromLTRB(0, 0, 30, 0),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: Image.asset("images/walletbalancegreaphics.png",width: 150,height: 150,),
+                ),
               )
 
             ],
@@ -267,7 +264,7 @@ class WalletViewWidgetState extends State<WalletViewWidget> {
                   color: Colors.blue[100],
                   child: ListView.builder(
                     controller: scrollController,
-                    itemCount: 25,
+                    itemCount: 1,
                     itemBuilder: (BuildContext context, int index) {
 
 
