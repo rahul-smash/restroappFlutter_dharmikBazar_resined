@@ -89,14 +89,14 @@ task runScript {
         proc.waitForOrKill(10000000)
         println "out> $sOut err> $sError"
 
-        proc = "flutter build apk --release".execute()
-//        proc = "flutter build apk --debug".execute()
+//        proc = "flutter build apk --release".execute()
+        proc = "flutter build apk --debug".execute()
         proc.consumeProcessOutput(sOut, sError)
         proc.waitForOrKill(10000000)
         println "out> $sOut err> $sError"
 
-//        def src = new File("/home/automation/valueAppzFlutter/restroapp-flutter/build/app/outputs/apk/debug/app-debug.apk")
-        def src = new File("/home/automation/valueAppzFlutter/restroapp-flutter/build/app/outputs/apk/release/app-release.apk")
+        def src = new File("/home/automation/valueAppzFlutter/restroapp-flutter/build/app/outputs/apk/debug/app-debug.apk")
+//        def src = new File("/home/automation/valueAppzFlutter/restroapp-flutter/build/app/outputs/apk/release/app-release.apk")
         def date = new Date()
         def sdf = new SimpleDateFormat("MMM_dd_yyyy_hh_mm_ss_a")
         println sdf.format(date)
