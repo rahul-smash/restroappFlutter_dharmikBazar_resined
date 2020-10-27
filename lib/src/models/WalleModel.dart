@@ -55,12 +55,14 @@ class WalletHistory {
     this.refund,
     this.label,
     this.dateTime,
+    this.refund_type
   });
 
   String id;
   String displayOrderId;
   String refund;
   String label;
+  String refund_type;
   DateTime dateTime;
 
   factory WalletHistory.fromJson(Map<String, dynamic> json) => WalletHistory(
@@ -68,6 +70,7 @@ class WalletHistory {
     displayOrderId: json["display_order_id"],
     refund: json["refund"],
     label: json["label"],
+    refund_type: json["refund_type"],
     dateTime: DateTime.parse(json["date_time"]),
   );
 
@@ -76,6 +79,7 @@ class WalletHistory {
     "display_order_id": displayOrderId,
     "refund": refund,
     "label": label,
+    "refund_type": refund_type,//order_refund or order_payment
     "date_time": dateTime.toIso8601String(),
   };
 }

@@ -136,7 +136,27 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
       children: [
         Padding(
           padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-          child: Icon(Icons.add_circle_outline),
+          //child: Icon(Icons.add_circle_outline),
+          child: Container(
+              height: 45,width: 45,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20.0),
+                  border: Border.all(
+                    width: 0.0,
+                    color: walletHistory.refund_type=="order_refund"?red1:green1,
+                  ),
+                color: walletHistory.refund_type=="order_refund"?red1:green1,
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(6),
+                child: Image.asset(walletHistory.refund_type == "order_refund"
+                    ? "images/orderrefund.png"
+                    : "images/cashbackicon.png",height: 20,width: 20,fit: BoxFit.fill,),
+              ),
+          ),
+          /*child: Image.asset(walletHistory.refund_type == "order_refund"
+              ? "images/orderrefund.png"
+              : "images/cashbackicon.png"),*/
         ),
         Expanded(
           child: Column(
@@ -161,9 +181,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text('${AppConstant.currency}${walletHistory.refund}',
+                Text('${walletHistory.refund_type == "order_refund" ? " - " : " + "}${AppConstant.currency}${walletHistory.refund}',
                     style: TextStyle(
-                        color: Colors.black,
+                        color: walletHistory.refund_type=="order_refund"?Colors.black:green2,
                         fontSize: 18,
                         fontWeight: FontWeight.normal)),
                 SizedBox(height: 5),

@@ -132,6 +132,8 @@ flutter:
     - images/whatsapp.png
     - images/placeHolder.png
     - images/walleticon.png
+    - images/cashbackicon.png
+    - images/orderrefund.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
