@@ -183,7 +183,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                               Utils.launchURL(socialModel.data.instagram);
                           }
                         },
-                        child: Image.asset("images/whatsappicon.png",width: iconHeight,height: iconHeight,),
+                        child: Image.asset("images/instagram.png",width: iconHeight,height: iconHeight,),
                       ),
                     ],
                   ),
