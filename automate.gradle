@@ -67,7 +67,7 @@ task runScript {
     String appending = ""
     def lines = fh1.readLines()
     for (line in lines) {
-       if (line.contains("APPLICATION_NAME")) {
+        if (line.contains("APPLICATION_NAME")) {
             String newtxt = "APPLICATION_NAME = " + app_name + "\n"
             appending = appending + newtxt
         }/* else if (line.contains("PACKAGE_NAME")) {
@@ -95,14 +95,14 @@ task runScript {
         proc.waitForOrKill(10000000)
         println "out> $sOut err> $sError"
 
-//        def src = new File("/home/automation/valueAppzFlutter/restroapp-flutter/build/app/outputs/apk/debug/app-debug.apk")
+//        def src = new File("/home/signity/workspace_signity/1_Flutter_projects/RestroApp_Flutter/build/app/outputs/apk/debug/app-debug.apk")
         def src = new File("/home/automation/valueAppzFlutter/restroapp-flutter/build/app/outputs/apk/release/app-release.apk")
         def date = new Date()
         def sdf = new SimpleDateFormat("MMM_dd_yyyy_hh_mm_ss_a")
         println sdf.format(date)
         def dateString =sdf.format(date)
         String app_nameNew = buildName.trim() +"_"+ dateString+ ".apk"
-        def dst = new File('/home/automation/apk', app_nameNew)
+        def dst = new File('/home/signity/Desktop', app_nameNew)
         if (dst.exists()) {
             dst.delete()
             src.withInputStream { stream -> dst << stream }
