@@ -648,7 +648,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                   EdgeInsets.symmetric(horizontal: 2.0),
                               itemBuilder: (context, _) => Icon(
                                 Icons.star,
-                                color: orangeColor,
+                                color: appThemeSecondary,
                               ),
                               ignoreGestures: true,
                               onRatingUpdate: (rating) {},
@@ -738,7 +738,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
 //                            ),
                         Container(
                           margin: EdgeInsets.only(top: 5),
-                          color: orangeColor,
+                          color: appThemeSecondary,
                           width: 50,
                           height: 3,
                         ),
@@ -777,7 +777,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
                           itemBuilder: (context, _) => Icon(
                             Icons.star,
-                            color: orangeColor,
+                            color: appThemeSecondary,
                           ),
                           onRatingUpdate: (rating) {
                             _rating = rating;
@@ -870,7 +870,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                 width: 130,
                                 child: FlatButton(
                                   child: Text('Submit'),
-                                  color: orangeColor,
+                                  color: appThemeSecondary,
                                   textColor: Colors.white,
                                   onPressed: () {
                                     if (_rating == 0) {

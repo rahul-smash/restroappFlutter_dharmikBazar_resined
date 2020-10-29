@@ -196,7 +196,7 @@ class _RegisterUserState extends State<RegisterUser> {
                                 style: TextStyle(color: Colors.white),
                               ),
                               onPressed: _submitForm,
-                              color: orangeColor,
+                              color: appThemeSecondary,
                             ),
                           ),
                         ),

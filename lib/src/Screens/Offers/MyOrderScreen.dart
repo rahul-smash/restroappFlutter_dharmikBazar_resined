@@ -340,7 +340,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
 
   Color getOrderTypeColor(status){
     if (status == "Pickup") {
-      return orangeColor;
+      return appThemeSecondary;
     } else {
       return Color(0xFFA0C057) ;
     }

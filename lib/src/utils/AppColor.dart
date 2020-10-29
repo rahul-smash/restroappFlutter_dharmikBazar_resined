@@ -26,6 +26,7 @@ Color dotIncreasedColor = Color(0xff777A18);
 //=================new added==========
 Color bottomBarBackgroundColor = Color(0xffffffff);
 Color gridBackgroundCOlor = Color(0xffECECEC);
+Color appThemeSecondary = Color(0xffFF5400);
 Color orangeColor = Color(0xffFF5400);
 Color grayColor = Color(0xffd3d3d3);
 Color favGrayColor = Color(0xfff3f3f3);
@@ -37,5 +38,21 @@ Color toastbgColor = Color(0xff656565);
 Color grayColorTitle = Color(0xff474d54);
 Color grayLightColor = Color(0xFFEEEEEE);
 Color grayLightColorSecondary = Color(0xFFDCDCDC);
+
+/// new Color
+Color webThemeCategoryOpenColor= Color(0xFFFCF1F1);
+Color stripsColor= Color(0xFF080A10);
+Color footerColor= Color(0xFF12151c);
+Color listingBackgroundColor= Color(0xFFf0f0f0);
+Color listingBorderColor= Color(0xFFe5e5e5);
+Color listingBoxBackgroundColor= Color(0xFFfcfcfc);
+Color homeSubHeadingColor= Color(0xFF12151c);
+Color productHeadingColor= Color(0xFF12151c);
+Color homeDescriptionColor= Color(0xFF70737b);
+Color staticHomeDescriptionColor= Color(0xFF70737F);
+Color staticBottomIcon= Color(0xFF939799);
+Color categoryListingButtonBorderColor= Color(0xFFC5C6C9);
+Color staticCategoryListingButtonBorderColor= Color(0xFFC5C6C9);
+Color categoryListingBoxBackgroundColor= Color(0xFFfcfcfc);
 
 

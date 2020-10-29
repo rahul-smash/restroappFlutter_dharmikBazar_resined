@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class StoreResponse {
   bool success;
   StoreModel store;
@@ -119,6 +121,7 @@ class StoreModel {
   PaymentSetting paymentSetting;
   List<PaymentGatewaySettings> paymentGatewaySettings;
   AppThemeColors appThemeColors;
+  WebAppThemeColors webAppThemeColors;
 
   //new keys added
   bool homePageTitleStatus;
@@ -148,6 +151,7 @@ class StoreModel {
       this.lat,
       this.lng,
       this.appThemeColors,
+        this.webAppThemeColors,
       this.contactPerson,
       this.contactNumber,
       this.contactEmail,
@@ -320,6 +324,7 @@ class StoreModel {
       }
     }
     appThemeColors = AppThemeColors.fromJson(json["app_theme_colors"]);
+    webAppThemeColors= json["web_app_theme_colors"] == null ? null : WebAppThemeColors.fromJson(json["web_app_theme_colors"]);
     /* if (json['tax_detail'] != null) {
       taxDetail = new List<Null>();
       json['tax_detail'].forEach((v) {
@@ -431,6 +436,7 @@ class StoreModel {
     data['about_us'] = this.aboutUs;
     data['otp_skip'] = this.otpSkip;
     data['app_theme_colors'] = this.appThemeColors;
+    data['web_app_theme_colors'] = this.webAppThemeColors;
     data['version'] = this.version;
     data['currency'] = this.currency;
     data['show_currency'] = this.showCurrency;
@@ -652,6 +658,111 @@ class AppThemeColors {
         "bottom_bar_background_color": bottom_bar_background_color,
         "left_menu_label_color": left_menu_label_Color,
       };
+}
+
+class WebAppThemeColors {
+  WebAppThemeColors({
+    this.id,
+    this.storeId,
+    this.webThemePrimaryColor,
+    this.webThemeSecondaryColor,
+    this.webThemeCategoryOpenColor,
+    this.stripsColor,
+    this.footerColor,
+    this.listingBackgroundColor,
+    this.listingBorderColor,
+    this.listingBoxBackgroundColor,
+    this.homeSubHeadingColor,
+    this.homeDescriptionColor,
+    this.categoryListingButtonBorderColor,
+    this.categoryListingBoxBackgroundColor,
+  });
+
+  String id;
+  String storeId;
+  String webThemePrimaryColor;
+  String webThemeSecondaryColor;
+  String webThemeCategoryOpenColor;
+  String stripsColor;
+  String footerColor;
+  String listingBackgroundColor;
+  String listingBorderColor;
+  String listingBoxBackgroundColor;
+  String homeSubHeadingColor;
+  String homeDescriptionColor;
+  String categoryListingButtonBorderColor;
+  String categoryListingBoxBackgroundColor;
+
+  WebAppThemeColors copyWith({
+    String id,
+    String storeId,
+    String webThemePrimaryColor,
+    String webThemeSecondaryColor,
+    String webThemeCategoryOpenColor,
+    String stripsColor,
+    String footerColor,
+    String listingBackgroundColor,
+    String listingBorderColor,
+    String listingBoxBackgroundColor,
+    String homeSubHeadingColor,
+    String homeDescriptionColor,
+    String categoryListingButtonBorderColor,
+    String categoryListingBoxBackgroundColor,
+  }) =>
+      WebAppThemeColors(
+        id: id ?? this.id,
+        storeId: storeId ?? this.storeId,
+        webThemePrimaryColor: webThemePrimaryColor ?? this.webThemePrimaryColor,
+        webThemeSecondaryColor: webThemeSecondaryColor ?? this.webThemeSecondaryColor,
+        webThemeCategoryOpenColor: webThemeCategoryOpenColor ?? this.webThemeCategoryOpenColor,
+        stripsColor: stripsColor ?? this.stripsColor,
+        footerColor: footerColor ?? this.footerColor,
+        listingBackgroundColor: listingBackgroundColor ?? this.listingBackgroundColor,
+        listingBorderColor: listingBorderColor ?? this.listingBorderColor,
+        listingBoxBackgroundColor: listingBoxBackgroundColor ?? this.listingBoxBackgroundColor,
+        homeSubHeadingColor: homeSubHeadingColor ?? this.homeSubHeadingColor,
+        homeDescriptionColor: homeDescriptionColor ?? this.homeDescriptionColor,
+        categoryListingButtonBorderColor: categoryListingButtonBorderColor ?? this.categoryListingButtonBorderColor,
+        categoryListingBoxBackgroundColor: categoryListingBoxBackgroundColor ?? this.categoryListingBoxBackgroundColor,
+      );
+
+  factory WebAppThemeColors.fromRawJson(String str) => WebAppThemeColors.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory WebAppThemeColors.fromJson(Map<String, dynamic> json) => WebAppThemeColors(
+    id: json["id"] == null ? null : json["id"],
+    storeId: json["store_id"] == null ? null : json["store_id"],
+    webThemePrimaryColor: json["web_theme_primary_color"] == null ? null : json["web_theme_primary_color"],
+    webThemeSecondaryColor: json["web_theme_secondary_color"] == null ? null : json["web_theme_secondary_color"],
+    webThemeCategoryOpenColor: json["web_theme_category_open_color"] == null ? null : json["web_theme_category_open_color"],
+    stripsColor: json["strips_color"] == null ? null : json["strips_color"],
+    footerColor: json["footer_color"] == null ? null : json["footer_color"],
+    listingBackgroundColor: json["listing_background_color"] == null ? null : json["listing_background_color"],
+    listingBorderColor: json["listing_border_color"] == null ? null : json["listing_border_color"],
+    listingBoxBackgroundColor: json["listing_box_background_color"] == null ? null : json["listing_box_background_color"],
+    homeSubHeadingColor: json["home_sub_heading_color"] == null ? null : json["home_sub_heading_color"],
+    homeDescriptionColor: json["home_description_color"] == null ? null : json["home_description_color"],
+    categoryListingButtonBorderColor: json["category_listing_button_border_color"] == null ? null : json["category_listing_button_border_color"],
+    categoryListingBoxBackgroundColor: json["category_listing_box_background_color"] == null ? null : json["category_listing_box_background_color"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id == null ? null : id,
+    "store_id": storeId == null ? null : storeId,
+    "web_theme_primary_color": webThemePrimaryColor == null ? null : webThemePrimaryColor,
+    "web_theme_secondary_color": webThemeSecondaryColor == null ? null : webThemeSecondaryColor,
+    "web_theme_category_open_color": webThemeCategoryOpenColor == null ? null : webThemeCategoryOpenColor,
+    "strips_color": stripsColor == null ? null : stripsColor,
+    "footer_color": footerColor == null ? null : footerColor,
+    "listing_background_color": listingBackgroundColor == null ? null : listingBackgroundColor,
+    "listing_border_color": listingBorderColor == null ? null : listingBorderColor,
+    "listing_box_background_color": listingBoxBackgroundColor == null ? null : listingBoxBackgroundColor,
+    "home_sub_heading_color": homeSubHeadingColor == null ? null : homeSubHeadingColor,
+    "home_description_color": homeDescriptionColor == null ? null : homeDescriptionColor,
+    "category_listing_button_border_color": categoryListingButtonBorderColor == null ? null : categoryListingButtonBorderColor,
+    "category_listing_box_background_color": categoryListingBoxBackgroundColor == null ? null : categoryListingBoxBackgroundColor,
+  };
 }
 
 class Banner {

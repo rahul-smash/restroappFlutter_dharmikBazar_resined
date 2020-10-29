@@ -299,7 +299,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
 
   Color getOrderTypeColor(status){
     if (status == "Pickup") {
-      return orangeColor;
+      return appThemeSecondary;
     } else {
       return Color(0xFFA0C057) ;
     }

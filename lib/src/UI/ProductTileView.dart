@@ -200,7 +200,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               padding: EdgeInsets.all(5),
                               decoration: new BoxDecoration(
                                 shape: BoxShape.rectangle,
-                                color: orangeColor,
+                                color: appThemeSecondary,
                                 borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(15.0),
                                     bottomRight: Radius.circular(15.0)),
@@ -331,7 +331,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                               ClassType.Favourites
                                           ? Icon(
                                               Icons.favorite,
-                                              color: orangeColor,
+                                              color: appThemeSecondary,
                                             )
                                           : Utils.showFavIcon(
                                               widget.product.isFav),
@@ -385,7 +385,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                     border: Border.all(
                                       color: weight.trim() == ""
                                           ? whiteColor
-                                          : orangeColor,
+                                          : appThemeSecondary,
                                       width: 1,
                                     ),
                                     borderRadius:
@@ -404,7 +404,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         child: Text(
                                           "${weight}",
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(color: orangeColor),
+                                          style: TextStyle(color: appThemeSecondary),
                                         ),
                                       ),
                                       Visibility(
@@ -480,7 +480,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
         width: 100,
         height: 30,
         decoration: BoxDecoration(
-          color: showAddButton == false ? whiteColor : orangeColor,
+          color: showAddButton == false ? whiteColor : appThemeSecondary,
           //border: Border.all(color: showAddButton == false ? whiteColor : orangeColor, width: 0,),
           borderRadius: BorderRadius.all(Radius.circular(5.0)),
         ),
@@ -583,9 +583,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             width: 35,
                             height: 25,
                             decoration: BoxDecoration(
-                              color: orangeColor,
+                              color: appThemeSecondary,
                               border: Border.all(
-                                color: orangeColor,
+                                color: appThemeSecondary,
                                 width: 1,
                               ),
                               borderRadius:
