@@ -216,15 +216,16 @@ class ApiController {
           await databaseHelper.getCount(DatabaseHelper.Categories_Table);
       bool isNetworkAviable = await Utils.isNetworkAvailable();
       if (dbCount == 0 && isNetworkAviable) {
-        print("database zero");
+        print("*************database zero*************");
         print("catttttt  $url");
         Response response = await Dio()
             .get(url, options: new Options(responseType: ResponseType.plain));
         //print(response);
         categoryResponse =
             CategoryResponse.fromJson(json.decode(response.data));
+        await databaseHelper.batchInsertCategorys(categoryResponse.categories);
         //print("-------Categories.length ---${categoryResponse.categories.length}");
-        for (int i = 0; i < categoryResponse.categories.length; i++) {
+        /*for (int i = 0; i < categoryResponse.categories.length; i++) {
 
           CategoryModel model = categoryResponse.categories[i];
           databaseHelper.saveCategories(model);
@@ -235,7 +236,7 @@ class ApiController {
             }
           }
 
-        }
+        }*/
       } else if (dbCount == 0 && !isNetworkAviable) {
         categoryResponse.success = false;
         return categoryResponse;
