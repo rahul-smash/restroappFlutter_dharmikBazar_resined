@@ -296,15 +296,16 @@ class ApiController {
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-          for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
-            for (int j = 0;
-                j < subCategoryResponse.subCategories[i].products.length;
-                j++) {
-              databaseHelper.saveProducts(
-                  subCategoryResponse.subCategories[i].products[j],
+
+          await databaseHelper.batchInsertProducts(subCategoryResponse.subCategories);
+
+          /*for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
+            for (int j = 0;j < subCategoryResponse.subCategories[i].products.length; j++) {
+              databaseHelper.saveProducts(subCategoryResponse.subCategories[i].products[j],
                   subCategoryResponse.subCategories[i].id);
             }
-          }
+          }*/
+
           return subCategoryResponse;
         }
         //print("-------store.success ---${storeData.success}");
