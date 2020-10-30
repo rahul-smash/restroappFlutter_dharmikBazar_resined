@@ -193,33 +193,33 @@ class DatabaseHelper {
     return res;
   }
 
-  /*Future<void> batchInsertCategorys(List<StoreCategories> storeCategorieslist)  async {
-    // Insert some records in a transaction
+  Future<int> saveSubCategories(SubCategory subCategories, String cat_id) async {
+    var dbClient = await db;
+    int res = await dbClient.insert(Sub_Categories_Table, subCategories.toMap(cat_id));
+    return res;
+  }
+
+  Future<void> batchInsertCategorys(List<CategoryModel> categoryModelList)  async {
     //print("-----------batchInsertCategorys---------------");
     Database db = await _instance.db;
     db.transaction((txn) async {
       Batch batch = txn.batch();
-      for (StoreCategories category in storeCategorieslist) {
-        Map<String, dynamic> row = {
-          DatabaseHelper.ID: category.id,
-          DatabaseHelper.Title: category.title,
-          DatabaseHelper.Slug: category.slug,
-          DatabaseHelper.Description: category.description,
-          DatabaseHelper.Status: category.status.toString(),
-          DatabaseHelper.Image_id: category.imageId.toString(),
-          DatabaseHelper.Image_thumbnail: category.imageThumbnail,
-        };
-        batch.insert(CategoryTable, row);
-        if(category.service != null){
-          if(category.service.isNotEmpty){
-            batchInsertServices(category.service,category.id);
+      for (CategoryModel category in categoryModelList) {
+
+        batch.insert(Categories_Table, category.toMap());
+
+        if (category.subCategory != null) {
+          for (int j = 0; j < category.subCategory.length; j++) {
+            batch.insert(Sub_Categories_Table, category.subCategory[j].toMap(category.id));
           }
+          batch.commit();
         }
+
       }
       batch.commit();
     });
     //print("------------batchInsertCategorys----batch.commit();-----------");
-  }*/
+  }
 
   Future<List<CategoryModel>> getCategories() async {
     List<CategoryModel> categoryList = new List();
@@ -254,13 +254,7 @@ class DatabaseHelper {
     return categoryList;
   }
 
-  Future<int> saveSubCategories(
-      SubCategory subCategories, String cat_id) async {
-    var dbClient = await db;
-    int res = await dbClient.insert(
-        Sub_Categories_Table, subCategories.toMap(cat_id));
-    return res;
-  }
+
 
   Future<List<SubCategory>> getSubCategories(String parent_id) async {
     List<SubCategory> subCategoryList = new List();

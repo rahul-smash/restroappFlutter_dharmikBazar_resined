@@ -225,13 +225,16 @@ class ApiController {
             CategoryResponse.fromJson(json.decode(response.data));
         //print("-------Categories.length ---${categoryResponse.categories.length}");
         for (int i = 0; i < categoryResponse.categories.length; i++) {
+
           CategoryModel model = categoryResponse.categories[i];
           databaseHelper.saveCategories(model);
+
           if (model.subCategory != null) {
             for (int j = 0; j < model.subCategory.length; j++) {
               databaseHelper.saveSubCategories(model.subCategory[j], model.id);
             }
           }
+
         }
       } else if (dbCount == 0 && !isNetworkAviable) {
         categoryResponse.success = false;
