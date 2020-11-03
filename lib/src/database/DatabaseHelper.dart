@@ -212,7 +212,7 @@ class DatabaseHelper {
           for (int j = 0; j < category.subCategory.length; j++) {
             batch.insert(Sub_Categories_Table, category.subCategory[j].toMap(category.id));
           }
-          batch.commit();
+//          batch.commit();
         }
 
       }
@@ -232,7 +232,7 @@ class DatabaseHelper {
           for (int j = 0; j < category.products.length; j++) {
             batch.insert(Products_Table,category.products[j].toMap(category.id));
           }
-          batch.commit();
+//          batch.commit();
         }
 
       }
