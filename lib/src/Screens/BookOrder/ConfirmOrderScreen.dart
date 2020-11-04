@@ -194,6 +194,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 builder: (context) => PaytmWebView(value, storeModel)),
           );
         } else {
+          Utils.hideProgressDialog(context);
           Utils.showToast("Api Error", false);
         }
       });
