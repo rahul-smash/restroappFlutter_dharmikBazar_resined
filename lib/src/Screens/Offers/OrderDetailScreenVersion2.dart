@@ -953,7 +953,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                   new BorderRadius.all(new Radius.circular(5.0)),
                                 ),
                                 child: FlatButton(
-                                  child: Text('Cancel',style: TextStyle(fontSize: 18),),
+                                  child: Text('Cancel',style: TextStyle(fontSize: 17),),
                                   color: Colors.grey,
                                   textColor: Colors.white,
                                   onPressed: () {
@@ -970,13 +970,14 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                   new BorderRadius.all(new Radius.circular(5.0)),
                                 ),
                                 child: FlatButton(
-                                  child: Text('Yes, cancel my order',style: TextStyle(fontSize: 18),),
+                                  child: Text('Yes, cancel my order',style: TextStyle(fontSize: 17),),
                                   color: orangeColor,
                                   textColor: Colors.white,
                                   onPressed: () {
+                                    String comment=commentController.text;
                                     Utils.hideKeyboard(context);
                                     Navigator.pop(context);
-                                    _hitCancelOrderApi(orderRejectionNote: commentController.text);
+                                    _hitCancelOrderApi(orderRejectionNote: comment);
                                   },
                                 ),
                               ))
@@ -996,7 +997,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   _hitCancelOrderApi({String orderRejectionNote}) async {
     Utils.showProgressDialog(context);
     CancelOrderModel cancelOrder =
-        await ApiController.orderCancelApi(widget.orderHistoryData.orderId);
+        await ApiController.orderCancelApi(widget.orderHistoryData.orderId,order_rejection_note: orderRejectionNote);
     if (cancelOrder != null && cancelOrder.success) {
       setState(() {
         widget.orderHistoryData.status = '6';
