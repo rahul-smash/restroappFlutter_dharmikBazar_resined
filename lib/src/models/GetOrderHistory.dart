@@ -35,6 +35,8 @@ class OrderData {
   String cartSaving;
   String couponType;
   String couponCode;
+  String orderRejectionNote;
+  String walletRefund;
   List<Null> storeTaxRateDetail;
   List<Null> calculatedTaxDetail;
   List<Null> storeFixedTaxDetail;
@@ -69,6 +71,8 @@ class OrderData {
     this.address,
     this.orderItems,
     this.deliveryAddress,
+    this.orderRejectionNote,
+    this.walletRefund,
   });
 
   OrderData.fromJson(Map<String, dynamic> json) {
@@ -92,6 +96,8 @@ class OrderData {
     couponCode = json['coupon_code'];
     rating = json['rating'];
     address = json['address'];
+    orderRejectionNote = json['order_rejection_note'];
+    walletRefund = json['wallet_refund'];
     if (json['order_items'] != null) {
       orderItems = new List<OrderItems>();
       json['order_items'].forEach((v) {

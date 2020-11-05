@@ -907,13 +907,13 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           ),
                         ),
                         Text(
-                            "Are you sure you want to\n cancel your order?",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400),
-                          ),
+                          "Are you sure you want to\n cancel your order?",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400),
+                        ),
                         Container(
                           height: 130,
                           margin: EdgeInsets.fromLTRB(10, 15, 10, 10),
@@ -949,11 +949,14 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                               Container(
                                 width: 120,
                                 decoration: new BoxDecoration(
-                                  borderRadius:
-                                  new BorderRadius.all(new Radius.circular(5.0)),
+                                  borderRadius: new BorderRadius.all(
+                                      new Radius.circular(5.0)),
                                 ),
                                 child: FlatButton(
-                                  child: Text('Cancel',style: TextStyle(fontSize: 17),),
+                                  child: Text(
+                                    'Cancel',
+                                    style: TextStyle(fontSize: 17),
+                                  ),
                                   color: Colors.grey,
                                   textColor: Colors.white,
                                   onPressed: () {
@@ -962,22 +965,28 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                   },
                                 ),
                               ),
-                              SizedBox(width: 10,),
-                              Expanded(child:
-                              Container(
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Expanded(
+                                  child: Container(
                                 decoration: new BoxDecoration(
-                                  borderRadius:
-                                  new BorderRadius.all(new Radius.circular(5.0)),
+                                  borderRadius: new BorderRadius.all(
+                                      new Radius.circular(5.0)),
                                 ),
                                 child: FlatButton(
-                                  child: Text('Yes, cancel my order',style: TextStyle(fontSize: 17),),
+                                  child: Text(
+                                    'Yes, cancel my order',
+                                    style: TextStyle(fontSize: 17),
+                                  ),
                                   color: orangeColor,
                                   textColor: Colors.white,
                                   onPressed: () {
-                                    String comment=commentController.text;
+                                    String comment = commentController.text;
                                     Utils.hideKeyboard(context);
                                     Navigator.pop(context);
-                                    _hitCancelOrderApi(orderRejectionNote: comment);
+                                    _hitCancelOrderApi(
+                                        orderRejectionNote: comment);
                                   },
                                 ),
                               ))
@@ -996,8 +1005,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
 
   _hitCancelOrderApi({String orderRejectionNote}) async {
     Utils.showProgressDialog(context);
-    CancelOrderModel cancelOrder =
-        await ApiController.orderCancelApi(widget.orderHistoryData.orderId,order_rejection_note: orderRejectionNote);
+    CancelOrderModel cancelOrder = await ApiController.orderCancelApi(
+        widget.orderHistoryData.orderId,
+        order_rejection_note: orderRejectionNote);
     if (cancelOrder != null && cancelOrder.success) {
       setState(() {
         widget.orderHistoryData.status = '6';
@@ -1180,7 +1190,22 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
             widget.orderHistoryData.status == '6'
         ? true
         : false;
+    bool isNoteVisible=(widget.orderHistoryData.status == '2' ||
+        widget.orderHistoryData.status == '6') &&
+        widget.orderHistoryData.orderRejectionNote != null &&
+        widget.orderHistoryData.orderRejectionNote.isNotEmpty;
+    String noteHeading= widget.orderHistoryData.orderRejectionNote != null &&
+        widget.orderHistoryData.orderRejectionNote.isNotEmpty
+        ?widget.orderHistoryData.status == '6'? "Cancellation Comment:-":widget.orderHistoryData.status == '2'? "Reason of Rejection:-":""
+        : "";
+    String orderRejectionNote=   widget.orderHistoryData.orderRejectionNote != null &&
+        widget
+            .orderHistoryData.orderRejectionNote.isNotEmpty
+        ? widget.orderHistoryData.orderRejectionNote
+        : "";
+
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Stack(
           children: <Widget>[
@@ -1361,6 +1386,29 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
             )
           ],
         ),
+        Visibility(
+            visible: isNoteVisible,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 15,
+                ),
+                Text(noteHeading,
+                  style: TextStyle(color: Colors.black, fontSize: 18),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 4),
+                  child: Text(
+                    orderRejectionNote,
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                )
+              ],
+            ))
       ],
     );
   }
