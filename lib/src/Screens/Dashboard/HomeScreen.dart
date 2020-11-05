@@ -395,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (AppConstant.isLoggedIn) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(store)),
+              MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(this.store)),
             );
             Map<String, dynamic> attributeMap = new Map<String, dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";
@@ -706,7 +706,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
-                    return NotificationScreen(widget.store);
+                    return NotificationScreen(this.store);
                   }),
                 );
               },
