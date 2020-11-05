@@ -93,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (widget.showForceUploadAlert) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           DialogUtils.showForceUpdateDialog(context, store.storeName,
-              store.forceDownload[0].forceDownloadMessage);
+              store.forceDownload[0].forceDownloadMessage,storeModel: store);
         });
       } else {
         if (!checkIfStoreClosed()) {
@@ -320,6 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Badge(
                 showBadge: cartBadgeCount == 0 ? false : true,
+                badgeColor: appThemeSecondary,
                 badgeContent: Text('${cartBadgeCount}',
                     style: TextStyle(color: Colors.white)),
                 child: Image.asset('images/carticon.png',
@@ -705,7 +706,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) {
-                    return NotificationScreen();
+                    return NotificationScreen(widget.store);
                   }),
                 );
               },

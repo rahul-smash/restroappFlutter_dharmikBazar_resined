@@ -195,7 +195,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                 padding: EdgeInsets.all(10),
                 decoration: new BoxDecoration(
                   shape: BoxShape.rectangle,
-                  color: orangeColor,
+                  color: appThemeSecondary,
                   borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(15.0),
                       bottomRight: Radius.circular(15.0)),
@@ -393,7 +393,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           Variant tagName = variants[index];
           if (selctedTag == index) {
             chipSelectedColor =
-            variants[index].weight.trim() == "" ? whiteColor : orangeColor;
+            variants[index].weight.trim() == "" ? whiteColor : appThemeSecondary;
             textColor = Color(0xFFFFFFFF);
           } else {
             chipSelectedColor = Color(0xFFBDBDBD);
@@ -451,7 +451,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         width: 100,
         height: 30,
         decoration: BoxDecoration(
-          color: showAddButton == false ? whiteColor : orangeColor,
+          color: showAddButton == false ? whiteColor : appThemeSecondary,
           borderRadius: BorderRadius.all(Radius.circular(5.0)),
         ),
         margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
@@ -554,9 +554,9 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                       width: 35,
                       height: 25,
                       decoration: BoxDecoration(
-                        color: orangeColor,
+                        color: appThemeSecondary,
                         border: Border.all(
-                          color: orangeColor,
+                          color: appThemeSecondary,
                           width: 1,
                         ),
                         borderRadius:

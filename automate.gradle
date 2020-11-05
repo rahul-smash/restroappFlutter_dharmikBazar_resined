@@ -1,0 +1,119 @@
+import groovy.json.JsonSlurper
+import groovy.json.JsonBuilder
+
+import java.text.SimpleDateFormat
+
+task runScript {
+
+    String buildName="Store_393"
+    String androidWorkingDirPath ="/home/automation/valueAppzFlutter/restroapp-flutter/android"
+    def myFile = new File("/home/automation/valueAppzFlutter/restroapp-flutter/assets/app_config.json")
+    def appConfig =new JsonSlurper().parseText(myFile.text)
+    appConfig.put("store_id","393")
+    appConfig.put("primary_store_id","811")
+    appConfig.put("isGroceryApp","true")
+    appConfig.put("isMultiStore",false)
+    appConfig.put("currency","\u20B9")
+    appConfig.each { println it }
+    myFile.write(new JsonBuilder(appConfig).toPrettyString())
+
+
+    String app_name,package_name,app_img_48_48,
+           app_img_72_72,
+           app_img_96_96,
+           app_img_144_144,
+           app_img_192_192
+
+    String text = new URL("https://app.restroapp.com/AppAutomationApi/pwaConfiguration").text
+    JsonSlurper slurper = new JsonSlurper()
+    Map parsedJson = slurper.parseText(text)
+    def jsonSlurped = parsedJson.get('data')
+    app_name = jsonSlurped.get('app_name')
+    app_name = "My Groceries"
+    package_name = jsonSlurped.get('package_name')
+//    host_site_domain = jsonSlurped.get('host_site_domain')
+//    host_scheme = jsonSlurped.get('host_scheme')
+    //mdpi
+    app_img_48_48 = jsonSlurped.get('app_img_48_48')
+    app_img_48_48 = "https://i.ibb.co/D1ppxs0/ic-launcher.png"
+    def contentImage = app_img_48_48.toURL().getBytes()
+    new File("$androidWorkingDirPath/app/src/main/res/mipmap-mdpi/ic_launcher.png").setBytes(contentImage)
+    //hdpi
+    app_img_72_72 = jsonSlurped.get('app_img_72_72')
+    if (app_img_72_72.contains("rupio")) {
+        app_img_72_72 = "https://grupio.s3.amazonaws.com/apk_andr_img/1584690317_Icon1024_72.jpg"
+
+    }
+    app_img_72_72 = 'https://i.ibb.co/09N2c91/ic-launcher.png'
+    contentImage = app_img_72_72.toURL().getBytes()
+    new File("$androidWorkingDirPath/app/src/main/res/mipmap-hdpi/ic_launcher.png").setBytes(contentImage)
+    //xhdpi
+    app_img_96_96 = jsonSlurped.get('app_img_96_96')
+    app_img_96_96 = 'https://i.ibb.co/GnLR28p/ic-launcher.png'
+    contentImage = app_img_96_96.toURL().getBytes()
+    new File("$androidWorkingDirPath/app/src/main/res/mipmap-xhdpi/ic_launcher.png").setBytes(contentImage)
+    //xxhdpi
+    app_img_144_144 = jsonSlurped.get('app_img_144_144')
+    app_img_144_144 = 'https://i.ibb.co/vsQKPmh/ic-launcher.png'
+    contentImage = app_img_144_144.toURL().getBytes()
+    new File("$androidWorkingDirPath/app/src/main/res/mipmap-xxhdpi/ic_launcher.png").setBytes(contentImage)
+    //xxxhdpi
+    app_img_192_192 = jsonSlurped.get('app_img_192_192')
+    app_img_192_192 = 'https://i.ibb.co/4JYPkBB/ic-launcher.png'
+    contentImage = app_img_192_192.toURL().getBytes()
+    new File("$androidWorkingDirPath/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png").setBytes(contentImage)
+
+    File fh1 = new File("$androidWorkingDirPath/gradle.properties")
+    String appending = ""
+    def lines = fh1.readLines()
+    for (line in lines) {
+        if (line.contains("APPLICATION_NAME")) {
+            String newtxt = "APPLICATION_NAME = " + app_name + "\n"
+            appending = appending + newtxt
+        }/* else if (line.contains("PACKAGE_NAME")) {
+            String newtxt = "PACKAGE_NAME = " + package_name + "\n"
+            appending = appending + newtxt
+        } */else {
+            if (line != null)
+                appending = appending + line + "\n"
+        }
+    }
+    println "$appending"
+    def gradlePropertiesFile = new File("$androidWorkingDirPath/gradle.properties")
+    gradlePropertiesFile.write(appending)
+
+    doLast {
+        def proc = "flutter clean".execute()
+        def sOut = new StringBuilder(), sError = new StringBuilder()
+        proc.consumeProcessOutput(sOut, sError)
+        proc.waitForOrKill(10000000)
+        println "out> $sOut err> $sError"
+
+        proc = "flutter build apk --release".execute()
+//        proc = "flutter build apk --debug".execute()
+        proc.consumeProcessOutput(sOut, sError)
+        proc.waitForOrKill(10000000)
+        println "out> $sOut err> $sError"
+
+//        def src = new File("/home/signity/workspace_signity/1_Flutter_projects/RestroApp_Flutter/build/app/outputs/apk/debug/app-debug.apk")
+        def src = new File("/home/automation/valueAppzFlutter/restroapp-flutter/build/app/outputs/apk/release/app-release.apk")
+        def date = new Date()
+        def sdf = new SimpleDateFormat("MMM_dd_yyyy_hh_mm_ss_a")
+        println sdf.format(date)
+        def dateString =sdf.format(date)
+        String app_nameNew = buildName.trim() +"_"+ dateString+ ".apk"
+        def dst = new File('/home/signity/Desktop', app_nameNew)
+        if (dst.exists()) {
+            dst.delete()
+            src.withInputStream { stream -> dst << stream }
+        } else {
+            src.withInputStream { stream -> dst << stream }
+        }
+
+        gradle.buildFinished {
+            Date now = new Date()
+            println "\n ***** All completed @ $now ***"
+        }
+    }
+
+}

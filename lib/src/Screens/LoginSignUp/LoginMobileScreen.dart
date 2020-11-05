@@ -117,7 +117,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                           Container(
                               padding: const EdgeInsets.only(left: 0.0, top: 0.0, right: 20.0),
                               child: new RaisedButton(
-                                color: orangeColor,
+                                color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),

@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_pull_to_refresh/flutter_pull_to_refresh.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class NotificationScreen extends StatefulWidget {
+  StoreModel store;
+  NotificationScreen(this.store);
+
   @override
   _NotificationScreenState createState() => _NotificationScreenState();
 }
@@ -125,7 +130,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) {
-              return NotificationScreen();
+              return MyOrderScreenVersion2(widget.store);
             }),
           );
         }

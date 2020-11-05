@@ -206,7 +206,7 @@ class _ProfileState extends State<ProfileScreen> {
                                 onPressed: () {
                                   _submitForm();
                                 },
-                                color: orangeColor,
+                                color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(3.0),
                                 ),

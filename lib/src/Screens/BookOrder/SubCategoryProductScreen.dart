@@ -37,7 +37,7 @@ class SubCategoryProductScreen extends StatelessWidget {
             labelColor: Colors.black,
             unselectedLabelColor: grayColorTitle,
             indicatorColor:
-                categoryModel.subCategory.length == 1 ? appTheme : orangeColor,
+                categoryModel.subCategory.length == 1 ? appTheme : appThemeSecondary,
             indicatorWeight: 3,
             tabs: List.generate(categoryModel.subCategory.length, (int index) {
               bool isTabVisible;

@@ -244,7 +244,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                         itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
                         itemBuilder: (context, _) => Icon(
                           Icons.star,
-                          color: orangeColor,
+                          color: appThemeSecondary,
                         ),
                         ignoreGestures: true,
                         onRatingUpdate: (rating) {},
@@ -273,7 +273,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
             Container(
               padding: EdgeInsets.fromLTRB(10, 8, 10, 8),
               decoration: BoxDecoration(
-                  color: Color(0xFFFD5401),
+                  color: appThemeSecondary,
                   borderRadius: BorderRadius.circular(5)),
               child: Text(
                 _getButtonStatus(cardOrderHistoryItems),
@@ -328,7 +328,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
 
   Color getOrderTypeColor(status) {
     if (status == "Pickup") {
-      return orangeColor;
+      return appThemeSecondary;
     } else {
       return Color(0xFFA0C057);
     }

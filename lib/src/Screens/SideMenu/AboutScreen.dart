@@ -81,7 +81,7 @@ class _AboutScreenState extends State<AboutScreen> {
                   margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
                   child: FlatButton(
                     child: Text('Contact Us'),
-                    color: orangeColor,
+                    color: appThemeSecondary,
                     textColor: Colors.white,
                     onPressed: () {
                       //Navigator.pop(context, false);

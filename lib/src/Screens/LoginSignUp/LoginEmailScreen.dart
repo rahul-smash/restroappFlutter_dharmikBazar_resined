@@ -149,7 +149,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                           alignment: Alignment.centerRight,
                           child: Text('Forgot password?',
                             style: TextStyle(
-                              fontFamily: 'Medium',fontSize: 14,color: orangeColor,),
+                              fontFamily: 'Medium',fontSize: 14,color: appThemeSecondary,),
 
                           ),
                         ),
@@ -185,7 +185,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
           alignment: Alignment.center,
           child: Container(
             decoration: new BoxDecoration(
-              color: orangeColor,
+              color: appThemeSecondary,
               borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
               border: new Border.all(
                 color: Colors.white,
@@ -230,7 +230,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                       fontFamily: 'Medium',
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: orangeColor),
+                      color: appThemeSecondary),
                   recognizer: (TapGestureRecognizer()
                     ..onTap = () {
                       Navigator.push(

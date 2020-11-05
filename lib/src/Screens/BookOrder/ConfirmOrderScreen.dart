@@ -709,7 +709,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       padding: EdgeInsets.only(top: 10),
                       child: Text(
                         "${product.weight}",
-                        style: TextStyle(color: orangeColor),
+                        style: TextStyle(color: appThemeSecondary),
                       )),
                 ),
                 Padding(
@@ -2644,7 +2644,7 @@ class PaytmWebView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-     WillPopScope(
+    return WillPopScope(
       onWillPop: () {
         //print("onWillPop onWillPop");
       },

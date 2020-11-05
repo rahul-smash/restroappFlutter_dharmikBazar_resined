@@ -125,7 +125,7 @@ class _OtpScreen extends State<OtpScreen> {
                           Container(
                               padding: EdgeInsets.only( left: 0.0, top: 10.0, right: 20.0),
                               child: new RaisedButton(
-                                color: orangeColor,
+                                color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
@@ -139,7 +139,7 @@ class _OtpScreen extends State<OtpScreen> {
                           Container(
                               padding: EdgeInsets.only( left: 20.0, top: 10.0, right: 0.0),
                               child: new RaisedButton(
-                                color: orangeColor,
+                                color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
