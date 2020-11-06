@@ -709,6 +709,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             )),
+        
         Visibility(
           visible: rightActionsEnable && whatIconEnable,
           child: Padding(
