@@ -333,11 +333,39 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Visibility(
-                          visible: orderHistoryData.shippingCharges == "0.00"
+                          visible: orderHistoryData.walletRefund == "0.00"
                               ? false
                               : true,
                           child: Padding(
                               padding: EdgeInsets.only(top: 16, bottom: 0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.max,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Flexible(
+                                    child: Text('(-)Wallet Amount',
+                                        style: TextStyle(
+                                          color: Color(0xff74BA33),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w400,
+                                        )),
+                                  ),
+                                  Text(
+                                      "${AppConstant.currency} ${orderHistoryData.walletRefund}",
+                                      style: TextStyle(
+                                          color: Color(0xff74BA33),
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500))
+                                ],
+                              ))),
+                      Visibility(
+                          visible: orderHistoryData.shippingCharges == "0.00"
+                              ? false
+                              : true,
+                          child: Padding(
+                              padding: EdgeInsets.only(top: orderHistoryData.walletRefund == "0.00"?0:16, bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
