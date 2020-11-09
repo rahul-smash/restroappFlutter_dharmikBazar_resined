@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -30,6 +31,8 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   StoreModel store;
   String otpSkip;
   FacebookLogin facebookSignIn = new FacebookLogin();
+  GoogleSignIn _googleSignIn;
+  GoogleSignInAccount _currentUser;
 
   _LoginMobileScreen(this.menu);
 
@@ -37,6 +40,17 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   void initState() {
     super.initState();
     getOTPSkip();
+    _googleSignIn = GoogleSignIn(
+    scopes: ['email','https://www.googleapis.com/auth/contacts.readonly',],);
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+        print("displayName=${_currentUser.displayName}");
+        print("email=${_currentUser.email}");
+        print("id=${_currentUser.id}");
+      });
+    });
+
   }
   void getOTPSkip() async {
     store = await SharedPrefs.getStore();
@@ -140,21 +154,22 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                             },
                             child: Container(
                               height: 40,
-                              color: fbblue,
+                              decoration: BoxDecoration(
+                                  color: fbblue,
+                                  border: Border.all(
+                                    color: fbblue,
+                                  ),
+                                  borderRadius: BorderRadius.all(Radius.circular(5))
+                              ),
                               width: Utils.getDeviceWidth(context),
                               margin: EdgeInsets.fromLTRB(0, 10, 20, 0),
                               child: Image.asset("images/fblogin_btn.png"),
                             ),
                           ),
 
-                          InkWell(
-                            onTap: (){
-                              print("------_googleSignInButton------");
-                            },
-                            child: Container(
-                              margin: EdgeInsets.fromLTRB(0, 10, 20, 10),
-                              child: _googleSignInButton(),
-                            ),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 10, 20, 10),
+                            child: _googleSignInButton(),
                           ),
 
                         ],
@@ -173,8 +188,13 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   Widget _googleSignInButton() {
     return OutlineButton(
       splashColor: Colors.grey,
-      onPressed: () {
+      onPressed: () async{
+        try {
+          await _googleSignIn.signIn();
 
+        } catch (error) {
+          print("catch.googleSignIn=${error}");
+        }
       },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       highlightElevation: 0,
