@@ -1,5 +1,6 @@
 import 'package:compressimage/compressimage.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
@@ -760,6 +761,38 @@ class ApiController {
       print(e);
     }
 
+    String userDeliveryAddress='',pin='';
+    if (address != null&&!isComingFromPickUpScreen) {
+      if (address.address2 != null &&
+          address.address2.isNotEmpty) {
+        if (address.address != null &&
+            address.address.isNotEmpty) {
+          userDeliveryAddress = address.address + ", "+ address.address2+
+              " " +
+              address.areaName +
+              " " +
+              address.city;
+        }else{
+          userDeliveryAddress = address.address2 +
+              " " +
+              address.areaName +
+              " " +
+              address.city;
+        }
+      } else {
+        if (address.address != null &&
+            address.address.isNotEmpty) {
+          userDeliveryAddress =address.address +
+              " " +
+              address.areaName +
+              " " +
+              address.city;
+        }
+      }
+
+      if (address.zipCode != null && address.zipCode.isNotEmpty)
+        pin = " "+ address.zipCode;
+    }
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
@@ -769,12 +802,7 @@ class ApiController {
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
         "user_address":
-            isComingFromPickUpScreen == true ? storeAddress :
-            address.address2!=null&&address.address2.trim().isNotEmpty?
-            '${address.address!=null&&address.address.trim().isNotEmpty?
-            '${address.address}, ${address.address2}'
-                :"${address.address2}"}'
-                : address.address,
+            isComingFromPickUpScreen == true ? storeAddress :userDeliveryAddress+pin,
         "store_fixed_tax_detail": "",
         "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",
