@@ -117,7 +117,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                             },
                           ),
                           Container(
-                              padding: const EdgeInsets.only(left: 0.0, top: 0.0, right: 20.0),
+                              padding:EdgeInsets.only(left: 0.0, top: 0.0, right: 20.0),
                               child: new RaisedButton(
                                 color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
@@ -132,7 +132,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                               )
                           ),
 
-                          
+
                           InkWell(
                             onTap: (){
                               print("------fblogin------");
@@ -140,9 +140,20 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                             },
                             child: Container(
                               height: 40,
+                              color: fbblue,
                               width: Utils.getDeviceWidth(context),
-                              margin: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                              margin: EdgeInsets.fromLTRB(0, 10, 20, 0),
                               child: Image.asset("images/fblogin_btn.png"),
+                            ),
+                          ),
+
+                          InkWell(
+                            onTap: (){
+                              print("------_googleSignInButton------");
+                            },
+                            child: Container(
+                              margin: EdgeInsets.fromLTRB(0, 10, 20, 10),
+                              child: _googleSignInButton(),
                             ),
                           ),
 
@@ -156,6 +167,38 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
         ),
       ),
 
+    );
+  }
+
+  Widget _googleSignInButton() {
+    return OutlineButton(
+      splashColor: Colors.grey,
+      onPressed: () {
+
+      },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      highlightElevation: 0,
+      borderSide: BorderSide(color: Colors.grey),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image(image: AssetImage("images/google_logo.png"), height: 25.0),
+            Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: Text(
+                'Sign in with Google',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 
