@@ -131,7 +131,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                             },
                           ),
                           Container(
-                              padding:EdgeInsets.only(left: 0.0, top: 0.0, right: 20.0),
+                              padding:EdgeInsets.only(left: 0.0, top: 0.0, right: 0.0),
                               child: new RaisedButton(
                                 color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
@@ -146,31 +146,55 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                               )
                           ),
 
-
-                          InkWell(
-                            onTap: (){
-                              print("------fblogin------");
-                              fblogin();
-                            },
-                            child: Container(
-                              height: 40,
-                              decoration: BoxDecoration(
-                                  color: fbblue,
-                                  border: Border.all(
-                                    color: fbblue,
-                                  ),
-                                  borderRadius: BorderRadius.all(Radius.circular(5))
-                              ),
-                              width: Utils.getDeviceWidth(context),
-                              margin: EdgeInsets.fromLTRB(0, 10, 20, 0),
-                              child: Image.asset("images/fblogin_btn.png"),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            width: Utils.getDeviceWidth(context),
+                            child: Center(
+                              child: Text("OR CONNECT WITH"),
                             ),
                           ),
 
-                          Container(
-                            margin: EdgeInsets.fromLTRB(0, 10, 20, 10),
-                            child: _googleSignInButton(),
-                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              InkWell(
+                                onTap: (){
+                                  print("------fblogin------");
+                                  fblogin();
+                                },
+                                child: Container(
+                                    height: 35,
+                                    width: Utils.getDeviceWidth(context)/2.6,
+                                    margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
+                                    decoration: BoxDecoration(
+                                        color: fbblue,
+                                        border: Border.all(color: fbblue,),
+                                        borderRadius: BorderRadius.all(Radius.circular(5))
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                          child: Image.asset("images/f_logo_white.png",height: 25.0),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                          child: Text("Facebook",
+                                            style: TextStyle(color: Colors.white,fontSize: 18),),
+                                        )
+                                      ],
+                                    )
+                                ),
+                              ),
+                              Container(
+                                height: 35,
+                                width: Utils.getDeviceWidth(context)/2.6,
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
+                                child: _googleSignInButton(),
+                              ),
+                            ],
+                          )
 
                         ],
                       )),
@@ -198,20 +222,20 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           print("catch.googleSignIn=${error}");
         }
       },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       highlightElevation: 0,
       borderSide: BorderSide(color: Colors.grey),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(0, 5, 0, 5),
+        padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Image(image: AssetImage("images/google_logo.png"), height: 25.0),
             Padding(
-              padding: EdgeInsets.only(left: 20),
+              padding: EdgeInsets.only(left: 10),
               child: Text(
-                'Sign in with Google',
+                'Google',
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.grey,
@@ -236,15 +260,6 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
         if(fbModel != null){
           print("email=${fbModel.email} AND id=${fbModel.id}");
         }
-
-        /*_showMessage('''
-         Logged in!
-         Token: ${accessToken.token}
-         User id: ${accessToken.userId}
-         Expires: ${accessToken.expires}
-         Permissions: ${accessToken.permissions}
-         Declined permissions: ${accessToken.declinedPermissions}
-         ''');*/
         break;
       case FacebookLoginStatus.cancelledByUser:
         _showMessage('Login cancelled by the user.');
