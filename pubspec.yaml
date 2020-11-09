@@ -59,6 +59,7 @@ dependencies:
   flutter_rating_bar: ^3.0.1+1
   image_picker: ^0.6.7+11
   compressimage: ^0.1.1
+  flutter_facebook_login: ^3.0.0
 
 dev_dependencies:
   flutter_test:
@@ -142,6 +143,7 @@ flutter:
     - images/whatsappicon.png
     - images/youtubeicon.png
     - images/instagram.png
+    - images/fblogin_btn.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

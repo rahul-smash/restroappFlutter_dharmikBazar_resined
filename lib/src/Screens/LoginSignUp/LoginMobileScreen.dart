@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:keyboard_visibility/keyboard_visibility.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -28,6 +29,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   final phoneController = new TextEditingController();
   StoreModel store;
   String otpSkip;
+  FacebookLogin facebookSignIn = new FacebookLogin();
 
   _LoginMobileScreen(this.menu);
 
@@ -127,7 +129,23 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                                 ),
                                 ),
                                 onPressed: _submitForm,
-                              )),
+                              )
+                          ),
+
+                          
+                          InkWell(
+                            onTap: (){
+                              print("------fblogin------");
+                              fblogin();
+                            },
+                            child: Container(
+                              height: 40,
+                              width: Utils.getDeviceWidth(context),
+                              margin: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                              child: Image.asset("images/fblogin_btn.png"),
+                            ),
+                          ),
+
                         ],
                       )),
                 ),
@@ -139,6 +157,38 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
       ),
 
     );
+  }
+
+  Future<Null> fblogin() async {
+    final FacebookLoginResult result =
+    await facebookSignIn.logIn(['email']);
+
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        FacebookAccessToken accessToken = result.accessToken;
+
+        FacebookModel fbModel =  await ApiController.getFbUserData(accessToken.token);
+        if(fbModel != null){
+          print("email=${fbModel.email} AND id=${fbModel.id}");
+        }
+
+        /*_showMessage('''
+         Logged in!
+         Token: ${accessToken.token}
+         User id: ${accessToken.userId}
+         Expires: ${accessToken.expires}
+         Permissions: ${accessToken.permissions}
+         Declined permissions: ${accessToken.declinedPermissions}
+         ''');*/
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        _showMessage('Login cancelled by the user.');
+        Utils.showToast("Login cancelled", false);
+        break;
+      case FacebookLoginStatus.error:
+        Utils.showToast("Something went wrong ${result.errorMessage}", false);
+        break;
+    }
   }
 
   void _submitForm() {
@@ -182,6 +232,10 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
       Utils.showToast("Please enter Mobile number", true);
     }
   }
+}
+
+void _showMessage(String s) {
+  print("_showMessage=${s}");
 }
 class LoginMobile {
   String phone;

@@ -16,6 +16,7 @@ import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
+import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
@@ -1711,6 +1712,29 @@ class ApiController {
       print(e);
     }
     return null;
+  }
+
+  static Future<FacebookModel> getFbUserData(String fbtoken) async {
+
+    //String url1 = "https://graph.facebook.com/${user_id}?fields=name,first_name,last_name,email,&access_token=${fbtoken}";
+    String url = 'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
+
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+
+    try {
+      final response = await request.send()
+          .timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("----url---${url}");
+      print("----respStr---${respStr}");
+      final parsed = json.decode(respStr);
+      FacebookModel fbModel = FacebookModel.fromJson(parsed);
+      return fbModel;
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
   }
 
 }
