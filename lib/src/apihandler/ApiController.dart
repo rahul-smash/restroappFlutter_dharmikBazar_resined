@@ -1717,7 +1717,7 @@ class ApiController {
   static Future<FacebookModel> getFbUserData(String fbtoken) async {
 
     //String url1 = "https://graph.facebook.com/${user_id}?fields=name,first_name,last_name,email,&access_token=${fbtoken}";
-    String url = 'https://graph.facebook.com/v2.12/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
+    String url = 'https://graph.facebook.com/v8.0/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
 
     var request = new http.MultipartRequest("GET", Uri.parse(url));
 
