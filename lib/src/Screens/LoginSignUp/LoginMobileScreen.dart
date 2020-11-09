@@ -190,7 +190,9 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
       splashColor: Colors.grey,
       onPressed: () async{
         try {
-          await _googleSignIn.signIn();
+          GoogleSignInAccount result = await _googleSignIn.signIn();
+
+          print("result.id=${result.id}");
 
         } catch (error) {
           print("catch.googleSignIn=${error}");
