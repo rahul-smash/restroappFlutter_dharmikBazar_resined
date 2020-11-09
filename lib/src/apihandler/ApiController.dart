@@ -16,6 +16,7 @@ import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
+import 'package:restroapp/src/models/HtmlModelResponse.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
@@ -1622,6 +1623,55 @@ class ApiController {
         final parsed = json.decode(respStr);
         RecommendedProductsResponse model =
             RecommendedProductsResponse.fromJson(parsed);
+        return model;
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<HtmlModelResponse> getHtmlForOptions(
+      String appScreen) async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAvailable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+        var url='';
+        switch (appScreen) {
+          case AdditionItemsConstants.TERMS_CONDITIONS:
+            url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+                ApiConstants.termCondition;
+            break;
+          case AdditionItemsConstants.PRIVACY_POLICY:
+            url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+                ApiConstants.privacyPolicy;
+            break;
+          case AdditionItemsConstants.REFUND_POLICY:
+            url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+                ApiConstants.refundPolicy;
+            break;
+        }
+        var request = new http.MultipartRequest("POST", Uri.parse(url));
+        request.fields.addAll({
+          "method": "GET",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android"
+        });
+        print("${url}");
+        final response =
+            await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        print("${respStr}");
+        final parsed = json.decode(respStr);
+        HtmlModelResponse model =
+        HtmlModelResponse.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);

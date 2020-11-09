@@ -62,6 +62,9 @@ class ApiConstants{
   static String recommendedProduct = 'recommendedProduct';
   static String orderDetailHistory = 'orderDetailHistory';
   static String reviewRating = 'review_rating';
+  static String termCondition = 'getHtmlPages/term_condition';
+  static String privacyPolicy = 'getHtmlPages/privacy_policy';
+  static String refundPolicy = 'getHtmlPages/refund_policy';
 
 
 

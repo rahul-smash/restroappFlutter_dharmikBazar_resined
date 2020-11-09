@@ -23,6 +23,7 @@ import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
+import 'AdditionalInformations.dart';
 import 'LoyalityPoints.dart';
 import 'ProfileScreen.dart';
 
@@ -60,15 +61,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           DrawerChildConstants.LOYALITY_POINTS, "images/loyality.png"));
     _drawerItems.add(
         DrawerChildItem(DrawerChildConstants.MY_FAVORITES, "images/myfav.png"));
-    _drawerItems.add(
-        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about_image.png"));
+//    _drawerItems.add(DrawerChildItem(
+//        DrawerChildConstants.ABOUT_US, "images/about_image.png"));
     _drawerItems.add(DrawerChildItem(
         widget.store.isRefererFnEnable && AppConstant.isLoggedIn
             ? DrawerChildConstants.ReferEarn
             : DrawerChildConstants.SHARE,
         "images/refer.png"));
     _drawerItems
-        .add(DrawerChildItem(DrawerChildConstants.FAQ, "images/about.png"));
+        .add(DrawerChildItem(DrawerChildConstants.ADDITION_INFORMATION, "images/about.png"));
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
@@ -254,6 +255,17 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         attributeMap["ScreenName"] = "AboutScreen";
         Utils.sendAnalyticsEvent("Clicked AboutScreen", attributeMap);
         break;
+
+      case DrawerChildConstants.ADDITION_INFORMATION:
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AdditionalInformation(widget.store)),
+        );
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+        attributeMap["ScreenName"] = "AdditionalInformation";
+        Utils.sendAnalyticsEvent("Clicked AdditionalInformation", attributeMap);
+        break;
       case DrawerChildConstants.ReferEarn:
       case DrawerChildConstants.SHARE:
         if (AppConstant.isLoggedIn) {
@@ -434,6 +446,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       print(e);
     }
   }
+
 }
 
 class DrawerChildItem {
@@ -451,8 +464,12 @@ class DrawerChildConstants {
   static const LOYALITY_POINTS = "Loyality Points";
   static const MY_FAVORITES = "My Favorites";
   static const ABOUT_US = "About Us";
+  static const ADDITION_INFORMATION = "Addition \nInformation";
   static const SHARE = "Share";
   static const FAQ = "FAQ";
+  static const TERMS_CONDITIONS = "Terms and Conditions";
+  static const PRIVACY_POLICY = "Privacy Policy";
+  static const REFUND_POLICY = "Refund Policy";
   static const ReferEarn = "Refer & Earn";
   static const LOGIN = "Login";
   static const LOGOUT = "Logout";

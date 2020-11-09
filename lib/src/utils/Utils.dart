@@ -618,3 +618,11 @@ enum OrderType { Delivery, PickUp, Menu }
 
 enum PaymentType { COD, ONLINE, ONLINE_PAYTM, CANCEL }
 enum RadioButtonEnum { SELECTD, UNSELECTED }
+
+class AdditionItemsConstants {
+  static const ABOUT_US = "About Us";
+  static const FAQ = "FAQ";
+  static const TERMS_CONDITIONS = "Terms and Conditions";
+  static const PRIVACY_POLICY = "Privacy Policy";
+  static const REFUND_POLICY = "Refund Policy";
+}
