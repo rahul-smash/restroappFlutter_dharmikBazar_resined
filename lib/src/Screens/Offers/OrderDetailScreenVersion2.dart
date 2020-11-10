@@ -365,7 +365,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                               ? false
                               : true,
                           child: Padding(
-                              padding: EdgeInsets.only(top: orderHistoryData.walletRefund == "0.00"?0:16, bottom: 0),
+                              padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -393,10 +393,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                               orderHistoryData.tax == "0.00" ? false : true,
                           child: Padding(
                               padding: EdgeInsets.only(
-                                  top:
-                                      orderHistoryData.shippingCharges == "0.00"
-                                          ? 16
-                                          : 0,
+                                  top: 16,
                                   bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
@@ -1396,7 +1393,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   isOrderCanceledOrRejected
                       ? widget.orderHistoryData.status == '2'
                           ? 'Order Rejected'
-                          : 'Order Canceled'
+                          : 'Order Cancelled'
                       : !widget.orderHistoryData.orderFacility
                               .toLowerCase()
                               .contains('pick')

@@ -65,6 +65,10 @@ class ApiConstants{
   static String reviewRating = 'review_rating';
   static String userWallet = 'user_wallet';
   static String socialLinking = 'social_linking';
+  static String termCondition = 'getHtmlPages/term_condition';
+  static String privacyPolicy = 'getHtmlPages/privacy_policy';
+  static String refundPolicy = 'getHtmlPages/refund_policy';
+
 
 
   static final String txt_mobile = "Please enter your Mobile No. to proceed further";

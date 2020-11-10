@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+
 //import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -93,7 +94,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool isOrderVariations = false;
 
-  bool showCOD=true;
+  bool showCOD = true;
 
   ConfirmOrderState({this.storeModel});
 
@@ -104,12 +105,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           widget.address.address2.isNotEmpty) {
         if (widget.address.address != null &&
             widget.address.address.isNotEmpty) {
-          address = widget.address.address + ", "+ widget.address.address2+
+          address = widget.address.address +
+              ", " +
+              widget.address.address2 +
               " " +
               widget.address.areaName +
               " " +
               widget.address.city;
-        }else{
+        } else {
           address = widget.address.address2 +
               " " +
               widget.address.areaName +
@@ -146,8 +149,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    Utils
-        .getCartItemsListToJson(
+    Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail)
         .then((orderJson) {
@@ -256,18 +258,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     multiTaxCalculationApi();
 
-    if(widget.storeModel != null){
-      if(widget.storeModel.cod == "1"){
+    if (widget.storeModel != null) {
+      if (widget.storeModel.cod == "1") {
         showCOD = true;
         widget.paymentMode = "2";
-      }else if(widget.storeModel.cod == "0"){
+      } else if (widget.storeModel.cod == "0") {
         showCOD = false;
       }
-      if (widget.storeModel.onlinePayment == "0" && widget.storeModel.cod == "0") {
+      if (widget.storeModel.onlinePayment == "0" &&
+          widget.storeModel.cod == "0") {
         showCOD = true;
         widget.paymentMode = "2";
       }
-      if(widget.storeModel.cod == "0" && widget.storeModel.onlinePayment == "1"){
+      if (widget.storeModel.cod == "0" &&
+          widget.storeModel.onlinePayment == "1") {
         widget._character = PaymentType.ONLINE;
         widget.paymentMode = "3";
       }
@@ -372,8 +376,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-
   WalleModel userWalleModel;
+
   Future<void> multiTaxCalculationApi() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
@@ -608,11 +612,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         }
       }
     Color containerColor =
-    detail != null && detail.productStatus.contains('out_of_stock')
-        ? Colors.black12
-        : Colors.transparent;
-    String mrpPrice = detail != null && detail.productStatus.contains('price_changed')? detail.newMrpPrice:product.mrpPrice;
-    String price = detail != null && detail.productStatus.contains('price_changed')? detail.newPrice:product.price;
+        detail != null && detail.productStatus.contains('out_of_stock')
+            ? Colors.black12
+            : Colors.transparent;
+    String mrpPrice =
+        detail != null && detail.productStatus.contains('price_changed')
+            ? detail.newMrpPrice
+            : product.mrpPrice;
+    String price =
+        detail != null && detail.productStatus.contains('price_changed')
+            ? detail.newPrice
+            : product.price;
 
     if (product.taxDetail != null) {
       return Container(
@@ -626,23 +636,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   style: TextStyle(color: Colors.black54)),
               detail != null && detail.productStatus.contains('out_of_stock')
                   ? Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red, width: 1),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Padding(
-                    padding: EdgeInsets.all(3),
-                    child: Text(
-                      "Out of Stock",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ))
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ))
                   : Text("${AppConstant.currency}${product.taxDetail.tax}",
-                  style: TextStyle(
-                      color: detail != null &&
-                          detail.productStatus.contains('out_of_stock')
-                          ? Colors.red
-                          : Colors.black54)),
+                      style: TextStyle(
+                          color: detail != null &&
+                                  detail.productStatus.contains('out_of_stock')
+                              ? Colors.red
+                              : Colors.black54)),
             ],
           ),
         ),
@@ -659,24 +669,24 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   style: TextStyle(color: Colors.black54)),
               detail != null && detail.productStatus.contains('out_of_stock')
                   ? Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red, width: 1),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Padding(
-                    padding: EdgeInsets.all(3),
-                    child: Text(
-                      "Out of Stock",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ))
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ))
                   : Text(
-                  "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
-                  style: TextStyle(
-                      color: detail != null &&
-                          detail.productStatus.contains('out_of_stock')
-                          ? Colors.red
-                          : Colors.black54)),
+                      "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
+                      style: TextStyle(
+                          color: detail != null &&
+                                  detail.productStatus.contains('out_of_stock')
+                              ? Colors.red
+                              : Colors.black54)),
             ],
           ),
         ),
@@ -725,25 +735,25 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
             detail != null && detail.productStatus.contains('out_of_stock')
                 ? Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red, width: 1),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5)),
-                child: Padding(
-                  padding: EdgeInsets.all(3),
-                  child: Text(
-                    "Out of Stock",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ))
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.red, width: 1),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Padding(
+                      padding: EdgeInsets.all(3),
+                      child: Text(
+                        "Out of Stock",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ))
                 : Text(
-                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}",
-                style: TextStyle(
-                    fontSize: 16,
-                    color: detail != null &&
-                        detail.productStatus.contains('out_of_stock')
-                        ? Colors.red
-                        : Colors.black45)),
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: detail != null &&
+                                detail.productStatus.contains('out_of_stock')
+                            ? Colors.red
+                            : Colors.black45)),
           ],
         ),
       );
@@ -752,127 +762,122 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addItemPrice() {
     return Container(
-      child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-                height: 1,
-                color: Colors.black45,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width),
-            Visibility(
-              visible: widget.address == null ? false : true,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Delivery charges:",
-                        style: TextStyle(color: Colors.black54)),
-                    Text(
-                        "${AppConstant.currency}${widget.address == null
-                            ? "0"
-                            : widget.address.areaCharges}",
-                        style: TextStyle(color: Colors.black54)),
-                  ],
-                ),
-              ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+            height: 1,
+            color: Colors.black45,
+            width: MediaQuery.of(context).size.width),
+        Visibility(
+          visible: widget.address == null ? false : true,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Delivery charges:",
+                    style: TextStyle(color: Colors.black54)),
+                Text(
+                    "${AppConstant.currency}${widget.address == null ? "0" : widget.address.areaCharges}",
+                    style: TextStyle(color: Colors.black54)),
+              ],
             ),
-            Visibility(
-              visible: taxModel == null ? false : true,
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Discount:", style: TextStyle(color: Colors.black54)),
-                    Text(
-                        "${AppConstant.currency}${taxModel == null
-                            ? "0"
-                            : taxModel.discount}",
-                        style: TextStyle(color: Colors.black54)),
-                  ],
-                ),
-              ),
+          ),
+        ),
+        Visibility(
+          visible: taxModel == null ? false : true,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Discount:", style: TextStyle(color: Colors.black54)),
+                Text(
+                    "${AppConstant.currency}${taxModel == null ? "0" : taxModel.discount}",
+                    style: TextStyle(color: Colors.black54)),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("Items Price", style: TextStyle(color: Colors.black)),
-                  Text(
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Items Price", style: TextStyle(color: Colors.black)),
+              Text(
 //                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
-                      "${AppConstant.currency}${taxModel == null
-                          ? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)
-                          : taxModel.itemSubTotal}",
-                      style: TextStyle(color: Colors.black)),
-                ],
-              ),
-            ),
-            Container(
-                height: 1,
-                color: Colors.black45,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width),
-            Visibility(
-              visible: widget.storeModel.wallet_setting == "1" ? true : false,
-              child: Container(
-                child: Padding(
-                    padding: EdgeInsets.only(left: 0,top:10,bottom: 10),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
-                          child: Icon(Icons.done,color: appTheme,size: 30,),
-                        ),
-
-
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("My Wallet",
-                                  style:TextStyle(color: Colors.black, fontSize: 16,fontWeight: FontWeight.bold)),
-                              Text(taxModel == null ? "Remaining Balance: ${AppConstant.currency}"
-                                  :"Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
-                                  style:TextStyle(color: Colors.black, fontSize: 15)),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(right: 5,top:0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Text("You Used",
-                                  style:TextStyle(color: Colors.black, fontSize: 16)),
-                              Text("${AppConstant.currency} ${taxModel == null ? "0.00" :taxModel.wallet_refund}",
-                                  style:TextStyle(color: appTheme, fontSize: 15)),
-                            ],
-                          ),
-                        ),
-
-                      ],
-                    )
-                ),
-              ),
-            ),
+                  "${AppConstant.currency}${taxModel == null ? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2) : taxModel.itemSubTotal}",
+                  style: TextStyle(color: Colors.black)),
+            ],
+          ),
+        ),
+        Container(
+            height: 1,
+            color: Colors.black45,
+            width: MediaQuery.of(context).size.width),
+        Visibility(
+          visible: widget.storeModel.wallet_setting == "1" ? true : false,
+          child: Container(
+            child: Padding(
+                padding: EdgeInsets.only(left: 0, top: 10, bottom: 10),
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                      child: Icon(
+                        Icons.done,
+                        color: appTheme,
+                        size: 30,
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("My Wallet",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text(
+                              taxModel == null
+                                  ? "Remaining Balance: ${AppConstant.currency}"
+                                  : "Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 5, top: 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("You Used",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 16)),
+                          Text(
+                              "${AppConstant.currency} ${taxModel == null ? "0.00" : taxModel.wallet_refund}",
+                              style: TextStyle(color: appTheme, fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                  ],
+                )),
+          ),
+        ),
       ]),
     );
   }
 
-  String getUserRemaningWallet(){
-    double balance = (double.parse(userWalleModel.data.userWallet) - double.parse(taxModel.itemSubTotal));
+  String getUserRemaningWallet() {
+    double balance = (double.parse(userWalleModel.data.userWallet) -
+        double.parse(taxModel.itemSubTotal)-double.parse(taxModel.shipping));
     //print("balance=${balance}");
-    if(balance > 0.0){
+    if (balance > 0.0) {
       // USer balance is greater than zero.
       return "${balance}";
-    }else{
+    } else {
       // USer balance is less than or equal to zero.
       return "0.00";
     }
@@ -978,8 +983,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           .productStatus
                           .compareTo('out_of_stock') ==
                       0 &&
-                  responseOrderDetail[i].productId.compareTo(product.id) == 0
-                  &&responseOrderDetail[i].variantId.compareTo(product.variantId) == 0) {
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
+                  responseOrderDetail[i]
+                          .variantId
+                          .compareTo(product.variantId) ==
+                      0) {
                 isProductOutOfStock = true;
                 break InnnerFor;
               }
@@ -987,22 +995,30 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           .productStatus
                           .compareTo('price_changed') ==
                       0 &&
-                  responseOrderDetail[i].productId.compareTo(product.id) == 0
-                  &&responseOrderDetail[i].variantId.compareTo(product.variantId) == 0) {
-                detail=responseOrderDetail[i];
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
+                  responseOrderDetail[i]
+                          .variantId
+                          .compareTo(product.variantId) ==
+                      0) {
+                detail = responseOrderDetail[i];
                 break InnnerFor;
               }
             }
           }
 
           if (!isProductOutOfStock) {
-            String mrpPrice=detail!=null&&detail.productStatus.contains('price_changed')?detail.newMrpPrice:product.mrpPrice;
-            String price=detail!=null&&detail.productStatus.contains('price_changed')?detail.newPrice:product.price;
-            totalSavings +=
-                (double.parse(mrpPrice) - double.parse(price)) *
-                    double.parse(product.quantity);
-            totalMRpPrice += (double.parse(mrpPrice) *
-                double.parse(product.quantity));
+            String mrpPrice =
+                detail != null && detail.productStatus.contains('price_changed')
+                    ? detail.newMrpPrice
+                    : product.mrpPrice;
+            String price =
+                detail != null && detail.productStatus.contains('price_changed')
+                    ? detail.newPrice
+                    : product.price;
+            totalSavings += (double.parse(mrpPrice) - double.parse(price)) *
+                double.parse(product.quantity);
+            totalMRpPrice +=
+                (double.parse(mrpPrice) * double.parse(product.quantity));
           }
         }
       }
@@ -1793,6 +1809,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 //      }
 //    }
 //    calculateTotalSavings();
+
+    if (taxModel != null &&
+        taxModel.wallet_refund != "0" &&
+        totalPrice == 0 &&
+        widget.paymentMode != '2') {
+      Utils.showToast("Choose COD Method to Avail Wallet Refund", false);
+      return;
+    }
     //Choose payment
     if (widget.paymentMode == "3") {
       Utils.hideProgressDialog(context);
@@ -2155,8 +2179,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    Utils
-        .getCartItemsListToJson(
+    Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail)
         .then((orderJson) {
@@ -2217,13 +2240,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 isOrderVariations: isOrderVariations,
                 responseOrderDetail: responseOrderDetail)
             .then((json) {*/
-        Utils
-            .getCartItemsListToJson(
+        Utils.getCartItemsListToJson(
                 isOrderVariations: isOrderVariations,
                 responseOrderDetail: responseOrderDetail)
             .then((json) {
-
-
           if (json == null) {
             print("--json == null-json == null-");
             return;
@@ -2572,9 +2592,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     return productOutOfStock;
   }
-
-
 }
+
 /*Code for ios*/
 class StripeWebView extends StatefulWidget {
   StripeCheckOutModel stripeCheckOutModel;
@@ -2673,7 +2692,7 @@ class PaytmWebView extends StatelessWidget {
               print('==2====onLoadStop======: $url');
               if (url.contains("/api/paytmPaymentResult/orderId:")) {
                 String txnId =
-                url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
+                    url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
                 url = url.replaceAll("/TxnId:" + txnId, "");
                 String orderId = url
                     .substring(url.indexOf("/orderId:") + "/orderId:".length);
