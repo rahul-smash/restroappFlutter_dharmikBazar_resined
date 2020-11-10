@@ -108,7 +108,7 @@ class Utils {
       //User Login with Mobile and OTP
       // 1 = email and 0 = ph-no
       StoreModel model = await SharedPrefs.getStore();
-      if (model.internationalOtp == "0") {
+      if (model.internationalOtp == "1") {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),

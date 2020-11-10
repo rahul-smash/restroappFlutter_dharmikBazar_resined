@@ -110,7 +110,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
               child: SafeArea(
                 child: Container(
                   color: _keyboardState ? whiteColor : Colors.transparent,
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  padding: EdgeInsets.fromLTRB(20, 0, 20, 15),
                   child: Column(
                     mainAxisSize: MainAxisSize.max,
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -177,7 +177,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                         visible: true,
                         //visible: storeModel == null ? false : storeModel.social_login == "0" ? false : true,
                         child: Container(
-                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          margin: EdgeInsets.fromLTRB(0, 15, 0, 10),
                           width: Utils.getDeviceWidth(context),
                           child: Center(
                             child: Text("──────── OR CONNECT WITH ────────",
@@ -205,7 +205,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                               child: Container(
                                   height: 35,
                                   width: Utils.getDeviceWidth(context)/2.6,
-                                  margin: EdgeInsets.fromLTRB(15, 10, 0, 10),
+                                  margin: EdgeInsets.fromLTRB(10, 10, 0, 10),
                                   decoration: BoxDecoration(
                                       color: fbblue,
                                       border: Border.all(color: fbblue,),
@@ -230,7 +230,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                             Container(
                               height: 35,
                               width: Utils.getDeviceWidth(context)/2.6,
-                              margin: EdgeInsets.fromLTRB(0, 10, 15, 10),
+                              margin: EdgeInsets.fromLTRB(0, 10, 10, 10),
                               child: _googleSignInButton(),
                             ),
                           ],
@@ -335,7 +335,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
         }
       },
       child: Padding(
-        padding: const EdgeInsets.only(right: 16),
+        padding: EdgeInsets.only(right: 0),
         child: Align(
           alignment: Alignment.center,
           child: Container(
@@ -348,9 +348,9 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
               ),
             ),
             padding: EdgeInsets.symmetric(
-              vertical: 15,
+              vertical: 10,
             ),
-            width: 200,
+            width: Utils.getDeviceWidth(context),
             margin: EdgeInsets.only(top: 10),
             child: Center(
               child: Text(
@@ -370,7 +370,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
 
   Widget addSignUpButton() {
     return Padding(
-      padding: const EdgeInsets.only(top:10 ,bottom: 5),
+      padding: EdgeInsets.only(top:10 ,bottom: 0),
       child: Align(
         alignment: Alignment.bottomCenter,
         child: RichText(
