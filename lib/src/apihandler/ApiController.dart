@@ -42,6 +42,7 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/VerifyEmailModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -1734,6 +1735,31 @@ class ApiController {
     } catch (e) {
       print("----catch---${e.toString()}");
       //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<MobileVerified> verifyEmail(String email) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.verifyEmail;
+
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "email": email,
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+      print('@@url=${url}');
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      MobileVerified userResponse = MobileVerified.fromJson(parsed);
+      return userResponse;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('=mobileVerification==catch==' + e.toString());
       return null;
     }
   }

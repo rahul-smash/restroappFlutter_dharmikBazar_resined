@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
@@ -506,7 +507,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             ),
             FlatButton(
               child: const Text('YES'),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
                 logout(context);
               },
@@ -546,6 +547,14 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   Future logout(BuildContext context) async {
     try {
+
+      FacebookLogin facebookSignIn = new FacebookLogin();
+      bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
+      print("isFbLoggedIn=${isFbLoggedIn}");
+      if(isFbLoggedIn){
+        await facebookSignIn.logOut();
+      }
+
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
       SharedPrefs.removeKey(AppConstant.showReferEarnAlert);

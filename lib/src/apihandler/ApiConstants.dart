@@ -47,6 +47,7 @@ class ApiConstants{
   static String cancelOrder = 'orderCancel';
 
   static String socialLogin = 'socialLogin';
+  static String verifyEmail = 'verifyEmail';
 
   static String deliveryAreasArea = 'deliveryAreas/Area';
 

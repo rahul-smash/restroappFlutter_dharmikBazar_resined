@@ -8,7 +8,9 @@ import 'package:restroapp/src/Screens/SideMenu/ProfileScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
+import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/VerifyEmailModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -287,16 +289,26 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
         FacebookAccessToken accessToken = result.accessToken;
         Utils.showProgressDialog(context);
         FacebookModel fbModel =  await ApiController.getFbUserData(accessToken.token);
-        Utils.hideProgressDialog(context);
         if(fbModel != null){
           print("email=${fbModel.email} AND id=${fbModel.id}");
-          Navigator.pop(context);
-          Navigator.push(context,
-            MaterialPageRoute(builder: (context) => ProfileScreen(true,"",
+
+          MobileVerified verifyEmailModel = await ApiController.verifyEmail(fbModel.email);
+          Utils.hideProgressDialog(context);
+          if(verifyEmailModel.userExists == 0){
+            Navigator.pop(context);
+            Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ProfileScreen(true,"",
                 "${fbModel.name}",fbModel,null)),
           );
+          }else if(verifyEmailModel.userExists == 1){
+            SharedPrefs.setUserLoggedIn(true);
+            SharedPrefs.saveUserMobile(verifyEmailModel.user);
+            Navigator.pop(context);
+          }
+
         }else{
           Utils.showToast("Something went wrong while login!", false);
+          Utils.hideProgressDialog(context);
         }
         break;
       case FacebookLoginStatus.cancelledByUser:
