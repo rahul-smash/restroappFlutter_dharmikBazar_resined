@@ -10,6 +10,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/VerifyEmailModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -254,6 +255,12 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
               }else if(verifyEmailModel.userExists == 1){
                 SharedPrefs.setUserLoggedIn(true);
                 SharedPrefs.saveUserMobile(verifyEmailModel.user);
+                UserModel user = UserModel();
+                user.fullName = verifyEmailModel.user.fullName;
+                user.email = verifyEmailModel.user.email;
+                user.phone = verifyEmailModel.user.phone;
+                user.id = verifyEmailModel.user.id;
+                SharedPrefs.saveUser(user);
                 Navigator.pop(context);
               }
 
@@ -315,6 +322,14 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           }else if(verifyEmailModel.userExists == 1){
             SharedPrefs.setUserLoggedIn(true);
             SharedPrefs.saveUserMobile(verifyEmailModel.user);
+
+            UserModel user = UserModel();
+            user.fullName = verifyEmailModel.user.fullName;
+            user.email = verifyEmailModel.user.email;
+            user.phone = verifyEmailModel.user.phone;
+            user.id = verifyEmailModel.user.id;
+            SharedPrefs.saveUser(user);
+
             Navigator.pop(context);
           }
 
