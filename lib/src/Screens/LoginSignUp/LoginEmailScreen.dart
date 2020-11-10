@@ -12,6 +12,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/AdminLoginModel.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
+import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:flutter/gestures.dart';
@@ -200,7 +201,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                                   Utils.showToast(AppConstant.noInternet, true);
                                   return;
                                 }
-                                //fblogin();
+                                fblogin();
                               },
                               child: Container(
                                   height: 35,
@@ -237,7 +238,17 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                         ),
                       ),
 
-                      addSignUpButton()
+                      InkWell(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => RegisterUser()),
+                          );
+                        },
+                        child: addSignUpButton(),
+                      ),
+
                     ],
                   ),
                 ),
@@ -308,7 +319,15 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
         Utils.hideProgressDialog(context);
         if(fbModel != null){
           print("email=${fbModel.email} AND id=${fbModel.id}");
+          MobileVerified verifyEmailModel = await ApiController.verifyEmail(fbModel.email);
+          Utils.hideProgressDialog(context);
+          if(verifyEmailModel.userExists == 0){
 
+          }else if(verifyEmailModel.userExists == 1){
+            SharedPrefs.setUserLoggedIn(true);
+            SharedPrefs.saveUserMobile(verifyEmailModel.user);
+            Navigator.pop(context);
+          }
         }else{
           Utils.showToast("Something went wrong while login!", false);
         }
@@ -388,12 +407,10 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                       color: appThemeSecondary),
                   recognizer: (TapGestureRecognizer()
                     ..onTap = () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegisterUser()),
-                      );
-                    })),
+
+                    }
+                    )
+              ),
             ],
           ),
         ),

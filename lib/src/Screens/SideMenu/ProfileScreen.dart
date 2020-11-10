@@ -298,13 +298,21 @@ class _ProfileState extends State<ProfileScreen> {
         }
 
         Utils.showProgressDialog(context);
-        await ApiController.socialSignUp(widget.fbModel,widget.googleResult,
+        MobileVerified userResponse = await ApiController.socialSignUp(widget.fbModel,widget.googleResult,
           firstNameController.text.trim(),
           emailController.text.trim(),
           phoneController.text.trim(),
           referCodeController.text.trim(),
           gstCodeController.text.trim()
         );
+
+        UserModel user = UserModel();
+        user.fullName = firstNameController.text.trim();
+        user.email = emailController.text.trim();
+        user.phone = phoneController.text.trim();
+        user.id = userResponse.user.id;
+        SharedPrefs.saveUser(user);
+
         Utils.hideProgressDialog(context);
         Navigator.pop(context);
 
