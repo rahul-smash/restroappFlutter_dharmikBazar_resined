@@ -14,6 +14,7 @@ import 'package:restroapp/src/models/AdminLoginModel.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:flutter/gestures.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -243,7 +244,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RegisterUser()),
+                                builder: (context) => RegisterUser(null,null)),
                           );
                         },
                         child: addSignUpButton(),
@@ -272,6 +273,26 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
             GoogleSignInAccount result = await _googleSignIn.signIn();
             if(result != null){
               print("result.id=${result.id}");
+              MobileVerified verifyEmailModel = await ApiController.verifyEmail(result.email);
+              if(verifyEmailModel.userExists == 0){
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => RegisterUser(null,result)),
+                );
+
+              }else if(verifyEmailModel.userExists == 1){
+                SharedPrefs.setUserLoggedIn(true);
+                SharedPrefs.saveUserMobile(verifyEmailModel.user);
+                UserModel user = UserModel();
+                user.fullName = verifyEmailModel.user.fullName;
+                user.email = verifyEmailModel.user.email;
+                user.phone = verifyEmailModel.user.phone;
+                user.id = verifyEmailModel.user.id;
+                SharedPrefs.saveUser(user);
+                Navigator.pop(context);
+              }
             }else{
               Utils.showToast("Something went wrong while login!", false);
             }
@@ -316,20 +337,33 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
         FacebookAccessToken accessToken = result.accessToken;
         Utils.showProgressDialog(context);
         FacebookModel fbModel =  await ApiController.getFbUserData(accessToken.token);
-        Utils.hideProgressDialog(context);
+        //Utils.hideProgressDialog(context);
         if(fbModel != null){
           print("email=${fbModel.email} AND id=${fbModel.id}");
           MobileVerified verifyEmailModel = await ApiController.verifyEmail(fbModel.email);
           Utils.hideProgressDialog(context);
           if(verifyEmailModel.userExists == 0){
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => RegisterUser(fbModel,null)),
+            );
 
           }else if(verifyEmailModel.userExists == 1){
             SharedPrefs.setUserLoggedIn(true);
             SharedPrefs.saveUserMobile(verifyEmailModel.user);
+            UserModel user = UserModel();
+            user.fullName = verifyEmailModel.user.fullName;
+            user.email = verifyEmailModel.user.email;
+            user.phone = verifyEmailModel.user.phone;
+            user.id = verifyEmailModel.user.id;
+            SharedPrefs.saveUser(user);
             Navigator.pop(context);
           }
         }else{
           Utils.showToast("Something went wrong while login!", false);
+          Utils.hideProgressDialog(context);
         }
         break;
       case FacebookLoginStatus.cancelledByUser:

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -11,7 +13,10 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class RegisterUser extends StatefulWidget {
 
-  RegisterUser();
+  FacebookModel fbModel;
+  GoogleSignInAccount googleResult;
+
+  RegisterUser(this.fbModel,this.googleResult);
 
   @override
   _RegisterUserState createState() => new _RegisterUserState();
