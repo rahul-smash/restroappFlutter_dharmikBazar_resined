@@ -240,11 +240,23 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
             GoogleSignInAccount result = await _googleSignIn.signIn();
             if(result != null){
               print("result.id=${result.id}");
-              Navigator.pop(context);
-              Navigator.push(context,
-                MaterialPageRoute(builder: (context) => ProfileScreen(true,"",
-                    "${result.displayName}",null,result)),
-              );
+
+              Utils.showProgressDialog(context);
+              MobileVerified verifyEmailModel = await ApiController.verifyEmail(result.email);
+              Utils.hideProgressDialog(context);
+
+              if(verifyEmailModel.userExists == 0){
+                Navigator.pop(context);
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen(true,"",
+                      "${result.displayName}",null,result)),
+                );
+              }else if(verifyEmailModel.userExists == 1){
+                SharedPrefs.setUserLoggedIn(true);
+                SharedPrefs.saveUserMobile(verifyEmailModel.user);
+                Navigator.pop(context);
+              }
+
             }else{
               Utils.showToast("Something went wrong while login!", false);
             }
