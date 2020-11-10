@@ -77,15 +77,6 @@ class _RegisterUserState extends State<RegisterUser> {
       ),
       body: Stack(
         children: <Widget>[
-          /*Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: Utils.getDeviceWidth(context),
-              child: AppConstant.isRestroApp ?
-              Image.asset("images/login_restro_bg.jpg",fit: BoxFit.fitWidth,)
-                  :Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
-            ),
-          ),*/
           Align(
             alignment: Alignment.bottomCenter,
             child: SafeArea(
@@ -105,11 +96,6 @@ class _RegisterUserState extends State<RegisterUser> {
                           ),
                           controller: _usernameController,
                           inputFormatters: [new LengthLimitingTextInputFormatter(30)],
-                          /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterName : null,
-                          onSaved: (val) {
-                            userData.name = val.trim();
-                          },*/
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
@@ -117,14 +103,6 @@ class _RegisterUserState extends State<RegisterUser> {
                           ),
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
-                          /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterPhone : null,
-                          inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly,
-                          ],
-                          onSaved: (val) {
-                            userData.phone = val.trim();
-                          },*/
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
@@ -133,12 +111,6 @@ class _RegisterUserState extends State<RegisterUser> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           //'Please enter a valid email address'
-                          /*validator: (value) => value.trim().isEmpty
-                              ? AppConstant.enterEmail
-                              : isValidEmail(value.trim())? null: AppConstant.enterValidEmail,
-                          onSaved: (val) {
-                            userData.email = val.trim();
-                          },*/
                         ),
                         Visibility(
                           visible: showReferralCodeView,
@@ -148,11 +120,6 @@ class _RegisterUserState extends State<RegisterUser> {
                             ),
                             controller: _referralCodeeController,
                             inputFormatters: [new LengthLimitingTextInputFormatter(30)],
-                            /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterName : null,
-                          onSaved: (val) {
-                            userData.name = val.trim();
-                          },*/
                           ),
                         ),
                         TextFormField(
@@ -162,11 +129,6 @@ class _RegisterUserState extends State<RegisterUser> {
                           ),
                           controller: _passwordController,
                           keyboardType: TextInputType.visiblePassword,
-                          /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterPassword : null,
-                          onSaved: (val) {
-                            userData.password = val.trim();
-                          },*/
                         ),
                         TextFormField(
                           obscureText: true,
@@ -175,11 +137,6 @@ class _RegisterUserState extends State<RegisterUser> {
                           ),
                           controller: _confirmpasswordController,
                           keyboardType: TextInputType.visiblePassword,
-                          /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterConfirmPassword : null,
-                          onSaved: (val) {
-                            userData.confirmPassword = val.trim();
-                          },*/
                         ),
                         Container(height: 20.0),
                         Container(

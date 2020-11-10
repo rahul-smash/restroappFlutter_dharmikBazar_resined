@@ -46,6 +46,8 @@ class ApiConstants{
   static String mobileVerification = 'mobileVerification';
   static String cancelOrder = 'orderCancel';
 
+  static String socialLogin = 'socialLogin';
+
   static String deliveryAreasArea = 'deliveryAreas/Area';
 
   static String razorpayCreateOrder = 'razorpayCreateOrder';

@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
+import 'package:restroapp/src/Screens/SideMenu/ProfileScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
@@ -146,56 +147,71 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                               )
                           ),
 
-                          Container(
-                            margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            width: Utils.getDeviceWidth(context),
-                            child: Center(
-                              child: Text("──────── OR CONNECT WITH ────────",
-                                style: TextStyle(color: gray9),),
+                          Visibility(
+                            visible: store == null ? false : store.social_login == "0" ? false : true,
+                            child: Container(
+                              margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              width: Utils.getDeviceWidth(context),
+                              child: Center(
+                                child: Text("──────── OR CONNECT WITH ────────",
+                                  style: TextStyle(color: gray9),),
+                              ),
                             ),
                           ),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              InkWell(
-                                onTap: (){
-                                  print("------fblogin------");
-                                  fblogin();
-                                },
-                                child: Container(
-                                    height: 35,
-                                    width: Utils.getDeviceWidth(context)/2.6,
-                                    margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
-                                    decoration: BoxDecoration(
-                                        color: fbblue,
-                                        border: Border.all(color: fbblue,),
-                                        borderRadius: BorderRadius.all(Radius.circular(5))
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                          child: Image.asset("images/f_logo_white.png",height: 25.0),
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                          child: Text("Facebook",
-                                            style: TextStyle(color: Colors.white,fontSize: 18),),
-                                        )
-                                      ],
-                                    )
+
+
+                          Visibility(
+                            visible: store == null ? false : store.social_login == "0" ? false : true,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                InkWell(
+                                  onTap: () async {
+                                    print("------fblogin------");
+                                    bool isNetworkAvailable =await Utils.isNetworkAvailable();
+                                    if(!isNetworkAvailable){
+                                      Utils.showToast(AppConstant.noInternet, true);
+                                      return;
+                                    }
+                                    fblogin();
+                                  },
+                                  child: Container(
+                                      height: 35,
+                                      width: Utils.getDeviceWidth(context)/2.6,
+                                      margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
+                                      decoration: BoxDecoration(
+                                          color: fbblue,
+                                          border: Border.all(color: fbblue,),
+                                          borderRadius: BorderRadius.all(Radius.circular(5))
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                            child: Image.asset("images/f_logo_white.png",height: 25.0),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                            child: Text("Facebook",
+                                              style: TextStyle(color: Colors.white,fontSize: 18),),
+                                          )
+                                        ],
+                                      )
+                                  ),
                                 ),
-                              ),
-                              Container(
-                                height: 35,
-                                width: Utils.getDeviceWidth(context)/2.6,
-                                margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
-                                child: _googleSignInButton(),
-                              ),
-                            ],
-                          )
+                                Container(
+                                  height: 35,
+                                  width: Utils.getDeviceWidth(context)/2.6,
+                                  margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
+                                  child: _googleSignInButton(),
+                                ),
+                              ],
+                            ),
+                          ),
+
+
 
                         ],
                       )),
@@ -210,17 +226,30 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
     );
   }
 
-  Widget _googleSignInButton() {
+  Widget _googleSignInButton(){
     return OutlineButton(
       splashColor: Colors.grey,
       onPressed: () async{
-        try {
-          GoogleSignInAccount result = await _googleSignIn.signIn();
+        bool isNetworkAvailable = await Utils.isNetworkAvailable();
+        if(!isNetworkAvailable){
+          Utils.showToast(AppConstant.noInternet, true);
+        }else{
+          try {
+            GoogleSignInAccount result = await _googleSignIn.signIn();
+            if(result != null){
+              print("result.id=${result.id}");
+              Navigator.pop(context);
+              Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfileScreen(true,"",
+                    "${result.displayName}",null,result)),
+              );
+            }else{
+              Utils.showToast("Something went wrong while login!", false);
+            }
 
-          print("result.id=${result.id}");
-
-        } catch (error) {
-          print("catch.googleSignIn=${error}");
+          } catch (error) {
+            print("catch.googleSignIn=${error}");
+          }
         }
       },
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
@@ -256,14 +285,22 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
     switch (result.status) {
       case FacebookLoginStatus.loggedIn:
         FacebookAccessToken accessToken = result.accessToken;
-
+        Utils.showProgressDialog(context);
         FacebookModel fbModel =  await ApiController.getFbUserData(accessToken.token);
+        Utils.hideProgressDialog(context);
         if(fbModel != null){
           print("email=${fbModel.email} AND id=${fbModel.id}");
+          Navigator.pop(context);
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) => ProfileScreen(true,"",
+                "${fbModel.name}",fbModel,null)),
+          );
+        }else{
+          Utils.showToast("Something went wrong while login!", false);
         }
         break;
       case FacebookLoginStatus.cancelledByUser:
-        _showMessage('Login cancelled by the user.');
+        //_showMessage('Login cancelled by the user.');
         Utils.showToast("Login cancelled", false);
         break;
       case FacebookLoginStatus.error:

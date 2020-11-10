@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ForceUpdate.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
@@ -9,6 +11,7 @@ import 'package:restroapp/src/UI/SocialLoginTabs.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/AdminLoginModel.dart';
+import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:flutter/gestures.dart';
@@ -34,12 +37,26 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   KeyboardVisibilityNotification _keyboardVisibility = new KeyboardVisibilityNotification();
   int _keyboardVisibilitySubscriberId;
   bool _keyboardState;
+  GoogleSignIn _googleSignIn;
+  GoogleSignInAccount _currentUser;
+  FacebookLogin facebookSignIn = new FacebookLogin();
 
   _LoginEmailScreenState(this.menu);
 
   @override
   void initState() {
     super.initState();
+    _googleSignIn = GoogleSignIn(
+      scopes: ['email','https://www.googleapis.com/auth/contacts.readonly',],);
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+        print("displayName=${_currentUser.displayName}");
+        print("email=${_currentUser.email}");
+        print("id=${_currentUser.id}");
+      });
+    });
+
     _keyboardState = _keyboardVisibility.isKeyboardVisible;
     _keyboardVisibilitySubscriberId = _keyboardVisibility.addNewListener(
         onChange: (bool visible) {
@@ -155,6 +172,71 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                         ),
                       ),
                       addLoginButton(),
+
+                      Visibility(
+                        visible: true,
+                        //visible: storeModel == null ? false : storeModel.social_login == "0" ? false : true,
+                        child: Container(
+                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                          width: Utils.getDeviceWidth(context),
+                          child: Center(
+                            child: Text("──────── OR CONNECT WITH ────────",
+                              style: TextStyle(color: gray9),),
+                          ),
+                        ),
+                      ),
+
+                      Visibility(
+                        visible: true,
+                        //visible: storeModel == null ? false : storeModel.social_login == "0" ? false : true,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            InkWell(
+                              onTap: () async {
+                                print("------fblogin------");
+                                bool isNetworkAvailable =await Utils.isNetworkAvailable();
+                                if(!isNetworkAvailable){
+                                  Utils.showToast(AppConstant.noInternet, true);
+                                  return;
+                                }
+                                //fblogin();
+                              },
+                              child: Container(
+                                  height: 35,
+                                  width: Utils.getDeviceWidth(context)/2.6,
+                                  margin: EdgeInsets.fromLTRB(15, 10, 0, 10),
+                                  decoration: BoxDecoration(
+                                      color: fbblue,
+                                      border: Border.all(color: fbblue,),
+                                      borderRadius: BorderRadius.all(Radius.circular(5))
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                                        child: Image.asset("images/f_logo_white.png",height: 25.0),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        child: Text("Facebook",
+                                          style: TextStyle(color: Colors.white,fontSize: 18),),
+                                      )
+                                    ],
+                                  )
+                              ),
+                            ),
+                            Container(
+                              height: 35,
+                              width: Utils.getDeviceWidth(context)/2.6,
+                              margin: EdgeInsets.fromLTRB(0, 10, 15, 10),
+                              child: _googleSignInButton(),
+                            ),
+                          ],
+                        ),
+                      ),
+
                       addSignUpButton()
                     ],
                   ),
@@ -165,6 +247,79 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
         ),
       ),
     );
+  }
+
+  Widget _googleSignInButton(){
+    return OutlineButton(
+      splashColor: Colors.grey,
+      onPressed: () async{
+        bool isNetworkAvailable = await Utils.isNetworkAvailable();
+        if(!isNetworkAvailable){
+          Utils.showToast(AppConstant.noInternet, true);
+        }else{
+          try {
+            GoogleSignInAccount result = await _googleSignIn.signIn();
+            if(result != null){
+              print("result.id=${result.id}");
+            }else{
+              Utils.showToast("Something went wrong while login!", false);
+            }
+
+          } catch (error) {
+            print("catch.googleSignIn=${error}");
+          }
+        }
+      },
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      highlightElevation: 0,
+      borderSide: BorderSide(color: Colors.grey),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image(image: AssetImage("images/google_logo.png"), height: 25.0),
+            Padding(
+              padding: EdgeInsets.only(left: 10),
+              child: Text(
+                'Google',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.grey,
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<Null> fblogin() async {
+    final FacebookLoginResult result =
+    await facebookSignIn.logIn(['email']);
+
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        FacebookAccessToken accessToken = result.accessToken;
+        Utils.showProgressDialog(context);
+        FacebookModel fbModel =  await ApiController.getFbUserData(accessToken.token);
+        Utils.hideProgressDialog(context);
+        if(fbModel != null){
+          print("email=${fbModel.email} AND id=${fbModel.id}");
+
+        }else{
+          Utils.showToast("Something went wrong while login!", false);
+        }
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        Utils.showToast("Login cancelled", false);
+        break;
+      case FacebookLoginStatus.error:
+        Utils.showToast("Something went wrong ${result.errorMessage}", false);
+        break;
+    }
   }
 
 
@@ -215,7 +370,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
 
   Widget addSignUpButton() {
     return Padding(
-      padding: const EdgeInsets.only(top:20 ,bottom: 5),
+      padding: const EdgeInsets.only(top:10 ,bottom: 5),
       child: Align(
         alignment: Alignment.bottomCenter,
         child: RichText(

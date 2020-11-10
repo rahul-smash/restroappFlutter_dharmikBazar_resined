@@ -250,7 +250,7 @@ class _OtpScreen extends State<OtpScreen> {
       Navigator.pop(context);
       Navigator.push(context,
         MaterialPageRoute(
-            builder: (context) => ProfileScreen(true,widget.response.user.id,widget.response.user.fullName)),
+            builder: (context) => ProfileScreen(true,widget.response.user.id,widget.response.user.fullName,null,null)),
       );
       //Navigator.pop(context);
     }
