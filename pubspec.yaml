@@ -148,7 +148,7 @@ flutter:
     - images/google_logo.png
     - images/f_logo_white.png
     - assets/en.json
-    - assets/de.json
+    - assets/malay.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

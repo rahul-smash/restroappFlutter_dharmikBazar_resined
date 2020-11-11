@@ -33,7 +33,7 @@ class Language{
     //print("\nselectedLangauge = ${selectedLangauge}");
     if(selectedLangauge != null && selectedLangauge == AppConstant.Malay){
       AppConstant.isEnglishSelected = false;
-      return await rootBundle.loadString('assets/de.json');
+      return await rootBundle.loadString('assets/malay.json');
     }else{
       AppConstant.isEnglishSelected = true;
       return await rootBundle.loadString('assets/en.json');
