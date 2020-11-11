@@ -13,10 +13,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class RegisterUser extends StatefulWidget {
 
-  FacebookModel fbModel;
-  GoogleSignInAccount googleResult;
-
-  RegisterUser(this.fbModel,this.googleResult);
+  RegisterUser();
 
   @override
   _RegisterUserState createState() => new _RegisterUserState();
@@ -35,6 +32,7 @@ class _RegisterUserState extends State<RegisterUser> {
   final _passwordController = TextEditingController();
   final _confirmpasswordController = TextEditingController();
   final _referralCodeeController = TextEditingController();
+  bool loginViaSocial = false;
 
   bool showReferralCodeView = false;
   StoreModel storeModel;
@@ -51,7 +49,6 @@ class _RegisterUserState extends State<RegisterUser> {
         });
       },
     );
-
     SharedPrefs.getStore().then((store){
       this.storeModel = store;
       if(storeModel.isRefererFnEnable){
@@ -104,7 +101,7 @@ class _RegisterUserState extends State<RegisterUser> {
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
-                            labelText: 'Phone *',
+                            labelText: 'Phone',
                           ),
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
@@ -195,10 +192,10 @@ class _RegisterUserState extends State<RegisterUser> {
       Utils.showToast("Please enter name", false);
       return;
     }
-    if(userData.phone.isEmpty){
+    /*if(userData.phone.isEmpty){
       Utils.showToast("Please enter phone", false);
       return;
-    }
+    }*/
     if(userData.email.isEmpty){
       Utils.showToast("Please enter email", false);
       return;
@@ -226,20 +223,26 @@ class _RegisterUserState extends State<RegisterUser> {
     if (userData.confirmPassword.trim() != userData.password.trim()) {
       Utils.showToast(AppConstant.passwordMatch, true);
     } else {
-      Utils.isNetworkAvailable().then((isNetworkAvailable) async {
-        if (isNetworkAvailable) {
-          Utils.showProgressDialog(context);
-          ApiController.registerApiRequest(userData,referralCode)
-              .then((response) async {
-            Utils.hideProgressDialog(context);
-            if (response != null && response.success) {
-              Navigator.pop(context);
-            }
-          });
-        } else {
-          Utils.showToast(AppConstant.noInternet, true);
-        }
-      });
+
+      if(loginViaSocial){
+
+
+      }else{
+        Utils.isNetworkAvailable().then((isNetworkAvailable) async {
+          if (isNetworkAvailable) {
+            Utils.showProgressDialog(context);
+            ApiController.registerApiRequest(userData,referralCode)
+                .then((response) async {
+              Utils.hideProgressDialog(context);
+              if (response != null && response.success) {
+                Navigator.pop(context);
+              }
+            });
+          } else {
+            Utils.showToast(AppConstant.noInternet, true);
+          }
+        });
+      }
     }
   }
 }

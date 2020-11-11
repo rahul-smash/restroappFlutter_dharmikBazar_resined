@@ -17,17 +17,17 @@ class FacebookModel {
     this.id,
   });
 
-  String name;
-  String firstName;
-  String lastName;
-  String email;
-  String id;
+  String name= "";
+  String firstName= "";
+  String lastName= "";
+  String email = "";
+  String id= "";
 
   factory FacebookModel.fromJson(Map<String, dynamic> json) => FacebookModel(
     name: json["name"],
     firstName: json["first_name"],
     lastName: json["last_name"],
-    email: json["email"],
+    email: json["email"] == null ? "" : json["email"],
     id: json["id"],
   );
 

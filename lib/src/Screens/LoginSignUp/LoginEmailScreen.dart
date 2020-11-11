@@ -7,6 +7,7 @@ import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ForceUpdate.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
+import 'package:restroapp/src/Screens/SideMenu/ProfileScreen.dart';
 import 'package:restroapp/src/UI/SocialLoginTabs.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -244,7 +245,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => RegisterUser(null,null)),
+                                builder: (context) => RegisterUser()),
                           );
                         },
                         child: addSignUpButton(),
@@ -276,10 +277,9 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
               MobileVerified verifyEmailModel = await ApiController.verifyEmail(result.email);
               if(verifyEmailModel.userExists == 0){
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => RegisterUser(null,result)),
+                Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => ProfileScreen(true,"",
+                      "${result.displayName}",null,result)),
                 );
 
               }else if(verifyEmailModel.userExists == 1){
@@ -344,10 +344,9 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
           Utils.hideProgressDialog(context);
           if(verifyEmailModel.userExists == 0){
             Navigator.pop(context);
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => RegisterUser(fbModel,null)),
+            Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ProfileScreen(true,"",
+                  "${fbModel.name}",fbModel,null)),
             );
 
           }else if(verifyEmailModel.userExists == 1){

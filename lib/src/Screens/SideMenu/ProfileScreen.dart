@@ -100,6 +100,30 @@ class _ProfileState extends State<ProfileScreen> {
         isLoginViaSocial = true;
       }
 
+      if (isLoginViaSocial) {
+        if(widget.fbModel != null){
+          if(widget.fbModel.email.isEmpty){
+            isEmailEditable = false;
+          }
+        }else if(widget.googleResult != null){
+          if(widget.googleResult.email.isEmpty){
+            isEmailEditable = false;
+          }
+        }
+      }
+
+      if (storeModel.internationalOtp == "1" && isLoginViaSocial) {
+        if(widget.fbModel != null){
+          if(widget.fbModel.email.isNotEmpty){
+            isEmailEditable = true;
+          }
+        }else if(widget.googleResult != null){
+          if(widget.googleResult.email.isNotEmpty){
+            isEmailEditable = true;
+          }
+        }
+      }
+
       print(
           "showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     });
@@ -291,12 +315,16 @@ class _ProfileState extends State<ProfileScreen> {
     } else {
       form.save();
 
-      if(isLoginViaSocial){
-        if (phoneController.text.trim().isEmpty) {
-          Utils.showToast("Please enter your valid mobile number", false);
-          return;
+      if(storeModel != null){
+        if(storeModel.internationalOtp == "0"){
+          if (phoneController.text.trim().isEmpty) {
+            Utils.showToast("Please enter your valid mobile number", false);
+            return;
+          }
         }
+      }
 
+      if(isLoginViaSocial){
         Utils.showProgressDialog(context);
         MobileVerified userResponse = await ApiController.socialSignUp(widget.fbModel,widget.googleResult,
           firstNameController.text.trim(),

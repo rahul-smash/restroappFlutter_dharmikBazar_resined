@@ -264,6 +264,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             attributeMap["WalletHistory"] = "WalletHistoryScreen";
             Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
           } else {
+            Navigator.pop(context);
             Utils.showLoginDialog(context);
           }
 
@@ -341,6 +342,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "ProfileScreen";
           Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -357,6 +359,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "DeliveryAddressList";
           Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -372,6 +375,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "MyOrderScreen";
           Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -384,6 +388,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                 builder: (context) => LoyalityPointsScreen(widget.store)),
           );
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
 
@@ -399,6 +404,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "Favourites";
           Utils.sendAnalyticsEvent("Clicked Favourites", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -568,6 +574,9 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
       SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
       SharedPrefs.removeKey(AppConstant.referEarnMsg);
+      SharedPrefs.removeKey("user_wallet");
+      SharedPrefs.removeKey("user");
+
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
