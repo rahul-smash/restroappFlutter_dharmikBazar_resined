@@ -1272,17 +1272,25 @@ class ApiController {
     }
   }
 
-  static Future<StripeCheckOutModel> stripePaymentApi(String amount) async {
+  static Future<StripeCheckOutModel> stripePaymentApi(String amount,String orderJson,dynamic detailsJson,
+      {String currencyAbbr}) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     UserModel user = await SharedPrefs.getUser();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.stripePaymentCheckout;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    if (currencyAbbr == null) {
+      currencyAbbr = 'usd';
+    }
     try {
-      request.fields.addAll(
-          {"customer_email": user.email, "amount": amount, "currency": "usd"});
+      request.fields.addAll({
+        "customer_email": user.email,
+        "amount": amount,
+        "currency": currencyAbbr.toLowerCase().trim(),
+        "order_info": detailsJson, //JSONObject details
+        "orders": orderJson
+      });
       print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();

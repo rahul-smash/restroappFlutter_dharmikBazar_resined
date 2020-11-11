@@ -2072,7 +2072,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  void callStripeApi() {
+  void callStripeApi() async {
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total);
     price = price * 100;
@@ -2080,25 +2080,69 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String mPrice =
         price.toString().substring(0, price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
-    ApiController.stripePaymentApi(mPrice).then((response) {
-      Utils.hideProgressDialog(context);
-      print("----stripePaymentApi------");
-      if (response != null) {
-        StripeCheckOutModel stripeCheckOutModel = response;
-        if (stripeCheckOutModel.success) {
-          //launchWebView(stripeCheckOutModel);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    StripeWebView(stripeCheckOutModel, storeModel)),
-          );
-        } else {
-          Utils.showToast("${stripeCheckOutModel.message}!", true);
-        }
-      } else {
-        Utils.showToast("Something went wrong!", true);
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    Utils.getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail)
+        .then((orderJson) {
+      if (orderJson == null) {
+        print("--orderjson == null-orderjson == null-");
+        return;
       }
+      String storeAddress = "";
+      try {
+        storeAddress = "${storeModel.storeName}, ${storeModel.location},"
+            "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
+      } catch (e) {
+        print(e);
+      }
+
+      String userId = user.id;
+      OrderDetailsModel detailsModel = OrderDetailsModel(
+          shippingCharges,
+          comment,
+          totalPrice.toString(),
+          widget.paymentMode,
+          taxModel,
+          widget.address,
+          widget.isComingFromPickUpScreen,
+          widget.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Stripe",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedDeliverSlotValue,
+          totalSavingsText);
+
+      ApiController.stripePaymentApi(mPrice,orderJson ,detailsModel.orderDetails,
+              currencyAbbr: storeModel.currencyAbbr)
+          .then((response) {
+        Utils.hideProgressDialog(context);
+        print("----stripePaymentApi------");
+        if (response != null) {
+          StripeCheckOutModel stripeCheckOutModel = response;
+          if (stripeCheckOutModel.success) {
+            //launchWebView(stripeCheckOutModel);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      StripeWebView(stripeCheckOutModel, storeModel)),
+            );
+          } else {
+            Utils.showToast("${stripeCheckOutModel.message}!", true);
+          }
+        } else {
+          Utils.showToast("Something went wrong!", true);
+        }
+      });
     });
   }
 
