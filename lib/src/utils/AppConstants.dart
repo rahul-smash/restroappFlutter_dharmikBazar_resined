@@ -1,6 +1,6 @@
 class AppConstant {
   static bool isLoggedIn = false;
-
+  static bool isEnglishSelected = false;
   static String currency = "";//\u20B9
   static String appThemeColor = "appThemeColor";
 
@@ -15,6 +15,11 @@ class AppConstant {
   static final String deviceToken = "device_token";
   static final String placeholderImageUrl =
       "https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png?v=1530129081";
+
+  static String ENGLISH = 'ENGLISH';
+  static String Malay = 'Malay';
+  static String SelectedLanguage = 'SelectedLanguage';
+
 
   static String placeholderUrl = "";
   static bool isRestroApp;

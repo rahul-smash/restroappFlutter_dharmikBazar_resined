@@ -17,8 +17,18 @@ import 'dart:io';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import 'src/UI/Language.dart';
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  String value = await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);
+  if(value == null){
+    SharedPrefs.storeSharedValue(AppConstant.SelectedLanguage, AppConstant.ENGLISH);
+  }
+  Language language = Language();
+  language.changeLanguage();
+
   DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
   AppConstant.isLoggedIn = await SharedPrefs.isUserLoggedIn();
 
