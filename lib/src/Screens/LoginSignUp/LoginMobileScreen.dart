@@ -177,6 +177,13 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                                       Utils.showToast(AppConstant.noInternet, true);
                                       return;
                                     }
+
+                                    bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
+                                    print("isFbLoggedIn=${isFbLoggedIn}");
+                                    if(isFbLoggedIn){
+                                      await facebookSignIn.logOut();
+                                    }
+
                                     fblogin();
                                   },
                                   child: Container(
@@ -237,6 +244,12 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
         if(!isNetworkAvailable){
           Utils.showToast(AppConstant.noInternet, true);
         }else{
+          bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
+          print("isGoogleSignedIn=${isGoogleSignedIn}");
+          if(isGoogleSignedIn){
+            await _googleSignIn.signOut();
+          }
+
           try {
             GoogleSignInAccount result = await _googleSignIn.signIn();
             if(result != null){
