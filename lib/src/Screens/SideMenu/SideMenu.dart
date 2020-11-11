@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_share/flutter_share.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
@@ -49,12 +51,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   SocialModel socialModel;
   WalleModel walleModel;
   double iconHeight = 25;
+  GoogleSignIn _googleSignIn;
 
   _NavDrawerMenuState();
 
   @override
   void initState() {
     super.initState();
+    _googleSignIn = GoogleSignIn(
+      scopes: ['email','https://www.googleapis.com/auth/contacts.readonly',],);
     //print("isRefererFnEnable=${widget.store.isRefererFnEnable}");
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.HOME, "images/home.png"));
@@ -260,6 +265,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             attributeMap["WalletHistory"] = "WalletHistoryScreen";
             Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
           } else {
+            Navigator.pop(context);
             Utils.showLoginDialog(context);
           }
 
@@ -331,12 +337,13 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfileScreen(false, "", "")),
+                builder: (context) => ProfileScreen(false, "", "",null,null)),
           );
           Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "ProfileScreen";
           Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -353,6 +360,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "DeliveryAddressList";
           Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -368,6 +376,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "MyOrderScreen";
           Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -380,6 +389,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                 builder: (context) => LoyalityPointsScreen(widget.store)),
           );
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
 
@@ -395,6 +405,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "Favourites";
           Utils.sendAnalyticsEvent("Clicked Favourites", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -518,7 +529,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             ),
             FlatButton(
               child: const Text('YES'),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
                 logout(context);
               },
@@ -558,10 +569,26 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   Future logout(BuildContext context) async {
     try {
+      FacebookLogin facebookSignIn = new FacebookLogin();
+      bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
+      print("isFbLoggedIn=${isFbLoggedIn}");
+      if(isFbLoggedIn){
+        await facebookSignIn.logOut();
+      }
+
+      bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
+      print("isGoogleSignedIn=${isGoogleSignedIn}");
+      if(isGoogleSignedIn){
+        await _googleSignIn.signOut();
+      }
+
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
       SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
       SharedPrefs.removeKey(AppConstant.referEarnMsg);
+      SharedPrefs.removeKey("user_wallet");
+      SharedPrefs.removeKey("user");
+
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);

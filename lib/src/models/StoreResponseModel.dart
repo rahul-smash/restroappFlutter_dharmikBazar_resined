@@ -40,6 +40,7 @@ class StoreModel {
   String version;
   String currency;
   String showCurrency;
+  String social_login;
   String currency_unicode;
   String appShareLink;
   String androidShareLink;
@@ -152,6 +153,7 @@ class StoreModel {
       this.zipcode,
       this.lat,
       this.lng,
+      this.social_login,
       this.appThemeColors,
         this.webAppThemeColors,
       this.contactPerson,
@@ -269,6 +271,7 @@ class StoreModel {
     cod = json['cod'];
     lat = json['lat'];
     lng = json['lng'];
+    social_login = json['social_login'];
     wallet_setting = json['wallet_setting'];
     contactPerson = json['contact_person'];
     contactNumber = json['contact_number'];
@@ -452,6 +455,7 @@ class StoreModel {
     data['web_theme'] = this.webTheme;
     data['aboutus_banner'] = this.aboutusBanner;
     data['type'] = this.type;
+    data['social_login'] = this.social_login;
     data['cat_type'] = this.catType;
     data['store_app'] = this.storeApp;
     data['store_logo'] = this.storeLogo;

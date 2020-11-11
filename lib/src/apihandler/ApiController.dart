@@ -1,5 +1,6 @@
 import 'package:compressimage/compressimage.dart';
 import 'package:dio/dio.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
@@ -18,6 +19,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
 import 'package:restroapp/src/models/HtmlModelResponse.dart';
+import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
@@ -42,6 +44,7 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/VerifyEmailModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -1740,6 +1743,112 @@ class ApiController {
       print(e);
     }
     return null;
+  }
+
+  static Future<FacebookModel> getFbUserData(String fbtoken) async {
+
+    //String url1 = "https://graph.facebook.com/${user_id}?fields=name,first_name,last_name,email,&access_token=${fbtoken}";
+    String url = 'https://graph.facebook.com/v8.0/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
+
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+
+    try {
+      final response = await request.send()
+          .timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("----url---${url}");
+      print("----respStr---${respStr}");
+      final parsed = json.decode(respStr);
+      FacebookModel fbModel = FacebookModel.fromJson(parsed);
+      return fbModel;
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<MobileVerified> verifyEmail(String email) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.verifyEmail;
+
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "email": email,
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+      print('@@url=${url}');
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      MobileVerified userResponse = MobileVerified.fromJson(parsed);
+      return userResponse;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('=mobileVerification==catch==' + e.toString());
+      return null;
+    }
+  }
+
+
+  static Future<MobileVerified> socialSignUp(FacebookModel fbModel,
+      GoogleSignInAccount googleResult,
+      String fullName,
+      String emailId,
+      String phoneNumber,
+      String user_refer_code,
+      String gstNumber) async {
+
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.socialLogin;
+
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    String socialPlatform;
+    if(fbModel != null){
+      socialPlatform = "facebook";
+    }else if(googleResult != null){
+      socialPlatform = "google";
+    }
+
+    try {
+      request.fields.addAll({
+        "phone": phoneNumber,
+        "country": store.internationalOtp == "0" ? "92" :"0",
+        "email": emailId,
+        "social_platform": socialPlatform,
+        "full_name": fullName,
+        "user_refer_code": user_refer_code,
+        "device_id": deviceId,
+        "device_token": deviceToken,
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+      print('@@url=${url}');
+      print('@@fields=${request.fields.toString()}');
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      MobileVerified userResponse = MobileVerified.fromJson(parsed);
+      if (userResponse.success) {
+        SharedPrefs.setUserLoggedIn(true);
+        SharedPrefs.saveUserMobile(userResponse.user);
+      }
+      return userResponse;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('=mobileVerification==catch==' + e.toString());
+      return null;
+    }
   }
 
 
