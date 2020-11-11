@@ -58,6 +58,50 @@ class DialogUtils {
     );
   }
 
+  static Future<bool> displayLanguageDialog(BuildContext context, String title,
+      String body, String buttonText1, String buttonText2) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {},
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 18,),
+            ),
+            content: Text(
+              body,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold,color: Colors.grey,fontSize: 16,),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text(buttonText1,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18,)),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                  // true here means you clicked ok
+                },
+              ),
+              new FlatButton(
+                child: Text(buttonText2,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18,)),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  // true here means you clicked ok
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   static Future<PaymentType> displayPaymentDialog(
       BuildContext context, String title, String note) async {
     return await showDialog<PaymentType>(

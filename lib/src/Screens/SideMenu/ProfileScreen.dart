@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:restroapp/src/UI/Language.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
@@ -8,6 +9,8 @@ import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -41,10 +44,12 @@ class _ProfileState extends State<ProfileScreen> {
   bool isEmailEditable = false;
   bool isPhonereadOnly = true;
   bool showReferralCodeView = false;
+  Language language;
 
   @override
   initState() {
     super.initState();
+    language = Language();
     getProfileData();
   }
 
@@ -141,6 +146,34 @@ class _ProfileState extends State<ProfileScreen> {
           appBar: AppBar(
             title: new Text("My Profile"),
             centerTitle: true,
+            actions: [
+              InkWell(
+                onTap: () async {
+                  var result;
+
+                  String value = await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);
+                  if(value == AppConstant.ENGLISH){
+                    value = AppConstant.Malay;
+                  }else {
+                    value = AppConstant.ENGLISH;
+                  }
+                  result = await DialogUtils.displayLanguageDialog(context, "Change Language",
+                      "Would you like to change the app language to ${value}?", "Cancel", "Ok");
+                  if(result == true){
+                    SharedPrefs.storeSharedValue(AppConstant.SelectedLanguage, value);
+                    language.changeLanguage().then((value){
+                      setState(() {
+
+                      });
+                    });
+                  }
+                },
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  child: Icon(Icons.language,color: Colors.white,),
+                ),
+              ),
+            ],
           ),
           body: SingleChildScrollView(
             child: Container(
@@ -172,7 +205,8 @@ class _ProfileState extends State<ProfileScreen> {
                             child: TextField(
                               controller: firstNameController,
                               decoration: InputDecoration(
-                                labelText: 'Full name *',
+                                //labelText: 'Full name *',
+                                labelText: Language.localizedValues["Full_name_txt"],
                               ),
                               style: TextStyle(
                                   fontSize: 18,
@@ -280,7 +314,8 @@ class _ProfileState extends State<ProfileScreen> {
               ),
             ),
           ),
-        ));
+        )
+    );
   }
 
   bool isValidEmail(String input) {

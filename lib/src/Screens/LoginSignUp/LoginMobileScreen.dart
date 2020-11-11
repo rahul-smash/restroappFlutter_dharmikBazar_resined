@@ -5,6 +5,7 @@ import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/ProfileScreen.dart';
+import 'package:restroapp/src/UI/Language.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
@@ -111,7 +112,9 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                           Container(
                               padding: EdgeInsets.only(top: 40.0),
                               child: Text(
-                                AppConstant.txt_mobile,textAlign: TextAlign.center,
+                                Language.localizedValues["Login_With_Phone_Btn_Txt"],
+                                /*AppConstant.txt_mobile*/
+                                textAlign: TextAlign.center,
                                 style: new TextStyle(
                                   fontSize: 16.0,
                                   color: Colors.black,
