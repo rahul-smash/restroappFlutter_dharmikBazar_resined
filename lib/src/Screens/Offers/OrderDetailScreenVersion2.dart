@@ -1198,7 +1198,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 ),
                 Expanded(
                     child: Text( isOrderCanceledOrRejected? widget.orderHistoryData.status=='2'?'Order Rejected':
-                    'Order Canceled':
+                    'Order Cancelled':
                       !widget.orderHistoryData.orderFacility
                           .toLowerCase()
                           .contains('pick')
