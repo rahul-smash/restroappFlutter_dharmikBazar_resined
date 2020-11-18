@@ -222,6 +222,7 @@ class OrderItems {
   String comment;
   String isTaxEnable;
   String status;
+  String refundStatus;
   String subcategoryId;
   String subcategoryName;
   String categoryId;
@@ -250,6 +251,7 @@ class OrderItems {
       this.comment,
       this.isTaxEnable,
       this.status,
+      this.refundStatus,
       this.subcategoryId,
       this.subcategoryName,
       this.categoryId,
@@ -277,6 +279,7 @@ class OrderItems {
     comment = json['comment'];
     isTaxEnable = json['isTaxEnable'];
     status = json['status'];
+    refundStatus = json['refund_status'];
     subcategoryId = json['subcategory_id'];
     subcategoryName = json['subcategory_name'];
     categoryId = json['category_id'];
@@ -311,6 +314,7 @@ class OrderItems {
     data['comment'] = this.comment;
     data['isTaxEnable'] = this.isTaxEnable;
     data['status'] = this.status;
+    data['refund_status'] = this.refundStatus;
     data['subcategory_id'] = this.subcategoryId;
     data['subcategory_name'] = this.subcategoryName;
     data['category_id'] = this.categoryId;
