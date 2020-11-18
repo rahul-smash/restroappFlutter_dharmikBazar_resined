@@ -263,8 +263,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                   ),
                   Text("Look like there are no credit"),
                   Text("in your wallet at that moment"),
-                  Text("kindly purchase more"),
-                  Text("to continue"),
+                  Text("kindly purchase more to continue"),
                   SizedBox(
                     height: 20,
                   ),
