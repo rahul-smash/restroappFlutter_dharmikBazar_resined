@@ -392,9 +392,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           visible:
                               orderHistoryData.tax == "0.00" ? false : true,
                           child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: 16,
-                                  bottom: 0),
+                              padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -601,7 +599,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   mainAxisSize: MainAxisSize.max,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Flexible(
                       child: Text(
@@ -612,12 +610,40 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                             fontWeight: FontWeight.w300,
                           )),
                     ),
-                    Text(
-                        "${AppConstant.currency} ${(double.parse(cardOrderHistoryItems.orderItems[index].quantity) * double.parse(cardOrderHistoryItems.orderItems[index].price)).toStringAsFixed(2)}",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500))
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                            cardOrderHistoryItems.orderItems[index].status ==
+                                    '2'
+                                ? "Rejected"
+                                : "${AppConstant.currency} ${(double.parse(cardOrderHistoryItems.orderItems[index].quantity) * double.parse(cardOrderHistoryItems.orderItems[index].price)).toStringAsFixed(2)}",
+                            style: TextStyle(
+                                color: cardOrderHistoryItems
+                                            .orderItems[index].status ==
+                                        '2'
+                                    ? Colors.red
+                                    : Colors.black,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500)),
+                        Visibility(visible: cardOrderHistoryItems.orderItems[index].refundStatus ==
+                            '2'||cardOrderHistoryItems.orderItems[index].refundStatus=='1',
+                            child:
+                        Text(
+                            cardOrderHistoryItems.orderItems[index].refundStatus ==
+                                    '1'
+                                ? "Refund Pending"
+                                : "Refunded",
+                            style: TextStyle(
+                                color: cardOrderHistoryItems.orderItems[index].refundStatus ==
+                                    '1'
+                                    ? Colors.red
+                                    : Colors.green,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500)))
+                      ],
+                    ),
                   ],
                 ),
               ],
@@ -1215,19 +1241,23 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
             widget.orderHistoryData.status == '6'
         ? true
         : false;
-    bool isNoteVisible=(widget.orderHistoryData.status == '2' ||
-        widget.orderHistoryData.status == '6') &&
+    bool isNoteVisible = (widget.orderHistoryData.status == '2' ||
+            widget.orderHistoryData.status == '6') &&
         widget.orderHistoryData.orderRejectionNote != null &&
         widget.orderHistoryData.orderRejectionNote.isNotEmpty;
-    String noteHeading= widget.orderHistoryData.orderRejectionNote != null &&
-        widget.orderHistoryData.orderRejectionNote.isNotEmpty
-        ?widget.orderHistoryData.status == '6'? "Cancellation Comment:-":widget.orderHistoryData.status == '2'? "Reason of Rejection:-":""
+    String noteHeading = widget.orderHistoryData.orderRejectionNote != null &&
+            widget.orderHistoryData.orderRejectionNote.isNotEmpty
+        ? widget.orderHistoryData.status == '6'
+            ? "Cancellation Comment:-"
+            : widget.orderHistoryData.status == '2'
+                ? "Reason of Rejection:-"
+                : ""
         : "";
-    String orderRejectionNote=   widget.orderHistoryData.orderRejectionNote != null &&
-        widget
-            .orderHistoryData.orderRejectionNote.isNotEmpty
-        ? widget.orderHistoryData.orderRejectionNote
-        : "";
+    String orderRejectionNote =
+        widget.orderHistoryData.orderRejectionNote != null &&
+                widget.orderHistoryData.orderRejectionNote.isNotEmpty
+            ? widget.orderHistoryData.orderRejectionNote
+            : "";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1419,7 +1449,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 SizedBox(
                   height: 15,
                 ),
-                Text(noteHeading,
+                Text(
+                  noteHeading,
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
                 SizedBox(
