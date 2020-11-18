@@ -91,6 +91,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   double totalMRpPrice = 0.0;
   List<OrderDetail> responseOrderDetail = List();
+  List<Product> cartListFromDB = List();
 
   bool isOrderVariations = false;
 
@@ -151,7 +152,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     //new changes
     Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail)
+            responseOrderDetail: responseOrderDetail,cartList: cartListFromDB)
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
@@ -386,9 +387,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     isLoading = true;
     userWalleModel = await SharedPrefs.getUserWallet();
-    databaseHelper.getCartItemsListToJson().then((json) {
+//    databaseHelper.getCartItemsListToJson().then((json) {
+    databaseHelper.getCartItemList().then((cartList) {
+      cartListFromDB=cartList;
+      List jsonList = Product.encodeToJson(cartList);
+      String encodedDoughnut = jsonEncode(jsonList);
       ApiController.multipleTaxCalculationRequest(
-              "", "0", "$shippingCharges", json)
+              "", "0", "$shippingCharges", encodedDoughnut)
           .then((response) async {
         //{"success":false,"message":"Some products are not available."}
         TaxCalculationResponse model = response;
@@ -2086,7 +2091,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail)
+            responseOrderDetail: responseOrderDetail,cartList: cartListFromDB)
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
@@ -2226,7 +2231,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     //new changes
     Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail)
+            responseOrderDetail: responseOrderDetail,cartList: cartListFromDB)
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
@@ -2287,7 +2292,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             .then((json) {*/
         Utils.getCartItemsListToJson(
                 isOrderVariations: isOrderVariations,
-                responseOrderDetail: responseOrderDetail)
+                responseOrderDetail: responseOrderDetail,cartList: cartListFromDB)
             .then((json) {
           if (json == null) {
             print("--json == null-json == null-");

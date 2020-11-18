@@ -71,8 +71,7 @@ class Utils {
       child: Center(
         child: CircularProgressIndicator(
             backgroundColor: Colors.black26,
-            valueColor:
-            AlwaysStoppedAnimation<Color>(Colors.black26)),
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
       ),
     );
   }
@@ -393,7 +392,6 @@ class Utils {
     return formatted;
   }
 
-
   static convertWalletDate(String date) {
     String formatted = date;
     try {
@@ -665,7 +663,18 @@ class Utils {
 
   static Future<String> getCartItemsListToJson(
       {bool isOrderVariations = true,
-      List<OrderDetail> responseOrderDetail}) async {
+      List<OrderDetail> responseOrderDetail,
+      List<Product> cartList}) async {
+    for (int i = 0; i < cartList.length; i++) {
+      for (int j = 0; j < responseOrderDetail.length; j++) {
+        if (cartList[i].id == responseOrderDetail[j].productId &&
+            cartList[i].variantId == responseOrderDetail[j].variantId) {
+          responseOrderDetail[j].discount=cartList[i].discount;
+          break;
+        }
+      }
+    }
+
     List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
         removeOutOfStockProducts: true);
     String encodedDoughnut = jsonEncode(jsonList);
