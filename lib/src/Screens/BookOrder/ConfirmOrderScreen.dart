@@ -1820,7 +1820,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         double.parse(taxModel.total) == 0 &&
         widget.paymentMode != '2') {
       Utils.hideProgressDialog(context);
-      Utils.showToast("Choose COD Method to Avail Wallet Refund", false);
+      Utils.showToast("Choose COD Method to Avail Wallet balance", false);
       return;
     }
     //Choose payment
