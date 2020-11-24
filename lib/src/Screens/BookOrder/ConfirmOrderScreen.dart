@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+
 //import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -92,7 +94,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool isOrderVariations = false;
 
-  bool showCOD=true;
+  bool showCOD = true;
 
   ConfirmOrderState({this.storeModel});
 
@@ -103,12 +105,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           widget.address.address2.isNotEmpty) {
         if (widget.address.address != null &&
             widget.address.address.isNotEmpty) {
-          address = widget.address.address + ", "+ widget.address.address2+
+          address = widget.address.address +
+              ", " +
+              widget.address.address2 +
               " " +
               widget.address.areaName +
               " " +
               widget.address.city;
-        }else{
+        } else {
           address = widget.address.address2 +
               " " +
               widget.address.areaName +
@@ -145,8 +149,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    Utils
-        .getCartItemsListToJson(
+    Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail)
         .then((orderJson) {
@@ -254,18 +257,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     multiTaxCalculationApi();
 
-    if(widget.storeModel != null){
-      if(widget.storeModel.cod == "1"){
+    if (widget.storeModel != null) {
+      if (widget.storeModel.cod == "1") {
         showCOD = true;
         widget.paymentMode = "2";
-      }else if(widget.storeModel.cod == "0"){
+      } else if (widget.storeModel.cod == "0") {
         showCOD = false;
       }
-      if (widget.storeModel.onlinePayment == "0" && widget.storeModel.cod == "0") {
+      if (widget.storeModel.onlinePayment == "0" &&
+          widget.storeModel.cod == "0") {
         showCOD = true;
         widget.paymentMode = "2";
       }
-      if(widget.storeModel.cod == "0" && widget.storeModel.onlinePayment == "1"){
+      if (widget.storeModel.cod == "0" &&
+          widget.storeModel.onlinePayment == "1") {
         widget._character = PaymentType.ONLINE;
         widget.paymentMode = "3";
       }
@@ -603,12 +608,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         }
       }
     Color containerColor =
-    detail != null && detail.productStatus.contains('out_of_stock')
-        ? Colors.black12
-        : Colors.transparent;
-    String mrpPrice = detail != null && detail.productStatus.contains('price_changed')? detail.newMrpPrice:product.mrpPrice;
-    String price = detail != null && detail.productStatus.contains('price_changed')? detail.newPrice:product.price;
-
+        detail != null && detail.productStatus.contains('out_of_stock')
+            ? Colors.black12
+            : Colors.transparent;
+    String mrpPrice =
+        detail != null && detail.productStatus.contains('price_changed')
+            ? detail.newMrpPrice
+            : product.mrpPrice;
+    String price =
+        detail != null && detail.productStatus.contains('price_changed')
+            ? detail.newPrice
+            : product.price;
+    String imageUrl = product.imageType == "0"
+        ? product.image == null
+            ? product.image10080
+            : product.image
+        : product.imageUrl;
     if (product.taxDetail != null) {
       return Container(
         color: containerColor,
@@ -621,28 +636,29 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   style: TextStyle(color: Colors.black54)),
               detail != null && detail.productStatus.contains('out_of_stock')
                   ? Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red, width: 1),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Padding(
-                    padding: EdgeInsets.all(3),
-                    child: Text(
-                      "Out of Stock",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ))
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ))
                   : Text("${AppConstant.currency}${product.taxDetail.tax}",
-                  style: TextStyle(
-                      color: detail != null &&
-                          detail.productStatus.contains('out_of_stock')
-                          ? Colors.red
-                          : Colors.black54)),
+                      style: TextStyle(
+                          color: detail != null &&
+                                  detail.productStatus.contains('out_of_stock')
+                              ? Colors.red
+                              : Colors.black54)),
             ],
           ),
         ),
       );
-    } else if (product.fixedTax != null) {
+    }
+    else if (product.fixedTax != null) {
       return Container(
         color: containerColor,
         child: Padding(
@@ -654,24 +670,24 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   style: TextStyle(color: Colors.black54)),
               detail != null && detail.productStatus.contains('out_of_stock')
                   ? Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(color: Colors.red, width: 1),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Padding(
-                    padding: EdgeInsets.all(3),
-                    child: Text(
-                      "Out of Stock",
-                      style: TextStyle(color: Colors.red),
-                    ),
-                  ))
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ))
                   : Text(
-                  "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
-                  style: TextStyle(
-                      color: detail != null &&
-                          detail.productStatus.contains('out_of_stock')
-                          ? Colors.red
-                          : Colors.black54)),
+                      "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
+                      style: TextStyle(
+                          color: detail != null &&
+                                  detail.productStatus.contains('out_of_stock')
+                              ? Colors.red
+                              : Colors.black54)),
             ],
           ),
         ),
@@ -683,6 +699,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            imageUrl == ""
+                ? Container(
+              width: 70.0,
+              height: 80.0,
+              child: Utils.getImgPlaceHolder(),
+            )
+                : Padding(
+                padding: EdgeInsets.only(left: 5, right: 20),
+                child: Container(
+                  width: 70.0,
+                  height: 80.0,
+                  child: CachedNetworkImage(
+                      imageUrl: "${imageUrl}", fit: BoxFit.fill
+                    //placeholder: (context, url) => CircularProgressIndicator(),
+                    //errorWidget: (context, url, error) => Icon(Icons.error),
+                  ),
+                  /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                                          fit: BoxFit.cover),*/
+                )),
+            Expanded(
+                flex: 4,
+                child:
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -717,8 +755,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")
                 ),*/
               ],
-            ),
-            detail != null && detail.productStatus.contains('out_of_stock')
+            )),
+              Expanded(child:
+              detail != null && detail.productStatus.contains('out_of_stock')
                 ? Container(
                 decoration: BoxDecoration(
                     border: Border.all(color: Colors.red, width: 1),
@@ -731,14 +770,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     style: TextStyle(color: Colors.red),
                   ),
                 ))
-                : Text(
-                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}",
+                :
+              Text(
+                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}" ,
                 style: TextStyle(
                     fontSize: 16,
                     color: detail != null &&
                         detail.productStatus.contains('out_of_stock')
                         ? Colors.red
-                        : Colors.black45)),
+                        : Colors.black45)),)
+
           ],
         ),
       );
@@ -791,8 +832,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               Text("Items Price", style: TextStyle(color: Colors.black)),
               Text(
 //                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
-                  "${AppConstant.currency}${taxModel==null? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2):
-                  taxModel.itemSubTotal}",
+                  "${AppConstant.currency}${taxModel == null ? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2) : taxModel.itemSubTotal}",
                   style: TextStyle(color: Colors.black)),
             ],
           ),
@@ -900,8 +940,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           .productStatus
                           .compareTo('out_of_stock') ==
                       0 &&
-                  responseOrderDetail[i].productId.compareTo(product.id) == 0
-                  &&responseOrderDetail[i].variantId.compareTo(product.variantId) == 0) {
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
+                  responseOrderDetail[i]
+                          .variantId
+                          .compareTo(product.variantId) ==
+                      0) {
                 isProductOutOfStock = true;
                 break InnnerFor;
               }
@@ -909,22 +952,30 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           .productStatus
                           .compareTo('price_changed') ==
                       0 &&
-                  responseOrderDetail[i].productId.compareTo(product.id) == 0
-                  &&responseOrderDetail[i].variantId.compareTo(product.variantId) == 0) {
-                detail=responseOrderDetail[i];
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
+                  responseOrderDetail[i]
+                          .variantId
+                          .compareTo(product.variantId) ==
+                      0) {
+                detail = responseOrderDetail[i];
                 break InnnerFor;
               }
             }
           }
 
           if (!isProductOutOfStock) {
-            String mrpPrice=detail!=null&&detail.productStatus.contains('price_changed')?detail.newMrpPrice:product.mrpPrice;
-            String price=detail!=null&&detail.productStatus.contains('price_changed')?detail.newPrice:product.price;
-            totalSavings +=
-                (double.parse(mrpPrice) - double.parse(price)) *
-                    double.parse(product.quantity);
-            totalMRpPrice += (double.parse(mrpPrice) *
-                double.parse(product.quantity));
+            String mrpPrice =
+                detail != null && detail.productStatus.contains('price_changed')
+                    ? detail.newMrpPrice
+                    : product.mrpPrice;
+            String price =
+                detail != null && detail.productStatus.contains('price_changed')
+                    ? detail.newPrice
+                    : product.price;
+            totalSavings += (double.parse(mrpPrice) - double.parse(price)) *
+                double.parse(product.quantity);
+            totalMRpPrice +=
+                (double.parse(mrpPrice) * double.parse(product.quantity));
           }
         }
       }
@@ -2077,8 +2128,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    Utils
-        .getCartItemsListToJson(
+    Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail)
         .then((orderJson) {
@@ -2139,13 +2189,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 isOrderVariations: isOrderVariations,
                 responseOrderDetail: responseOrderDetail)
             .then((json) {*/
-        Utils
-            .getCartItemsListToJson(
+        Utils.getCartItemsListToJson(
                 isOrderVariations: isOrderVariations,
                 responseOrderDetail: responseOrderDetail)
             .then((json) {
-
-
           if (json == null) {
             print("--json == null-json == null-");
             return;
@@ -2495,6 +2542,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     return productOutOfStock;
   }
 }
+
 /*Code for ios*/
 class StripeWebView extends StatefulWidget {
   StripeCheckOutModel stripeCheckOutModel;
@@ -2593,7 +2641,7 @@ class PaytmWebView extends StatelessWidget {
               print('==2====onLoadStop======: $url');
               if (url.contains("/api/paytmPaymentResult/orderId:")) {
                 String txnId =
-                url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
+                    url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
                 url = url.replaceAll("/TxnId:" + txnId, "");
                 String orderId = url
                     .substring(url.indexOf("/orderId:") + "/orderId:".length);
