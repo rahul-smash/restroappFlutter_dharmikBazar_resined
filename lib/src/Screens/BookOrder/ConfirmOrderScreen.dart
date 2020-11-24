@@ -1092,7 +1092,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               print("taxModel.total=${taxModel.total}");
                             });
                           }, appliedReddemPointsCodeList, isOrderVariations,
-                              responseOrderDetail),
+                              responseOrderDetail
+                              ,shippingCharges),
                           fullscreenDialog: true,
                         ));
                   }
@@ -1164,15 +1165,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       setState(() {
                         hideRemoveCouponFirstTime = false;
                         taxModel = model;
-                        double taxModelTotal = double.parse(taxModel.total) +
-                            int.parse(shippingCharges);
-                        taxModel.total = taxModelTotal.toString();
+//                        double taxModelTotal = double.parse(taxModel.total) +
+//                            int.parse(shippingCharges);
+//                        taxModel.total = taxModelTotal.toString();
                         appliedCouponCodeList.add(model.couponCode);
                         print("===couponCode=== ${model.couponCode}");
                         print("taxModel.total=${taxModel.total}");
                       });
                     }, appliedCouponCodeList, isOrderVariations,
-                        responseOrderDetail),
+                        responseOrderDetail,
+                    shippingCharges),
                   );
                 }
               },
@@ -1521,7 +1523,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               await ApiController.multipleTaxCalculationRequest(
                                   couponCodeController.text,
                                   couponModel.discountAmount,
-                                  "0",
+                                  shippingCharges,
                                   json);
                           Utils.hideProgressDialog(context);
                           if (model != null && !model.success) {
