@@ -152,7 +152,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     //new changes
     Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail,cartList: cartListFromDB)
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
@@ -387,9 +388,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     isLoading = true;
     userWalleModel = await SharedPrefs.getUserWallet();
+    if (userWalleModel == null) {
+      await ApiController.getUserWallet();
+      userWalleModel = await SharedPrefs.getUserWallet();
+    }
 //    databaseHelper.getCartItemsListToJson().then((json) {
     databaseHelper.getCartItemList().then((cartList) {
-      cartListFromDB=cartList;
+      cartListFromDB = cartList;
       List jsonList = Product.encodeToJson(cartList);
       String encodedDoughnut = jsonEncode(jsonList);
       ApiController.multipleTaxCalculationRequest(
@@ -862,7 +867,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               style:
                                   TextStyle(color: Colors.black, fontSize: 16)),
                           Text(
-                              "${AppConstant.currency} ${taxModel == null ? "0.00" : taxModel.wallet_refund}",
+                              "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.wallet_refund),2).toStringAsFixed(2)}",
                               style: TextStyle(color: appTheme, fontSize: 15)),
                         ],
                       ),
@@ -877,11 +882,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   String getUserRemaningWallet() {
     double balance = (double.parse(userWalleModel.data.userWallet) -
-        double.parse(taxModel.itemSubTotal)-double.parse(taxModel.shipping));
+        double.parse(taxModel.itemSubTotal) -
+        double.parse(taxModel.shipping));
     //print("balance=${balance}");
     if (balance > 0.0) {
       // USer balance is greater than zero.
-      return "${balance}";
+      return databaseHelper.roundOffPrice(balance,2).toStringAsFixed(2);
     } else {
       // USer balance is less than or equal to zero.
       return "0.00";
@@ -2091,7 +2097,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail,cartList: cartListFromDB)
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
@@ -2126,7 +2133,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           selectedDeliverSlotValue,
           totalSavingsText);
 
-      ApiController.stripePaymentApi(mPrice,orderJson ,detailsModel.orderDetails,
+      ApiController.stripePaymentApi(
+              mPrice, orderJson, detailsModel.orderDetails,
               currencyAbbr: storeModel.currencyAbbr)
           .then((response) {
         Utils.hideProgressDialog(context);
@@ -2231,7 +2239,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     //new changes
     Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail,cartList: cartListFromDB)
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
@@ -2292,7 +2301,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             .then((json) {*/
         Utils.getCartItemsListToJson(
                 isOrderVariations: isOrderVariations,
-                responseOrderDetail: responseOrderDetail,cartList: cartListFromDB)
+                responseOrderDetail: responseOrderDetail,
+                cartList: cartListFromDB)
             .then((json) {
           if (json == null) {
             print("--json == null-json == null-");
