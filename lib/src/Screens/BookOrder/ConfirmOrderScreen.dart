@@ -882,7 +882,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   String getUserRemaningWallet() {
     double balance = (double.parse(userWalleModel.data.userWallet) -
-        double.parse(taxModel.itemSubTotal) -
+        double.parse(taxModel.wallet_refund) -
         double.parse(taxModel.shipping));
     //print("balance=${balance}");
     if (balance > 0.0) {
