@@ -278,8 +278,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                     'No',
                     'Yes');
                 if (result == true) {
-                  Utils.showToast('Re order', false);
-                  Utils.reOrderItems(cardOrderHistoryItems.orderItems);
+                  Utils.reOrderItems(widget.store.storeName,context,cardOrderHistoryItems);
                 }
               },
               child: Wrap(

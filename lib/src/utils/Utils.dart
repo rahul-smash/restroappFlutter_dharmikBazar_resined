@@ -10,6 +10,7 @@ import 'package:connectivity/connectivity.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -203,6 +204,10 @@ class Utils {
       favIcon = Icon(Icons.favorite_border);
       return favIcon;
     }
+    if (isFav.isEmpty) {
+      favIcon = Icon(Icons.favorite_border);
+      return favIcon;
+    }
     if (isFav == "1") {
       favIcon = Icon(
         Icons.favorite,
@@ -211,6 +216,7 @@ class Utils {
     } else if (isFav == "0") {
       favIcon = Icon(Icons.favorite_border);
     }
+
     return favIcon;
   }
 
@@ -614,7 +620,8 @@ class Utils {
     return returnedColor;
   }
 
-  static void insertInCartTable(OrderItems product, int quantity) aynse{
+  static void insertInCartTable(String storeName, BuildContext context,
+      OrderItems product, int quantity) async {
     DatabaseHelper databaseHelper = new DatabaseHelper();
     String variantId, weight, mrpPrice, price, discount, isUnitType;
     variantId = product.variantId;
@@ -636,46 +643,58 @@ class Utils {
       DatabaseHelper.DISCOUNT: discount,
       DatabaseHelper.UNIT_TYPE: isUnitType,
       DatabaseHelper.PRODUCT_ID: product.id,
-//      DatabaseHelper.isFavorite: product.isFav,
+      /* product.isFav*/
       DatabaseHelper.isFavorite: '',
       DatabaseHelper.QUANTITY: quantity.toString(),
       DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
       DatabaseHelper.Product_Name: product.productName,
-      DatabaseHelper.nutrient: '',
-      DatabaseHelper.description: '',
-      DatabaseHelper.imageType:'',
-      DatabaseHelper.imageUrl: '',
-      DatabaseHelper.image_100_80: '',
-      DatabaseHelper.image_300_200: '',/* DatabaseHelper.nutrient: product.nutrient,
+      DatabaseHelper.nutrient: product.nutrient,
       DatabaseHelper.description: product.description,
       DatabaseHelper.imageType: product.imageType,
       DatabaseHelper.imageUrl: product.imageUrl,
       DatabaseHelper.image_100_80: product.image10080,
-      DatabaseHelper.image_300_200: product.image300200,*/
+      DatabaseHelper.image_300_200: product.image300200
     };
 
-    databaseHelper
-        .checkIfProductsExistInDb(DatabaseHelper.CART_Table, variantId)
-        .then((count) {
-      //print("-count-- ${count}");
-      if (count == 0) {
-        databaseHelper.addProductToCart(row).then((count) {
+    int count = await databaseHelper.checkIfProductsExistInDb(
+        DatabaseHelper.CART_Table, variantId);
+    //print("-count-- ${count}");
+    if (count == 0) {
+      count = await databaseHelper.addProductToCart(row);
 //          widget.callback();
-          eventBus.fire(updateCartCount());
-        });
-      } else {
-        databaseHelper.updateProductInCart(row, variantId).then((count) {
+      eventBus.fire(updateCartCount());
+    } else {
+      count = await databaseHelper.updateProductInCart(row, variantId);
 //          widget.callback();
-          eventBus.fire(updateCartCount());
-        });
-      }
-    });
+      eventBus.fire(updateCartCount());
+    }
+    var result = await DialogUtils.displayCommonDialog(context, storeName,
+        'Your order is successfully added to your cart. Please check your cart to proceed',
+        buttonText: 'Ok');
+    if (result == true) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => MyCartScreen(() {})));
+    }
   }
 
-  static void reOrderItems(List<OrderItems> ordersList) {
-    for(int i=0;i<ordersList.length;i++){
-      insertInCartTable(ordersList[i],int.parse(ordersList[i].quantity));
-    }
+  static void reOrderItems(
+      String storeName, BuildContext context, OrderData orderData) {
+    Utils.showProgressDialog(context);
+    ApiController.getOrderDetail(orderData.orderId).then((respone) {
+      if (respone != null &&
+          respone.success &&
+          respone.orders != null &&
+          respone.orders.isNotEmpty) {
+        for (int i = 0; i < respone.orders.first.orderItems.length; i++) {
+          insertInCartTable(storeName, context, respone.orders.first.orderItems[i],
+              int.parse(respone.orders.first.orderItems[i].quantity));
+        }
+      }
+      Utils.hideProgressDialog(context);
+    });
   }
 }
 
