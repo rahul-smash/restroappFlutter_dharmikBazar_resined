@@ -183,7 +183,7 @@ class OrderDetail {
   String newDiscount;
   String newPrice;
   String gst_state;
-  String gst_tax_rate;
+  dynamic gst_tax_rate;
   dynamic cgst;
   dynamic sgst;
   dynamic igst;

@@ -642,7 +642,7 @@ class Utils {
       DatabaseHelper.PRICE: price,
       DatabaseHelper.DISCOUNT: discount,
       DatabaseHelper.UNIT_TYPE: isUnitType,
-      DatabaseHelper.PRODUCT_ID: product.id,
+      DatabaseHelper.PRODUCT_ID: product.productId,
       /* product.isFav*/
       DatabaseHelper.isFavorite: '',
       DatabaseHelper.QUANTITY: quantity.toString(),
