@@ -13,14 +13,17 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 
+import 'Callbacks.dart';
 import 'DialogUtils.dart';
 
 class Utils {
@@ -609,6 +612,70 @@ class Utils {
       }
     }
     return returnedColor;
+  }
+
+  static void insertInCartTable(OrderItems product, int quantity) aynse{
+    DatabaseHelper databaseHelper = new DatabaseHelper();
+    String variantId, weight, mrpPrice, price, discount, isUnitType;
+    variantId = product.variantId;
+    weight = product.weight;
+    mrpPrice = product.mrpPrice;
+    price = product.price;
+    discount = product.discount;
+    isUnitType = product.unitType;
+
+    var mId = int.parse(product.id);
+    //String variantId = product.variantId;
+
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID: mId,
+      DatabaseHelper.VARIENT_ID: variantId,
+      DatabaseHelper.WEIGHT: weight,
+      DatabaseHelper.MRP_PRICE: mrpPrice,
+      DatabaseHelper.PRICE: price,
+      DatabaseHelper.DISCOUNT: discount,
+      DatabaseHelper.UNIT_TYPE: isUnitType,
+      DatabaseHelper.PRODUCT_ID: product.id,
+//      DatabaseHelper.isFavorite: product.isFav,
+      DatabaseHelper.isFavorite: '',
+      DatabaseHelper.QUANTITY: quantity.toString(),
+      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+      DatabaseHelper.Product_Name: product.productName,
+      DatabaseHelper.nutrient: '',
+      DatabaseHelper.description: '',
+      DatabaseHelper.imageType:'',
+      DatabaseHelper.imageUrl: '',
+      DatabaseHelper.image_100_80: '',
+      DatabaseHelper.image_300_200: '',/* DatabaseHelper.nutrient: product.nutrient,
+      DatabaseHelper.description: product.description,
+      DatabaseHelper.imageType: product.imageType,
+      DatabaseHelper.imageUrl: product.imageUrl,
+      DatabaseHelper.image_100_80: product.image10080,
+      DatabaseHelper.image_300_200: product.image300200,*/
+    };
+
+    databaseHelper
+        .checkIfProductsExistInDb(DatabaseHelper.CART_Table, variantId)
+        .then((count) {
+      //print("-count-- ${count}");
+      if (count == 0) {
+        databaseHelper.addProductToCart(row).then((count) {
+//          widget.callback();
+          eventBus.fire(updateCartCount());
+        });
+      } else {
+        databaseHelper.updateProductInCart(row, variantId).then((count) {
+//          widget.callback();
+          eventBus.fire(updateCartCount());
+        });
+      }
+    });
+  }
+
+  static void reOrderItems(List<OrderItems> ordersList) {
+    for(int i=0;i<ordersList.length;i++){
+      insertInCartTable(ordersList[i],int.parse(ordersList[i].quantity));
+    }
   }
 }
 

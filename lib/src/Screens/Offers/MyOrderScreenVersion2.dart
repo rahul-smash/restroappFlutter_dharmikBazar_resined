@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
-import 'package:restroapp/src/UI/CardOrderHistoryItems.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:flutter_pull_to_refresh/flutter_pull_to_refresh.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-
-import 'OrderDetailScreen.dart';
 
 class MyOrderScreenVersion2 extends StatefulWidget {
   StoreModel store;
@@ -84,8 +82,8 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) =>
-                OrderDetailScreenVersion2(cardOrderHistoryItems,isRatingEnable),
+            builder: (context) => OrderDetailScreenVersion2(
+                cardOrderHistoryItems, isRatingEnable),
           ),
         );
       },
@@ -269,6 +267,40 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
               ],
             ),
           ),
+          Expanded(
+            child: InkWell(
+              onTap: () async {
+                //Add to Cart
+                var result = await DialogUtils.displayCommonDialog2(
+                    context,
+                    widget.store.storeName,
+                    'Do you want to reorder these items?',
+                    'No',
+                    'Yes');
+                if (result == true) {
+                  Utils.showToast('Re order', false);
+                  Utils.reOrderItems(cardOrderHistoryItems.orderItems);
+                }
+              },
+              child: Wrap(
+                children: [
+                  Container(
+                      margin: EdgeInsets.only(right: 5, left: 10),
+                      child: Icon(
+                        Icons.refresh,
+                        size: 20,
+                        color: Colors.red,
+                      )),
+                  Text('Re-Order',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w300,
+                      )),
+                ],
+              ),
+            ),
+          ),
           Wrap(children: <Widget>[
             Container(
               padding: EdgeInsets.fromLTRB(10, 8, 10, 8),
@@ -376,7 +408,9 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
       case '0':
       case '1':
       case '4':
-        if (cardOrderHistoryItems.orderFacility.toLowerCase().contains('pick')) {
+        if (cardOrderHistoryItems.orderFacility
+            .toLowerCase()
+            .contains('pick')) {
           title = "View Order";
         } else
           title = "Track Order";
