@@ -14,6 +14,7 @@ class RedeemPointsScreen extends StatefulWidget {
 
   final DeliveryAddressData address;
   final String paymentMode; // 2 = COD, 3 = Online Payment
+  String shippingCharges='0'; // 2 = COD, 3 = Online Payment
   final Function(TaxCalculationModel) callback;
   bool isComingFromPickUpScreen;
   String areaId;
@@ -22,7 +23,7 @@ class RedeemPointsScreen extends StatefulWidget {
   List<OrderDetail> responseOrderDetail;
 
   RedeemPointsScreen(this.address,this.paymentMode, this.isComingFromPickUpScreen,
-      this.areaId,this.callback,this.reddemPointsCodeList,this.isOrderVariations,this.responseOrderDetail);
+      this.areaId,this.callback,this.reddemPointsCodeList,this.isOrderVariations,this.responseOrderDetail,this.shippingCharges);
 
   @override
   RedeemPointsScreenState createState() => RedeemPointsScreenState();
@@ -223,7 +224,7 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
     print("----couponCode-----=>${loyalityData.amount}");
     Utils.showProgressDialog(context);
     ApiController.multipleTaxCalculationRequest(loyalityData.couponCode,
-        loyalityData.amount, "0", json).then((response) async {
+        loyalityData.amount, widget.shippingCharges, json).then((response) async {
 
       Utils.hideProgressDialog(context);
       if (response.success) {

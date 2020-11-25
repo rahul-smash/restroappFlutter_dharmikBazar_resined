@@ -11,7 +11,8 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class AvailableOffersDialog extends StatefulWidget {
   final DeliveryAddressData address;
-  final String paymentMode; // 2 = COD, 3 = Online Payment
+  final String paymentMode;
+  String shippingCharges = '0'; // 2 = COD, 3 = Online Payment
   final Function(TaxCalculationModel) callback;
   bool isComingFromPickUpScreen;
   String areaId;
@@ -27,7 +28,8 @@ class AvailableOffersDialog extends StatefulWidget {
       this.callback,
       this.appliedCouponCodeList,
       this.isOrderVariations,
-      this.responseOrderDetail);
+      this.responseOrderDetail,
+      this.shippingCharges);
 
   @override
   AvailableOffersState createState() => AvailableOffersState();
@@ -127,7 +129,8 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                                     child: Text(
                                                       "${offer.couponCode}",
                                                       style: TextStyle(
-                                                        color: appThemeSecondary,
+                                                        color:
+                                                            appThemeSecondary,
                                                       ),
                                                     ),
                                                   ),
@@ -183,7 +186,6 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             } else {
                                               if (widget.appliedCouponCodeList
                                                   .isEmpty) {
-
                                                 databaseHelper
                                                     .getCartItemsListToJson(
                                                         isOrderVariations: widget
@@ -247,15 +249,14 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
 
   void validateCouponApi(String couponCode, String json) {
     print("----couponCode-----=>${couponCode}");
-    Utils.showProgressDialog(
-        context);
+    Utils.showProgressDialog(context);
     ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json)
         .then((validCouponModel) {
       if (validCouponModel != null && validCouponModel.success) {
         Utils.showToast(validCouponModel.message, true);
         print("-discountAmount-=${validCouponModel.discountAmount}-");
         ApiController.multipleTaxCalculationRequest(
-                couponCode, validCouponModel.discountAmount, "0", json)
+                couponCode, validCouponModel.discountAmount, widget.shippingCharges, json)
             .then((response) async {
           Utils.hideProgressDialog(context);
           if (response.success) {
