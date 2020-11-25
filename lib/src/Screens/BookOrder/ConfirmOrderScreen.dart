@@ -756,7 +756,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 ),*/
               ],
             )),
-              Expanded(child:
+
               detail != null && detail.productStatus.contains('out_of_stock')
                 ? Container(
                 decoration: BoxDecoration(
@@ -778,7 +778,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     color: detail != null &&
                         detail.productStatus.contains('out_of_stock')
                         ? Colors.red
-                        : Colors.black45)),)
+                        : Colors.black45)),
 
           ],
         ),
