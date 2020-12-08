@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -633,7 +634,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         detail != null && detail.productStatus.contains('price_changed')
             ? detail.newPrice
             : product.price;
-
+    String imageUrl = product.imageType == "0"
+        ? product.image == null
+            ? product.image10080
+            : product.image
+        : product.imageUrl;
     if (product.taxDetail != null) {
       return Container(
         color: containerColor,
@@ -708,6 +713,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            imageUrl == ""
+                ? Container(
+              width: 70.0,
+              height: 80.0,
+              child: Utils.getImgPlaceHolder(),
+            )
+                : Padding(
+                padding: EdgeInsets.only(left: 5, right: 20),
+                child: Container(
+                  width: 70.0,
+                  height: 80.0,
+                  child: CachedNetworkImage(
+                      imageUrl: "${imageUrl}", fit: BoxFit.fill
+                    //placeholder: (context, url) => CircularProgressIndicator(),
+                    //errorWidget: (context, url, error) => Icon(Icons.error),
+                  ),
+                  /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                                          fit: BoxFit.cover),*/
+                )),
+            Expanded(
+                flex: 4,
+                child:
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -742,28 +769,31 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")
                 ),*/
               ],
-            ),
-            detail != null && detail.productStatus.contains('out_of_stock')
+            )),
+
+              detail != null && detail.productStatus.contains('out_of_stock')
                 ? Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(color: Colors.red, width: 1),
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(5)),
-                    child: Padding(
-                      padding: EdgeInsets.all(3),
-                      child: Text(
-                        "Out of Stock",
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ))
-                : Text(
-                    "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: detail != null &&
-                                detail.productStatus.contains('out_of_stock')
-                            ? Colors.red
-                            : Colors.black45)),
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.red, width: 1),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: Text(
+                    "Out of Stock",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ))
+                :
+              Text(
+                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}" ,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: detail != null &&
+                        detail.productStatus.contains('out_of_stock')
+                        ? Colors.red
+                        : Colors.black45)),
+
           ],
         ),
       );
