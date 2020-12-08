@@ -1,6 +1,7 @@
 class ApiConstants{
-  static String baseUrl = 'https://app.restroapp.com/storeId/api/';
-  static String baseUrl2 = 'https://app.restroapp.com/storeId/api/';
+  static String baseUrl2 = 'https://stage.restroapp.com/storeId/api_v1/';
+  static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
+  static String baseUrl3 = 'https://stage.restroapp.com/storeId/api/';
 
   static String storeList = 'storeList';
   static String version = 'version';
@@ -45,6 +46,9 @@ class ApiConstants{
   static String mobileVerification = 'mobileVerification';
   static String cancelOrder = 'orderCancel';
 
+  static String socialLogin = 'socialLogin';
+  static String verifyEmail = 'verifyEmail';
+
   static String deliveryAreasArea = 'deliveryAreas/Area';
 
   static String razorpayCreateOrder = 'razorpayCreateOrder';
@@ -62,6 +66,8 @@ class ApiConstants{
   static String recommendedProduct = 'recommendedProduct';
   static String orderDetailHistory = 'orderDetailHistory';
   static String reviewRating = 'review_rating';
+  static String userWallet = 'user_wallet';
+  static String socialLinking = 'social_linking';
   static String termCondition = 'getHtmlPages/term_condition';
   static String privacyPolicy = 'getHtmlPages/privacy_policy';
   static String refundPolicy = 'getHtmlPages/refund_policy';

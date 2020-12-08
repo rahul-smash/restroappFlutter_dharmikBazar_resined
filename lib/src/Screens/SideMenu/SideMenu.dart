@@ -2,7 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_share/flutter_share.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
@@ -15,7 +18,9 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
+import 'package:restroapp/src/models/SocialModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -26,6 +31,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'AdditionalInformations.dart';
 import 'LoyalityPoints.dart';
 import 'ProfileScreen.dart';
+import 'WalletHistory.dart';
 
 class NavDrawerMenu extends StatefulWidget {
   final StoreModel store;
@@ -41,12 +47,22 @@ class NavDrawerMenu extends StatefulWidget {
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
   List<dynamic> _drawerItems = List();
+  SocialModel socialModel;
+  WalleModel walleModel;
+  double iconHeight = 25;
+  GoogleSignIn _googleSignIn;
 
   _NavDrawerMenuState();
 
   @override
   void initState() {
     super.initState();
+    _googleSignIn = GoogleSignIn(
+      scopes: [
+        'email',
+        'https://www.googleapis.com/auth/contacts.readonly',
+      ],
+    );
     //print("isRefererFnEnable=${widget.store.isRefererFnEnable}");
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.HOME, "images/home.png"));
@@ -68,8 +84,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             ? DrawerChildConstants.ReferEarn
             : DrawerChildConstants.SHARE,
         "images/refer.png"));
-    _drawerItems
-        .add(DrawerChildItem(DrawerChildConstants.ADDITION_INFORMATION, "images/about.png"));
+    _drawerItems.add(DrawerChildItem(
+        DrawerChildConstants.ADDITION_INFORMATION, "images/about.png"));
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
@@ -77,6 +93,17 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     } catch (e) {
       print(e);
     }
+    if (AppConstant.isLoggedIn) {
+      ApiController.getUserWallet().then((response) {
+        setState(() {
+          this.walleModel = response;
+        });
+      });
+    }
+
+    ApiController.getStoreSocialOptions().then((value) {
+      this.socialModel = value;
+    });
   }
 
   @override
@@ -86,15 +113,156 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           canvasColor: left_menu_background_color,
         ),
         child: Drawer(
-          child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: _drawerItems.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                return (index == 0
-                    ? createHeaderInfoItem()
-                    : createDrawerItem(index - 1, context));
-              }),
-        ));
+            child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: _drawerItems.length + 1,
+                  itemBuilder: (BuildContext context, int index) {
+                    return (index == 0
+                        ? Container(
+                            child: Column(
+                              children: [
+                                createHeaderInfoItem(),
+                                showUserWalletView(),
+                              ],
+                            ),
+                          )
+                        : createDrawerItem(index - 1, context));
+                  }),
+            ),
+            Visibility(
+//                    visible: socialModel != null &&
+//                        socialModel.data != null &&
+//                        socialModel.data.facebook.isNotEmpty ||
+//                        socialModel != null &&
+//                            socialModel.data != null &&
+//                            socialModel.data.twitter.isNotEmpty ||
+//                        socialModel != null &&
+//                            socialModel.data != null &&
+//                            socialModel.data.youtube.isNotEmpty ||
+//                        socialModel != null &&
+//                            socialModel.data != null &&
+//                            socialModel.data.instagram.isNotEmpty ||
+//                        socialModel != null &&
+//                            socialModel.data != null &&
+//                            socialModel.data.linkedin.isNotEmpty ,
+                visible: true,
+                child: Container(
+                  color: appTheme,
+                  height: 40,
+                  child: Center(
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Text(
+                            "Follow Us On",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        Visibility(
+                            visible: socialModel != null &&
+                                socialModel.data != null &&
+                                socialModel.data.facebook.isNotEmpty,
+                            child: InkWell(
+                              onTap: () {
+                                if (socialModel != null) {
+                                  if (socialModel.data.facebook.isNotEmpty)
+                                    Utils.launchURL(socialModel.data.facebook);
+                                }
+                              },
+                              child: Image.asset(
+                                "images/fbicon.png",
+                                width: iconHeight,
+                                height: iconHeight,
+                              ),
+                            )),
+                        Visibility(
+                          visible: socialModel != null &&
+                              socialModel.data != null &&
+                              socialModel.data.twitter.isNotEmpty,
+                          child: InkWell(
+                            onTap: () {
+                              if (socialModel != null) {
+                                if (socialModel.data.twitter.isNotEmpty)
+                                  Utils.launchURL(socialModel.data.twitter);
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              child: Image.asset(
+                                "images/twittericon.png",
+                                width: iconHeight,
+                                height: iconHeight,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: socialModel != null &&
+                              socialModel.data != null &&
+                              socialModel.data.linkedin.isNotEmpty,
+                          child: InkWell(
+                            onTap: () {
+                              if (socialModel != null) {
+                                if (socialModel.data.linkedin.isNotEmpty)
+                                  Utils.launchURL(socialModel.data.linkedin);
+                              }
+                            },
+                            child: Image.asset(
+                              "images/linkedinicon.png",
+                              width: iconHeight,
+                              height: iconHeight,
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: socialModel != null &&
+                              socialModel.data != null &&
+                              socialModel.data.youtube.isNotEmpty,
+                          child: InkWell(
+                            onTap: () {
+                              if (socialModel != null) {
+                                if (socialModel.data.youtube.isNotEmpty)
+                                  Utils.launchURL(socialModel.data.youtube);
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              child: Image.asset(
+                                "images/youtubeicon.png",
+                                width: iconHeight,
+                                height: iconHeight,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: socialModel != null &&
+                              socialModel.data != null &&
+                              socialModel.data.instagram.isNotEmpty,
+                          child: InkWell(
+                            onTap: () {
+                              if (socialModel != null) {
+                                if (socialModel.data.instagram.isNotEmpty)
+                                  Utils.launchURL(socialModel.data.instagram);
+                              }
+                            },
+                            child: Image.asset(
+                              "images/instagram.png",
+                              width: iconHeight,
+                              height: iconHeight,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ))
+          ],
+        )));
   }
 
   Widget createHeaderInfoItem() {
@@ -134,6 +302,64 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                     ]),
               ),
             ])));
+  }
+
+  Widget showUserWalletView() {
+    return Visibility(
+      visible: widget.store.wallet_setting == "1" ? true : false,
+      child: InkWell(
+        onTap: () async {
+          print("showUserWalletView");
+          bool isNetworkAvailable = await Utils.isNetworkAvailable();
+          if (!isNetworkAvailable) {
+            Utils.showToast(AppConstant.noInternet, false);
+            return;
+          }
+          if (AppConstant.isLoggedIn) {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => WalletHistoryScreen()),
+            );
+            Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+            attributeMap["WalletHistory"] = "WalletHistoryScreen";
+            Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
+          } else {
+            Navigator.pop(context);
+            Utils.showLoginDialog(context);
+          }
+        },
+        child: Container(
+          child: Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: ListTile(
+                //leading: Icon(Icons.account_balance_wallet,color: left_menu_icon_colors, size: 30),
+                leading: Image.asset(
+                  "images/walleticon.png",
+                  color: left_menu_icon_colors,
+                  height: 30,
+                  width: 30,
+                ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Wallet Balance",
+                        style: TextStyle(
+                            color: leftMenuLabelTextColors, fontSize: 16)),
+                    Text(
+                        AppConstant.isLoggedIn
+                            ? walleModel == null
+                                ? "${AppConstant.currency}"
+                                : "${AppConstant.currency} ${walleModel.data.userWallet}"
+                            : "",
+                        style: TextStyle(
+                            color: leftMenuLabelTextColors, fontSize: 15)),
+                  ],
+                ),
+              )),
+        ),
+      ),
+    );
   }
 
   Widget createDrawerItem(int index, BuildContext context) {
@@ -178,12 +404,13 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => ProfileScreen(false, "", "")),
+                builder: (context) => ProfileScreen(false, "", "", null, null)),
           );
           Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "ProfileScreen";
           Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -200,6 +427,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "DeliveryAddressList";
           Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -215,6 +443,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "MyOrderScreen";
           Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -227,6 +456,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                 builder: (context) => LoyalityPointsScreen(widget.store)),
           );
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
 
@@ -242,6 +472,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           attributeMap["ScreenName"] = "Favourites";
           Utils.sendAnalyticsEvent("Clicked Favourites", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -260,7 +491,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         Navigator.pop(context);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => AdditionalInformation(widget.store)),
+          MaterialPageRoute(
+              builder: (context) => AdditionalInformation(widget.store)),
         );
         Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "AdditionalInformation";
@@ -365,7 +597,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             ),
             FlatButton(
               child: const Text('YES'),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
                 logout(context);
               },
@@ -405,10 +637,26 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   Future logout(BuildContext context) async {
     try {
+      FacebookLogin facebookSignIn = new FacebookLogin();
+      bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
+      print("isFbLoggedIn=${isFbLoggedIn}");
+      if (isFbLoggedIn) {
+        await facebookSignIn.logOut();
+      }
+
+      bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
+      print("isGoogleSignedIn=${isGoogleSignedIn}");
+      if (isGoogleSignedIn) {
+        await _googleSignIn.signOut();
+      }
+
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
       SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
       SharedPrefs.removeKey(AppConstant.referEarnMsg);
+      SharedPrefs.removeKey("user_wallet");
+      SharedPrefs.removeKey("user");
+
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
@@ -446,7 +694,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       print(e);
     }
   }
-
 }
 
 class DrawerChildItem {

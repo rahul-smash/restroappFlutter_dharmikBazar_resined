@@ -75,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     listenCartChanges();
     checkForMultiStore();
     getCategoryApi();
+    ApiController.getUserWallet();
     try {
       AppConstant.placeholderUrl = store.banner10080;
       //print("-----store.banners-----${store.banners.length}------");
@@ -394,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (AppConstant.isLoggedIn) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(store)),
+              MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(this.store)),
             );
             Map<String, dynamic> attributeMap = new Map<String, dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";
@@ -426,6 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //print("------_handleDrawer-------");
         if (AppConstant.isLoggedIn) {
           user = await SharedPrefs.getUser();
+          print("user.id=${user.id}");
           if (user != null) setState(() {});
         }
       }

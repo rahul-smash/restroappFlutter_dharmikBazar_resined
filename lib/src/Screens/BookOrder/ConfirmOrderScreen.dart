@@ -28,6 +28,7 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -90,6 +91,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   double totalMRpPrice = 0.0;
   List<OrderDetail> responseOrderDetail = List();
+  List<Product> cartListFromDB = List();
 
   bool isOrderVariations = false;
 
@@ -150,7 +152,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     //new changes
     Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail)
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
@@ -195,6 +198,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 builder: (context) => PaytmWebView(value, storeModel)),
           );
         } else {
+          Utils.hideProgressDialog(context);
           Utils.showToast("Api Error", false);
         }
       });
@@ -374,6 +378,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
+  WalleModel userWalleModel;
+
   Future<void> multiTaxCalculationApi() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
@@ -381,9 +387,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return;
     }
     isLoading = true;
-    databaseHelper.getCartItemsListToJson().then((json) {
+//    userWalleModel = await SharedPrefs.getUserWallet();
+//    if (userWalleModel == null) {
+    userWalleModel=  await ApiController.getUserWallet();
+//      userWalleModel = await SharedPrefs.getUserWallet();
+//    }
+//    databaseHelper.getCartItemsListToJson().then((json) {
+    databaseHelper.getCartItemList().then((cartList) {
+      cartListFromDB = cartList;
+      List jsonList = Product.encodeToJson(cartList);
+      String encodedDoughnut = jsonEncode(jsonList);
       ApiController.multipleTaxCalculationRequest(
-              "", "0", "$shippingCharges", json)
+              "", "0", "$shippingCharges", encodedDoughnut)
           .then((response) async {
         //{"success":false,"message":"Some products are not available."}
         TaxCalculationResponse model = response;
@@ -806,8 +821,78 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ],
           ),
         ),
+        Container(
+            height: 1,
+            color: Colors.black45,
+            width: MediaQuery.of(context).size.width),
+        Visibility(
+          visible: widget.storeModel.wallet_setting == "1" ? true : false,
+          child: Container(
+            child: Padding(
+                padding: EdgeInsets.only(left: 0, top: 10, bottom: 10),
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                      child: Icon(
+                        Icons.done,
+                        color: appTheme,
+                        size: 30,
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("My Wallet",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text(
+                              taxModel == null
+                                  ? "Remaining Balance: ${AppConstant.currency}"
+                                  : "Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 5, top: 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("You Used",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 16)),
+                          Text(
+                              "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.wallet_refund),2).toStringAsFixed(2)}",
+                              style: TextStyle(color: appTheme, fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                  ],
+                )),
+          ),
+        ),
       ]),
     );
+  }
+
+  String getUserRemaningWallet() {
+    double balance = (double.parse(userWalleModel.data.userWallet) -
+        double.parse(taxModel.wallet_refund) -
+        double.parse(taxModel.shipping));
+    //print("balance=${balance}");
+    if (balance > 0.0) {
+      // USer balance is greater than zero.
+      return databaseHelper.roundOffPrice(balance,2).toStringAsFixed(2);
+    } else {
+      // USer balance is less than or equal to zero.
+      return "0.00";
+    }
+    //return "${userWalleModel == null ? "" : userWalleModel.data.userWallet}";
   }
 
   Widget addTotalPrice() {
@@ -1007,7 +1092,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               print("taxModel.total=${taxModel.total}");
                             });
                           }, appliedReddemPointsCodeList, isOrderVariations,
-                              responseOrderDetail),
+                              responseOrderDetail
+                              ,shippingCharges),
                           fullscreenDialog: true,
                         ));
                   }
@@ -1079,15 +1165,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       setState(() {
                         hideRemoveCouponFirstTime = false;
                         taxModel = model;
-                        double taxModelTotal = double.parse(taxModel.total) +
-                            int.parse(shippingCharges);
-                        taxModel.total = taxModelTotal.toString();
+//                        double taxModelTotal = double.parse(taxModel.total) +
+//                            int.parse(shippingCharges);
+//                        taxModel.total = taxModelTotal.toString();
                         appliedCouponCodeList.add(model.couponCode);
                         print("===couponCode=== ${model.couponCode}");
                         print("taxModel.total=${taxModel.total}");
                       });
                     }, appliedCouponCodeList, isOrderVariations,
-                        responseOrderDetail),
+                        responseOrderDetail,
+                    shippingCharges),
                   );
                 }
               },
@@ -1436,7 +1523,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               await ApiController.multipleTaxCalculationRequest(
                                   couponCodeController.text,
                                   couponModel.discountAmount,
-                                  "0",
+                                  shippingCharges,
                                   json);
                           Utils.hideProgressDialog(context);
                           if (model != null && !model.success) {
@@ -1735,6 +1822,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 //      }
 //    }
 //    calculateTotalSavings();
+
+    if (taxModel != null &&
+        taxModel.wallet_refund != "0" &&
+        double.parse(taxModel.total) == 0 &&
+        widget.paymentMode != '2') {
+      Utils.hideProgressDialog(context);
+      Utils.showToast("Choose COD Method to Avail Wallet balance", false);
+      return;
+    }
     //Choose payment
     if (widget.paymentMode == "3") {
       Utils.hideProgressDialog(context);
@@ -1989,7 +2085,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  void callStripeApi() {
+  void callStripeApi() async {
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total);
     price = price * 100;
@@ -1997,25 +2093,71 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String mPrice =
         price.toString().substring(0, price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
-    ApiController.stripePaymentApi(mPrice).then((response) {
-      Utils.hideProgressDialog(context);
-      print("----stripePaymentApi------");
-      if (response != null) {
-        StripeCheckOutModel stripeCheckOutModel = response;
-        if (stripeCheckOutModel.success) {
-          //launchWebView(stripeCheckOutModel);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    StripeWebView(stripeCheckOutModel, storeModel)),
-          );
-        } else {
-          Utils.showToast("${stripeCheckOutModel.message}!", true);
-        }
-      } else {
-        Utils.showToast("Something went wrong!", true);
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    Utils.getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
+        .then((orderJson) {
+      if (orderJson == null) {
+        print("--orderjson == null-orderjson == null-");
+        return;
       }
+      String storeAddress = "";
+      try {
+        storeAddress = "${storeModel.storeName}, ${storeModel.location},"
+            "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
+      } catch (e) {
+        print(e);
+      }
+
+      String userId = user.id;
+      OrderDetailsModel detailsModel = OrderDetailsModel(
+          shippingCharges,
+          comment,
+          totalPrice.toString(),
+          widget.paymentMode,
+          taxModel,
+          widget.address,
+          widget.isComingFromPickUpScreen,
+          widget.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Stripe",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedDeliverSlotValue,
+          totalSavingsText);
+
+      ApiController.stripePaymentApi(
+              mPrice, orderJson, detailsModel.orderDetails,
+              currencyAbbr: storeModel.currencyAbbr)
+          .then((response) {
+        Utils.hideProgressDialog(context);
+        print("----stripePaymentApi------");
+        if (response != null) {
+          StripeCheckOutModel stripeCheckOutModel = response;
+          if (stripeCheckOutModel.success) {
+            //launchWebView(stripeCheckOutModel);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      StripeWebView(stripeCheckOutModel, storeModel)),
+            );
+          } else {
+            Utils.showToast("${stripeCheckOutModel.message}!", true);
+          }
+        } else {
+          Utils.showToast("Something went wrong!", true);
+        }
+      });
     });
   }
 
@@ -2099,7 +2241,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     //new changes
     Utils.getCartItemsListToJson(
             isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail)
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
@@ -2160,7 +2303,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             .then((json) {*/
         Utils.getCartItemsListToJson(
                 isOrderVariations: isOrderVariations,
-                responseOrderDetail: responseOrderDetail)
+                responseOrderDetail: responseOrderDetail,
+                cartList: cartListFromDB)
             .then((json) {
           if (json == null) {
             print("--json == null-json == null-");

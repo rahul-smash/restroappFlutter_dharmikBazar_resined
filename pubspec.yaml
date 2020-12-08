@@ -59,6 +59,8 @@ dependencies:
   flutter_rating_bar: ^3.0.1+1
   image_picker: ^0.6.7+11
   compressimage: ^0.1.1
+  flutter_facebook_login: ^3.0.0
+  google_sign_in: ^4.5.6
 
 dev_dependencies:
   flutter_test:
@@ -131,6 +133,22 @@ flutter:
     - images/gifticon.png
     - images/whatsapp.png
     - images/placeHolder.png
+    - images/walleticon.png
+    - images/cashbackicon.png
+    - images/orderrefund.png
+    - images/emptywalletbalancegreaphics.png
+    - images/walletbalancegreaphics.png
+    - images/fbicon.png
+    - images/linkedinicon.png
+    - images/twittericon.png
+    - images/whatsappicon.png
+    - images/youtubeicon.png
+    - images/instagram.png
+    - images/fblogin_btn.png
+    - images/google_logo.png
+    - images/f_logo_white.png
+    - assets/en.json
+    - assets/malay.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

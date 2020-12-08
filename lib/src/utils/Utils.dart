@@ -20,6 +20,7 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'DialogUtils.dart';
 
@@ -50,6 +51,29 @@ class Utils {
     } catch (e) {
       print(e);
     }
+  }
+
+  static Widget getEmptyView1(String value) {
+    return Container(
+      child: Center(
+        child: Text(value,
+            overflow: TextOverflow.ellipsis,
+            style: new TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
+            )),
+      ),
+    );
+  }
+
+  static Widget showIndicator() {
+    return Container(
+      child: Center(
+        child: CircularProgressIndicator(
+            backgroundColor: Colors.black26,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+      ),
+    );
   }
 
   static Future<PackageInfo> getAppVersionDetails(
@@ -229,6 +253,10 @@ class Utils {
     return MediaQuery.of(context).size.width;
   }
 
+  static double getDeviceHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height;
+  }
+
   static Widget showDivider(BuildContext context) {
     return Container(
       width: MediaQuery.of(context).size.width,
@@ -356,6 +384,23 @@ class Utils {
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
       DateFormat formatter = new DateFormat('dd MMM, yyyy');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
+  static convertWalletDate(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM, yyyy hh:mm:aa');
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);
@@ -504,6 +549,32 @@ class Utils {
     }
   }
 
+  static launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  static launchCaller(String call) async {
+    String url = "tel:${call}";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  static launchEmail(String email) async {
+    String url = "mailto:${email}?subject=&body=";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   static Widget getIndicatorView() {
     return Center(
       child: CircularProgressIndicator(
@@ -592,7 +663,18 @@ class Utils {
 
   static Future<String> getCartItemsListToJson(
       {bool isOrderVariations = true,
-      List<OrderDetail> responseOrderDetail}) async {
+      List<OrderDetail> responseOrderDetail,
+      List<Product> cartList}) async {
+    for (int i = 0; i < cartList.length; i++) {
+      for (int j = 0; j < responseOrderDetail.length; j++) {
+        if (cartList[i].id == responseOrderDetail[j].productId &&
+            cartList[i].variantId == responseOrderDetail[j].variantId) {
+          responseOrderDetail[j].discount=cartList[i].discount;
+          break;
+        }
+      }
+    }
+
     List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
         removeOutOfStockProducts: true);
     String encodedDoughnut = jsonEncode(jsonList);

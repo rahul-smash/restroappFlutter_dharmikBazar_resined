@@ -1,5 +1,7 @@
 import 'package:compressimage/compressimage.dart';
 import 'package:dio/dio.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
@@ -17,6 +19,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
 import 'package:restroapp/src/models/HtmlModelResponse.dart';
+import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
@@ -27,6 +30,7 @@ import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/RecommendedProductsResponse.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/SearchTagsModel.dart';
+import 'package:restroapp/src/models/SocialModel.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
@@ -40,6 +44,8 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/VerifyEmailModel.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -215,28 +221,32 @@ class ApiController {
           await databaseHelper.getCount(DatabaseHelper.Categories_Table);
       bool isNetworkAviable = await Utils.isNetworkAvailable();
       if (dbCount == 0 && isNetworkAviable) {
-        print("database zero");
+        print("*************database zero*************");
         print("catttttt  $url");
         Response response = await Dio()
             .get(url, options: new Options(responseType: ResponseType.plain));
         //print(response);
         categoryResponse =
             CategoryResponse.fromJson(json.decode(response.data));
+        await databaseHelper.batchInsertCategorys(categoryResponse.categories);
         //print("-------Categories.length ---${categoryResponse.categories.length}");
-        for (int i = 0; i < categoryResponse.categories.length; i++) {
+        /*for (int i = 0; i < categoryResponse.categories.length; i++) {
+
           CategoryModel model = categoryResponse.categories[i];
           databaseHelper.saveCategories(model);
+
           if (model.subCategory != null) {
             for (int j = 0; j < model.subCategory.length; j++) {
               databaseHelper.saveSubCategories(model.subCategory[j], model.id);
             }
           }
-        }
+
+        }*/
       } else if (dbCount == 0 && !isNetworkAviable) {
         categoryResponse.success = false;
         return categoryResponse;
       } else {
-        print("database has values");
+        print("1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
         //prepare model object
         List<CategoryModel> categoryList = await databaseHelper.getCategories();
         categoryResponse.categories = categoryList;
@@ -246,6 +256,7 @@ class ApiController {
               await databaseHelper.getSubCategories(parent_id);
         }
         categoryResponse.success = true;
+        print("2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
       }
     } catch (e) {
       print(e);
@@ -290,15 +301,16 @@ class ApiController {
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-          for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
-            for (int j = 0;
-                j < subCategoryResponse.subCategories[i].products.length;
-                j++) {
-              databaseHelper.saveProducts(
-                  subCategoryResponse.subCategories[i].products[j],
+
+          await databaseHelper.batchInsertProducts(subCategoryResponse.subCategories);
+
+          /*for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
+            for (int j = 0;j < subCategoryResponse.subCategories[i].products.length; j++) {
+              databaseHelper.saveProducts(subCategoryResponse.subCategories[i].products[j],
                   subCategoryResponse.subCategories[i].id);
             }
-          }
+          }*/
+
           return subCategoryResponse;
         }
         //print("-------store.success ---${storeData.success}");
@@ -635,6 +647,7 @@ class ApiController {
       String orderJson) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
+    WalleModel userWallet = await SharedPrefs.getUserWallet();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
 
@@ -649,6 +662,7 @@ class ApiController {
         "fixed_discount_amount": "${discount}",
         "tax": "0",
         "user_id": user.id,
+        "user_wallet":userWallet == null ? "0" : userWallet.data.userWallet,
         "discount": "0",
         "shipping": shipping,
         "order_detail": orderJson,
@@ -751,20 +765,48 @@ class ApiController {
       print(e);
     }
 
+    String userDeliveryAddress='',pin='';
+    if (address != null&&!isComingFromPickUpScreen) {
+      if (address.address2 != null &&
+          address.address2.isNotEmpty) {
+        if (address.address != null &&
+            address.address.isNotEmpty) {
+          userDeliveryAddress = address.address + ", "+ address.address2+
+              " " +
+              address.areaName +
+              " " +
+              address.city;
+        }else{
+          userDeliveryAddress = address.address2 +
+              " " +
+              address.areaName +
+              " " +
+              address.city;
+        }
+      } else {
+        if (address.address != null &&
+            address.address.isNotEmpty) {
+          userDeliveryAddress =address.address +
+              " " +
+              address.areaName +
+              " " +
+              address.city;
+        }
+      }
+
+      if (address.zipCode != null && address.zipCode.isNotEmpty)
+        pin = " "+ address.zipCode;
+    }
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
         "note": note,
+        "wallet_refund": store.wallet_setting == "0" ? "" : taxModel == null ? "0" : "${taxModel.wallet_refund}" ,
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
         "user_address":
-            isComingFromPickUpScreen == true ? storeAddress :
-            address.address2!=null&&address.address2.trim().isNotEmpty?
-            '${address.address!=null&&address.address.trim().isNotEmpty?
-            '${address.address}, ${address.address2}'
-                :"${address.address2}"}'
-                : address.address,
+            isComingFromPickUpScreen == true ? storeAddress :userDeliveryAddress+pin,
         "store_fixed_tax_detail": "",
         "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",
@@ -1230,17 +1272,25 @@ class ApiController {
     }
   }
 
-  static Future<StripeCheckOutModel> stripePaymentApi(String amount) async {
+  static Future<StripeCheckOutModel> stripePaymentApi(String amount,String orderJson,dynamic detailsJson,
+      {String currencyAbbr}) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     UserModel user = await SharedPrefs.getUser();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.stripePaymentCheckout;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    if (currencyAbbr == null) {
+      currencyAbbr = 'usd';
+    }
     try {
-      request.fields.addAll(
-          {"customer_email": user.email, "amount": amount, "currency": "usd"});
+      request.fields.addAll({
+        "customer_email": user.email,
+        "amount": amount,
+        "currency": currencyAbbr.toLowerCase().trim(),
+        "order_info": detailsJson, //JSONObject details
+        "orders": orderJson
+      });
       print('--url===  $url');
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -1356,7 +1406,7 @@ class ApiController {
     }
   }
 
-  static Future<CancelOrderModel> orderCancelApi(String order_id) async {
+  static Future<CancelOrderModel> orderCancelApi(String order_id,{String order_rejection_note=""}) async {
     // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
     // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
     StoreModel store = await SharedPrefs.getStore();
@@ -1369,6 +1419,7 @@ class ApiController {
       request.fields.addAll({
         "user_id": user.id,
         "order_id": order_id,
+        "order_rejection_note":order_rejection_note
       });
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -1632,6 +1683,182 @@ class ApiController {
     }
     return null;
   }
+
+  static Future<WalleModel> getUserWallet() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAvailable) {
+        StoreModel store = await SharedPrefs.getStore();
+        UserModel user = await SharedPrefs.getUser();
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.userWallet;
+
+        var request = new http.MultipartRequest("POST", Uri.parse(url));
+        request.fields.addAll({
+          "user_id": user.id,
+          "store_id": store.id,
+        });
+        //print("fields=${request.fields.toString()}");
+        print("${url}");
+        final response =
+        await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        print("${respStr}");
+        final parsed = json.decode(respStr);
+        WalleModel model = WalleModel.fromJson(parsed);
+        SharedPrefs.saveUserWallet(model);
+        return model;
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<SocialModel> getStoreSocialOptions() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    try {
+      if (isNetworkAvailable) {
+        StoreModel store = await SharedPrefs.getStore();
+        UserModel user = await SharedPrefs.getUser();
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.socialLinking;
+
+        var request = new http.MultipartRequest("POST", Uri.parse(url));
+        request.fields.addAll({
+          "device_id": deviceId,
+          "platform": Platform.isIOS ? "IOS" : "Android"
+        });
+        //print("fields=${request.fields.toString()}");
+        print("${url}");
+        final response =
+        await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        print("${respStr}");
+        final parsed = json.decode(respStr);
+        SocialModel model = SocialModel.fromJson(parsed);
+        return model;
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<FacebookModel> getFbUserData(String fbtoken) async {
+
+    //String url1 = "https://graph.facebook.com/${user_id}?fields=name,first_name,last_name,email,&access_token=${fbtoken}";
+    String url = 'https://graph.facebook.com/v8.0/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
+
+    var request = new http.MultipartRequest("GET", Uri.parse(url));
+
+    try {
+      final response = await request.send()
+          .timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("----url---${url}");
+      print("----respStr---${respStr}");
+      final parsed = json.decode(respStr);
+      FacebookModel fbModel = FacebookModel.fromJson(parsed);
+      return fbModel;
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<MobileVerified> verifyEmail(String email) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.verifyEmail;
+
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "email": email,
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+      print('@@url=${url}');
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      MobileVerified userResponse = MobileVerified.fromJson(parsed);
+      return userResponse;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('=mobileVerification==catch==' + e.toString());
+      return null;
+    }
+  }
+
+
+  static Future<MobileVerified> socialSignUp(FacebookModel fbModel,
+      GoogleSignInAccount googleResult,
+      String fullName,
+      String emailId,
+      String phoneNumber,
+      String user_refer_code,
+      String gstNumber) async {
+
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.socialLogin;
+
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    String socialPlatform;
+    if(fbModel != null){
+      socialPlatform = "facebook";
+    }else if(googleResult != null){
+      socialPlatform = "google";
+    }
+
+    try {
+      request.fields.addAll({
+        "phone": phoneNumber,
+        "country": store.internationalOtp == "0" ? "92" :"0",
+        "email": emailId,
+        "social_platform": socialPlatform,
+        "full_name": fullName,
+        "user_refer_code": user_refer_code,
+        "device_id": deviceId,
+        "device_token": deviceToken,
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+      print('@@url=${url}');
+      print('@@fields=${request.fields.toString()}');
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      MobileVerified userResponse = MobileVerified.fromJson(parsed);
+      if (userResponse.success) {
+        SharedPrefs.setUserLoggedIn(true);
+        SharedPrefs.saveUserMobile(userResponse.user);
+      }
+      return userResponse;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('=mobileVerification==catch==' + e.toString());
+      return null;
+    }
+  }
+
 
   static Future<HtmlModelResponse> getHtmlForOptions(
       String appScreen) async {
