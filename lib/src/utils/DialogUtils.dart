@@ -480,6 +480,7 @@ class DialogUtils {
           onWillPop: () {
             //print("onWillPop onWillPop");
             //Navigator.pop(context);
+            return Future(()=>false);
           },
           child: Dialog(
               shape: RoundedRectangleBorder(
@@ -773,6 +774,7 @@ class DialogUtils {
           onWillPop: () {
             //print("onWillPop onWillPop");
             Navigator.pop(context);
+            return Future(()=>false);
           },
           child: Dialog(
               shape: RoundedRectangleBorder(

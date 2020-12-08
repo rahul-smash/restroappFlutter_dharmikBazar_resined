@@ -10,11 +10,14 @@ import 'package:connectivity/connectivity.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
@@ -22,6 +25,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'Callbacks.dart';
 import 'DialogUtils.dart';
 
 class Utils {
@@ -224,6 +228,10 @@ class Utils {
       favIcon = Icon(Icons.favorite_border);
       return favIcon;
     }
+    if (isFav.isEmpty) {
+      favIcon = Icon(Icons.favorite_border);
+      return favIcon;
+    }
     if (isFav == "1") {
       favIcon = Icon(
         Icons.favorite,
@@ -232,6 +240,7 @@ class Utils {
     } else if (isFav == "0") {
       favIcon = Icon(Icons.favorite_border);
     }
+
     return favIcon;
   }
 
@@ -691,6 +700,83 @@ class Utils {
       }
     }
     return returnedColor;
+  }
+
+  static void insertInCartTable(String storeName, BuildContext context,
+      OrderItems product, int quantity) async {
+    DatabaseHelper databaseHelper = new DatabaseHelper();
+    String variantId, weight, mrpPrice, price, discount, isUnitType;
+    variantId = product.variantId;
+    weight = product.weight;
+    mrpPrice = product.mrpPrice;
+    price = product.price;
+    discount = product.discount;
+    isUnitType = product.unitType;
+
+    var mId = int.parse(product.id);
+    //String variantId = product.variantId;
+
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID: mId,
+      DatabaseHelper.VARIENT_ID: variantId,
+      DatabaseHelper.WEIGHT: weight,
+      DatabaseHelper.MRP_PRICE: mrpPrice,
+      DatabaseHelper.PRICE: price,
+      DatabaseHelper.DISCOUNT: discount,
+      DatabaseHelper.UNIT_TYPE: isUnitType,
+      DatabaseHelper.PRODUCT_ID: product.productId,
+      /* product.isFav*/
+      DatabaseHelper.isFavorite: '',
+      DatabaseHelper.QUANTITY: quantity.toString(),
+      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+      DatabaseHelper.Product_Name: product.productName,
+      DatabaseHelper.nutrient: product.nutrient,
+      DatabaseHelper.description: product.description,
+      DatabaseHelper.imageType: product.imageType,
+      DatabaseHelper.imageUrl: product.imageUrl,
+      DatabaseHelper.image_100_80: product.image10080,
+      DatabaseHelper.image_300_200: product.image300200
+    };
+
+    int count = await databaseHelper.checkIfProductsExistInDb(
+        DatabaseHelper.CART_Table, variantId);
+    //print("-count-- ${count}");
+    if (count == 0) {
+      count = await databaseHelper.addProductToCart(row);
+//          widget.callback();
+      eventBus.fire(updateCartCount());
+    } else {
+      count = await databaseHelper.updateProductInCart(row, variantId);
+//          widget.callback();
+      eventBus.fire(updateCartCount());
+    }
+    var result = await DialogUtils.displayCommonDialog(context, storeName,
+        'Your order is successfully added to your cart. Please check your cart to proceed',
+        buttonText: 'Ok');
+    if (result == true) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => MyCartScreen(() {})));
+    }
+  }
+
+  static void reOrderItems(
+      String storeName, BuildContext context, OrderData orderData) {
+    Utils.showProgressDialog(context);
+    ApiController.getOrderDetail(orderData.orderId).then((respone) {
+      if (respone != null &&
+          respone.success &&
+          respone.orders != null &&
+          respone.orders.isNotEmpty) {
+        for (int i = 0; i < respone.orders.first.orderItems.length; i++) {
+          insertInCartTable(storeName, context, respone.orders.first.orderItems[i],
+              int.parse(respone.orders.first.orderItems[i].quantity));
+        }
+      }
+      Utils.hideProgressDialog(context);
+    });
   }
 }
 
