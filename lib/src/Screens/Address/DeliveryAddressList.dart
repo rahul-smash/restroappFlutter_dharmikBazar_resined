@@ -257,7 +257,11 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     ),
                   ),
                   addAddressInfoRow(Icons.phone, area.mobile),
-                  addAddressInfoRow(Icons.location_on, area.address),
+                  addAddressInfoRow(Icons.location_on,  area.address2!=null&&area.address2.trim().isNotEmpty?
+                  '${area.address!=null&&area.address.trim().isNotEmpty?
+                  '${area.address}, ${area.address2}'
+                      :"${area.address2}"}'
+                      : area.address,),
                   addAddressInfoRow(Icons.email, area.email),
                 ],
               ),
@@ -403,6 +407,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       color: appTheme,
       child: InkWell(
         onTap: () async {
+          StoreModel storeModel = await SharedPrefs.getStore();
           if (addressList.length == 0) {
             Utils.showToast(AppConstant.selectAddress, false);
           } else {
@@ -416,7 +421,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         addressList[selectedIndex],
                         false,
                         "",
-                        widget.delivery)),
+                        widget.delivery,storeModel: storeModel,)),
               );
             } else {
               var result = await DialogUtils.displayOrderConfirmationDialog(
@@ -432,10 +437,56 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                           addressList[selectedIndex],
                           false,
                           "",
-                          widget.delivery)),
+                          widget.delivery,storeModel: storeModel,)),
                 );
               }
             }
+          //Code Commented Due to not approved by client
+           /* StoreModel storeModel = await SharedPrefs.getStore();
+            bool isPaymentModeOnline = false;
+
+            if (storeModel.onlinePayment == "1") {
+              isPaymentModeOnline = true;
+            } else {
+              widget.paymentMode = "2"; //cod
+            }
+            //case 1: payment mode off and no note
+            //case 2: payment mode ON and no note
+            //case 3: payment mode On and Having Note
+
+            if (!isPaymentModeOnline &&
+                addressList[selectedIndex].note.isEmpty) {
+              widget.paymentMode = "2";
+            } else {
+              var result =
+                  await DialogUtils.displayOrderPaymentConfirmationDialog(
+                      context,
+//                      "Confirmation",
+                      "Select Payment",
+                      addressList[selectedIndex].note,
+                      isPaymentModeOnline);
+
+              if (result == PaymentType.CANCEL) {
+                return;
+              }
+              if (result == PaymentType.ONLINE) {
+                widget.paymentMode = "3";
+              } else {
+                widget.paymentMode = "2"; //cod
+              }
+            }
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ConfirmOrderScreen(
+                        addressList[selectedIndex],
+                        false,
+                        "",
+                        widget.delivery,
+                        paymentMode: widget.paymentMode,
+                      )),
+            );*/
           }
         },
         child: Row(

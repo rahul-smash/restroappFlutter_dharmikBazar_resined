@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -30,6 +32,7 @@ class _RegisterUserState extends State<RegisterUser> {
   final _passwordController = TextEditingController();
   final _confirmpasswordController = TextEditingController();
   final _referralCodeeController = TextEditingController();
+  bool loginViaSocial = false;
 
   bool showReferralCodeView = false;
   StoreModel storeModel;
@@ -46,7 +49,6 @@ class _RegisterUserState extends State<RegisterUser> {
         });
       },
     );
-
     SharedPrefs.getStore().then((store){
       this.storeModel = store;
       if(storeModel.isRefererFnEnable){
@@ -77,15 +79,6 @@ class _RegisterUserState extends State<RegisterUser> {
       ),
       body: Stack(
         children: <Widget>[
-          /*Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              width: Utils.getDeviceWidth(context),
-              child: AppConstant.isRestroApp ?
-              Image.asset("images/login_restro_bg.jpg",fit: BoxFit.fitWidth,)
-                  :Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
-            ),
-          ),*/
           Align(
             alignment: Alignment.bottomCenter,
             child: SafeArea(
@@ -105,26 +98,13 @@ class _RegisterUserState extends State<RegisterUser> {
                           ),
                           controller: _usernameController,
                           inputFormatters: [new LengthLimitingTextInputFormatter(30)],
-                          /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterName : null,
-                          onSaved: (val) {
-                            userData.name = val.trim();
-                          },*/
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
-                            labelText: 'Phone *',
+                            labelText: 'Phone',
                           ),
                           controller: _phoneController,
                           keyboardType: TextInputType.phone,
-                          /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterPhone : null,
-                          inputFormatters: [
-                            WhitelistingTextInputFormatter.digitsOnly,
-                          ],
-                          onSaved: (val) {
-                            userData.phone = val.trim();
-                          },*/
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
@@ -133,12 +113,6 @@ class _RegisterUserState extends State<RegisterUser> {
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           //'Please enter a valid email address'
-                          /*validator: (value) => value.trim().isEmpty
-                              ? AppConstant.enterEmail
-                              : isValidEmail(value.trim())? null: AppConstant.enterValidEmail,
-                          onSaved: (val) {
-                            userData.email = val.trim();
-                          },*/
                         ),
                         Visibility(
                           visible: showReferralCodeView,
@@ -148,11 +122,6 @@ class _RegisterUserState extends State<RegisterUser> {
                             ),
                             controller: _referralCodeeController,
                             inputFormatters: [new LengthLimitingTextInputFormatter(30)],
-                            /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterName : null,
-                          onSaved: (val) {
-                            userData.name = val.trim();
-                          },*/
                           ),
                         ),
                         TextFormField(
@@ -162,11 +131,6 @@ class _RegisterUserState extends State<RegisterUser> {
                           ),
                           controller: _passwordController,
                           keyboardType: TextInputType.visiblePassword,
-                          /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterPassword : null,
-                          onSaved: (val) {
-                            userData.password = val.trim();
-                          },*/
                         ),
                         TextFormField(
                           obscureText: true,
@@ -175,11 +139,6 @@ class _RegisterUserState extends State<RegisterUser> {
                           ),
                           controller: _confirmpasswordController,
                           keyboardType: TextInputType.visiblePassword,
-                          /*validator: (val) =>
-                          val.isEmpty ? AppConstant.enterConfirmPassword : null,
-                          onSaved: (val) {
-                            userData.confirmPassword = val.trim();
-                          },*/
                         ),
                         Container(height: 20.0),
                         Container(
@@ -196,7 +155,7 @@ class _RegisterUserState extends State<RegisterUser> {
                                 style: TextStyle(color: Colors.white),
                               ),
                               onPressed: _submitForm,
-                              color: orangeColor,
+                              color: appThemeSecondary,
                             ),
                           ),
                         ),
@@ -233,10 +192,10 @@ class _RegisterUserState extends State<RegisterUser> {
       Utils.showToast("Please enter name", false);
       return;
     }
-    if(userData.phone.isEmpty){
+    /*if(userData.phone.isEmpty){
       Utils.showToast("Please enter phone", false);
       return;
-    }
+    }*/
     if(userData.email.isEmpty){
       Utils.showToast("Please enter email", false);
       return;
@@ -264,20 +223,26 @@ class _RegisterUserState extends State<RegisterUser> {
     if (userData.confirmPassword.trim() != userData.password.trim()) {
       Utils.showToast(AppConstant.passwordMatch, true);
     } else {
-      Utils.isNetworkAvailable().then((isNetworkAvailable) async {
-        if (isNetworkAvailable) {
-          Utils.showProgressDialog(context);
-          ApiController.registerApiRequest(userData,referralCode)
-              .then((response) async {
-            Utils.hideProgressDialog(context);
-            if (response != null && response.success) {
-              Navigator.pop(context);
-            }
-          });
-        } else {
-          Utils.showToast(AppConstant.noInternet, true);
-        }
-      });
+
+      if(loginViaSocial){
+
+
+      }else{
+        Utils.isNetworkAvailable().then((isNetworkAvailable) async {
+          if (isNetworkAvailable) {
+            Utils.showProgressDialog(context);
+            ApiController.registerApiRequest(userData,referralCode)
+                .then((response) async {
+              Utils.hideProgressDialog(context);
+              if (response != null && response.success) {
+                Navigator.pop(context);
+              }
+            });
+          } else {
+            Utils.showToast(AppConstant.noInternet, true);
+          }
+        });
+      }
     }
   }
 }

@@ -114,7 +114,7 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                                           padding: const EdgeInsets.only(bottom: 20,
                                               left: 10.0, top: 10.0, right: 40.0),
                                           child: new RaisedButton(
-                                            color: orangeColor,
+                                            color: appThemeSecondary,
                                             shape: RoundedRectangleBorder(
                                               borderRadius: BorderRadius.circular(5.0),
                                             ),

@@ -125,7 +125,7 @@ class _OtpScreen extends State<OtpScreen> {
                           Container(
                               padding: EdgeInsets.only( left: 0.0, top: 10.0, right: 20.0),
                               child: new RaisedButton(
-                                color: orangeColor,
+                                color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
@@ -139,7 +139,7 @@ class _OtpScreen extends State<OtpScreen> {
                           Container(
                               padding: EdgeInsets.only( left: 20.0, top: 10.0, right: 0.0),
                               child: new RaisedButton(
-                                color: orangeColor,
+                                color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
@@ -250,7 +250,7 @@ class _OtpScreen extends State<OtpScreen> {
       Navigator.pop(context);
       Navigator.push(context,
         MaterialPageRoute(
-            builder: (context) => ProfileScreen(true,widget.response.user.id,widget.response.user.fullName)),
+            builder: (context) => ProfileScreen(true,widget.response.user.id,widget.response.user.fullName,null,null)),
       );
       //Navigator.pop(context);
     }

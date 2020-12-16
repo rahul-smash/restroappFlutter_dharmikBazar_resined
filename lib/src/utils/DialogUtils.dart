@@ -58,6 +58,50 @@ class DialogUtils {
     );
   }
 
+  static Future<bool> displayLanguageDialog(BuildContext context, String title,
+      String body, String buttonText1, String buttonText2) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {},
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(10.0))),
+            title: Text(
+              title,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold,color: Colors.black,fontSize: 18,),
+            ),
+            content: Text(
+              body,
+              textAlign: TextAlign.center,
+              style: TextStyle(fontWeight: FontWeight.bold,color: Colors.grey,fontSize: 16,),
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text(buttonText1,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18,)),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                  // true here means you clicked ok
+                },
+              ),
+              new FlatButton(
+                child: Text(buttonText2,style: TextStyle(fontWeight: FontWeight.bold,fontSize: 18,)),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                  // true here means you clicked ok
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   static Future<PaymentType> displayPaymentDialog(
       BuildContext context, String title, String note) async {
     return await showDialog<PaymentType>(
@@ -134,34 +178,44 @@ class DialogUtils {
             ),
             content: Container(
               width: double.maxFinite,
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: storeArea.data.length,
-                      itemBuilder: (context, index) {
-                        Datum areaObject = storeArea.data[index];
-                        return InkWell(
-                            onTap: () {
-                              Navigator.pop(context, areaObject);
-                            },
-                            child: Container(
-                              height: 50,
-                              decoration: BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(
-                                        width: 1.0, color: Colors.black)),
-                                color: Colors.white,
-                              ),
-                              child: Center(child: Text(areaObject.city.city)),
-                            ));
-                      },
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: storeArea.data.length,
+                separatorBuilder: (BuildContext context, int index) {
+                  return Divider();
+                },
+                itemBuilder: (context, index) {
+                  Datum areaObject = storeArea.data[index];
+                  return InkWell(
+                    onTap: () {
+                      Navigator.pop(context, areaObject);
+                    },
+                    child: ListTile(
+                      title: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(areaObject.city.city,
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 16)),
+                            ),
+                          ]),
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Cancel"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.pop(context, null);
+                  // true here means you clicked ok
+                },
+              ),
+            ],
           ),
         );
       },
@@ -184,34 +238,44 @@ class DialogUtils {
             ),
             content: Container(
               width: double.maxFinite,
-              child: Column(
-                children: <Widget>[
-                  Expanded(
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: cityObject.area.length,
-                      itemBuilder: (context, index) {
-                        Area object = cityObject.area[index];
-                        return InkWell(
-                            onTap: () {
-                              Navigator.pop(context, object);
-                            },
-                            child: Container(
-                              height: 50,
-                              decoration: BoxDecoration(
-                                border: Border(
-                                    bottom: BorderSide(
-                                        width: 1.0, color: Colors.black)),
-                                color: Colors.white,
-                              ),
-                              child: Center(child: Text(object.areaName)),
-                            ));
-                      },
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: cityObject.area.length,
+                separatorBuilder: (BuildContext context, int index) {
+                  return Divider();
+                },
+                itemBuilder: (context, index) {
+                  Area object = cityObject.area[index];
+                  return InkWell(
+                    onTap: () {
+                      Navigator.pop(context, object);
+                    },
+                    child: ListTile(
+                      title: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Expanded(
+                              child: Text(object.pickupAdd,
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 16)),
+                            ),
+                          ]),
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text("Cancel"),
+                textColor: Colors.blue,
+                onPressed: () {
+                  Navigator.pop(context, null);
+                  // true here means you clicked ok
+                },
+              ),
+            ],
           ),
         );
       },
@@ -219,7 +283,8 @@ class DialogUtils {
   }
 
   static Future<Variant> displayVariantsDialog(
-      BuildContext context, String title, List<Variant> variants) async {
+      BuildContext context, String title, List<Variant> variants,
+      {Variant selectedVariant}) async {
     return await showDialog<Variant>(
       context: context,
       builder: (BuildContext context) {
@@ -306,7 +371,7 @@ class DialogUtils {
                 child: new Text("Cancel"),
                 textColor: Colors.blue,
                 onPressed: () {
-                  Navigator.pop(context);
+                  Navigator.pop(context, selectedVariant);
                   // true here means you clicked ok
                 },
               ),
@@ -376,7 +441,7 @@ class DialogUtils {
                                 ),
                               ),
                               color: Colors.white,
-                              textColor: orangeColor,
+                              textColor: appThemeSecondary,
                               onPressed: () {
                                 Navigator.pop(context, true);
                               },
@@ -386,7 +451,7 @@ class DialogUtils {
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
                               child: Text('OK'),
-                              color: orangeColor,
+                              color: appThemeSecondary,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context, false);
@@ -405,7 +470,8 @@ class DialogUtils {
   }
 
   static Future<bool> displayCommonDialog(
-      BuildContext context, String title, String message) async {
+      BuildContext context, String title, String message,
+      {String buttonText = 'OK'}) async {
     return await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -414,6 +480,7 @@ class DialogUtils {
           onWillPop: () {
             //print("onWillPop onWillPop");
             //Navigator.pop(context);
+            return Future(()=>false);
           },
           child: Dialog(
               shape: RoundedRectangleBorder(
@@ -437,7 +504,7 @@ class DialogUtils {
                         color: Colors.black45,
                         width: MediaQuery.of(context).size.width),
                     Padding(
-                      padding: EdgeInsets.fromLTRB(0, 15, 0, 10),
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
                       child: Center(
                         child: Text(
                           "${message}",
@@ -456,8 +523,8 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
-                              child: Text('OK'),
-                              color: orangeColor,
+                              child: Text('$buttonText'),
+                              color: appThemeSecondary,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context, true);
@@ -528,7 +595,7 @@ class DialogUtils {
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
                               child: Text('OK'),
-                              color: orangeColor,
+                              color: appThemeSecondary,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context, true);
@@ -600,7 +667,7 @@ class DialogUtils {
                             margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
                             child: FlatButton(
                               child: Text('Cancel'),
-                              color: orangeColor,
+                              color: appThemeSecondary,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context, false);
@@ -707,6 +774,7 @@ class DialogUtils {
           onWillPop: () {
             //print("onWillPop onWillPop");
             Navigator.pop(context);
+            return Future(()=>false);
           },
           child: Dialog(
               shape: RoundedRectangleBorder(
@@ -750,7 +818,7 @@ class DialogUtils {
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
                               child: Text('${button1}'),
-                              color: orangeColor,
+                              color: appThemeSecondary,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context, false);
@@ -761,7 +829,7 @@ class DialogUtils {
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
                               child: Text('${button2}'),
-                              color: orangeColor,
+                              color: appThemeSecondary,
                               textColor: Colors.white,
                               onPressed: () {
                                 Navigator.pop(context, true);
@@ -780,7 +848,8 @@ class DialogUtils {
   }
 
   static Future<bool> showForceUpdateDialog(
-      BuildContext context, String title, String message) async {
+      BuildContext context, String title, String message,
+      {StoreModel storeModel}) async {
     return await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -831,11 +900,27 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             child: FlatButton(
-                              child: Text('OK'),
-                              color: orangeColor,
+                              child: Text('Update'),
+                              color: appThemeSecondary,
                               textColor: Colors.white,
                               onPressed: () {
-                                SystemNavigator.pop();
+                                String urlString = "";
+                                if (Platform.isIOS) {
+                                  urlString = storeModel.iphoneShareLink;
+                                } else if (Platform.isAndroid) {
+                                  urlString = storeModel.androidShareLink;
+                                } else if (Platform.isWindows) {
+                                  urlString = storeModel.appShareLink;
+                                } else if (Platform.isLinux) {
+                                  urlString = storeModel.appShareLink;
+                                } else if (Platform.isMacOS) {
+                                  urlString = storeModel.appShareLink;
+                                }
+                                if (urlString.isNotEmpty)
+                                  launch(urlString);
+                                else {
+                                  SystemNavigator.pop();
+                                }
                               },
                             ),
                           )
@@ -1199,34 +1284,35 @@ class DialogUtils {
                                   fontWeight: FontWeight.w500),
                             ),
                           ),
-                             Container(
-                              height: 120,
-                              margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
-                              decoration: new BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: new BorderRadius.all(
-                                    new Radius.circular(5.0)),
-                                border: new Border.all(
-                                  color: Colors.grey,
-                                  width: 1.0,
-                                ),
+                          Container(
+                            height: 120,
+                            margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
+                            decoration: new BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: new BorderRadius.all(
+                                  new Radius.circular(5.0)),
+                              border: new Border.all(
+                                color: Colors.grey,
+                                width: 1.0,
                               ),
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
-                                child: TextField(
-                                  textAlign: TextAlign.left,
-                                  maxLength: 250,
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  textCapitalization: TextCapitalization.sentences,
-                                  controller: commentController,
-                                  decoration: InputDecoration(
-                                    contentPadding: EdgeInsets.all(10.0),
-                                    border: InputBorder.none,
-                                  ),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+                              child: TextField(
+                                textAlign: TextAlign.left,
+                                maxLength: 250,
+                                keyboardType: TextInputType.multiline,
+                                maxLines: null,
+                                textCapitalization:
+                                    TextCapitalization.sentences,
+                                controller: commentController,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  border: InputBorder.none,
                                 ),
                               ),
                             ),
+                          ),
                           Padding(
                             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Row(
@@ -1238,12 +1324,12 @@ class DialogUtils {
                                   width: 130,
                                   child: FlatButton(
                                     child: Text('Submit'),
-                                    color: orangeColor,
+                                    color: appThemeSecondary,
                                     textColor: Colors.white,
                                     onPressed: () {
                                       Utils.hideKeyboard(context);
-                                      Navigator.pop(
-                                          context, commentController.text.trim());
+                                      Navigator.pop(context,
+                                          commentController.text.trim());
                                     },
                                   ),
                                 )
@@ -1257,7 +1343,75 @@ class DialogUtils {
         });
   }
 
-  static Future<bool> showAreaRemovedDialog(BuildContext context,String area) async {
+  static Future<String> displayMultipleOnlinePaymentMethodDialog(
+      BuildContext context, StoreModel storeObject) async {
+    return await showDialog<String>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop: () {
+              Navigator.pop(context, "");
+            },
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(10.0))),
+              title: Container(
+                child: Text(
+                  "Payment Via",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.black),
+                ),
+              ),
+              content: Container(
+                width: double.maxFinite,
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: storeObject.paymentGatewaySettings.length,
+                  separatorBuilder: (BuildContext context, int index) {
+                    return Divider();
+                  },
+                  itemBuilder: (context, index) {
+                    PaymentGatewaySettings paymentGatewaySettings =
+                        storeObject.paymentGatewaySettings[index];
+                    return InkWell(
+                      onTap: () {
+                        Navigator.pop(
+                            context, paymentGatewaySettings.paymentGateway);
+                      },
+                      child: ListTile(
+                        title: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Expanded(
+                                child: Text(
+                                    paymentGatewaySettings.paymentGateway,
+                                    style: TextStyle(color: Colors.black)),
+                              ),
+                            ]),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text("Cancel"),
+                  textColor: Colors.blue,
+                  onPressed: () {
+                    Navigator.pop(context, "");
+                    // true here means you clicked ok
+                  },
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
+  static Future<bool> showAreaRemovedDialog(
+      BuildContext context, String area) async {
     StoreModel storeModel = await SharedPrefs.getStore();
     String storeName = storeModel.storeName;
     return await showDialog<bool>(

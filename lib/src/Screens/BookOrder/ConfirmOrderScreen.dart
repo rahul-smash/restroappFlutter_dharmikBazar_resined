@@ -1,19 +1,25 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
+
+//import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
-import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
+import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/OrderDetailsModel.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -23,11 +29,13 @@ import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
@@ -37,19 +45,23 @@ class ConfirmOrderScreen extends StatefulWidget {
   String areaId;
   OrderType deliveryType;
   Area areaObject;
+  StoreModel storeModel;
   List<Product> cartList = new List();
+  PaymentType _character = PaymentType.COD;
 
   ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen, this.areaId,
       this.deliveryType,
-      {this.areaObject});
+      {this.areaObject, this.paymentMode = "2", this.storeModel});
 
   @override
-  ConfirmOrderState createState() => ConfirmOrderState();
+  ConfirmOrderState createState() => ConfirmOrderState(storeModel: storeModel);
 }
 
 class ConfirmOrderState extends State<ConfirmOrderScreen> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   double totalPrice = 0.00;
+  double totalSavings = 0.00;
+  String totalSavingsText = "";
   TaxCalculationModel taxModel;
 
   //TextEditingController noteController = TextEditingController();
@@ -73,41 +85,138 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool isCommentAdded = false;
 
   String comment = "";
+  bool isDeliveryResponseFalse = false;
+  bool ispaytmSelected = false;
+
+  bool isPayTmActive = false;
+
+  double totalMRpPrice = 0.0;
+  List<OrderDetail> responseOrderDetail = List();
+  List<Product> cartListFromDB = List();
+
+  bool isOrderVariations = false;
+
+  bool showCOD = true;
+
+  ConfirmOrderState({this.storeModel});
+
+  void callPaytmPayApi() async {
+    String address = "NA", pin = "NA";
+    if (widget.deliveryType == OrderType.Delivery) {
+      if (widget.address.address2 != null &&
+          widget.address.address2.isNotEmpty) {
+        if (widget.address.address != null &&
+            widget.address.address.isNotEmpty) {
+          address = widget.address.address +
+              ", " +
+              widget.address.address2 +
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        } else {
+          address = widget.address.address2 +
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        }
+      } else {
+        if (widget.address.address != null &&
+            widget.address.address.isNotEmpty) {
+          address = widget.address.address +
+              " " +
+              widget.address.areaName +
+              " " +
+              widget.address.city;
+        }
+      }
+
+      if (widget.address.zipCode != null && widget.address.zipCode.isNotEmpty)
+        pin = widget.address.zipCode;
+    } else if (widget.deliveryType == OrderType.PickUp) {
+      address = widget.areaObject.pickupAdd;
+      pin = 'NA';
+    }
+
+    print(
+        "amount ${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}"
+        " address $address zipCode $pin");
+    double amount = databaseHelper.roundOffPrice(
+        taxModel == null ? totalPrice : double.parse(taxModel.total), 2);
+    Utils.showProgressDialog(context);
+
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    //new changes
+    Utils.getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
+        .then((orderJson) {
+      if (orderJson == null) {
+        print("--orderjson == null-orderjson == null-");
+        return;
+      }
+      String storeAddress = "";
+      try {
+        storeAddress = "${storeModel.storeName}, ${storeModel.location},"
+            "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
+      } catch (e) {
+        print(e);
+      }
+
+      String userId = user.id;
+      OrderDetailsModel detailsModel = OrderDetailsModel(
+          shippingCharges,
+          comment,
+          totalPrice.toString(),
+          widget.paymentMode,
+          taxModel,
+          widget.address,
+          widget.isComingFromPickUpScreen,
+          widget.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Paytm",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedDeliverSlotValue,
+          totalSavingsText);
+      ApiController.createPaytmTxnToken(
+              address, pin, amount, orderJson, detailsModel.orderDetails)
+          .then((value) async {
+        Utils.hideProgressDialog(context);
+        if (value != null && value.success) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PaytmWebView(value, storeModel)),
+          );
+        } else {
+          Utils.hideProgressDialog(context);
+          Utils.showToast("Api Error", false);
+        }
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     initRazorPay();
     listenWebViewChanges();
+    checkPaytmActive();
     selctedTag = 0;
     hideRemoveCouponFirstTime = true;
     print("You are on confirm order screen");
     //print("-deliveryType--${widget.deliveryType}---");
-    try {
-      if (widget.address != null) {
-        if (widget.address.areaCharges != null) {
-          shippingCharges = widget.address.areaCharges;
-          //print("-shippingCharges--${widget.address.areaCharges}---");
-        }
-        //print("----minAmount=${widget.address.minAmount}");
-        //print("----notAllow=${widget.address.notAllow}");
-        checkMinOrderAmount();
-      }
-      checkMinOrderPickAmount();
-    } catch (e) {
-      print(e);
-    }
-    try {
-      if (widget.deliveryType == OrderType.PickUp) {
-        databaseHelper.getTotalPrice().then((mTotalPrice) {
-          setState(() {
-            totalPrice = mTotalPrice;
-          });
-        });
-      }
-    } catch (e) {
-      print(e);
-    }
+    constraints();
     try {
       SharedPrefs.getStore().then((storeData) {
         storeModel = storeData;
@@ -116,8 +225,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if (storeModel.deliverySlot == "1") {
             ApiController.deliveryTimeSlotApi().then((response) {
               setState(() {
+                if (!response.success) {
+                  isDeliveryResponseFalse = true;
+                  return;
+                }
                 deliverySlotModel = response;
-                print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+                print(
+                    "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
                 isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
                 for (int i = 0;
                     i < deliverySlotModel.data.dateTimeCollection.length;
@@ -146,6 +260,25 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       print(e);
     }
     multiTaxCalculationApi();
+
+    if (widget.storeModel != null) {
+      if (widget.storeModel.cod == "1") {
+        showCOD = true;
+        widget.paymentMode = "2";
+      } else if (widget.storeModel.cod == "0") {
+        showCOD = false;
+      }
+      if (widget.storeModel.onlinePayment == "0" &&
+          widget.storeModel.cod == "0") {
+        showCOD = true;
+        widget.paymentMode = "2";
+      }
+      if (widget.storeModel.cod == "0" &&
+          widget.storeModel.onlinePayment == "1") {
+        widget._character = PaymentType.ONLINE;
+        widget.paymentMode = "3";
+      }
+    }
   }
 
   @override
@@ -235,6 +368,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   addTotalPrice(),
                   addEnterCouponCodeView(),
                   addCouponCodeRow(),
+                  addPaymentOptions(),
                   addConfirmOrder()
                 ],
               ),
@@ -245,6 +379,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
+  WalleModel userWalleModel;
+
   Future<void> multiTaxCalculationApi() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
@@ -252,9 +388,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return;
     }
     isLoading = true;
-    databaseHelper.getCartItemsListToJson().then((json) {
+//    userWalleModel = await SharedPrefs.getUserWallet();
+//    if (userWalleModel == null) {
+    userWalleModel=  await ApiController.getUserWallet();
+//      userWalleModel = await SharedPrefs.getUserWallet();
+//    }
+//    databaseHelper.getCartItemsListToJson().then((json) {
+    databaseHelper.getCartItemList().then((cartList) {
+      cartListFromDB = cartList;
+      List jsonList = Product.encodeToJson(cartList);
+      String encodedDoughnut = jsonEncode(jsonList);
       ApiController.multipleTaxCalculationRequest(
-              "", "0", "$shippingCharges", json)
+              "", "0", "$shippingCharges", encodedDoughnut)
           .then((response) async {
         //{"success":false,"message":"Some products are not available."}
         TaxCalculationResponse model = response;
@@ -271,6 +416,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             product.fixedTax = model.taxCalculation.fixedTax[i];
             widget.cartList.add(product);
           }
+          if (model.taxCalculation.orderDetail != null &&
+              model.taxCalculation.orderDetail.isNotEmpty) {
+            responseOrderDetail = model.taxCalculation.orderDetail;
+            bool someProductsUpdated = false;
+            isOrderVariations = model.taxCalculation.isChanged;
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('out_of_stock') ==
+                      0 ||
+                  responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('price_changed') ==
+                      0) {
+                someProductsUpdated = true;
+                break;
+              }
+            }
+            if (someProductsUpdated) {
+              DialogUtils.displayCommonDialog(
+                  context,
+                  storeModel == null ? "" : storeModel.storeName,
+                  "Some Cart items were updated. Please review the cart before procceeding.",
+                  buttonText: 'Procceed');
+              constraints();
+            }
+          }
+
+          calculateTotalSavings();
           setState(() {
             isLoading = false;
           });
@@ -281,7 +455,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               "${model.message}");
           if (result != null && result == true) {
             databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
-            databaseHelper.deleteTable(DatabaseHelper.CART_Table);
             databaseHelper.deleteTable(DatabaseHelper.CART_Table);
             databaseHelper.deleteTable(DatabaseHelper.Products_Table);
             eventBus.fire(updateCartCount());
@@ -439,8 +612,36 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addProductCart(Product product) {
+    OrderDetail detail;
+    if (product.id != null)
+      for (int i = 0; i < responseOrderDetail.length; i++) {
+        if (product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
+            product.variantId.compareTo(responseOrderDetail[i].variantId) ==
+                0) {
+          detail = responseOrderDetail[i];
+          break;
+        }
+      }
+    Color containerColor =
+        detail != null && detail.productStatus.contains('out_of_stock')
+            ? Colors.black12
+            : Colors.transparent;
+    String mrpPrice =
+        detail != null && detail.productStatus.contains('price_changed')
+            ? detail.newMrpPrice
+            : product.mrpPrice;
+    String price =
+        detail != null && detail.productStatus.contains('price_changed')
+            ? detail.newPrice
+            : product.price;
+    String imageUrl = product.imageType == "0"
+        ? product.image == null
+            ? product.image10080
+            : product.image
+        : product.imageUrl;
     if (product.taxDetail != null) {
       return Container(
+        color: containerColor,
         child: Padding(
           padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
           child: Row(
@@ -448,14 +649,32 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.taxDetail.label} (${product.taxDetail.rate}%)",
                   style: TextStyle(color: Colors.black54)),
-              Text("${AppConstant.currency}${product.taxDetail.tax}",
-                  style: TextStyle(color: Colors.black54)),
+              detail != null && detail.productStatus.contains('out_of_stock')
+                  ? Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ))
+                  : Text("${AppConstant.currency}${product.taxDetail.tax}",
+                      style: TextStyle(
+                          color: detail != null &&
+                                  detail.productStatus.contains('out_of_stock')
+                              ? Colors.red
+                              : Colors.black54)),
             ],
           ),
         ),
       );
     } else if (product.fixedTax != null) {
       return Container(
+        color: containerColor,
         child: Padding(
           padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
           child: Row(
@@ -463,18 +682,59 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("${product.fixedTax.fixedTaxLabel}",
                   style: TextStyle(color: Colors.black54)),
-              Text("${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
-                  style: TextStyle(color: Colors.black54)),
+              detail != null && detail.productStatus.contains('out_of_stock')
+                  ? Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.red, width: 1),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.all(3),
+                        child: Text(
+                          "Out of Stock",
+                          style: TextStyle(color: Colors.red),
+                        ),
+                      ))
+                  : Text(
+                      "${AppConstant.currency}${product.fixedTax.fixedTaxAmount}",
+                      style: TextStyle(
+                          color: detail != null &&
+                                  detail.productStatus.contains('out_of_stock')
+                              ? Colors.red
+                              : Colors.black54)),
             ],
           ),
         ),
       );
     } else {
       return Container(
+        color: containerColor,
         padding: EdgeInsets.fromLTRB(15, 0, 20, 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            imageUrl == ""
+                ? Container(
+              width: 70.0,
+              height: 80.0,
+              child: Utils.getImgPlaceHolder(),
+            )
+                : Padding(
+                padding: EdgeInsets.only(left: 5, right: 20),
+                child: Container(
+                  width: 70.0,
+                  height: 80.0,
+                  child: CachedNetworkImage(
+                      imageUrl: "${imageUrl}", fit: BoxFit.fill
+                    //placeholder: (context, url) => CircularProgressIndicator(),
+                    //errorWidget: (context, url, error) => Icon(Icons.error),
+                  ),
+                  /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                                          fit: BoxFit.cover),*/
+                )),
+            Expanded(
+                flex: 4,
+                child:
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -483,7 +743,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   child: SizedBox(
                     width: (Utils.getDeviceWidth(context) - 150),
                     child: Container(
-                      color: whiteColor,
                       child: Text(product.title,
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -497,23 +756,44 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       padding: EdgeInsets.only(top: 10),
                       child: Text(
                         "${product.weight}",
-                        style: TextStyle(color: orangeColor),
+                        style: TextStyle(color: appThemeSecondary),
                       )),
                 ),
                 Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
                     child: Text(
-                        "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")),
+                        "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(price).toStringAsFixed(2)}")),
                 //
                 /*Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
                     child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")
                 ),*/
               ],
-            ),
-            Text(
-                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(product.price), 2).toStringAsFixed(2)}",
-                style: TextStyle(fontSize: 16, color: Colors.black45)),
+            )),
+
+              detail != null && detail.productStatus.contains('out_of_stock')
+                ? Container(
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.red, width: 1),
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(5)),
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: Text(
+                    "Out of Stock",
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ))
+                :
+              Text(
+                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}" ,
+                style: TextStyle(
+                    fontSize: 16,
+                    color: detail != null &&
+                        detail.productStatus.contains('out_of_stock')
+                        ? Colors.red
+                        : Colors.black45)),
+
           ],
         ),
       );
@@ -565,13 +845,84 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             children: [
               Text("Items Price", style: TextStyle(color: Colors.black)),
               Text(
-                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
+//                  "${AppConstant.currency}${databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2)}",
+                  "${AppConstant.currency}${taxModel == null ? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2) : taxModel.itemSubTotal}",
                   style: TextStyle(color: Colors.black)),
             ],
           ),
         ),
+        Container(
+            height: 1,
+            color: Colors.black45,
+            width: MediaQuery.of(context).size.width),
+        Visibility(
+          visible: widget.storeModel.wallet_setting == "1" ? true : false,
+          child: Container(
+            child: Padding(
+                padding: EdgeInsets.only(left: 0, top: 10, bottom: 10),
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                      child: Icon(
+                        Icons.done,
+                        color: appTheme,
+                        size: 30,
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("My Wallet",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text(
+                              taxModel == null
+                                  ? "Remaining Balance: ${AppConstant.currency}"
+                                  : "Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(right: 5, top: 0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text("You Used",
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 16)),
+                          Text(
+                              "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.wallet_refund),2).toStringAsFixed(2)}",
+                              style: TextStyle(color: appTheme, fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                  ],
+                )),
+          ),
+        ),
       ]),
     );
+  }
+
+  String getUserRemaningWallet() {
+    double balance = (double.parse(userWalleModel.data.userWallet) -
+        double.parse(taxModel.wallet_refund) -
+        double.parse(taxModel.shipping));
+    //print("balance=${balance}");
+    if (balance > 0.0) {
+      // USer balance is greater than zero.
+      return databaseHelper.roundOffPrice(balance,2).toStringAsFixed(2);
+    } else {
+      // USer balance is less than or equal to zero.
+      return "0.00";
+    }
+    //return "${userWalleModel == null ? "" : userWalleModel.data.userWallet}";
   }
 
   Widget addTotalPrice() {
@@ -582,8 +933,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             height: 1,
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
+        addMRPPrice(),
+        addTotalSavingPrice(),
         Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+            padding: EdgeInsets.fromLTRB(15, totalSavings > 0 ? 5 : 10, 10, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -598,6 +951,127 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ))
       ]),
     );
+  }
+
+  Widget addTotalSavingPrice() {
+    if (totalSavings != 0.00)
+      return Container(
+          color: Colors.white,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(15, 5, 10, 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Cart Discount",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: appTheme,
+                          fontSize: 16)),
+                  Text('-${AppConstant.currency}$totalSavingsText',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: appTheme,
+                          fontSize: 16)),
+                ],
+              )));
+    else
+      return Container();
+  }
+
+  Widget addMRPPrice() {
+    if (totalSavings != 0.00)
+      return Container(
+          color: Colors.white,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(15, 10, 10, 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("MRP Price",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14)),
+                  Text(
+                      '${AppConstant.currency}${totalMRpPrice.toStringAsFixed(2)}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14)),
+                ],
+              )));
+    else
+      return Container();
+  }
+
+  void calculateTotalSavings() {
+    //calculate total savings
+    totalMRpPrice = 0;
+    totalSavings = 0;
+    if (widget.cartList != null && widget.cartList.isNotEmpty) {
+      for (Product product in widget.cartList) {
+        if (product != null &&
+            product.mrpPrice != null &&
+            product.price != null &&
+            product.quantity != null) {
+          bool isProductOutOfStock = false;
+          OrderDetail detail;
+          //check product is out of stock of not
+          if (isOrderVariations) {
+            InnnerFor:
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('out_of_stock') ==
+                      0 &&
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
+                  responseOrderDetail[i]
+                          .variantId
+                          .compareTo(product.variantId) ==
+                      0) {
+                isProductOutOfStock = true;
+                break InnnerFor;
+              }
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('price_changed') ==
+                      0 &&
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
+                  responseOrderDetail[i]
+                          .variantId
+                          .compareTo(product.variantId) ==
+                      0) {
+                detail = responseOrderDetail[i];
+                break InnnerFor;
+              }
+            }
+          }
+
+          if (!isProductOutOfStock) {
+            String mrpPrice =
+                detail != null && detail.productStatus.contains('price_changed')
+                    ? detail.newMrpPrice
+                    : product.mrpPrice;
+            String price =
+                detail != null && detail.productStatus.contains('price_changed')
+                    ? detail.newPrice
+                    : product.price;
+            totalSavings += (double.parse(mrpPrice) - double.parse(price)) *
+                double.parse(product.quantity);
+            totalMRpPrice +=
+                (double.parse(mrpPrice) * double.parse(product.quantity));
+          }
+        }
+      }
+      //Y is P% of X
+      //P% = Y/X
+      //P= (Y/X)*100
+      double totalSavedPercentage = (totalSavings / totalMRpPrice) * 100;
+      totalSavingsText =
+//          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
+          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}";
+      setState(() {});
+    }
   }
 
   Widget addCouponCodeRow() {
@@ -647,7 +1121,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               print("===discount=== ${model.discount}");
                               print("taxModel.total=${taxModel.total}");
                             });
-                          }, appliedReddemPointsCodeList),
+                          }, appliedReddemPointsCodeList, isOrderVariations,
+                              responseOrderDetail
+                              ,shippingCharges),
                           fullscreenDialog: true,
                         ));
                   }
@@ -712,21 +1188,23 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     context: context,
                     builder: (BuildContext context) => AvailableOffersDialog(
                         widget.address,
-                        "",
+                        widget.paymentMode,
                         widget.isComingFromPickUpScreen,
                         widget.areaId, (model) async {
                       await updateTaxDetails(model);
                       setState(() {
                         hideRemoveCouponFirstTime = false;
                         taxModel = model;
-                        double taxModelTotal = double.parse(taxModel.total) +
-                            int.parse(shippingCharges);
-                        taxModel.total = taxModelTotal.toString();
+//                        double taxModelTotal = double.parse(taxModel.total) +
+//                            int.parse(shippingCharges);
+//                        taxModel.total = taxModelTotal.toString();
                         appliedCouponCodeList.add(model.couponCode);
                         print("===couponCode=== ${model.couponCode}");
                         print("taxModel.total=${taxModel.total}");
                       });
-                    }, appliedCouponCodeList),
+                    }, appliedCouponCodeList, isOrderVariations,
+                        responseOrderDetail,
+                    shippingCharges),
                   );
                 }
               },
@@ -760,6 +1238,232 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   Icon(appliedCouponCodeList.isNotEmpty
                       ? Icons.cancel
                       : Icons.keyboard_arrow_right),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget addPaymentOptionsold() {
+    bool showOptions = false;
+//    if (storeModel != null) {
+//      return Container();
+//    }
+    if (widget.storeModel.onlinePayment != null) {
+      if (widget.storeModel.onlinePayment == "1") {
+        showOptions = true;
+      } else {
+        showOptions = false; //cod
+      }
+    }
+    return Visibility(
+      visible: showOptions,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+        child: Wrap(
+          children: <Widget>[
+            Utils.showDivider(context),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Text("Select Payment",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: appTheme,
+                      fontWeight: FontWeight.w600,
+                    )),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    Radio(
+                      value: PaymentType.COD,
+                      groupValue: widget._character,
+                      activeColor: appTheme,
+                      onChanged: (PaymentType value) async {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.COD) {
+                            widget.paymentMode = "2";
+                            ispaytmSelected = false;
+                          }
+                        });
+                      },
+                    ),
+                    Text('COD',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ],
+                ),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    Radio(
+                      value: PaymentType.ONLINE,
+                      activeColor: appTheme,
+                      groupValue: widget._character,
+                      onChanged: (PaymentType value) async {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.ONLINE) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = false;
+                          }
+                        });
+                      },
+                    ),
+                    Text('Online',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ],
+                ),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: <Widget>[
+                    Radio(
+                      value: PaymentType.ONLINE_PAYTM,
+                      activeColor: appTheme,
+                      groupValue: widget._character,
+                      onChanged: (PaymentType value) async {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.ONLINE_PAYTM) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = true;
+                          }
+                        });
+                      },
+                    ),
+                    Text('Paytm',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ],
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget addPaymentOptions() {
+    bool showOptions = false;
+    if (widget.storeModel.onlinePayment != null) {
+      if (widget.storeModel.onlinePayment == "1") {
+        showOptions = true;
+      } else {
+        showOptions = false; //cod
+      }
+    } else {
+      if (isPayTmActive) {
+        showOptions = true;
+      }
+    }
+
+    return Visibility(
+      visible: showOptions,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+        child: Wrap(
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: <Widget>[
+            Utils.showDivider(context),
+            Container(
+              child: Text("Select Payment",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: appTheme,
+                    fontWeight: FontWeight.w600,
+                  )),
+            ),
+            Visibility(
+              visible: showCOD,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.COD,
+                    groupValue: widget._character,
+                    activeColor: appTheme,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.COD) {
+                          widget.paymentMode = "2";
+                          ispaytmSelected = false;
+                        }
+                      });
+                    },
+                  ),
+                  Text('COD',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: widget.storeModel.onlinePayment != null &&
+                  widget.storeModel.onlinePayment.compareTo('1') == 0,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE,
+                    activeColor: appTheme,
+                    groupValue: widget._character,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.ONLINE) {
+                          widget.paymentMode = "3";
+                          ispaytmSelected = false;
+                        }
+                      });
+                    },
+                  ),
+                  Text('Online',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: isPayTmActive,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE_PAYTM,
+                    activeColor: appTheme,
+                    groupValue: widget._character,
+                    onChanged: (PaymentType value) async {
+                      setState(() {
+                        widget._character = value;
+                        if (value == PaymentType.ONLINE_PAYTM) {
+                          widget.paymentMode = "3";
+                          ispaytmSelected = true;
+                        }
+                      });
+                    },
+                  ),
+                  Text('Paytm',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
                 ],
               ),
             ),
@@ -833,7 +1537,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       Utils.showProgressDialog(context);
                       Utils.hideKeyboard(context);
                       databaseHelper
-                          .getCartItemsListToJson()
+                          .getCartItemsListToJson(
+                              isOrderVariations: isOrderVariations,
+                              responseOrderDetail: responseOrderDetail)
                           .then((json) async {
                         ValidateCouponResponse couponModel =
                             await ApiController.validateOfferApiRequest(
@@ -847,7 +1553,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               await ApiController.multipleTaxCalculationRequest(
                                   couponCodeController.text,
                                   couponModel.discountAmount,
-                                  "0",
+                                  shippingCharges,
                                   json);
                           Utils.hideProgressDialog(context);
                           if (model != null && !model.success) {
@@ -863,6 +1569,40 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                 .popUntil((route) => route.isFirst);
                           } else {
                             await updateTaxDetails(model.taxCalculation);
+                            if (model.taxCalculation.orderDetail != null &&
+                                model.taxCalculation.orderDetail.isNotEmpty) {
+                              responseOrderDetail =
+                                  model.taxCalculation.orderDetail;
+                              bool someProductsUpdated = false;
+                              isOrderVariations =
+                                  model.taxCalculation.isChanged;
+                              for (int i = 0;
+                                  i < responseOrderDetail.length;
+                                  i++) {
+                                if (responseOrderDetail[i]
+                                            .productStatus
+                                            .compareTo('out_of_stock') ==
+                                        0 ||
+                                    responseOrderDetail[i]
+                                            .productStatus
+                                            .compareTo('price_changed') ==
+                                        0) {
+                                  someProductsUpdated = true;
+                                  break;
+                                }
+                              }
+                              if (someProductsUpdated) {
+                                DialogUtils.displayCommonDialog(
+                                    context,
+                                    storeModel == null
+                                        ? ""
+                                        : storeModel.storeName,
+                                    "Some Cart items were updated. Please review the cart before procceeding.",
+                                    buttonText: 'Procceed');
+                                constraints();
+                              }
+                            }
+                            calculateTotalSavings();
                             setState(() {
                               taxModel = model.taxCalculation;
                               isCouponsApplied = true;
@@ -930,7 +1670,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.address.notAllow) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.address.minAmount}",
+                      "Your order amount is too low. Minimum order amount is ${widget.address.minAmount}",
                       false);
                   return;
                 }
@@ -939,27 +1679,34 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   widget.areaObject != null) {
                 if (!minOrderCheck) {
                   Utils.showToast(
-                      "Your order amount is to low. Minimum order amount is ${widget.areaObject.minOrder}",
+                      "Your order amount is too low. Minimum order amount is ${widget.areaObject.minOrder}",
                       false);
                   return;
                 }
               }
-
-              if (storeModel.onlinePayment == "1") {
-                var result = await DialogUtils.displayPaymentDialog(
-                    context, "Select Payment", "");
-                //print("----result----${result}--");
-                if (result == null) {
-                  return;
-                }
-                if (result == PaymentType.ONLINE) {
-                  widget.paymentMode = "3";
-                } else {
-                  widget.paymentMode = "2"; //cod
-                }
-              } else {
-                widget.paymentMode = "2"; //cod
+              if (checkThatItemIsInStocks()) {
+                DialogUtils.displayCommonDialog(
+                    context,
+                    storeModel == null ? "" : storeModel.storeName,
+                    "Some Cart items were updated. Please review the cart before procceeding.",
+                    buttonText: 'Ok');
+                return;
               }
+//              if (storeModel.onlinePayment == "1") {
+//                var result = await DialogUtils.displayPaymentDialog(
+//                    context, "Select Payment", "");
+//                //print("----result----${result}--");
+//                if (result == null) {
+//                  return;
+//                }
+//                if (result == PaymentType.ONLINE) {
+//                  widget.paymentMode = "3";
+//                } else {
+//                  widget.paymentMode = "2"; //cod
+//                }
+//              } else {
+//                widget.paymentMode = "2"; //cod
+//              }
 
               print("----paymentMod----${widget.paymentMode}--");
               print("-paymentGateway----${storeObject.paymentGateway}-}-");
@@ -976,7 +1723,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 } else {
                   //Store provides instant delivery of the orders.
                   print(isInstantDelivery);
-                  if (storeObject.deliverySlot == "1" && isInstantDelivery) {
+                  if (isDeliveryResponseFalse) {
+                    selectedDeliverSlotValue = "";
+                  } else if (storeObject.deliverySlot == "1" &&
+                      isInstantDelivery) {
                     //Store provides instant delivery of the orders.
                     selectedDeliverSlotValue = "";
                   } else if (storeObject.deliverySlot == "1" &&
@@ -1019,22 +1769,173 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-  performPlaceOrderOperation(StoreModel storeObject) {
+  performPlaceOrderOperation(StoreModel storeObject) async {
+    String json = await databaseHelper.getCartItemsListToJson(
+        isOrderVariations: isOrderVariations,
+        responseOrderDetail: responseOrderDetail);
+    if (json == null) {
+      print("--json == null-json == null-");
+      return;
+    }
+
+    String couponCode = taxModel == null ? "" : taxModel.couponCode;
+    String discount = taxModel == null ? "0" : taxModel.discount;
+    if (widget.deliveryType == OrderType.PickUp)
+      Utils.showProgressDialog(context);
+
+    TaxCalculationResponse response =
+        await ApiController.multipleTaxCalculationRequest(
+            "${couponCode}", "${discount}", shippingCharges, json);
+
+    if (response != null && !response.success) {
+      Utils.showToast(response.message, true);
+      databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      eventBus.fire(updateCartCount());
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      return;
+    }
+
+    taxModel = response.taxCalculation;
+
+    Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+    attributeMap["ScreenName"] = "Order Confirm Screen";
+    attributeMap["action"] = "Place Order Request";
+    attributeMap["totalPrice"] = "${totalPrice}";
+    attributeMap["deliveryType"] = "${widget.deliveryType}";
+    attributeMap["paymentMode"] = "${widget.paymentMode}";
+    attributeMap["shippingCharges"] = "${shippingCharges}";
+    Utils.sendAnalyticsEvent("Clicked Place Order button", attributeMap);
+
+//    if (response.taxCalculation.orderDetail != null &&
+//        response.taxCalculation.orderDetail.isNotEmpty) {
+//      responseOrderDetail = response.taxCalculation.orderDetail;
+//      bool someProductsUpdated = false;
+//      bool previousValue=isOrderVariations;
+//      isOrderVariations = response.taxCalculation.isChanged;
+//      for (int i = 0; i < responseOrderDetail.length; i++) {
+//        if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
+//                0 ||
+//            responseOrderDetail[i].productStatus.compareTo('price_changed') ==
+//                0) {
+//          someProductsUpdated = true;
+//          break;
+//        }
+//      }
+//      //check any variation made
+//      if(previousValue){
+//        //check current value=
+//        if(!isOrderVariations){
+//          someProductsUpdated=true;
+//        }
+//      }
+//
+//      if (someProductsUpdated) {
+//        Utils.hideProgressDialog(context);
+//        DialogUtils.displayCommonDialog(
+//            context,
+//            storeModel == null ? "" : storeModel.storeName,
+//            "Some Cart items were updated. Please review the cart before procceeding.",
+//            buttonText: 'ok');
+//        constraints();
+//        //remove coupon
+//        setState(() {
+//          hideRemoveCouponFirstTime = true;
+//          taxModel = response.taxCalculation;
+//          appliedCouponCodeList.clear();
+//          appliedReddemPointsCodeList.clear();
+//          isCouponsApplied = false;
+//          couponCodeController.text = "";
+//        });
+//        return;
+//      }
+//    }
+//    calculateTotalSavings();
+
+    if (taxModel != null &&
+        taxModel.wallet_refund != "0" &&
+        double.parse(taxModel.total) == 0 &&
+        widget.paymentMode != '2') {
+      Utils.hideProgressDialog(context);
+      Utils.showToast("Choose COD Method to Avail Wallet balance", false);
+      return;
+    }
+    //Choose payment
     if (widget.paymentMode == "3") {
-      if (storeObject.paymentGateway == "Razorpay") {
-        callOrderIdApi(storeObject);
-      } else if (storeObject.paymentGateway == "Stripe") {
-        callStripeApi();
+      Utils.hideProgressDialog(context);
+      if (ispaytmSelected) {
+        callPaymentGateWay("Paytmpay", storeObject);
+      } else {
+        String paymentGateway = storeObject.paymentGateway;
+        if (storeObject.paymentGatewaySettings != null &&
+            storeObject.paymentGatewaySettings.isNotEmpty) {
+          //case only single gateway is comming
+          if (storeObject.paymentGatewaySettings.length == 1) {
+            paymentGateway =
+                storeObject.paymentGatewaySettings.first.paymentGateway;
+            callPaymentGateWay(paymentGateway, storeObject);
+          } else {
+            //remove paytm option
+            int indexToRemove = -1;
+            for (int i = 0;
+                i < storeObject.paymentGatewaySettings.length;
+                i++) {
+              if (storeObject.paymentGatewaySettings[i].paymentGateway
+                  .toLowerCase()
+                  .contains('paytm')) {
+                indexToRemove = i;
+                break;
+              }
+            }
+            if (indexToRemove != -1) {
+              storeObject.paymentGatewaySettings.removeAt(indexToRemove);
+            }
+            if (storeObject.paymentGatewaySettings.length == 1) {
+              paymentGateway =
+                  storeObject.paymentGatewaySettings.first.paymentGateway;
+              callPaymentGateWay(paymentGateway, storeObject);
+            } else {
+              String result =
+                  await DialogUtils.displayMultipleOnlinePaymentMethodDialog(
+                      context, storeObject);
+              if (result.isEmpty) {
+                Utils.hideProgressDialog(context);
+                return;
+              }
+              paymentGateway = result;
+              callPaymentGateWay(paymentGateway, storeObject);
+            }
+          }
+          return;
+        } else {
+          //case payment gateway setting list empty
+          callPaymentGateWay(paymentGateway, storeObject);
+        }
       }
     } else {
       placeOrderApiCall("", "", "");
     }
   }
 
+  callPaymentGateWay(String paymentGateway, StoreModel storeObject) {
+    Utils.hideProgressDialog(context);
+    switch (paymentGateway) {
+      case "Razorpay":
+        callOrderIdApi(storeObject);
+        break;
+      case "Stripe":
+        callStripeApi();
+        break;
+      case "Paytmpay":
+        callPaytmPayApi();
+        break;
+    }
+  }
+
   checkDeliveryAreaDeleted(StoreModel storeObject, {String addressId = ""}) {
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses) async {
-      Utils.hideProgressDialog(context);
       int length = responses.data.length;
       List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
           context, responses.data,
@@ -1055,7 +1956,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       return;
     }
     Utils.showProgressDialog(context);
-    databaseHelper.getCartItemsListToJson().then((json) {
+    databaseHelper
+        .getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail)
+        .then((json) {
       ApiController.multipleTaxCalculationRequest(
               "", "0", "${shippingCharges}", json)
           .then((response) async {
@@ -1070,6 +1975,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           Navigator.of(context).popUntil((route) => route.isFirst);
         } else {
           await updateTaxDetails(response.taxCalculation);
+          if (response.taxCalculation.orderDetail != null &&
+              response.taxCalculation.orderDetail.isNotEmpty) {
+            responseOrderDetail = response.taxCalculation.orderDetail;
+            bool someProductsUpdated = false;
+            isOrderVariations = response.taxCalculation.isChanged;
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('out_of_stock') ==
+                      0 ||
+                  responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('price_changed') ==
+                      0) {
+                someProductsUpdated = true;
+                break;
+              }
+            }
+            if (someProductsUpdated) {
+              DialogUtils.displayCommonDialog(
+                  context,
+                  storeModel == null ? "" : storeModel.storeName,
+                  "Some Cart items were updated. Please review the cart before procceeding.",
+                  buttonText: 'Procceed');
+              constraints();
+            }
+          }
+          calculateTotalSavings();
+
           setState(() {
             hideRemoveCouponFirstTime = true;
             taxModel = response.taxCalculation;
@@ -1095,7 +2029,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         } catch (e) {
           print(e);
         }
-        double totalPrice = await databaseHelper.getTotalPrice();
+        double totalPrice = await databaseHelper.getTotalPrice(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail);
         int mtotalPrice = totalPrice.round();
 
         print("----minAmount=${minAmount}");
@@ -1152,7 +2088,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         } catch (e) {
           print(e);
         }
-        double totalPrice = await databaseHelper.getTotalPrice();
+        double totalPrice = await databaseHelper.getTotalPrice(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail);
         int mtotalPrice = totalPrice.round();
 
         print("----minAmount=${minAmount}");
@@ -1177,7 +2115,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  void callStripeApi() {
+  void callStripeApi() async {
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total);
     price = price * 100;
@@ -1185,25 +2123,71 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String mPrice =
         price.toString().substring(0, price.toString().indexOf('.')).trim();
     print("----mPrice----${mPrice}--");
-    ApiController.stripePaymentApi(mPrice).then((response) {
-      Utils.hideProgressDialog(context);
-      print("----stripePaymentApi------");
-      if (response != null) {
-        StripeCheckOutModel stripeCheckOutModel = response;
-        if (stripeCheckOutModel.success) {
-          //launchWebView(stripeCheckOutModel);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    StripeWebView(stripeCheckOutModel, storeModel)),
-          );
-        } else {
-          Utils.showToast("${stripeCheckOutModel.message}!", true);
-        }
-      } else {
-        Utils.showToast("Something went wrong!", true);
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    Utils.getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
+        .then((orderJson) {
+      if (orderJson == null) {
+        print("--orderjson == null-orderjson == null-");
+        return;
       }
+      String storeAddress = "";
+      try {
+        storeAddress = "${storeModel.storeName}, ${storeModel.location},"
+            "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
+      } catch (e) {
+        print(e);
+      }
+
+      String userId = user.id;
+      OrderDetailsModel detailsModel = OrderDetailsModel(
+          shippingCharges,
+          comment,
+          totalPrice.toString(),
+          widget.paymentMode,
+          taxModel,
+          widget.address,
+          widget.isComingFromPickUpScreen,
+          widget.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Stripe",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedDeliverSlotValue,
+          totalSavingsText);
+
+      ApiController.stripePaymentApi(
+              mPrice, orderJson, detailsModel.orderDetails,
+              currencyAbbr: storeModel.currencyAbbr)
+          .then((response) {
+        Utils.hideProgressDialog(context);
+        print("----stripePaymentApi------");
+        if (response != null) {
+          StripeCheckOutModel stripeCheckOutModel = response;
+          if (stripeCheckOutModel.success) {
+            //launchWebView(stripeCheckOutModel);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      StripeWebView(stripeCheckOutModel, storeModel)),
+            );
+          } else {
+            Utils.showToast("${stripeCheckOutModel.message}!", true);
+          }
+        } else {
+          Utils.showToast("Something went wrong!", true);
+        }
+      });
     });
   }
 
@@ -1220,9 +2204,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       'order_id': razorpay_order_id,
       //'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
       'amount': (double.parse(taxModel.total) * 100),
-      'name': '${user.fullName}',
+      'name': '${storeModel.storeName}',
       'description': '',
-      'prefill': {'contact': '${user.phone}', 'email': '${user.email}'},
+      'prefill': {
+        'contact': '${user.phone}',
+        'email': '${user.email}',
+        'name': '${user.fullName}'
+      },
       /*'external': {
         'wallets': ['paytm']
       }*/
@@ -1267,7 +2255,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
   }
 
-  void callOrderIdApi(StoreModel storeObject) {
+  void callOrderIdApi(StoreModel storeObject) async {
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total); //totalPrice ;
     print("=======1===${price}===total==${taxModel.total}======");
@@ -1276,15 +2264,60 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     String mPrice =
         price.toString().substring(0, price.toString().indexOf('.'));
     print("=======mPrice===${mPrice}===========");
-    ApiController.razorpayCreateOrderApi(mPrice).then((response) {
-      CreateOrderData model = response;
-      if (model != null && response.success) {
-        print("----razorpayCreateOrderApi----${response.data.id}--");
-        openCheckout(model.data.id, storeObject);
-      } else {
-        Utils.showToast("${model.message}", true);
-        Utils.hideProgressDialog(context);
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    //new changes
+    Utils.getCartItemsListToJson(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail,
+            cartList: cartListFromDB)
+        .then((orderJson) {
+      if (orderJson == null) {
+        print("--orderjson == null-orderjson == null-");
+        return;
       }
+      String storeAddress = "";
+      try {
+        storeAddress = "${storeModel.storeName}, ${storeModel.location},"
+            "${storeModel.city}, ${storeModel.state}, ${storeModel.country}, ${storeModel.zipcode}";
+      } catch (e) {
+        print(e);
+      }
+
+      String userId = user.id;
+      OrderDetailsModel detailsModel = OrderDetailsModel(
+          shippingCharges,
+          comment,
+          totalPrice.toString(),
+          widget.paymentMode,
+          taxModel,
+          widget.address,
+          widget.isComingFromPickUpScreen,
+          widget.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Razorpay",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedDeliverSlotValue,
+          totalSavingsText);
+      ApiController.razorpayCreateOrderApi(
+              mPrice, orderJson, detailsModel.orderDetails)
+          .then((response) {
+        CreateOrderData model = response;
+        if (model != null && response.success) {
+          print("----razorpayCreateOrderApi----${response.data.id}--");
+          openCheckout(model.data.id, storeObject);
+        } else {
+          Utils.showToast("${model.message}", true);
+          Utils.hideProgressDialog(context);
+        }
+      });
     });
   }
 
@@ -1293,94 +2326,80 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.hideKeyboard(context);
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable == true) {
-        databaseHelper.getCartItemsListToJson().then((json) {
+        /*databaseHelper
+            .getCartItemsListToJson(
+                isOrderVariations: isOrderVariations,
+                responseOrderDetail: responseOrderDetail)
+            .then((json) {*/
+        Utils.getCartItemsListToJson(
+                isOrderVariations: isOrderVariations,
+                responseOrderDetail: responseOrderDetail,
+                cartList: cartListFromDB)
+            .then((json) {
           if (json == null) {
             print("--json == null-json == null-");
             return;
           }
 
-          String couponCode = taxModel == null ? "" : taxModel.couponCode;
-          String discount = taxModel == null ? "0" : taxModel.discount;
-          Utils.showProgressDialog(context);
-          ApiController.multipleTaxCalculationRequest(
-                  "${couponCode}", "${discount}", shippingCharges, json)
-              .then((response) {
-            //Utils.hideProgressDialog(context);
-            if (response != null && !response.success) {
-              Utils.showToast(response.message, true);
-              databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
-              databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-              databaseHelper.deleteTable(DatabaseHelper.Products_Table);
-              eventBus.fire(updateCartCount());
-              Navigator.of(context).popUntil((route) => route.isFirst);
+//          String couponCode = taxModel == null ? "" : taxModel.couponCode;
+//          String discount = taxModel == null ? "0" : taxModel.discount;
+//          Utils.showProgressDialog(context);
+//          ApiController.multipleTaxCalculationRequest(
+//                  "${couponCode}", "${discount}", shippingCharges, json)
+//              .then((response) {
+
+          print("-paymentMode-${widget.paymentMode}");
+
+          ApiController.placeOrderRequest(
+                  shippingCharges,
+                  comment,
+                  totalPrice.toString(),
+                  widget.paymentMode,
+                  taxModel,
+                  widget.address,
+                  json,
+                  widget.isComingFromPickUpScreen,
+                  widget.areaId,
+                  widget.deliveryType,
+                  payment_request_id,
+                  payment_id,
+                  onlineMethod,
+                  selectedDeliverSlotValue,
+                  cart_saving: totalSavings.toStringAsFixed(2))
+              .then((response) async {
+            Utils.hideProgressDialog(context);
+            if (response == null) {
+              print("--response == null-response == null-");
               return;
             }
-
-            taxModel = response.taxCalculation;
-
-            Map<String, dynamic> attributeMap = new Map<String, dynamic>();
-            attributeMap["ScreenName"] = "Order Confirm Screen";
-            attributeMap["action"] = "Place Order Request";
-            attributeMap["totalPrice"] = "${totalPrice}";
-            attributeMap["deliveryType"] = "${widget.deliveryType}";
-            attributeMap["paymentMode"] = "${widget.paymentMode}";
-            attributeMap["shippingCharges"] = "${shippingCharges}";
-            Utils.sendAnalyticsEvent(
-                "Clicked Place Order button", attributeMap);
-
-            ApiController.placeOrderRequest(
-                    shippingCharges,
-                    comment,
-                    totalPrice.toString(),
-                    widget.paymentMode,
-                    taxModel,
-                    widget.address,
-                    json,
-                    widget.isComingFromPickUpScreen,
-                    widget.areaId,
-                    widget.deliveryType,
-                    payment_request_id,
-                    payment_id,
-                    onlineMethod,
-                    selectedDeliverSlotValue)
-                .then((response) async {
-              Utils.hideProgressDialog(context);
-              if (response == null) {
-                print("--response == null-response == null-");
-                return;
-              }
-              eventBus.fire(updateCartCount());
-              print("${widget.deliveryType}");
-              //print("Location = ${storeModel.lat},${storeModel.lng}");
-              if (widget.deliveryType == OrderType.PickUp) {
-                bool result =
-                    await DialogUtils.displayPickUpDialog(context, storeModel);
-                if (result == true) {
-                  //print("==result== ${result}");
-                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                  eventBus.fire(updateCartCount());
-                  DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
-                      double.parse(storeModel.lng));
-                } else {
-                  //print("==result== ${result}");
-                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                  eventBus.fire(updateCartCount());
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                }
+            eventBus.fire(updateCartCount());
+            print("${widget.deliveryType}");
+            //print("Location = ${storeModel.lat},${storeModel.lng}");
+            if (widget.deliveryType == OrderType.PickUp) {
+              bool result =
+                  await DialogUtils.displayPickUpDialog(context, storeModel);
+              if (result == true) {
+                //print("==result== ${result}");
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                eventBus.fire(updateCartCount());
+                DialogUtils.openMap(storeModel, double.parse(storeModel.lat),
+                    double.parse(storeModel.lng));
               } else {
-                bool result = await DialogUtils.displayThankYouDialog(
-                    context,
-                    response.success
-                        ? AppConstant.orderAdded
-                        : response.message);
-                if (result == true) {
-                  await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-                  Navigator.of(context).popUntil((route) => route.isFirst);
-                  eventBus.fire(updateCartCount());
-                }
+                //print("==result== ${result}");
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                eventBus.fire(updateCartCount());
+                Navigator.of(context).popUntil((route) => route.isFirst);
               }
-            });
+            } else {
+              bool result = await DialogUtils.displayThankYouDialog(context,
+                  response.success ? AppConstant.orderAdded : response.message);
+              if (result == true) {
+                await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+                Navigator.of(context).popUntil((route) => route.isFirst);
+                eventBus.fire(updateCartCount());
+              }
+            }
           });
         });
       } else {
@@ -1401,6 +2420,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       print("<---onPageFinished------->");
       callStripeVerificationApi(event.url);
     });
+
+    eventBus.on<onPayTMPageFinished>().listen((event) {
+      print("Event Bus called");
+      callPaytmApi(event.url, event.orderId, event.txnId);
+    });
+  }
+
+  void callPaytmApi(String url, String orderId, String txnID) {
+    Utils.showProgressDialog(context);
+    placeOrderApiCall(orderId, txnID, 'paytm');
   }
 
   void callStripeVerificationApi(String payment_request_id) {
@@ -1551,8 +2580,114 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       )
     ]);
   }
+
+  void checkPaytmActive() {
+    String paymentGateway = storeModel.paymentGateway;
+    if (storeModel.paymentGatewaySettings != null &&
+        storeModel.paymentGatewaySettings.isNotEmpty) {
+      //case only single gateway is comming
+      if (storeModel.paymentGatewaySettings.length == 1) {
+        paymentGateway = storeModel.paymentGatewaySettings.first.paymentGateway;
+        if (paymentGateway.toLowerCase().contains('paytm')) {
+          isPayTmActive = true;
+        }
+      } else {
+        for (int i = 0; i < storeModel.paymentGatewaySettings.length; i++) {
+          paymentGateway = storeModel.paymentGatewaySettings[i].paymentGateway;
+          if (paymentGateway.toLowerCase().contains('paytm')) {
+            isPayTmActive = true;
+            break;
+          }
+        }
+      }
+    } else {
+      if (paymentGateway.toLowerCase().contains('paytm')) {
+        isPayTmActive = true;
+      }
+    }
+  }
+
+  void constraints() {
+    try {
+      if (widget.address != null) {
+        if (widget.address.areaCharges != null) {
+          if (responseOrderDetail.isNotEmpty && checkThatItemIsInStocks())
+            shippingCharges = '0';
+          else {
+            shippingCharges = widget.address.areaCharges;
+          }
+          //print("-shippingCharges--${widget.address.areaCharges}---");
+        }
+        //print("----minAmount=${widget.address.minAmount}");
+        //print("----notAllow=${widget.address.notAllow}");
+        checkMinOrderAmount();
+      }
+      checkMinOrderPickAmount();
+    } catch (e) {
+      print(e);
+    }
+    try {
+      if (widget.deliveryType == OrderType.PickUp) {
+        databaseHelper
+            .getTotalPrice(
+                isOrderVariations: isOrderVariations,
+                responseOrderDetail: responseOrderDetail)
+            .then((mTotalPrice) {
+          setState(() {
+            totalPrice = mTotalPrice;
+          });
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+    if (responseOrderDetail.isNotEmpty &&
+        checkThatItemIsInStocks() &&
+        taxModel != null) {
+      shippingCharges = '0';
+      taxModel.total = '0';
+      totalPrice = 0;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  bool checkThatItemIsInStocks() {
+    bool isAllItemsInOutOfStocks = true;
+    for (int j = 0; j < widget.cartList.length; j++) {
+      Product product = widget.cartList[j];
+      if (product.id != null) {
+        //check product is out of stock
+        bool productOutOfStock = _checkIsProductISOutOfStock(product);
+        if (!productOutOfStock) {
+          isAllItemsInOutOfStocks = false;
+          break;
+        }
+      }
+    }
+    return isAllItemsInOutOfStocks;
+  }
+
+  bool _checkIsProductISOutOfStock(Product product) {
+    bool productOutOfStock = false;
+    for (int i = 0; i < responseOrderDetail.length; i++) {
+      if (product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
+          product.variantId.compareTo(responseOrderDetail[i].variantId) == 0) {
+        if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
+            0) {
+          productOutOfStock = true;
+        } else {
+          productOutOfStock = false;
+        }
+        break;
+      }
+    }
+    return productOutOfStock;
+  }
 }
 
+/*Code for ios*/
 class StripeWebView extends StatefulWidget {
   StripeCheckOutModel stripeCheckOutModel;
   StoreModel storeModel;
@@ -1611,3 +2746,192 @@ class _StripeWebViewState extends State<StripeWebView> {
     );
   }
 }
+
+class PaytmWebView extends StatelessWidget {
+  CreatePaytmTxnTokenResponse stripeCheckOutModel;
+  StoreModel storeModel;
+  Completer<WebViewController> _controller = Completer<WebViewController>();
+
+  bool isPaytmPaymentSuccessed = false;
+
+  PaytmWebView(this.stripeCheckOutModel, this.storeModel);
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () {
+        //print("onWillPop onWillPop");
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Used for removing back buttoon.
+          title: Text('Payment'),
+          centerTitle: true,
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return WebView(
+            initialUrl: '${stripeCheckOutModel.url}',
+            javascriptMode: JavascriptMode.unrestricted,
+            onWebViewCreated: (WebViewController webViewController) {
+              _controller.complete(webViewController);
+            },
+            navigationDelegate: (NavigationRequest request) {
+              //print('=======NavigationRequest======= $request}');
+              return NavigationDecision.navigate;
+            },
+            onPageStarted: (String url) {
+              //print('======Page started loading======: $url');
+            },
+            onPageFinished: (String url) {
+              print('==2====onLoadStop======: $url');
+              if (url.contains("/api/paytmPaymentResult/orderId:") &&
+                  !isPaytmPaymentSuccessed) {
+                isPaytmPaymentSuccessed = true;
+                String txnId =
+                    url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
+                url = url.replaceAll("/TxnId:" + txnId, "");
+                String orderId = url
+                    .substring(url.indexOf("/orderId:") + "/orderId:".length);
+                print(txnId);
+                print(orderId);
+                eventBus.fire(
+                    onPayTMPageFinished(url, orderId = orderId, txnId = txnId));
+                Navigator.pop(context);
+              } else if (url.contains("api/paytmPaymentResult/failure:")) {
+                Navigator.pop(context);
+                Utils.showToast("Payment Failed", false);
+              }
+            },
+            gestureNavigationEnabled: false,
+          );
+        }),
+      ),
+    );
+  }
+}
+
+/*Code for android*/
+/*class StripeWebView extends StatefulWidget {
+  StripeCheckOutModel stripeCheckOutModel;
+  StoreModel storeModel;
+
+  StripeWebView(this.stripeCheckOutModel, this.storeModel);
+
+  @override
+  _StripeWebViewState createState() {
+    return _StripeWebViewState();
+  }
+}
+
+class _StripeWebViewState extends State<StripeWebView> {
+  InAppWebViewController webView;
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () {
+        //print("onWillPop onWillPop");
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Used for removing back buttoon.
+          title: Text('Payment'),
+          centerTitle: true,
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return InAppWebView(
+            initialUrl: "${widget.stripeCheckOutModel.checkoutUrl}",
+            initialHeaders: {},
+            initialOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                    debuggingEnabled: true,
+                    javaScriptEnabled: true,
+                    javaScriptCanOpenWindowsAutomatically: true)),
+            onWebViewCreated: (InAppWebViewController controller) {
+              webView = controller;
+            },
+            onLoadStart: (InAppWebViewController controller, String url) {
+              print('==1====onLoadStart======: $url');
+            },
+            onLoadStop: (InAppWebViewController controller, String url) async {
+              if (url
+                  .contains("api/stripeVerifyTransaction?response=success")) {
+                eventBus.fire(onPageFinished(
+                    widget.stripeCheckOutModel.paymentRequestId));
+                Navigator.pop(context);
+              }
+            },
+            onProgressChanged:
+                (InAppWebViewController controller, int progress) {
+              //print('==3====onProgressChanged======: $progress');
+            },
+          );
+        }),
+      ),
+    );
+  }
+}
+
+class PaytmWebView extends StatelessWidget {
+  CreatePaytmTxnTokenResponse stripeCheckOutModel;
+  InAppWebViewController webView;
+  StoreModel storeModel;
+
+  PaytmWebView(this.stripeCheckOutModel, this.storeModel);
+
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () {},
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          automaticallyImplyLeading: false, // Used for removing back buttoon.
+          title: Text('Payment'),
+          centerTitle: true,
+        ),
+        body: Builder(builder: (BuildContext context) {
+          return InAppWebView(
+            initialUrl: "${stripeCheckOutModel.url}",
+            initialHeaders: {},
+            initialOptions: InAppWebViewGroupOptions(
+                crossPlatform: InAppWebViewOptions(
+                    debuggingEnabled: true,
+                    javaScriptEnabled: true,
+                    javaScriptCanOpenWindowsAutomatically: true)),
+            onWebViewCreated: (InAppWebViewController controller) {
+              webView = controller;
+            },
+            onLoadStart: (InAppWebViewController controller, String url) {
+              print('==1====onLoadStart======: $url');
+            },
+            onLoadStop: (InAppWebViewController controller, String url) async {
+              print('==2====onLoadStop======: $url');
+              if (url.contains("/api/paytmPaymentResult/orderId:")) {
+                String txnId =
+                    url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
+                url = url.replaceAll("/TxnId:" + txnId, "");
+                String orderId = url
+                    .substring(url.indexOf("/orderId:") + "/orderId:".length);
+                print(txnId);
+                print(orderId);
+                eventBus.fire(
+                    onPayTMPageFinished(url, orderId = orderId, txnId = txnId));
+                Navigator.pop(context);
+              } else if (url.contains("api/paytmPaymentResult/failure:")) {
+                Navigator.pop(context);
+                Utils.showToast("Payment Failed", false);
+              }
+            },
+            onProgressChanged:
+                (InAppWebViewController controller, int progress) {
+              //print('==3====onProgressChanged======: $progress');
+            },
+          );
+        }),
+      ),
+    );
+  }
+}*/

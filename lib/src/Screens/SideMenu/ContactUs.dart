@@ -252,9 +252,9 @@ class ContactUs extends StatelessWidget {
                   child: FlatButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(5.0),
-                        side: BorderSide(color: orangeColor)),
+                        side: BorderSide(color: appThemeSecondary)),
                     child: Text('Send Your Message'),
-                    color: orangeColor,
+                    color: appThemeSecondary,
                     textColor: Colors.white,
                     onPressed: () async {
                       bool isNetworkAvailable = await Utils.isNetworkAvailable();

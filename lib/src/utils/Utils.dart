@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:core';
 import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,16 +10,22 @@ import 'package:connectivity/connectivity.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'Callbacks.dart';
 import 'DialogUtils.dart';
 
 class Utils {
@@ -48,6 +55,29 @@ class Utils {
     } catch (e) {
       print(e);
     }
+  }
+
+  static Widget getEmptyView1(String value) {
+    return Container(
+      child: Center(
+        child: Text(value,
+            overflow: TextOverflow.ellipsis,
+            style: new TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 18.0,
+            )),
+      ),
+    );
+  }
+
+  static Widget showIndicator() {
+    return Container(
+      child: Center(
+        child: CircularProgressIndicator(
+            backgroundColor: Colors.black26,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+      ),
+    );
   }
 
   static Future<PackageInfo> getAppVersionDetails(
@@ -198,14 +228,19 @@ class Utils {
       favIcon = Icon(Icons.favorite_border);
       return favIcon;
     }
+    if (isFav.isEmpty) {
+      favIcon = Icon(Icons.favorite_border);
+      return favIcon;
+    }
     if (isFav == "1") {
       favIcon = Icon(
         Icons.favorite,
-        color: orangeColor,
+        color: appThemeSecondary,
       );
     } else if (isFav == "0") {
       favIcon = Icon(Icons.favorite_border);
     }
+
     return favIcon;
   }
 
@@ -225,6 +260,10 @@ class Utils {
 
   static double getDeviceWidth(BuildContext context) {
     return MediaQuery.of(context).size.width;
+  }
+
+  static double getDeviceHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height;
   }
 
   static Widget showDivider(BuildContext context) {
@@ -263,7 +302,8 @@ class Utils {
     //print("variants = ${product.variants} and ${classType}");
 
     if (classType == ClassType.CART) {
-      return Icon(Icons.keyboard_arrow_down, color: orangeColor, size: 25);
+      return Icon(Icons.keyboard_arrow_down,
+          color: appThemeSecondary, size: 25);
     } else {
       bool isVariantNull = false;
       if (product.variants != null) {
@@ -272,7 +312,7 @@ class Utils {
         }
       }
       return Icon(Icons.keyboard_arrow_down,
-          color: isVariantNull ? whiteColor : orangeColor, size: 25);
+          color: isVariantNull ? whiteColor : appThemeSecondary, size: 25);
     }
   }
 
@@ -335,7 +375,61 @@ class Utils {
       DateTime time = format.parse(date, true);
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
-      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm');
+      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm a');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
+  static convertOrderDate(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM, yyyy');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
+  static convertWalletDate(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM, yyyy hh:mm:aa');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
+  static convertNotificationDateTime(String date, {bool onlyTime = false}) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("dd MMM yyyy hh:mm a");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      if (onlyTime) {
+        formatter = new DateFormat('hh:mm a');
+      }
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);
@@ -464,6 +558,32 @@ class Utils {
     }
   }
 
+  static launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  static launchCaller(String call) async {
+    String url = "tel:${call}";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  static launchEmail(String email) async {
+    String url = "mailto:${email}?subject=&body=";
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
   static Widget getIndicatorView() {
     return Center(
       child: CircularProgressIndicator(
@@ -516,15 +636,15 @@ class Utils {
       BuildContext context, List<DeliveryAddressData> addressList,
       {bool showDialogBool, bool hitApi = false, String id = ""}) async {
     DeliveryAddressData deletedItem;
-print(id);
+    print(id);
     for (int i = 0; i < addressList.length; i++) {
-      print(addressList[i].id.compareTo(id) == 0 );
+      print(addressList[i].id.compareTo(id) == 0);
       if (id.isNotEmpty &&
           addressList[i].id.compareTo(id) == 0 &&
           addressList[i].isDeleted) {
         deletedItem = addressList[i];
         break;
-      } else if (id.isEmpty &&addressList[i].isDeleted) {
+      } else if (id.isEmpty && addressList[i].isDeleted) {
         deletedItem = addressList[i];
         break;
       }
@@ -549,10 +669,128 @@ print(id);
     }
     return addressList;
   }
+
+  static Future<String> getCartItemsListToJson(
+      {bool isOrderVariations = true,
+      List<OrderDetail> responseOrderDetail,
+      List<Product> cartList}) async {
+    for (int i = 0; i < cartList.length; i++) {
+      for (int j = 0; j < responseOrderDetail.length; j++) {
+        if (cartList[i].id == responseOrderDetail[j].productId &&
+            cartList[i].variantId == responseOrderDetail[j].variantId) {
+          responseOrderDetail[j].discount=cartList[i].discount;
+          break;
+        }
+      }
+    }
+
+    List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
+        removeOutOfStockProducts: true);
+    String encodedDoughnut = jsonEncode(jsonList);
+    return encodedDoughnut;
+  }
+
+  static Color colorGeneralization(Color passedColor, String colorString) {
+    Color returnedColor = passedColor;
+    if (colorString != null) {
+      try {
+        returnedColor = Color(int.parse(colorString.replaceAll("#", "0xff")));
+      } catch (e) {
+        print(e);
+      }
+    }
+    return returnedColor;
+  }
+
+  static void insertInCartTable(String storeName, BuildContext context,
+      OrderItems product, int quantity) async {
+    DatabaseHelper databaseHelper = new DatabaseHelper();
+    String variantId, weight, mrpPrice, price, discount, isUnitType;
+    variantId = product.variantId;
+    weight = product.weight;
+    mrpPrice = product.mrpPrice;
+    price = product.price;
+    discount = product.discount;
+    isUnitType = product.unitType;
+
+    var mId = int.parse(product.id);
+    //String variantId = product.variantId;
+
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID: mId,
+      DatabaseHelper.VARIENT_ID: variantId,
+      DatabaseHelper.WEIGHT: weight,
+      DatabaseHelper.MRP_PRICE: mrpPrice,
+      DatabaseHelper.PRICE: price,
+      DatabaseHelper.DISCOUNT: discount,
+      DatabaseHelper.UNIT_TYPE: isUnitType,
+      DatabaseHelper.PRODUCT_ID: product.productId,
+      /* product.isFav*/
+      DatabaseHelper.isFavorite: '',
+      DatabaseHelper.QUANTITY: quantity.toString(),
+      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+      DatabaseHelper.Product_Name: product.productName,
+      DatabaseHelper.nutrient: product.nutrient,
+      DatabaseHelper.description: product.description,
+      DatabaseHelper.imageType: product.imageType,
+      DatabaseHelper.imageUrl: product.imageUrl,
+      DatabaseHelper.image_100_80: product.image10080,
+      DatabaseHelper.image_300_200: product.image300200
+    };
+
+    int count = await databaseHelper.checkIfProductsExistInDb(
+        DatabaseHelper.CART_Table, variantId);
+    //print("-count-- ${count}");
+    if (count == 0) {
+      count = await databaseHelper.addProductToCart(row);
+//          widget.callback();
+      eventBus.fire(updateCartCount());
+    } else {
+      count = await databaseHelper.updateProductInCart(row, variantId);
+//          widget.callback();
+      eventBus.fire(updateCartCount());
+    }
+    var result = await DialogUtils.displayCommonDialog(context, storeName,
+        'Your order is successfully added to your cart. Please check your cart to proceed',
+        buttonText: 'Ok');
+    if (result == true) {
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (BuildContext context) => MyCartScreen(() {})));
+    }
+  }
+
+  static void reOrderItems(
+      String storeName, BuildContext context, OrderData orderData) {
+    Utils.showProgressDialog(context);
+    ApiController.getOrderDetail(orderData.orderId).then((respone) {
+      if (respone != null &&
+          respone.success &&
+          respone.orders != null &&
+          respone.orders.isNotEmpty) {
+        for (int i = 0; i < respone.orders.first.orderItems.length; i++) {
+          insertInCartTable(storeName, context, respone.orders.first.orderItems[i],
+              int.parse(respone.orders.first.orderItems[i].quantity));
+        }
+      }
+      Utils.hideProgressDialog(context);
+    });
+  }
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }
 
 enum OrderType { Delivery, PickUp, Menu }
 
-enum PaymentType { COD, ONLINE, CANCEL }
+enum PaymentType { COD, ONLINE, ONLINE_PAYTM, CANCEL }
+enum RadioButtonEnum { SELECTD, UNSELECTED }
+
+class AdditionItemsConstants {
+  static const ABOUT_US = "About Us";
+  static const FAQ = "FAQ";
+  static const TERMS_CONDITIONS = "Terms and Conditions";
+  static const PRIVACY_POLICY = "Privacy Policy";
+  static const REFUND_POLICY = "Refund Policy";
+}

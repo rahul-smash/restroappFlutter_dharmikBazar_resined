@@ -14,13 +14,16 @@ class RedeemPointsScreen extends StatefulWidget {
 
   final DeliveryAddressData address;
   final String paymentMode; // 2 = COD, 3 = Online Payment
+  String shippingCharges='0'; // 2 = COD, 3 = Online Payment
   final Function(TaxCalculationModel) callback;
   bool isComingFromPickUpScreen;
   String areaId;
   List<String> reddemPointsCodeList;
+  bool isOrderVariations=false;
+  List<OrderDetail> responseOrderDetail;
 
   RedeemPointsScreen(this.address,this.paymentMode, this.isComingFromPickUpScreen,
-      this.areaId,this.callback,this.reddemPointsCodeList);
+      this.areaId,this.callback,this.reddemPointsCodeList,this.isOrderVariations,this.responseOrderDetail,this.shippingCharges);
 
   @override
   RedeemPointsScreenState createState() => RedeemPointsScreenState();
@@ -180,7 +183,14 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
                                       }else{
 
                                         if(widget.reddemPointsCodeList.isEmpty){
-                                          databaseHelper.getCartItemsListToJson().then((json) {
+                                          databaseHelper.getCartItemsListToJson(isOrderVariations:widget.isOrderVariations,responseOrderDetail: widget.responseOrderDetail).then((json) {
+                                            if (json.length == 2) {
+                                              Utils.showToast(
+                                                  "All Items are out of stock.",
+                                                  true);
+                                              Utils.hideProgressDialog(context);
+                                              return;
+                                            }
                                             validateCouponApi(loyalityData, json,);
                                           });
                                         }else{
@@ -214,11 +224,13 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
     print("----couponCode-----=>${loyalityData.amount}");
     Utils.showProgressDialog(context);
     ApiController.multipleTaxCalculationRequest(loyalityData.couponCode,
-        loyalityData.amount, "0", json).then((response) async {
+        loyalityData.amount, widget.shippingCharges, json).then((response) async {
 
       Utils.hideProgressDialog(context);
       if (response.success) {
         widget.callback(response.taxCalculation);
+      }else{
+        Utils.showToast(response.message, true);
       }
       Navigator.pop(context, true);
 

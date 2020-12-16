@@ -4,11 +4,12 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
+import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
 import 'package:restroapp/src/UI/CategoryView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -26,7 +27,6 @@ import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'ForceUpdate.dart';
 import 'SearchScreen.dart';
 import 'dart:io';
 import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
@@ -75,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
     listenCartChanges();
     checkForMultiStore();
     getCategoryApi();
+    ApiController.getUserWallet();
     try {
       AppConstant.placeholderUrl = store.banner10080;
       //print("-----store.banners-----${store.banners.length}------");
@@ -92,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
       if (widget.showForceUploadAlert) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           DialogUtils.showForceUpdateDialog(context, store.storeName,
-              store.forceDownload[0].forceDownloadMessage);
+              store.forceDownload[0].forceDownloadMessage,storeModel: store);
         });
       } else {
         if (!checkIfStoreClosed()) {
@@ -129,12 +130,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 : categoryResponse == null
                     ? SingleChildScrollView(child: Center(child: Text("")))
                     : Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage("images/backgroundimg.png"),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                        color: grayLightColor,
+//                        decoration: BoxDecoration(
+//                          image: DecorationImage(
+//                            image: AssetImage("images/backgroundimg.png"),
+//                            fit: BoxFit.cover,
+//                          ),
+//                        ),
                         padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                         child: GridView.count(
                             crossAxisCount: 2,
@@ -219,7 +221,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 j++) {
                               SubCategory subCategory =
                                   categories.subCategory[j];
-
                               if (subCategory.id ==
                                   store.banners[position].subCategoryId) {
                                 print(
@@ -319,6 +320,7 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Badge(
                 showBadge: cartBadgeCount == 0 ? false : true,
+                badgeColor: appThemeSecondary,
                 badgeContent: Text('${cartBadgeCount}',
                     style: TextStyle(color: Colors.white)),
                 child: Image.asset('images/carticon.png',
@@ -393,7 +395,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if (AppConstant.isLoggedIn) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MyOrderScreen(store)),
+              MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(this.store)),
             );
             Map<String, dynamic> attributeMap = new Map<String, dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";
@@ -425,6 +427,7 @@ class _HomeScreenState extends State<HomeScreen> {
         //print("------_handleDrawer-------");
         if (AppConstant.isLoggedIn) {
           user = await SharedPrefs.getUser();
+          print("user.id=${user.id}");
           if (user != null) setState(() {});
         }
       }
@@ -691,6 +694,24 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: _handleDrawer,
       ),
       actions: <Widget>[
+        Visibility(
+            visible: AppConstant.isLoggedIn,
+            child: IconButton(
+              icon: Icon(
+                Icons.notifications,
+                size: 25.0,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return NotificationScreen(this.store);
+                  }),
+                );
+              },
+            )),
+        
         Visibility(
           visible: rightActionsEnable && whatIconEnable,
           child: Padding(

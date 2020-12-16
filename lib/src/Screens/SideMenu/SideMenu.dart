@@ -1,39 +1,42 @@
 import 'dart:io';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_share/flutter_share.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
+import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
-import 'package:restroapp/src/Screens/SideMenu/BookNowScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
-import 'package:restroapp/src/Screens/SideMenu/ReferEarn.dart';
+import 'package:restroapp/src/Screens/SideMenu/FAQScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
+import 'package:restroapp/src/models/SocialModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 
+import 'AdditionalInformations.dart';
 import 'LoyalityPoints.dart';
 import 'ProfileScreen.dart';
+import 'WalletHistory.dart';
 
 class NavDrawerMenu extends StatefulWidget {
-
   final StoreModel store;
   final String userName;
+
   NavDrawerMenu(this.store, this.userName);
 
   @override
@@ -44,11 +47,22 @@ class NavDrawerMenu extends StatefulWidget {
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
   List<dynamic> _drawerItems = List();
+  SocialModel socialModel;
+  WalleModel walleModel;
+  double iconHeight = 25;
+  GoogleSignIn _googleSignIn;
+
   _NavDrawerMenuState();
 
   @override
   void initState() {
     super.initState();
+    _googleSignIn = GoogleSignIn(
+      scopes: [
+        'email',
+        'https://www.googleapis.com/auth/contacts.readonly',
+      ],
+    );
     //print("isRefererFnEnable=${widget.store.isRefererFnEnable}");
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.HOME, "images/home.png"));
@@ -63,11 +77,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           DrawerChildConstants.LOYALITY_POINTS, "images/loyality.png"));
     _drawerItems.add(
         DrawerChildItem(DrawerChildConstants.MY_FAVORITES, "images/myfav.png"));
-    _drawerItems.add(
-        DrawerChildItem(DrawerChildConstants.ABOUT_US, "images/about.png"));
-    _drawerItems.add(DrawerChildItem(widget.store.isRefererFnEnable && AppConstant.isLoggedIn
-        ? DrawerChildConstants.ReferEarn
-        : DrawerChildConstants.SHARE, "images/refer.png"));
+//    _drawerItems.add(DrawerChildItem(
+//        DrawerChildConstants.ABOUT_US, "images/about_image.png"));
+    _drawerItems.add(DrawerChildItem(
+        widget.store.isRefererFnEnable && AppConstant.isLoggedIn
+            ? DrawerChildConstants.ReferEarn
+            : DrawerChildConstants.SHARE,
+        "images/refer.png"));
+    _drawerItems.add(DrawerChildItem(
+        DrawerChildConstants.ADDITION_INFORMATION, "images/about.png"));
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
     try {
@@ -75,8 +93,18 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     } catch (e) {
       print(e);
     }
-  }
+    if (AppConstant.isLoggedIn) {
+      ApiController.getUserWallet().then((response) {
+        setState(() {
+          this.walleModel = response;
+        });
+      });
+    }
 
+    ApiController.getStoreSocialOptions().then((value) {
+      this.socialModel = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,16 +113,156 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           canvasColor: left_menu_background_color,
         ),
         child: Drawer(
-          child: ListView.builder(
-              padding: EdgeInsets.zero,
-              itemCount: _drawerItems.length + 1,
-              itemBuilder: (BuildContext context, int index) {
-                return (index == 0
-                    ? createHeaderInfoItem()
-                    : createDrawerItem(index - 1, context));
-              }),
-        )
-    );
+            child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  itemCount: _drawerItems.length + 1,
+                  itemBuilder: (BuildContext context, int index) {
+                    return (index == 0
+                        ? Container(
+                            child: Column(
+                              children: [
+                                createHeaderInfoItem(),
+                                showUserWalletView(),
+                              ],
+                            ),
+                          )
+                        : createDrawerItem(index - 1, context));
+                  }),
+            ),
+            Visibility(
+//                    visible: socialModel != null &&
+//                        socialModel.data != null &&
+//                        socialModel.data.facebook.isNotEmpty ||
+//                        socialModel != null &&
+//                            socialModel.data != null &&
+//                            socialModel.data.twitter.isNotEmpty ||
+//                        socialModel != null &&
+//                            socialModel.data != null &&
+//                            socialModel.data.youtube.isNotEmpty ||
+//                        socialModel != null &&
+//                            socialModel.data != null &&
+//                            socialModel.data.instagram.isNotEmpty ||
+//                        socialModel != null &&
+//                            socialModel.data != null &&
+//                            socialModel.data.linkedin.isNotEmpty ,
+                visible: true,
+                child: Container(
+                  color: appTheme,
+                  height: 40,
+                  child: Center(
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Text(
+                            "Follow Us On",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        Visibility(
+                            visible: socialModel != null &&
+                                socialModel.data != null &&
+                                socialModel.data.facebook.isNotEmpty,
+                            child: InkWell(
+                              onTap: () {
+                                if (socialModel != null) {
+                                  if (socialModel.data.facebook.isNotEmpty)
+                                    Utils.launchURL(socialModel.data.facebook);
+                                }
+                              },
+                              child: Image.asset(
+                                "images/fbicon.png",
+                                width: iconHeight,
+                                height: iconHeight,
+                              ),
+                            )),
+                        Visibility(
+                          visible: socialModel != null &&
+                              socialModel.data != null &&
+                              socialModel.data.twitter.isNotEmpty,
+                          child: InkWell(
+                            onTap: () {
+                              if (socialModel != null) {
+                                if (socialModel.data.twitter.isNotEmpty)
+                                  Utils.launchURL(socialModel.data.twitter);
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              child: Image.asset(
+                                "images/twittericon.png",
+                                width: iconHeight,
+                                height: iconHeight,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: socialModel != null &&
+                              socialModel.data != null &&
+                              socialModel.data.linkedin.isNotEmpty,
+                          child: InkWell(
+                            onTap: () {
+                              if (socialModel != null) {
+                                if (socialModel.data.linkedin.isNotEmpty)
+                                  Utils.launchURL(socialModel.data.linkedin);
+                              }
+                            },
+                            child: Image.asset(
+                              "images/linkedinicon.png",
+                              width: iconHeight,
+                              height: iconHeight,
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: socialModel != null &&
+                              socialModel.data != null &&
+                              socialModel.data.youtube.isNotEmpty,
+                          child: InkWell(
+                            onTap: () {
+                              if (socialModel != null) {
+                                if (socialModel.data.youtube.isNotEmpty)
+                                  Utils.launchURL(socialModel.data.youtube);
+                              }
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              child: Image.asset(
+                                "images/youtubeicon.png",
+                                width: iconHeight,
+                                height: iconHeight,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Visibility(
+                          visible: socialModel != null &&
+                              socialModel.data != null &&
+                              socialModel.data.instagram.isNotEmpty,
+                          child: InkWell(
+                            onTap: () {
+                              if (socialModel != null) {
+                                if (socialModel.data.instagram.isNotEmpty)
+                                  Utils.launchURL(socialModel.data.instagram);
+                              }
+                            },
+                            child: Image.asset(
+                              "images/instagram.png",
+                              width: iconHeight,
+                              height: iconHeight,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ))
+          ],
+        )));
   }
 
   Widget createHeaderInfoItem() {
@@ -106,7 +274,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
               Padding(
                 padding: EdgeInsets.only(left: 0, right: 20),
                 child: Center(
-                  child: Icon(Icons.account_circle,size: 60, color: Colors.white,),
+                  child: Icon(
+                    Icons.account_circle,
+                    size: 60,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               Flexible(
@@ -114,17 +286,80 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text('Welcome',
-                          style: TextStyle(color: leftMenuWelcomeTextColors,
-                              fontSize: 18, fontWeight: FontWeight.bold)),
+                          style: TextStyle(
+                              color: leftMenuWelcomeTextColors,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
                       SizedBox(height: 5),
-                      Text(AppConstant.isLoggedIn == false ? '' : widget.userName,
-                          maxLines: 2, overflow: TextOverflow.ellipsis,
-                          style: TextStyle(color: leftMenuWelcomeTextColors, fontSize: 15)
-                      ),
-                    ]
-                ),
+                      Text(
+                          AppConstant.isLoggedIn == false
+                              ? ''
+                              : widget.userName,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: leftMenuWelcomeTextColors, fontSize: 15)),
+                    ]),
               ),
             ])));
+  }
+
+  Widget showUserWalletView() {
+    return Visibility(
+      visible: widget.store.wallet_setting == "1" ? true : false,
+      child: InkWell(
+        onTap: () async {
+          print("showUserWalletView");
+          bool isNetworkAvailable = await Utils.isNetworkAvailable();
+          if (!isNetworkAvailable) {
+            Utils.showToast(AppConstant.noInternet, false);
+            return;
+          }
+          if (AppConstant.isLoggedIn) {
+            Navigator.pop(context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => WalletHistoryScreen()),
+            );
+            Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+            attributeMap["WalletHistory"] = "WalletHistoryScreen";
+            Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
+          } else {
+            Navigator.pop(context);
+            Utils.showLoginDialog(context);
+          }
+        },
+        child: Container(
+          child: Padding(
+              padding: EdgeInsets.only(left: 20),
+              child: ListTile(
+                //leading: Icon(Icons.account_balance_wallet,color: left_menu_icon_colors, size: 30),
+                leading: Image.asset(
+                  "images/walleticon.png",
+                  color: left_menu_icon_colors,
+                  height: 30,
+                  width: 30,
+                ),
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Wallet Balance",
+                        style: TextStyle(
+                            color: leftMenuLabelTextColors, fontSize: 16)),
+                    Text(
+                        AppConstant.isLoggedIn
+                            ? walleModel == null
+                                ? "${AppConstant.currency}"
+                                : "${AppConstant.currency} ${walleModel.data.userWallet}"
+                            : "",
+                        style: TextStyle(
+                            color: leftMenuLabelTextColors, fontSize: 15)),
+                  ],
+                ),
+              )),
+        ),
+      ),
+    );
   }
 
   Widget createDrawerItem(int index, BuildContext context) {
@@ -134,31 +369,31 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         child: ListTile(
           leading: Image.asset(
               item.title == DrawerChildConstants.LOGIN ||
-                  item.title == DrawerChildConstants.LOGOUT
+                      item.title == DrawerChildConstants.LOGOUT
                   ? AppConstant.isLoggedIn == false
-                  ? 'images/sign_in.png'
-                  : 'images/sign_out.png'
+                      ? 'images/sign_in.png'
+                      : 'images/sign_out.png'
                   : item.icon,
               color: left_menu_icon_colors,
               width: 30),
           title: item.title == DrawerChildConstants.LOGIN ||
-              item.title == DrawerChildConstants.LOGOUT
+                  item.title == DrawerChildConstants.LOGOUT
               ? Text(
-              AppConstant.isLoggedIn == false
-                  ? DrawerChildConstants.LOGIN
-                  : DrawerChildConstants.LOGOUT,
-              style:
-              TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
+                  AppConstant.isLoggedIn == false
+                      ? DrawerChildConstants.LOGIN
+                      : DrawerChildConstants.LOGOUT,
+                  style:
+                      TextStyle(color: leftMenuLabelTextColors, fontSize: 15))
               : Text(item.title,
-              style:
-              TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
+                  style:
+                      TextStyle(color: leftMenuLabelTextColors, fontSize: 15)),
           onTap: () {
             _openPageForIndex(item, index, context);
           },
         ));
   }
 
-  _openPageForIndex(DrawerChildItem item,int pos, BuildContext context) async {
+  _openPageForIndex(DrawerChildItem item, int pos, BuildContext context) async {
     switch (item.title) {
       case DrawerChildConstants.HOME:
         Navigator.pop(context);
@@ -168,12 +403,14 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => ProfileScreen(false,"","")),
+            MaterialPageRoute(
+                builder: (context) => ProfileScreen(false, "", "", null, null)),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "ProfileScreen";
-          Utils.sendAnalyticsEvent("Clicked ProfileScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked ProfileScreen", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -182,12 +419,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => DeliveryAddressList(false,OrderType.Menu)),
+            MaterialPageRoute(
+                builder: (context) =>
+                    DeliveryAddressList(false, OrderType.Menu)),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "DeliveryAddressList";
-          Utils.sendAnalyticsEvent("Clicked DeliveryAddressList",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -196,12 +436,14 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => MyOrderScreen(widget.store)),
+            MaterialPageRoute(
+                builder: (context) => MyOrderScreenVersion2(widget.store)),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "MyOrderScreen";
-          Utils.sendAnalyticsEvent("Clicked MyOrderScreen",attributeMap);
+          Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
         } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -210,9 +452,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => LoyalityPointsScreen(widget.store)),
+            MaterialPageRoute(
+                builder: (context) => LoyalityPointsScreen(widget.store)),
           );
-        }else {
+        } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
 
@@ -222,12 +466,13 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => Favourites(() { })),
+            MaterialPageRoute(builder: (context) => Favourites(() {})),
           );
-          Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
           attributeMap["ScreenName"] = "Favourites";
-          Utils.sendAnalyticsEvent("Clicked Favourites",attributeMap);
-        }else {
+          Utils.sendAnalyticsEvent("Clicked Favourites", attributeMap);
+        } else {
+          Navigator.pop(context);
           Utils.showLoginDialog(context);
         }
         break;
@@ -237,41 +482,53 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           context,
           MaterialPageRoute(builder: (context) => AboutScreen(widget.store)),
         );
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "AboutScreen";
-        Utils.sendAnalyticsEvent("Clicked AboutScreen",attributeMap);
+        Utils.sendAnalyticsEvent("Clicked AboutScreen", attributeMap);
+        break;
+
+      case DrawerChildConstants.ADDITION_INFORMATION:
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AdditionalInformation(widget.store)),
+        );
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+        attributeMap["ScreenName"] = "AdditionalInformation";
+        Utils.sendAnalyticsEvent("Clicked AdditionalInformation", attributeMap);
         break;
       case DrawerChildConstants.ReferEarn:
       case DrawerChildConstants.SHARE:
         if (AppConstant.isLoggedIn) {
-          if(widget.store.isRefererFnEnable){
+          if (widget.store.isRefererFnEnable) {
             Navigator.pop(context);
 
             Utils.showProgressDialog(context);
             ReferEarnData referEarn = await ApiController.referEarn();
             Utils.hideProgressDialog(context);
-            share2(referEarn.referEarn.sharedMessage,widget.store);
-          }else{
+            share2(referEarn.referEarn.sharedMessage, widget.store);
+          } else {
             Utils.showToast("Refer Earn is inactive!", true);
-            share2(null,widget.store);
+            share2(null, widget.store);
           }
-        }else {
+        } else {
           Navigator.pop(context);
-          if(widget.store.isRefererFnEnable){
+          if (widget.store.isRefererFnEnable) {
             var result = await DialogUtils.showInviteEarnAlert(context);
             print("showInviteEarnAlert=${result}");
-          }else{
-            share2(null,widget.store);
+          } else {
+            share2(null, widget.store);
           }
         }
         //share();
 
-        Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "share apk url";
-        Utils.sendAnalyticsEvent("Clicked share",attributeMap);
+        Utils.sendAnalyticsEvent("Clicked share", attributeMap);
 
         //DialogUtils.showInviteEarnAlert2(context);
-        
+
         break;
       case DrawerChildConstants.LOGIN:
       case DrawerChildConstants.LOGOUT:
@@ -279,30 +536,44 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           _showDialog(context);
         } else {
           Navigator.pop(context);
-          SharedPrefs.getStore().then((storeData){
+          SharedPrefs.getStore().then((storeData) {
             StoreModel model = storeData;
             print("---internationalOtp--${model.internationalOtp}");
             //User Login with Mobile and OTP = 0
             // 1 = email and 0 = ph-no
-            if(model.internationalOtp == "0"){
+            if (model.internationalOtp == "0") {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LoginMobileScreen("menu")),
+                MaterialPageRoute(
+                    builder: (context) => LoginMobileScreen("menu")),
               );
-              Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+              Map<String, dynamic> attributeMap = new Map<String, dynamic>();
               attributeMap["ScreenName"] = "LoginMobileScreen";
-              Utils.sendAnalyticsEvent("Clicked LoginMobileScreen",attributeMap);
-            }else{
+              Utils.sendAnalyticsEvent(
+                  "Clicked LoginMobileScreen", attributeMap);
+            } else {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => LoginEmailScreen("menu")),
+                MaterialPageRoute(
+                    builder: (context) => LoginEmailScreen("menu")),
               );
-              Map<String,dynamic> attributeMap = new Map<String,dynamic>();
+              Map<String, dynamic> attributeMap = new Map<String, dynamic>();
               attributeMap["ScreenName"] = "LoginEmailScreen";
-              Utils.sendAnalyticsEvent("Clicked LoginEmailScreen",attributeMap);
+              Utils.sendAnalyticsEvent(
+                  "Clicked LoginEmailScreen", attributeMap);
             }
           });
         }
+        break;
+      case DrawerChildConstants.FAQ:
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => FAQScreen(widget.store)),
+        );
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+        attributeMap["ScreenName"] = "FAQ";
+        Utils.sendAnalyticsEvent("Clicked AboutScreen", attributeMap);
         break;
     }
   }
@@ -326,7 +597,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
             ),
             FlatButton(
               child: const Text('YES'),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
                 logout(context);
               },
@@ -341,32 +612,51 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     await FlutterShare.share(
         title: 'Kindly download',
         text: 'Kindly download' + widget.store.storeName + 'app from',
-        linkUrl: Platform.isIOS ? widget.store.iphoneShareLink :widget.store.androidShareLink,
+        linkUrl: Platform.isIOS
+            ? widget.store.iphoneShareLink
+            : widget.store.androidShareLink,
         chooserTitle: 'Share');
   }
 
-  Future<void> share2(String referEarn,StoreModel store) async {
-    if(referEarn != null && store.isRefererFnEnable){
+  Future<void> share2(String referEarn, StoreModel store) async {
+    if (referEarn != null && store.isRefererFnEnable) {
       await FlutterShare.share(
           title: '${store.storeName}',
           linkUrl: referEarn,
           chooserTitle: 'Refer & Earn');
-    }else{
+    } else {
       await FlutterShare.share(
           title: 'Kindly download',
           text: 'Kindly download' + widget.store.storeName + 'app from',
-          linkUrl: Platform.isIOS ? widget.store.iphoneShareLink :widget.store.androidShareLink,
+          linkUrl: Platform.isIOS
+              ? widget.store.iphoneShareLink
+              : widget.store.androidShareLink,
           chooserTitle: 'Share');
     }
-
   }
 
   Future logout(BuildContext context) async {
     try {
+      FacebookLogin facebookSignIn = new FacebookLogin();
+      bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
+      print("isFbLoggedIn=${isFbLoggedIn}");
+      if (isFbLoggedIn) {
+        await facebookSignIn.logOut();
+      }
+
+      bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
+      print("isGoogleSignedIn=${isGoogleSignedIn}");
+      if (isGoogleSignedIn) {
+        await _googleSignIn.signOut();
+      }
+
       SharedPrefs.setUserLoggedIn(false);
       SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
       SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
       SharedPrefs.removeKey(AppConstant.referEarnMsg);
+      SharedPrefs.removeKey("user_wallet");
+      SharedPrefs.removeKey("user");
+
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
       databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
@@ -389,26 +679,27 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   Future<void> _setSetUserId() async {
     try {
-      if(AppConstant.isLoggedIn){
+      if (AppConstant.isLoggedIn) {
         UserModel user = await SharedPrefs.getUser();
         await Utils.analytics.setUserId('${user.id}');
         await Utils.analytics.setUserProperty(name: "userid", value: user.id);
-        await Utils.analytics.setUserProperty(name: "useremail", value: user.email);
-        await Utils.analytics.setUserProperty(name: "userfullName", value: user.fullName);
-        await Utils.analytics.setUserProperty(name: "userphone", value: user.phone);
+        await Utils.analytics
+            .setUserProperty(name: "useremail", value: user.email);
+        await Utils.analytics
+            .setUserProperty(name: "userfullName", value: user.fullName);
+        await Utils.analytics
+            .setUserProperty(name: "userphone", value: user.phone);
       }
     } catch (e) {
       print(e);
     }
   }
-
 }
-
-
 
 class DrawerChildItem {
   String title;
   String icon;
+
   DrawerChildItem(this.title, this.icon);
 }
 
@@ -420,9 +711,13 @@ class DrawerChildConstants {
   static const LOYALITY_POINTS = "Loyality Points";
   static const MY_FAVORITES = "My Favorites";
   static const ABOUT_US = "About Us";
+  static const ADDITION_INFORMATION = "Addition \nInformation";
   static const SHARE = "Share";
+  static const FAQ = "FAQ";
+  static const TERMS_CONDITIONS = "Terms and Conditions";
+  static const PRIVACY_POLICY = "Privacy Policy";
+  static const REFUND_POLICY = "Refund Policy";
   static const ReferEarn = "Refer & Earn";
   static const LOGIN = "Login";
   static const LOGOUT = "Logout";
 }
-

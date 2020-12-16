@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
 import 'package:restroapp/src/Screens/Address/StoreLocationScreen.dart';
+import 'package:restroapp/src/Screens/Address/StoreLocationScreenWithMultiplePick.dart';
 import 'package:restroapp/src/Screens/BookOrder/OrderSelectionScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -198,7 +199,8 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                         }else{
                           Navigator.push(context,
                             MaterialPageRoute(
-                                builder: (context) => PickUpOrderScreen(storeArea,OrderType.PickUp)),
+//                                builder: (context) => PickUpOrderScreen(storeArea,OrderType.PickUp)),
+                                builder: (context) => StoreLocationScreenWithMultiplePick(storeArea,OrderType.PickUp)),
                           );
                         }
                       }else{
