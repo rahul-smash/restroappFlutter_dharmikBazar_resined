@@ -110,7 +110,8 @@ Widget showHomeScreen(StoreResponse model,ConfigModel configObject,PackageInfo p
     }
     //print("--currentVesrion--${currentVesrion} and ${apiVesrion}");
     if(apiVesrion > currentVesrion){
-      //return ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
+      //returnhi
+      // ForceUpdateAlert(forceDownload[0].forceDownloadMessage,appName);
       return HomeScreen(model.store,configObject,true);
     }else{
       return HomeScreen(model.store,configObject,false);
