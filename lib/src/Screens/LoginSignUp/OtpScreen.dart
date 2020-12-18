@@ -18,10 +18,10 @@ import 'LoginMobileScreen.dart';
 import 'RegisterScreen.dart';
 
 class OtpScreen extends StatefulWidget {
-
   String menu;
   MobileVerified response;
   LoginMobile phone;
+
   OtpScreen(this.menu, this.response, this.phone);
 
   @override
@@ -29,18 +29,18 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreen extends State<OtpScreen> {
-
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   OTPData otpModel = new OTPData();
   Timer _timer;
   int _start = 30;
 
   StoreModel store;
-  String otpSkip,pickupfacility,delieveryAdress;
+  String otpSkip, pickupfacility, delieveryAdress;
+
   @override
   void initState() {
     super.initState();
-    startTimer();
+//    startTimer();
     getAddresKey();
   }
 
@@ -48,7 +48,7 @@ class _OtpScreen extends State<OtpScreen> {
   void dispose() {
     // TODO: implement dispose
     super.dispose();
-    if(_timer != null){
+    if (_timer != null) {
       _timer.cancel();
     }
   }
@@ -57,20 +57,24 @@ class _OtpScreen extends State<OtpScreen> {
     store = await SharedPrefs.getStore();
     setState(() {
       pickupfacility = store.pickupFacility;
-      delieveryAdress=store.deliveryFacility;
-      print('@@HomeModel   '+pickupfacility+'  Delievery'+delieveryAdress);
+      delieveryAdress = store.deliveryFacility;
+      print(
+          '@@HomeModel   ' + pickupfacility + '  Delievery' + delieveryAdress);
     });
   }
+
   @override
   Widget build(BuildContext context) {
-
     return new Scaffold(
       backgroundColor: whiteColor,
       appBar: new AppBar(
         centerTitle: true,
-        title: new Text('Mobile Verification',style: new TextStyle(
-          color: Colors.white,
-        ),),
+        title: new Text(
+          'Mobile Verification',
+          style: new TextStyle(
+            color: Colors.white,
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         reverse: true,
@@ -80,9 +84,15 @@ class _OtpScreen extends State<OtpScreen> {
               alignment: Alignment.topCenter,
               child: Container(
                 width: Utils.getDeviceWidth(context),
-                child: AppConstant.isRestroApp ?
-                Image.asset("images/login_restro_bg.jpg",fit: BoxFit.fitWidth,)
-                    :Image.asset("images/login_img.jpg",fit: BoxFit.fitWidth,),
+                child: AppConstant.isRestroApp
+                    ? Image.asset(
+                        "images/login_restro_bg.jpg",
+                        fit: BoxFit.fitWidth,
+                      )
+                    : Image.asset(
+                        "images/login_img.jpg",
+                        fit: BoxFit.fitWidth,
+                      ),
               ),
             ),
             Align(
@@ -96,7 +106,8 @@ class _OtpScreen extends State<OtpScreen> {
                     children: <Widget>[
                       Container(
                           padding: const EdgeInsets.only(top: 40.0),
-                          margin: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
+                          margin:
+                              const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
                           child: new Text(
                             AppConstant.txt_OTP,
                             style: new TextStyle(
@@ -111,7 +122,7 @@ class _OtpScreen extends State<OtpScreen> {
                         ),
                         keyboardType: TextInputType.phone,
                         validator: (val) =>
-                        val.isEmpty ? AppConstant.enterOtp : null,
+                            val.isEmpty ? AppConstant.enterOtp : null,
                         inputFormatters: [
                           WhitelistingTextInputFormatter.digitsOnly,
                         ],
@@ -122,35 +133,37 @@ class _OtpScreen extends State<OtpScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+//                          Container(
+//                              padding: EdgeInsets.only( left: 0.0, top: 10.0, right: 20.0),
+//                              child: new RaisedButton(
+//                                color: appThemeSecondary,
+//                                shape: RoundedRectangleBorder(
+//                                  borderRadius: BorderRadius.circular(5.0),
+//                                ),
+//                                textColor: Colors.white,
+//                                child: Text(_start != 0 ? "${_start} sec" : "Skip",style: TextStyle(
+//                                  color: Colors.white,
+//                                ),
+//                                ),
+//                                onPressed: onSkipButtonPressed,
+//                              )),
                           Container(
-                              padding: EdgeInsets.only( left: 0.0, top: 10.0, right: 20.0),
+                              padding: EdgeInsets.only(
+                                  left: 0.0, top: 10.0, right: 0.0),
                               child: new RaisedButton(
                                 color: appThemeSecondary,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(5.0),
                                 ),
                                 textColor: Colors.white,
-                                child: Text(_start != 0 ? "${_start} sec" : "Skip",style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                                ),
-                                onPressed: onSkipButtonPressed,
-                              )),
-                          Container(
-                              padding: EdgeInsets.only( left: 20.0, top: 10.0, right: 0.0),
-                              child: new RaisedButton(
-                                color: appThemeSecondary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                                textColor: Colors.white,
-                                child: const Text('Submit',style: TextStyle(
-                                  color: Colors.white,
-                                ),
+                                child: const Text(
+                                  'Submit',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
                                 ),
                                 onPressed: onSubmitClicked,
-                              )
-                          ),
+                              )),
                         ],
                       ),
                     ],
@@ -162,22 +175,21 @@ class _OtpScreen extends State<OtpScreen> {
     );
   }
 
-
   void startTimer() {
     //print('--startTimer===  $_start');
     const oneSec = const Duration(seconds: 1);
-    _timer = new Timer.periodic(oneSec,
-          (Timer timer) {
-            //print('--periodic===  $_start');
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) {
+        //print('--periodic===  $_start');
         setState(
-              () {
+          () {
             if (_start < 1) {
               timer.cancel();
             } else {
               _start = _start - 1;
             }
           },
-
         );
       },
     );
@@ -186,15 +198,14 @@ class _OtpScreen extends State<OtpScreen> {
   void onSkipButtonPressed() {
     //print('@@MENUGET'+widget.menu);
     //print('--periodic===  $_start');
-    if(_start == 0){
+    if (_start == 0) {
       // user clicked on skip button
       //print('--Skip=Skip==');
       proceedToNextActivity();
     }
   }
 
-
- /* void resendOtpScreen(){
+  /* void resendOtpScreen(){
     Utils.isNetworkAvailable().then((isNetworkAvailable) async {
       if (isNetworkAvailable) {
         Utils.showProgressDialog(context);
@@ -213,23 +224,22 @@ class _OtpScreen extends State<OtpScreen> {
 
   }*/
 
-  void onSubmitClicked(){
+  void onSubmitClicked() {
     final FormState form = _formKey.currentState;
     if (form.validate()) {
       form.save(); //This invokes each onSaved event
       Utils.isNetworkAvailable().then((isNetworkAvailable) async {
         if (isNetworkAvailable) {
-
           Utils.showProgressDialog(context);
 
-          ApiController.otpVerified(otpModel,widget.phone).then((response) {
+          ApiController.otpVerified(otpModel, widget.phone).then((response) {
             Utils.hideProgressDialog(context);
             if (response != null && response.success) {
               //print('@@----object+'+response.success.toString());
               Utils.showToast(response.message, true);
               //Navigator.pop(context);
               proceedToNextActivity();
-            }else{
+            } else {
               if (response != null) {
                 Utils.showToast(response.message, true);
               }
@@ -239,28 +249,26 @@ class _OtpScreen extends State<OtpScreen> {
           Utils.showToast(AppConstant.noInternet, true);
         }
       });
-    }else{
+    } else {
       Utils.showToast("Please enter OTP", true);
     }
   }
 
   void proceedToNextActivity() {
-    print('@@MENUGET'+widget.menu);
+    print('@@MENUGET' + widget.menu);
     if (widget.menu == ("menu")) {
       Navigator.pop(context);
-      Navigator.push(context,
+      Navigator.push(
+        context,
         MaterialPageRoute(
-            builder: (context) => ProfileScreen(true,widget.response.user.id,widget.response.user.fullName,null,null)),
+            builder: (context) => ProfileScreen(true, widget.response.user.id,
+                widget.response.user.fullName, null, null)),
       );
       //Navigator.pop(context);
     }
-
   }
-
 }
 
-
 class OTPData {
-
   String otp;
 }
