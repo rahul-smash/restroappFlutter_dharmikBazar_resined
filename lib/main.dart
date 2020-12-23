@@ -16,7 +16,6 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'dart:io';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-
 import 'src/UI/Language.dart';
 
 Future<void> main() async {
