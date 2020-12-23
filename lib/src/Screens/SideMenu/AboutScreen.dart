@@ -6,6 +6,7 @@ import 'package:maps_launcher/maps_launcher.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
@@ -31,7 +32,7 @@ class _AboutScreenState extends State<AboutScreen> {
   void initState() {
     super.initState();
     try {
-      print("aboutusBanner=${widget.store.aboutusBanner[0].image}");
+      //print("aboutusBanner=${widget.store.aboutusBanner[0].image}");
       aboutUsBanner = widget.store.aboutusBanner[0].image;
     } catch (e) {
       print(e);
@@ -83,15 +84,19 @@ class _AboutScreenState extends State<AboutScreen> {
                     child: Text('Contact Us'),
                     color: appThemeSecondary,
                     textColor: Colors.white,
-                    onPressed: () {
+                    onPressed: () async {
                       //Navigator.pop(context, false);
                       if (AppConstant.isLoggedIn) {
+
+                        UserModel model = await SharedPrefs.getUser();
+
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ContactUs()),
+                          MaterialPageRoute(builder: (context) => ContactUs(model)),
                         );
                       }else{
                         Utils.showToast(AppConstant.pleaseLogin, true);
+                        Utils.showLoginDialog(context);
                       }
 
                     },
