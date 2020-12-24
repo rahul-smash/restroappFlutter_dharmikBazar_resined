@@ -335,7 +335,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(
-                          "Full Name:*",
+                          "First name:*",
                           style: TextStyle(color: infoLabel, fontSize: 17.0),
                         ),
                       ),
