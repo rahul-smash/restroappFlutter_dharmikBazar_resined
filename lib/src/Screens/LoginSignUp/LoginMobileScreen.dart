@@ -159,7 +159,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                               margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                               width: Utils.getDeviceWidth(context),
                               child: Center(
-                                child: Text("──────── OR CONNECT WITH ────────",
+                                child: Text("OR CONNECT WITH",
                                   style: TextStyle(color: gray9),),
                               ),
                             ),
