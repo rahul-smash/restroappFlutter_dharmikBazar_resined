@@ -8,15 +8,39 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
-class ContactUs extends StatelessWidget {
+class ContactUs extends StatefulWidget {
 
+  UserModel model;
+  ContactUs(this.model);
+
+  @override
+  _ContactUsState createState() => _ContactUsState();
+}
+
+class _ContactUsState extends State<ContactUs> {
   TextEditingController firstNameController = TextEditingController();
+
   TextEditingController lastNameController = TextEditingController();
+
   TextEditingController mobileNameController = TextEditingController();
+
   TextEditingController emailNameController = TextEditingController();
+
   TextEditingController cityNameController = TextEditingController();
+
   TextEditingController messagetNameController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    try {
+      firstNameController.text = widget.model.fullName;
+      mobileNameController.text = widget.model.phone;
+      emailNameController.text = widget.model.email;
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -320,6 +344,4 @@ class ContactUs extends StatelessWidget {
       ),
     );
   }
-
-
 }

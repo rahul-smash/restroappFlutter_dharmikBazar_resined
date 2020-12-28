@@ -63,5 +63,27 @@
         <key>NSAllowsLocalNetworking</key>
         <true/>
     </dict>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>fb3522925701099597</string>
+                <string>com.googleusercontent.apps.771670170221-732j2nlvgjl9q8hdkp2vd96eecr0kpb3</string>
+            </array>
+        </dict>
+    </array>
+    <key>FacebookAppID</key>
+    <string>3522925701099597</string>
+    <key>FacebookDisplayName</key>
+    <string>App</string>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>fbapi</string>
+        <string>fb-messenger-share-api</string>
+        <string>fbauth2</string>
+        <string>fbshareextension</string>
+    </array>
+    
 </dict>
 </plist>

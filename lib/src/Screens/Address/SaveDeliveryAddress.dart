@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/UI/SelectLocation.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
@@ -13,6 +14,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:app_settings/app_settings.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
   final DeliveryAddressData selectedAddress;
@@ -41,7 +43,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   void initState() {
     super.initState();
     if (widget.selectedAddress != null) {
-      //print("-11111111111-------");
+      print("-11111111111-------");
       selectedCity = City();
       selectedCity.city = widget.selectedAddress.city;
       selectedCity.id = widget.selectedAddress.cityId;
@@ -59,9 +61,12 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       locationData.address = widget.selectedAddress.address;
       locationData.lat = widget.selectedAddress.lat.toString();
       locationData.lng = widget.selectedAddress.lng.toString();
+
     } else {
-      //print("-2222222222222222-------");
+      print("-2222222222222222-------");
       locationData = new LocationData();
+
+      getUserData();
 
       if (widget.addressValue != null && widget.addressValue.isNotEmpty) {
         //print("-3333333333333333-------");
@@ -73,6 +78,17 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       }
     }
     //getLocation();
+  }
+  void getUserData() {
+    try {
+      SharedPrefs.getUser().then((user){
+        setState(() {
+          fullnameController.text = user.fullName;
+        });
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -252,6 +268,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                   }
                                 }
                               } else {
+                                await AppSettings.openLocationSettings();
                                 Utils.showToast("Please turn on gps!", false);
                               }
                             });
@@ -318,7 +335,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(
-                          "Full Name:*",
+                          "First name:*",
                           style: TextStyle(color: infoLabel, fontSize: 17.0),
                         ),
                       ),
@@ -449,6 +466,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   ))),
         ));
   }
+
+
 }
 
 class CityDialog extends StatefulWidget {
