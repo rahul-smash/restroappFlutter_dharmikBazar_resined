@@ -21,9 +21,11 @@ import 'src/UI/Language.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  String value = await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);
-  if(value == null){
-    SharedPrefs.storeSharedValue(AppConstant.SelectedLanguage, AppConstant.ENGLISH);
+  String value =
+      await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);
+  if (value == null) {
+    SharedPrefs.storeSharedValue(
+        AppConstant.SelectedLanguage, AppConstant.ENGLISH);
   }
   Language language = Language();
   language.changeLanguage();
@@ -120,8 +122,13 @@ Widget showHomeScreen(
     double currentVesrion = double.parse(version.substring(0, index1).trim());
     double apiVesrion = 1.0;
     try {
-      apiVesrion = double.parse(
-          forceDownload[0].androidAppVerison.substring(0, index1).trim());
+      if (Platform.isIOS) {
+        apiVesrion = double.parse(
+            forceDownload[0].iosAppVersion.substring(0, index1).trim());
+      } else {
+        apiVesrion = double.parse(
+            forceDownload[0].androidAppVerison.substring(0, index1).trim());
+      }
     } catch (e) {
       //print("-apiVesrion--catch--${e}----");
     }
@@ -172,7 +179,6 @@ void setAppThemeColors(StoreModel store) {
   leftMenuLabelTextColors =
       Color(int.parse(appThemeColors.left_menu_label_Color));
 
-
   //flow change
   if (store.webAppThemeColors != null) {
     WebAppThemeColors webAppThemeColors = store.webAppThemeColors;
@@ -182,7 +188,7 @@ void setAppThemeColors(StoreModel store) {
     appThemeSecondary = Utils.colorGeneralization(
         appThemeSecondary, webAppThemeColors.webThemeSecondaryColor);
 
-    dotIncreasedColor=appThemeSecondary;
+    dotIncreasedColor = appThemeSecondary;
     webThemeCategoryOpenColor = Utils.colorGeneralization(
         appThemeLight, webAppThemeColors.webThemeCategoryOpenColor);
     stripsColor =
@@ -206,18 +212,13 @@ void setAppThemeColors(StoreModel store) {
         categoryListingBoxBackgroundColor,
         webAppThemeColors.categoryListingBoxBackgroundColor);
 
-    bottomBarTextColor = Utils.colorGeneralization(
-        bottomBarBackgroundColor,
-        "#000000");
-    bottomBarIconColor= appTheme;
+    bottomBarTextColor =
+        Utils.colorGeneralization(bottomBarBackgroundColor, "#000000");
+    bottomBarIconColor = appTheme;
     bottomBarBackgroundColor =
-        Utils.colorGeneralization(
-            bottomBarBackgroundColor,
-            "#ffffff");
+        Utils.colorGeneralization(bottomBarBackgroundColor, "#ffffff");
     leftMenuLabelTextColors =
-        Utils.colorGeneralization(
-            leftMenuLabelTextColors,
-            "#ffffff");
+        Utils.colorGeneralization(leftMenuLabelTextColors, "#ffffff");
   } else {
     appTheme = Color(int.parse(appThemeColors.appThemeColor));
     appThemeLight = appTheme.withOpacity(0.1);
