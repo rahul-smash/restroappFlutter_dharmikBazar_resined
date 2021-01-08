@@ -98,6 +98,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool showCOD = true;
 
+  bool isAnotherOnlinePaymentGatwayFound=false;
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() async {
@@ -1414,7 +1416,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
             Visibility(
               visible: widget.storeModel.onlinePayment != null &&
-                  widget.storeModel.onlinePayment.compareTo('1') == 0,
+                  widget.storeModel.onlinePayment.compareTo('1') == 0&&isAnotherOnlinePaymentGatwayFound,
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: <Widget>[
@@ -2590,19 +2592,25 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         paymentGateway = storeModel.paymentGatewaySettings.first.paymentGateway;
         if (paymentGateway.toLowerCase().contains('paytm')) {
           isPayTmActive = true;
+        }else{
+          isPayTmActive=false;
         }
       } else {
         for (int i = 0; i < storeModel.paymentGatewaySettings.length; i++) {
           paymentGateway = storeModel.paymentGatewaySettings[i].paymentGateway;
           if (paymentGateway.toLowerCase().contains('paytm')) {
             isPayTmActive = true;
-            break;
+          }else{
+            isAnotherOnlinePaymentGatwayFound=true;
           }
         }
       }
     } else {
       if (paymentGateway.toLowerCase().contains('paytm')) {
         isPayTmActive = true;
+      }else{
+        isPayTmActive = false;
+        isAnotherOnlinePaymentGatwayFound=false;
       }
     }
   }
