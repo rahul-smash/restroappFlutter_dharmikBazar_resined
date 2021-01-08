@@ -1935,6 +1935,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
+
   checkDeliveryAreaDeleted(StoreModel storeObject, {String addressId = ""}) {
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses) async {
