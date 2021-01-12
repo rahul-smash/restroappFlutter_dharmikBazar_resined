@@ -98,7 +98,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool showCOD = true;
 
-  bool isAnotherOnlinePaymentGatwayFound=false;
+  bool isAnotherOnlinePaymentGatwayFound = false;
 
   ConfirmOrderState({this.storeModel});
 
@@ -211,6 +211,33 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      checkInternetConnection();
+    });
+  }
+
+  void checkInternetConnection() {
+    Utils.isNetworkAvailable().then((value) {
+      if (value == false) {
+        DialogUtils.displayDialog(
+            context, "Opps!!!", "No Internet Connection", "Cancel", "Retry",
+            button2: () {
+          Navigator.pop(context);
+          checkInternetConnection();
+        });
+      } else {
+        initialize();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
+  }
+
+  void initialize() {
     initRazorPay();
     listenWebViewChanges();
     checkPaytmActive();
@@ -281,12 +308,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         widget.paymentMode = "3";
       }
     }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _razorpay.clear();
   }
 
   @override
@@ -392,7 +413,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     isLoading = true;
 //    userWalleModel = await SharedPrefs.getUserWallet();
 //    if (userWalleModel == null) {
-    userWalleModel=  await ApiController.getUserWallet();
+    userWalleModel = await ApiController.getUserWallet();
 //      userWalleModel = await SharedPrefs.getUserWallet();
 //    }
 //    databaseHelper.getCartItemsListToJson().then((json) {
@@ -717,85 +738,81 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           children: [
             imageUrl == ""
                 ? Container(
-              width: 70.0,
-              height: 80.0,
-              child: Utils.getImgPlaceHolder(),
-            )
+                    width: 70.0,
+                    height: 80.0,
+                    child: Utils.getImgPlaceHolder(),
+                  )
                 : Padding(
-                padding: EdgeInsets.only(left: 5, right: 20),
-                child: Container(
-                  width: 70.0,
-                  height: 80.0,
-                  child: CachedNetworkImage(
-                      imageUrl: "${imageUrl}", fit: BoxFit.fill
-                    //placeholder: (context, url) => CircularProgressIndicator(),
-                    //errorWidget: (context, url, error) => Icon(Icons.error),
-                  ),
-                  /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                    padding: EdgeInsets.only(left: 5, right: 20),
+                    child: Container(
+                      width: 70.0,
+                      height: 80.0,
+                      child: CachedNetworkImage(
+                          imageUrl: "${imageUrl}", fit: BoxFit.fill
+                          //placeholder: (context, url) => CircularProgressIndicator(),
+                          //errorWidget: (context, url, error) => Icon(Icons.error),
+                          ),
+                      /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
                                           fit: BoxFit.cover),*/
-                )),
+                    )),
             Expanded(
                 flex: 4,
-                child:
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(top: 15),
-                  child: SizedBox(
-                    width: (Utils.getDeviceWidth(context) - 150),
-                    child: Container(
-                      child: Text(product.title,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(top: 15),
+                      child: SizedBox(
+                        width: (Utils.getDeviceWidth(context) - 150),
+                        child: Container(
+                          child: Text(product.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Visibility(
-                  visible: product.weight.isEmpty ? false : true,
-                  child: Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Text(
-                        "${product.weight}",
-                        style: TextStyle(color: appThemeSecondary),
-                      )),
-                ),
-                Padding(
-                    padding: EdgeInsets.only(top: 5, bottom: 20),
-                    child: Text(
-                        "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(price).toStringAsFixed(2)}")),
-                //
-                /*Padding(
+                    Visibility(
+                      visible: product.weight.isEmpty ? false : true,
+                      child: Padding(
+                          padding: EdgeInsets.only(top: 10),
+                          child: Text(
+                            "${product.weight}",
+                            style: TextStyle(color: appThemeSecondary),
+                          )),
+                    ),
+                    Padding(
+                        padding: EdgeInsets.only(top: 5, bottom: 20),
+                        child: Text(
+                            "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(price).toStringAsFixed(2)}")),
+                    //
+                    /*Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
                     child: Text("Price: " + "${AppConstant.currency}${double.parse(product.price).toStringAsFixed(2)}")
                 ),*/
-              ],
-            )),
-
-              detail != null && detail.productStatus.contains('out_of_stock')
+                  ],
+                )),
+            detail != null && detail.productStatus.contains('out_of_stock')
                 ? Container(
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red, width: 1),
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(5)),
-                child: Padding(
-                  padding: EdgeInsets.all(3),
-                  child: Text(
-                    "Out of Stock",
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ))
-                :
-              Text(
-                "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}" ,
-                style: TextStyle(
-                    fontSize: 16,
-                    color: detail != null &&
-                        detail.productStatus.contains('out_of_stock')
-                        ? Colors.red
-                        : Colors.black45)),
-
+                    decoration: BoxDecoration(
+                        border: Border.all(color: Colors.red, width: 1),
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(5)),
+                    child: Padding(
+                      padding: EdgeInsets.all(3),
+                      child: Text(
+                        "Out of Stock",
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ))
+                : Text(
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(int.parse(product.quantity) * double.parse(price), 2).toStringAsFixed(2)}",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: detail != null &&
+                                detail.productStatus.contains('out_of_stock')
+                            ? Colors.red
+                            : Colors.black45)),
           ],
         ),
       );
@@ -899,7 +916,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               style:
                                   TextStyle(color: Colors.black, fontSize: 16)),
                           Text(
-                              "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.wallet_refund),2).toStringAsFixed(2)}",
+                              "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.wallet_refund), 2).toStringAsFixed(2)}",
                               style: TextStyle(color: appTheme, fontSize: 15)),
                         ],
                       ),
@@ -919,7 +936,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     //print("balance=${balance}");
     if (balance > 0.0) {
       // USer balance is greater than zero.
-      return databaseHelper.roundOffPrice(balance,2).toStringAsFixed(2);
+      return databaseHelper.roundOffPrice(balance, 2).toStringAsFixed(2);
     } else {
       // USer balance is less than or equal to zero.
       return "0.00";
@@ -1124,8 +1141,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               print("taxModel.total=${taxModel.total}");
                             });
                           }, appliedReddemPointsCodeList, isOrderVariations,
-                              responseOrderDetail
-                              ,shippingCharges),
+                              responseOrderDetail, shippingCharges),
                           fullscreenDialog: true,
                         ));
                   }
@@ -1205,8 +1221,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         print("taxModel.total=${taxModel.total}");
                       });
                     }, appliedCouponCodeList, isOrderVariations,
-                        responseOrderDetail,
-                    shippingCharges),
+                        responseOrderDetail, shippingCharges),
                   );
                 }
               },
@@ -1416,7 +1431,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
             Visibility(
               visible: widget.storeModel.onlinePayment != null &&
-                  widget.storeModel.onlinePayment.compareTo('1') == 0&&isAnotherOnlinePaymentGatwayFound,
+                  widget.storeModel.onlinePayment.compareTo('1') == 0 &&
+                  isAnotherOnlinePaymentGatwayFound,
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: <Widget>[
@@ -1659,107 +1675,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             textColor: Colors.white,
             color: appTheme,
             onPressed: () async {
-              StoreModel storeObject = await SharedPrefs.getStore();
-              bool status =
-                  Utils.checkStoreOpenTime(storeObject, widget.deliveryType);
-              print("----checkStoreOpenTime----${status}--");
-
-              if (!status) {
-                Utils.showToast("${storeObject.closehoursMessage}", false);
-                return;
-              }
-              if (widget.deliveryType == OrderType.Delivery &&
-                  widget.address.notAllow) {
-                if (!minOrderCheck) {
-                  Utils.showToast(
-                      "Your order amount is too low. Minimum order amount is ${widget.address.minAmount}",
-                      false);
-                  return;
-                }
-              }
-              if (widget.deliveryType == OrderType.PickUp &&
-                  widget.areaObject != null) {
-                if (!minOrderCheck) {
-                  Utils.showToast(
-                      "Your order amount is too low. Minimum order amount is ${widget.areaObject.minOrder}",
-                      false);
-                  return;
-                }
-              }
-              if (checkThatItemIsInStocks()) {
-                DialogUtils.displayCommonDialog(
-                    context,
-                    storeModel == null ? "" : storeModel.storeName,
-                    "Some Cart items were updated. Please review the cart before procceeding.",
-                    buttonText: 'Ok');
-                return;
-              }
-//              if (storeModel.onlinePayment == "1") {
-//                var result = await DialogUtils.displayPaymentDialog(
-//                    context, "Select Payment", "");
-//                //print("----result----${result}--");
-//                if (result == null) {
-//                  return;
-//                }
-//                if (result == PaymentType.ONLINE) {
-//                  widget.paymentMode = "3";
-//                } else {
-//                  widget.paymentMode = "2"; //cod
-//                }
-//              } else {
-//                widget.paymentMode = "2"; //cod
-//              }
-
-              print("----paymentMod----${widget.paymentMode}--");
-              print("-paymentGateway----${storeObject.paymentGateway}-}-");
-
-              bool isNetworkAvailable = await Utils.isNetworkAvailable();
-              if (!isNetworkAvailable) {
-                Utils.showToast(AppConstant.noInternet, false);
-                return;
-              }
-
-              if (widget.deliveryType == OrderType.Delivery) {
-                if (storeObject.deliverySlot == "0") {
-                  selectedDeliverSlotValue = "";
+              Utils.isNetworkAvailable().then((value) {
+                if (value == true) {
+                  actionConfirmOrder();
                 } else {
-                  //Store provides instant delivery of the orders.
-                  print(isInstantDelivery);
-                  if (isDeliveryResponseFalse) {
-                    selectedDeliverSlotValue = "";
-                  } else if (storeObject.deliverySlot == "1" &&
-                      isInstantDelivery) {
-                    //Store provides instant delivery of the orders.
-                    selectedDeliverSlotValue = "";
-                  } else if (storeObject.deliverySlot == "1" &&
-                      !isSlotSelected &&
-                      !isInstantDelivery) {
-                    Utils.showToast("Please select delivery slot", false);
-                    return;
-                  } else {
-                    String slotDate = deliverySlotModel
-                        .data.dateTimeCollection[selctedTag].label;
-                    String timeSlot = deliverySlotModel
-                        .data
-                        .dateTimeCollection[selctedTag]
-                        .timeslot[selectedTimeSlot]
-                        .label;
-                    selectedDeliverSlotValue =
-                        "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
-                    //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
-                  }
+                  DialogUtils.displayDialogSingleButton(
+                      context, "Opps!!!", "No Internet Connection", "Retry",
+                      button1: () {
+                    Navigator.pop(context);
+                  });
                 }
-              } else {
-                selectedDeliverSlotValue = "";
-              }
-
-              if (widget.deliveryType == OrderType.Delivery) {
-                //The "performPlaceOrderOperation" are called in below method
-                checkDeliveryAreaDeleted(storeObject,
-                    addressId: widget.address.id);
-              } else if (widget.deliveryType == OrderType.PickUp) {
-                performPlaceOrderOperation(storeObject);
-              }
+              });
             },
             child: Text(
               "Confirm Order",
@@ -1934,7 +1860,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         break;
     }
   }
-
 
   checkDeliveryAreaDeleted(StoreModel storeObject, {String addressId = ""}) {
     Utils.showProgressDialog(context);
@@ -2593,25 +2518,25 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         paymentGateway = storeModel.paymentGatewaySettings.first.paymentGateway;
         if (paymentGateway.toLowerCase().contains('paytm')) {
           isPayTmActive = true;
-        }else{
-          isPayTmActive=false;
+        } else {
+          isPayTmActive = false;
         }
       } else {
         for (int i = 0; i < storeModel.paymentGatewaySettings.length; i++) {
           paymentGateway = storeModel.paymentGatewaySettings[i].paymentGateway;
           if (paymentGateway.toLowerCase().contains('paytm')) {
             isPayTmActive = true;
-          }else{
-            isAnotherOnlinePaymentGatwayFound=true;
+          } else {
+            isAnotherOnlinePaymentGatwayFound = true;
           }
         }
       }
     } else {
       if (paymentGateway.toLowerCase().contains('paytm')) {
         isPayTmActive = true;
-      }else{
+      } else {
         isPayTmActive = false;
-        isAnotherOnlinePaymentGatwayFound=false;
+        isAnotherOnlinePaymentGatwayFound = false;
       }
     }
   }
@@ -2693,6 +2618,102 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       }
     }
     return productOutOfStock;
+  }
+
+  void actionConfirmOrder() async {
+    StoreModel storeObject = await SharedPrefs.getStore();
+    bool status = Utils.checkStoreOpenTime(storeObject, widget.deliveryType);
+    print("----checkStoreOpenTime----${status}--");
+
+    if (!status) {
+      Utils.showToast("${storeObject.closehoursMessage}", false);
+      return;
+    }
+    if (widget.deliveryType == OrderType.Delivery && widget.address.notAllow) {
+      if (!minOrderCheck) {
+        Utils.showToast(
+            "Your order amount is too low. Minimum order amount is ${widget.address.minAmount}",
+            false);
+        return;
+      }
+    }
+    if (widget.deliveryType == OrderType.PickUp && widget.areaObject != null) {
+      if (!minOrderCheck) {
+        Utils.showToast(
+            "Your order amount is too low. Minimum order amount is ${widget.areaObject.minOrder}",
+            false);
+        return;
+      }
+    }
+    if (checkThatItemIsInStocks()) {
+      DialogUtils.displayCommonDialog(
+          context,
+          storeModel == null ? "" : storeModel.storeName,
+          "Some Cart items were updated. Please review the cart before procceeding.",
+          buttonText: 'Ok');
+      return;
+    }
+//              if (storeModel.onlinePayment == "1") {
+//                var result = await DialogUtils.displayPaymentDialog(
+//                    context, "Select Payment", "");
+//                //print("----result----${result}--");
+//                if (result == null) {
+//                  return;
+//                }
+//                if (result == PaymentType.ONLINE) {
+//                  widget.paymentMode = "3";
+//                } else {
+//                  widget.paymentMode = "2"; //cod
+//                }
+//              } else {
+//                widget.paymentMode = "2"; //cod
+//              }
+
+    print("----paymentMod----${widget.paymentMode}--");
+    print("-paymentGateway----${storeObject.paymentGateway}-}-");
+
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if (!isNetworkAvailable) {
+      Utils.showToast(AppConstant.noInternet, false);
+      return;
+    }
+
+    if (widget.deliveryType == OrderType.Delivery) {
+      if (storeObject.deliverySlot == "0") {
+        selectedDeliverSlotValue = "";
+      } else {
+        //Store provides instant delivery of the orders.
+        print(isInstantDelivery);
+        if (isDeliveryResponseFalse) {
+          selectedDeliverSlotValue = "";
+        } else if (storeObject.deliverySlot == "1" && isInstantDelivery) {
+          //Store provides instant delivery of the orders.
+          selectedDeliverSlotValue = "";
+        } else if (storeObject.deliverySlot == "1" &&
+            !isSlotSelected &&
+            !isInstantDelivery) {
+          Utils.showToast("Please select delivery slot", false);
+          return;
+        } else {
+          String slotDate =
+              deliverySlotModel.data.dateTimeCollection[selctedTag].label;
+          String timeSlot = deliverySlotModel.data
+              .dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+          selectedDeliverSlotValue =
+              "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
+          //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
+        }
+      }
+    } else {
+      selectedDeliverSlotValue = "";
+    }
+
+    if (widget.deliveryType == OrderType.Delivery) {
+      //The "performPlaceOrderOperation" are called in below method
+      checkDeliveryAreaDeleted(storeObject, addressId: widget.address.id);
+    } else if (widget.deliveryType == OrderType.PickUp) {
+      performPlaceOrderOperation(storeObject);
+    }
   }
 }
 

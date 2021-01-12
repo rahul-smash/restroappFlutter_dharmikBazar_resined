@@ -15,6 +15,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'dart:io';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'src/UI/Language.dart';
 
@@ -60,7 +61,9 @@ Future<void> main() async {
     configObject.storeId = branch_id;
   }
   //print(configObject.storeId);
+  bool isConnected = await Utils.isNetworkAvailable();
 
+  if (isConnected) {
   Crashlytics.instance.enableInDevMode = true;
   StoreResponse storeData =
       await ApiController.versionApiRequest("${configObject.storeId}");
@@ -72,10 +75,71 @@ Future<void> main() async {
   PackageInfo packageInfo = await Utils.getAppVersionDetails(storeData);
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  await Utils.getDeviceInfo(storeData);
   // To turn off landscape mode
   runZoned(() {
     runApp(ValueApp(packageInfo, configObject, storeData));
   }, onError: Crashlytics.instance.recordError);
+  } else {
+    runApp(NoInternetWidget());
+    // runZoned(() {
+    //   runApp(NoInternetWidget());
+    // }, onError: Crashlytics.instance.recordError);
+  }
+}
+
+class NoInternetWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Oops!!!',
+        theme: ThemeData(
+          primaryColor: appTheme,
+        ),
+        home: NoInternetWidgetScreen());
+  }
+}
+
+class NoInternetWidgetScreen extends StatefulWidget {
+  @override
+  _NoInternetWidgetScreenState createState() => _NoInternetWidgetScreenState();
+}
+
+class _NoInternetWidgetScreenState extends State<NoInternetWidgetScreen> {
+  var isDialogDisplayed = false;
+  @override
+  void initState() {
+    super.initState();
+    checkInternetConnection();
+  }
+
+  void checkInternetConnection() {
+    Utils.isNetworkAvailable().then((value) {
+      if (value == false) {
+        DialogUtils.displayDialog(
+            context, "Opps!!!", "No Internet Connection", "Cancel", "Retry",
+            button1:(){
+              SystemNavigator.pop();
+            },
+            button2: () {
+          Navigator.pop(context);
+          checkInternetConnection();
+        }
+       );
+      } else {
+        main();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xffFCB912),
+      body: Container(color: Color(0xffFCB912)),
+    );
+  }
 }
 
 class ValueApp extends StatelessWidget {
