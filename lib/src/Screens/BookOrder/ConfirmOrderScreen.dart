@@ -1675,17 +1675,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             textColor: Colors.white,
             color: appTheme,
             onPressed: () async {
-              Utils.isNetworkAvailable().then((value) {
-                if (value == true) {
-                  actionConfirmOrder();
-                } else {
-                  DialogUtils.displayDialogSingleButton(
-                      context, "Opps!!!", "No Internet Connection", "Retry",
-                      button1: () {
-                    Navigator.pop(context);
-                  });
-                }
-              });
+              actionConfirmOrder();
             },
             child: Text(
               "Confirm Order",
