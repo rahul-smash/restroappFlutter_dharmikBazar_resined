@@ -2510,6 +2510,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           isPayTmActive = true;
         } else {
           isPayTmActive = false;
+          isAnotherOnlinePaymentGatwayFound = true;
         }
       } else {
         for (int i = 0; i < storeModel.paymentGatewaySettings.length; i++) {
