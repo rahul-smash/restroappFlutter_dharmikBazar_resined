@@ -17,6 +17,7 @@ import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/DeviceInfo.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
 import 'package:restroapp/src/models/HtmlModelResponse.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
@@ -150,13 +151,14 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.login;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    var deviceInfoJson = DeviceInfo.getInstance().getInfo();
     try {
       request.fields.addAll({
         "email": username,
         "password": password,
         "device_id": deviceId,
         "device_token": deviceToken,
+        "device_info": deviceInfoJson,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
@@ -1058,12 +1060,13 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.mobileVerification;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
-
+    var deviceInfoJson = await DeviceInfo.getInstance().getInfo();
     try {
       request.fields.addAll({
         "phone": loginData.phone,
         "device_id": deviceId,
         "device_token": deviceToken,
+        "device_info": deviceInfoJson,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
       print('@@mobileVerification' + url + request.fields.toString());
@@ -1814,7 +1817,7 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-
+    var deviceInfoJson = await DeviceInfo.getInstance().getInfo();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.socialLogin;
 
@@ -1837,7 +1840,8 @@ class ApiController {
         "user_refer_code": user_refer_code,
         "device_id": deviceId,
         "device_token": deviceToken,
-        "platform": Platform.isIOS ? "IOS" : "Android"
+        "platform": Platform.isIOS ? "IOS" : "Android",
+        "device_info": deviceInfoJson
       });
       print('@@url=${url}');
       print('@@fields=${request.fields.toString()}');
