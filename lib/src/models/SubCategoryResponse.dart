@@ -416,6 +416,7 @@ class Variant {
   String stockType;
   String minStockAlert;
   String stock;
+  String maxQuantityPerOrder;
 
   Variant({
     this.id,
@@ -436,7 +437,8 @@ class Variant {
     this.isExportFromFile,
     this.stockType,
     this.minStockAlert,
-    this.stock
+    this.stock,
+    this.maxQuantityPerOrder
   });
 
   factory Variant.fromJson(Map<String, dynamic> json) =>
@@ -460,6 +462,7 @@ class Variant {
         stockType: json["stock_type"],
         minStockAlert: json["min_stock_alert"],
         stock: json["stock"],
+        maxQuantityPerOrder: json["max_quantity_per_order"],
       );
 
   Map<String, dynamic> toJson() =>
@@ -483,6 +486,7 @@ class Variant {
         "stock_type": stockType,
         "min_stock_alert": minStockAlert,
         "stock": stock,
+        "max_quantity_per_order": maxQuantityPerOrder,
       };
 
   Map<String, dynamic> toMap() {
@@ -506,6 +510,7 @@ class Variant {
     map["stock_type"] = stockType;
     map["min_stock_alert"] = minStockAlert;
     map["stock"] = stock;
+    map["max_quantity_per_order"] = maxQuantityPerOrder;
     return map;
   }
 }
