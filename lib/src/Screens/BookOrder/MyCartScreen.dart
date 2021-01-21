@@ -102,13 +102,25 @@ class _MyCartScreenState extends State<MyCartScreen> {
 
   void getCartListFromDB() {
     isLoading = true;
-    databaseHelper.getCartItemList().then((response){
+    databaseHelper.getCartItemList().then((response) {
       setState(() {
         cartList = response;
+        isLoading = true;
+        eventBus.fire(updateCartCount());
+        findVariantFromProductTable(cartList);
+      });
+    });
+  }
+
+  void findVariantFromProductTable(List<Product> cartList) {
+    databaseHelper.getProductsByIDs(cartList).then((value) {
+      setState(() {
+        this.cartList = value;
         isLoading = false;
         eventBus.fire(updateCartCount());
       });
     });
+
   }
 
   Widget showCartList() {
