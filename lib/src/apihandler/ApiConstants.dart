@@ -1,7 +1,7 @@
 class ApiConstants{
   static String baseUrl2 = 'https://stage.restroapp.com/storeId/api_v1/';
-  static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
-  static String baseUrl3 = 'https://stage.restroapp.com/storeId/api/';
+  //static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
+  static String baseUrl = 'https://stage.restroapp.com/storeId/api_v1/';
 
   static String storeList = 'storeList';
   static String version = 'version';

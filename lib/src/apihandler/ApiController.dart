@@ -300,8 +300,7 @@ class ApiController {
                 contentType: "application/json",
                 responseType: ResponseType.plain));
         //print(response.data);
-        subCategoryResponse =
-            SubCategoryResponse.fromJson(json.decode(response.data));
+        subCategoryResponse = SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
 
           await databaseHelper.batchInsertProducts(subCategoryResponse.subCategories);

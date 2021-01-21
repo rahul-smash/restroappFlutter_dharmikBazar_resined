@@ -29,6 +29,7 @@ class StoreModel {
   String state;
   String country;
   String wallet_setting;
+  Subscription subscription;
   String zipcode;
   String lat;
   String lng;
@@ -146,6 +147,7 @@ class StoreModel {
       this.aboutusBanner,
       this.location,
       this.wallet_setting,
+      this.subscription,
       this.city,
       this.state,
       this.country,
@@ -155,7 +157,7 @@ class StoreModel {
       this.lng,
       this.social_login,
       this.appThemeColors,
-        this.webAppThemeColors,
+      this.webAppThemeColors,
       this.contactPerson,
       this.contactNumber,
       this.contactEmail,
@@ -313,6 +315,7 @@ class StoreModel {
     taxRate = json['tax_rate'];
     istaxenable = json['istaxenable'];
     paymentGateway = json["payment_gateway"];
+    subscription = Subscription.fromJson(json["Subscription"]);
     paymentSetting = PaymentSetting.fromJson(json["payment_setting"]);
     if (json['payment_gateway_settings'] != null) {
       if (json['payment_gateway_settings'] is String) {
@@ -436,6 +439,7 @@ class StoreModel {
     data['zipcode'] = this.zipcode;
     data['lat'] = this.lat;
     data['lng'] = this.lng;
+    data['Subscription'] = this.subscription.toJson();
     data['contact_person'] = this.contactPerson;
     data['contact_number'] = this.contactNumber;
     data['contact_email'] = this.contactEmail;
@@ -562,6 +566,34 @@ class StoreModel {
     data['allow_customer_for_gst']=this.allowCustomerForGst;
     return data;
   }
+}
+
+class Subscription {
+  Subscription({
+    this.status,
+    this.feeType,
+    this.cycleType,
+    this.minimumOrderDaily,
+  });
+
+  String status;
+  String feeType;
+  String cycleType;
+  String minimumOrderDaily;
+
+  factory Subscription.fromJson(Map<String, dynamic> json) => Subscription(
+    status: json["status"],
+    feeType: json["fee_type"],
+    cycleType: json["cycle_type"],
+    minimumOrderDaily: json["minimum_order_daily"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "status": status,
+    "fee_type": feeType,
+    "cycle_type": cycleType,
+    "minimum_order_daily": minimumOrderDaily,
+  };
 }
 
 class PaymentSetting {

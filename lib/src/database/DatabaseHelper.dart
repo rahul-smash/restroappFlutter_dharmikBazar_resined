@@ -433,8 +433,10 @@ class DatabaseHelper {
         columns: columnsToSelect,
         where: 'category_ids = ?',
         whereArgs: [category_ids]);
+
     if (resultList != null && resultList.isNotEmpty) {
       resultList.forEach((row) {
+        Map productMap = Map<String, String>();
         Product product = Product();
         product.id = row["id"].toString();
         product.isFav = row["isfavorite"];
@@ -459,15 +461,22 @@ class DatabaseHelper {
         product.image10080 = row["image_100_80"] ?? "";
         product.image300200 = row["image_300_200"] ?? "";
         var parsedListJson = jsonDecode(row["variants"]);
-        List<Variant> variantsList =
-            List<Variant>.from(parsedListJson.map((i) => Variant.fromJson(i)));
+        List<Variant> variantsList = List<Variant>.from(parsedListJson.map((i) =>
+            Variant.fromJson(i)));
         product.variants = variantsList;
         product.variantId = row["variantId"].toString();
         product.weight = row["weight"];
         product.mrpPrice = row["mrpPrice"];
         product.price = row["price"];
+        product.isSubscriptionOn = row["is_subscription_on"];
         product.discount = row["discount"];
         product.isUnitType = row["isUnitType"];
+
+        for (var i=0; i < variantsList.length; i++) {
+          productMap[variantsList[i].id] = variantsList[i].isSubscriptionOn;
+          //print("==${variantsList[i].id}=isSubscriptionOn===${variantsList[i].isSubscriptionOn}");
+        }
+        product.variantMap = productMap;
 
         productList.add(product);
       });

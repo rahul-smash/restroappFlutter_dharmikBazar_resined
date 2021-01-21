@@ -13,6 +13,8 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import 'AddSubscriptionScreen.dart';
+
 class ProductTileItem extends StatefulWidget {
   Product product;
   VoidCallback callback;
@@ -98,6 +100,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
     if (weight.isEmpty) {
       variantsVisibility = false;
     }
+
+    //print("==variantMap=${widget.product.variantId} and ${widget.product.variantMap[widget.product.variantId]}");
 
     return Container(
       color: Colors.white,
@@ -347,7 +351,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                           Visibility(
                             visible: variantsVisibility,
                             child: Padding(
-                              padding: EdgeInsets.only(top: 20, bottom: 3),
+                              padding: EdgeInsets.only(top: 0, bottom: 10),
                               child: InkWell(
                                 onTap: () async {
                                   //print("-variants.length--${widget.product.variants.length}");
@@ -454,9 +458,45 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                 fontWeight: FontWeight.w400)),
                                       ],
                                     ),
-                              addQuantityView(),
+                              //addQuantityView(),
                             ],
                           ),
+
+                          //0 => subscription is on
+                          //1 => subscription is off
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Visibility(
+                                  visible: widget.product.variantMap[widget.product.variantId] == "0" ? true : false,
+                                  child: InkWell(
+                                    onTap: (){
+                                      Navigator.push(context,
+                                        MaterialPageRoute(builder: (context) => AddSubscriptionScreen()),
+                                      );
+                                    },
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: appThemeSecondary,
+                                            ),
+                                            borderRadius: BorderRadius.all(Radius.circular(5))
+                                        ),
+                                        width: 100,height: 30,
+                                        child: Center(
+                                            child: Text("SUBSCRIBE",
+                                              style: TextStyle(color: appThemeSecondary),)
+                                        )
+                                    ),
+                                  )
+                                ),
+                                addQuantityView(),
+                              ],
+                            ),
+                          ),
+
                         ],
                       )),
                     ],
@@ -467,7 +507,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
         Container(
             height: 1,
             width: MediaQuery.of(context).size.width,
-            color: Color(0xFFBDBDBD))
+            color: Color(0xFFBDBDBD)
+        )
       ]),
     );
   }
