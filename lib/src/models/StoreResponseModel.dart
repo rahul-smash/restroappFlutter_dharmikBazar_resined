@@ -578,21 +578,46 @@ class Subscription {
 
   String status;
   String feeType;
-  String cycleType;
+  List<CycleType> cycleType;
   String minimumOrderDaily;
 
   factory Subscription.fromJson(Map<String, dynamic> json) => Subscription(
     status: json["status"],
     feeType: json["fee_type"],
-    cycleType: json["cycle_type"],
+    cycleType: List<CycleType>.from(json["cycle_type"].map((x) => CycleType.fromJson(x))),
     minimumOrderDaily: json["minimum_order_daily"],
   );
 
   Map<String, dynamic> toJson() => {
     "status": status,
     "fee_type": feeType,
-    "cycle_type": cycleType,
+    //"cycle_type": cycleType,
+    "cycle_type": List<dynamic>.from(cycleType.map((x) => x.toJson())),
     "minimum_order_daily": minimumOrderDaily,
+  };
+}
+
+class CycleType {
+  CycleType({
+    this.label,
+    this.days,
+    this.key,
+  });
+
+  String label;
+  String days;
+  String key;
+
+  factory CycleType.fromJson(Map<String, dynamic> json) => CycleType(
+    label: json["label"],
+    days: json["days"],
+    key: json["key"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "label": label,
+    "days": days,
+    "key": key,
   };
 }
 

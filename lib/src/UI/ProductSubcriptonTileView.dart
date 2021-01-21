@@ -17,18 +17,18 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 import 'AddSubscriptionScreen.dart';
 
-class ProductTileItem extends StatefulWidget {
+class ProductSubcriptonTileView extends StatefulWidget {
   Product product;
   VoidCallback callback;
   ClassType classType;
 
-  ProductTileItem(this.product, this.callback, this.classType);
+  ProductSubcriptonTileView(this.product, this.callback, this.classType);
 
   @override
-  _ProductTileItemState createState() => new _ProductTileItemState();
+  _ProductSubcriptonTileViewState createState() => new _ProductSubcriptonTileViewState();
 }
 
-class _ProductTileItemState extends State<ProductTileItem> {
+class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   int counter = 0;
   CartData cartData;
@@ -103,7 +103,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
       variantsVisibility = false;
     }
 
-    //print("==variantMap=${widget.product.variantId} and ${widget.product.variantMap[widget.product.variantId]}");
 
     return Container(
       color: Colors.white,
@@ -156,7 +155,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
             }
           },
           child: Padding(
-            padding: EdgeInsets.only(top: 15, bottom: 15),
+            padding: EdgeInsets.only(top: 0, bottom: 15),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -467,12 +466,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
                           //0 => subscription is on
                           //1 => subscription is off
                           Padding(
-                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Visibility(
-                                  visible: widget.product.variantMap[widget.product.variantId] == "0" ? true : false,
+                                  visible: false,
                                   child: InkWell(
                                     onTap: () async {
 

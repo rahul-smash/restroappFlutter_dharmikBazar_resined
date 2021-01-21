@@ -1,11 +1,22 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_calendar_carousel/classes/event.dart';
+import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
+import 'ProductSubcriptonTileView.dart';
 
 class AddSubscriptionScreen extends StatefulWidget {
 
-  AddSubscriptionScreen();
+  StoreModel model;
+  Product product;
+  AddSubscriptionScreen(this.product, this.model);
 
   @override
   _AddSubscriptionScreenState createState() {
@@ -15,14 +26,23 @@ class AddSubscriptionScreen extends StatefulWidget {
 
 class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
+  TextEditingController controllerStartDate = TextEditingController();
+  TextEditingController controllerEndDate = TextEditingController();
+
+  bool isDeliveryResponseFalse = false;
+  DeliveryTimeSlotModel deliverySlotModel;
+  int selctedTag, selectedTimeSlot;
+  List<Timeslot> timeslotList;
+  bool isSlotSelected = false;
+  //Store provides instant delivery of the orders.
+  bool isInstantDelivery = false;
+  int selecteddays = -1;
+
   @override
   void initState() {
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
+    selecteddays = -1;
+    callDeliverySlotsApi();
   }
 
   @override
@@ -41,6 +61,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               children: [
                 Expanded(
                   child: ListView(
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
                     children: [
                       Container(
                         height: 60.0,
@@ -64,7 +86,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           ),
                         ),
                       ),
-
                       Container(
                         margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
                         child: Row(
@@ -128,6 +149,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                     textColor: Colors.grey[600],
                                     color: Colors.grey[300],
                                     onPressed: () async {
+
                                     },
                                     child: Text("Change",
                                       style: TextStyle(color: Colors.grey[700],),
@@ -140,13 +162,187 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           ],
                         ),
                       ),
-
                       Container(
                         margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
                         height: 1,
                         color: Colors.grey,
-                      )
+                      ),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(15, 10, 0, 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                                child: Text("When do you want to start the subscription?",
+                                  style: TextStyle(fontSize: 16),)
+                            ),
 
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    child: Stack(
+                                      children: [
+                                        Text("Start Date",style: TextStyle(fontSize: 14),),
+                                        Container(
+                                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                          child: TextField(
+                                            controller: controllerStartDate,
+                                            onTap: () async {
+                                              String selectedDate = await Utils.selectDate(context);
+                                              setState(() {
+                                                controllerStartDate.text = selectedDate;
+                                              });
+
+                                              },
+                                              readOnly: true,
+                                              decoration: InputDecoration(
+                                                suffixIcon: IconButton(
+                                                    icon: Icon(Icons.calendar_today,),
+                                                    onPressed: () {
+                                                    }
+                                                ),
+                                              )
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 30,),
+                                Expanded(
+                                  child: Container(
+                                    child: Stack(
+                                      children: [
+                                        Text("End Date",style: TextStyle(fontSize: 14),),
+
+                                        Container(
+                                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                          child: TextField(
+                                              controller: controllerEndDate,
+                                              onTap: () async {
+                                                String selectedDate = await Utils.selectDate(context);
+                                                setState(() {
+                                                  controllerEndDate.text = selectedDate;
+                                                });
+
+                                              },
+                                              readOnly: true,
+                                              decoration: InputDecoration(
+                                                suffixIcon: IconButton(
+                                                    icon: Icon(Icons.calendar_today,),
+                                                    onPressed: () {
+                                                      //_controllerx.text = '';
+                                                    }
+                                                ),
+                                              )
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+
+                          ],
+                        ),
+                      ),
+                      showDeliverySlot(),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                        height: 5,
+                        color: Colors.grey[400],
+                      ),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                                child: Text("How often do you want to receive this product?",
+                                  style: TextStyle(fontSize: 16),)
+                            ),
+
+                            GridView.count(
+                                childAspectRatio: MediaQuery.of(context).size.width /
+                                    (MediaQuery.of(context).size.height / 5),
+                                physics: NeverScrollableScrollPhysics(), // to disable GridView's scrolling
+                                shrinkWrap: true,
+                                crossAxisCount: 2,
+                                children: List.generate(widget.model.subscription.cycleType.length, (index) {
+
+                                  return Container(
+                                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                                    color: Colors.white,
+                                    child: Center(
+                                      child: InkWell(
+                                        onTap: (){
+                                          print("index=${index}");
+                                          setState(() {
+                                            selecteddays = index;
+                                          });
+                                        },
+                                        child: Row(
+                                          children: [
+                                            selecteddays == index
+                                                ? Icon(Icons.radio_button_checked,color: appTheme,)
+                                                : Icon(Icons.radio_button_unchecked,color: appTheme,),
+                                            SizedBox(width: 10,),
+                                            Text(widget.model.subscription.cycleType[index].label),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                })
+                            ),
+
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Center(child: Text("Preview")),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        child: CalendarCarousel<Event>(
+                          childAspectRatio: 1.5,
+                          height: 330,
+                          headerMargin: EdgeInsets.all(0),
+                          customGridViewPhysics: NeverScrollableScrollPhysics(),
+                          isScrollable: true,
+                          weekendTextStyle: TextStyle(
+                            color: Colors.red,
+                          ),
+                          todayButtonColor: Colors.blue[200],
+                          //markedDatesMap: _markedDateMap,
+                          markedDateShowIcon: true,
+                          markedDateIconMaxShown: 1,
+                          markedDateMoreShowTotal: null, // null for not showing hidden events indicator
+                          /*markedDateIconBuilder: (event) {
+                            return event.icon;
+                          },*/
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                        height: 1,
+                        color: Colors.grey,
+                      ),
+
+
+                      ProductSubcriptonTileView(widget.product, () {
+                      }, ClassType.SubCategory),
+
+
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                        height: 1,
+                        color: Colors.grey,
+                      ),
                     ],
                   ),
                 )
@@ -192,5 +388,323 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       ),
     );
 
+  }
+
+  void callDeliverySlotsApi() {
+
+    if (widget.model.deliverySlot == "1") {
+      ApiController.deliveryTimeSlotApi().then((response) {
+        setState(() {
+          if (!response.success) {
+            isDeliveryResponseFalse = true;
+            return;
+          }
+          deliverySlotModel = response;
+          print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+          isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
+          for (int i = 0;
+          i < deliverySlotModel.data.dateTimeCollection.length;
+          i++) {
+            timeslotList =
+                deliverySlotModel.data.dateTimeCollection[i].timeslot;
+            for (int j = 0; j < timeslotList.length; j++) {
+              Timeslot timeslot = timeslotList[j];
+              if (timeslot.isEnable) {
+                selectedTimeSlot = j;
+                isSlotSelected = true;
+                break;
+              }
+            }
+            if (isSlotSelected) {
+              selctedTag = i;
+              break;
+            }
+          }
+        });
+      });
+    }
+  }
+
+  Widget showDeliverySlot() {
+    Color selectedSlotColor, textColor;
+    if (deliverySlotModel == null) {
+      return Container();
+    } else {
+      //print("--length = ${deliverySlotModel.data.dateTimeCollection.length}----");
+      if (deliverySlotModel.data != null &&
+          deliverySlotModel.data.dateTimeCollection != null &&
+          deliverySlotModel.data.dateTimeCollection.isNotEmpty) {
+        return Padding(
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                    child: Text("When would you like your service?"),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+                    child: Text("${Utils.getDate()}"),
+                  ),
+                  Container(
+                      margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                      height: 1,
+                      width: MediaQuery.of(context).size.width,
+                      color: Color(0xFFBDBDBD)),
+                  Container(
+                    //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                    height: 50.0,
+                    child: ListView.builder(
+                      itemCount:
+                      deliverySlotModel.data.dateTimeCollection.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        DateTimeCollection slotsObject =
+                        deliverySlotModel.data.dateTimeCollection[index];
+                        if (selctedTag == index) {
+                          selectedSlotColor = Color(0xFFEEEEEE);
+                          textColor = Color(0xFFff4600);
+                        } else {
+                          selectedSlotColor = Color(0xFFFFFFFF);
+                          textColor = Color(0xFF000000);
+                        }
+                        return Container(
+                          color: selectedSlotColor,
+                          margin: EdgeInsets.fromLTRB(15, 0, 10, 0),
+                          child: InkWell(
+                            onTap: () {
+                              print("${slotsObject.timeslot.length}");
+                              setState(() {
+                                selctedTag = index;
+                                timeslotList = slotsObject.timeslot;
+                                isSlotSelected = false;
+                                //selectedTimeSlot = 0;
+                                //print("timeslotList=${timeslotList.length}");
+                                for (int i = 0; i < timeslotList.length; i++) {
+                                  //print("isEnable=${timeslotList[i].isEnable}");
+                                  Timeslot timeslot = timeslotList[i];
+                                  if (timeslot.isEnable) {
+                                    selectedTimeSlot = i;
+                                    isSlotSelected = true;
+                                    break;
+                                  }
+                                }
+                              });
+                            },
+                            child: Container(
+                              child: Center(
+                                child: Text(
+                                    ' ${Utils.convertStringToDate(slotsObject.label)} ',
+                                    style: TextStyle(color: textColor)),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      height: 1,
+                      width: MediaQuery.of(context).size.width,
+                      color: Color(0xFFBDBDBD)),
+                  Container(
+                    //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                    height: 50.0,
+                    child: ListView.builder(
+                      itemCount: timeslotList.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        Timeslot slotsObject = timeslotList[index];
+                        print("----${slotsObject.label}-and ${selctedTag}--");
+
+                        //selectedTimeSlot
+                        Color textColor;
+                        if (!slotsObject.isEnable) {
+                          textColor = Color(0xFFBDBDBD);
+                        } else {
+                          textColor = Color(0xFF000000);
+                        }
+                        if (selectedTimeSlot == index &&
+                            (slotsObject.isEnable)) {
+                          textColor = Color(0xFFff4600);
+                        }
+
+                        return Container(
+                          //color: selectedSlotColor,
+                          margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: InkWell(
+                            onTap: () {
+                              print("${slotsObject.label}");
+                              if (slotsObject.isEnable) {
+                                setState(() {
+                                  selectedTimeSlot = index;
+                                });
+                              } else {
+                                Utils.showToast(slotsObject.innerText, false);
+                              }
+                            },
+                            child: Container(
+                              child: Center(
+                                child: Text(
+                                    '${slotsObject.isEnable == true ? slotsObject.label : "${slotsObject.label}(${slotsObject.innerText})"}',
+                                    style: TextStyle(color: textColor)),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      } else {
+        return Container();
+      }
+    }
+  }
+}
+
+
+
+class CalendarPage2 extends StatefulWidget {
+
+  @override
+  _CalendarPage2State createState() => new _CalendarPage2State();
+}
+
+List<DateTime> presentDates = [
+  DateTime(2020, 11, 1),
+  DateTime(2020, 11, 3),
+  DateTime(2020, 11, 4),
+  DateTime(2020, 11, 5),
+  DateTime(2020, 11, 6),
+  DateTime(2020, 11, 9),
+  DateTime(2020, 11, 10),
+  DateTime(2020, 11, 11),
+  DateTime(2020, 11, 15),
+  DateTime(2020, 11, 22),
+  DateTime(2020, 11, 23),
+];
+List<DateTime> absentDates = [
+  DateTime(2020, 11, 2),
+  DateTime(2020, 11, 7),
+  DateTime(2020, 11, 8),
+  DateTime(2020, 11, 12),
+  DateTime(2020, 11, 13),
+  DateTime(2020, 11, 14),
+  DateTime(2020, 11, 16),
+  DateTime(2020, 11, 17),
+  DateTime(2020, 11, 18),
+  DateTime(2020, 11, 19),
+  DateTime(2020, 11, 20),
+];
+
+class _CalendarPage2State extends State<CalendarPage2> {
+
+
+  @override
+  Widget build(BuildContext context) {
+    cHeight = MediaQuery.of(context).size.height;
+    for (int i = 0; i < len; i++) {
+      _markedDateMap.add(
+        presentDates[i],
+        new Event(
+          date: presentDates[i],
+          title: 'Event 5',
+          icon: _presentIcon(
+            presentDates[i].day.toString(),
+          ),
+        ),
+      );
+    }
+
+    for (int i = 0; i < len; i++) {
+      _markedDateMap.add(
+        absentDates[i],
+        new Event(
+          date: absentDates[i],
+          title: 'Event 5',
+          icon: _absentIcon(
+            absentDates[i].day.toString(),
+          ),
+        ),
+      );
+    }
+
+    _calendarCarouselNoHeader = CalendarCarousel<Event>(
+      height: cHeight * 0.54,
+      weekendTextStyle: TextStyle(
+        color: Colors.red,
+      ),
+      todayButtonColor: Colors.blue[200],
+      markedDatesMap: _markedDateMap,
+      markedDateShowIcon: true,
+      markedDateIconMaxShown: 1,
+      markedDateMoreShowTotal:
+      null, // null for not showing hidden events indicator
+      markedDateIconBuilder: (event) {
+        return event.icon;
+      },
+    );
+
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          _calendarCarouselNoHeader,
+          markerRepresent(Colors.red, "Absent"),
+          markerRepresent(Colors.green, "Present"),
+        ],
+      ),
+    );
+  }
+
+  DateTime _currentDate2 = DateTime.now();
+  static Widget _presentIcon(String day) => CircleAvatar(
+    backgroundColor: Colors.green,
+    child: Text(
+      day,
+      style: TextStyle(
+        color: Colors.black,
+      ),
+    ),
+  );
+  static Widget _absentIcon(String day) => CircleAvatar(
+    backgroundColor: Colors.red,
+    child: Text(
+      day,
+      style: TextStyle(
+        color: Colors.black,
+      ),
+    ),
+  );
+
+  EventList<Event> _markedDateMap = new EventList<Event>(
+    events: {},
+  );
+
+  CalendarCarousel _calendarCarouselNoHeader;
+
+  var len = min(absentDates?.length, presentDates.length);
+  double cHeight;
+
+  Widget markerRepresent(Color color, String data) {
+    return new ListTile(
+      leading: new CircleAvatar(
+        backgroundColor: color,
+        radius: cHeight * 0.022,
+      ),
+      title: new Text(
+        data,
+      ),
+    );
   }
 }
