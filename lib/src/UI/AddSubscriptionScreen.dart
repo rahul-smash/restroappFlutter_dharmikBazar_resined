@@ -63,333 +63,327 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       body: Column(
         children: [
           Expanded(
-            child: Column(
+            child: ListView(
+              shrinkWrap: true,
+              physics: ScrollPhysics(),
               children: [
-                Expanded(
-                  child: ListView(
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    children: [
-                      Container(
-                        height: 60.0,
-                        color: Colors.grey[200],
-                        child: InkWell(
-                          onTap: (){
+                Container(
+                  height: 60.0,
+                  color: Colors.grey[200],
+                  child: InkWell(
+                    onTap: (){
 
-                          },
-                          child: Container(
-                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Icon( Icons.add,color: Colors.black,size: 30.0,),
-                                Text(
-                                  "Add Delivery Address",
-                                  style: TextStyle(color: Colors.black, fontSize: 18.0),
-                                ),
-                              ],
-                            ),
+                    },
+                    child: Container(
+                      margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Icon( Icons.add,color: Colors.black,size: 30.0,),
+                          Text(
+                            "Add Delivery Address",
+                            style: TextStyle(color: Colors.black, fontSize: 18.0),
                           ),
-                        ),
+                        ],
                       ),
-                      Container(
-                        margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                margin: EdgeInsets.fromLTRB(15, 10, 0, 0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.fromLTRB(15, 10, 0, 0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Deliver To",style: TextStyle(fontSize: 16),),
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                child: Row(
                                   children: [
-                                    Text("Deliver To",style: TextStyle(fontSize: 16),),
+                                    Text("Vicky Sharma",
+                                      style: TextStyle(fontSize: 18,color: Colors.black),),
+
                                     Container(
-                                      margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                      child: Row(
-                                        children: [
-                                          Text("Vicky Sharma",
-                                            style: TextStyle(fontSize: 18,color: Colors.black),),
-
-                                          Container(
-                                            height: 30.0,
-                                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                            color: appTheme,
-                                            child: InkWell(
-                                              onTap: () async {},
-                                              child: ButtonTheme(
-                                                minWidth: 60,
-                                                child: RaisedButton(
-                                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                  textColor: Colors.grey[600],
-                                                  color: Colors.grey[300],
-                                                  onPressed: () async {
-                                                  },
-                                                  child: Text("Home",
-                                                    style: TextStyle(color: Colors.grey[700],),
-                                                  ),
-                                                ),
-                                              ),
+                                      height: 30.0,
+                                      margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                      color: appTheme,
+                                      child: InkWell(
+                                        onTap: () async {},
+                                        child: ButtonTheme(
+                                          minWidth: 60,
+                                          child: RaisedButton(
+                                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                            textColor: Colors.grey[600],
+                                            color: Colors.grey[300],
+                                            onPressed: () async {
+                                            },
+                                            child: Text("Home",
+                                              style: TextStyle(color: Colors.grey[700],),
                                             ),
-                                          )
-
-                                        ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                    Text("Netsmartz House, Floor 3, Plot No. 10, Rajiv Gandhi IT Park, Chandigarh, 160101",style: TextStyle(fontSize: 16),),
+                                    )
+
                                   ],
                                 ),
                               ),
+                              Text("Netsmartz House, Floor 3, Plot No. 10, Rajiv Gandhi IT Park, Chandigarh, 160101",style: TextStyle(fontSize: 16),),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                        height: 35.0,
+                        margin: EdgeInsets.fromLTRB(0, 20, 10, 0),
+                        color: appTheme,
+                        child: InkWell(
+                          onTap: () async {},
+                          child: ButtonTheme(
+                            minWidth: 80,
+                            child: RaisedButton(
+                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              textColor: Colors.grey[600],
+                              color: Colors.grey[300],
+                              onPressed: () async {
+
+                              },
+                              child: Text("Change",
+                                style: TextStyle(color: Colors.grey[700],),
+                              ),
                             ),
+                          ),
+                        ),
+                      )
 
-                            Container(
-                              height: 35.0,
-                              margin: EdgeInsets.fromLTRB(0, 20, 10, 0),
-                              color: appTheme,
-                              child: InkWell(
-                                onTap: () async {},
-                                child: ButtonTheme(
-                                  minWidth: 80,
-                                  child: RaisedButton(
-                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                    textColor: Colors.grey[600],
-                                    color: Colors.grey[300],
-                                    onPressed: () async {
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                  height: 1,
+                  color: Colors.grey,
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(15, 10, 0, 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                          child: Text("When do you want to start the subscription?",
+                            style: TextStyle(fontSize: 16),)
+                      ),
 
-                                    },
-                                    child: Text("Change",
-                                      style: TextStyle(color: Colors.grey[700],),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Container(
+                              child: Stack(
+                                children: [
+                                  Text("Start Date",style: TextStyle(fontSize: 14),),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                    child: TextField(
+                                        controller: controllerStartDate,
+                                        onTap: () async {
+                                          selectedStartDate = await selectDate(context);
+                                          String date = DateFormat('dd-MM-yyyy').format(selectedStartDate);
+                                          setState(() {
+                                            controllerStartDate.text = date;
+                                          });
+
+                                        },
+                                        readOnly: true,
+                                        decoration: InputDecoration(
+                                          suffixIcon: IconButton(
+                                              icon: Icon(Icons.calendar_today,),
+                                              onPressed: () {
+                                              }
+                                          ),
+                                        )
                                     ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 30,),
+                          Expanded(
+                            child: Container(
+                              child: Stack(
+                                children: [
+                                  Text("End Date",style: TextStyle(fontSize: 14),),
+
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                    child: TextField(
+                                        controller: controllerEndDate,
+                                        onTap: () async {
+                                          selectedEndDate = await selectDate(context);
+                                          String date = DateFormat('dd-MM-yyyy').format(selectedEndDate);
+                                          setState(() {
+                                            controllerEndDate.text = date;
+                                          });
+
+                                        },
+                                        readOnly: true,
+                                        decoration: InputDecoration(
+                                          suffixIcon: IconButton(
+                                              icon: Icon(Icons.calendar_today,),
+                                              onPressed: () {
+                                                //_controllerx.text = '';
+                                              }
+                                          ),
+                                        )
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                    ],
+                  ),
+                ),
+                showDeliverySlot(),
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                  height: 5,
+                  color: Colors.grey[400],
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                          margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                          child: Text("How often do you want to receive this product?",
+                            style: TextStyle(fontSize: 16),)
+                      ),
+
+                      GridView.count(
+                          childAspectRatio: MediaQuery.of(context).size.width /
+                              (MediaQuery.of(context).size.height / 5),
+                          physics: NeverScrollableScrollPhysics(), // to disable GridView's scrolling
+                          shrinkWrap: true,
+                          crossAxisCount: 2,
+                          children: List.generate(widget.model.subscription.cycleType.length, (index) {
+
+                            return Container(
+                              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                              color: Colors.white,
+                              child: Center(
+                                child: InkWell(
+                                  onTap: (){
+                                    if(selectedStartDate != null && selectedEndDate != null){
+                                      //print("label=${widget.model.subscription.cycleType[index].label}");
+                                      //print("days=${widget.model.subscription.cycleType[index].days}");
+                                      int days = int.parse(widget.model.subscription.cycleType[index].days);
+                                      //final difference = selectedEndDate.difference(selectedStartDate).inDays;
+                                      //print("difference.inDays=${difference}");
+
+                                      if(days == 1){
+                                        List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(selectedStartDate, selectedEndDate);
+                                        _markedDateMap.clear();
+                                        for (var i = 0; i < getDatesInBeteween.length; i++) {
+                                          _markedDateMap.add(getDatesInBeteween[i],Event(
+                                            date: getDatesInBeteween[i],
+                                            title: '${getDatesInBeteween[i].day.toString()}',
+                                            icon: _presentIcon(getDatesInBeteween[i].day.toString()),
+                                          ));
+                                        }
+                                        setState(() {
+                                          selecteddays = index;
+                                        });
+                                      }else{
+                                        _markedDateMap.clear();
+                                        List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(selectedStartDate, selectedEndDate);
+                                        for (var i = 0; i < getDatesInBeteween.length; i++) {
+                                          if(i % days == 0) {
+                                            _markedDateMap.add(getDatesInBeteween[i],Event(
+                                              date: getDatesInBeteween[i],
+                                              title: '${getDatesInBeteween[i].day.toString()}',
+                                              icon: _presentIcon(getDatesInBeteween[i].day.toString()),
+                                            ));
+                                          }
+                                        }
+                                        setState(() {
+                                          selecteddays = index;
+                                        });
+                                      }
+                                    }else if(selectedStartDate == null){
+                                      Utils.showToast("Please select Start Date", false);
+                                    }else if(selectedEndDate == null){
+                                      Utils.showToast("Please select End Date", false);
+                                    }
+
+                                  },
+                                  child: Row(
+                                    children: [
+                                      selecteddays == index
+                                          ? Icon(Icons.radio_button_checked,color: appTheme,)
+                                          : Icon(Icons.radio_button_unchecked,color: appTheme,),
+                                      SizedBox(width: 10,),
+                                      Text(widget.model.subscription.cycleType[index].label),
+                                    ],
                                   ),
                                 ),
                               ),
-                            )
-
-                          ],
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                        height: 1,
-                        color: Colors.grey,
-                      ),
-                      Container(
-                        margin: EdgeInsets.fromLTRB(15, 10, 0, 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-                                child: Text("When do you want to start the subscription?",
-                                  style: TextStyle(fontSize: 16),)
-                            ),
-
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    child: Stack(
-                                      children: [
-                                        Text("Start Date",style: TextStyle(fontSize: 14),),
-                                        Container(
-                                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                          child: TextField(
-                                            controller: controllerStartDate,
-                                            onTap: () async {
-                                              selectedStartDate = await selectDate(context);
-                                              String date = DateFormat('dd-MM-yyyy').format(selectedStartDate);
-                                              setState(() {
-                                                controllerStartDate.text = date;
-                                              });
-
-                                              },
-                                              readOnly: true,
-                                              decoration: InputDecoration(
-                                                suffixIcon: IconButton(
-                                                    icon: Icon(Icons.calendar_today,),
-                                                    onPressed: () {
-                                                    }
-                                                ),
-                                              )
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 30,),
-                                Expanded(
-                                  child: Container(
-                                    child: Stack(
-                                      children: [
-                                        Text("End Date",style: TextStyle(fontSize: 14),),
-
-                                        Container(
-                                          margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                          child: TextField(
-                                              controller: controllerEndDate,
-                                              onTap: () async {
-                                                selectedEndDate = await selectDate(context);
-                                                String date = DateFormat('dd-MM-yyyy').format(selectedEndDate);
-                                                setState(() {
-                                                  controllerEndDate.text = date;
-                                                });
-
-                                              },
-                                              readOnly: true,
-                                              decoration: InputDecoration(
-                                                suffixIcon: IconButton(
-                                                    icon: Icon(Icons.calendar_today,),
-                                                    onPressed: () {
-                                                      //_controllerx.text = '';
-                                                    }
-                                                ),
-                                              )
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                          ],
-                        ),
-                      ),
-                      showDeliverySlot(),
-                      Container(
-                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                        height: 5,
-                        color: Colors.grey[400],
-                      ),
-                      Container(
-                        margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                                margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-                                child: Text("How often do you want to receive this product?",
-                                  style: TextStyle(fontSize: 16),)
-                            ),
-
-                            GridView.count(
-                                childAspectRatio: MediaQuery.of(context).size.width /
-                                    (MediaQuery.of(context).size.height / 5),
-                                physics: NeverScrollableScrollPhysics(), // to disable GridView's scrolling
-                                shrinkWrap: true,
-                                crossAxisCount: 2,
-                                children: List.generate(widget.model.subscription.cycleType.length, (index) {
-
-                                  return Container(
-                                    margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                                    color: Colors.white,
-                                    child: Center(
-                                      child: InkWell(
-                                        onTap: (){
-                                          if(selectedStartDate != null && selectedEndDate != null){
-                                            //print("label=${widget.model.subscription.cycleType[index].label}");
-                                            //print("days=${widget.model.subscription.cycleType[index].days}");
-                                            int days = int.parse(widget.model.subscription.cycleType[index].days);
-                                            //final difference = selectedEndDate.difference(selectedStartDate).inDays;
-                                            //print("difference.inDays=${difference}");
-
-                                            if(days == 1){
-                                              List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(selectedStartDate, selectedEndDate);
-                                              _markedDateMap.clear();
-                                              for (var i = 0; i < getDatesInBeteween.length; i++) {
-                                                _markedDateMap.add(getDatesInBeteween[i],Event(
-                                                  date: getDatesInBeteween[i],
-                                                  title: '${getDatesInBeteween[i].day.toString()}',
-                                                  icon: _presentIcon(getDatesInBeteween[i].day.toString()),
-                                                ));
-                                              }
-                                              setState(() {
-                                                selecteddays = index;
-                                              });
-                                            }else{
-                                              _markedDateMap.clear();
-                                              List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(selectedStartDate, selectedEndDate);
-                                              for (var i = 0; i < getDatesInBeteween.length; i++) {
-                                                if(i % days == 0) {
-                                                  _markedDateMap.add(getDatesInBeteween[i],Event(
-                                                    date: getDatesInBeteween[i],
-                                                    title: '${getDatesInBeteween[i].day.toString()}',
-                                                    icon: _presentIcon(getDatesInBeteween[i].day.toString()),
-                                                  ));
-                                                }
-                                              }
-                                              setState(() {
-                                                selecteddays = index;
-                                              });
-                                            }
-                                          }else if(selectedStartDate == null){
-                                            Utils.showToast("Please select Start Date", false);
-                                          }else if(selectedEndDate == null){
-                                            Utils.showToast("Please select End Date", false);
-                                          }
-
-                                        },
-                                        child: Row(
-                                          children: [
-                                            selecteddays == index
-                                                ? Icon(Icons.radio_button_checked,color: appTheme,)
-                                                : Icon(Icons.radio_button_unchecked,color: appTheme,),
-                                            SizedBox(width: 10,),
-                                            Text(widget.model.subscription.cycleType[index].label),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                })
-                            ),
-
-                          ],
-                        ),
-                      ),
-                      Container(
-                        child: Center(child: Text("Preview")),
-                      ),
-                      Container(
-                        color: Colors.white,
-                        child: CalendarCarousel<Event>(
-                          childAspectRatio: 1.5,
-                          height: 330,
-                          markedDatesMap: _markedDateMap,
-                          headerMargin: EdgeInsets.all(0),
-                          customGridViewPhysics: NeverScrollableScrollPhysics(),
-                          isScrollable: true,
-                          weekendTextStyle: TextStyle(color: Colors.black,),
-                          todayButtonColor: Colors.white,
-                          todayTextStyle: TextStyle(color: Colors.black,),
-                          markedDateShowIcon: true,
-                          shouldShowTransform: false,
-                          markedDateIconMaxShown: 1,
-                          markedDateMoreShowTotal: null, // null for not showing hidden events indicator
-                          markedDateIconBuilder: (event) {
-                            return event.icon;
-                          },
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-                        height: 1,
-                        color: Colors.grey,
+                            );
+                          })
                       ),
 
-                      ProductSubcriptonTileView(widget.product, () {
-                      }, ClassType.SubCategory),
-
-                      Container(
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-                        height: 1,
-                        color: Colors.grey,
-                      ),
                     ],
                   ),
-                )
+                ),
+                Container(
+                  child: Center(child: Text("Preview")),
+                ),
+                Container(
+                  color: Colors.white,
+                  child: CalendarCarousel<Event>(
+                    childAspectRatio: 1.5,
+                    height: 330,
+                    markedDatesMap: _markedDateMap,
+                    headerMargin: EdgeInsets.all(0),
+                    customGridViewPhysics: NeverScrollableScrollPhysics(),
+                    isScrollable: true,
+                    weekendTextStyle: TextStyle(color: Colors.black,),
+                    todayButtonColor: Colors.white,
+                    todayTextStyle: TextStyle(color: Colors.black,),
+                    markedDateShowIcon: true,
+                    shouldShowTransform: false,
+                    markedDateIconMaxShown: 1,
+                    markedDateMoreShowTotal: null, // null for not showing hidden events indicator
+                    markedDateIconBuilder: (event) {
+                      return event.icon;
+                    },
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                  height: 1,
+                  color: Colors.grey,
+                ),
+
+                ProductSubcriptonTileView(widget.product, () {
+                }, ClassType.SubCategory),
+
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                  height: 1,
+                  color: Colors.grey,
+                ),
               ],
             ),
           ),
