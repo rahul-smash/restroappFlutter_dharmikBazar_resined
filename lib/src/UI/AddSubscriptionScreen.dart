@@ -197,7 +197,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                             controller: controllerStartDate,
                                             onTap: () async {
                                               selectedStartDate = await selectDate(context);
-                                              String date = DateFormat('DD-MM-yyyy').format(selectedStartDate);
+                                              String date = DateFormat('dd-MM-yyyy').format(selectedStartDate);
                                               setState(() {
                                                 controllerStartDate.text = date;
                                               });
@@ -230,7 +230,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                               controller: controllerEndDate,
                                               onTap: () async {
                                                 selectedEndDate = await selectDate(context);
-                                                String date = DateFormat('DD-MM-yyyy').format(selectedEndDate);
+                                                String date = DateFormat('dd-MM-yyyy').format(selectedEndDate);
                                                 setState(() {
                                                   controllerEndDate.text = date;
                                                 });
@@ -627,7 +627,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         firstDate: DateTime.now(),
         lastDate: DateTime(DateTime.now().year + 10)
     );
-    if (picked != null && picked != selectedDate)
+    print(picked);
+    if (picked != null)
       //dayName = DateFormat('DD-MM-yyyy').format(selectedDate);
       return picked;
   }
