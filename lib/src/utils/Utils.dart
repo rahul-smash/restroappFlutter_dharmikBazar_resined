@@ -832,22 +832,13 @@ class Utils {
     DeviceInfo.getInstance(deviceInfo: param);
   }
 
-  static DateTime selectedDate = DateTime.now();
-  static Future<String> selectDate(BuildContext context) async {
-    String dayName = "";
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: selectedDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(DateTime.now().year + 10)
-    );
-    if (picked != null && picked != selectedDate)
-
-    dayName = DateFormat('DD-MM-yyyy').format(selectedDate);
-
-    return dayName;
+  static List<DateTime> getDatesInBeteween(DateTime startDate, DateTime endDate) {
+    List<DateTime> days = [];
+    for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
+      days.add(startDate.add(Duration(days: i)));
+    }
+    return days;
   }
-
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }

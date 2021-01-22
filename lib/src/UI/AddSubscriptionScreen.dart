@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
+import 'package:intl/intl.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -37,11 +38,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   //Store provides instant delivery of the orders.
   bool isInstantDelivery = false;
   int selecteddays = -1;
+  DateTime selectedStartDate,selectedEndDate;
+  EventList<Event> _markedDateMap;
 
   @override
   void initState() {
     super.initState();
     selecteddays = -1;
+    _markedDateMap = new EventList<Event>(
+      events: {},
+    );
     callDeliverySlotsApi();
   }
 
@@ -190,9 +196,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                           child: TextField(
                                             controller: controllerStartDate,
                                             onTap: () async {
-                                              String selectedDate = await Utils.selectDate(context);
+                                              selectedStartDate = await selectDate(context);
+                                              String date = DateFormat('DD-MM-yyyy').format(selectedStartDate);
                                               setState(() {
-                                                controllerStartDate.text = selectedDate;
+                                                controllerStartDate.text = date;
                                               });
 
                                               },
@@ -222,9 +229,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                           child: TextField(
                                               controller: controllerEndDate,
                                               onTap: () async {
-                                                String selectedDate = await Utils.selectDate(context);
+                                                selectedEndDate = await selectDate(context);
+                                                String date = DateFormat('DD-MM-yyyy').format(selectedEndDate);
                                                 setState(() {
-                                                  controllerEndDate.text = selectedDate;
+                                                  controllerEndDate.text = date;
                                                 });
 
                                               },
@@ -280,10 +288,48 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                     child: Center(
                                       child: InkWell(
                                         onTap: (){
-                                          print("index=${index}");
-                                          setState(() {
-                                            selecteddays = index;
-                                          });
+                                          if(selectedStartDate != null && selectedEndDate != null){
+                                            //print("label=${widget.model.subscription.cycleType[index].label}");
+                                            //print("days=${widget.model.subscription.cycleType[index].days}");
+                                            int days = int.parse(widget.model.subscription.cycleType[index].days);
+                                            //final difference = selectedEndDate.difference(selectedStartDate).inDays;
+                                            //print("difference.inDays=${difference}");
+
+                                            if(days == 1){
+                                              List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(selectedStartDate, selectedEndDate);
+                                              _markedDateMap.clear();
+                                              for (var i = 0; i < getDatesInBeteween.length; i++) {
+                                                _markedDateMap.add(getDatesInBeteween[i],Event(
+                                                  date: getDatesInBeteween[i],
+                                                  title: '${getDatesInBeteween[i].day.toString()}',
+                                                  icon: _presentIcon(getDatesInBeteween[i].day.toString()),
+                                                ));
+                                              }
+                                              setState(() {
+                                                selecteddays = index;
+                                              });
+                                            }else{
+                                              _markedDateMap.clear();
+                                              List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(selectedStartDate, selectedEndDate);
+                                              for (var i = 0; i < getDatesInBeteween.length; i++) {
+                                                if(i % days == 0) {
+                                                  _markedDateMap.add(getDatesInBeteween[i],Event(
+                                                    date: getDatesInBeteween[i],
+                                                    title: '${getDatesInBeteween[i].day.toString()}',
+                                                    icon: _presentIcon(getDatesInBeteween[i].day.toString()),
+                                                  ));
+                                                }
+                                              }
+                                              setState(() {
+                                                selecteddays = index;
+                                              });
+                                            }
+                                          }else if(selectedStartDate == null){
+                                            Utils.showToast("Please select Start Date", false);
+                                          }else if(selectedEndDate == null){
+                                            Utils.showToast("Please select End Date", false);
+                                          }
+
                                         },
                                         child: Row(
                                           children: [
@@ -311,20 +357,20 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         child: CalendarCarousel<Event>(
                           childAspectRatio: 1.5,
                           height: 330,
+                          markedDatesMap: _markedDateMap,
                           headerMargin: EdgeInsets.all(0),
                           customGridViewPhysics: NeverScrollableScrollPhysics(),
                           isScrollable: true,
-                          weekendTextStyle: TextStyle(
-                            color: Colors.red,
-                          ),
-                          todayButtonColor: Colors.blue[200],
-                          //markedDatesMap: _markedDateMap,
+                          weekendTextStyle: TextStyle(color: Colors.black,),
+                          todayButtonColor: Colors.white,
+                          todayTextStyle: TextStyle(color: Colors.black,),
                           markedDateShowIcon: true,
+                          shouldShowTransform: false,
                           markedDateIconMaxShown: 1,
                           markedDateMoreShowTotal: null, // null for not showing hidden events indicator
-                          /*markedDateIconBuilder: (event) {
+                          markedDateIconBuilder: (event) {
                             return event.icon;
-                          },*/
+                          },
                         ),
                       ),
                       Container(
@@ -333,10 +379,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         color: Colors.grey,
                       ),
 
-
                       ProductSubcriptonTileView(widget.product, () {
                       }, ClassType.SubCategory),
-
 
                       Container(
                         margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
@@ -366,7 +410,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   Widget addSubscriptionBtn() {
-
 
     return Container(
       height: 50.0,
@@ -520,7 +563,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
                         Timeslot slotsObject = timeslotList[index];
-                        print("----${slotsObject.label}-and ${selctedTag}--");
+                        //print("----${slotsObject.label}-and ${selctedTag}--");
 
                         //selectedTimeSlot
                         Color textColor;
@@ -569,6 +612,24 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         return Container();
       }
     }
+  }
+
+  static Widget _presentIcon(String day) => CircleAvatar(
+    backgroundColor: Colors.blue,
+    child: Text(day,style: TextStyle(color: Colors.white,), ),
+  );
+
+  Future<DateTime> selectDate(BuildContext context) async {
+    DateTime selectedDate = DateTime.now();
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDate,
+        firstDate: DateTime.now(),
+        lastDate: DateTime(DateTime.now().year + 10)
+    );
+    if (picked != null && picked != selectedDate)
+      //dayName = DateFormat('DD-MM-yyyy').format(selectedDate);
+      return picked;
   }
 }
 
