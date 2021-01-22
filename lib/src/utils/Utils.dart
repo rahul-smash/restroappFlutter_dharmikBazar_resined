@@ -843,7 +843,7 @@ class Utils {
 
 enum ClassType { CART, SubCategory, Favourites, Search }
 
-enum OrderType { Delivery, PickUp, Menu }
+enum OrderType { Delivery, PickUp, Menu, SubScription }
 
 enum PaymentType { COD, ONLINE, ONLINE_PAYTM, CANCEL }
 enum RadioButtonEnum { SELECTD, UNSELECTED }

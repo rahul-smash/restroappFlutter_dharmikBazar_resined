@@ -3,12 +3,16 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:intl/intl.dart';
+import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'ProductSubcriptonTileView.dart';
@@ -40,6 +44,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   int selecteddays = -1;
   DateTime selectedStartDate,selectedEndDate;
   EventList<Event> _markedDateMap;
+  DeliveryAddressData addressData;
 
   @override
   void initState() {
@@ -49,6 +54,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       events: {},
     );
     callDeliverySlotsApi();
+    eventBus.on<onAddressSelected>().listen((event) {
+      print("<---onAddressSelected------->");
+      setState(() {
+        this.addressData = event.addressData;
+      });
+    });
   }
 
   @override
@@ -67,12 +78,25 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               shrinkWrap: true,
               physics: ScrollPhysics(),
               children: [
-                Container(
+                addressData == null
+                    ? Container(
                   height: 60.0,
                   color: Colors.grey[200],
                   child: InkWell(
                     onTap: (){
-
+                      if (AppConstant.isLoggedIn) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  DeliveryAddressList(true, OrderType.SubScription)),
+                        );
+                        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+                        attributeMap["ScreenName"] = "DeliveryAddressList";
+                        Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
+                      } else {
+                        Utils.showLoginDialog(context);
+                      }
                     },
                     child: Container(
                       margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
@@ -88,8 +112,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       ),
                     ),
                   ),
-                ),
-                Container(
+                )
+                    : Container(
                   margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,35 +129,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                 margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
                                 child: Row(
                                   children: [
-                                    Text("Vicky Sharma",
-                                      style: TextStyle(fontSize: 18,color: Colors.black),),
-
-                                    Container(
-                                      height: 30.0,
-                                      margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                      color: appTheme,
-                                      child: InkWell(
-                                        onTap: () async {},
-                                        child: ButtonTheme(
-                                          minWidth: 60,
-                                          child: RaisedButton(
-                                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                            textColor: Colors.grey[600],
-                                            color: Colors.grey[300],
-                                            onPressed: () async {
-                                            },
-                                            child: Text("Home",
-                                              style: TextStyle(color: Colors.grey[700],),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-
+                                    Text("${addressData.firstName}",
+                                      style: TextStyle(fontWeight: FontWeight.w700,fontSize: 18,color: Colors.black),),
                                   ],
                                 ),
                               ),
-                              Text("Netsmartz House, Floor 3, Plot No. 10, Rajiv Gandhi IT Park, Chandigarh, 160101",style: TextStyle(fontSize: 16),),
+                              Text("${addressData.address}",style: TextStyle(fontSize: 16),),
                             ],
                           ),
                         ),
@@ -143,20 +144,29 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         height: 35.0,
                         margin: EdgeInsets.fromLTRB(0, 20, 10, 0),
                         color: appTheme,
-                        child: InkWell(
-                          onTap: () async {},
-                          child: ButtonTheme(
-                            minWidth: 80,
-                            child: RaisedButton(
-                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              textColor: Colors.grey[600],
-                              color: Colors.grey[300],
-                              onPressed: () async {
-
-                              },
-                              child: Text("Change",
-                                style: TextStyle(color: Colors.grey[700],),
-                              ),
+                        child: ButtonTheme(
+                          minWidth: 80,
+                          child: RaisedButton(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            textColor: Colors.grey[600],
+                            color: Colors.grey[300],
+                            onPressed: () async {
+                              if (AppConstant.isLoggedIn) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          DeliveryAddressList(true, OrderType.SubScription)),
+                                );
+                                Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+                                attributeMap["ScreenName"] = "DeliveryAddressList";
+                                Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
+                              } else {
+                                Utils.showLoginDialog(context);
+                              }
+                            },
+                            child: Text("Change",
+                              style: TextStyle(color: Colors.grey[700],),
                             ),
                           ),
                         ),
@@ -165,9 +175,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     ],
                   ),
                 ),
+
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                  height: 1,
+                  height: addressData == null ? 0 : 1,
                   color: Colors.grey,
                 ),
                 Container(
@@ -401,7 +412,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       ),
     );
   }
-
   Widget addSubscriptionBtn() {
 
     return Container(
