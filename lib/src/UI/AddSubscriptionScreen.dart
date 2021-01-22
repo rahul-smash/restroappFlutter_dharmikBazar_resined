@@ -607,7 +607,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     }
   }
 
-  static Widget _presentIcon(String day) => CircleAvatar(
+  Widget _presentIcon(String day) => CircleAvatar(
     backgroundColor: Colors.blue,
     child: Text(day,style: TextStyle(color: Colors.white,), ),
   );
