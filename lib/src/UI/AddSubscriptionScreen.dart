@@ -374,7 +374,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     todayTextStyle: TextStyle(color: Colors.black,),
                     markedDateShowIcon: true,
                     shouldShowTransform: false,
+                    weekdayTextStyle: TextStyle(color: Colors.black,),
                     markedDateIconMaxShown: 1,
+                    headerTextStyle: TextStyle(color: Colors.black,fontSize: 18),
                     markedDateMoreShowTotal: null, // null for not showing hidden events indicator
                     markedDateIconBuilder: (event) {
                       return event.icon;
