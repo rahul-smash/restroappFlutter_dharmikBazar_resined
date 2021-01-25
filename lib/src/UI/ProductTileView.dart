@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
@@ -796,6 +797,11 @@ class _ProductTileItemState extends State<ProductTileItem> {
     if (selectedVariant != null &&
         selectedVariant.stockType != null &&
         selectedVariant.stockType.isNotEmpty) {
+      if (selectedVariant.maxQuantityPerOrder.isNotEmpty&& counter >= int.parse(selectedVariant.maxQuantityPerOrder)) {
+        Utils.showToast(
+            "Maximum quantity per order is " + selectedVariant.maxQuantityPerOrder.toString(), true);
+        return false;
+      }
       switch (selectedVariant.stockType) {
         case 'threshold_quantity':
           if (selectedVariant.stock != null) {

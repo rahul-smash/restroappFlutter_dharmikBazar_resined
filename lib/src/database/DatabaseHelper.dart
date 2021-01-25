@@ -911,4 +911,134 @@ class DatabaseHelper {
   }
 
   void updateProductDetails(Product first) {}
+
+  Future<List<Product>> getProductsByIDs(List<Product> cartList) async {
+    List<Product> productList = new List();
+    if (cartList.isEmpty) {
+      return productList;
+    }
+    List<String> ids = List();
+    String id = '';
+    for (int i = 0; i < cartList.length; i++) {
+      ids.add(cartList[i].id);
+      if (i != cartList.length - 1)
+        id = id + cartList[i].id + ', ';
+      else
+        id = id + cartList[i].id;
+    }
+
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      "id",
+      "store_id",
+      "category_ids",
+      "title",
+      "brand",
+      "nutrient",
+      "description",
+      "tags",
+      "isfavorite",
+      "image",
+      "image_url",
+      "status",
+      "image_type",
+      "show_price",
+      "isTaxEnable",
+      "image_100_80",
+      "image_300_200",
+      "gst_tax_rate",
+      "gst_tax_type",
+      "status",
+      "deleted",
+      "sort",
+      "selectedVariant",
+      "variantId",
+      "weight",
+      "mrpPrice",
+      "price",
+      "discount",
+      "isUnitType",
+      "variants"
+    ];
+
+//    List<Map> resultList = await dbClient.query(Products_Table,
+//        columns: columnsToSelect, where: 'id = ?', whereArgs: ids);
+
+    List<Map> resultList = await dbClient.rawQuery(
+        'SELECT * from ${Products_Table} where ${ID} in (${id})');
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        Product product = Product();
+        product.id = row["id"].toString();
+        product.isFav = row["isfavorite"];
+        product.storeId = row["store_id"];
+        product.categoryIds = row["category_ids"];
+        product.title = row["title"];
+        product.brand = row["brand"];
+        product.nutrient = row["nutrient"];
+        product.description = row["description"];
+        product.image = row["image"];
+        product.imageType = row["image_type"];
+        product.imageUrl = row["image_url"] ?? "";
+        product.showPrice = row["show_price"];
+        product.isTaxEnable = row["isTaxEnable"];
+        product.gstTaxType = row["gst_tax_type"];
+        product.gstTaxRate = row["gst_tax_rate"];
+        product.status = row["status"];
+        product.sort = row["sort"];
+        Map<String, dynamic> map = jsonDecode(row["selectedVariant"]);
+        product.selectedVariant = SelectedVariant.fromJson(map);
+        product.deleted = row["deleted"] == 'true';
+        product.image10080 = row["image_100_80"] ?? "";
+        product.image300200 = row["image_300_200"] ?? "";
+        var parsedListJson = jsonDecode(row["variants"]);
+        List<Variant> variantsList =
+            List<Variant>.from(parsedListJson.map((i) => Variant.fromJson(i)));
+        product.variants = variantsList;
+        product.variantId = row["variantId"].toString();
+        product.weight = row["weight"];
+        product.mrpPrice = row["mrpPrice"];
+        product.price = row["price"];
+        product.discount = row["discount"];
+        product.isUnitType = row["isUnitType"];
+
+        productList.add(product);
+      });
+
+      for (int i = 0; i < cartList.length; i++) {
+        for (int j = 0; j < productList.length; j++) {
+          if (cartList[i].id.compareTo(productList[j].id) == 0) {
+            cartList[i].id = productList[j].id;
+            cartList[i].storeId = productList[j].storeId;
+            cartList[i].categoryIds = productList[j].categoryIds;
+            cartList[i].title = productList[j].title;
+            cartList[i].brand = productList[j].brand;
+            cartList[i].nutrient = productList[j].nutrient;
+            cartList[i].description = productList[j].description;
+            cartList[i].image = productList[j].image;
+            cartList[i].imageType = productList[j].imageType;
+            cartList[i].imageUrl = productList[j].imageUrl;
+            cartList[i].showPrice = productList[j].showPrice;
+            cartList[i].isTaxEnable = productList[j].isTaxEnable;
+            cartList[i].gstTaxType = productList[j].gstTaxType;
+            cartList[i].gstTaxRate = productList[j].gstTaxRate;
+            cartList[i].status = productList[j].status;
+            cartList[i].sort = productList[j].sort;
+            cartList[i].selectedVariant = productList[j].selectedVariant;
+            cartList[i].deleted = productList[j].deleted;
+            cartList[i].image10080 = productList[j].image10080;
+            cartList[i].image300200 = productList[j].image300200;
+            cartList[i].variants = productList[j].variants;
+            cartList[i].mrpPrice = productList[j].mrpPrice;
+            cartList[i].price = productList[j].price;
+            cartList[i].discount = productList[j].discount;
+            break;
+          }
+        }
+      }
+    }else{
+      return cartList;
+    }
+    return productList;
+  }
 }
