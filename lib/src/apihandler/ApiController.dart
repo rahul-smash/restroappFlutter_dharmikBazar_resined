@@ -37,6 +37,7 @@ import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
 import 'package:restroapp/src/models/StripeVerifyModel.dart';
+import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -248,7 +249,8 @@ class ApiController {
         categoryResponse.success = false;
         return categoryResponse;
       } else {
-        print("1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
+        print(
+            "1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
         //prepare model object
         List<CategoryModel> categoryList = await databaseHelper.getCategories();
         categoryResponse.categories = categoryList;
@@ -258,7 +260,8 @@ class ApiController {
               await databaseHelper.getSubCategories(parent_id);
         }
         categoryResponse.success = true;
-        print("2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
+        print(
+            "2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
       }
     } catch (e) {
       print(e);
@@ -300,10 +303,11 @@ class ApiController {
                 contentType: "application/json",
                 responseType: ResponseType.plain));
         //print(response.data);
-        subCategoryResponse = SubCategoryResponse.fromJson(json.decode(response.data));
+        subCategoryResponse =
+            SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-
-          await databaseHelper.batchInsertProducts(subCategoryResponse.subCategories);
+          await databaseHelper
+              .batchInsertProducts(subCategoryResponse.subCategories);
 
           /*for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
             for (int j = 0;j < subCategoryResponse.subCategories[i].products.length; j++) {
@@ -492,7 +496,8 @@ class ApiController {
       String city,
       String cityId,
       String lat,
-      String lng,{String address2=''}) async {
+      String lng,
+      {String address2 = ''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
@@ -516,7 +521,7 @@ class ApiController {
         "area_id": areaId,
         "first_name": fullname,
         "email": user.email,
-        "address2":address2
+        "address2": address2
       });
 
       if (addressId != null) {
@@ -663,7 +668,7 @@ class ApiController {
         "fixed_discount_amount": "${discount}",
         "tax": "0",
         "user_id": user.id,
-        "user_wallet":userWallet == null ? "0" : userWallet.data.userWallet,
+        "user_wallet": userWallet == null ? "0" : userWallet.data.userWallet,
         "discount": "0",
         "shipping": shipping,
         "order_detail": orderJson,
@@ -766,48 +771,46 @@ class ApiController {
       print(e);
     }
 
-    String userDeliveryAddress='',pin='';
-    if (address != null&&!isComingFromPickUpScreen) {
-      if (address.address2 != null &&
-          address.address2.isNotEmpty) {
-        if (address.address != null &&
-            address.address.isNotEmpty) {
-          userDeliveryAddress = address.address + ", "+ address.address2+
+    String userDeliveryAddress = '', pin = '';
+    if (address != null && !isComingFromPickUpScreen) {
+      if (address.address2 != null && address.address2.isNotEmpty) {
+        if (address.address != null && address.address.isNotEmpty) {
+          userDeliveryAddress = address.address +
+              ", " +
+              address.address2 +
               " " +
               address.areaName +
               " " +
               address.city;
-        }else{
-          userDeliveryAddress = address.address2 +
-              " " +
-              address.areaName +
-              " " +
-              address.city;
+        } else {
+          userDeliveryAddress =
+              address.address2 + " " + address.areaName + " " + address.city;
         }
       } else {
-        if (address.address != null &&
-            address.address.isNotEmpty) {
-          userDeliveryAddress =address.address +
-              " " +
-              address.areaName +
-              " " +
-              address.city;
+        if (address.address != null && address.address.isNotEmpty) {
+          userDeliveryAddress =
+              address.address + " " + address.areaName + " " + address.city;
         }
       }
 
       if (address.zipCode != null && address.zipCode.isNotEmpty)
-        pin = " "+ address.zipCode;
+        pin = " " + address.zipCode;
     }
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
         "note": note,
-        "wallet_refund": store.wallet_setting == "0" ? "" : taxModel == null ? "0" : "${taxModel.wallet_refund}" ,
+        "wallet_refund": store.wallet_setting == "0"
+            ? ""
+            : taxModel == null
+                ? "0"
+                : "${taxModel.wallet_refund}",
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
-        "user_address":
-            isComingFromPickUpScreen == true ? storeAddress :userDeliveryAddress+pin,
+        "user_address": isComingFromPickUpScreen == true
+            ? storeAddress
+            : userDeliveryAddress + pin,
         "store_fixed_tax_detail": "",
         "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",
@@ -1274,7 +1277,8 @@ class ApiController {
     }
   }
 
-  static Future<StripeCheckOutModel> stripePaymentApi(String amount,String orderJson,dynamic detailsJson,
+  static Future<StripeCheckOutModel> stripePaymentApi(
+      String amount, String orderJson, dynamic detailsJson,
       {String currencyAbbr}) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1408,7 +1412,8 @@ class ApiController {
     }
   }
 
-  static Future<CancelOrderModel> orderCancelApi(String order_id,{String order_rejection_note=""}) async {
+  static Future<CancelOrderModel> orderCancelApi(String order_id,
+      {String order_rejection_note = ""}) async {
     // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
     // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
     StoreModel store = await SharedPrefs.getStore();
@@ -1421,7 +1426,7 @@ class ApiController {
       request.fields.addAll({
         "user_id": user.id,
         "order_id": order_id,
-        "order_rejection_note":order_rejection_note
+        "order_rejection_note": order_rejection_note
       });
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -1521,8 +1526,11 @@ class ApiController {
         StoreModel store = await SharedPrefs.getStore();
         SharedPreferences prefs = await SharedPreferences.getInstance();
         UserModel user = await SharedPrefs.getUser();
-        String email =
-            user.email == null ? 'NA' : user.email.isEmpty ? "NA" : user.email;
+        String email = user.email == null
+            ? 'NA'
+            : user.email.isEmpty
+                ? "NA"
+                : user.email;
 //        address = "170,phase1";
         String firstName = user.fullName.contains(" ") == true
             ? user.fullName.substring(0, user.fullName.indexOf(" "))
@@ -1704,7 +1712,7 @@ class ApiController {
         //print("fields=${request.fields.toString()}");
         print("${url}");
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
@@ -1740,7 +1748,7 @@ class ApiController {
         //print("fields=${request.fields.toString()}");
         print("${url}");
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
@@ -1756,15 +1764,14 @@ class ApiController {
   }
 
   static Future<FacebookModel> getFbUserData(String fbtoken) async {
-
     //String url1 = "https://graph.facebook.com/${user_id}?fields=name,first_name,last_name,email,&access_token=${fbtoken}";
-    String url = 'https://graph.facebook.com/v8.0/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
+    String url =
+        'https://graph.facebook.com/v8.0/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
 
     var request = new http.MultipartRequest("GET", Uri.parse(url));
 
     try {
-      final response = await request.send()
-          .timeout(Duration(seconds: timeout));
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----url---${url}");
       print("----respStr---${respStr}");
@@ -1780,14 +1787,13 @@ class ApiController {
 
   static Future<MobileVerified> verifyEmail(String email) async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.verifyEmail;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.verifyEmail;
 
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
-      request.fields.addAll({
-        "email": email,
-        "platform": Platform.isIOS ? "IOS" : "Android"
-      });
+      request.fields.addAll(
+          {"email": email, "platform": Platform.isIOS ? "IOS" : "Android"});
       print('@@url=${url}');
 
       final response = await request.send().timeout(Duration(seconds: timeout));
@@ -1803,15 +1809,14 @@ class ApiController {
     }
   }
 
-
-  static Future<MobileVerified> socialSignUp(FacebookModel fbModel,
+  static Future<MobileVerified> socialSignUp(
+      FacebookModel fbModel,
       GoogleSignInAccount googleResult,
       String fullName,
       String emailId,
       String phoneNumber,
       String user_refer_code,
       String gstNumber) async {
-
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -1823,16 +1828,16 @@ class ApiController {
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     String socialPlatform;
-    if(fbModel != null){
+    if (fbModel != null) {
       socialPlatform = "facebook";
-    }else if(googleResult != null){
+    } else if (googleResult != null) {
       socialPlatform = "google";
     }
 
     try {
       request.fields.addAll({
         "phone": phoneNumber,
-        "country": store.internationalOtp == "0" ? "92" :"0",
+        "country": store.internationalOtp == "0" ? "92" : "0",
         "email": emailId,
         "social_platform": socialPlatform,
         "full_name": fullName,
@@ -1862,9 +1867,7 @@ class ApiController {
     }
   }
 
-
-  static Future<HtmlModelResponse> getHtmlForOptions(
-      String appScreen) async {
+  static Future<HtmlModelResponse> getHtmlForOptions(String appScreen) async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     try {
       if (isNetworkAvailable) {
@@ -1872,7 +1875,7 @@ class ApiController {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String deviceId = prefs.getString(AppConstant.deviceId);
         String deviceToken = prefs.getString(AppConstant.deviceToken);
-        var url='';
+        var url = '';
         switch (appScreen) {
           case AdditionItemsConstants.TERMS_CONDITIONS:
             url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -1900,8 +1903,7 @@ class ApiController {
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
-        HtmlModelResponse model =
-        HtmlModelResponse.fromJson(parsed);
+        HtmlModelResponse model = HtmlModelResponse.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
@@ -1910,5 +1912,243 @@ class ApiController {
       print(e);
     }
     return null;
+  }
+
+  /*Subscription module*/
+  static Future<SubscriptionTaxCalculationResponse>
+      subscriptionMultipleTaxCalculationRequest(
+          String couponCode,
+          String discount,
+          String shipping,
+          String orderJson,
+          String userAddressId,
+          String userAddress,
+          String total,
+          String paymentMethod,
+          String checkout,
+          String deliveryTimeSlot,
+          String paymentRequestId,
+          String paymentId,
+          String onlineMethod,
+          String note,
+          String walletRefund,
+          String cartSaving,
+          String totalDeliveries) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    WalleModel userWallet = await SharedPrefs.getUserWallet();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.subscriptionTaxCalculation;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    print("----url---${url}");
+    //print("----orderJson---${orderJson}");
+    print("--discount-${discount}");
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "device_id": deviceId,
+        "device_token": deviceToken,
+        "user_address_id": userAddressId,
+        "user_address": userAddress,
+        "shipping": shipping,
+        "platform": Platform.isIOS ? "IOS" : "Android",
+        "total": total,
+//        "discount": "$discount",
+        "discount": "0",
+//        "payment_method": paymentMethod,
+        "coupon_code": couponCode,
+        "checkout": checkout,
+        "delivery_time_slot": deliveryTimeSlot,
+//        "payment_request_id": paymentRequestId,
+//        "payment_id": paymentId,
+//        "online_method": onlineMethod,
+//        "note": note,
+//        "wallet_refund": walletRefund,
+        "cart_saving": cartSaving,
+        "total_deliveries": totalDeliveries,
+        "fixed_discount_amount": "${discount}",
+        "tax": "0",
+        "user_wallet": userWallet == null ? "0" : userWallet.data.userWallet,
+        "order_detail": orderJson,
+      });
+      print("--fields---${request.fields.toString()}");
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("--Tax--respStr---${respStr}");
+      final parsed = json.decode(respStr);
+
+      SubscriptionTaxCalculationResponse model =
+          SubscriptionTaxCalculationResponse.fromJson(couponCode, parsed);
+      return model;
+    } catch (e) {
+      print("--multipleTax--respStr---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<ResponseModel> subscriptionPlaceOrderRequest(
+      String shipping_charges,
+      String note,
+      String totalPrice,
+      String paymentMethod,
+      TaxCalculationModel taxModel,
+      DeliveryAddressData address,
+      String orderJson,
+      bool isComingFromPickUpScreen,
+      String areaId,
+      OrderType deliveryType,
+      String razorpay_order_id,
+      String razorpay_payment_id,
+      String online_method,
+      String selectedDeliverSlotValue,
+      {String cart_saving = "0.00"}) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+    var url;
+    if (deliveryType == OrderType.Delivery) {
+      url = ApiConstants.base.replaceAll("storeId", store.id) +
+          ApiConstants.subscriptionPlaceOrder;
+    } else {
+      url = ApiConstants.base.replaceAll("storeId", store.id) +
+          ApiConstants.subscriptionPickupPlaceOrder;
+    }
+    String storeAddress = "";
+    try {
+      storeAddress = "${store.storeName}, ${store.location},"
+          "${store.city}, ${store.state}, ${store.country}, ${store.zipcode}";
+      print("storeAddress= ${storeAddress}");
+    } catch (e) {
+      print(e);
+    }
+
+    /*var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.placeOrder;*/
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    //print("==orderJson==${orderJson}====");
+    String encodedtaxDetail = "[]";
+    String encodedtaxLabel = "[]";
+    String encodedFixedTax = "[]";
+    try {
+      /*print("fixedTax= ${taxModel.fixedTax}");
+      print("taxLabel= ${taxModel.taxLabel}");
+      print("taxDetail= ${taxModel.taxDetail}");*/
+
+      try {
+        List jsonfixedTaxList =
+        taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+        encodedFixedTax = jsonEncode(jsonfixedTaxList);
+        //print("encodedFixedTax= ${encodedFixedTax}");
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        List jsontaxDetailList =
+        taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+        encodedtaxDetail = jsonEncode(jsontaxDetailList);
+        //print("encodedtaxDetail= ${encodedtaxDetail}");
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        List jsontaxLabelList =
+        taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+        encodedtaxLabel = jsonEncode(jsontaxLabelList);
+        //print("encodedtaxLabel= ${encodedtaxLabel}");
+      } catch (e) {
+        print(e);
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    String userDeliveryAddress = '', pin = '';
+    if (address != null && !isComingFromPickUpScreen) {
+      if (address.address2 != null && address.address2.isNotEmpty) {
+        if (address.address != null && address.address.isNotEmpty) {
+          userDeliveryAddress = address.address +
+              ", " +
+              address.address2 +
+              " " +
+              address.areaName +
+              " " +
+              address.city;
+        } else {
+          userDeliveryAddress =
+              address.address2 + " " + address.areaName + " " + address.city;
+        }
+      } else {
+        if (address.address != null && address.address.isNotEmpty) {
+          userDeliveryAddress =
+              address.address + " " + address.areaName + " " + address.city;
+        }
+      }
+
+      if (address.zipCode != null && address.zipCode.isNotEmpty)
+        pin = " " + address.zipCode;
+    }
+    try {
+      request.fields.addAll({
+        "shipping_charges": "${shipping_charges}",
+        "note": note,
+        "wallet_refund": store.wallet_setting == "0"
+            ? ""
+            : taxModel == null
+            ? "0"
+            : "${taxModel.wallet_refund}",
+        "calculated_tax_detail": "",
+        "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
+        "device_id": deviceId,
+        "user_address": isComingFromPickUpScreen == true
+            ? storeAddress
+            : userDeliveryAddress + pin,
+        "store_fixed_tax_detail": "",
+        "tax": taxModel == null ? "0" : '${taxModel.tax}',
+        "store_tax_rate_detail": "",
+        "platform": Platform.isIOS ? "IOS" : "Android",
+        "tax_rate": "0",
+        "total": /*taxModel == null ? '${totalPrice}' : */ '${taxModel.total}',
+        "user_id": user.id,
+        "device_token": deviceToken,
+        "user_address_id":
+        isComingFromPickUpScreen == true ? areaId : address.id,
+        "orders": orderJson,
+        "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
+        "payment_method": paymentMethod == "2" ? "COD" : "online",
+        "discount": taxModel == null ? "" : '${taxModel.discount}',
+        "payment_request_id": razorpay_order_id,
+        "payment_id": razorpay_payment_id,
+        "online_method": online_method,
+        "delivery_time_slot": selectedDeliverSlotValue,
+        "store_fixed_tax_detail": encodedFixedTax,
+        "store_tax_rate_detail": encodedtaxLabel,
+        "calculated_tax_detail": encodedtaxDetail,
+        "cart_saving": cart_saving,
+      });
+
+      //print("----${url}");
+      //print("--fields--${request.fields.toString()}--");
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      //print("--respStr--${respStr}--");
+      final parsed = json.decode(respStr);
+
+      ResponseModel model = ResponseModel.fromJson(parsed);
+      return model;
+    } catch (e) {
+      print("-x-fields--${e.toString()}--");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
   }
 }

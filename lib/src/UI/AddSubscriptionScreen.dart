@@ -18,9 +18,9 @@ import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'ProductSubcriptonTileView.dart';
 
 class AddSubscriptionScreen extends StatefulWidget {
-
   StoreModel model;
   Product product;
+
   AddSubscriptionScreen(this.product, this.model);
 
   @override
@@ -30,7 +30,6 @@ class AddSubscriptionScreen extends StatefulWidget {
 }
 
 class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
-
   TextEditingController controllerStartDate = TextEditingController();
   TextEditingController controllerEndDate = TextEditingController();
 
@@ -39,10 +38,11 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   int selctedTag, selectedTimeSlot;
   List<Timeslot> timeslotList;
   bool isSlotSelected = false;
+
   //Store provides instant delivery of the orders.
   bool isInstantDelivery = false;
   int selecteddays = -1;
-  DateTime selectedStartDate,selectedEndDate;
+  DateTime selectedStartDate, selectedEndDate;
   EventList<Event> _markedDateMap;
   DeliveryAddressData addressData;
 
@@ -64,7 +64,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -80,102 +79,126 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               children: [
                 addressData == null
                     ? Container(
-                  height: 60.0,
-                  color: Colors.grey[200],
-                  child: InkWell(
-                    onTap: (){
-                      if (AppConstant.isLoggedIn) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  DeliveryAddressList(true, OrderType.SubScription)),
-                        );
-                        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
-                        attributeMap["ScreenName"] = "DeliveryAddressList";
-                        Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
-                      } else {
-                        Utils.showLoginDialog(context);
-                      }
-                    },
-                    child: Container(
-                      margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Icon( Icons.add,color: Colors.black,size: 30.0,),
-                          Text(
-                            "Add Delivery Address",
-                            style: TextStyle(color: Colors.black, fontSize: 18.0),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-                    : Container(
-                  margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.fromLTRB(15, 10, 0, 0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Deliver To",style: TextStyle(fontSize: 16),),
-                              Container(
-                                margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                child: Row(
-                                  children: [
-                                    Text("${addressData.firstName}",
-                                      style: TextStyle(fontWeight: FontWeight.w700,fontSize: 18,color: Colors.black),),
-                                  ],
+                        height: 60.0,
+                        color: Colors.grey[200],
+                        child: InkWell(
+                          onTap: () {
+                            if (AppConstant.isLoggedIn) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => DeliveryAddressList(
+                                        true, OrderType.SubScription)),
+                              );
+                              Map<String, dynamic> attributeMap =
+                                  new Map<String, dynamic>();
+                              attributeMap["ScreenName"] =
+                                  "DeliveryAddressList";
+                              Utils.sendAnalyticsEvent(
+                                  "Clicked DeliveryAddressList", attributeMap);
+                            } else {
+                              Utils.showLoginDialog(context);
+                            }
+                          },
+                          child: Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: <Widget>[
+                                Icon(
+                                  Icons.add,
+                                  color: Colors.black,
+                                  size: 30.0,
                                 ),
-                              ),
-                              Text("${addressData.address}",style: TextStyle(fontSize: 16),),
-                            ],
-                          ),
-                        ),
-                      ),
-
-                      Container(
-                        height: 35.0,
-                        margin: EdgeInsets.fromLTRB(0, 20, 10, 0),
-                        color: appTheme,
-                        child: ButtonTheme(
-                          minWidth: 80,
-                          child: RaisedButton(
-                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            textColor: Colors.grey[600],
-                            color: Colors.grey[300],
-                            onPressed: () async {
-                              if (AppConstant.isLoggedIn) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          DeliveryAddressList(true, OrderType.SubScription)),
-                                );
-                                Map<String, dynamic> attributeMap = new Map<String, dynamic>();
-                                attributeMap["ScreenName"] = "DeliveryAddressList";
-                                Utils.sendAnalyticsEvent("Clicked DeliveryAddressList", attributeMap);
-                              } else {
-                                Utils.showLoginDialog(context);
-                              }
-                            },
-                            child: Text("Change",
-                              style: TextStyle(color: Colors.grey[700],),
+                                Text(
+                                  "Add Delivery Address",
+                                  style: TextStyle(
+                                      color: Colors.black, fontSize: 18.0),
+                                ),
+                              ],
                             ),
                           ),
                         ),
                       )
-
-                    ],
-                  ),
-                ),
-
+                    : Container(
+                        margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                margin: EdgeInsets.fromLTRB(15, 10, 0, 0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Deliver To",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            "${addressData.firstName}",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w700,
+                                                fontSize: 18,
+                                                color: Colors.black),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Text(
+                                      "${addressData.address}",
+                                      style: TextStyle(fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 35.0,
+                              margin: EdgeInsets.fromLTRB(0, 20, 10, 0),
+                              color: appTheme,
+                              child: ButtonTheme(
+                                minWidth: 80,
+                                child: RaisedButton(
+                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  textColor: Colors.grey[600],
+                                  color: Colors.grey[300],
+                                  onPressed: () async {
+                                    if (AppConstant.isLoggedIn) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                DeliveryAddressList(true,
+                                                    OrderType.SubScription)),
+                                      );
+                                      Map<String, dynamic> attributeMap =
+                                          new Map<String, dynamic>();
+                                      attributeMap["ScreenName"] =
+                                          "DeliveryAddressList";
+                                      Utils.sendAnalyticsEvent(
+                                          "Clicked DeliveryAddressList",
+                                          attributeMap);
+                                    } else {
+                                      Utils.showLoginDialog(context);
+                                    }
+                                  },
+                                  child: Text(
+                                    "Change",
+                                    style: TextStyle(
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
                   height: addressData == null ? 0 : 1,
@@ -188,72 +211,86 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     children: [
                       Container(
                           margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-                          child: Text("When do you want to start the subscription?",
-                            style: TextStyle(fontSize: 16),)
-                      ),
-
+                          child: Text(
+                            "When do you want to start the subscription?",
+                            style: TextStyle(fontSize: 16),
+                          )),
                       Row(
                         children: [
                           Expanded(
                             child: Container(
                               child: Stack(
                                 children: [
-                                  Text("Start Date",style: TextStyle(fontSize: 14),),
+                                  Text(
+                                    "Start Date",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
                                   Container(
                                     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                                     child: TextField(
                                         controller: controllerStartDate,
                                         onTap: () async {
-                                          selectedStartDate = await selectDate(context);
-                                          String date = DateFormat('dd-MM-yyyy').format(selectedStartDate);
-                                          setState(() {
-                                            controllerStartDate.text = date;
-                                          });
-
+                                          selectedStartDate =
+                                              await selectDate(context,isStartIndex: true);
+                                          if (selectedStartDate != null) {
+                                            String date =
+                                                DateFormat('dd-MM-yyyy')
+                                                    .format(selectedStartDate);
+                                            setState(() {
+                                              controllerStartDate.text = date;
+                                            });
+                                          }
                                         },
                                         readOnly: true,
                                         decoration: InputDecoration(
                                           suffixIcon: IconButton(
-                                              icon: Icon(Icons.calendar_today,),
-                                              onPressed: () {
-                                              }
-                                          ),
-                                        )
-                                    ),
+                                              icon: Icon(
+                                                Icons.calendar_today,
+                                              ),
+                                              onPressed: () {}),
+                                        )),
                                   )
                                 ],
                               ),
                             ),
                           ),
-                          SizedBox(width: 30,),
+                          SizedBox(
+                            width: 30,
+                          ),
                           Expanded(
                             child: Container(
                               child: Stack(
                                 children: [
-                                  Text("End Date",style: TextStyle(fontSize: 14),),
-
+                                  Text(
+                                    "End Date",
+                                    style: TextStyle(fontSize: 14),
+                                  ),
                                   Container(
                                     margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                                     child: TextField(
                                         controller: controllerEndDate,
                                         onTap: () async {
-                                          selectedEndDate = await selectDate(context);
-                                          String date = DateFormat('dd-MM-yyyy').format(selectedEndDate);
-                                          setState(() {
-                                            controllerEndDate.text = date;
-                                          });
-
+                                          selectedEndDate =
+                                              await selectDate(context,isStartIndex: true);
+                                          if (selectedEndDate != null) {
+                                            String date =
+                                                DateFormat('dd-MM-yyyy')
+                                                    .format(selectedEndDate);
+                                            setState(() {
+                                              controllerEndDate.text = date;
+                                            });
+                                          }
                                         },
                                         readOnly: true,
                                         decoration: InputDecoration(
                                           suffixIcon: IconButton(
-                                              icon: Icon(Icons.calendar_today,),
+                                              icon: Icon(
+                                                Icons.calendar_today,
+                                              ),
                                               onPressed: () {
                                                 //_controllerx.text = '';
-                                              }
-                                          ),
-                                        )
-                                    ),
+                                              }),
+                                        )),
                                   )
                                 ],
                               ),
@@ -261,7 +298,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           ),
                         ],
                       ),
-
                     ],
                   ),
                 ),
@@ -278,82 +314,117 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     children: [
                       Container(
                           margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-                          child: Text("How often do you want to receive this product?",
-                            style: TextStyle(fontSize: 16),)
-                      ),
-
+                          child: Text(
+                            "How often do you want to receive this product?",
+                            style: TextStyle(fontSize: 16),
+                          )),
                       GridView.count(
                           childAspectRatio: MediaQuery.of(context).size.width /
                               (MediaQuery.of(context).size.height / 5),
-                          physics: NeverScrollableScrollPhysics(), // to disable GridView's scrolling
+                          physics: NeverScrollableScrollPhysics(),
+                          // to disable GridView's scrolling
                           shrinkWrap: true,
                           crossAxisCount: 2,
-                          children: List.generate(widget.model.subscription.cycleType.length, (index) {
-
+                          children: List.generate(
+                              widget.model.subscription.cycleType.length,
+                              (index) {
                             return Container(
-                              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 10),
                               color: Colors.white,
                               child: Center(
                                 child: InkWell(
-                                  onTap: (){
-                                    if(selectedStartDate != null && selectedEndDate != null){
+                                  onTap: () {
+                                    if (selectedStartDate != null &&
+                                        selectedEndDate != null) {
                                       //print("label=${widget.model.subscription.cycleType[index].label}");
                                       //print("days=${widget.model.subscription.cycleType[index].days}");
-                                      int days = int.parse(widget.model.subscription.cycleType[index].days);
+                                      int days = int.parse(widget.model
+                                          .subscription.cycleType[index].days);
                                       //final difference = selectedEndDate.difference(selectedStartDate).inDays;
                                       //print("difference.inDays=${difference}");
 
-                                      if(days == 1){
-                                        List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(selectedStartDate, selectedEndDate);
+                                      if (days == 1) {
+                                        List<DateTime> getDatesInBeteween =
+                                            Utils.getDatesInBeteween(
+                                                selectedStartDate,
+                                                selectedEndDate);
                                         _markedDateMap.clear();
-                                        for (var i = 0; i < getDatesInBeteween.length; i++) {
-                                          _markedDateMap.add(getDatesInBeteween[i],Event(
-                                            date: getDatesInBeteween[i],
-                                            title: '${getDatesInBeteween[i].day.toString()}',
-                                            icon: _presentIcon(getDatesInBeteween[i].day.toString()),
-                                          ));
+                                        for (var i = 0;
+                                            i < getDatesInBeteween.length;
+                                            i++) {
+                                          _markedDateMap.add(
+                                              getDatesInBeteween[i],
+                                              Event(
+                                                date: getDatesInBeteween[i],
+                                                title:
+                                                    '${getDatesInBeteween[i].day.toString()}',
+                                                icon: _presentIcon(
+                                                    getDatesInBeteween[i]
+                                                        .day
+                                                        .toString()),
+                                              ));
                                         }
                                         setState(() {
                                           selecteddays = index;
                                         });
-                                      }else{
+                                      } else {
                                         _markedDateMap.clear();
-                                        List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(selectedStartDate, selectedEndDate);
-                                        for (var i = 0; i < getDatesInBeteween.length; i++) {
-                                          if(i % days == 0) {
-                                            _markedDateMap.add(getDatesInBeteween[i],Event(
-                                              date: getDatesInBeteween[i],
-                                              title: '${getDatesInBeteween[i].day.toString()}',
-                                              icon: _presentIcon(getDatesInBeteween[i].day.toString()),
-                                            ));
+                                        List<DateTime> getDatesInBeteween =
+                                            Utils.getDatesInBeteween(
+                                                selectedStartDate,
+                                                selectedEndDate);
+                                        for (var i = 0;
+                                            i < getDatesInBeteween.length;
+                                            i++) {
+                                          if (i % days == 0) {
+                                            _markedDateMap.add(
+                                                getDatesInBeteween[i],
+                                                Event(
+                                                  date: getDatesInBeteween[i],
+                                                  title:
+                                                      '${getDatesInBeteween[i].day.toString()}',
+                                                  icon: _presentIcon(
+                                                      getDatesInBeteween[i]
+                                                          .day
+                                                          .toString()),
+                                                ));
                                           }
                                         }
                                         setState(() {
                                           selecteddays = index;
                                         });
                                       }
-                                    }else if(selectedStartDate == null){
-                                      Utils.showToast("Please select Start Date", false);
-                                    }else if(selectedEndDate == null){
-                                      Utils.showToast("Please select End Date", false);
+                                    } else if (selectedStartDate == null) {
+                                      Utils.showToast(
+                                          "Please select Start Date", false);
+                                    } else if (selectedEndDate == null) {
+                                      Utils.showToast(
+                                          "Please select End Date", false);
                                     }
-
                                   },
                                   child: Row(
                                     children: [
                                       selecteddays == index
-                                          ? Icon(Icons.radio_button_checked,color: appTheme,)
-                                          : Icon(Icons.radio_button_unchecked,color: appTheme,),
-                                      SizedBox(width: 10,),
-                                      Text(widget.model.subscription.cycleType[index].label),
+                                          ? Icon(
+                                              Icons.radio_button_checked,
+                                              color: appTheme,
+                                            )
+                                          : Icon(
+                                              Icons.radio_button_unchecked,
+                                              color: appTheme,
+                                            ),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(widget.model.subscription
+                                          .cycleType[index].label),
                                     ],
                                   ),
                                 ),
                               ),
                             );
-                          })
-                      ),
-
+                          })),
                     ],
                   ),
                 ),
@@ -369,15 +440,23 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     headerMargin: EdgeInsets.all(0),
                     customGridViewPhysics: NeverScrollableScrollPhysics(),
                     isScrollable: true,
-                    weekendTextStyle: TextStyle(color: Colors.black,),
+                    weekendTextStyle: TextStyle(
+                      color: Colors.black,
+                    ),
                     todayButtonColor: Colors.white,
-                    todayTextStyle: TextStyle(color: Colors.black,),
+                    todayTextStyle: TextStyle(
+                      color: Colors.black,
+                    ),
                     markedDateShowIcon: true,
                     shouldShowTransform: false,
-                    weekdayTextStyle: TextStyle(color: Colors.black,),
+                    weekdayTextStyle: TextStyle(
+                      color: Colors.black,
+                    ),
                     markedDateIconMaxShown: 1,
-                    headerTextStyle: TextStyle(color: Colors.black,fontSize: 18),
-                    markedDateMoreShowTotal: null, // null for not showing hidden events indicator
+                    headerTextStyle:
+                        TextStyle(color: Colors.black, fontSize: 18),
+                    markedDateMoreShowTotal: null,
+                    // null for not showing hidden events indicator
                     markedDateIconBuilder: (event) {
                       return event.icon;
                     },
@@ -388,10 +467,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                   height: 1,
                   color: Colors.grey,
                 ),
-
-                ProductSubcriptonTileView(widget.product, () {
-                }, ClassType.SubCategory),
-
+                ProductSubcriptonTileView(
+                    widget.product, () {}, ClassType.SubCategory),
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
                   height: 1,
@@ -404,9 +481,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             alignment: Alignment.bottomCenter,
             child: SafeArea(
               child: Wrap(
-                children: [
-                  addSubscriptionBtn()
-                ],
+                children: [addSubscriptionBtn()],
               ),
             ),
           ),
@@ -414,8 +489,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       ),
     );
   }
-  Widget addSubscriptionBtn() {
 
+  Widget addSubscriptionBtn() {
     return Container(
       height: 50.0,
       color: appTheme,
@@ -427,19 +502,18 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             textColor: Colors.white,
             color: appTheme,
-            onPressed: () async {
-            },
-            child: Text("Subscribe",style: TextStyle(color: Colors.white, fontSize: 18.0),
+            onPressed: () async {},
+            child: Text(
+              "Subscribe",
+              style: TextStyle(color: Colors.white, fontSize: 18.0),
             ),
           ),
         ),
       ),
     );
-
   }
 
   void callDeliverySlotsApi() {
-
     if (widget.model.deliverySlot == "1") {
       ApiController.deliveryTimeSlotApi().then((response) {
         setState(() {
@@ -448,11 +522,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             return;
           }
           deliverySlotModel = response;
-          print("deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+          print(
+              "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
           isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
           for (int i = 0;
-          i < deliverySlotModel.data.dateTimeCollection.length;
-          i++) {
+              i < deliverySlotModel.data.dateTimeCollection.length;
+              i++) {
             timeslotList =
                 deliverySlotModel.data.dateTimeCollection[i].timeslot;
             for (int j = 0; j < timeslotList.length; j++) {
@@ -508,11 +583,11 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     height: 50.0,
                     child: ListView.builder(
                       itemCount:
-                      deliverySlotModel.data.dateTimeCollection.length,
+                          deliverySlotModel.data.dateTimeCollection.length,
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
                         DateTimeCollection slotsObject =
-                        deliverySlotModel.data.dateTimeCollection[index];
+                            deliverySlotModel.data.dateTimeCollection[index];
                         if (selctedTag == index) {
                           selectedSlotColor = Color(0xFFEEEEEE);
                           textColor = Color(0xFFff4600);
@@ -620,18 +695,25 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   Widget _presentIcon(String day) => CircleAvatar(
-    backgroundColor: Colors.blue,
-    child: Text(day,style: TextStyle(color: Colors.white,), ),
-  );
+        backgroundColor: Colors.blue,
+        child: Text(
+          day,
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      );
 
-  Future<DateTime> selectDate(BuildContext context) async {
+  Future<DateTime> selectDate(BuildContext context, {bool isStartIndex}) async {
     DateTime selectedDate = DateTime.now();
+    if (isStartIndex != null) {
+      selectedDate = selectedDate.add(Duration(days: 1));
+    }
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: selectedDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime(DateTime.now().year + 10)
-    );
+        firstDate: selectedDate,
+        lastDate: DateTime(DateTime.now().year + 10));
     print(picked);
     if (picked != null)
       //dayName = DateFormat('DD-MM-yyyy').format(selectedDate);

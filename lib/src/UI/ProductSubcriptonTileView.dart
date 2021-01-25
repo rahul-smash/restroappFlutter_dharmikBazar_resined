@@ -509,7 +509,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
           ),
         ),
         Container(
-            height: 1,
+            height:0.1,
             width: MediaQuery.of(context).size.width,
             color: Color(0xFFBDBDBD)
         )
@@ -538,7 +538,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                     setState(() {});
                     counter++;
                     showAddButton = false;
-                    insertInCartTable(widget.product, counter);
+//                    insertInCartTable(widget.product, counter);
                     widget.callback();
                   }
                 },
@@ -565,10 +565,10 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                               setState(() => counter--);
                               if (counter == 0) {
                                 // delete from cart table
-                                removeFromCartTable(widget.product.variantId);
+//                                removeFromCartTable(widget.product.variantId);
                               } else {
                                 // insert/update to cart table
-                                insertInCartTable(widget.product, counter);
+//                                insertInCartTable(widget.product, counter);
                               }
                               widget.callback();
                             }
@@ -617,10 +617,10 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                             setState(() => counter++);
                             if (counter == 0) {
                               // delete from cart table
-                              removeFromCartTable(widget.product.variantId);
+//                              removeFromCartTable(widget.product.variantId);
                             } else {
                               // insert/update to cart table
-                              insertInCartTable(widget.product, counter);
+//                              insertInCartTable(widget.product, counter);
                             }
                           }
                         },
@@ -675,56 +675,6 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
     );
   }
 
-  void insertInCartTable(Product product, int quantity) {
-    String variantId, weight, mrpPrice, price, discount, isUnitType;
-    variantId = variant == null ? widget.product.variantId : variant.id;
-    weight = variant == null ? widget.product.weight : variant.weight;
-    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
-    price = variant == null ? widget.product.price : variant.price;
-    discount = variant == null ? widget.product.discount : variant.discount;
-    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
-
-    var mId = int.parse(product.id);
-    //String variantId = product.variantId;
-
-    Map<String, dynamic> row = {
-      DatabaseHelper.ID: mId,
-      DatabaseHelper.VARIENT_ID: variantId,
-      DatabaseHelper.WEIGHT: weight,
-      DatabaseHelper.MRP_PRICE: mrpPrice,
-      DatabaseHelper.PRICE: price,
-      DatabaseHelper.DISCOUNT: discount,
-      DatabaseHelper.UNIT_TYPE: isUnitType,
-      DatabaseHelper.PRODUCT_ID: product.id,
-      DatabaseHelper.isFavorite: product.isFav,
-      DatabaseHelper.QUANTITY: quantity.toString(),
-      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
-      DatabaseHelper.Product_Name: product.title,
-      DatabaseHelper.nutrient: product.nutrient,
-      DatabaseHelper.description: product.description,
-      DatabaseHelper.imageType: product.imageType,
-      DatabaseHelper.imageUrl: product.imageUrl,
-      DatabaseHelper.image_100_80: product.image10080,
-      DatabaseHelper.image_300_200: product.image300200,
-    };
-
-    databaseHelper
-        .checkIfProductsExistInDb(DatabaseHelper.CART_Table, variantId)
-        .then((count) {
-      //print("-count-- ${count}");
-      if (count == 0) {
-        databaseHelper.addProductToCart(row).then((count) {
-          widget.callback();
-          eventBus.fire(updateCartCount());
-        });
-      } else {
-        databaseHelper.updateProductInCart(row, variantId).then((count) {
-          widget.callback();
-          eventBus.fire(updateCartCount());
-        });
-      }
-    });
-  }
 
   void removeFromCartTable(String variant_Id) {
     try {
