@@ -565,19 +565,19 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                    child: Text("When would you like your service?"),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-                    child: Text("${Utils.getDate()}"),
-                  ),
-                  Container(
-                      margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                      height: 1,
-                      width: MediaQuery.of(context).size.width,
-                      color: Color(0xFFBDBDBD)),
+//                  Padding(
+//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+//                    child: Text("When would you like your service?"),
+//                  ),
+//                  Padding(
+//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
+//                    child: Text("${Utils.getDate()}"),
+//                  ),
+//                  Container(
+//                      margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+//                      height: 1,
+//                      width: MediaQuery.of(context).size.width,
+//                      color: Color(0xFFBDBDBD)),
                   Container(
                     //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                     height: 50.0,
