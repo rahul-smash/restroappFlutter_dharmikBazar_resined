@@ -558,7 +558,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           deliverySlotModel.data.dateTimeCollection != null &&
           deliverySlotModel.data.dateTimeCollection.isNotEmpty) {
         return Padding(
-          padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: Align(
             alignment: Alignment.topLeft,
             child: Container(
@@ -578,63 +578,63 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 //                      height: 1,
 //                      width: MediaQuery.of(context).size.width,
 //                      color: Color(0xFFBDBDBD)),
-                  Container(
-                    //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                    height: 50.0,
-                    child: ListView.builder(
-                      itemCount:
-                          deliverySlotModel.data.dateTimeCollection.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context, index) {
-                        DateTimeCollection slotsObject =
-                            deliverySlotModel.data.dateTimeCollection[index];
-                        if (selctedTag == index) {
-                          selectedSlotColor = Color(0xFFEEEEEE);
-                          textColor = Color(0xFFff4600);
-                        } else {
-                          selectedSlotColor = Color(0xFFFFFFFF);
-                          textColor = Color(0xFF000000);
-                        }
-                        return Container(
-                          color: selectedSlotColor,
-                          margin: EdgeInsets.fromLTRB(15, 0, 10, 0),
-                          child: InkWell(
-                            onTap: () {
-                              print("${slotsObject.timeslot.length}");
-                              setState(() {
-                                selctedTag = index;
-                                timeslotList = slotsObject.timeslot;
-                                isSlotSelected = false;
-                                //selectedTimeSlot = 0;
-                                //print("timeslotList=${timeslotList.length}");
-                                for (int i = 0; i < timeslotList.length; i++) {
-                                  //print("isEnable=${timeslotList[i].isEnable}");
-                                  Timeslot timeslot = timeslotList[i];
-                                  if (timeslot.isEnable) {
-                                    selectedTimeSlot = i;
-                                    isSlotSelected = true;
-                                    break;
-                                  }
-                                }
-                              });
-                            },
-                            child: Container(
-                              child: Center(
-                                child: Text(
-                                    ' ${Utils.convertStringToDate(slotsObject.label)} ',
-                                    style: TextStyle(color: textColor)),
-                              ),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                      height: 1,
-                      width: MediaQuery.of(context).size.width,
-                      color: Color(0xFFBDBDBD)),
+//                  Container(
+//                    //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+//                    height: 50.0,
+//                    child: ListView.builder(
+//                      itemCount:
+//                          deliverySlotModel.data.dateTimeCollection.length,
+//                      scrollDirection: Axis.horizontal,
+//                      itemBuilder: (context, index) {
+//                        DateTimeCollection slotsObject =
+//                            deliverySlotModel.data.dateTimeCollection[index];
+//                        if (selctedTag == index) {
+//                          selectedSlotColor = Color(0xFFEEEEEE);
+//                          textColor = Color(0xFFff4600);
+//                        } else {
+//                          selectedSlotColor = Color(0xFFFFFFFF);
+//                          textColor = Color(0xFF000000);
+//                        }
+//                        return Container(
+//                          color: selectedSlotColor,
+//                          margin: EdgeInsets.fromLTRB(15, 0, 10, 0),
+//                          child: InkWell(
+//                            onTap: () {
+//                              print("${slotsObject.timeslot.length}");
+//                              setState(() {
+//                                selctedTag = index;
+//                                timeslotList = slotsObject.timeslot;
+//                                isSlotSelected = false;
+//                                //selectedTimeSlot = 0;
+//                                //print("timeslotList=${timeslotList.length}");
+//                                for (int i = 0; i < timeslotList.length; i++) {
+//                                  //print("isEnable=${timeslotList[i].isEnable}");
+//                                  Timeslot timeslot = timeslotList[i];
+//                                  if (timeslot.isEnable) {
+//                                    selectedTimeSlot = i;
+//                                    isSlotSelected = true;
+//                                    break;
+//                                  }
+//                                }
+//                              });
+//                            },
+//                            child: Container(
+//                              child: Center(
+//                                child: Text(
+//                                    ' ${Utils.convertStringToDate(slotsObject.label)} ',
+//                                    style: TextStyle(color: textColor)),
+//                              ),
+//                            ),
+//                          ),
+//                        );
+//                      },
+//                    ),
+//                  ),
+//                  Container(
+//                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+//                      height: 1,
+//                      width: MediaQuery.of(context).size.width,
+//                      color: Color(0xFFBDBDBD)),
                   Container(
                     //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                     height: 50.0,
