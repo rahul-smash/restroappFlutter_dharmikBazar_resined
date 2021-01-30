@@ -4,11 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:intl/intl.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
+import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
+import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
@@ -41,10 +45,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
   //Store provides instant delivery of the orders.
   bool isInstantDelivery = false;
+  double totalPrice = 0.00;
+  double totalSavings = 0.00;
+  double totalMRpPrice = 0.0;
+  String totalSavingsText = "";
   int selecteddays = -1;
   DateTime selectedStartDate, selectedEndDate;
   EventList<Event> _markedDateMap;
+  TextEditingController couponCodeController = TextEditingController();
   DeliveryAddressData addressData;
+  bool isCouponsApplied = false;
 
   @override
   void initState() {
@@ -230,8 +240,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                     child: TextField(
                                         controller: controllerStartDate,
                                         onTap: () async {
-                                          selectedStartDate =
-                                              await selectDate(context,isStartIndex: true);
+                                          selectedStartDate = await selectDate(
+                                              context,
+                                              isStartIndex: true);
                                           if (selectedStartDate != null) {
                                             String date =
                                                 DateFormat('dd-MM-yyyy')
@@ -270,8 +281,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                     child: TextField(
                                         controller: controllerEndDate,
                                         onTap: () async {
-                                          selectedEndDate =
-                                              await selectDate(context,isStartIndex: true);
+                                          selectedEndDate = await selectDate(
+                                              context,
+                                              isStartIndex: true);
                                           if (selectedEndDate != null) {
                                             String date =
                                                 DateFormat('dd-MM-yyyy')
@@ -447,7 +459,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     todayTextStyle: TextStyle(
                       color: Colors.black,
                     ),
-                    markedDateShowIcon: true,
+                    markedDateShowIcon: false,
                     shouldShowTransform: false,
                     weekdayTextStyle: TextStyle(
                       color: Colors.black,
@@ -470,10 +482,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 ProductSubcriptonTileView(
                     widget.product, () {}, ClassType.SubCategory),
                 Container(
-                  margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                  margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                   height: 1,
                   color: Colors.grey,
                 ),
+                addItemPrice(),
+                addTotalPrice(),
+                addEnterCouponCodeView(),
+                addCouponCodeRow()
               ],
             ),
           ),
@@ -692,6 +708,350 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         return Container();
       }
     }
+  }
+
+  Widget addItemPrice() {
+    return Container(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+            height: 1,
+            color: Colors.black45,
+            width: MediaQuery.of(context).size.width),
+        Visibility(
+          visible: /*widget.address == null ? false :*/ true,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Delivery charges:",
+                    style: TextStyle(color: Colors.black54)),
+                Text(
+                    "${AppConstant.currency}${/*widget.address == null ? "0" : widget.address.areaCharges*/ "0"}",
+                    style: TextStyle(color: Colors.black54)),
+              ],
+            ),
+          ),
+        ),
+        Visibility(
+          visible: /* taxModel == null ? false :*/ true,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Discount:", style: TextStyle(color: Colors.black54)),
+                Text(
+                    "${AppConstant.currency}${/*taxModel == null ? "0" : taxModel.discount*/ '0'}",
+                    style: TextStyle(color: Colors.black54)),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Items Price", style: TextStyle(color: Colors.black)),
+              Text(
+                  "${AppConstant.currency}${'0' /*taxModel == null ? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2) : taxModel.itemSubTotal*/}",
+                  style: TextStyle(color: Colors.black)),
+            ],
+          ),
+        ),
+      ]),
+    );
+  }
+
+  Widget addCouponCodeRow() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+      child: Container(
+        child: Wrap(
+          children: <Widget>[
+            Visibility(
+              visible: true /*isloyalityPointsEnabled == true ? true : false*/,
+              child: InkWell(
+                onTap: () async {},
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Container(
+                      height: 40.0,
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      decoration: BoxDecoration(
+                        color: whiteColor,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          /* appliedReddemPointsCodeList.isEmpty
+                              ?*/
+                          "Redeem Loyality Points"
+                          /*  : "${taxModel.couponCode} Applied"*/,
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color:
+                                  /*appliedCouponCodeList.isEmpty
+                                  ? isCouponsApplied
+                                  ? appTheme.withOpacity(0.5)
+                                  : appTheme
+                                  : */
+                                  appTheme.withOpacity(0.5)),
+                        ),
+                      ),
+                    ),
+                    Icon(
+                        /*appliedReddemPointsCodeList.isNotEmpty
+                        ? Icons.cancel
+                        : */
+                        Icons.keyboard_arrow_right),
+                  ],
+                ),
+              ),
+            ),
+            Visibility(
+              visible: true /* isloyalityPointsEnabled == true ? true : false*/,
+              child: Utils.showDivider(context),
+            ),
+            InkWell(
+              onTap: () {
+                /*  print(
+                    "appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                print(
+                    "appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                if (isCouponsApplied) {
+                  Utils.showToast(
+                      "Please remove Applied Coupon to Avail Offers", false);
+                  return;
+                }
+                if (appliedReddemPointsCodeList.isNotEmpty) {
+                  Utils.showToast(
+                      "Please remove Applied Coupon to Avail Offers", false);
+                  return;
+                }
+                if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
+                  removeCoupon();
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) => AvailableOffersDialog(
+                        widget.address,
+                        widget.paymentMode,
+                        widget.isComingFromPickUpScreen,
+                        widget.areaId, (model) async {
+                      await updateTaxDetails(model);
+                      setState(() {
+                        hideRemoveCouponFirstTime = false;
+                        taxModel = model;
+//                        double taxModelTotal = double.parse(taxModel.total) +
+//                            int.parse(shippingCharges);
+//                        taxModel.total = taxModelTotal.toString();
+                        appliedCouponCodeList.add(model.couponCode);
+                        print("===couponCode=== ${model.couponCode}");
+                        print("taxModel.total=${taxModel.total}");
+                      });
+                    }, appliedCouponCodeList, isOrderVariations,
+                        responseOrderDetail, shippingCharges),
+                  );
+                }*/
+              },
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Container(
+                    margin: EdgeInsets.fromLTRB(
+                        /*  isloyalityPointsEnabled ? 0 :*/
+                        0,
+                        0,
+                        0,
+                        0),
+                    height: 40,
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    decoration: new BoxDecoration(
+                      color: whiteColor,
+                    ),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                          /*appliedCouponCodeList.isEmpty
+                              ? */
+                          "Available Offers"
+                          /* : "${taxModel.couponCode} Applied"*/,
+                          textAlign: TextAlign.left,
+                          style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              color:
+                                  /* appliedReddemPointsCodeList.isEmpty
+                                  ? isCouponsApplied
+                                  ? appTheme.withOpacity(0.5)
+                                  : appTheme
+                                  : */
+                                  appTheme.withOpacity(0.5))),
+                    ),
+                  ),
+                  Icon(
+                      /*appliedCouponCodeList.isNotEmpty
+                      ? Icons.cancel
+                      : */
+                      Icons.keyboard_arrow_right),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> updateTaxDetails(TaxCalculationModel taxModel) async {
+//    widget.cartList = await databaseHelper.getCartItemList();
+    for (int i = 0; i < taxModel.taxDetail.length; i++) {
+      Product product = Product();
+      product.taxDetail = taxModel.taxDetail[i];
+//      widget.cartList.add(product);
+    }
+    for (var i = 0; i < taxModel.fixedTax.length; i++) {
+      Product product = Product();
+      product.fixedTax = taxModel.fixedTax[i];
+//      widget.cartList.add(product);
+    }
+  }
+
+  Widget addEnterCouponCodeView() {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(10, 0, 10, 5),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              height: 40,
+              margin: EdgeInsets.fromLTRB(0, 0, 10, 0),
+              decoration: new BoxDecoration(
+                color: Colors.white,
+                borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                border: new Border.all(
+                  color: Colors.grey,
+                  width: 1.0,
+                ),
+              ),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+                child: TextField(
+                  textAlign: TextAlign.left,
+                  controller: couponCodeController,
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.all(10.0),
+                    hintText: "Coupon Code",
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              height: 40.0,
+              margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: RaisedButton(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                ),
+                padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                textColor: Colors.white,
+                color: appTheme,
+                onPressed: () async {},
+                child: new Text(
+                    isCouponsApplied ? "Remove Coupon" : "Apply Coupon"),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget addMRPPrice() {
+    if (totalSavings != 0.00)
+      return Container(
+          color: Colors.white,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(15, 10, 10, 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("MRP Price",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14)),
+                  Text(
+                      '${AppConstant.currency}${totalMRpPrice.toStringAsFixed(2)}',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                          fontSize: 14)),
+                ],
+              )));
+    else
+      return Container();
+  }
+
+  Widget addTotalSavingPrice() {
+    if (totalSavings != 0.00)
+      return Container(
+          color: Colors.white,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(15, 5, 10, 5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text("Cart Discount",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: appTheme,
+                          fontSize: 16)),
+                  Text('-${AppConstant.currency}$totalSavingsText',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: appTheme,
+                          fontSize: 16)),
+                ],
+              )));
+    else
+      return Container();
+  }
+
+  Widget addTotalPrice() {
+    return Container(
+      color: Colors.white,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+            height: 1,
+            color: Colors.black45,
+            width: MediaQuery.of(context).size.width),
+        addMRPPrice(),
+        addTotalSavingPrice(),
+        Padding(
+            padding: EdgeInsets.fromLTRB(15, totalSavings > 0 ? 5 : 10, 10, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text("Total",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(
+                    "${AppConstant.currency}${/*databaseHelper.roundOffPrice(taxModel == null ?*/ totalPrice /* : double.parse(taxModel.total),2)*/
+                        .toStringAsFixed(2)}",
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ))
+      ]),
+    );
   }
 
   Widget _presentIcon(String day) => CircleAvatar(

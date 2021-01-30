@@ -49,6 +49,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
 
   updateTotalPrice() {
     databaseHelper.getTotalPrice().then((mTotalPrice) {
+      if(mounted)
       setState(() {
         totalPrice = mTotalPrice;
         //print("----mTotalPrice==== ${mTotalPrice}--");
