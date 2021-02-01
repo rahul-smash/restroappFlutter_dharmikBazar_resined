@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -12,11 +13,14 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
+import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'ProductSubcriptonTileView.dart';
@@ -55,6 +59,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   TextEditingController couponCodeController = TextEditingController();
   DeliveryAddressData addressData;
   bool isCouponsApplied = false;
+
+  bool isLoading=true;
+
+  WalleModel userWalleModel;
+
+  String shippingCharges='0';
+
+  SubscriptionTaxCalculation taxModel;
 
   @override
   void initState() {
@@ -1078,5 +1090,96 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     if (picked != null)
       //dayName = DateFormat('DD-MM-yyyy').format(selectedDate);
       return picked;
+  }
+
+  Future<void> multiTaxCalculationApi() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if (!isNetworkAvailable) {
+      Utils.showToast(AppConstant.noInternet, false);
+      return;
+    }
+    isLoading = true;
+    userWalleModel = await ApiController.getUserWallet();
+    getCartItemList().then((cartList) {
+      cartListFromDB = cartList;
+      List jsonList = Product.encodeToJson(cartList);
+      String encodedDoughnut = jsonEncode(jsonList);
+      ApiController.subscriptionMultipleTaxCalculationRequest(
+           couponCode:'',
+           discount:"0",
+           shipping:"$shippingCharges",
+           orderJson:'',
+           userAddressId:'',
+           userAddress:'',
+           total:'',
+           checkout:'',
+           deliveryTimeSlot:'',
+           cartSaving:'',
+           totalDeliveries:'')
+          .then((response) async {
+        //{"success":false,"message":"Some products are not available."}
+        SubscriptionTaxCalculationResponse model = response;
+        if (model.success) {
+//          taxModel = model.data;
+//          widget.cartList = await databaseHelper.getCartItemList();
+//          for (int i = 0; i < model.taxCalculation.taxDetail.length; i++) {
+//            Product product = Product();
+//            product.taxDetail = model.data.taxDetail[i];
+//            widget.cartList.add(product);
+//          }
+//          for (var i = 0; i < model.taxCalculation.fixedTax.length; i++) {
+//            Product product = Product();
+//            product.fixedTax = model.taxCalculation.fixedTax[i];
+//            widget.cartList.add(product);
+//          }
+//          if (model.taxCalculation.orderDetail != null &&
+//              model.taxCalculation.orderDetail.isNotEmpty) {
+//            responseOrderDetail = model.taxCalculation.orderDetail;
+//            bool someProductsUpdated = false;
+//            isOrderVariations = model.taxCalculation.isChanged;
+//            for (int i = 0; i < responseOrderDetail.length; i++) {
+//              if (responseOrderDetail[i]
+//                  .productStatus
+//                  .compareTo('out_of_stock') ==
+//                  0 ||
+//                  responseOrderDetail[i]
+//                      .productStatus
+//                      .compareTo('price_changed') ==
+//                      0) {
+//                someProductsUpdated = true;
+//                break;
+//              }
+//            }
+//            if (someProductsUpdated) {
+//              DialogUtils.displayCommonDialog(
+//                  context,
+//                  widget.model == null ? "" : widget.model.storeName,
+//                  "Some Cart items were updated. Please review the cart before procceeding.",
+//                  buttonText: 'Procceed');
+//              constraints();
+//            }
+//          }
+//
+//          calculateTotalSavings();
+//          setState(() {
+//            isLoading = false;
+//          });
+        } else {
+          var result = await DialogUtils.displayCommonDialog(
+              context,
+              widget.model == null ? "" : widget.model.storeName,
+              "${model.message}");
+          if (result != null && result == true) {
+
+            eventBus.fire(updateCartCount());
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          }
+        }
+      });
+    });
+  }
+
+  Future<List<Product>> getCartItemList() {
+
   }
 }

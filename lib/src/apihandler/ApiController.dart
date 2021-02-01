@@ -1916,24 +1916,24 @@ class ApiController {
 
   /*Subscription module*/
   static Future<SubscriptionTaxCalculationResponse>
-      subscriptionMultipleTaxCalculationRequest(
-          String couponCode,
-          String discount,
-          String shipping,
-          String orderJson,
-          String userAddressId,
-          String userAddress,
-          String total,
-          String paymentMethod,
-          String checkout,
-          String deliveryTimeSlot,
-          String paymentRequestId,
-          String paymentId,
-          String onlineMethod,
-          String note,
-          String walletRefund,
-          String cartSaving,
-          String totalDeliveries) async {
+      subscriptionMultipleTaxCalculationRequest({
+          String couponCode='',
+          String discount='',
+          String shipping='',
+          String orderJson='',
+          String userAddressId='',
+          String userAddress='',
+          String total='',
+//          String paymentMethod='',
+          String checkout='',
+          String deliveryTimeSlot='',
+//          String paymentRequestId='',
+//          String paymentId='',
+//          String onlineMethod='',
+//          String note='',
+//          String walletRefund='',
+          String cartSaving='',
+          String totalDeliveries=''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     WalleModel userWallet = await SharedPrefs.getUserWallet();

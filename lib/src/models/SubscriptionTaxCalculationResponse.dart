@@ -8,18 +8,22 @@ class SubscriptionTaxCalculationResponse {
   SubscriptionTaxCalculationResponse({
     this.success,
     this.data,
+    this.message,
   });
 
   bool success;
-  Data data;
+  SubscriptionTaxCalculation data;
+  String message;
 
   SubscriptionTaxCalculationResponse copyWith({
     bool success,
-    Data data,
+    SubscriptionTaxCalculation data,
+    String message
   }) =>
       SubscriptionTaxCalculationResponse(
         success: success ?? this.success,
         data: data ?? this.data,
+        message: message ?? this.message,
       );
 
   String toRawJson() => json.encode(toJson());
@@ -28,19 +32,21 @@ class SubscriptionTaxCalculationResponse {
           String couponCode, Map<String, dynamic> json) =>
       SubscriptionTaxCalculationResponse(
         success: json["success"] == null ? null : json["success"],
+        message: json["message"] == null ? null : json["message"],
         data: json["data"] == null
             ? null
-            : Data.fromJson(couponCode, json["data"]),
+            : SubscriptionTaxCalculation.fromJson(couponCode, json["data"]),
       );
 
   Map<String, dynamic> toJson() => {
         "success": success == null ? null : success,
+        "message": message == null ? null : message,
         "data": data == null ? null : data.toJson(),
       };
 }
 
-class Data {
-  Data({
+class SubscriptionTaxCalculation {
+  SubscriptionTaxCalculation({
     this.total,
     this.singleDayTotal,
     this.walletRefund,
@@ -82,7 +88,7 @@ class Data {
   bool isChanged;
   String couponCode;
 
-  Data copyWith({
+  SubscriptionTaxCalculation copyWith({
     String total,
     String singleDayTotal,
     String walletRefund,
@@ -103,7 +109,7 @@ class Data {
     bool isChanged,
     String couponCode,
   }) =>
-      Data(
+      SubscriptionTaxCalculation(
           total: total ?? this.total,
           singleDayTotal: singleDayTotal ?? this.singleDayTotal,
           walletRefund: walletRefund ?? this.walletRefund,
@@ -128,8 +134,8 @@ class Data {
 
   String toRawJson() => json.encode(toJson());
 
-  factory Data.fromJson(String couponCodePassed, Map<String, dynamic> json) =>
-      Data(
+  factory SubscriptionTaxCalculation.fromJson(String couponCodePassed, Map<String, dynamic> json) =>
+      SubscriptionTaxCalculation(
         total: json["total"] == null ? null : json["total"],
         singleDayTotal:
             json["single_day_total"] == null ? null : json["single_day_total"],
