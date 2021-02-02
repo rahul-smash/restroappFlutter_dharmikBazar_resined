@@ -25,6 +25,8 @@ import 'ProductSubcriptonTileView.dart';
 class AddSubscriptionScreen extends StatefulWidget {
   StoreModel model;
   Product product;
+  OrderType deliveryType=OrderType.Delivery;
+  List<Product> cartList = new List();
 
   AddSubscriptionScreen(this.product, this.model);
 
@@ -63,7 +65,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
   WalleModel userWalleModel;
 
-  String shippingCharges = '';
+  String shippingCharges = '0';
 
   SubscriptionTaxCalculation taxModel;
 
@@ -78,10 +80,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   String cartSaving = '0';
 
   String selectedTimeSlotString = '';
+  bool isOrderVariations = false;
+  List<OrderDetail> responseOrderDetail = List();
+  bool isloyalityPointsEnabled = false;
 
   @override
   void initState() {
     super.initState();
+    widget.cartList.add(widget.product);
     selecteddays = -1;
     _markedDateMap = new EventList<Event>(
       events: {},
@@ -93,15 +99,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         this.addressData = event.addressData;
       });
     });
-    databaseHelper
-        .getProductQuantitiy(widget.product.variantId,
-            isSubscriptionTable: true)
-        .then((cartDataObj) {
-      totalDeliveries = cartDataObj.QUANTITY;
-      multiTaxCalculationApi(
-        couponCode: '',
-      );
-    });
+//    databaseHelper
+//        .getProductQuantitiy(widget.product.variantId,
+//            isSubscriptionTable: true)
+//        .then((cartDataObj) {
+//      totalDeliveries = cartDataObj.QUANTITY;
+//
+//    });
+    multiTaxCalculationApi(
+      couponCode: '',
+    );
   }
 
   @override
@@ -684,9 +691,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
         Visibility(
-          visible: /*widget.address == null ? false :*/ true,
+          visible: addressData == null ? false : true,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+            padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -700,36 +707,50 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           ),
         ),
         Visibility(
-          visible: /* taxModel == null ? false :*/ true,
+          visible:  taxModel == null ? false : true,
           child: Padding(
-            padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+            padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("Discount:", style: TextStyle(color: Colors.black54)),
                 Text(
-                    "${AppConstant.currency}${/*taxModel == null ? "0" : taxModel.discount*/ '0'}",
+                    "${AppConstant.currency}${taxModel == null ? "0" : taxModel.discount.isNotEmpty?taxModel.discount:'0'}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
           ),
         ),
         Padding(
-          padding: EdgeInsets.fromLTRB(15, 10, 20, 10),
+          padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Items Price", style: TextStyle(color: Colors.black)),
               Text(
-                  "${AppConstant.currency}${'0' /*taxModel == null ? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2) : taxModel.itemSubTotal*/}",
+                  "${AppConstant.currency}${taxModel == null ? databaseHelper.roundOffPrice((totalPrice - int.parse(shippingCharges)), 2).toStringAsFixed(2) : taxModel.singleDayItemSubTotal}",
                   style: TextStyle(color: Colors.black)),
             ],
           ),
         ),
+        addMRPPrice(),
+        addTotalSavingPrice(),
       ]),
     );
   }
-
+  void checkLoyalityPointsOption() {
+    //1 - enable, 0 means disable
+    try {
+      print("====-loyality===== ${widget.model.loyality}--");
+      if (widget.model.loyality != null && widget.model.loyality == "1") {
+        this.isloyalityPointsEnabled = true;
+      } else {
+        this.isloyalityPointsEnabled = false;
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
   Widget addCouponCodeRow() {
     return Padding(
       padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
@@ -737,7 +758,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         child: Wrap(
           children: <Widget>[
             Visibility(
-              visible: true /*isloyalityPointsEnabled == true ? true : false*/,
+              visible: isloyalityPointsEnabled == true ? true : false,
               child: InkWell(
                 onTap: () async {},
                 child: Row(
@@ -945,7 +966,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       return Container(
           color: Colors.white,
           child: Padding(
-              padding: EdgeInsets.fromLTRB(15, 10, 10, 5),
+              padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -971,7 +992,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       return Container(
           color: Colors.white,
           child: Padding(
-              padding: EdgeInsets.fromLTRB(15, 5, 10, 5),
+              padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -999,10 +1020,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             height: 1,
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
-        addMRPPrice(),
-        addTotalSavingPrice(),
         Padding(
-            padding: EdgeInsets.fromLTRB(15, totalSavings > 0 ? 5 : 10, 10, 10),
+            padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -1010,7 +1029,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Text(
-                    "${AppConstant.currency}${/*databaseHelper.roundOffPrice(taxModel == null ?*/ totalPrice /* : double.parse(taxModel.total),2)*/
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice  : double.parse(taxModel.total),2)
                         .toStringAsFixed(2)}",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
@@ -1088,9 +1107,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     }
     isLoading = true;
     userWalleModel = await ApiController.getUserWallet();
-    databaseHelper.getCartItemList(isSubscriptionTable: true).then((cartList) {
-      cartListFromDB = cartList;
-      List jsonList = Product.encodeToJson(cartList);
+//    databaseHelper.getCartItemList(isSubscriptionTable: true).then((cartList) {
+//      cartListFromDB = cartList;
+      List jsonList = Product.encodeToJson(widget.cartList);
       String encodedDoughnut = jsonEncode(jsonList);
       ApiController.subscriptionMultipleTaxCalculationRequest(
               couponCode: couponCode,
@@ -1104,10 +1123,11 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               totalDeliveries: totalDeliveries)
           .then((response) async {
         //{"success":false,"message":"Some products are not available."}
-        SubscriptionTaxCalculationResponse  model = response;
+        SubscriptionTaxCalculationResponse model = response;
         if (model.success) {
           taxModel = model.data;
-          widget.cartList = await databaseHelper.getCartItemList(isSubscriptionTable: true);
+//          widget.cartList =
+//              await databaseHelper.getCartItemList(isSubscriptionTable: true);
           for (int i = 0; i < model.data.taxDetail.length; i++) {
             Product product = Product();
             product.taxDetail = taxModel.taxDetail[i];
@@ -1118,8 +1138,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             product.fixedTax = taxModel.fixedTax[i];
             widget.cartList.add(product);
           }
-          if (taxModel.orderDetail != null &&
-              taxModel.orderDetail.isNotEmpty) {
+          if (taxModel.orderDetail != null && taxModel.orderDetail.isNotEmpty) {
             responseOrderDetail = taxModel.orderDetail;
             bool someProductsUpdated = false;
             isOrderVariations = taxModel.isChanged;
@@ -1161,7 +1180,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           }
         }
       });
-    });
+//    });
   }
 
   void constraints() {
@@ -1187,8 +1206,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       if (widget.deliveryType == OrderType.PickUp) {
         databaseHelper
             .getTotalPrice(
-            isOrderVariations: isOrderVariations,
-            responseOrderDetail: responseOrderDetail)
+                isOrderVariations: isOrderVariations,
+                responseOrderDetail: responseOrderDetail)
             .then((mTotalPrice) {
           setState(() {
             totalPrice = mTotalPrice;
@@ -1231,7 +1250,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         print("--Cart--mtotalPrice=${mtotalPrice}");
         print("----shippingCharges=${shippingCharges}");
 
-        if (widget.address.notAllow) {
+        if (addressData.notAllow) {
           if (mtotalPrice <= minAmount) {
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
@@ -1269,15 +1288,15 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   Future<void> checkMinOrderPickAmount() async {
-    if (widget.deliveryType == OrderType.PickUp && widget.areaObject != null) {
-      print("----minAmount=${addressData.minOrder}");
+    if (widget.deliveryType == OrderType.PickUp && addressData != null) {
+      print("----minAmount=${addressData.minAmount}");
       print("----notAllow=${addressData.notAllow}");
       print("--------------------------------------------");
       int minAmount = 0;
       try {
         try {
-          if (widget.areaObject.minOrder.isNotEmpty)
-            minAmount = double.parse(widget.areaObject.minOrder).toInt();
+          if (addressData.minAmount.isNotEmpty)
+            minAmount = double.parse(addressData.minAmount).toInt();
         } catch (e) {
           print(e);
         }
@@ -1307,7 +1326,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       }
     }
   }
+
   bool minOrderCheck = true;
+
   void calculateTotalSavings() {
     //calculate total savings
     totalMRpPrice = 0;
@@ -1325,25 +1346,25 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             InnnerFor:
             for (int i = 0; i < responseOrderDetail.length; i++) {
               if (responseOrderDetail[i]
-                  .productStatus
-                  .compareTo('out_of_stock') ==
-                  0 &&
+                          .productStatus
+                          .compareTo('out_of_stock') ==
+                      0 &&
                   responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
                   responseOrderDetail[i]
-                      .variantId
-                      .compareTo(product.variantId) ==
+                          .variantId
+                          .compareTo(product.variantId) ==
                       0) {
                 isProductOutOfStock = true;
                 break InnnerFor;
               }
               if (responseOrderDetail[i]
-                  .productStatus
-                  .compareTo('price_changed') ==
-                  0 &&
+                          .productStatus
+                          .compareTo('price_changed') ==
+                      0 &&
                   responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
                   responseOrderDetail[i]
-                      .variantId
-                      .compareTo(product.variantId) ==
+                          .variantId
+                          .compareTo(product.variantId) ==
                       0) {
                 detail = responseOrderDetail[i];
                 break InnnerFor;
@@ -1353,17 +1374,17 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
           if (!isProductOutOfStock) {
             String mrpPrice =
-            detail != null && detail.productStatus.contains('price_changed')
-                ? detail.newMrpPrice
-                : product.mrpPrice;
+                detail != null && detail.productStatus.contains('price_changed')
+                    ? detail.newMrpPrice
+                    : product.mrpPrice;
             String price =
-            detail != null && detail.productStatus.contains('price_changed')
-                ? detail.newPrice
-                : product.price;
+                detail != null && detail.productStatus.contains('price_changed')
+                    ? detail.newPrice
+                    : product.price;
             totalSavings += (double.parse(mrpPrice) - double.parse(price)) *
                 double.parse(product.quantity);
             totalMRpPrice +=
-            (double.parse(mrpPrice) * double.parse(product.quantity));
+                (double.parse(mrpPrice) * double.parse(product.quantity));
           }
         }
       }
@@ -1373,8 +1394,40 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       double totalSavedPercentage = (totalSavings / totalMRpPrice) * 100;
       totalSavingsText =
 //          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
-      "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}";
+          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}";
       setState(() {});
     }
+  }
+
+  bool checkThatItemIsInStocks() {
+    bool isAllItemsInOutOfStocks = true;
+    for (int j = 0; j < widget.cartList.length; j++) {
+      Product product = widget.cartList[j];
+      if (product.id != null) {
+        //check product is out of stock
+        bool productOutOfStock = _checkIsProductISOutOfStock(product);
+        if (!productOutOfStock) {
+          isAllItemsInOutOfStocks = false;
+          break;
+        }
+      }
+    }
+    return isAllItemsInOutOfStocks;
+  }
+  bool _checkIsProductISOutOfStock(Product product) {
+    bool productOutOfStock = false;
+    for (int i = 0; i < responseOrderDetail.length; i++) {
+      if (product.id.compareTo(responseOrderDetail[i].productId) == 0 &&
+          product.variantId.compareTo(responseOrderDetail[i].variantId) == 0) {
+        if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
+            0) {
+          productOutOfStock = true;
+        } else {
+          productOutOfStock = false;
+        }
+        break;
+      }
+    }
+    return productOutOfStock;
   }
 }

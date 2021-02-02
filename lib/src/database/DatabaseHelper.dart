@@ -22,7 +22,6 @@ class DatabaseHelper {
   static final String Products_Table = "products";
   static final String Favorite_Table = "favorite";
   static final String CART_Table = "cart";
-  static final String SUBSCRIPTION_CART_Table = "subscription_cart";
 
 //  static final String VARIANT_Table = "Variant";
 
@@ -161,26 +160,7 @@ class DatabaseHelper {
         "image_300_200 TEXT, "
         "unit_type TEXT"
         ")");
-    await db.execute("CREATE TABLE ${SUBSCRIPTION_CART_Table}("
-        "id INTEGER, "
-        "product_name TEXT, "
-        "isfavorite TEXT, "
-        "nutrient TEXT, "
-        "description TEXT, "
-        "imageType TEXT, "
-        "imageUrl TEXT, "
-        "variant_id TEXT, "
-        "product_id TEXT, "
-        "weight TEXT, "
-        "mrp_price TEXT, "
-        "price TEXT, "
-        "discount TEXT, "
-        "quantity TEXT, "
-        "isTaxEnable TEXT, "
-        "image_100_80 TEXT, "
-        "image_300_200 TEXT, "
-        "unit_type TEXT"
-        ")");
+
     await db.execute("CREATE TABLE ${Favorite_Table}("
         "id INTEGER, "
         "product_json TEXT, "
@@ -554,14 +534,10 @@ class DatabaseHelper {
     return variantList;
   }*/
 
-  Future<int> addProductToCart(Map<String, dynamic> row,
-      {bool isSubscriptionTable = false}) async {
+  Future<int> addProductToCart(Map<String, dynamic> row) async {
     var dbClient = await db;
     int res = 0;
-    if (!isSubscriptionTable)
       res = await dbClient.insert(CART_Table, row);
-    else
-      res = await dbClient.insert(SUBSCRIPTION_CART_Table, row);
     print("-insert Products-- ${res}");
     return res;
   }
@@ -572,19 +548,13 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<int> updateProductInCart(Map<String, dynamic> row, String variantId,
-      {bool isSubscriptionTable = false}) async {
+  Future<int> updateProductInCart(Map<String, dynamic> row, String variantId) async {
     var dbClient = await db;
-    if (!isSubscriptionTable)
       return dbClient.update(CART_Table, row,
-          where: "${VARIENT_ID} = ?", whereArgs: [variantId]);
-    else
-      return dbClient.update(SUBSCRIPTION_CART_Table, row,
           where: "${VARIENT_ID} = ?", whereArgs: [variantId]);
   }
 
-  Future<CartData> getProductQuantitiy(String variantId,
-      {bool isSubscriptionTable = false}) async {
+  Future<CartData> getProductQuantitiy(String variantId) async {
     CartData cartData;
     String count = "0";
     //database connection
@@ -603,13 +573,7 @@ class DatabaseHelper {
 
     List<dynamic> whereArguments = [variantId];
     List<Map> result;
-    if (!isSubscriptionTable)
       result = await dbClient.query(CART_Table,
-          columns: columnsToSelect,
-          where: whereClause,
-          whereArgs: whereArguments);
-    else
-      result = await dbClient.query(SUBSCRIPTION_CART_Table,
           columns: columnsToSelect,
           where: whereClause,
           whereArgs: whereArguments);
@@ -639,8 +603,7 @@ class DatabaseHelper {
   * */
   Future<double> getTotalPrice(
       {bool isOrderVariations = false,
-      List<OrderDetail> responseOrderDetail,
-      bool isSubscriptionTable = false}) async {
+      List<OrderDetail> responseOrderDetail,}) async {
     double totalPrice = 0.00;
     //database connection
     var dbClient = await db;
@@ -653,12 +616,7 @@ class DatabaseHelper {
       VARIENT_ID
     ];
     List<Map> resultList;
-    if (!isSubscriptionTable)
       resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
-    else
-      resultList = await dbClient.query(SUBSCRIPTION_CART_Table,
-          columns: columnsToSelect);
-
     // print the results
     if (resultList != null && resultList.isNotEmpty) {
       //print("--TotalPrice-result.length--- ${resultList.length}");
@@ -724,8 +682,7 @@ class DatabaseHelper {
   /*
     this method will get all the data from cart table
   * */
-  Future<List<Product>> getCartItemList(
-      {bool isSubscriptionTable = false}) async {
+  Future<List<Product>> getCartItemList() async {
     List<Product> cartList = new List();
     var dbClient = await db;
     List<String> columnsToSelect = [
@@ -749,11 +706,7 @@ class DatabaseHelper {
     ];
 
     List<Map> resultList;
-    if (!isSubscriptionTable)
       resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
-    else
-      resultList = await dbClient.query(SUBSCRIPTION_CART_Table,
-          columns: columnsToSelect);
     if (resultList != null && resultList.isNotEmpty) {
       resultList.forEach((row) {
         Product product = new Product();

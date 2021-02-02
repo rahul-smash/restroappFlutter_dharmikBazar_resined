@@ -4,6 +4,8 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 /// The global [EventBus] object.
 EventBus eventBus = EventBus();
 
+typedef CustomCallback = T Function<T extends Object>({T value});
+
 class updateCartCount {
   updateCartCount();
 }

@@ -21,7 +21,6 @@ class ProductSubcriptonTileView extends StatefulWidget {
   Product product;
   VoidCallback callback;
   ClassType classType;
-
   ProductSubcriptonTileView(this.product, this.callback, this.classType);
 
   @override
@@ -31,7 +30,7 @@ class ProductSubcriptonTileView extends StatefulWidget {
 class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   int counter = 0;
-  CartData cartData;
+//  CartData cartData;
   Variant variant;
   bool showAddButton;
 
@@ -47,15 +46,16 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
   }
 
   void getDataFromDB() {
-    databaseHelper
-        .getProductQuantitiy(widget.product.variantId,isSubscriptionTable: true)
-        .then((cartDataObj) {
-      cartData = cartDataObj;
-      counter = int.parse(cartData.QUANTITY);
-      showAddButton = counter == 0 ? true : false;
+    showAddButton = counter == 0 ? true : false;
+//    databaseHelper
+//        .getProductQuantitiy(widget.product.variantId,isSubscriptionTable: true)
+//        .then((cartDataObj) {
+//      cartData = cartDataObj;
+//      counter = int.parse(cartData.QUANTITY);
+//      showAddButton = counter == 0 ? true : false;
       //print("-QUANTITY-${counter}=");
-      setState(() {});
-    });
+//      setState(() {});
+//    });
     databaseHelper
         .checkProductsExistInFavTable(
             DatabaseHelper.Favorite_Table, widget.product.id)
@@ -129,16 +129,17 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                   variantId = variant==null? widget.product.variantId:variant.id;
                 }
                 _checkOutOfStock(findNext: false);
-                databaseHelper
-                    .getProductQuantitiy(variantId)
-                    .then((cartDataObj) {
-                  setState(() {
-                    cartData = cartDataObj;
-                    counter = int.parse(cartData.QUANTITY);
-                    showAddButton = counter == 0 ? true : false;
-                    //print("-QUANTITY-${counter}=");
-                  });
-                });
+                //TODO: Counter Update
+//                databaseHelper
+//                    .getProductQuantitiy(variantId)
+//                    .then((cartDataObj) {
+//                  setState(() {
+//                    cartData = cartDataObj;
+//                    counter = int.parse(cartData.QUANTITY);
+//                    showAddButton = counter == 0 ? true : false;
+//                    //print("-QUANTITY-${counter}=");
+//                  });
+//                });
                 databaseHelper
                     .checkProductsExistInFavTable(
                         DatabaseHelper.Favorite_Table, widget.product.id)
@@ -371,16 +372,17 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                                                   print("variant.discount= ${variant.discount}");
                                                   print("variant.mrpPrice= ${variant.mrpPrice}");
                                                   print("variant.price= ${variant.price}");*/
-                                    databaseHelper
-                                        .getProductQuantitiy(variant.id)
-                                        .then((cartDataObj) {
-                                      //print("QUANTITY= ${cartDataObj.QUANTITY}");
-                                      cartData = cartDataObj;
-                                      counter = int.parse(cartData.QUANTITY);
-                                      showAddButton =
-                                          counter == 0 ? true : false;
-                                      setState(() {});
-                                    });
+                                    //TODO: Counter Update
+//                                    databaseHelper
+//                                        .getProductQuantitiy(variant.id)
+//                                        .then((cartDataObj) {
+//                                      //print("QUANTITY= ${cartDataObj.QUANTITY}");
+//                                      cartData = cartDataObj;
+//                                      counter = int.parse(cartData.QUANTITY);
+//                                      showAddButton =
+//                                          counter == 0 ? true : false;
+//                                      setState(() {});
+//                                    });
                                   }
                                   _checkOutOfStock(findNext: false);
                                 },
@@ -538,7 +540,8 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                     setState(() {});
                     counter++;
                     showAddButton = false;
-                    insertInCartTable(widget.product, counter);
+                    //TODO: counter update
+//                    insertInCartTable(widget.product, counter);
                     widget.callback();
                   }
                 },
@@ -564,11 +567,13 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                             if (counter != 0) {
                               setState(() => counter--);
                               if (counter == 0) {
+                                //TODO: counter update
                                 // delete from cart table
-                                removeFromCartTable(widget.product.variantId);
+//                                removeFromCartTable(widget.product.variantId);
                               } else {
+                                //TODO: counter update
                                 // insert/update to cart table
-                                insertInCartTable(widget.product, counter);
+//                                insertInCartTable(widget.product, counter);
                               }
                               widget.callback();
                             }
@@ -616,11 +621,13 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                           if (_checkStockQuantity(counter)) {
                             setState(() => counter++);
                             if (counter == 0) {
+                              //TODO:counter update
                               // delete from cart table
-                              removeFromCartTable(widget.product.variantId);
+//                              removeFromCartTable(widget.product.variantId);
                             } else {
+                              //TODO:counter update
                               // insert/update to cart table
-                              insertInCartTable(widget.product, counter);
+//                              insertInCartTable(widget.product, counter);
                             }
                           }
                         },
@@ -676,19 +683,19 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
   }
 
 
-  void removeFromCartTable(String variant_Id) {
-    try {
-      //print("------removeFromCartTable-------");
-      String variantId;
-      variantId = variant == null ? variant_Id : variant.id;
-      databaseHelper.delete(DatabaseHelper.SUBSCRIPTION_CART_Table, variantId).then((count) {
-        widget.callback();
-        eventBus.fire(updateCartCount());
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
+//  void removeFromCartTable(String variant_Id) {
+//    try {
+//      //print("------removeFromCartTable-------");
+//      String variantId;
+//      variantId = variant == null ? variant_Id : variant.id;
+//      databaseHelper.delete(DatabaseHelper.SUBSCRIPTION_CART_Table, variantId).then((count) {
+//        widget.callback();
+//        eventBus.fire(updateCartCount());
+//      });
+//    } catch (e) {
+//      print(e);
+//    }
+//  }
 
   void insertInFavTable(Product product, int quantity) {
     var mId = int.parse(product.id);
@@ -847,55 +854,55 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
     return foundVariant;
   }
 
-  void insertInCartTable(Product product, int quantity) {
-    String variantId, weight, mrpPrice, price, discount, isUnitType;
-    variantId = variant == null ? widget.product.variantId : variant.id;
-    weight = variant == null ? widget.product.weight : variant.weight;
-    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
-    price = variant == null ? widget.product.price : variant.price;
-    discount = variant == null ? widget.product.discount : variant.discount;
-    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
-
-    var mId = int.parse(product.id);
-    //String variantId = product.variantId;
-
-    Map<String, dynamic> row = {
-      DatabaseHelper.ID: mId,
-      DatabaseHelper.VARIENT_ID: variantId,
-      DatabaseHelper.WEIGHT: weight,
-      DatabaseHelper.MRP_PRICE: mrpPrice,
-      DatabaseHelper.PRICE: price,
-      DatabaseHelper.DISCOUNT: discount,
-      DatabaseHelper.UNIT_TYPE: isUnitType,
-      DatabaseHelper.PRODUCT_ID: product.id,
-      DatabaseHelper.isFavorite: product.isFav,
-      DatabaseHelper.QUANTITY: quantity.toString(),
-      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
-      DatabaseHelper.Product_Name: product.title,
-      DatabaseHelper.nutrient: product.nutrient,
-      DatabaseHelper.description: product.description,
-      DatabaseHelper.imageType: product.imageType,
-      DatabaseHelper.imageUrl: product.imageUrl,
-      DatabaseHelper.image_100_80: product.image10080,
-      DatabaseHelper.image_300_200: product.image300200,
-    };
-
-    databaseHelper
-        .checkIfProductsExistInDb(DatabaseHelper.SUBSCRIPTION_CART_Table, variantId)
-        .then((count) {
-      //print("-count-- ${count}");
-      if (count == 0) {
-        databaseHelper.addProductToCart(row,isSubscriptionTable: true).then((count) {
-          widget.callback();
-          eventBus.fire(updateCartCount());
-        });
-      } else {
-        databaseHelper.updateProductInCart(row, variantId,isSubscriptionTable: true).then((count) {
-          widget.callback();
-          eventBus.fire(updateCartCount());
-        });
-      }
-    });
-  }
+//  void insertInCartTable(Product product, int quantity) {
+//    String variantId, weight, mrpPrice, price, discount, isUnitType;
+//    variantId = variant == null ? widget.product.variantId : variant.id;
+//    weight = variant == null ? widget.product.weight : variant.weight;
+//    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
+//    price = variant == null ? widget.product.price : variant.price;
+//    discount = variant == null ? widget.product.discount : variant.discount;
+//    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
+//
+//    var mId = int.parse(product.id);
+//    //String variantId = product.variantId;
+//
+//    Map<String, dynamic> row = {
+//      DatabaseHelper.ID: mId,
+//      DatabaseHelper.VARIENT_ID: variantId,
+//      DatabaseHelper.WEIGHT: weight,
+//      DatabaseHelper.MRP_PRICE: mrpPrice,
+//      DatabaseHelper.PRICE: price,
+//      DatabaseHelper.DISCOUNT: discount,
+//      DatabaseHelper.UNIT_TYPE: isUnitType,
+//      DatabaseHelper.PRODUCT_ID: product.id,
+//      DatabaseHelper.isFavorite: product.isFav,
+//      DatabaseHelper.QUANTITY: quantity.toString(),
+//      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+//      DatabaseHelper.Product_Name: product.title,
+//      DatabaseHelper.nutrient: product.nutrient,
+//      DatabaseHelper.description: product.description,
+//      DatabaseHelper.imageType: product.imageType,
+//      DatabaseHelper.imageUrl: product.imageUrl,
+//      DatabaseHelper.image_100_80: product.image10080,
+//      DatabaseHelper.image_300_200: product.image300200,
+//    };
+//
+//    databaseHelper
+//        .checkIfProductsExistInDb(DatabaseHelper.SUBSCRIPTION_CART_Table, variantId)
+//        .then((count) {
+//      //print("-count-- ${count}");
+//      if (count == 0) {
+//        databaseHelper.addProductToCart(row,isSubscriptionTable: true).then((count) {
+//          widget.callback();
+//          eventBus.fire(updateCartCount());
+//        });
+//      } else {
+//        databaseHelper.updateProductInCart(row, variantId,isSubscriptionTable: true).then((count) {
+//          widget.callback();
+//          eventBus.fire(updateCartCount());
+//        });
+//      }
+//    });
+//  }
 
 }

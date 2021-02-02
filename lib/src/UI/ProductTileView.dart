@@ -489,9 +489,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         Product product = widget.product;
                                         StoreModel model =
                                             await SharedPrefs.getStore();
-                                        //add product to subscription table
-                                        await insertInSubscribeCartTable(
-                                            product, counter);
+//                                        await insertInSubscribeCartTable(
+//                                            product, counter);
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -915,61 +914,4 @@ class _ProductTileItemState extends State<ProductTileItem> {
     return foundVariant;
   }
 
-  Future<bool> insertInSubscribeCartTable(Product product, int quantity) {
-    String variantId, weight, mrpPrice, price, discount, isUnitType;
-    variantId = variant == null ? widget.product.variantId : variant.id;
-    weight = variant == null ? widget.product.weight : variant.weight;
-    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
-    price = variant == null ? widget.product.price : variant.price;
-    discount = variant == null ? widget.product.discount : variant.discount;
-    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
-
-    var mId = int.parse(product.id);
-    //String variantId = product.variantId;
-
-    Map<String, dynamic> row = {
-      DatabaseHelper.ID: mId,
-      DatabaseHelper.VARIENT_ID: variantId,
-      DatabaseHelper.WEIGHT: weight,
-      DatabaseHelper.MRP_PRICE: mrpPrice,
-      DatabaseHelper.PRICE: price,
-      DatabaseHelper.DISCOUNT: discount,
-      DatabaseHelper.UNIT_TYPE: isUnitType,
-      DatabaseHelper.PRODUCT_ID: product.id,
-      DatabaseHelper.isFavorite: product.isFav,
-      DatabaseHelper.QUANTITY: quantity.toString(),
-      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
-      DatabaseHelper.Product_Name: product.title,
-      DatabaseHelper.nutrient: product.nutrient,
-      DatabaseHelper.description: product.description,
-      DatabaseHelper.imageType: product.imageType,
-      DatabaseHelper.imageUrl: product.imageUrl,
-      DatabaseHelper.image_100_80: product.image10080,
-      DatabaseHelper.image_300_200: product.image300200,
-    };
-
-    databaseHelper
-        .checkIfProductsExistInDb(
-            DatabaseHelper.SUBSCRIPTION_CART_Table, variantId)
-        .then((count) {
-      //print("-count-- ${count}");
-      if (count == 0) {
-        databaseHelper
-            .addProductToCart(row, isSubscriptionTable: true)
-            .then((count) {
-          widget.callback();
-          eventBus.fire(updateCartCount());
-          return true;
-        });
-      } else {
-        databaseHelper
-            .updateProductInCart(row, variantId, isSubscriptionTable: true)
-            .then((count) {
-          widget.callback();
-          eventBus.fire(updateCartCount());
-          return true;
-        });
-      }
-    });
-  }
 }
