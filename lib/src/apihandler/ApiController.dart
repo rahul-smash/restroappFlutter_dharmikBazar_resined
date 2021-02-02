@@ -1923,9 +1923,9 @@ class ApiController {
           String orderJson='',
           String userAddressId='',
           String userAddress='',
-          String total='',
+//          String total='',
 //          String paymentMethod='',
-          String checkout='',
+//          String checkout='',
           String deliveryTimeSlot='',
 //          String paymentRequestId='',
 //          String paymentId='',
@@ -1941,7 +1941,7 @@ class ApiController {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll("api_v1", "api_v1_tax") +
         ApiConstants.subscriptionTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
@@ -1956,12 +1956,12 @@ class ApiController {
         "user_address": userAddress,
         "shipping": shipping,
         "platform": Platform.isIOS ? "IOS" : "Android",
-        "total": total,
+//        "total": total,
 //        "discount": "$discount",
         "discount": "0",
 //        "payment_method": paymentMethod,
         "coupon_code": couponCode,
-        "checkout": checkout,
+//        "checkout": checkout,
         "delivery_time_slot": deliveryTimeSlot,
 //        "payment_request_id": paymentRequestId,
 //        "payment_id": paymentId,

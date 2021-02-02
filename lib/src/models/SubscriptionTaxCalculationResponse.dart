@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+
 class SubscriptionTaxCalculationResponse {
   SubscriptionTaxCalculationResponse({
     this.success,
@@ -358,45 +360,6 @@ class OrderDetail {
       };
 }
 
-class TaxDetail {
-  TaxDetail({
-    this.label,
-    this.rate,
-    this.tax,
-  });
-
-  String label;
-  String rate;
-  String tax;
-
-  TaxDetail copyWith({
-    String label,
-    String rate,
-    String tax,
-  }) =>
-      TaxDetail(
-        label: label ?? this.label,
-        rate: rate ?? this.rate,
-        tax: tax ?? this.tax,
-      );
-
-  factory TaxDetail.fromRawJson(String str) =>
-      TaxDetail.fromJson(json.decode(str));
-
-  String toRawJson() => json.encode(toJson());
-
-  factory TaxDetail.fromJson(Map<String, dynamic> json) => TaxDetail(
-        label: json["label"] == null ? null : json["label"],
-        rate: json["rate"] == null ? null : json["rate"],
-        tax: json["tax"] == null ? null : json["tax"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "label": label == null ? null : label,
-        "rate": rate == null ? null : rate,
-        "tax": tax == null ? null : tax,
-      };
-}
 
 class TaxLabel {
   TaxLabel({

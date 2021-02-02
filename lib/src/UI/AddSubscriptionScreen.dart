@@ -1,14 +1,11 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:intl/intl.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
-import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
-import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
-import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -40,6 +37,7 @@ class AddSubscriptionScreen extends StatefulWidget {
 class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   TextEditingController controllerStartDate = TextEditingController();
   TextEditingController controllerEndDate = TextEditingController();
+  DatabaseHelper databaseHelper = new DatabaseHelper();
 
   bool isDeliveryResponseFalse = false;
   DeliveryTimeSlotModel deliverySlotModel;
@@ -59,14 +57,27 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   TextEditingController couponCodeController = TextEditingController();
   DeliveryAddressData addressData;
   bool isCouponsApplied = false;
+  List<Product> cartListFromDB = List();
 
-  bool isLoading=true;
+  bool isLoading = true;
 
   WalleModel userWalleModel;
 
-  String shippingCharges='0';
+  String shippingCharges = '';
 
   SubscriptionTaxCalculation taxModel;
+
+  bool isComingFromPickUpScreen = false;
+
+  String pin = '';
+
+  String userDeliveryAddress = '';
+
+  String totalDeliveries = '0';
+
+  String cartSaving = '0';
+
+  String selectedTimeSlotString = '';
 
   @override
   void initState() {
@@ -81,6 +92,15 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       setState(() {
         this.addressData = event.addressData;
       });
+    });
+    databaseHelper
+        .getProductQuantitiy(widget.product.variantId,
+            isSubscriptionTable: true)
+        .then((cartDataObj) {
+      totalDeliveries = cartDataObj.QUANTITY;
+      multiTaxCalculationApi(
+        couponCode: '',
+      );
     });
   }
 
@@ -104,7 +124,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         height: 60.0,
                         color: Colors.grey[200],
                         child: InkWell(
-                          onTap: () {
+                          onTap: () async {
                             if (AppConstant.isLoggedIn) {
                               Navigator.push(
                                 context,
@@ -118,6 +138,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                   "DeliveryAddressList";
                               Utils.sendAnalyticsEvent(
                                   "Clicked DeliveryAddressList", attributeMap);
+                              multiTaxCalculationApi();
                             } else {
                               Utils.showLoginDialog(context);
                             }
@@ -573,6 +594,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           }
         });
       });
+      if (selectedTimeSlot != null && selctedTag != null) {
+        selectedTimeSlotString = deliverySlotModel.data
+            .dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+      }
     }
   }
 
@@ -593,76 +618,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-//                  Padding(
-//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-//                    child: Text("When would you like your service?"),
-//                  ),
-//                  Padding(
-//                    padding: EdgeInsets.fromLTRB(15, 0, 0, 0),
-//                    child: Text("${Utils.getDate()}"),
-//                  ),
-//                  Container(
-//                      margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-//                      height: 1,
-//                      width: MediaQuery.of(context).size.width,
-//                      color: Color(0xFFBDBDBD)),
-//                  Container(
-//                    //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-//                    height: 50.0,
-//                    child: ListView.builder(
-//                      itemCount:
-//                          deliverySlotModel.data.dateTimeCollection.length,
-//                      scrollDirection: Axis.horizontal,
-//                      itemBuilder: (context, index) {
-//                        DateTimeCollection slotsObject =
-//                            deliverySlotModel.data.dateTimeCollection[index];
-//                        if (selctedTag == index) {
-//                          selectedSlotColor = Color(0xFFEEEEEE);
-//                          textColor = Color(0xFFff4600);
-//                        } else {
-//                          selectedSlotColor = Color(0xFFFFFFFF);
-//                          textColor = Color(0xFF000000);
-//                        }
-//                        return Container(
-//                          color: selectedSlotColor,
-//                          margin: EdgeInsets.fromLTRB(15, 0, 10, 0),
-//                          child: InkWell(
-//                            onTap: () {
-//                              print("${slotsObject.timeslot.length}");
-//                              setState(() {
-//                                selctedTag = index;
-//                                timeslotList = slotsObject.timeslot;
-//                                isSlotSelected = false;
-//                                //selectedTimeSlot = 0;
-//                                //print("timeslotList=${timeslotList.length}");
-//                                for (int i = 0; i < timeslotList.length; i++) {
-//                                  //print("isEnable=${timeslotList[i].isEnable}");
-//                                  Timeslot timeslot = timeslotList[i];
-//                                  if (timeslot.isEnable) {
-//                                    selectedTimeSlot = i;
-//                                    isSlotSelected = true;
-//                                    break;
-//                                  }
-//                                }
-//                              });
-//                            },
-//                            child: Container(
-//                              child: Center(
-//                                child: Text(
-//                                    ' ${Utils.convertStringToDate(slotsObject.label)} ',
-//                                    style: TextStyle(color: textColor)),
-//                              ),
-//                            ),
-//                          ),
-//                        );
-//                      },
-//                    ),
-//                  ),
-//                  Container(
-//                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-//                      height: 1,
-//                      width: MediaQuery.of(context).size.width,
-//                      color: Color(0xFFBDBDBD)),
                   Container(
                     //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
                     height: 50.0,
@@ -672,7 +627,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       itemBuilder: (context, index) {
                         Timeslot slotsObject = timeslotList[index];
                         //print("----${slotsObject.label}-and ${selctedTag}--");
-
                         //selectedTimeSlot
                         Color textColor;
                         if (!slotsObject.isEnable) {
@@ -739,7 +693,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 Text("Delivery charges:",
                     style: TextStyle(color: Colors.black54)),
                 Text(
-                    "${AppConstant.currency}${/*widget.address == null ? "0" : widget.address.areaCharges*/ "0"}",
+                    "${AppConstant.currency}${addressData == null ? "0" : addressData.areaCharges}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
@@ -1092,85 +1046,116 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       return picked;
   }
 
-  Future<void> multiTaxCalculationApi() async {
+  Future<void> multiTaxCalculationApi({
+    String couponCode = '',
+  }) async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
       Utils.showToast(AppConstant.noInternet, false);
       return;
     }
+    userDeliveryAddress = '';
+    pin = '';
+    if (addressData != null && !isComingFromPickUpScreen) {
+      if (addressData.address2 != null && addressData.address2.isNotEmpty) {
+        if (addressData.address != null && addressData.address.isNotEmpty) {
+          userDeliveryAddress = addressData.address +
+              ", " +
+              addressData.address2 +
+              " " +
+              addressData.areaName +
+              " " +
+              addressData.city;
+        } else {
+          userDeliveryAddress = addressData.address2 +
+              " " +
+              addressData.areaName +
+              " " +
+              addressData.city;
+        }
+      } else {
+        if (addressData.address != null && addressData.address.isNotEmpty) {
+          userDeliveryAddress = addressData.address +
+              " " +
+              addressData.areaName +
+              " " +
+              addressData.city;
+        }
+      }
+
+      if (addressData.zipCode != null && addressData.zipCode.isNotEmpty)
+        pin = " " + addressData.zipCode;
+    }
     isLoading = true;
     userWalleModel = await ApiController.getUserWallet();
-    getCartItemList().then((cartList) {
+    databaseHelper.getCartItemList(isSubscriptionTable: true).then((cartList) {
       cartListFromDB = cartList;
       List jsonList = Product.encodeToJson(cartList);
       String encodedDoughnut = jsonEncode(jsonList);
       ApiController.subscriptionMultipleTaxCalculationRequest(
-           couponCode:'',
-           discount:"0",
-           shipping:"$shippingCharges",
-           orderJson:'',
-           userAddressId:'',
-           userAddress:'',
-           total:'',
-           checkout:'',
-           deliveryTimeSlot:'',
-           cartSaving:'',
-           totalDeliveries:'')
+              couponCode: couponCode,
+              discount: '',
+              shipping: shippingCharges,
+              orderJson: encodedDoughnut,
+              userAddressId: addressData == null ? '' : addressData.areaId,
+              userAddress: userDeliveryAddress,
+              deliveryTimeSlot: selectedTimeSlotString,
+              cartSaving: cartSaving,
+              totalDeliveries: totalDeliveries)
           .then((response) async {
         //{"success":false,"message":"Some products are not available."}
-        SubscriptionTaxCalculationResponse model = response;
+        SubscriptionTaxCalculationResponse  model = response;
         if (model.success) {
-//          taxModel = model.data;
-//          widget.cartList = await databaseHelper.getCartItemList();
-//          for (int i = 0; i < model.taxCalculation.taxDetail.length; i++) {
-//            Product product = Product();
-//            product.taxDetail = model.data.taxDetail[i];
-//            widget.cartList.add(product);
-//          }
-//          for (var i = 0; i < model.taxCalculation.fixedTax.length; i++) {
-//            Product product = Product();
-//            product.fixedTax = model.taxCalculation.fixedTax[i];
-//            widget.cartList.add(product);
-//          }
-//          if (model.taxCalculation.orderDetail != null &&
-//              model.taxCalculation.orderDetail.isNotEmpty) {
-//            responseOrderDetail = model.taxCalculation.orderDetail;
-//            bool someProductsUpdated = false;
-//            isOrderVariations = model.taxCalculation.isChanged;
-//            for (int i = 0; i < responseOrderDetail.length; i++) {
-//              if (responseOrderDetail[i]
-//                  .productStatus
-//                  .compareTo('out_of_stock') ==
-//                  0 ||
-//                  responseOrderDetail[i]
-//                      .productStatus
-//                      .compareTo('price_changed') ==
-//                      0) {
-//                someProductsUpdated = true;
-//                break;
-//              }
-//            }
-//            if (someProductsUpdated) {
-//              DialogUtils.displayCommonDialog(
-//                  context,
-//                  widget.model == null ? "" : widget.model.storeName,
-//                  "Some Cart items were updated. Please review the cart before procceeding.",
-//                  buttonText: 'Procceed');
-//              constraints();
-//            }
-//          }
-//
-//          calculateTotalSavings();
-//          setState(() {
-//            isLoading = false;
-//          });
+          taxModel = model.data;
+          widget.cartList = await databaseHelper.getCartItemList(isSubscriptionTable: true);
+          for (int i = 0; i < model.data.taxDetail.length; i++) {
+            Product product = Product();
+            product.taxDetail = taxModel.taxDetail[i];
+            widget.cartList.add(product);
+          }
+          for (var i = 0; i < model.data.fixedTax.length; i++) {
+            Product product = Product();
+            product.fixedTax = taxModel.fixedTax[i];
+            widget.cartList.add(product);
+          }
+          if (taxModel.orderDetail != null &&
+              taxModel.orderDetail.isNotEmpty) {
+            responseOrderDetail = taxModel.orderDetail;
+            bool someProductsUpdated = false;
+            isOrderVariations = taxModel.isChanged;
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('out_of_stock') ==
+                      0 ||
+                  responseOrderDetail[i]
+                          .productStatus
+                          .compareTo('price_changed') ==
+                      0) {
+                someProductsUpdated = true;
+                break;
+              }
+            }
+            if (someProductsUpdated) {
+              DialogUtils.displayCommonDialog(
+                  context,
+                  widget.model == null ? "" : widget.model.storeName,
+                  "Some Cart items were updated. Please review the cart before procceeding.",
+                  buttonText: 'Procceed');
+              constraints();
+            }
+          }
+
+          calculateTotalSavings();
+          setState(() {
+            isLoading = false;
+          });
         } else {
           var result = await DialogUtils.displayCommonDialog(
               context,
               widget.model == null ? "" : widget.model.storeName,
               "${model.message}");
           if (result != null && result == true) {
-
             eventBus.fire(updateCartCount());
             Navigator.of(context).popUntil((route) => route.isFirst);
           }
@@ -1179,7 +1164,217 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     });
   }
 
-  Future<List<Product>> getCartItemList() {
+  void constraints() {
+    try {
+      if (addressData != null) {
+        if (addressData.areaCharges != null) {
+          if (responseOrderDetail.isNotEmpty && checkThatItemIsInStocks())
+            shippingCharges = '0';
+          else {
+            shippingCharges = addressData.areaCharges;
+          }
+          //print("-shippingCharges--${widget.address.areaCharges}---");
+        }
+        //print("----minAmount=${widget.address.minAmount}");
+        //print("----notAllow=${widget.address.notAllow}");
+        checkMinOrderAmount();
+      }
+      checkMinOrderPickAmount();
+    } catch (e) {
+      print(e);
+    }
+    try {
+      if (widget.deliveryType == OrderType.PickUp) {
+        databaseHelper
+            .getTotalPrice(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail)
+            .then((mTotalPrice) {
+          setState(() {
+            totalPrice = mTotalPrice;
+          });
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+    if (responseOrderDetail.isNotEmpty &&
+        checkThatItemIsInStocks() &&
+        taxModel != null) {
+      shippingCharges = '0';
+      taxModel.total = '0';
+      totalPrice = 0;
+    }
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
+  Future<void> checkMinOrderAmount() async {
+    if (widget.deliveryType == OrderType.Delivery) {
+      print("----minAmount=${addressData.minAmount}");
+      print("----notAllow=${addressData.notAllow}");
+      print("--------------------------------------------");
+      int minAmount = 0;
+      try {
+        try {
+          minAmount = double.parse(addressData.minAmount).toInt();
+        } catch (e) {
+          print(e);
+        }
+        double totalPrice = await databaseHelper.getTotalPrice(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail);
+        int mtotalPrice = totalPrice.round();
+
+        print("----minAmount=${minAmount}");
+        print("--Cart--mtotalPrice=${mtotalPrice}");
+        print("----shippingCharges=${shippingCharges}");
+
+        if (widget.address.notAllow) {
+          if (mtotalPrice <= minAmount) {
+            print("---Cart-totalPrice is less than min amount----}");
+            // then Store will charge shipping charges.
+            minOrderCheck = false;
+            setState(() {
+              this.totalPrice = mtotalPrice.toDouble();
+            });
+          } else {
+            minOrderCheck = true;
+            setState(() {
+              this.totalPrice = mtotalPrice.toDouble();
+            });
+          }
+        } else {
+          if (mtotalPrice <= minAmount) {
+            print("---Cart-totalPrice is less than min amount----}");
+            // then Store will charge shipping charges.
+            setState(() {
+              this.totalPrice = totalPrice + int.parse(shippingCharges);
+            });
+          } else {
+            print("-Cart-totalPrice is greater than min amount---}");
+            //then Store will not charge shipping.
+            setState(() {
+              this.totalPrice = totalPrice;
+              shippingCharges = "0";
+              addressData.areaCharges = "0";
+            });
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  Future<void> checkMinOrderPickAmount() async {
+    if (widget.deliveryType == OrderType.PickUp && widget.areaObject != null) {
+      print("----minAmount=${addressData.minOrder}");
+      print("----notAllow=${addressData.notAllow}");
+      print("--------------------------------------------");
+      int minAmount = 0;
+      try {
+        try {
+          if (widget.areaObject.minOrder.isNotEmpty)
+            minAmount = double.parse(widget.areaObject.minOrder).toInt();
+        } catch (e) {
+          print(e);
+        }
+        double totalPrice = await databaseHelper.getTotalPrice(
+            isOrderVariations: isOrderVariations,
+            responseOrderDetail: responseOrderDetail);
+        int mtotalPrice = totalPrice.round();
+
+        print("----minAmount=${minAmount}");
+        print("--Cart--mtotalPrice=${mtotalPrice}");
+        //TODO:In Future check here "not allow".
+        if (mtotalPrice <= minAmount) {
+          print("---Cart-totalPrice is less than min amount----}");
+          // then Store will charge shipping charges.
+          minOrderCheck = false;
+          setState(() {
+            this.totalPrice = mtotalPrice.toDouble();
+          });
+        } else {
+          minOrderCheck = true;
+          setState(() {
+            this.totalPrice = mtotalPrice.toDouble();
+          });
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+  bool minOrderCheck = true;
+  void calculateTotalSavings() {
+    //calculate total savings
+    totalMRpPrice = 0;
+    totalSavings = 0;
+    if (widget.cartList != null && widget.cartList.isNotEmpty) {
+      for (Product product in widget.cartList) {
+        if (product != null &&
+            product.mrpPrice != null &&
+            product.price != null &&
+            product.quantity != null) {
+          bool isProductOutOfStock = false;
+          OrderDetail detail;
+          //check product is out of stock of not
+          if (isOrderVariations) {
+            InnnerFor:
+            for (int i = 0; i < responseOrderDetail.length; i++) {
+              if (responseOrderDetail[i]
+                  .productStatus
+                  .compareTo('out_of_stock') ==
+                  0 &&
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
+                  responseOrderDetail[i]
+                      .variantId
+                      .compareTo(product.variantId) ==
+                      0) {
+                isProductOutOfStock = true;
+                break InnnerFor;
+              }
+              if (responseOrderDetail[i]
+                  .productStatus
+                  .compareTo('price_changed') ==
+                  0 &&
+                  responseOrderDetail[i].productId.compareTo(product.id) == 0 &&
+                  responseOrderDetail[i]
+                      .variantId
+                      .compareTo(product.variantId) ==
+                      0) {
+                detail = responseOrderDetail[i];
+                break InnnerFor;
+              }
+            }
+          }
+
+          if (!isProductOutOfStock) {
+            String mrpPrice =
+            detail != null && detail.productStatus.contains('price_changed')
+                ? detail.newMrpPrice
+                : product.mrpPrice;
+            String price =
+            detail != null && detail.productStatus.contains('price_changed')
+                ? detail.newPrice
+                : product.price;
+            totalSavings += (double.parse(mrpPrice) - double.parse(price)) *
+                double.parse(product.quantity);
+            totalMRpPrice +=
+            (double.parse(mrpPrice) * double.parse(product.quantity));
+          }
+        }
+      }
+      //Y is P% of X
+      //P% = Y/X
+      //P= (Y/X)*100
+      double totalSavedPercentage = (totalSavings / totalMRpPrice) * 100;
+      totalSavingsText =
+//          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
+      "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}";
+      setState(() {});
+    }
   }
 }

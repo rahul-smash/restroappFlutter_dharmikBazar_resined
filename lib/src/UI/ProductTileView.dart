@@ -127,7 +127,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                   weight = variant.weight;
                   variantId = variant.id;
                 } else {
-                  variantId = variant==null? widget.product.variantId:variant.id;
+                  variantId =
+                      variant == null ? widget.product.variantId : variant.id;
                 }
                 _checkOutOfStock(findNext: false);
                 databaseHelper
@@ -366,7 +367,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                       await DialogUtils.displayVariantsDialog(
                                           context,
                                           "${widget.product.title}",
-                                          widget.product.variants,selectedVariant: variant);
+                                          widget.product.variants,
+                                          selectedVariant: variant);
                                   if (variant != null) {
                                     /*print("variant.weight= ${variant.weight}");
                                                   print("variant.discount= ${variant.discount}");
@@ -410,7 +412,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         child: Text(
                                           "${weight}",
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(color: appThemeSecondary),
+                                          style: TextStyle(
+                                              color: appThemeSecondary),
                                         ),
                                       ),
                                       Visibility(
@@ -472,36 +475,51 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Visibility(
-                                  visible: widget.product.variantMap[widget.product.variantId] == "0" ? true : false,
-                                  child: InkWell(
-                                    onTap: () async {
-
-                                      Product product = widget.product;
-                                      StoreModel model = await SharedPrefs.getStore();
-                                      Navigator.push(context,
-                                        MaterialPageRoute(builder: (context) => AddSubscriptionScreen(product,model)),
-                                      );
-                                    },
-                                    child: Container(
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: appThemeSecondary,
-                                            ),
-                                            borderRadius: BorderRadius.all(Radius.circular(5))
-                                        ),
-                                        width: 100,height: 30,
-                                        child: Center(
-                                            child: Text("SUBSCRIBE",
-                                              style: TextStyle(color: appThemeSecondary),)
-                                        )
-                                    ),
-                                  )
-                                ),
+                                    visible: widget.product.variantMap[
+                                                widget.product.variantId] ==
+                                            "0"
+                                        ? true
+                                        : false,
+                                    child: InkWell(
+                                      onTap: () async {
+                                        if (!AppConstant.isLoggedIn) {
+                                          Utils.showLoginDialog(context);
+                                          return;
+                                        }
+                                        Product product = widget.product;
+                                        StoreModel model =
+                                            await SharedPrefs.getStore();
+                                        //add product to subscription table
+                                        await insertInSubscribeCartTable(
+                                            product, counter);
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  AddSubscriptionScreen(
+                                                      product, model)),
+                                        );
+                                      },
+                                      child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: appThemeSecondary,
+                                              ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(5))),
+                                          width: 100,
+                                          height: 30,
+                                          child: Center(
+                                              child: Text(
+                                            "SUBSCRIBE",
+                                            style: TextStyle(
+                                                color: appThemeSecondary),
+                                          ))),
+                                    )),
                                 addQuantityView(),
                               ],
                             ),
                           ),
-
                         ],
                       )),
                     ],
@@ -512,8 +530,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
         Container(
             height: 1,
             width: MediaQuery.of(context).size.width,
-            color: Color(0xFFBDBDBD)
-        )
+            color: Color(0xFFBDBDBD))
       ]),
     );
   }
@@ -866,7 +883,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
             if (stock <= 0) {
               isProductAvailable = false;
               Utils.showToast("Out of Stock", true);
-            } else if (counter>=(stock-minStockAlert)) {
+            } else if (counter >= (stock - minStockAlert)) {
               isProductAvailable = false;
               Utils.showToast(
                   "Only ${counter} Items Available in Stocks", true);
@@ -896,5 +913,63 @@ class _ProductTileItemState extends State<ProductTileItem> {
         }
       }
     return foundVariant;
+  }
+
+  Future<bool> insertInSubscribeCartTable(Product product, int quantity) {
+    String variantId, weight, mrpPrice, price, discount, isUnitType;
+    variantId = variant == null ? widget.product.variantId : variant.id;
+    weight = variant == null ? widget.product.weight : variant.weight;
+    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
+    price = variant == null ? widget.product.price : variant.price;
+    discount = variant == null ? widget.product.discount : variant.discount;
+    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
+
+    var mId = int.parse(product.id);
+    //String variantId = product.variantId;
+
+    Map<String, dynamic> row = {
+      DatabaseHelper.ID: mId,
+      DatabaseHelper.VARIENT_ID: variantId,
+      DatabaseHelper.WEIGHT: weight,
+      DatabaseHelper.MRP_PRICE: mrpPrice,
+      DatabaseHelper.PRICE: price,
+      DatabaseHelper.DISCOUNT: discount,
+      DatabaseHelper.UNIT_TYPE: isUnitType,
+      DatabaseHelper.PRODUCT_ID: product.id,
+      DatabaseHelper.isFavorite: product.isFav,
+      DatabaseHelper.QUANTITY: quantity.toString(),
+      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+      DatabaseHelper.Product_Name: product.title,
+      DatabaseHelper.nutrient: product.nutrient,
+      DatabaseHelper.description: product.description,
+      DatabaseHelper.imageType: product.imageType,
+      DatabaseHelper.imageUrl: product.imageUrl,
+      DatabaseHelper.image_100_80: product.image10080,
+      DatabaseHelper.image_300_200: product.image300200,
+    };
+
+    databaseHelper
+        .checkIfProductsExistInDb(
+            DatabaseHelper.SUBSCRIPTION_CART_Table, variantId)
+        .then((count) {
+      //print("-count-- ${count}");
+      if (count == 0) {
+        databaseHelper
+            .addProductToCart(row, isSubscriptionTable: true)
+            .then((count) {
+          widget.callback();
+          eventBus.fire(updateCartCount());
+          return true;
+        });
+      } else {
+        databaseHelper
+            .updateProductInCart(row, variantId, isSubscriptionTable: true)
+            .then((count) {
+          widget.callback();
+          eventBus.fire(updateCartCount());
+          return true;
+        });
+      }
+    });
   }
 }
