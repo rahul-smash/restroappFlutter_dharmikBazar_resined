@@ -21,15 +21,21 @@ class ProductSubcriptonTileView extends StatefulWidget {
   Product product;
   VoidCallback callback;
   ClassType classType;
-  ProductSubcriptonTileView(this.product, this.callback, this.classType);
+  String quantity = '';
+  Variant globelVariant;
+
+  ProductSubcriptonTileView(this.product, this.callback, this.classType,
+      this.quantity, this.globelVariant);
 
   @override
-  _ProductSubcriptonTileViewState createState() => new _ProductSubcriptonTileViewState();
+  _ProductSubcriptonTileViewState createState() =>
+      new _ProductSubcriptonTileViewState();
 }
 
 class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   int counter = 0;
+
 //  CartData cartData;
   Variant variant;
   bool showAddButton;
@@ -39,6 +45,30 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
   @override
   initState() {
     super.initState();
+    variant = widget.globelVariant;
+    widget.product.variantId = widget.globelVariant == null
+        ? widget.product.variantId
+        : widget.globelVariant.id;
+    widget.product.weight = widget.globelVariant == null
+        ? widget.product.weight
+        : widget.globelVariant.weight;
+    widget.product.mrpPrice = widget.globelVariant == null
+        ? widget.product.mrpPrice
+        : widget.globelVariant.mrpPrice;
+    widget.product.price = widget.globelVariant == null
+        ? widget.product.price
+        : widget.globelVariant.price;
+    widget.product.discount = widget.globelVariant == null
+        ? widget.product.discount
+        : widget.globelVariant.discount;
+    widget.product.isUnitType = widget.globelVariant == null
+        ? widget.product.isUnitType
+        : widget.globelVariant.unitType;
+    counter = widget.quantity != null
+        ? widget.quantity.isEmpty
+            ? 0
+            : int.parse(widget.quantity)
+        : 0;
     showAddButton = false;
     //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
@@ -53,7 +83,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
 //      cartData = cartDataObj;
 //      counter = int.parse(cartData.QUANTITY);
 //      showAddButton = counter == 0 ? true : false;
-      //print("-QUANTITY-${counter}=");
+    //print("-QUANTITY-${counter}=");
 //      setState(() {});
 //    });
     databaseHelper
@@ -103,7 +133,6 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
       variantsVisibility = false;
     }
 
-
     return Container(
       color: Colors.white,
       child: Column(children: [
@@ -126,10 +155,13 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                   weight = variant.weight;
                   variantId = variant.id;
                 } else {
-                  variantId = variant==null? widget.product.variantId:variant.id;
+                  variantId =
+                      variant == null ? widget.product.variantId : variant.id;
                 }
                 _checkOutOfStock(findNext: false);
                 //TODO: Counter Update
+                eventBus.fire(
+                    onSubscribeProduct(widget.product, counter.toString()));
 //                databaseHelper
 //                    .getProductQuantitiy(variantId)
 //                    .then((cartDataObj) {
@@ -351,7 +383,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                             height: variantsVisibility == true ? 0 : 20,
                           ),
                           Visibility(
-                            visible: variantsVisibility,
+                            visible: /* variantsVisibility,*/ false,
                             child: Padding(
                               padding: EdgeInsets.only(top: 0, bottom: 10),
                               child: InkWell(
@@ -366,13 +398,16 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                                       await DialogUtils.displayVariantsDialog(
                                           context,
                                           "${widget.product.title}",
-                                          widget.product.variants,selectedVariant: variant);
+                                          widget.product.variants,
+                                          selectedVariant: variant);
                                   if (variant != null) {
                                     /*print("variant.weight= ${variant.weight}");
                                                   print("variant.discount= ${variant.discount}");
                                                   print("variant.mrpPrice= ${variant.mrpPrice}");
                                                   print("variant.price= ${variant.price}");*/
                                     //TODO: Counter Update
+                                    eventBus.fire(onSubscribeProduct(
+                                        widget.product, counter.toString()));
 //                                    databaseHelper
 //                                        .getProductQuantitiy(variant.id)
 //                                        .then((cartDataObj) {
@@ -411,7 +446,8 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                                         child: Text(
                                           "${weight}",
                                           textAlign: TextAlign.center,
-                                          style: TextStyle(color: appThemeSecondary),
+                                          style: TextStyle(
+                                              color: appThemeSecondary),
                                         ),
                                       ),
                                       Visibility(
@@ -473,36 +509,29 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Visibility(
-                                  visible: false,
-                                  child: InkWell(
-                                    onTap: () async {
-
-                                      Product product = widget.product;
-                                      StoreModel model = await SharedPrefs.getStore();
-                                      Navigator.push(context,
-                                        MaterialPageRoute(builder: (context) => AddSubscriptionScreen(product,model)),
-                                      );
-                                    },
-                                    child: Container(
-                                        decoration: BoxDecoration(
-                                            border: Border.all(
-                                              color: appThemeSecondary,
-                                            ),
-                                            borderRadius: BorderRadius.all(Radius.circular(5))
-                                        ),
-                                        width: 100,height: 30,
-                                        child: Center(
-                                            child: Text("SUBSCRIBE",
-                                              style: TextStyle(color: appThemeSecondary),)
-                                        )
-                                    ),
-                                  )
-                                ),
+                                    visible: false,
+                                    child: InkWell(
+                                      onTap: () async {},
+                                      child: Container(
+                                          decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: appThemeSecondary,
+                                              ),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(5))),
+                                          width: 100,
+                                          height: 30,
+                                          child: Center(
+                                              child: Text(
+                                            "SUBSCRIBE",
+                                            style: TextStyle(
+                                                color: appThemeSecondary),
+                                          ))),
+                                    )),
                                 addQuantityView(),
                               ],
                             ),
                           ),
-
                         ],
                       )),
                     ],
@@ -511,10 +540,9 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
           ),
         ),
         Container(
-            height:0.1,
+            height: 0.1,
             width: MediaQuery.of(context).size.width,
-            color: Color(0xFFBDBDBD)
-        )
+            color: Color(0xFFBDBDBD))
       ]),
     );
   }
@@ -540,7 +568,8 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                     setState(() {});
                     counter++;
                     showAddButton = false;
-                    //TODO: counter update
+                    eventBus.fire(
+                        onSubscribeProduct(widget.product, counter.toString()));
 //                    insertInCartTable(widget.product, counter);
                     widget.callback();
                   }
@@ -567,11 +596,13 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                             if (counter != 0) {
                               setState(() => counter--);
                               if (counter == 0) {
-                                //TODO: counter update
                                 // delete from cart table
+                                eventBus.fire(onSubscribeProduct(
+                                    widget.product, counter.toString()));
 //                                removeFromCartTable(widget.product.variantId);
                               } else {
-                                //TODO: counter update
+                                eventBus.fire(onSubscribeProduct(
+                                    widget.product, counter.toString()));
                                 // insert/update to cart table
 //                                insertInCartTable(widget.product, counter);
                               }
@@ -621,11 +652,13 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                           if (_checkStockQuantity(counter)) {
                             setState(() => counter++);
                             if (counter == 0) {
-                              //TODO:counter update
+                              eventBus.fire(onSubscribeProduct(
+                                  widget.product, counter.toString()));
                               // delete from cart table
 //                              removeFromCartTable(widget.product.variantId);
                             } else {
-                              //TODO:counter update
+                              eventBus.fire(onSubscribeProduct(
+                                  widget.product, counter.toString()));
                               // insert/update to cart table
 //                              insertInCartTable(widget.product, counter);
                             }
@@ -681,7 +714,6 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
               )),
     );
   }
-
 
 //  void removeFromCartTable(String variant_Id) {
 //    try {
@@ -822,7 +854,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
             if (stock <= 0) {
               isProductAvailable = false;
               Utils.showToast("Out of Stock", true);
-            } else if (counter>=(stock-minStockAlert)) {
+            } else if (counter >= (stock - minStockAlert)) {
               isProductAvailable = false;
               Utils.showToast(
                   "Only ${counter} Items Available in Stocks", true);

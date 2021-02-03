@@ -34,12 +34,19 @@ class _ProductTileItemState extends State<ProductTileItem> {
   CartData cartData;
   Variant variant;
   bool showAddButton;
-
+  StoreModel storeModel;
+  bool _isSubscriptionActive = false;
   bool _isProductOutOfStock = false;
 
   @override
   initState() {
     super.initState();
+
+    SharedPrefs.getStore().then((value) {
+      storeModel = value;
+      _isSubscriptionActive = storeModel.subscription.status == '1';
+      if (mounted) setState(() {});
+    });
     showAddButton = false;
     //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
@@ -475,9 +482,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Visibility(
-                                    visible: widget.product.variantMap[
-                                                widget.product.variantId] ==
-                                            "0"
+                                    visible: _isSubscriptionActive &&
+                                            widget.product.variantMap[
+                                                    widget.product.variantId] ==
+                                                "0"
                                         ? true
                                         : false,
                                     child: InkWell(
@@ -496,7 +504,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   AddSubscriptionScreen(
-                                                      product, model)),
+                                                      product, model,counter.toString(),variant)),
                                         );
                                       },
                                       child: Container(
@@ -913,5 +921,4 @@ class _ProductTileItemState extends State<ProductTileItem> {
       }
     return foundVariant;
   }
-
 }

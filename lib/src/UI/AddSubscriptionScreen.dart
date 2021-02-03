@@ -25,10 +25,15 @@ import 'ProductSubcriptonTileView.dart';
 class AddSubscriptionScreen extends StatefulWidget {
   StoreModel model;
   Product product;
-  OrderType deliveryType=OrderType.Delivery;
+  OrderType deliveryType = OrderType.Delivery;
   List<Product> cartList = new List();
 
-  AddSubscriptionScreen(this.product, this.model);
+  Variant selectedVariant;
+
+  String quantity;
+
+  AddSubscriptionScreen(
+      this.product, this.model, this.quantity, this.selectedVariant);
 
   @override
   _AddSubscriptionScreenState createState() {
@@ -75,7 +80,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
   String userDeliveryAddress = '';
 
-  String totalDeliveries = '0';
+  int totalDeliveries = 1;
 
   String cartSaving = '0';
 
@@ -84,9 +89,18 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   List<OrderDetail> responseOrderDetail = List();
   bool isloyalityPointsEnabled = false;
 
+  String couponCodeApplied = '';
+
   @override
   void initState() {
     super.initState();
+    widget.product.quantity = widget.quantity;
+    widget.product. variantId = widget.selectedVariant == null ? widget.product.variantId : widget.selectedVariant.id;
+    widget.product. weight = widget.selectedVariant == null ? widget.product.weight : widget.selectedVariant.weight;
+    widget.product.mrpPrice = widget.selectedVariant == null ? widget.product.mrpPrice : widget.selectedVariant.mrpPrice;
+    widget.product.price = widget.selectedVariant == null ? widget.product.price : widget.selectedVariant.price;
+    widget.product. discount = widget.selectedVariant == null ? widget.product.discount : widget.selectedVariant.discount;
+    widget.product.isUnitType = widget.selectedVariant == null ? widget.product.isUnitType : widget.selectedVariant.unitType;
     widget.cartList.add(widget.product);
     selecteddays = -1;
     _markedDateMap = new EventList<Event>(
@@ -98,7 +112,17 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       setState(() {
         this.addressData = event.addressData;
       });
+      multiTaxCalculationApi(couponCode: couponCodeApplied);
     });
+    eventBus.on<onSubscribeProduct>().listen((event) {
+      if (event != null && event.product != null) {
+        widget.cartList.first=event.product;
+        widget.cartList.first.quantity = event.quanity;
+      }
+      setState(() {});
+      multiTaxCalculationApi(couponCode: couponCodeApplied);
+    });
+
 //    databaseHelper
 //        .getProductQuantitiy(widget.product.variantId,
 //            isSubscriptionTable: true)
@@ -145,7 +169,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                   "DeliveryAddressList";
                               Utils.sendAnalyticsEvent(
                                   "Clicked DeliveryAddressList", attributeMap);
-                              multiTaxCalculationApi();
                             } else {
                               Utils.showLoginDialog(context);
                             }
@@ -284,6 +307,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                               context,
                                               isStartIndex: true);
                                           if (selectedStartDate != null) {
+                                            if(selectedEndDate!=null){
+                                             bool isBefore= selectedStartDate.isBefore(selectedEndDate);
+                                             if(isBefore){
+                                               setState(() {
+                                                 controllerEndDate.text = '';
+                                               });
+                                             }
+                                            }
                                             String date =
                                                 DateFormat('dd-MM-yyyy')
                                                     .format(selectedStartDate);
@@ -325,6 +356,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                               context,
                                               isStartIndex: true);
                                           if (selectedEndDate != null) {
+
+                                            if(selectedStartDate!=null){
+                                              bool isBefore= selectedStartDate.isBefore(selectedEndDate);
+                                              if(!isBefore){
+                                                setState(() {
+                                                  controllerEndDate.text = '';
+                                                });
+                                              }
+                                            }
+
                                             String date =
                                                 DateFormat('dd-MM-yyyy')
                                                     .format(selectedEndDate);
@@ -417,6 +458,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                                         .toString()),
                                               ));
                                         }
+                                        totalDeliveries =
+                                            _markedDateMap.events.length;
+                                        multiTaxCalculationApi(
+                                            couponCode: couponCodeApplied);
                                         setState(() {
                                           selecteddays = index;
                                         });
@@ -443,6 +488,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                                 ));
                                           }
                                         }
+                                        totalDeliveries =
+                                            _markedDateMap.events.length;
+                                        multiTaxCalculationApi(
+                                            couponCode: couponCodeApplied);
                                         setState(() {
                                           selecteddays = index;
                                         });
@@ -520,7 +569,11 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                   color: Colors.grey,
                 ),
                 ProductSubcriptonTileView(
-                    widget.product, () {}, ClassType.SubCategory),
+                    widget.cartList.first,
+                    () {},
+                    ClassType.SubCategory,
+                    widget.cartList.first.quantity,
+                    widget.selectedVariant),
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                   height: 1,
@@ -599,12 +652,13 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               break;
             }
           }
+          if (selectedTimeSlot != null && selctedTag != null) {
+            selectedTimeSlotString = deliverySlotModel.data
+                .dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+          }
         });
       });
-      if (selectedTimeSlot != null && selctedTag != null) {
-        selectedTimeSlotString = deliverySlotModel.data
-            .dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
-      }
+
     }
   }
 
@@ -655,6 +709,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                               if (slotsObject.isEnable) {
                                 setState(() {
                                   selectedTimeSlot = index;
+                                  if (selectedTimeSlot != null && selctedTag != null) {
+                                    selectedTimeSlotString = deliverySlotModel.data
+                                        .dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+                                  }
                                 });
                               } else {
                                 Utils.showToast(slotsObject.innerText, false);
@@ -707,7 +765,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           ),
         ),
         Visibility(
-          visible:  taxModel == null ? false : true,
+          visible: taxModel == null ? false : true,
           child: Padding(
             padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
             child: Row(
@@ -715,7 +773,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               children: [
                 Text("Discount:", style: TextStyle(color: Colors.black54)),
                 Text(
-                    "${AppConstant.currency}${taxModel == null ? "0" : taxModel.discount.isNotEmpty?taxModel.discount:'0'}",
+                    "${AppConstant.currency}${taxModel == null ? "0" : taxModel.discount.isNotEmpty ? taxModel.discount : '0'}",
                     style: TextStyle(color: Colors.black54)),
               ],
             ),
@@ -738,6 +796,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       ]),
     );
   }
+
   void checkLoyalityPointsOption() {
     //1 - enable, 0 means disable
     try {
@@ -751,6 +810,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       print(e);
     }
   }
+
   Widget addCouponCodeRow() {
     return Padding(
       padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
@@ -1029,8 +1089,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 Text(
-                    "${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice  : double.parse(taxModel.total),2)
-                        .toStringAsFixed(2)}",
+                    "${AppConstant.currency}${databaseHelper.roundOffPrice(taxModel == null ? totalPrice : double.parse(taxModel.total), 2).toStringAsFixed(2)}",
                     style:
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
@@ -1068,6 +1127,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   Future<void> multiTaxCalculationApi({
     String couponCode = '',
   }) async {
+    constraints();
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
       Utils.showToast(AppConstant.noInternet, false);
@@ -1109,77 +1169,77 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     userWalleModel = await ApiController.getUserWallet();
 //    databaseHelper.getCartItemList(isSubscriptionTable: true).then((cartList) {
 //      cartListFromDB = cartList;
-      List jsonList = Product.encodeToJson(widget.cartList);
-      String encodedDoughnut = jsonEncode(jsonList);
-      ApiController.subscriptionMultipleTaxCalculationRequest(
-              couponCode: couponCode,
-              discount: '',
-              shipping: shippingCharges,
-              orderJson: encodedDoughnut,
-              userAddressId: addressData == null ? '' : addressData.areaId,
-              userAddress: userDeliveryAddress,
-              deliveryTimeSlot: selectedTimeSlotString,
-              cartSaving: cartSaving,
-              totalDeliveries: totalDeliveries)
-          .then((response) async {
-        //{"success":false,"message":"Some products are not available."}
-        SubscriptionTaxCalculationResponse model = response;
-        if (model.success) {
-          taxModel = model.data;
+    List jsonList = Product.encodeToJson(widget.cartList);
+    String encodedDoughnut = jsonEncode(jsonList);
+    ApiController.subscriptionMultipleTaxCalculationRequest(
+            couponCode: couponCode,
+            discount: '',
+            shipping: shippingCharges,
+            orderJson: encodedDoughnut,
+            userAddressId: addressData == null ? '' : addressData.areaId,
+            userAddress: userDeliveryAddress,
+            deliveryTimeSlot: selectedTimeSlotString,
+            cartSaving: cartSaving,
+            totalDeliveries: totalDeliveries.toString())
+        .then((response) async {
+      //{"success":false,"message":"Some products are not available."}
+      SubscriptionTaxCalculationResponse model = response;
+      if (model.success) {
+        taxModel = model.data;
 //          widget.cartList =
 //              await databaseHelper.getCartItemList(isSubscriptionTable: true);
-          for (int i = 0; i < model.data.taxDetail.length; i++) {
-            Product product = Product();
-            product.taxDetail = taxModel.taxDetail[i];
-            widget.cartList.add(product);
-          }
-          for (var i = 0; i < model.data.fixedTax.length; i++) {
-            Product product = Product();
-            product.fixedTax = taxModel.fixedTax[i];
-            widget.cartList.add(product);
-          }
-          if (taxModel.orderDetail != null && taxModel.orderDetail.isNotEmpty) {
-            responseOrderDetail = taxModel.orderDetail;
-            bool someProductsUpdated = false;
-            isOrderVariations = taxModel.isChanged;
-            for (int i = 0; i < responseOrderDetail.length; i++) {
-              if (responseOrderDetail[i]
-                          .productStatus
-                          .compareTo('out_of_stock') ==
-                      0 ||
-                  responseOrderDetail[i]
-                          .productStatus
-                          .compareTo('price_changed') ==
-                      0) {
-                someProductsUpdated = true;
-                break;
-              }
-            }
-            if (someProductsUpdated) {
-              DialogUtils.displayCommonDialog(
-                  context,
-                  widget.model == null ? "" : widget.model.storeName,
-                  "Some Cart items were updated. Please review the cart before procceeding.",
-                  buttonText: 'Procceed');
-              constraints();
+//        for (int i = 0; i < model.data.taxDetail.length; i++) {
+//          Product product = Product();
+//          product.taxDetail = taxModel.taxDetail[i];
+//          widget.cartList.add(product);
+//        }
+//        for (var i = 0; i < model.data.fixedTax.length; i++) {
+//          Product product = Product();
+//          product.fixedTax = taxModel.fixedTax[i];
+//          widget.cartList.add(product);
+//        }
+        if (taxModel.orderDetail != null && taxModel.orderDetail.isNotEmpty) {
+          responseOrderDetail = taxModel.orderDetail;
+          bool someProductsUpdated = false;
+          isOrderVariations = taxModel.isChanged;
+          for (int i = 0; i < responseOrderDetail.length; i++) {
+            if (responseOrderDetail[i]
+                        .productStatus
+                        .compareTo('out_of_stock') ==
+                    0 ||
+                responseOrderDetail[i]
+                        .productStatus
+                        .compareTo('price_changed') ==
+                    0) {
+              someProductsUpdated = true;
+              break;
             }
           }
-
-          calculateTotalSavings();
-          setState(() {
-            isLoading = false;
-          });
-        } else {
-          var result = await DialogUtils.displayCommonDialog(
-              context,
-              widget.model == null ? "" : widget.model.storeName,
-              "${model.message}");
-          if (result != null && result == true) {
-            eventBus.fire(updateCartCount());
-            Navigator.of(context).popUntil((route) => route.isFirst);
+          if (someProductsUpdated) {
+            DialogUtils.displayCommonDialog(
+                context,
+                widget.model == null ? "" : widget.model.storeName,
+                "Some Cart items were updated. Please review the cart before procceeding.",
+                buttonText: 'Procceed');
+            constraints();
           }
         }
-      });
+
+        calculateTotalSavings();
+        setState(() {
+          isLoading = false;
+        });
+      } else {
+        var result = await DialogUtils.displayCommonDialog(
+            context,
+            widget.model == null ? "" : widget.model.storeName,
+            "${model.message}");
+        if (result != null && result == true) {
+          eventBus.fire(updateCartCount());
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      }
+    });
 //    });
   }
 
@@ -1414,6 +1474,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     }
     return isAllItemsInOutOfStocks;
   }
+
   bool _checkIsProductISOutOfStock(Product product) {
     bool productOutOfStock = false;
     for (int i = 0; i < responseOrderDetail.length; i++) {

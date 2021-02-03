@@ -1,5 +1,6 @@
 import 'package:event_bus/event_bus.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/SubCategoryResponse.dart';
 
 /// The global [EventBus] object.
 EventBus eventBus = EventBus();
@@ -24,6 +25,11 @@ class onPageFinished {
 class onAddressSelected {
   DeliveryAddressData addressData;
   onAddressSelected(this.addressData);
+}
+class onSubscribeProduct {
+  Product product;
+  String quanity;
+  onSubscribeProduct(this.product,this.quanity);
 }
 
 class onPayTMPageFinished {
