@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:intl/intl.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
+import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
@@ -88,19 +89,35 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   bool isOrderVariations = false;
   List<OrderDetail> responseOrderDetail = List();
   bool isloyalityPointsEnabled = false;
-
+  List<String> appliedCouponCodeList = List();
+  List<String> appliedReddemPointsCodeList = List();
   String couponCodeApplied = '';
+
+  bool hideRemoveCouponFirstTime = false;
 
   @override
   void initState() {
     super.initState();
+    hideRemoveCouponFirstTime = true;
     widget.product.quantity = widget.quantity;
-    widget.product. variantId = widget.selectedVariant == null ? widget.product.variantId : widget.selectedVariant.id;
-    widget.product. weight = widget.selectedVariant == null ? widget.product.weight : widget.selectedVariant.weight;
-    widget.product.mrpPrice = widget.selectedVariant == null ? widget.product.mrpPrice : widget.selectedVariant.mrpPrice;
-    widget.product.price = widget.selectedVariant == null ? widget.product.price : widget.selectedVariant.price;
-    widget.product. discount = widget.selectedVariant == null ? widget.product.discount : widget.selectedVariant.discount;
-    widget.product.isUnitType = widget.selectedVariant == null ? widget.product.isUnitType : widget.selectedVariant.unitType;
+    widget.product.variantId = widget.selectedVariant == null
+        ? widget.product.variantId
+        : widget.selectedVariant.id;
+    widget.product.weight = widget.selectedVariant == null
+        ? widget.product.weight
+        : widget.selectedVariant.weight;
+    widget.product.mrpPrice = widget.selectedVariant == null
+        ? widget.product.mrpPrice
+        : widget.selectedVariant.mrpPrice;
+    widget.product.price = widget.selectedVariant == null
+        ? widget.product.price
+        : widget.selectedVariant.price;
+    widget.product.discount = widget.selectedVariant == null
+        ? widget.product.discount
+        : widget.selectedVariant.discount;
+    widget.product.isUnitType = widget.selectedVariant == null
+        ? widget.product.isUnitType
+        : widget.selectedVariant.unitType;
     widget.cartList.add(widget.product);
     selecteddays = -1;
     _markedDateMap = new EventList<Event>(
@@ -116,7 +133,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     });
     eventBus.on<onSubscribeProduct>().listen((event) {
       if (event != null && event.product != null) {
-        widget.cartList.first=event.product;
+        widget.cartList.first = event.product;
         widget.cartList.first.quantity = event.quanity;
       }
       setState(() {});
@@ -307,13 +324,17 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                               context,
                                               isStartIndex: true);
                                           if (selectedStartDate != null) {
-                                            if(selectedEndDate!=null){
-                                             bool isBefore= selectedStartDate.isBefore(selectedEndDate);
-                                             if(isBefore){
-                                               setState(() {
-                                                 controllerEndDate.text = '';
-                                               });
-                                             }
+                                            _markedDateMap.clear();
+                                            selecteddays = -1;
+                                            if (selectedEndDate != null) {
+                                              bool isBefore = selectedStartDate
+                                                  .isBefore(selectedEndDate);
+                                              if (!isBefore) {
+                                                setState(() {
+                                                  selectedEndDate = null;
+                                                  controllerEndDate.text = '';
+                                                });
+                                              }
                                             }
                                             String date =
                                                 DateFormat('dd-MM-yyyy')
@@ -356,13 +377,17 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                               context,
                                               isStartIndex: true);
                                           if (selectedEndDate != null) {
-
-                                            if(selectedStartDate!=null){
-                                              bool isBefore= selectedStartDate.isBefore(selectedEndDate);
-                                              if(!isBefore){
+                                            _markedDateMap.clear();
+                                            selecteddays = -1;
+                                            if (selectedStartDate != null) {
+                                              bool isBefore = selectedStartDate
+                                                  .isBefore(selectedEndDate);
+                                              if (!isBefore) {
                                                 setState(() {
+                                                  selectedEndDate = null;
                                                   controllerEndDate.text = '';
                                                 });
+                                                return;
                                               }
                                             }
 
@@ -653,12 +678,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             }
           }
           if (selectedTimeSlot != null && selctedTag != null) {
-            selectedTimeSlotString = deliverySlotModel.data
-                .dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+            selectedTimeSlotString = deliverySlotModel
+                .data
+                .dateTimeCollection[selctedTag]
+                .timeslot[selectedTimeSlot]
+                .label;
           }
         });
       });
-
     }
   }
 
@@ -709,9 +736,13 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                               if (slotsObject.isEnable) {
                                 setState(() {
                                   selectedTimeSlot = index;
-                                  if (selectedTimeSlot != null && selctedTag != null) {
-                                    selectedTimeSlotString = deliverySlotModel.data
-                                        .dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
+                                  if (selectedTimeSlot != null &&
+                                      selctedTag != null) {
+                                    selectedTimeSlotString = deliverySlotModel
+                                        .data
+                                        .dateTimeCollection[selctedTag]
+                                        .timeslot[selectedTimeSlot]
+                                        .label;
                                   }
                                 });
                               } else {
@@ -820,7 +851,50 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             Visibility(
               visible: isloyalityPointsEnabled == true ? true : false,
               child: InkWell(
-                onTap: () async {},
+                onTap: () async {
+                  /*     //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                  //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+                  if (isCouponsApplied) {
+                    Utils.showToast(
+                        "Please remove Applied Coupon to Redeem Loyality Points",
+                        false);
+                    return;
+                  }
+                  if (appliedCouponCodeList.isNotEmpty) {
+                    Utils.showToast(
+                        "Please remove Applied Coupon to Redeem Points", false);
+                    return;
+                  }
+                  if (taxModel != null &&
+                      appliedReddemPointsCodeList.isNotEmpty) {
+                    removeCoupon();
+                  } else {
+                    var result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => RedeemPointsScreen(
+                              widget.address,
+                              "",
+                              widget.isComingFromPickUpScreen,
+                              widget.areaId, (model) async {
+                            await updateTaxDetails(model);
+                            setState(() {
+                              hideRemoveCouponFirstTime = false;
+                              taxModel = model;
+                              double taxModelTotal =
+                                  double.parse(taxModel.total) +
+                                      int.parse(shippingCharges);
+                              taxModel.total = taxModelTotal.toString();
+                              appliedReddemPointsCodeList.add(model.couponCode);
+                              print("===discount=== ${model.discount}");
+                              print("taxModel.total=${taxModel.total}");
+                            });
+                          }, appliedReddemPointsCodeList, isOrderVariations,
+                              responseOrderDetail, shippingCharges),
+                          fullscreenDialog: true,
+                        ));
+                  }*/
+                },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -860,12 +934,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               ),
             ),
             Visibility(
-              visible: true /* isloyalityPointsEnabled == true ? true : false*/,
+              visible: isloyalityPointsEnabled == true ? true : false,
               child: Utils.showDivider(context),
             ),
             InkWell(
               onTap: () {
-                /*  print(
+                print(
                     "appliedCouponCodeList = ${appliedCouponCodeList.length}");
                 print(
                     "appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
@@ -882,13 +956,36 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
                   removeCoupon();
                 } else {
+                  if (addressData == null) return;
+                  List jsonList = Product.encodeToJson(widget.cartList);
+                  String encodedDoughnut = jsonEncode(jsonList);
+                  Map<String, String> subcriptionMap = Map();
+                  subcriptionMap.putIfAbsent(
+                      'orderJson', () => encodedDoughnut);
+                  subcriptionMap.putIfAbsent('userAddressId',
+                      () => addressData == null ? '' : addressData.areaId);
+                  subcriptionMap.putIfAbsent(
+                      'userAddress', () => userDeliveryAddress);
+                  subcriptionMap.putIfAbsent(
+                      'deliveryTimeSlot', () => selectedTimeSlotString);
+                  subcriptionMap.putIfAbsent('cartSaving', () => cartSaving);
+                  subcriptionMap.putIfAbsent(
+                      'totalDeliveries', () => totalDeliveries.toString());
                   showDialog(
                     context: context,
                     builder: (BuildContext context) => AvailableOffersDialog(
-                        widget.address,
-                        widget.paymentMode,
-                        widget.isComingFromPickUpScreen,
-                        widget.areaId, (model) async {
+                        addressData,
+                        '3',
+                        false,
+                        addressData.areaId,
+                        (model) async {},
+                        appliedCouponCodeList,
+                        isOrderVariations,
+                        responseOrderDetail,
+                        shippingCharges,
+                        isSubcriptionScreen: true,
+                        subcriptionCallback: (model) async {
+                      taxModel = model;
                       await updateTaxDetails(model);
                       setState(() {
                         hideRemoveCouponFirstTime = false;
@@ -900,21 +997,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         print("===couponCode=== ${model.couponCode}");
                         print("taxModel.total=${taxModel.total}");
                       });
-                    }, appliedCouponCodeList, isOrderVariations,
-                        responseOrderDetail, shippingCharges),
+                    }),
                   );
-                }*/
+                }
               },
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Container(
                     margin: EdgeInsets.fromLTRB(
-                        /*  isloyalityPointsEnabled ? 0 :*/
-                        0,
-                        0,
-                        0,
-                        0),
+                        isloyalityPointsEnabled ? 0 : 0, 0, 0, 0),
                     height: 40,
                     padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                     decoration: new BoxDecoration(
@@ -923,27 +1015,22 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                          /*appliedCouponCodeList.isEmpty
-                              ? */
-                          "Available Offers"
-                          /* : "${taxModel.couponCode} Applied"*/,
+                          appliedCouponCodeList.isEmpty
+                              ? "Available Offers"
+                              : "${taxModel.couponCode} Applied",
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color:
-                                  /* appliedReddemPointsCodeList.isEmpty
+                              color: appliedReddemPointsCodeList.isEmpty
                                   ? isCouponsApplied
-                                  ? appTheme.withOpacity(0.5)
-                                  : appTheme
-                                  : */
-                                  appTheme.withOpacity(0.5))),
+                                      ? appTheme.withOpacity(0.5)
+                                      : appTheme
+                                  : appTheme.withOpacity(0.5))),
                     ),
                   ),
-                  Icon(
-                      /*appliedCouponCodeList.isNotEmpty
+                  Icon(appliedCouponCodeList.isNotEmpty
                       ? Icons.cancel
-                      : */
-                      Icons.keyboard_arrow_right),
+                      : Icons.keyboard_arrow_right),
                 ],
               ),
             ),
@@ -953,7 +1040,17 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     );
   }
 
-  Future<void> updateTaxDetails(TaxCalculationModel taxModel) async {
+  Future<void> removeCoupon() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if (!isNetworkAvailable) {
+      Utils.showToast(AppConstant.noInternet, false);
+      return;
+    }
+    Utils.showProgressDialog(context);
+    multiTaxCalculationApi(couponCode: '');
+  }
+
+  Future<void> updateTaxDetails(SubscriptionTaxCalculation taxModel) async {
 //    widget.cartList = await databaseHelper.getCartItemList();
     for (int i = 0; i < taxModel.taxDetail.length; i++) {
       Product product = Product();
@@ -1125,7 +1222,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   Future<void> multiTaxCalculationApi({
-    String couponCode = '',
+    String couponCode = '',bool isRemovedOffer=false
   }) async {
     constraints();
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
@@ -1184,7 +1281,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         .then((response) async {
       //{"success":false,"message":"Some products are not available."}
       SubscriptionTaxCalculationResponse model = response;
-      if (model.success) {
+      Utils.hideProgressDialog(context);
+      Utils.hideKeyboard(context);
+      if (model!=null&& model.success) {
         taxModel = model.data;
 //          widget.cartList =
 //              await databaseHelper.getCartItemList(isSubscriptionTable: true);
@@ -1229,6 +1328,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         setState(() {
           isLoading = false;
         });
+        if(isRemovedOffer){
+          setState(() {
+            hideRemoveCouponFirstTime = true;
+            appliedCouponCodeList.clear();
+            appliedReddemPointsCodeList.clear();
+            isCouponsApplied = false;
+            couponCodeController.text = "";
+          });
+        }
+
       } else {
         var result = await DialogUtils.displayCommonDialog(
             context,
