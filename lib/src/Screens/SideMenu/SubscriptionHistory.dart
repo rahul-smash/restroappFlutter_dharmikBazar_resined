@@ -164,6 +164,25 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
             margin: EdgeInsets.fromLTRB(0, 15, 0, 15),
           ),
 
+
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Text("Total Amount: ",style: TextStyle(fontSize: 18,)),
+                    Text("\u20B91275",style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Text("Deliver Slots", style: TextStyle(fontSize: 14,decoration: TextDecoration.underline,),)
+                  ],
+                )
+              ]
+          ),
+
+
         ],
       ),
 
