@@ -22,7 +22,7 @@ class AvailableOffersDialog extends StatefulWidget {
   bool isOrderVariations = false;
   bool isSubcriptionScreen = false;
   List<OrderDetail> responseOrderDetail = List();
-  Map<String, String> subcriptionMap=Map();
+  Map<String, String> subcriptionMap = Map();
 
   AvailableOffersDialog(
       this.address,
@@ -34,7 +34,7 @@ class AvailableOffersDialog extends StatefulWidget {
       this.isOrderVariations,
       this.responseOrderDetail,
       this.shippingCharges,
-      {this.isSubcriptionScreen=false,
+      {this.isSubcriptionScreen = false,
       this.subcriptionCallback,
       this.subcriptionMap});
 
@@ -193,22 +193,31 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             } else {
                                               if (widget.appliedCouponCodeList
                                                   .isEmpty) {
-                                                databaseHelper
-                                                    .getCartItemsListToJson(
-                                                        isOrderVariations: widget
-                                                            .isOrderVariations,
-                                                        responseOrderDetail: widget
-                                                            .responseOrderDetail)
-                                                    .then((json) {
-                                                  if (json.length == 2) {
-                                                    Utils.showToast(
-                                                        "All Items are out of stock.",
-                                                        true);
-                                                    return;
-                                                  }
+                                                if (!widget
+                                                    .isSubcriptionScreen) {
+                                                  databaseHelper
+                                                      .getCartItemsListToJson(
+                                                          isOrderVariations: widget
+                                                              .isOrderVariations,
+                                                          responseOrderDetail:
+                                                              widget
+                                                                  .responseOrderDetail)
+                                                      .then((json) {
+                                                    if (json.length == 2) {
+                                                      Utils.showToast(
+                                                          "All Items are out of stock.",
+                                                          true);
+                                                      return;
+                                                    }
+                                                    validateCouponApi(
+                                                        offer.couponCode, json);
+                                                  });
+                                                } else {
                                                   validateCouponApi(
-                                                      offer.couponCode, json);
-                                                });
+                                                      offer.couponCode,
+                                                      widget.subcriptionMap[
+                                                          'orderJson']);
+                                                }
                                               } else {
                                                 Utils.showToast(
                                                     "Please remove the applied coupon first!",
@@ -272,7 +281,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                   userAddress: widget.subcriptionMap['userAddress'],
                   deliveryTimeSlot: widget.subcriptionMap['deliveryTimeSlot'],
                   cartSaving: widget.subcriptionMap['cartSaving'],
-                  totalDeliveries:widget.subcriptionMap['totalDeliveries'] )
+                  totalDeliveries: widget.subcriptionMap['totalDeliveries'])
               .then((value) {
             Utils.hideProgressDialog(context);
             if (value.success) {

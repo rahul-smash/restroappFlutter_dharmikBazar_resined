@@ -13,6 +13,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -956,7 +957,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
                   removeCoupon();
                 } else {
-                  if (addressData == null) return;
+                  if (addressData == null) {
+                    Utils.showToast(
+                        "Please select Address", false);
+                    return;
+                  }
+
                   List jsonList = Product.encodeToJson(widget.cartList);
                   String encodedDoughnut = jsonEncode(jsonList);
                   Map<String, String> subcriptionMap = Map();
@@ -984,6 +990,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         responseOrderDetail,
                         shippingCharges,
                         isSubcriptionScreen: true,
+                        subcriptionMap: subcriptionMap,
                         subcriptionCallback: (model) async {
                       taxModel = model;
                       await updateTaxDetails(model);
@@ -1047,7 +1054,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       return;
     }
     Utils.showProgressDialog(context);
-    multiTaxCalculationApi(couponCode: '');
+    multiTaxCalculationApi(couponCode: '',isRemovedOffer: true);
   }
 
   Future<void> updateTaxDetails(SubscriptionTaxCalculation taxModel) async {
@@ -1107,7 +1114,111 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                 textColor: Colors.white,
                 color: appTheme,
-                onPressed: () async {},
+                onPressed: () async {
+                  print("---Apply Coupon----");
+                  if (couponCodeController.text.trim().isEmpty) {
+                  } else {
+                    if(addressData==null){
+                      Utils.showToast('Please select address', false);
+                      return;
+                    }
+
+                    print(
+                        "--${appliedCouponCodeList.length}-and -${appliedReddemPointsCodeList.length}---");
+                    if (appliedCouponCodeList.isNotEmpty ||
+                        appliedReddemPointsCodeList.isNotEmpty) {
+                      Utils.showToast(
+                          "Please remove the applied coupon first!", false);
+                      return;
+                    }
+                    if (isCouponsApplied) {
+                      removeCoupon();
+                    } else {
+                      String couponCode = couponCodeController.text;
+                      Utils.showProgressDialog(context);
+                      Utils.hideKeyboard(context);
+                      databaseHelper
+                          .getCartItemsListToJson(
+                          isOrderVariations: isOrderVariations,
+                          responseOrderDetail: responseOrderDetail)
+                          .then((json) async {
+                        ValidateCouponResponse couponModel =
+                        await ApiController.validateOfferApiRequest(
+                            couponCodeController.text,
+                            widget.paymentMode,
+                            json);
+                        if (couponModel.success) {
+                          print("---success----");
+                          Utils.showToast("${couponModel.message}", false);
+                          SubscriptionTaxCalculation model =
+                          await ApiController.multipleTaxCalculationRequest(
+                              couponCodeController.text,
+                              couponModel.discountAmount,
+                              shippingCharges,
+                              json);
+                          Utils.hideProgressDialog(context);
+                          if (model != null && !model.success) {
+                            Utils.showToast(model.message, true);
+                            databaseHelper
+                                .deleteTable(DatabaseHelper.Favorite_Table);
+                            databaseHelper
+                                .deleteTable(DatabaseHelper.CART_Table);
+                            databaseHelper
+                                .deleteTable(DatabaseHelper.Products_Table);
+                            eventBus.fire(updateCartCount());
+                            Navigator.of(context)
+                                .popUntil((route) => route.isFirst);
+                          } else {
+                            await updateTaxDetails(model.);
+                            if (model.taxCalculation.orderDetail != null &&
+                                model.taxCalculation.orderDetail.isNotEmpty) {
+                              responseOrderDetail =
+                                  model.taxCalculation.orderDetail;
+                              bool someProductsUpdated = false;
+                              isOrderVariations =
+                                  model.taxCalculation.isChanged;
+                              for (int i = 0;
+                              i < responseOrderDetail.length;
+                              i++) {
+                                if (responseOrderDetail[i]
+                                    .productStatus
+                                    .compareTo('out_of_stock') ==
+                                    0 ||
+                                    responseOrderDetail[i]
+                                        .productStatus
+                                        .compareTo('price_changed') ==
+                                        0) {
+                                  someProductsUpdated = true;
+                                  break;
+                                }
+                              }
+                              if (someProductsUpdated) {
+                                DialogUtils.displayCommonDialog(
+                                    context,
+                                    storeModel == null
+                                        ? ""
+                                        : storeModel.storeName,
+                                    "Some Cart items were updated. Please review the cart before procceeding.",
+                                    buttonText: 'Procceed');
+                                constraints();
+                              }
+                            }
+                            calculateTotalSavings();
+                            setState(() {
+                              taxModel = model.taxCalculation;
+                              isCouponsApplied = true;
+                              couponCodeController.text = couponCode;
+                            });
+                          }
+                        } else {
+                          Utils.showToast("${couponModel.message}", false);
+                          Utils.hideProgressDialog(context);
+                          Utils.hideKeyboard(context);
+                        }
+                      });
+                    }
+                  }
+                },
                 child: new Text(
                     isCouponsApplied ? "Remove Coupon" : "Apply Coupon"),
               ),
