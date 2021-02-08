@@ -5,6 +5,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
+import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -21,9 +22,14 @@ class RedeemPointsScreen extends StatefulWidget {
   List<String> reddemPointsCodeList;
   bool isOrderVariations=false;
   List<OrderDetail> responseOrderDetail;
+  bool isSubcriptionScreen = false;
+  Map<String, String> subcriptionMap = Map();
+  final Function(SubscriptionTaxCalculation) subcriptionCallback;
 
   RedeemPointsScreen(this.address,this.paymentMode, this.isComingFromPickUpScreen,
-      this.areaId,this.callback,this.reddemPointsCodeList,this.isOrderVariations,this.responseOrderDetail,this.shippingCharges);
+      this.areaId,this.callback,this.reddemPointsCodeList,this.isOrderVariations,this.responseOrderDetail,this.shippingCharges,{this.isSubcriptionScreen = false,
+        this.subcriptionCallback,
+        this.subcriptionMap});
 
   @override
   RedeemPointsScreenState createState() => RedeemPointsScreenState();
@@ -223,18 +229,37 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
   void validateCouponApi(LoyalityData loyalityData, String json) {
     print("----couponCode-----=>${loyalityData.amount}");
     Utils.showProgressDialog(context);
-    ApiController.multipleTaxCalculationRequest(loyalityData.couponCode,
-        loyalityData.amount, widget.shippingCharges, json).then((response) async {
-
-      Utils.hideProgressDialog(context);
-      if (response.success) {
-        widget.callback(response.taxCalculation);
-      }else{
-        Utils.showToast(response.message, true);
-      }
-      Navigator.pop(context, true);
-
-    });
+    if (widget.isSubcriptionScreen) {
+      ApiController.subscriptionMultipleTaxCalculationRequest(
+          couponCode: loyalityData.couponCode,
+          discount: loyalityData.amount,
+          shipping: widget.shippingCharges,
+          orderJson: widget.subcriptionMap['orderJson'],
+          userAddressId: widget.subcriptionMap['userAddressId'],
+          userAddress: widget.subcriptionMap['userAddress'],
+          deliveryTimeSlot: widget.subcriptionMap['deliveryTimeSlot'],
+          cartSaving: widget.subcriptionMap['cartSaving'],
+          totalDeliveries: widget.subcriptionMap['totalDeliveries'])
+          .then((value) {
+        Utils.hideProgressDialog(context);
+        if (value.success) {
+          widget.subcriptionCallback(value.data);
+        }
+        Navigator.pop(context, true);
+      });
+    } else {
+      ApiController.multipleTaxCalculationRequest(loyalityData.couponCode,
+          loyalityData.amount, widget.shippingCharges, json).then((
+          response) async {
+        Utils.hideProgressDialog(context);
+        if (response.success) {
+          widget.callback(response.taxCalculation);
+        } else {
+          Utils.showToast(response.message, true);
+        }
+        Navigator.pop(context, true);
+      });
+    }
 
   }
 }

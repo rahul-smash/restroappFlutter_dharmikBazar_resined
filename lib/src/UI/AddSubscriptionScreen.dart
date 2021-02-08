@@ -5,6 +5,7 @@ import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:intl/intl.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
+import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
@@ -853,7 +854,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               visible: isloyalityPointsEnabled == true ? true : false,
               child: InkWell(
                 onTap: () async {
-                  /*     //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                       //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
                   //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
                   if (isCouponsApplied) {
                     Utils.showToast(
@@ -870,31 +871,56 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       appliedReddemPointsCodeList.isNotEmpty) {
                     removeCoupon();
                   } else {
+
+                    if (addressData == null) {
+                      Utils.showToast(
+                          "Please select Address", false);
+                      return;
+                    }
+
+                    List jsonList = Product.encodeToJson(widget.cartList);
+                    String encodedDoughnut = jsonEncode(jsonList);
+                    Map<String, String> subcriptionMap = Map();
+                    subcriptionMap.putIfAbsent(
+                        'orderJson', () => encodedDoughnut);
+                    subcriptionMap.putIfAbsent('userAddressId',
+                            () => addressData == null ? '' : addressData.areaId);
+                    subcriptionMap.putIfAbsent(
+                        'userAddress', () => userDeliveryAddress);
+                    subcriptionMap.putIfAbsent(
+                        'deliveryTimeSlot', () => selectedTimeSlotString);
+                    subcriptionMap.putIfAbsent('cartSaving', () => cartSaving);
+                    subcriptionMap.putIfAbsent(
+                        'totalDeliveries', () => totalDeliveries.toString());
                     var result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) => RedeemPointsScreen(
-                              widget.address,
+                              addressData,
                               "",
-                              widget.isComingFromPickUpScreen,
-                              widget.areaId, (model) async {
-                            await updateTaxDetails(model);
-                            setState(() {
-                              hideRemoveCouponFirstTime = false;
-                              taxModel = model;
-                              double taxModelTotal =
-                                  double.parse(taxModel.total) +
-                                      int.parse(shippingCharges);
-                              taxModel.total = taxModelTotal.toString();
-                              appliedReddemPointsCodeList.add(model.couponCode);
-                              print("===discount=== ${model.discount}");
-                              print("taxModel.total=${taxModel.total}");
-                            });
-                          }, appliedReddemPointsCodeList, isOrderVariations,
-                              responseOrderDetail, shippingCharges),
+                             false,
+                              addressData.areaId, (model) async {},
+                              appliedReddemPointsCodeList, isOrderVariations,
+                              responseOrderDetail, shippingCharges,
+                              isSubcriptionScreen: true,
+                              subcriptionMap: subcriptionMap,
+                              subcriptionCallback: (model) async{
+                                await updateTaxDetails(model);
+                                setState(() {
+                                  hideRemoveCouponFirstTime = false;
+                                  taxModel = model;
+                                  double taxModelTotal =
+                                      double.parse(taxModel.total) +
+                                          int.parse(shippingCharges);
+                                  taxModel.total = taxModelTotal.toString();
+                                  appliedReddemPointsCodeList.add(model.couponCode);
+                                  print("===discount=== ${model.discount}");
+                                  print("taxModel.total=${taxModel.total}");
+                                });
+                              }),
                           fullscreenDialog: true,
                         ));
-                  }*/
+                  }
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -908,27 +934,27 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          /* appliedReddemPointsCodeList.isEmpty
-                              ?*/
+                           appliedReddemPointsCodeList.isEmpty
+                              ?
                           "Redeem Loyality Points"
-                          /*  : "${taxModel.couponCode} Applied"*/,
+                            : "${taxModel.couponCode} Applied",
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
                               color:
-                                  /*appliedCouponCodeList.isEmpty
+                                  appliedCouponCodeList.isEmpty
                                   ? isCouponsApplied
                                   ? appTheme.withOpacity(0.5)
                                   : appTheme
-                                  : */
+                                  :
                                   appTheme.withOpacity(0.5)),
                         ),
                       ),
                     ),
                     Icon(
-                        /*appliedReddemPointsCodeList.isNotEmpty
+                        appliedReddemPointsCodeList.isNotEmpty
                         ? Icons.cancel
-                        : */
+                        :
                         Icons.keyboard_arrow_right),
                   ],
                 ),
@@ -1137,46 +1163,42 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       String couponCode = couponCodeController.text;
                       Utils.showProgressDialog(context);
                       Utils.hideKeyboard(context);
-                      databaseHelper
-                          .getCartItemsListToJson(
-                          isOrderVariations: isOrderVariations,
-                          responseOrderDetail: responseOrderDetail)
-                          .then((json) async {
+                      List jsonList = Product.encodeToJson(widget.cartList);
+                      String encodedDoughnut = jsonEncode(jsonList);
                         ValidateCouponResponse couponModel =
                         await ApiController.validateOfferApiRequest(
                             couponCodeController.text,
-                            widget.paymentMode,
-                            json);
+                           '3',
+                            encodedDoughnut);
                         if (couponModel.success) {
                           print("---success----");
                           Utils.showToast("${couponModel.message}", false);
-                          SubscriptionTaxCalculation model =
-                          await ApiController.multipleTaxCalculationRequest(
-                              couponCodeController.text,
-                              couponModel.discountAmount,
-                              shippingCharges,
-                              json);
+                          SubscriptionTaxCalculationResponse modelResponse =
+                          await ApiController.subscriptionMultipleTaxCalculationRequest(
+                              couponCode: couponCode,
+                              discount: couponModel.discountAmount,
+                              shipping: shippingCharges,
+                              orderJson: encodedDoughnut,
+                              userAddressId: addressData == null ? '' : addressData.areaId,
+                              userAddress: userDeliveryAddress,
+                              deliveryTimeSlot: selectedTimeSlotString,
+                              cartSaving: cartSaving,
+                              totalDeliveries: totalDeliveries.toString()
+                          );
                           Utils.hideProgressDialog(context);
-                          if (model != null && !model.success) {
-                            Utils.showToast(model.message, true);
-                            databaseHelper
-                                .deleteTable(DatabaseHelper.Favorite_Table);
-                            databaseHelper
-                                .deleteTable(DatabaseHelper.CART_Table);
-                            databaseHelper
-                                .deleteTable(DatabaseHelper.Products_Table);
-                            eventBus.fire(updateCartCount());
+                          if (modelResponse != null && !modelResponse.success) {
+                            Utils.showToast(modelResponse.message, true);
                             Navigator.of(context)
                                 .popUntil((route) => route.isFirst);
                           } else {
-                            await updateTaxDetails(model.);
-                            if (model.taxCalculation.orderDetail != null &&
-                                model.taxCalculation.orderDetail.isNotEmpty) {
+                            await updateTaxDetails(modelResponse.data);
+                            if (modelResponse.data.orderDetail != null &&
+                                modelResponse.data.orderDetail.isNotEmpty) {
                               responseOrderDetail =
-                                  model.taxCalculation.orderDetail;
+                                  modelResponse.data.orderDetail;
                               bool someProductsUpdated = false;
                               isOrderVariations =
-                                  model.taxCalculation.isChanged;
+                                  modelResponse.data.isChanged;
                               for (int i = 0;
                               i < responseOrderDetail.length;
                               i++) {
@@ -1195,9 +1217,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                               if (someProductsUpdated) {
                                 DialogUtils.displayCommonDialog(
                                     context,
-                                    storeModel == null
+                                    widget.model == null
                                         ? ""
-                                        : storeModel.storeName,
+                                        : widget.model.storeName,
                                     "Some Cart items were updated. Please review the cart before procceeding.",
                                     buttonText: 'Procceed');
                                 constraints();
@@ -1205,7 +1227,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                             }
                             calculateTotalSavings();
                             setState(() {
-                              taxModel = model.taxCalculation;
+                              taxModel = modelResponse.data;
                               isCouponsApplied = true;
                               couponCodeController.text = couponCode;
                             });
@@ -1215,7 +1237,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           Utils.hideProgressDialog(context);
                           Utils.hideKeyboard(context);
                         }
-                      });
                     }
                   }
                 },
