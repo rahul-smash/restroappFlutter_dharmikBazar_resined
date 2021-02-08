@@ -665,7 +665,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         bottom: MediaQuery.of(context).viewInsets.bottom),
                     child: Container(
                       color: Colors.white,
-                      margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
                       child: Wrap(children: <Widget>[
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
