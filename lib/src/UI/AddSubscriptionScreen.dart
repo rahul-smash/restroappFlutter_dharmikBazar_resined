@@ -638,7 +638,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
             textColor: Colors.white,
             color: appTheme,
-            onPressed: () async {},
+            onPressed: () async {
+              //TODO: show bottomsheet
+              bottomSheet(context);
+            },
             child: Text(
               "Subscribe",
               style: TextStyle(color: Colors.white, fontSize: 18.0),
@@ -647,6 +650,118 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         ),
       ),
     );
+  }
+
+  bottomSheet(context) async {
+    await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext bc) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return SafeArea(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery.of(context).viewInsets.bottom),
+                    child: Container(
+                      color: Colors.white,
+                      margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: Wrap(children: <Widget>[
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Stack(children: [
+                              ClipRRect(
+                                  borderRadius: BorderRadius.circular(0.0),
+                                  child: Image.asset('images/bg_subscription.jpg',
+                                      fit: BoxFit.cover)),
+                              Column(children: [ Align(
+                                alignment: Alignment.centerRight,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Padding(
+                                    padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                                    child: Icon(
+                                      Icons.cancel,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                                  child: Text(
+                                    "Your Total deliveries",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.fromLTRB(20, 0, 20, 5),
+                                  child: Text(
+                                    "${totalDeliveries}",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],),
+                            ],),
+
+                            Container(
+                              margin: EdgeInsets.only(top: 5),
+                              color: appThemeSecondary,
+                              width: 50,
+                              height: 3,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(top: 5,bottom: 5),
+                              child: Text(
+                                "Date",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Color(0xff797C82),
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                            Row(children: [  Icon(
+                                    Icons.calendar_today,
+                                  ),
+                              Container(
+                                margin: EdgeInsets.only(left: 10),
+                                child: Center(
+                                  child: Text(
+                                      'Delivery slots',
+                                      style: TextStyle(color: appTheme,decoration: TextDecoration
+                                          .underline,)),
+                                ),
+                              )
+                            ],),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(
+                                  top: 0, bottom: 16, left: 16, right: 16),
+                              color: Color(0xFFE1E1E1),
+                              height: 1,
+                            ),
+                          ],
+                        )
+                      ]),
+                    ),
+                  ));
+            },
+          );
+        });
   }
 
   void callDeliverySlotsApi() {

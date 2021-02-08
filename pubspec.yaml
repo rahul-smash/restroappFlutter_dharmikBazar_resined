@@ -148,8 +148,15 @@ flutter:
     - images/youtubeicon.png
     - images/instagram.png
     - images/fblogin_btn.png
+    - images/calendargreyicon.png
+    - images/cancelicon.png
+    - images/cashicon.png
+    - images/dateicon.png
+    - images/onlinepayicon.png
+    - images/timegreyicon.png
     - images/google_logo.png
     - images/f_logo_white.png
+    - images/bg_subscription.jpg
     - assets/en.json
     - assets/malay.json
 
