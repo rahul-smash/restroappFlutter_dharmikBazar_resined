@@ -197,7 +197,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text("#${ordersList[index].displaySubscriptionId} (${ordersList[index].orderItems.length} ${ordersList[index].orderItems.length>1?'Items':'Item'})",
+            Text(
+                "#${ordersList[index].displaySubscriptionId} (${ordersList[index].orderItems.length} ${ordersList[index].orderItems.length > 1 ? 'Items' : 'Item'})",
                 style: TextStyle(
                   fontSize: 18,
                 )),
@@ -223,54 +224,54 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
           SizedBox(
             height: 10,
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    size: 18,
+                Expanded(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Expanded(
+                        child: Text(
+                          "${ordersList[index].startDate} to ${ordersList[index].endDate}",
+                          maxLines: 2,
+                          style: TextStyle(
+                            fontSize: 16,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(
-                    child: Text(
-                      "26 Jan 2021 to 6 Feb 2021",
-                      maxLines: 2,
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: 18,
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      "${ordersList[index].deliveryTimeSlot}",
                       style: TextStyle(
                         fontSize: 16,
                         decoration: TextDecoration.underline,
                       ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Icon(
-                  Icons.access_time,
-                  size: 18,
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  "${ordersList[index].deliveryTimeSlot}",
-                  style: TextStyle(
-                    fontSize: 16,
-                    decoration: TextDecoration.underline,
-                  ),
+                    )
+                  ],
                 )
-              ],
-            )
-
-          ]),
+              ]),
           Container(
             height: 1,
             color: Colors.grey[300],
@@ -450,7 +451,6 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   }
 }
 
-
 class MultiSelectChip extends StatefulWidget {
   final List<String> reportList;
 
@@ -498,5 +498,68 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
       ));
     });
     return choices;
+  }
+
+  String _getSubscriptionStatus(SubscriptionOrderData cardOrderHistoryItems) {
+//    0 -> Due
+//    1-> Active
+//    2-> Reject
+//    5-> Completed
+//    6-> Cancel by customer
+//    9->Pause by customer
+//    10-> Pause by store Admin
+    String title = "Due";
+    switch (cardOrderHistoryItems.status) {
+      case '0':
+        title='Due';
+        break;
+      case '1':
+        title='Active';
+        break;
+      case '2':
+        title='Rejected';
+        break;
+      case '5':
+        title='Completed';
+        break;
+      case '6':
+        title='Cancelled';
+        break;
+      case '9':
+      case '10':
+        title='Paused';
+        break;
+    }
+    return title;
+  }
+  Color _getSubscriptionStatusColor(SubscriptionOrderData cardOrderHistoryItems) {
+//    0 -> Due
+//    1-> Active
+//    2-> Reject
+//    5-> Completed
+//    6-> Cancel by customer
+//    9->Pause by customer
+//    10-> Pause by store Admin
+    Color statusColor=Colors.black;
+    switch (cardOrderHistoryItems.status) {
+      case '0':
+       statusColor=Colors.yellow;
+        break;
+      case '2':
+        statusColor=Colors.redAccent;
+        break;
+      case '1':
+      case '5':
+        statusColor=Colors.greenAccent;
+        break;
+      case '6':
+        statusColor=Colors.redAccent;
+        break;
+      case '9':
+      case '10':
+      statusColor=Colors.redAccent;
+        break;
+    }
+    return statusColor;
   }
 }
