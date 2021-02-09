@@ -8,12 +8,16 @@ import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
+import 'package:restroapp/src/models/OrderDetailsModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -23,7 +27,10 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ProductSubcriptonTileView.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:restroapp/src/models/RazorpayOrderData.dart';
 
 class AddSubscriptionScreen extends StatefulWidget {
   StoreModel model;
@@ -100,6 +107,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   @override
   void initState() {
     super.initState();
+    initRazorPay();
     hideRemoveCouponFirstTime = true;
     widget.product.quantity = widget.quantity;
     widget.product.variantId = widget.selectedVariant == null
@@ -200,12 +208,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                 Icon(
                                   Icons.add,
                                   color: Colors.black,
-                                  size: 30.0,
+                                  size: 25.0,
                                 ),
                                 Text(
                                   "Add Delivery Address",
                                   style: TextStyle(
-                                      color: Colors.black, fontSize: 18.0),
+                                      color: Colors.black, fontSize: 16.0),
                                 ),
                               ],
                             ),
@@ -639,8 +647,33 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             textColor: Colors.white,
             color: appTheme,
             onPressed: () async {
-              //TODO: show bottomsheet
-              bottomSheet(context);
+              if (addressData == null) {
+                Utils.showToast('Please Select Delivery Address', true);
+              } else if (taxModel == null) {
+                Utils.showToast(
+                    'Calculation are not done yet, Please try again', true);
+              } else if (selectedTimeSlotString.isEmpty) {
+                Utils.showToast('Please Select time slot', true);
+              } else if (selectedStartDate == null) {
+                Utils.showToast('Please Select Start Subscription Date', true);
+              } else if (selectedEndDate == null) {
+                Utils.showToast('Please Select End Subscription Date', true);
+              } else if (_markedDateMap.events.isEmpty) {
+                Utils.showToast('Please Select Variant Dates', true);
+              } else if (widget.cartList.isEmpty) {
+                Utils.showToast(
+                    'Please add product to Subscription cart', true);
+              } else if (widget.cartList.first.quantity == '0') {
+                Utils.showToast('Please add Quantity', true);
+              } else if (double.parse(
+                      widget.model.subscription.minimumOrderDaily) >
+                  double.parse(taxModel.singleDayTotal)) {
+                Utils.showToast(
+                    'Your single day subscription amount is low. Single day subscription amount should be grater than ${AppConstant.currency}${widget.model.subscription.minimumOrderDaily}',
+                    true);
+              } else {
+                bottomSheet(context);
+              }
             },
             child: Text(
               "Subscribe",
@@ -658,37 +691,42 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         isScrollControlled: true,
         builder: (BuildContext bc) {
           return StatefulBuilder(
-            builder: (BuildContext context, setState) {
+            builder: (BuildContext context, setStateBottomSheet) {
               return SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom),
-                    child: Container(
-                      color: Colors.white,
-                      child: Wrap(children: <Widget>[
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Stack(children: [
-                              ClipRRect(
-                                  borderRadius: BorderRadius.circular(0.0),
-                                  child: Image.asset('images/bg_subscription.jpg',
-                                      fit: BoxFit.cover)),
-                              Column(children: [ Align(
-                                alignment: Alignment.centerRight,
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                  },
-                                  child: Padding(
-                                    padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
-                                    child: Icon(
-                                      Icons.cancel,
-                                      color: Colors.grey,
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Container(
+                  color: Colors.white,
+                  child: Wrap(children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Stack(
+                          children: [
+                            ClipRRect(
+                                borderRadius: BorderRadius.circular(0.0),
+                                child: Image.asset('images/bg_subscription.jpg',
+                                    fit: BoxFit.cover)),
+                            Column(
+                              children: [
+                                Align(
+                                  alignment: Alignment.centerRight,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                                      child: Image.asset(
+                                        'images/cancelicon.png',
+                                        fit: BoxFit.scaleDown,
+                                        height: 15,
+                                        width: 15,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                                   child: Text(
@@ -711,56 +749,285 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         fontWeight: FontWeight.w500),
                                   ),
                                 ),
-                              ],),
-                            ],),
-
-                            Container(
-                              margin: EdgeInsets.only(top: 5),
-                              color: appThemeSecondary,
-                              width: 50,
-                              height: 3,
+                              ],
                             ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 5,bottom: 5),
-                              child: Text(
-                                "Date",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Color(0xff797C82),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400),
+                          ],
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                          child: Text(
+                            "Date",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff797C82),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                'images/calendargreyicon.png',
+                                fit: BoxFit.scaleDown,
+                                height: 15,
+                                width: 15,
                               ),
-                            ),
-                            Row(children: [  Icon(
-                                    Icons.calendar_today,
-                                  ),
                               Container(
                                 margin: EdgeInsets.only(left: 10),
                                 child: Center(
-                                  child: Text(
-                                      'Delivery slots',
-                                      style: TextStyle(color: appTheme,decoration: TextDecoration
-                                          .underline,)),
+                                  child: Text('Delivery slots',
+                                      style: TextStyle(
+                                        color: appTheme,
+                                        decoration: TextDecoration.underline,
+                                      )),
                                 ),
                               )
-                            ],),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  top: 0, bottom: 16, left: 16, right: 16),
-                              color: Color(0xFFE1E1E1),
-                              height: 1,
-                            ),
-                          ],
-                        )
-                      ]),
-                    ),
-                  ));
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                          child: Text(
+                            "Time",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff797C82),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                'images/timegreyicon.png',
+                                fit: BoxFit.scaleDown,
+                                height: 15,
+                                width: 15,
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 10),
+                                child: Center(
+                                  child: Text('${selectedTimeSlotString}',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                      )),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: 0, bottom: 16, left: 16, right: 16),
+                          color: Color(0xFFE1E1E1),
+                          height: 1,
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Address",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                      Container(
+                                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        child: Row(
+                                          children: [
+                                            Text(
+                                              "${addressData.firstName}",
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 18,
+                                                  color: Colors.black),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Text(
+                                        "${addressData.address}",
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 5),
+                          color: Color(0xFFE1E1E1),
+                          height: 3,
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(15, 10, 15, 3),
+                          child: Text(
+                            'Your order amount is approximately.',
+                            style: TextStyle(color: Colors.black, fontSize: 16),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(25, 0, 15, 0),
+                          child: Text(
+                              '${AppConstant.currency}${taxModel.total}',
+                              style:
+                                  TextStyle(color: Colors.black, fontSize: 24)),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: 0, bottom: 16, left: 16, right: 16),
+                          color: Color(0xFFE1E1E1),
+                          height: 1,
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.radio_button_checked,
+                                color: appTheme,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Image.asset(
+                                'images/onlinepayicon.png',
+                                color: appTheme,
+                                fit: BoxFit.scaleDown,
+                                height: 30,
+                                width: 30,
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 10),
+                                child: Center(
+                                  child: Text('Online Pay Full Amount',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                      )),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(26, 16, 26, 16),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                  child: Container(
+                                decoration: new BoxDecoration(
+                                  borderRadius: new BorderRadius.all(
+                                      new Radius.circular(5.0)),
+                                ),
+                                child: FlatButton(
+                                  child: Text(
+                                    'Place Order',
+                                    style: TextStyle(fontSize: 17),
+                                  ),
+                                  color: appTheme,
+                                  textColor: Colors.white,
+                                  onPressed: () {
+                                    //todo:hit api
+                                    callOrderIdApi(widget.model);
+                                  },
+                                ),
+                              ))
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  ]),
+                ),
+              ));
             },
           );
         });
+  }
+
+  void callOrderIdApi(StoreModel storeObject) async {
+    Utils.showProgressDialog(context);
+    double price = double.parse(taxModel.total); //totalPrice ;
+    print("=======1===${price}===total==${taxModel.total}======");
+    price = price * 100;
+    print("=======2===${price}===========");
+    String mPrice =
+    price.toString().substring(0, price.toString().indexOf('.'));
+    print("=======mPrice===${mPrice}===========");
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    //new changes
+    Utils.getCartItemsListToJson(
+        isOrderVariations: isOrderVariations,
+        responseOrderDetail: responseOrderDetail,
+        cartList: cartListFromDB)
+        .then((orderJson) {
+      if (orderJson == null) {
+        print("--orderjson == null-orderjson == null-");
+        return;
+      }
+      String storeAddress = "";
+      try {
+        storeAddress = "${widget.model.storeName}, ${widget.model..location},"
+            "${widget.model.city}, ${widget.model.state}, ${widget.model.country}, ${widget.model.zipcode}";
+      } catch (e) {
+        print(e);
+      }
+
+      String userId = user.id;
+      OrderDetailsModel detailsModel = OrderDetailsModel(
+          shippingCharges,
+          '',
+          totalPrice.toString(),
+          '3',
+          taxModel,
+          addressData,
+          false,
+          addressData.areaId,
+          widget.deliveryType,
+          "",
+          "",
+          deviceId,
+          "Razorpay",
+          userId,
+          deviceToken,
+          storeAddress,
+          selectedTimeSlotString,
+          totalSavingsText);
+      ApiController.razorpayCreateOrderApi(
+          mPrice, orderJson, detailsModel.orderDetails)
+          .then((response) {
+        CreateOrderData model = response;
+        if (model != null && response.success) {
+          print("----razorpayCreateOrderApi----${response.data.id}--");
+          openCheckout(model.data.id, storeObject);
+        } else {
+          Utils.showToast("${model.message}", true);
+          Utils.hideProgressDialog(context);
+        }
+      });
+    });
   }
 
   void callDeliverySlotsApi() {
@@ -968,7 +1235,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               visible: isloyalityPointsEnabled == true ? true : false,
               child: InkWell(
                 onTap: () async {
-                       //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
+                  //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
                   //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
                   if (isCouponsApplied) {
                     Utils.showToast(
@@ -985,10 +1252,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       appliedReddemPointsCodeList.isNotEmpty) {
                     removeCoupon();
                   } else {
-
                     if (addressData == null) {
-                      Utils.showToast(
-                          "Please select Address", false);
+                      Utils.showToast("Please select Address", false);
                       return;
                     }
 
@@ -998,7 +1263,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     subcriptionMap.putIfAbsent(
                         'orderJson', () => encodedDoughnut);
                     subcriptionMap.putIfAbsent('userAddressId',
-                            () => addressData == null ? '' : addressData.areaId);
+                        () => addressData == null ? '' : addressData.areaId);
                     subcriptionMap.putIfAbsent(
                         'userAddress', () => userDeliveryAddress);
                     subcriptionMap.putIfAbsent(
@@ -1012,26 +1277,29 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           builder: (BuildContext context) => RedeemPointsScreen(
                               addressData,
                               "",
-                             false,
-                              addressData.areaId, (model) async {},
-                              appliedReddemPointsCodeList, isOrderVariations,
-                              responseOrderDetail, shippingCharges,
+                              false,
+                              addressData.areaId,
+                              (model) async {},
+                              appliedReddemPointsCodeList,
+                              isOrderVariations,
+                              responseOrderDetail,
+                              shippingCharges,
                               isSubcriptionScreen: true,
                               subcriptionMap: subcriptionMap,
-                              subcriptionCallback: (model) async{
-                                await updateTaxDetails(model);
-                                setState(() {
-                                  hideRemoveCouponFirstTime = false;
-                                  taxModel = model;
-                                  double taxModelTotal =
-                                      double.parse(taxModel.total) +
-                                          int.parse(shippingCharges);
-                                  taxModel.total = taxModelTotal.toString();
-                                  appliedReddemPointsCodeList.add(model.couponCode);
-                                  print("===discount=== ${model.discount}");
-                                  print("taxModel.total=${taxModel.total}");
-                                });
-                              }),
+                              subcriptionCallback: (model) async {
+                            await updateTaxDetails(model);
+                            setState(() {
+                              hideRemoveCouponFirstTime = false;
+                              taxModel = model;
+                              double taxModelTotal =
+                                  double.parse(taxModel.total) +
+                                      int.parse(shippingCharges);
+                              taxModel.total = taxModelTotal.toString();
+                              appliedReddemPointsCodeList.add(model.couponCode);
+                              print("===discount=== ${model.discount}");
+                              print("taxModel.total=${taxModel.total}");
+                            });
+                          }),
                           fullscreenDialog: true,
                         ));
                   }
@@ -1048,28 +1316,23 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                           appliedReddemPointsCodeList.isEmpty
-                              ?
-                          "Redeem Loyality Points"
-                            : "${taxModel.couponCode} Applied",
+                          appliedReddemPointsCodeList.isEmpty
+                              ? "Redeem Loyality Points"
+                              : "${taxModel.couponCode} Applied",
                           textAlign: TextAlign.left,
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              color:
-                                  appliedCouponCodeList.isEmpty
+                              color: appliedCouponCodeList.isEmpty
                                   ? isCouponsApplied
-                                  ? appTheme.withOpacity(0.5)
-                                  : appTheme
-                                  :
-                                  appTheme.withOpacity(0.5)),
+                                      ? appTheme.withOpacity(0.5)
+                                      : appTheme
+                                  : appTheme.withOpacity(0.5)),
                         ),
                       ),
                     ),
-                    Icon(
-                        appliedReddemPointsCodeList.isNotEmpty
+                    Icon(appliedReddemPointsCodeList.isNotEmpty
                         ? Icons.cancel
-                        :
-                        Icons.keyboard_arrow_right),
+                        : Icons.keyboard_arrow_right),
                   ],
                 ),
               ),
@@ -1098,8 +1361,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                   removeCoupon();
                 } else {
                   if (addressData == null) {
-                    Utils.showToast(
-                        "Please select Address", false);
+                    Utils.showToast("Please select Address", false);
                     return;
                   }
 
@@ -1194,7 +1456,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       return;
     }
     Utils.showProgressDialog(context);
-    multiTaxCalculationApi(couponCode: '',isRemovedOffer: true);
+    multiTaxCalculationApi(couponCode: '', isRemovedOffer: true);
   }
 
   Future<void> updateTaxDetails(SubscriptionTaxCalculation taxModel) async {
@@ -1258,7 +1520,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                   print("---Apply Coupon----");
                   if (couponCodeController.text.trim().isEmpty) {
                   } else {
-                    if(addressData==null){
+                    if (addressData == null) {
                       Utils.showToast('Please select address', false);
                       return;
                     }
@@ -1279,78 +1541,78 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       Utils.hideKeyboard(context);
                       List jsonList = Product.encodeToJson(widget.cartList);
                       String encodedDoughnut = jsonEncode(jsonList);
-                        ValidateCouponResponse couponModel =
-                        await ApiController.validateOfferApiRequest(
-                            couponCodeController.text,
-                           '3',
-                            encodedDoughnut);
-                        if (couponModel.success) {
-                          print("---success----");
-                          Utils.showToast("${couponModel.message}", false);
-                          SubscriptionTaxCalculationResponse modelResponse =
-                          await ApiController.subscriptionMultipleTaxCalculationRequest(
-                              couponCode: couponCode,
-                              discount: couponModel.discountAmount,
-                              shipping: shippingCharges,
-                              orderJson: encodedDoughnut,
-                              userAddressId: addressData == null ? '' : addressData.areaId,
-                              userAddress: userDeliveryAddress,
-                              deliveryTimeSlot: selectedTimeSlotString,
-                              cartSaving: cartSaving,
-                              totalDeliveries: totalDeliveries.toString()
-                          );
-                          Utils.hideProgressDialog(context);
-                          if (modelResponse != null && !modelResponse.success) {
-                            Utils.showToast(modelResponse.message, true);
-                            Navigator.of(context)
-                                .popUntil((route) => route.isFirst);
-                          } else {
-                            await updateTaxDetails(modelResponse.data);
-                            if (modelResponse.data.orderDetail != null &&
-                                modelResponse.data.orderDetail.isNotEmpty) {
-                              responseOrderDetail =
-                                  modelResponse.data.orderDetail;
-                              bool someProductsUpdated = false;
-                              isOrderVariations =
-                                  modelResponse.data.isChanged;
-                              for (int i = 0;
-                              i < responseOrderDetail.length;
-                              i++) {
-                                if (responseOrderDetail[i]
-                                    .productStatus
-                                    .compareTo('out_of_stock') ==
-                                    0 ||
-                                    responseOrderDetail[i]
-                                        .productStatus
-                                        .compareTo('price_changed') ==
-                                        0) {
-                                  someProductsUpdated = true;
-                                  break;
-                                }
-                              }
-                              if (someProductsUpdated) {
-                                DialogUtils.displayCommonDialog(
-                                    context,
-                                    widget.model == null
-                                        ? ""
-                                        : widget.model.storeName,
-                                    "Some Cart items were updated. Please review the cart before procceeding.",
-                                    buttonText: 'Procceed');
-                                constraints();
+                      ValidateCouponResponse couponModel =
+                          await ApiController.validateOfferApiRequest(
+                              couponCodeController.text, '3', encodedDoughnut);
+                      if (couponModel.success) {
+                        print("---success----");
+                        Utils.showToast("${couponModel.message}", false);
+                        SubscriptionTaxCalculationResponse modelResponse =
+                            await ApiController
+                                .subscriptionMultipleTaxCalculationRequest(
+                                    couponCode: couponCode,
+                                    discount: couponModel.discountAmount,
+                                    shipping: shippingCharges,
+                                    orderJson: encodedDoughnut,
+                                    userAddressId: addressData == null
+                                        ? ''
+                                        : addressData.areaId,
+                                    userAddress: userDeliveryAddress,
+                                    deliveryTimeSlot: selectedTimeSlotString,
+                                    cartSaving: cartSaving,
+                                    totalDeliveries:
+                                        totalDeliveries.toString());
+                        Utils.hideProgressDialog(context);
+                        if (modelResponse != null && !modelResponse.success) {
+                          Utils.showToast(modelResponse.message, true);
+                          Navigator.of(context)
+                              .popUntil((route) => route.isFirst);
+                        } else {
+                          await updateTaxDetails(modelResponse.data);
+                          if (modelResponse.data.orderDetail != null &&
+                              modelResponse.data.orderDetail.isNotEmpty) {
+                            responseOrderDetail =
+                                modelResponse.data.orderDetail;
+                            bool someProductsUpdated = false;
+                            isOrderVariations = modelResponse.data.isChanged;
+                            for (int i = 0;
+                                i < responseOrderDetail.length;
+                                i++) {
+                              if (responseOrderDetail[i]
+                                          .productStatus
+                                          .compareTo('out_of_stock') ==
+                                      0 ||
+                                  responseOrderDetail[i]
+                                          .productStatus
+                                          .compareTo('price_changed') ==
+                                      0) {
+                                someProductsUpdated = true;
+                                break;
                               }
                             }
-                            calculateTotalSavings();
-                            setState(() {
-                              taxModel = modelResponse.data;
-                              isCouponsApplied = true;
-                              couponCodeController.text = couponCode;
-                            });
+                            if (someProductsUpdated) {
+                              DialogUtils.displayCommonDialog(
+                                  context,
+                                  widget.model == null
+                                      ? ""
+                                      : widget.model.storeName,
+                                  "Some Cart items were updated. Please review the cart before procceeding.",
+                                  buttonText: 'Procceed');
+                              constraints();
+                            }
                           }
-                        } else {
-                          Utils.showToast("${couponModel.message}", false);
-                          Utils.hideProgressDialog(context);
-                          Utils.hideKeyboard(context);
+                          calculateTotalSavings();
+                          setState(() {
+                            taxModel = modelResponse.data;
+                            isCouponsApplied = true;
+                            couponCodeController.text = couponCode;
+                          });
                         }
+                      } else {
+                        Utils.showToast("${couponModel.message}", false);
+                        Utils.hideProgressDialog(context);
+                        Utils.hideKeyboard(context);
+                      }
                     }
                   }
                 },
@@ -1468,7 +1730,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   Future<void> multiTaxCalculationApi({
-    String couponCode = '',bool isRemovedOffer=false
+    String couponCode = '',
+    bool isRemovedOffer = false,
   }) async {
     constraints();
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
@@ -1529,7 +1792,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       SubscriptionTaxCalculationResponse model = response;
       Utils.hideProgressDialog(context);
       Utils.hideKeyboard(context);
-      if (model!=null&& model.success) {
+      if (model != null && model.success) {
         taxModel = model.data;
 //          widget.cartList =
 //              await databaseHelper.getCartItemList(isSubscriptionTable: true);
@@ -1574,7 +1837,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         setState(() {
           isLoading = false;
         });
-        if(isRemovedOffer){
+        if (isRemovedOffer) {
           setState(() {
             hideRemoveCouponFirstTime = true;
             appliedCouponCodeList.clear();
@@ -1583,7 +1846,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             couponCodeController.text = "";
           });
         }
-
       } else {
         var result = await DialogUtils.displayCommonDialog(
             context,
@@ -1596,6 +1858,220 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       }
     });
 //    });
+  }
+
+  Razorpay _razorpay;
+
+  void initRazorPay() {
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _razorpay.clear();
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse responseObj) {
+    //Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId, timeInSecForIos: 4);
+    Utils.showProgressDialog(context);
+    ApiController.razorpayVerifyTransactionApi(responseObj.orderId)
+        .then((response) {
+      //print("----razorpayVerifyTransactionApi----${response}--");
+      if (response != null) {
+        RazorpayOrderData model = response;
+        if (model.success) {
+          placeOrderApi(
+            payment_request_id: responseObj.orderId,
+            payment_id: model.data.id,
+          );
+        } else {
+          Utils.showToast("Something went wrong!", true);
+          Utils.hideProgressDialog(context);
+        }
+      } else {
+        Utils.showToast("Something went wrong!", true);
+        Utils.hideProgressDialog(context);
+      }
+    });
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    Utils.showToast(response.message, true);
+    print("----_handlePaymentError--message--${response.message}--");
+    print("----_handlePaymentError--code--${response.code.toString()}--");
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    /*print("----ExternalWalletResponse----${response.walletName}--");
+    Fluttertoast.showToast(
+        msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
+  }
+
+  String razorpay_orderId = "";
+
+  void openCheckout(String razorpay_order_id, StoreModel storeObject) async {
+    Utils.hideProgressDialog(context);
+    UserModel user = await SharedPrefs.getUser();
+    //double price = totalPrice ;
+    razorpay_orderId = razorpay_order_id;
+    var options = {
+      'key': '${storeObject.paymentSetting.apiKey}',
+      'currency': "INR",
+      'order_id': razorpay_order_id,
+      //'amount': taxModel == null ? (price * 100) : (double.parse(taxModel.total) * 100),
+      'amount': (double.parse(taxModel.total) * 100),
+      'name': '${widget.model.storeName}',
+      'description': '',
+      'prefill': {
+        'contact': '${user.phone}',
+        'email': '${user.email}',
+        'name': '${user.fullName}'
+      },
+      /*'external': {
+        'wallets': ['paytm']
+      }*/
+    };
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint(e);
+    }
+  }
+
+  Future<void> placeOrderApi(
+      {String payment_request_id = '', String payment_id}) async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if (!isNetworkAvailable) {
+      Utils.showToast(AppConstant.noInternet, false);
+      return;
+    }
+    Utils.showProgressDialog(context);
+    List<String> selectedDatesList = List();
+    try {
+      for (DateTime event in _markedDateMap.events.keys) {
+        var formatter = new DateFormat('yyyy-MM-dd');
+        String formatted = formatter.format(event);
+        selectedDatesList.add(formatted);
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    String encodedDateList = jsonEncode(selectedDatesList);
+    String start_date = '',
+        end_date = '',
+        single_day_shipping_charges = taxModel.singleDayShipping,
+        single_day_total = taxModel.singleDayTotal,
+        single_day_discount = taxModel.singleDayDiscount,
+        single_day_tax = taxModel.singleDayTax,
+        single_day_checkout = taxModel.singleDayTotal,
+        subscription_type =
+            widget.model.subscription.cycleType[selecteddays].key,
+        delivery_dates = encodedDateList,
+        total_deliveries = totalDeliveries.toString();
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String formatted = formatter.format(selectedStartDate);
+    start_date = formatted;
+    formatted = formatter.format(selectedEndDate);
+    end_date = formatted;
+    userDeliveryAddress = '';
+    pin = '';
+    if (addressData != null && !isComingFromPickUpScreen) {
+      if (addressData.address2 != null && addressData.address2.isNotEmpty) {
+        if (addressData.address != null && addressData.address.isNotEmpty) {
+          userDeliveryAddress = addressData.address +
+              ", " +
+              addressData.address2 +
+              " " +
+              addressData.areaName +
+              " " +
+              addressData.city;
+        } else {
+          userDeliveryAddress = addressData.address2 +
+              " " +
+              addressData.areaName +
+              " " +
+              addressData.city;
+        }
+      } else {
+        if (addressData.address != null && addressData.address.isNotEmpty) {
+          userDeliveryAddress = addressData.address +
+              " " +
+              addressData.areaName +
+              " " +
+              addressData.city;
+        }
+      }
+
+      if (addressData.zipCode != null && addressData.zipCode.isNotEmpty)
+        pin = " " + addressData.zipCode;
+    }
+    isLoading = true;
+    userWalleModel = await ApiController.getUserWallet();
+
+    List jsonList = Product.encodeToJson(widget.cartList);
+    String encodedDoughnut = jsonEncode(jsonList);
+
+    ApiController.subscriptionPlaceOrderRequest(
+      shippingCharges,
+      '',
+      taxModel.total,
+      '3',
+      taxModel,
+      addressData,
+      encodedDoughnut,
+      false,
+      addressData.areaId,
+      widget.deliveryType,
+      payment_request_id,
+      payment_id,
+      'Razorpay',
+      selectedTimeSlotString,
+      cart_saving: totalSavings.toStringAsFixed(2),
+      start_date: start_date,
+      end_date: end_date,
+      single_day_shipping_charges: single_day_shipping_charges,
+      single_day_total: single_day_total,
+      single_day_discount: single_day_discount,
+      single_day_tax: single_day_tax,
+      single_day_checkout: single_day_checkout,
+      subscription_type: subscription_type,
+      delivery_dates: delivery_dates,
+      total_deliveries: total_deliveries,
+    ).then((response) async {
+      Utils.hideProgressDialog(context);
+      if (response == null) {
+        print("--response == null-response == null-");
+        return;
+      }
+      eventBus.fire(updateCartCount());
+      print("${widget.deliveryType}");
+      if (widget.deliveryType == OrderType.PickUp) {
+        bool result =
+            await DialogUtils.displayPickUpDialog(context, widget.model);
+        if (result == true) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          eventBus.fire(updateCartCount());
+          DialogUtils.openMap(widget.model, double.parse(widget.model.lat),
+              double.parse(widget.model.lng));
+        } else {
+          await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+          eventBus.fire(updateCartCount());
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      } else {
+        bool result = await DialogUtils.displayThankYouDialog(context,
+            response.success ? AppConstant.orderAdded : response.message);
+        if (result == true) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          eventBus.fire(updateCartCount());
+        }
+      }
+    });
   }
 
   void constraints() {

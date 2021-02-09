@@ -485,7 +485,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                     visible: _isSubscriptionActive &&
                                             widget.product.variantMap[
                                                     widget.product.variantId] ==
-                                                "0"
+                                                "1"
                                         ? true
                                         : false,
                                     child: InkWell(

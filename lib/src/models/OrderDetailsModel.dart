@@ -11,7 +11,8 @@ class OrderDetailsModel {
   String note;
   String totalPrice;
   String paymentMethod;
-  TaxCalculationModel taxModel;
+//  TaxCalculationModel taxModel;
+  var taxModel;
   DeliveryAddressData address;
   bool isComingFromPickUpScreen;
   String areaId;

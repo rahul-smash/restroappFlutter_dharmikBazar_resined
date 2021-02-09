@@ -1916,24 +1916,24 @@ class ApiController {
 
   /*Subscription module*/
   static Future<SubscriptionTaxCalculationResponse>
-      subscriptionMultipleTaxCalculationRequest({
-          String couponCode='',
-          String discount='',
-          String shipping='',
-          String orderJson='',
-          String userAddressId='',
-          String userAddress='',
+      subscriptionMultipleTaxCalculationRequest(
+          {String couponCode = '',
+          String discount = '',
+          String shipping = '',
+          String orderJson = '',
+          String userAddressId = '',
+          String userAddress = '',
 //          String total='',
 //          String paymentMethod='',
 //          String checkout='',
-          String deliveryTimeSlot='',
+          String deliveryTimeSlot = '',
 //          String paymentRequestId='',
 //          String paymentId='',
 //          String onlineMethod='',
 //          String note='',
 //          String walletRefund='',
-          String cartSaving='',
-          String totalDeliveries=''}) async {
+          String cartSaving = '',
+          String totalDeliveries = ''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     WalleModel userWallet = await SharedPrefs.getUserWallet();
@@ -1941,7 +1941,9 @@ class ApiController {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll("api_v1", "api_v1_tax") +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", store.id)
+            .replaceAll("api_v1", "api_v1_tax") +
         ApiConstants.subscriptionTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
@@ -1996,7 +1998,7 @@ class ApiController {
       String note,
       String totalPrice,
       String paymentMethod,
-      TaxCalculationModel taxModel,
+      SubscriptionTaxCalculation taxModel,
       DeliveryAddressData address,
       String orderJson,
       bool isComingFromPickUpScreen,
@@ -2006,7 +2008,17 @@ class ApiController {
       String razorpay_payment_id,
       String online_method,
       String selectedDeliverSlotValue,
-      {String cart_saving = "0.00"}) async {
+      {String cart_saving = "0.00",
+      String start_date = '',
+      String end_date = '',
+      String single_day_shipping_charges = '',
+      String single_day_total = '',
+      String single_day_discount = '',
+      String single_day_tax = '',
+      String single_day_checkout = '',
+      String subscription_type = '',
+      String delivery_dates = '',
+      String total_deliveries = ''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -2044,7 +2056,7 @@ class ApiController {
 
       try {
         List jsonfixedTaxList =
-        taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+            taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
         encodedFixedTax = jsonEncode(jsonfixedTaxList);
         //print("encodedFixedTax= ${encodedFixedTax}");
       } catch (e) {
@@ -2053,7 +2065,7 @@ class ApiController {
 
       try {
         List jsontaxDetailList =
-        taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+            taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
         encodedtaxDetail = jsonEncode(jsontaxDetailList);
         //print("encodedtaxDetail= ${encodedtaxDetail}");
       } catch (e) {
@@ -2062,7 +2074,7 @@ class ApiController {
 
       try {
         List jsontaxLabelList =
-        taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+            taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
         encodedtaxLabel = jsonEncode(jsontaxLabelList);
         //print("encodedtaxLabel= ${encodedtaxLabel}");
       } catch (e) {
@@ -2104,8 +2116,10 @@ class ApiController {
         "wallet_refund": store.wallet_setting == "0"
             ? ""
             : taxModel == null
-            ? "0"
-            : "${taxModel.wallet_refund}",
+                ? "0"
+//            : "${taxModel.wallet_refund}",
+                //TODO: wallet implement here
+                : "0",
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
@@ -2121,7 +2135,7 @@ class ApiController {
         "user_id": user.id,
         "device_token": deviceToken,
         "user_address_id":
-        isComingFromPickUpScreen == true ? areaId : address.id,
+            isComingFromPickUpScreen == true ? areaId : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
         "payment_method": paymentMethod == "2" ? "COD" : "online",
@@ -2134,6 +2148,16 @@ class ApiController {
         "store_tax_rate_detail": encodedtaxLabel,
         "calculated_tax_detail": encodedtaxDetail,
         "cart_saving": cart_saving,
+        "start_date": start_date,
+        "end_date": end_date,
+        "single_day_shipping_charges": single_day_shipping_charges,
+        "single_day_total": single_day_total,
+        "single_day_discount": single_day_discount,
+        "single_day_tax": single_day_tax,
+        "single_day_checkout": single_day_checkout,
+        "subscription_type": subscription_type,
+        "delivery_dates": delivery_dates,
+        "total_deliveries": total_deliveries,
       });
 
       //print("----${url}");
