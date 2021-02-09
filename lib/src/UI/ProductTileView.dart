@@ -483,8 +483,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               children: [
                                 Visibility(
                                     visible: _isSubscriptionActive &&
-                                            widget.product.variantMap[
-                                                    widget.product.variantId] ==
+                                            widget.product.variantMap[variant == null ? widget.product.variantId : variant.id] ==
                                                 "1"
                                         ? true
                                         : false,
