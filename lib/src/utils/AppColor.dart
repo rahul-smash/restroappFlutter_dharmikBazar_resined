@@ -64,6 +64,8 @@ Color green2 = Color(0xFF40c707);
 Color fbblue = Color(0xFF4267B2);
 Color gray9 = Color(0xFFa1a3a6);
 
+Color blue3 = Color(0xFF00bfcf);
 
+Color blue4 = Color(0xFF41cdc9);
 
 

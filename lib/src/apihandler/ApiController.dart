@@ -37,6 +37,7 @@ import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
 import 'package:restroapp/src/models/StripeVerifyModel.dart';
+import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
@@ -2172,6 +2173,38 @@ class ApiController {
     } catch (e) {
       print("-x-fields--${e.toString()}--");
       //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<SubscriptionDataResponse> getSubscriptionOrderHistory() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    var url = ApiConstants.base.replaceAll("storeId", store.id) +
+        ApiConstants.subscriptionHistory;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    if (isNetworkAvailable) {
+      try {
+        request.fields.addAll({
+          "user_id": user.id,
+          "platform": Platform.isIOS ? "IOS" : "android",
+        });
+        print('--url===  $url');
+        print('--user.id=== ${user.id}');
+        final response =
+        await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        final parsed = json.decode(respStr);
+        print('--respStr===  $respStr');
+        SubscriptionDataResponse getOrderHistory = SubscriptionDataResponse.fromJson(parsed);
+        return getOrderHistory;
+      } catch (e) {
+        Utils.showToast(e.toString(), true);
+        return null;
+      }
+    } else {
+      Utils.showToast(AppConstant.noInternet, true);
       return null;
     }
   }

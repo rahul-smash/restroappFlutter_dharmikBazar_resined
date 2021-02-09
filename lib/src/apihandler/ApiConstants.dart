@@ -92,4 +92,6 @@ class ApiConstants {
       '/api_v1_subscription/placeSubscriptionOrder';
   static String subscriptionPickupPlaceOrder =
       '/api_v1_subscription/pickupPlaceSubscriptionOrder';
+  static String subscriptionHistory =
+      '/api_v1_subscription/subscriptionHistory';
 }
