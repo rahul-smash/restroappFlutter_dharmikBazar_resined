@@ -627,21 +627,28 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                     : Colors.black,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500)),
-                        Visibility(visible: cardOrderHistoryItems.orderItems[index].refundStatus ==
-                            '2'||cardOrderHistoryItems.orderItems[index].refundStatus=='1',
-                            child:
-                        Text(
-                            cardOrderHistoryItems.orderItems[index].refundStatus ==
-                                    '1'
-                                ? "Refund Pending"
-                                : "Refunded",
-                            style: TextStyle(
-                                color: cardOrderHistoryItems.orderItems[index].refundStatus ==
-                                    '1'
-                                    ? Colors.red
-                                    : Colors.green,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500)))
+                        Visibility(
+                            visible: cardOrderHistoryItems
+                                        .orderItems[index].refundStatus ==
+                                    '2' ||
+                                cardOrderHistoryItems
+                                        .orderItems[index].refundStatus ==
+                                    '1',
+                            child: Text(
+                                cardOrderHistoryItems
+                                            .orderItems[index].refundStatus ==
+                                        '1'
+                                    ? "Refund Pending"
+                                    : "Refunded",
+                                style: TextStyle(
+                                    color: cardOrderHistoryItems
+                                                .orderItems[index]
+                                                .refundStatus ==
+                                            '1'
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500)))
                       ],
                     ),
                   ],
@@ -659,8 +666,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Visibility(
-                        visible: widget.isRatingEnable &&
-                            cardOrderHistoryItems.status.contains('5'),
+//                        visible: widget.isRatingEnable &&
+//                            cardOrderHistoryItems.status.contains('5'),
+                      visible: true,
                         child: Padding(
                           padding: EdgeInsets.only(top: 5),
                           child: InkWell(
@@ -673,9 +681,19 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                               itemCount: 5,
                               itemPadding:
                                   EdgeInsets.symmetric(horizontal: 2.0),
-                              itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: appThemeSecondary,
+                              ratingWidget: RatingWidget(
+                                full: Icon(
+                                  Icons.star,
+                                  color: appThemeSecondary,
+                                ),
+                                half: Icon(
+                                  Icons.star_half,
+                                  color: appThemeSecondary,
+                                ),
+                                empty: Icon(
+                                  Icons.star_border,
+                                  color: appThemeSecondary,
+                                ),
                               ),
                               ignoreGestures: true,
                               onRatingUpdate: (rating) {},
@@ -802,13 +820,23 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           allowHalfRating: false,
                           itemCount: 5,
                           itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
-                          itemBuilder: (context, _) => Icon(
-                            Icons.star,
-                            color: appThemeSecondary,
-                          ),
                           onRatingUpdate: (rating) {
                             _rating = rating;
                           },
+                          ratingWidget: RatingWidget(
+                            full: Icon(
+                              Icons.star,
+                              color: appThemeSecondary,
+                            ),
+                            half: Icon(
+                              Icons.star_half,
+                              color: appThemeSecondary,
+                            ),
+                            empty: Icon(
+                              Icons.star_border,
+                              color: appThemeSecondary,
+                            ),
+                          ),
                         ),
                         Container(
                           height: 120,

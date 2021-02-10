@@ -291,162 +291,37 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         choices.add('Change Delivery Slots');
         break;
     }
-    return Container(
-      color: Colors.white,
-      //height: 100,
-      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-      margin: EdgeInsets.fromLTRB(15, 15, 15, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text(
-                "#${ordersList[index].displaySubscriptionId} (${ordersList[index].orderItems.length} ${ordersList[index].orderItems.length > 1 ? 'Items' : 'Item'})",
-                style: TextStyle(
-                  fontSize: 18,
-                )),
-            Row(
-              children: [
-                Icon(
-                  Icons.check_circle_outline,
-                  size: 18,
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  "Order ${_getSubscriptionStatus(ordersList[index])}",
+    return InkWell(
+      onTap: (){ Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SubscriptionHistoryDetails(
+            ordersList[index], false
+            ,deliverySlotModel,
+            selctedTag,
+            selectedTimeSlot,
+            timeslotList,
+            isInstantDelivery,
+            isDeliveryResponseFalse,
+            isSlotSelected,
+            initSelectedTimeSlotString,),
+        ),
+      );},
+      child: Container(
+        color: Colors.white,
+        //height: 100,
+        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+        margin: EdgeInsets.fromLTRB(15, 15, 15, 0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text(
+                  "#${ordersList[index].displaySubscriptionId} (${ordersList[index].orderItems.length} ${ordersList[index].orderItems.length > 1 ? 'Items' : 'Item'})",
                   style: TextStyle(
-                    fontSize: 14,
-                    color: _getSubscriptionStatusColor(ordersList[index]),
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                PopupMenuButton(
-                  elevation: 1.2,
-                  onSelected: (choice) {
-                    if (choice == 'View Details') {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SubscriptionHistoryDetails(
-                              ordersList[index], false
-                          ,deliverySlotModel,
-                            selctedTag,
-                            selectedTimeSlot,
-                            timeslotList,
-                            isInstantDelivery,
-                            isDeliveryResponseFalse,
-                            isSlotSelected,
-                            initSelectedTimeSlotString,),
-                        ),
-                      );
-                      return;
-                    } else if (choice == 'Change Delivery Slots') {
-                      deliverySlotBottomSheet(context, ordersList[index],true);
-                      return;
-                    }
-
-                    String status = '1';
-                    switch (choice) {
-                      case 'Order Stop':
-                        status = '6';
-                        break;
-                      case 'Pause':
-                        status = '9';
-                        break;
-                      case 'Active':
-                        status = '1';
-                        break;
-                    }
-                    //hit api
-                    Utils.showProgressDialog(context);
-                    updateSubscriptionStatus(
-                        ordersList[index].subscriptionOrderId, status);
-                  },
-                  onCanceled: () {
-                    print('You have not chossed anything');
-                  },
-                  itemBuilder: (BuildContext context) {
-                    return choices.map((String choice) {
-                      return PopupMenuItem(
-                        value: choice,
-                        child: Text(choice),
-                      );
-                    }).toList();
-                  },
-                )
-              ],
-            )
-          ]),
-          SizedBox(
-            height: 10,
-          ),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Icon(
-                        Icons.calendar_today,
-                        size: 18,
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(
-                        child: Text(
-                          "${_getDateFormated(ordersList[index].startDate)} to ${_getDateFormated(ordersList[index].endDate)}",
-                          maxLines: 2,
-                          style: TextStyle(
-                            fontSize: 16,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 18,
-                    ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      "${ordersList[index].deliveryTimeSlot}",
-                      style: TextStyle(
-                        fontSize: 16,
-                        decoration: TextDecoration.underline,
-                      ),
-                    )
-                  ],
-                )
-              ]),
-          Container(
-            height: 1,
-            color: Colors.grey[300],
-            margin: EdgeInsets.fromLTRB(0, 15, 0, 10),
-          ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text(
-                "Order ${ordersList[index].orderItems.length > 1 ? 'items' : 'item'}",
-                style: TextStyle(
-                  fontSize: 18,
-                )),
-            Visibility(
-              visible: false,
-              child: Row(
+                    fontSize: 18,
+                  )),
+              Row(
                 children: [
                   Icon(
                     Icons.check_circle_outline,
@@ -456,146 +331,288 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                     width: 5,
                   ),
                   Text(
-                    _getDeliveryType(index),
+                    "Order ${_getSubscriptionStatus(ordersList[index])}",
                     style: TextStyle(
                       fontSize: 14,
+                      color: _getSubscriptionStatusColor(ordersList[index]),
+                      decoration: TextDecoration.underline,
                     ),
-                  )
-                ],
-              ),
-            )
-          ]),
-          Container(
-            height: 50,
-            padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-            //color: Colors.grey,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      itemCount: ordersList[index].orderItems.length > 3
-                          ? 3
-                          : ordersList[index].orderItems.length,
-                      itemBuilder: (context, itemIndex) {
-                        return Container(
-                          margin: EdgeInsets.only(top: 5),
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                            child: Wrap(
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Colors.grey[300],
-                                      ),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
-                                  padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                  child: Center(
-                                    child: Text(
-                                      "${ordersList[index].orderItems[itemIndex].productName}",
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  PopupMenuButton(
+                    elevation: 1.2,
+                    onSelected: (choice) {
+                      if (choice == 'View Details') {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SubscriptionHistoryDetails(
+                                ordersList[index], false
+                            ,deliverySlotModel,
+                              selctedTag,
+                              selectedTimeSlot,
+                              timeslotList,
+                              isInstantDelivery,
+                              isDeliveryResponseFalse,
+                              isSlotSelected,
+                              initSelectedTimeSlotString,),
                           ),
                         );
-                      }),
-                ),
-                Visibility(
-                  visible: false,
-                  child: Container(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
+                        return;
+                      } else if (choice == 'Change Delivery Slots') {
+                        deliverySlotBottomSheet(context, ordersList[index],true);
+                        return;
+                      }
+
+                      String status = '1';
+                      switch (choice) {
+                        case 'Order Stop':
+                          status = '6';
+                          break;
+                        case 'Pause':
+                          status = '9';
+                          break;
+                        case 'Active':
+                          status = '1';
+                          break;
+                      }
+                      //hit api
+                      Utils.showProgressDialog(context);
+                      updateSubscriptionStatus(
+                          ordersList[index].subscriptionOrderId, status);
+                    },
+                    onCanceled: () {
+                      print('You have not chossed anything');
+                    },
+                    itemBuilder: (BuildContext context) {
+                      return choices.map((String choice) {
+                        return PopupMenuItem(
+                          value: choice,
+                          child: Text(choice),
+                        );
+                      }).toList();
+                    },
+                  )
+                ],
+              )
+            ]),
+            SizedBox(
+              height: 10,
+            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Next Delivery Date"),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today,
-                              size: 18,
-                            ),
-                            SizedBox(
-                              width: 5,
-                            ),
-                            Text(
-                              "28 Jan 2021",
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
-                            )
-                          ],
+                        Icon(
+                          Icons.calendar_today,
+                          size: 18,
                         ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Expanded(
+                          child: Text(
+                            "${_getDateFormated(ordersList[index].startDate)} to ${_getDateFormated(ordersList[index].endDate)}",
+                            maxLines: 2,
+                            style: TextStyle(
+                              fontSize: 16,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        )
                       ],
                     ),
                   ),
-                ),
-              ],
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Icon(
+                        Icons.access_time,
+                        size: 18,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        "${ordersList[index].deliveryTimeSlot}",
+                        style: TextStyle(
+                          fontSize: 16,
+                          decoration: TextDecoration.underline,
+                        ),
+                      )
+                    ],
+                  )
+                ]),
+            Container(
+              height: 1,
+              color: Colors.grey[300],
+              margin: EdgeInsets.fromLTRB(0, 15, 0, 10),
             ),
-          ),
-          Visibility(
-            visible: ordersList[index].orderItems.length > 3,
-            child: InkWell(
-              onTap: () => _showOrderItemsDialog(ordersList[index]),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                child: Text(
-                  "View More",
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Text(
+                  "Order ${ordersList[index].orderItems.length > 1 ? 'items' : 'item'}",
                   style: TextStyle(
-                    fontSize: 14,
-                    color: appTheme,
-                    decoration: TextDecoration.underline,
-                  ),
+                    fontSize: 18,
+                  )),
+              Visibility(
+                visible: false,
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.check_circle_outline,
+                      size: 18,
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text(
+                      _getDeliveryType(index),
+                      style: TextStyle(
+                        fontSize: 14,
+                      ),
+                    )
+                  ],
                 ),
+              )
+            ]),
+            Container(
+              height: 50,
+              padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+              //color: Colors.grey,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: ListView.builder(
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: ordersList[index].orderItems.length > 3
+                            ? 3
+                            : ordersList[index].orderItems.length,
+                        itemBuilder: (context, itemIndex) {
+                          return Container(
+                            margin: EdgeInsets.only(top: 5),
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                              child: Wrap(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.grey[300],
+                                        ),
+                                        borderRadius:
+                                            BorderRadius.all(Radius.circular(5))),
+                                    padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                    child: Center(
+                                      child: Text(
+                                        "${ordersList[index].orderItems[itemIndex].productName}",
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }),
+                  ),
+                  Visibility(
+                    visible: false,
+                    child: Container(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text("Next Delivery Date"),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.calendar_today,
+                                size: 18,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                "28 Jan 2021",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ),
-          Container(
-            height: 1,
-            width: Utils.getDeviceWidth(context) / 2,
-            color: Colors.grey[300],
-            margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-          ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Row(
-              children: [
-                Text("Total Amount: ",
-                    style: TextStyle(
-                      fontSize: 18,
-                    )),
-                Text("${AppConstant.currency}${ordersList[index].total}",
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ],
-            ),
-            Row(
-              children: [
-                InkWell(
-                  onTap: (){
-                    deliverySlotBottomSheet(context, ordersList[index],false);
-                  },
+            Visibility(
+              visible: ordersList[index].orderItems.length > 3,
+              child: InkWell(
+                onTap: () => _showOrderItemsDialog(ordersList[index]),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
                   child: Text(
-                    "Delivery Slots",
+                    "View More",
                     style: TextStyle(
                       fontSize: 14,
                       color: appTheme,
                       decoration: TextDecoration.underline,
                     ),
                   ),
-                )
-              ],
-            )
-          ]),
-        ],
+                ),
+              ),
+            ),
+            Container(
+              height: 1,
+              width: Utils.getDeviceWidth(context) / 2,
+              color: Colors.grey[300],
+              margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+            ),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Row(
+                children: [
+                  Text("Total Amount: ",
+                      style: TextStyle(
+                        fontSize: 18,
+                      )),
+                  Text("${AppConstant.currency}${ordersList[index].total}",
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              Row(
+                children: [
+                  InkWell(
+                    onTap: (){
+                      deliverySlotBottomSheet(context, ordersList[index],false);
+                    },
+                    child: Text(
+                      "Delivery Slots",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: appTheme,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  )
+                ],
+              )
+            ]),
+          ],
+        ),
       ),
     );
   }

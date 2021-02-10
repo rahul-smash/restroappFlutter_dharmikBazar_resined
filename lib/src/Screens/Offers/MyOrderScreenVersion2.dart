@@ -240,9 +240,19 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                         allowHalfRating: true,
                         itemCount: 5,
                         itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
-                        itemBuilder: (context, _) => Icon(
-                          Icons.star,
-                          color: appThemeSecondary,
+                        ratingWidget: RatingWidget(
+                          full: Icon(
+                            Icons.star,
+                            color: appThemeSecondary,
+                          ),
+                          half: Icon(
+                            Icons.star_half,
+                            color: appThemeSecondary,
+                          ),
+                          empty: Icon(
+                            Icons.star_border,
+                            color: appThemeSecondary,
+                          ),
                         ),
                         ignoreGestures: true,
                         onRatingUpdate: (rating) {},
