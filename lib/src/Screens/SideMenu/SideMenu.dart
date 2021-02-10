@@ -709,10 +709,10 @@ class DrawerChildConstants {
   static const MY_PROFILE = "My Profile";
   static const DELIVERY_ADDRESS = "Delivery Address";
   static const MY_ORDERS = "My Orders";
-  static const LOYALITY_POINTS = "Loyality Points";
+  static const LOYALITY_POINTS = "Loyalty Points";
   static const MY_FAVORITES = "My Favorites";
   static const ABOUT_US = "About Us";
-  static const ADDITION_INFORMATION = "Addition \nInformation";
+  static const ADDITION_INFORMATION = "Additional \nInformation";
   static const SHARE = "Share";
   static const FAQ = "FAQ";
   static const TERMS_CONDITIONS = "Terms and Conditions";
