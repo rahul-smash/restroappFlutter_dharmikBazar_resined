@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_pull_to_refresh/flutter_pull_to_refresh.dart';
+import 'package:intl/intl.dart';
+import 'package:restroapp/src/UI/SubscriptionHistoryDetails.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SubscriptionHistory extends StatefulWidget {
@@ -25,15 +30,6 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     "Pause Orders",
     "Completed Orders"
   ];
-  List<String> menuList = [
-    "item 1",
-    "item 2",
-    "item 3",
-    "item 4",
-    "item 5",
-    "item 6",
-    "item 7"
-  ];
 
   int selectedFilter = -1;
 
@@ -41,11 +37,64 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
 
   List<SubscriptionOrderData> ordersList;
 
+  DeliveryTimeSlotModel deliverySlotModel;
+  int selctedTag, selectedTimeSlot;
+  List<Timeslot> timeslotList;
+
+  //Store provides instant delivery of the orders.
+  bool isInstantDelivery = false;
+  bool isDeliveryResponseFalse = false;
+  bool isSlotSelected = false;
+  String initSelectedTimeSlotString = '';
+
   @override
   void initState() {
     super.initState();
     selectedFilter = -1;
     getSubscriptionOrderHistory();
+    callDeliverySlotsApi();
+  }
+
+  void callDeliverySlotsApi() {
+    if (widget.store.deliverySlot == "1") {
+      ApiController.deliveryTimeSlotApi().then((response) {
+        setState(() {
+          if (!response.success) {
+            isDeliveryResponseFalse = true;
+            return;
+          }
+          deliverySlotModel = response;
+          print(
+              "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+          isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
+          for (int i = 0;
+              i < deliverySlotModel.data.dateTimeCollection.length;
+              i++) {
+            timeslotList =
+                deliverySlotModel.data.dateTimeCollection[i].timeslot;
+            for (int j = 0; j < timeslotList.length; j++) {
+              Timeslot timeslot = timeslotList[j];
+              if (timeslot.isEnable) {
+                selectedTimeSlot = j;
+                isSlotSelected = true;
+                break;
+              }
+            }
+            if (isSlotSelected) {
+              selctedTag = i;
+              break;
+            }
+          }
+          if (selectedTimeSlot != null && selctedTag != null) {
+            initSelectedTimeSlotString = deliverySlotModel
+                .data
+                .dateTimeCollection[selctedTag]
+                .timeslot[selectedTimeSlot]
+                .label;
+          }
+        });
+      });
+    }
   }
 
   Future<Null> getSubscriptionOrderHistory() {
@@ -62,12 +111,44 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     });
   }
 
+  Future<Null> updateSubscriptionStatus(
+      String subscriptionOrderId, String status) {
+    isLoading = true;
+    return ApiController.subscriptionStatusUpdate(subscriptionOrderId, status)
+        .then((respone) {
+      Utils.hideProgressDialog(context);
+      if (respone != null && respone.success) {
+        if (mounted)
+          setState(() {
+            isLoading = false;
+            getSubscriptionOrderHistory();
+          });
+      }
+    });
+  }
+
+  Future<Null> updateSubscriptionOrderDeliverySlots(
+      String subscriptionOrderId, String deliverySlot) {
+    isLoading = true;
+    return ApiController.subscriptionOrderUpdate(subscriptionOrderId, deliverySlot)
+        .then((respone) {
+      Utils.hideProgressDialog(context);
+      if (respone != null && respone.success) {
+        if (mounted)
+          setState(() {
+            isLoading = false;
+            getSubscriptionOrderHistory();
+          });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: grayColor,
       appBar: AppBar(
-        title: Text("SubScribe"),
+        title: Text("Subscribe"),
         centerTitle: true,
         actions: [
           Icon(
@@ -83,7 +164,9 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         ],
       ),
       body: PullToRefreshView(
-          onRefresh: () {},
+          onRefresh: () {
+            return getSubscriptionOrderHistory();
+          },
           child: isLoading
               ? Center(child: CircularProgressIndicator())
               : ordersList == null
@@ -188,6 +271,26 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   }
 
   Widget showSubScribeView(int index) {
+    List<String> choices = List();
+    switch (ordersList[index].status) {
+      case '0':
+      case '2':
+      case '5':
+      case '6':
+      case '10':
+        choices.add('View Details');
+        break;
+      case '1':
+        choices.add('Order Stop');
+        choices.add('Pause');
+        choices.add('Change Delivery Slots');
+        break;
+      case '9':
+        choices.add('Order Stop');
+        choices.add('Active');
+        choices.add('Change Delivery Slots');
+        break;
+    }
     return Container(
       color: Colors.white,
       //height: 100,
@@ -212,11 +315,61 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                   width: 5,
                 ),
                 Text(
-                  "Order Active",
+                  "Order ${_getSubscriptionStatus(ordersList[index])}",
                   style: TextStyle(
                     fontSize: 14,
+                    color: _getSubscriptionStatusColor(ordersList[index]),
                     decoration: TextDecoration.underline,
                   ),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                PopupMenuButton(
+                  elevation: 1.2,
+                  onSelected: (choice) {
+                    if (choice == 'View Details') {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SubscriptionHistoryDetails(
+                              ordersList[index], false),
+                        ),
+                      );
+                      return;
+                    } else if (choice == 'Change Delivery Slots') {
+                      cancelOrderBottomSheet(context, ordersList[index],true);
+                      return;
+                    }
+
+                    String status = '1';
+                    switch (choice) {
+                      case 'Order Stop':
+                        status = '6';
+                        break;
+                      case 'Pause':
+                        status = '9';
+                        break;
+                      case 'Active':
+                        status = '1';
+                        break;
+                    }
+                    //hit api
+                    Utils.showProgressDialog(context);
+                    updateSubscriptionStatus(
+                        ordersList[index].subscriptionOrderId, status);
+                  },
+                  onCanceled: () {
+                    print('You have not chossed anything');
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return choices.map((String choice) {
+                      return PopupMenuItem(
+                        value: choice,
+                        child: Text(choice),
+                      );
+                    }).toList();
+                  },
                 )
               ],
             )
@@ -241,7 +394,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                       ),
                       Expanded(
                         child: Text(
-                          "${ordersList[index].startDate} to ${ordersList[index].endDate}",
+                          "${_getDateFormated(ordersList[index].startDate)} to ${_getDateFormated(ordersList[index].endDate)}",
                           maxLines: 2,
                           style: TextStyle(
                             fontSize: 16,
@@ -278,7 +431,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
             margin: EdgeInsets.fromLTRB(0, 15, 0, 10),
           ),
           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-            Text("Order items",
+            Text(
+                "Order ${ordersList[index].orderItems.length > 1 ? 'items' : 'item'}",
                 style: TextStyle(
                   fontSize: 18,
                 )),
@@ -305,37 +459,42 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
           ]),
           Container(
             height: 50,
+            padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
             //color: Colors.grey,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: ListView.builder(
+                      shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
-                      itemCount: menuList.length > 3 ? 3 : menuList.length,
-                      itemBuilder: (context, index) {
+                      itemCount: ordersList[index].orderItems.length > 3
+                          ? 3
+                          : ordersList[index].orderItems.length,
+                      itemBuilder: (context, itemIndex) {
                         return Container(
+                          margin: EdgeInsets.only(top: 5),
                           child: Padding(
                             padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                            child: Row(
+                            child: Wrap(
                               children: [
-                                InkWell(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey[300],
-                                        ),
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(5))),
-                                    padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                    child: Center(
-                                        child: Text(
-                                      "${menuList[index]}",
+                                Container(
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Colors.grey[300],
+                                      ),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
+                                  padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                  child: Center(
+                                    child: Text(
+                                      "${ordersList[index].orderItems[itemIndex].productName}",
+                                      overflow: TextOverflow.ellipsis,
                                       style: TextStyle(
                                         color: Colors.black,
                                         fontSize: 16,
                                       ),
-                                    )),
-                                    height: 30,
+                                    ),
                                   ),
                                 ),
                               ],
@@ -344,44 +503,50 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         );
                       }),
                 ),
-                Container(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text("Next Delivery Date"),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_today,
-                            size: 18,
-                          ),
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                            "28 Jan 2021",
-                            style: TextStyle(
-                              fontSize: 16,
+                Visibility(
+                  visible: false,
+                  child: Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text("Next Delivery Date"),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today,
+                              size: 18,
                             ),
-                          )
-                        ],
-                      ),
-                    ],
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text(
+                              "28 Jan 2021",
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          InkWell(
-            onTap: () => _showOrderItemsDialog(),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-              child: Text(
-                "View More",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: appTheme,
-                  decoration: TextDecoration.underline,
+          Visibility(
+            visible: ordersList[index].orderItems.length > 3,
+            child: InkWell(
+              onTap: () => _showOrderItemsDialog(ordersList[index]),
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                child: Text(
+                  "View More",
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: appTheme,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               ),
             ),
@@ -399,19 +564,24 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                     style: TextStyle(
                       fontSize: 18,
                     )),
-                Text("\u20B91275",
+                Text("${AppConstant.currency}${ordersList[index].total}",
                     style:
                         TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ],
             ),
             Row(
               children: [
-                Text(
-                  "Deliver Slots",
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: appTheme,
-                    decoration: TextDecoration.underline,
+                InkWell(
+                  onTap: (){
+                    cancelOrderBottomSheet(context, ordersList[index],false);
+                  },
+                  child: Text(
+                    "Delivery Slots",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: appTheme,
+                      decoration: TextDecoration.underline,
+                    ),
                   ),
                 )
               ],
@@ -422,11 +592,11 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     );
   }
 
-  _showOrderItemsDialog() {
+  _showOrderItemsDialog(SubscriptionOrderData data) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          //Here we will build the content of the dialog
+          //Here we wifll build the content of the dialog
           return AlertDialog(
             //title: Text("Order Items"),
             title: Row(
@@ -439,9 +609,70 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         Navigator.of(context).pop();
                       })
                 ]),
-            content: MultiSelectChip(menuList),
+            content: MultiSelectChip(data.orderItems),
           );
         });
+  }
+
+  String _getSubscriptionStatus(SubscriptionOrderData cardOrderHistoryItems) {
+//    0 -> Due
+//    1-> Active
+//    2-> Reject
+//    5-> Completed
+//    6-> Cancel by customer
+//    9->Pause by customer
+//    10-> Pause by store Admin
+    String title = "Due";
+    switch (cardOrderHistoryItems.status) {
+      case '0':
+        title = 'Due';
+        break;
+      case '1':
+        title = 'Active';
+        break;
+      case '2':
+        title = 'Rejected';
+        break;
+      case '5':
+        title = 'Completed';
+        break;
+      case '6':
+        title = 'Cancelled';
+        break;
+      case '9':
+      case '10':
+        title = 'Paused';
+        break;
+    }
+    return title;
+  }
+
+  Color _getSubscriptionStatusColor(
+      SubscriptionOrderData cardOrderHistoryItems) {
+//    0 -> Due
+//    1-> Active
+//    2-> Reject
+//    5-> Completed
+//    6-> Cancel by customer
+//    9->Pause by customer
+//    10-> Pause by store Admin
+    Color statusColor = Colors.black;
+    switch (cardOrderHistoryItems.status) {
+      case '0':
+      case '1':
+      case '5':
+        statusColor = Colors.green;
+        break;
+      case '2':
+      case '6':
+        statusColor = Colors.red;
+        break;
+      case '9':
+      case '10':
+        statusColor = Colors.yellow;
+        break;
+    }
+    return statusColor;
   }
 
   String _getDeliveryType(int index) {
@@ -449,10 +680,198 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
 //    ordersList[index].ke
 //    Alternate
   }
+
+  _getDateFormated(DateTime event) {
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String formatted = formatter.format(event);
+    return formatted;
+  }
+
+  cancelOrderBottomSheet(
+      context, SubscriptionOrderData cardOrderHistoryItems,bool isEnable) async {
+    String _selectedTimeSlotString = initSelectedTimeSlotString;
+    await showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext bc) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              return SafeArea(
+                  child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Container(
+                  color: Colors.white,
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  child: Wrap(children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 15, 5, 0),
+                              child: Image.asset(
+                                'images/cancelicon.png',
+                                fit: BoxFit.scaleDown,
+                                height: 15,
+                                width: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20, 5, 20, 15),
+                          child: Text(
+                            "Delivery Slots",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        deliverySlotModel == null
+                            ? Container()
+                            :
+                            //print("--length = ${deliverySlotModel.data.dateTimeCollection.length}----");
+                            deliverySlotModel.data != null &&
+                                    deliverySlotModel.data.dateTimeCollection !=
+                                        null &&
+                                    deliverySlotModel
+                                        .data.dateTimeCollection.isNotEmpty
+                                ? Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Container(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Container(
+                                              //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                              height: 50.0,
+                                              child: ListView.builder(
+                                                itemCount: timeslotList.length,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemBuilder: (context, index) {
+                                                  Timeslot slotsObject =
+                                                      timeslotList[index];
+                                                  //print("----${slotsObject.label}-and ${selctedTag}--");
+                                                  //selectedTimeSlot
+                                                  Color textColor;
+                                                  if (!slotsObject.isEnable) {
+                                                    textColor =
+                                                        Color(0xFFBDBDBD);
+                                                  } else {
+                                                    textColor =
+                                                        Color(0xFF000000);
+                                                  }
+                                                  if (selectedTimeSlot ==
+                                                          index &&
+                                                      (slotsObject.isEnable)) {
+                                                    textColor =
+                                                        Color(0xFFff4600);
+                                                  }
+
+                                                  return Container(
+                                                    //color: selectedSlotColor,
+                                                    margin: EdgeInsets.fromLTRB(
+                                                        10, 0, 10, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        print(
+                                                            "${slotsObject.label}");
+                                                        if (slotsObject
+                                                            .isEnable) {
+                                                          setState(() {
+                                                            selectedTimeSlot =
+                                                                index;
+                                                            if (selectedTimeSlot !=
+                                                                    null &&
+                                                                selctedTag !=
+                                                                    null) {
+                                                              _selectedTimeSlotString =
+                                                                  deliverySlotModel
+                                                                      .data
+                                                                      .dateTimeCollection[
+                                                                          selctedTag]
+                                                                      .timeslot[
+                                                                          selectedTimeSlot]
+                                                                      .label;
+                                                            }
+                                                          });
+                                                        } else {
+                                                          Utils.showToast(
+                                                              slotsObject
+                                                                  .innerText,
+                                                              false);
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        child: Center(
+                                                          child: Text(
+                                                              '${slotsObject.isEnable == true ? slotsObject.label : "${slotsObject.label}(${slotsObject.innerText})"}',
+                                                              style: TextStyle(
+                                                                  color:
+                                                                      textColor)),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                        Visibility(
+                          visible: isEnable,
+                          child: Container(
+                            decoration: new BoxDecoration(
+                              borderRadius:
+                                  new BorderRadius.all(new Radius.circular(5.0)),
+                            ),
+                            child: FlatButton(
+                              child: Text(
+                                'Save',
+                                style: TextStyle(fontSize: 17),
+                              ),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context);
+                                updateSubscriptionOrderDeliverySlots(
+                                    cardOrderHistoryItems.subscriptionOrderId,
+                                    _selectedTimeSlotString);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ]),
+                ),
+              ));
+            },
+          );
+        });
+  }
+
+  Widget showDeliverySlot() {}
 }
 
 class MultiSelectChip extends StatefulWidget {
-  final List<String> reportList;
+  final List<OrderItem> reportList;
 
   MultiSelectChip(this.reportList);
 
@@ -485,7 +904,7 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
                   color: Colors.grey[500],
                 ),
                 borderRadius: BorderRadius.all(Radius.circular(5))),
-            child: Text("  ${item}  "),
+            child: Text("  ${item.productName}  "),
             //padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
           ),
           selected: selectedChoice == item,
@@ -498,68 +917,5 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
       ));
     });
     return choices;
-  }
-
-  String _getSubscriptionStatus(SubscriptionOrderData cardOrderHistoryItems) {
-//    0 -> Due
-//    1-> Active
-//    2-> Reject
-//    5-> Completed
-//    6-> Cancel by customer
-//    9->Pause by customer
-//    10-> Pause by store Admin
-    String title = "Due";
-    switch (cardOrderHistoryItems.status) {
-      case '0':
-        title='Due';
-        break;
-      case '1':
-        title='Active';
-        break;
-      case '2':
-        title='Rejected';
-        break;
-      case '5':
-        title='Completed';
-        break;
-      case '6':
-        title='Cancelled';
-        break;
-      case '9':
-      case '10':
-        title='Paused';
-        break;
-    }
-    return title;
-  }
-  Color _getSubscriptionStatusColor(SubscriptionOrderData cardOrderHistoryItems) {
-//    0 -> Due
-//    1-> Active
-//    2-> Reject
-//    5-> Completed
-//    6-> Cancel by customer
-//    9->Pause by customer
-//    10-> Pause by store Admin
-    Color statusColor=Colors.black;
-    switch (cardOrderHistoryItems.status) {
-      case '0':
-       statusColor=Colors.yellow;
-        break;
-      case '2':
-        statusColor=Colors.redAccent;
-        break;
-      case '1':
-      case '5':
-        statusColor=Colors.greenAccent;
-        break;
-      case '6':
-        statusColor=Colors.redAccent;
-        break;
-      case '9':
-      case '10':
-      statusColor=Colors.redAccent;
-        break;
-    }
-    return statusColor;
   }
 }

@@ -94,4 +94,10 @@ class ApiConstants {
       '/api_v1_subscription/pickupPlaceSubscriptionOrder';
   static String subscriptionHistory =
       '/api_v1_subscription/subscriptionHistory';
+
+  static String subscriptionCancel='/api_v1_subscription/subscriptionOrderCancel';
+
+  static String subscriptionStatusUpdate='/api_v1_subscription/subscriptionPauseStart';
+  static String subscriptionOrderUpdate='/api_v1_subscription/subscriptionOrderUpdate';
+  static String subscriptionDetailHistory='/api_v1_subscription/subscriptionDetailHistory';
 }
