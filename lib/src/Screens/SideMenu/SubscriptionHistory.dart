@@ -333,12 +333,20 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => SubscriptionHistoryDetails(
-                              ordersList[index], false),
+                              ordersList[index], false
+                          ,deliverySlotModel,
+                            selctedTag,
+                            selectedTimeSlot,
+                            timeslotList,
+                            isInstantDelivery,
+                            isDeliveryResponseFalse,
+                            isSlotSelected,
+                            initSelectedTimeSlotString,),
                         ),
                       );
                       return;
                     } else if (choice == 'Change Delivery Slots') {
-                      cancelOrderBottomSheet(context, ordersList[index],true);
+                      deliverySlotBottomSheet(context, ordersList[index],true);
                       return;
                     }
 
@@ -573,7 +581,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
               children: [
                 InkWell(
                   onTap: (){
-                    cancelOrderBottomSheet(context, ordersList[index],false);
+                    deliverySlotBottomSheet(context, ordersList[index],false);
                   },
                   child: Text(
                     "Delivery Slots",
@@ -687,7 +695,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     return formatted;
   }
 
-  cancelOrderBottomSheet(
+  deliverySlotBottomSheet(
       context, SubscriptionOrderData cardOrderHistoryItems,bool isEnable) async {
     String _selectedTimeSlotString = initSelectedTimeSlotString;
     await showModalBottomSheet(

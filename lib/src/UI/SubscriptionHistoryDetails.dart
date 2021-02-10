@@ -2,12 +2,15 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_calendar_carousel/classes/event.dart';
+import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CancelOrderModel.dart';
+import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
@@ -21,14 +24,34 @@ class SubscriptionHistoryDetails extends StatefulWidget {
   SubscriptionOrderData orderHistoryData;
   bool isRatingEnable;
 
-  SubscriptionHistoryDetails(this.orderHistoryData, this.isRatingEnable);
+  DeliveryTimeSlotModel deliverySlotModel;
+  int selctedTag, selectedTimeSlot;
+  List<Timeslot> timeslotList;
+
+  //Store provides instant delivery of the orders.
+  bool isInstantDelivery = false;
+  bool isDeliveryResponseFalse = false;
+  bool isSlotSelected = false;
+  String initSelectedTimeSlotString = '';
+  SubscriptionHistoryDetails(this.orderHistoryData,
+      this.isRatingEnable,
+      this.deliverySlotModel,
+      this.selctedTag,
+      this.selectedTimeSlot,
+      this.timeslotList,
+      this.isInstantDelivery,
+      this.isDeliveryResponseFalse,
+      this.isSlotSelected,
+      this.initSelectedTimeSlotString,
+      );
 
   @override
   _SubscriptionHistoryDetailsState createState() =>
       _SubscriptionHistoryDetailsState();
 }
 
-class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails> {
+class _SubscriptionHistoryDetailsState
+    extends State<SubscriptionHistoryDetails> {
   var screenWidth;
 
   var mainContext;
@@ -41,10 +64,34 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
 
   String userId = ''; // <---- Another instance variable
 
+  DeliveryTimeSlotModel deliverySlotModel;
+  int selctedTag, selectedTimeSlot;
+  List<Timeslot> timeslotList;
+
+  //Store provides instant delivery of the orders.
+  bool isInstantDelivery = false;
+  bool isDeliveryResponseFalse = false;
+  bool isSlotSelected = false;
+  String initSelectedTimeSlotString = '';
+  EventList<Event> _markedDateMap;
+
+
   @override
   void initState() {
     super.initState();
+    _markedDateMap = new EventList<Event>(
+      events: {},
+    );
     getOrderListApi();
+
+    deliverySlotModel=widget.deliverySlotModel;
+    selctedTag=widget.selctedTag;
+    selectedTimeSlot=widget.selectedTimeSlot;
+    timeslotList=widget.timeslotList;
+    isInstantDelivery = widget.isInstantDelivery;
+    isDeliveryResponseFalse = widget.isDeliveryResponseFalse;
+    isSlotSelected = widget.isSlotSelected;
+    initSelectedTimeSlotString = widget.initSelectedTimeSlotString;
   }
 
   Future<Null> getOrderListApi({bool isLoading = true}) async {
@@ -52,7 +99,8 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
     UserModel user = await SharedPrefs.getUser();
     userId = user.id;
 
-    return ApiController.getSubscriptionDetailHistory(widget.orderHistoryData.subscriptionOrderId)
+    return ApiController.getSubscriptionDetailHistory(
+            widget.orderHistoryData.subscriptionOrderId)
         .then((respone) {
       if (respone != null &&
           respone.success &&
@@ -75,6 +123,37 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
     });
   }
 
+  Future<Null> updateSubscriptionStatus(
+      String subscriptionOrderId, String status) {
+    Utils.showProgressDialog(context);
+    return ApiController.subscriptionStatusUpdate(subscriptionOrderId, status)
+        .then((respone) {
+      Utils.hideProgressDialog(context);
+      if (respone != null && respone.success) {
+        if (mounted)
+          setState(() {
+            getOrderListApi(isLoading: false);
+          });
+      }
+    });
+  }
+
+  Future<Null> updateSubscriptionOrderDeliverySlots(
+      String subscriptionOrderId, String deliverySlot) {
+    Utils.showProgressDialog(context);
+    return ApiController.subscriptionOrderUpdate(
+            subscriptionOrderId, deliverySlot)
+        .then((respone) {
+      Utils.hideProgressDialog(context);
+      if (respone != null && respone.success) {
+        if (mounted)
+          setState(() {
+            getOrderListApi(isLoading: false);
+          });
+      }
+    });
+  }
+
   calculateSaving() {
     try {
       double _cartSaving = widget.orderHistoryData.cartSaving != null
@@ -85,7 +164,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
           : 0;
       double _totalSaving = _cartSaving + _couponDiscount;
       _totalCartSaving =
-      _totalSaving != 0 ? _totalSaving.toStringAsFixed(2) : '0';
+          _totalSaving != 0 ? _totalSaving.toStringAsFixed(2) : '0';
       double _totalPriceVar =
           double.parse(widget.orderHistoryData.total) + _totalSaving;
       if (_totalSaving != 0)
@@ -109,101 +188,236 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
     String orderFacility = widget.orderHistoryData.orderFacility != null
         ? '${widget.orderHistoryData.orderFacility}, '
         : '';
+    List<String> choices = List();
+    switch (widget.orderHistoryData.status) {
+      case '0':
+      case '2':
+      case '5':
+      case '6':
+      case '10':
+        break;
+      case '1':
+        choices.add('Order Stop');
+        choices.add('Pause');
+        choices.add('Change Delivery Slots');
+        break;
+      case '9':
+        choices.add('Order Stop');
+        choices.add('Active');
+        choices.add('Change Delivery Slots');
+        break;
+    }
     return isLoading
         ? Scaffold(
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Order Details',
-              style: TextStyle(),
-              textAlign: TextAlign.left,
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              title: Text(
+                'Detail',
+                style: TextStyle(),
+                textAlign: TextAlign.left,
+              ),
+              centerTitle: true,
             ),
-          ],
-        ),
-        centerTitle: false,
-      ),
-      body: Center(child: CircularProgressIndicator()),
-    )
-        : new Scaffold(
-      backgroundColor: Color(0xffDCDCDC),
-      appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              'Order - ${widget.orderHistoryData.displaySubscriptionId}',
-              style: TextStyle(),
-              textAlign: TextAlign.left,
-            ),
-            Text(
-              '$orderFacility$itemText${AppConstant.currency} ${widget.orderHistoryData.total}',
-              style: TextStyle(fontSize: 13),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-            ),
-          ],
-        ),
-        centerTitle: false,
-        actions: <Widget>[
-          Visibility(
-            visible: showCancelButton(widget.orderHistoryData.status),
-            child: InkWell(
-                onTap: () async {
-                  cancelOrderBottomSheet(
-                      context, widget.orderHistoryData);
-                },
-                child: Center(
-                  child: Padding(
-                      padding: EdgeInsets.only(right: 16, left: 16),
-                      child: Text(
-                        'Cancel',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w400),
-                      )),
-                )),
+            body: Center(child: CircularProgressIndicator()),
           )
-        ],
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Container(
-            color: Color(0xffDCDCDC),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                firstRow(widget.orderHistoryData),
-                Container(
-                  color: Colors.white,
-                  margin: EdgeInsets.only(top: 5),
-                  padding: EdgeInsets.all(16),
-                  width: Utils.getDeviceWidth(context),
+        : new Scaffold(
+            backgroundColor: Color(0xffDCDCDC),
+            appBar:  AppBar(
+              title: Text(
+                'Detail',
+                style: TextStyle(),
+                textAlign: TextAlign.left,
+              ),
+              centerTitle: true,
+            ),
+            body: SafeArea(
+              child: SingleChildScrollView(
+                child: Container(
+                  color: Color(0xffDCDCDC),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(
-                        'Track Order',
-                        style: TextStyle(fontSize: 18),
+                      Container(
+                        color:Colors.white,
+                        padding: EdgeInsets.only(left: 16,right: 16,top: 16),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                  "#${widget.orderHistoryData.displaySubscriptionId} (${widget.orderHistoryData.orderItems.length} ${widget.orderHistoryData.orderItems.length > 1 ? 'Items' : 'Item'})",
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                  )),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.check_circle_outline,
+                                    size: 18,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text(
+                                    "Order ${_getSubscriptionStatus(widget.orderHistoryData)}",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: _getSubscriptionStatusColor(
+                                          widget.orderHistoryData),
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  choices.length>0?
+                                  PopupMenuButton(
+                                    elevation: 1.2,
+                                    onSelected: (choice) {
+                                      if (choice == 'Change Delivery Slots') {
+                                        deliverySlotBottomSheet(
+                                            context, widget.orderHistoryData, true);
+                                        return;
+                                      }
+
+                                      String status = '1';
+                                      switch (choice) {
+                                        case 'Order Stop':
+                                          status = '6';
+                                          break;
+                                        case 'Pause':
+                                          status = '9';
+                                          break;
+                                        case 'Active':
+                                          status = '1';
+                                          break;
+                                      }
+                                      //hit api
+                                      Utils.showProgressDialog(context);
+                                      updateSubscriptionStatus(
+                                          widget.orderHistoryData.subscriptionOrderId,
+                                          status);
+                                    },
+                                    onCanceled: () {
+                                      print('You have not chossed anything');
+                                    },
+                                    itemBuilder: (BuildContext context) {
+                                      return choices.map((String choice) {
+                                        return PopupMenuItem(
+                                          value: choice,
+                                          child: Text(choice),
+                                        );
+                                      }).toList();
+                                    },
+                                  ):Container()
+                                ],
+                              )
+                            ]),
                       ),
-                      SizedBox(
-                        height: 16,
+                      firstRow(widget.orderHistoryData),
+                      Container(
+                        color: Colors.white,
+                        child: CalendarCarousel<Event>(
+                          childAspectRatio: 1.5,
+                          height: 330,
+                          markedDatesMap: _markedDateMap,
+                          headerMargin: EdgeInsets.all(0),
+                          customGridViewPhysics: NeverScrollableScrollPhysics(),
+                          isScrollable: true,
+                          weekendTextStyle: TextStyle(
+                            color: Colors.black,
+                          ),
+                          todayButtonColor: Colors.white,
+                          todayTextStyle: TextStyle(
+                            color: Colors.black,
+                          ),
+                          markedDateShowIcon: false,
+                          shouldShowTransform: false,
+                          weekdayTextStyle: TextStyle(
+                            color: Colors.black,
+                          ),
+                          markedDateIconMaxShown: 1,
+                          headerTextStyle:
+                          TextStyle(color: Colors.black, fontSize: 18),
+                          markedDateMoreShowTotal: null,
+                          // null for not showing hidden events indicator
+                          markedDateIconBuilder: (event) {
+                            return event.icon;
+                          },
+                        ),
                       ),
-                      _getTrackWidget(),
-                      SizedBox(
-                        height: 16,
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                        height: 1,
+                        color: Colors.grey,
                       ),
+                      secondRow(widget.orderHistoryData)
                     ],
                   ),
                 ),
-                secondRow(widget.orderHistoryData)
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
-    );
+          );
+  }
+
+  String _getSubscriptionStatus(SubscriptionOrderData cardOrderHistoryItems) {
+//    0 -> Due
+//    1-> Active
+//    2-> Reject
+//    5-> Completed
+//    6-> Cancel by customer
+//    9->Pause by customer
+//    10-> Pause by store Admin
+    String title = "Due";
+    switch (cardOrderHistoryItems.status) {
+      case '0':
+        title = 'Due';
+        break;
+      case '1':
+        title = 'Active';
+        break;
+      case '2':
+        title = 'Rejected';
+        break;
+      case '5':
+        title = 'Completed';
+        break;
+      case '6':
+        title = 'Cancelled';
+        break;
+      case '9':
+      case '10':
+        title = 'Paused';
+        break;
+    }
+    return title;
+  }
+
+  Color _getSubscriptionStatusColor(
+      SubscriptionOrderData cardOrderHistoryItems) {
+//    0 -> Due
+//    1-> Active
+//    2-> Reject
+//    5-> Completed
+//    6-> Cancel by customer
+//    9->Pause by customer
+//    10-> Pause by store Admin
+    Color statusColor = Colors.black;
+    switch (cardOrderHistoryItems.status) {
+      case '0':
+      case '1':
+      case '5':
+        statusColor = Colors.green;
+        break;
+      case '2':
+      case '6':
+        statusColor = Colors.red;
+        break;
+      case '9':
+      case '10':
+        statusColor = Colors.yellow;
+        break;
+    }
+    return statusColor;
   }
 
   Widget firstRow(SubscriptionOrderData orderHistoryData) {
@@ -251,7 +465,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                     ),
                     child: Text('${orderHistoryData.orderFacility}',
                         style:
-                        TextStyle(color: Color(0xFF968788), fontSize: 13))),
+                            TextStyle(color: Color(0xFF968788), fontSize: 13))),
               ],
             ),
           ),
@@ -341,7 +555,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                               padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
@@ -369,7 +583,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                               padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
@@ -391,12 +605,12 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                               ))),
                       Visibility(
                           visible:
-                          orderHistoryData.tax == "0.00" ? false : true,
+                              orderHistoryData.tax == "0.00" ? false : true,
                           child: Padding(
                               padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
@@ -445,7 +659,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                               padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
@@ -471,7 +685,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                               padding: EdgeInsets.only(top: 16, bottom: 0),
                               child: Row(
                                 mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                 mainAxisSize: MainAxisSize.max,
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: <Widget>[
@@ -520,7 +734,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                                       fontWeight: FontWeight.w500)),
                               Visibility(
                                 visible:
-                                !(_totalCartSaving.compareTo('0') == 0),
+                                    !(_totalCartSaving.compareTo('0') == 0),
                                 child: Padding(
                                   padding: EdgeInsets.only(top: 3),
                                   child: Text(
@@ -546,8 +760,8 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
     );
   }
 
-  Widget listItem(
-      BuildContext context, SubscriptionOrderData cardOrderHistoryItems, int index) {
+  Widget listItem(BuildContext context,
+      SubscriptionOrderData cardOrderHistoryItems, int index) {
     double findRating = _findRating(cardOrderHistoryItems, index);
     return Container(
       color: Colors.white,
@@ -617,28 +831,35 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                       children: [
                         Text(
                             cardOrderHistoryItems.orderItems[index].status ==
-                                '2'
+                                    '2'
                                 ? "Rejected"
                                 : "${AppConstant.currency} ${(double.parse(cardOrderHistoryItems.orderItems[index].quantity) * double.parse(cardOrderHistoryItems.orderItems[index].price)).toStringAsFixed(2)}",
                             style: TextStyle(
                                 color: cardOrderHistoryItems
-                                    .orderItems[index].status ==
-                                    '2'
+                                            .orderItems[index].status ==
+                                        '2'
                                     ? Colors.red
                                     : Colors.black,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500)),
-                        Visibility(visible: cardOrderHistoryItems.orderItems[index].refundStatus ==
-                            '2'||cardOrderHistoryItems.orderItems[index].refundStatus=='1',
-                            child:
-                            Text(
-                                cardOrderHistoryItems.orderItems[index].refundStatus ==
-                                    '1'
+                        Visibility(
+                            visible: cardOrderHistoryItems
+                                        .orderItems[index].refundStatus ==
+                                    '2' ||
+                                cardOrderHistoryItems
+                                        .orderItems[index].refundStatus ==
+                                    '1',
+                            child: Text(
+                                cardOrderHistoryItems
+                                            .orderItems[index].refundStatus ==
+                                        '1'
                                     ? "Refund Pending"
                                     : "Refunded",
                                 style: TextStyle(
-                                    color: cardOrderHistoryItems.orderItems[index].refundStatus ==
-                                        '1'
+                                    color: cardOrderHistoryItems
+                                                .orderItems[index]
+                                                .refundStatus ==
+                                            '1'
                                         ? Colors.red
                                         : Colors.green,
                                     fontSize: 14,
@@ -673,7 +894,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                               allowHalfRating: true,
                               itemCount: 5,
                               itemPadding:
-                              EdgeInsets.symmetric(horizontal: 2.0),
+                                  EdgeInsets.symmetric(horizontal: 2.0),
                               itemBuilder: (context, _) => Icon(
                                 Icons.star,
                                 color: appThemeSecondary,
@@ -710,7 +931,8 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
     );
   }
 
-  bottomSheet(context, SubscriptionOrderData cardOrderHistoryItems, int index) async {
+  bottomSheet(
+      context, SubscriptionOrderData cardOrderHistoryItems, int index) async {
     double _rating = 0;
     _image = null;
     final commentController = TextEditingController();
@@ -722,40 +944,40 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
             builder: (BuildContext context, setState) {
               return SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom),
-                    child: Container(
-                      color: Colors.white,
-                      margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: Wrap(children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Align(
-                              alignment: Alignment.centerRight,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Padding(
-                                  padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
-                                  child: Icon(
-                                    Icons.cancel,
-                                    color: Colors.grey,
-                                  ),
-                                ),
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Container(
+                  color: Colors.white,
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  child: Wrap(children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                              child: Icon(
+                                Icons.cancel,
+                                color: Colors.grey,
                               ),
                             ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
-                              child: Text(
-                                "Rating",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500),
-                              ),
-                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
+                          child: Text(
+                            "Rating",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
 //                            Text(
 //                              "(Select a star amount)",
 //                              textAlign: TextAlign.center,
@@ -764,172 +986,173 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
 //                                  fontSize: 16,
 //                                  fontWeight: FontWeight.w400),
 //                            ),
-                            Container(
-                              margin: EdgeInsets.only(top: 5),
-                              color: appThemeSecondary,
-                              width: 50,
-                              height: 3,
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 20),
-                              child: Text(
-                                "Product Name",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Color(0xff797C82),
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(top: 5),
-                              child: Text(
-                                "${cardOrderHistoryItems.orderItems[index].productName}",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            RatingBar(
-                              initialRating: _rating,
-                              minRating: 0,
-                              itemSize: 35,
-                              direction: Axis.horizontal,
-                              allowHalfRating: false,
-                              itemCount: 5,
-                              itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
-                              itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: appThemeSecondary,
-                              ),
-                              onRatingUpdate: (rating) {
-                                _rating = rating;
-                              },
-                            ),
-                            Container(
-                              height: 120,
-                              margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
-                              decoration: new BoxDecoration(
-                                color: grayLightColor,
-                                borderRadius:
+                        Container(
+                          margin: EdgeInsets.only(top: 5),
+                          color: appThemeSecondary,
+                          width: 50,
+                          height: 3,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text(
+                            "Product Name",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff797C82),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 5),
+                          child: Text(
+                            "${cardOrderHistoryItems.orderItems[index].productName}",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        RatingBar(
+                          initialRating: _rating,
+                          minRating: 0,
+                          itemSize: 35,
+                          direction: Axis.horizontal,
+                          allowHalfRating: false,
+                          itemCount: 5,
+                          itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
+                          itemBuilder: (context, _) => Icon(
+                            Icons.star,
+                            color: appThemeSecondary,
+                          ),
+                          onRatingUpdate: (rating) {
+                            _rating = rating;
+                          },
+                        ),
+                        Container(
+                          height: 120,
+                          margin: EdgeInsets.fromLTRB(20, 15, 20, 20),
+                          decoration: new BoxDecoration(
+                            color: grayLightColor,
+                            borderRadius:
                                 new BorderRadius.all(new Radius.circular(3.0)),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
-                                child: TextField(
-                                  textAlign: TextAlign.left,
-                                  maxLength: 250,
-                                  keyboardType: TextInputType.text,
-                                  maxLines: null,
-                                  textCapitalization: TextCapitalization.sentences,
-                                  controller: commentController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10.0),
-                                      border: InputBorder.none,
-                                      fillColor: grayLightColor,
-                                      hintText: 'Write your Review...'),
-                                ),
-                              ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
+                            child: TextField(
+                              textAlign: TextAlign.left,
+                              maxLength: 250,
+                              keyboardType: TextInputType.text,
+                              maxLines: null,
+                              textCapitalization: TextCapitalization.sentences,
+                              controller: commentController,
+                              decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(10.0),
+                                  border: InputBorder.none,
+                                  fillColor: grayLightColor,
+                                  hintText: 'Write your Review...'),
                             ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  top: 0, bottom: 16, left: 16, right: 16),
-                              color: Color(0xFFE1E1E1),
-                              height: 1,
-                            ),
-                            Container(
-                              width: double.maxFinite,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  InkWell(
-                                      onTap: () {
-                                        showAlertDialog(context, setState);
-                                      },
-                                      child: Container(
-                                        margin: EdgeInsets.only(
-                                            top: 0, bottom: 6, left: 16, right: 16),
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            image: AssetImage(
-                                                "images/placeHolder.png"),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                        height: 100,
-                                        width: 120,
-                                        child: _image != null
-                                            ? Padding(
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: 0, bottom: 16, left: 16, right: 16),
+                          color: Color(0xFFE1E1E1),
+                          height: 1,
+                        ),
+                        Container(
+                          width: double.maxFinite,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              InkWell(
+                                  onTap: () {
+                                    showAlertDialog(context, setState);
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                        top: 0, bottom: 6, left: 16, right: 16),
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        image: AssetImage(
+                                            "images/placeHolder.png"),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                    height: 100,
+                                    width: 120,
+                                    child: _image != null
+                                        ? Padding(
                                             padding: EdgeInsets.all(5),
                                             child: Image.file(
                                               _image,
                                               fit: BoxFit.cover,
                                             ))
-                                            : null,
-                                      )),
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                        top: 0, left: 18, bottom: 30),
-                                    child: Text(
-                                      "File Size limit - 1MB",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ),
-                                ],
+                                        : null,
+                                  )),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    top: 0, left: 18, bottom: 30),
+                                child: Text(
+                                  "File Size limit - 1MB",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w400),
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Container(
-                                    margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                    width: 130,
-                                    child: FlatButton(
-                                      child: Text('Submit'),
-                                      color: appThemeSecondary,
-                                      textColor: Colors.white,
-                                      onPressed: () {
-                                        if (_rating == 0) {
-                                          Utils.showToast(
-                                              'Please give some rating .', true);
-                                          return;
-                                        }
-                                        Utils.hideKeyboard(context);
-                                        Navigator.pop(context);
-                                        postRating(
-                                            cardOrderHistoryItems, index, _rating,
-                                            desc: commentController.text.trim(),
-                                            imageFile: _image);
-                                      },
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                          ],
-                        )
-                      ]),
-                    ),
-                  ));
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Container(
+                                margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                                padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                width: 130,
+                                child: FlatButton(
+                                  child: Text('Submit'),
+                                  color: appThemeSecondary,
+                                  textColor: Colors.white,
+                                  onPressed: () {
+                                    if (_rating == 0) {
+                                      Utils.showToast(
+                                          'Please give some rating .', true);
+                                      return;
+                                    }
+                                    Utils.hideKeyboard(context);
+                                    Navigator.pop(context);
+                                    postRating(
+                                        cardOrderHistoryItems, index, _rating,
+                                        desc: commentController.text.trim(),
+                                        imageFile: _image);
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  ]),
+                ),
+              ));
             },
           );
         });
   }
 
-  cancelOrderBottomSheet(context, SubscriptionOrderData cardOrderHistoryItems) async {
-    final commentController = TextEditingController();
+  deliverySlotBottomSheet(context, SubscriptionOrderData cardOrderHistoryItems,
+      bool isEnable) async {
+    String _selectedTimeSlotString = initSelectedTimeSlotString;
     await showModalBottomSheet(
         context: context,
         isScrollControlled: true,
@@ -938,141 +1161,173 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
             builder: (BuildContext context, setState) {
               return SafeArea(
                   child: Padding(
-                    padding: EdgeInsets.only(
-                        bottom: MediaQuery.of(context).viewInsets.bottom),
-                    child: Container(
-                      color: Colors.white,
-                      margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                      child: Wrap(children: <Widget>[
-                        Column(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(20, 10, 20, 15),
-                              child: Text(
-                                "Cancel Confirm",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500),
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Container(
+                  color: Colors.white,
+                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                  child: Wrap(children: <Widget>[
+                    Column(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 15, 5, 0),
+                              child: Image.asset(
+                                'images/cancelicon.png',
+                                fit: BoxFit.scaleDown,
+                                height: 15,
+                                width: 15,
                               ),
                             ),
-                            Text(
-                              "Are you sure you want to\n cancel your order?",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                            Container(
-                              height: 130,
-                              margin: EdgeInsets.fromLTRB(10, 15, 10, 10),
-                              decoration: new BoxDecoration(
-                                color: grayLightColor,
-                                borderRadius:
-                                new BorderRadius.all(new Radius.circular(5.0)),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 0, 3),
-                                child: TextField(
-                                  textAlign: TextAlign.left,
-                                  maxLength: 250,
-                                  keyboardType: TextInputType.text,
-                                  maxLines: null,
-                                  textCapitalization: TextCapitalization.sentences,
-                                  controller: commentController,
-                                  decoration: InputDecoration(
-                                      contentPadding: EdgeInsets.all(10.0),
-                                      border: InputBorder.none,
-                                      fillColor: grayLightColor,
-                                      hintText: 'Add the reason for cancellation.'),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.max,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: <Widget>[
-                                  Container(
-                                    width: 120,
-                                    decoration: new BoxDecoration(
-                                      borderRadius: new BorderRadius.all(
-                                          new Radius.circular(5.0)),
-                                    ),
-                                    child: FlatButton(
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(fontSize: 17),
-                                      ),
-                                      color: Colors.grey,
-                                      textColor: Colors.white,
-                                      onPressed: () {
-                                        Utils.hideKeyboard(context);
-                                        Navigator.pop(context);
-                                      },
-                                    ),
-                                  ),
-                                  SizedBox(
-                                    width: 10,
-                                  ),
-                                  Expanded(
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(20, 5, 20, 15),
+                          child: Text(
+                            "Delivery Slots",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        deliverySlotModel == null
+                            ? Container()
+                            :
+                            //print("--length = ${deliverySlotModel.data.dateTimeCollection.length}----");
+                            deliverySlotModel.data != null &&
+                                    deliverySlotModel.data.dateTimeCollection !=
+                                        null &&
+                                    deliverySlotModel
+                                        .data.dateTimeCollection.isNotEmpty
+                                ? Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    child: Align(
+                                      alignment: Alignment.topLeft,
                                       child: Container(
-                                        decoration: new BoxDecoration(
-                                          borderRadius: new BorderRadius.all(
-                                              new Radius.circular(5.0)),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Container(
+                                              //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                              height: 50.0,
+                                              child: ListView.builder(
+                                                itemCount: timeslotList.length,
+                                                scrollDirection:
+                                                    Axis.horizontal,
+                                                itemBuilder: (context, index) {
+                                                  Timeslot slotsObject =
+                                                      timeslotList[index];
+                                                  //print("----${slotsObject.label}-and ${selctedTag}--");
+                                                  //selectedTimeSlot
+                                                  Color textColor;
+                                                  if (!slotsObject.isEnable) {
+                                                    textColor =
+                                                        Color(0xFFBDBDBD);
+                                                  } else {
+                                                    textColor =
+                                                        Color(0xFF000000);
+                                                  }
+                                                  if (selectedTimeSlot ==
+                                                          index &&
+                                                      (slotsObject.isEnable)) {
+                                                    textColor =
+                                                        Color(0xFFff4600);
+                                                  }
+
+                                                  return Container(
+                                                    //color: selectedSlotColor,
+                                                    margin: EdgeInsets.fromLTRB(
+                                                        10, 0, 10, 0),
+                                                    child: InkWell(
+                                                      onTap: () {
+                                                        print(
+                                                            "${slotsObject.label}");
+                                                        if (slotsObject
+                                                            .isEnable) {
+                                                          setState(() {
+                                                            selectedTimeSlot =
+                                                                index;
+                                                            if (selectedTimeSlot !=
+                                                                    null &&
+                                                                selctedTag !=
+                                                                    null) {
+                                                              _selectedTimeSlotString =
+                                                                  deliverySlotModel
+                                                                      .data
+                                                                      .dateTimeCollection[
+                                                                          selctedTag]
+                                                                      .timeslot[
+                                                                          selectedTimeSlot]
+                                                                      .label;
+                                                            }
+                                                          });
+                                                        } else {
+                                                          Utils.showToast(
+                                                              slotsObject
+                                                                  .innerText,
+                                                              false);
+                                                        }
+                                                      },
+                                                      child: Container(
+                                                        child: Center(
+                                                          child: Text(
+                                                              '${slotsObject.isEnable == true ? slotsObject.label : "${slotsObject.label}(${slotsObject.innerText})"}',
+                                                              style: TextStyle(
+                                                                  color:
+                                                                      textColor)),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        child: FlatButton(
-                                          child: Text(
-                                            'Yes, cancel my order',
-                                            style: TextStyle(fontSize: 17),
-                                          ),
-                                          color: orangeColor,
-                                          textColor: Colors.white,
-                                          onPressed: () {
-                                            String comment = commentController.text;
-                                            Utils.hideKeyboard(context);
-                                            Navigator.pop(context);
-                                            _hitCancelOrderApi(
-                                                orderRejectionNote: comment);
-                                          },
-                                        ),
-                                      ))
-                                ],
-                              ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(),
+                        Visibility(
+                          visible: isEnable,
+                          child: Container(
+                            decoration: new BoxDecoration(
+                              borderRadius: new BorderRadius.all(
+                                  new Radius.circular(5.0)),
                             ),
-                          ],
-                        )
-                      ]),
-                    ),
-                  ));
+                            child: FlatButton(
+                              child: Text(
+                                'Save',
+                                style: TextStyle(fontSize: 17),
+                              ),
+                              color: orangeColor,
+                              textColor: Colors.white,
+                              onPressed: () {
+                                Navigator.pop(context);
+                                updateSubscriptionOrderDeliverySlots(
+                                    cardOrderHistoryItems.subscriptionOrderId,
+                                    _selectedTimeSlotString);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  ]),
+                ),
+              ));
             },
           );
         });
-  }
-
-  _hitCancelOrderApi({String orderRejectionNote}) async {
-    Utils.showProgressDialog(context);
-    CancelOrderModel cancelOrder = await ApiController.orderCancelApi(
-        widget.orderHistoryData.subscriptionOrderId,
-        order_rejection_note: orderRejectionNote);
-    if (cancelOrder != null && cancelOrder.success) {
-      setState(() {
-        widget.orderHistoryData.status = '6';
-      });
-    }
-    try {
-      Utils.showToast("${cancelOrder.data}", false);
-    } catch (e) {
-      print(e);
-    }
-//                          Utils.hideProgressDialog(context);
-    eventBus.fire(refreshOrderHistory());
-    getOrderListApi(isLoading: false);
   }
 
   bottomDeviderView() {
@@ -1083,18 +1338,6 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
     );
   }
 
-  bool showCancelButton(status) {
-    bool showCancelButton;
-    // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
-// 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
-    //Remove cancel button on processing status
-    if (/*status == "1" || status == "4" ||*/ status == "0") {
-      showCancelButton = true;
-    } else {
-      showCancelButton = false;
-    }
-    return showCancelButton;
-  }
 
   deviderLine() {
     return Divider(
@@ -1135,8 +1378,8 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
     return status == "0"
         ? Color(0xFFA1BF4C)
         : status == "1"
-        ? Color(0xFFA0C057)
-        : Color(0xFFCF0000);
+            ? Color(0xFFA0C057)
+            : Color(0xFFCF0000);
   }
 
   String getDeliveryAddress() {
@@ -1170,10 +1413,10 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
         orderHistoryData.deliveryTimeSlot.isNotEmpty) {
       int dateEndIndex = orderHistoryData.deliveryTimeSlot.indexOf(' ');
       String date =
-      orderHistoryData.deliveryTimeSlot.substring(0, dateEndIndex);
+          orderHistoryData.deliveryTimeSlot.substring(0, dateEndIndex);
       String convertedDate = convertOrderDateTime(date);
       String returnedDate =
-      orderHistoryData.deliveryTimeSlot.replaceFirst(' ', ' | ');
+          orderHistoryData.deliveryTimeSlot.replaceFirst(' ', ' | ');
       return returnedDate.replaceAll(date, convertedDate);
     } else {
       return '';
@@ -1205,60 +1448,60 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
 
     Color orderPlaced = Colors.black;
     Color orderConfirmed = widget.orderHistoryData.status == '1' ||
-        widget.orderHistoryData.status == '4' ||
-        widget.orderHistoryData.status == '5'
+            widget.orderHistoryData.status == '4' ||
+            widget.orderHistoryData.status == '5'
         ? Colors.black
         : grayLightColorSecondary;
 
     Color orderShipped = widget.orderHistoryData.status == '4' ||
-        widget.orderHistoryData.status == '5'
+            widget.orderHistoryData.status == '5'
         ? Colors.black
         : grayLightColorSecondary;
     Color orderDelivered = widget.orderHistoryData.status == '2' ||
-        widget.orderHistoryData.status == '6'
+            widget.orderHistoryData.status == '6'
         ? Colors.red
         : widget.orderHistoryData.status == '5'
-        ? Colors.black
-        : grayLightColorSecondary;
+            ? Colors.black
+            : grayLightColorSecondary;
 
     double orderPlacedProgress = 100;
     double orderConfirmedProgress = widget.orderHistoryData.status == '1' ||
-        widget.orderHistoryData.status == '4' ||
-        widget.orderHistoryData.status == '5'
+            widget.orderHistoryData.status == '4' ||
+            widget.orderHistoryData.status == '5'
         ? 100
         : 0;
 
     double orderShippedProgress = widget.orderHistoryData.status == '4' ||
-        widget.orderHistoryData.status == '5'
+            widget.orderHistoryData.status == '5'
         ? 100
         : 0;
     double orderDeliveredProgress = widget.orderHistoryData.status == '2' ||
-        widget.orderHistoryData.status == '6'
+            widget.orderHistoryData.status == '6'
         ? 100
         : widget.orderHistoryData.status == '5'
-        ? 100
-        : 0;
+            ? 100
+            : 0;
     bool isOrderCanceledOrRejected = widget.orderHistoryData.status == '2' ||
-        widget.orderHistoryData.status == '6'
+            widget.orderHistoryData.status == '6'
         ? true
         : false;
     bool isNoteVisible = (widget.orderHistoryData.status == '2' ||
-        widget.orderHistoryData.status == '6') &&
+            widget.orderHistoryData.status == '6') &&
         widget.orderHistoryData.orderRejectionNote != null &&
         widget.orderHistoryData.orderRejectionNote.isNotEmpty;
     String noteHeading = widget.orderHistoryData.orderRejectionNote != null &&
-        widget.orderHistoryData.orderRejectionNote.isNotEmpty
+            widget.orderHistoryData.orderRejectionNote.isNotEmpty
         ? widget.orderHistoryData.status == '6'
-        ? "Cancellation Comment:-"
-        : widget.orderHistoryData.status == '2'
-        ? "Reason of Rejection:-"
-        : ""
+            ? "Cancellation Comment:-"
+            : widget.orderHistoryData.status == '2'
+                ? "Reason of Rejection:-"
+                : ""
         : "";
     String orderRejectionNote =
-    widget.orderHistoryData.orderRejectionNote != null &&
-        widget.orderHistoryData.orderRejectionNote.isNotEmpty
-        ? widget.orderHistoryData.orderRejectionNote
-        : "";
+        widget.orderHistoryData.orderRejectionNote != null &&
+                widget.orderHistoryData.orderRejectionNote.isNotEmpty
+            ? widget.orderHistoryData.orderRejectionNote
+            : "";
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1289,9 +1532,9 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                 ),
                 Expanded(
                     child: Text(
-                      'Order Placed',
-                      style: TextStyle(fontSize: 16, color: orderPlaced),
-                    )),
+                  'Order Placed',
+                  style: TextStyle(fontSize: 16, color: orderPlaced),
+                )),
                 Text(
                   '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}',
                   style: TextStyle(color: orderPlaced),
@@ -1332,9 +1575,9 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                   ),
                   Expanded(
                       child: Text(
-                        'Order Confirmed',
-                        style: TextStyle(fontSize: 16, color: orderConfirmed),
-                      )),
+                    'Order Confirmed',
+                    style: TextStyle(fontSize: 16, color: orderConfirmed),
+                  )),
                   Text(
                     orderConfirmed == Colors.black ? 'Done' : 'Pending',
                     style: TextStyle(color: orderConfirmed, fontSize: 16),
@@ -1379,9 +1622,9 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                   ),
                   Expanded(
                       child: Text(
-                        'Order Shipped',
-                        style: TextStyle(fontSize: 16, color: orderShipped),
-                      )),
+                    'Order Shipped',
+                    style: TextStyle(fontSize: 16, color: orderShipped),
+                  )),
                   Text(
                     orderShipped == Colors.black ? 'Done' : 'Pending',
                     style: TextStyle(color: orderShipped, fontSize: 16),
@@ -1421,17 +1664,17 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
                 ),
                 Expanded(
                     child: Text(
-                      isOrderCanceledOrRejected
-                          ? widget.orderHistoryData.status == '2'
+                  isOrderCanceledOrRejected
+                      ? widget.orderHistoryData.status == '2'
                           ? 'Order Rejected'
                           : 'Order Cancelled'
-                          : !widget.orderHistoryData.orderFacility
-                          .toLowerCase()
-                          .contains('pick')
+                      : !widget.orderHistoryData.orderFacility
+                              .toLowerCase()
+                              .contains('pick')
                           ? 'Order Delivered'
                           : 'Order Picked',
-                      style: TextStyle(fontSize: 16, color: orderDelivered),
-                    )),
+                  style: TextStyle(fontSize: 16, color: orderDelivered),
+                )),
                 Text(
                   orderDelivered == Colors.black || orderDelivered == Colors.red
                       ? 'Done'
@@ -1482,7 +1725,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
           onPressed: () async {
             Navigator.of(context).pop();
             var image =
-            await ImagePicker().getImage(source: ImageSource.camera);
+                await ImagePicker().getImage(source: ImageSource.camera);
             if (image == null) {
               print("---image == null----");
             } else {
@@ -1499,7 +1742,7 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
           onPressed: () async {
             Navigator.of(context).pop();
             var image =
-            await ImagePicker().getImage(source: ImageSource.gallery);
+                await ImagePicker().getImage(source: ImageSource.gallery);
             if (image == null) {
               print("---image == null----");
             } else {
@@ -1536,15 +1779,16 @@ class _SubscriptionHistoryDetailsState extends State<SubscriptionHistoryDetails>
     return foundRating;
   }
 
-  void postRating(SubscriptionOrderData cardOrderHistoryItems, int index, double _rating,
+  void postRating(
+      SubscriptionOrderData cardOrderHistoryItems, int index, double _rating,
       {String desc = "", File imageFile}) {
     Utils.showProgressDialog(context);
     ApiController.postProductRating(
-        cardOrderHistoryItems.subscriptionOrderId,
-        cardOrderHistoryItems.orderItems[index].productId,
-        _rating.toString(),
-        desc: desc,
-        imageFile: imageFile)
+            cardOrderHistoryItems.subscriptionOrderId,
+            cardOrderHistoryItems.orderItems[index].productId,
+            _rating.toString(),
+            desc: desc,
+            imageFile: imageFile)
         .then((value) {
       if (value != null && value.success) {
         //Hit event Bus
