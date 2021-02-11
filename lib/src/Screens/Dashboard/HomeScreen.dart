@@ -93,7 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (widget.showForceUploadAlert) {
         WidgetsBinding.instance.addPostFrameCallback((_) async {
           DialogUtils.showForceUpdateDialog(context, store.storeName,
-              store.forceDownload[0].forceDownloadMessage,storeModel: store);
+              store.forceDownload[0].forceDownloadMessage,
+              storeModel: store);
         });
       } else {
         if (!checkIfStoreClosed()) {
@@ -395,7 +396,8 @@ class _HomeScreenState extends State<HomeScreen> {
           if (AppConstant.isLoggedIn) {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MyOrderScreenVersion2(this.store)),
+              MaterialPageRoute(
+                  builder: (context) => MyOrderScreenVersion2(this.store)),
             );
             Map<String, dynamic> attributeMap = new Map<String, dynamic>();
             attributeMap["ScreenName"] = "MyOrderScreen";
@@ -500,8 +502,14 @@ class _HomeScreenState extends State<HomeScreen> {
         onSelectNotification: onSelectNotification);
 
     var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        '${appName}', '${appName}', '${appName}',
-        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+      '${appName}',
+      '${appName}',
+      '${appName}',
+      importance: Importance.Max,
+      priority: Priority.High,
+      ticker: 'ticker',
+      style: AndroidNotificationStyle.BigText,
+    );
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
@@ -711,7 +719,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
             )),
-        
         Visibility(
           visible: rightActionsEnable && whatIconEnable,
           child: Padding(

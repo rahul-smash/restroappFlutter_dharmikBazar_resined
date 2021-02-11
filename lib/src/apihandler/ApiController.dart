@@ -2315,4 +2315,61 @@ class ApiController {
     }
   }
 
+  static Future<CreateOrderData> subscriptionRazorpayCreateOrderApi(String amount,
+      String orderJson, dynamic detailsJson) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.base.replaceAll("storeId", store.id) +
+        ApiConstants.subscriptionRazorpayCreateSubscription;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "amount": amount,
+        "currency": "INR",
+        "receipt": "Order",
+        "payment_capture": "1",
+        "subscription_info": detailsJson, //JSONObject details
+        "subscriptions": orderJson //cart jsonObject
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      CreateOrderData model = CreateOrderData.fromJson(parsed);
+      return model;
+    } catch (e) {
+      print('---catch-razorpayCreateOrder-----' + e.toString());
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<RazorpayOrderData> subscriptionRazorpayVerifyTransactionApi(
+      String razorpay_order_id) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.base.replaceAll("storeId", store.id) +
+        ApiConstants.subscriptionRazorpayVerifyTransaction;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "razorpay_order_id": razorpay_order_id,
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      RazorpayOrderData model = RazorpayOrderData.fromJson(parsed);
+      return model;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+
 }

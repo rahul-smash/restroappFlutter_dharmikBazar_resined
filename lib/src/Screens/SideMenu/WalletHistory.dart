@@ -14,7 +14,7 @@ class WalletHistoryScreen extends StatefulWidget {
   @override
   _WalletHistoryScreenState createState() => _WalletHistoryScreenState();
 }
-
+//subscription_payment//subscription_refund
 class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
   WalleModel walleModel;
 
@@ -164,15 +164,15 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               border: Border.all(
                 width: 0.0,
                 color:
-                    walletHistory.refund_type != "order_refund" ? red1 : green1,
+                    walletHistory.refund_type != "order_refund"||walletHistory.refund_type!="subscription_refund" ? red1 : green1,
               ),
               color:
-                  walletHistory.refund_type != "order_refund" ? red1 : green1,
+                  walletHistory.refund_type != "order_refund"||walletHistory.refund_type!="subscription_refund" ? red1 : green1,
             ),
             child: Padding(
               padding: EdgeInsets.all(6),
               child: Image.asset(
-                walletHistory.refund_type != "order_refund"
+                walletHistory.refund_type != "order_refund"||walletHistory.refund_type!="subscription_refund"
                     ? "images/orderrefund.png"
                     : "images/cashbackicon.png",
                 height: 20,
@@ -207,9 +207,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Text(
-                    '${walletHistory.refund_type == "order_refund" ? " + " : " - "}${AppConstant.currency}${walletHistory.refund}',
+                    '${walletHistory.refund_type == "order_refund"||walletHistory.refund_type=="subscription_refund" ? " + " : " - "}${AppConstant.currency}${walletHistory.refund}',
                     style: TextStyle(
-                        color: walletHistory.refund_type == "order_refund"
+                        color: walletHistory.refund_type == "order_refund"||walletHistory.refund_type=="subscription_refund"
                             ? green2
                             : Colors.black,
                         fontSize: 18,

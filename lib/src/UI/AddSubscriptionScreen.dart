@@ -15,6 +15,7 @@ import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/OrderDetailsModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/models/SubscriptionOrderDetailsModel.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
@@ -971,62 +972,96 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     price = price * 100;
     print("=======2===${price}===========");
     String mPrice =
-    price.toString().substring(0, price.toString().indexOf('.'));
+        price.toString().substring(0, price.toString().indexOf('.'));
     print("=======mPrice===${mPrice}===========");
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     //new changes
-    Utils.getCartItemsListToJson(
-        isOrderVariations: isOrderVariations,
-        responseOrderDetail: responseOrderDetail,
-        cartList: cartListFromDB)
-        .then((orderJson) {
-      if (orderJson == null) {
-        print("--orderjson == null-orderjson == null-");
-        return;
-      }
-      String storeAddress = "";
-      try {
-        storeAddress = "${widget.model.storeName}, ${widget.model..location},"
-            "${widget.model.city}, ${widget.model.state}, ${widget.model.country}, ${widget.model.zipcode}";
-      } catch (e) {
-        print(e);
-      }
+    List jsonList = Product.encodeToJson(widget.cartList);
 
-      String userId = user.id;
-      OrderDetailsModel detailsModel = OrderDetailsModel(
-          shippingCharges,
-          '',
-          totalPrice.toString(),
-          '3',
-          taxModel,
-          addressData,
-          false,
-          addressData.areaId,
-          widget.deliveryType,
-          "",
-          "",
-          deviceId,
-          "Razorpay",
-          userId,
-          deviceToken,
-          storeAddress,
-          selectedTimeSlotString,
-          totalSavingsText);
-      ApiController.razorpayCreateOrderApi(
-          mPrice, orderJson, detailsModel.orderDetails)
-          .then((response) {
-        CreateOrderData model = response;
-        if (model != null && response.success) {
-          print("----razorpayCreateOrderApi----${response.data.id}--");
-          openCheckout(model.data.id, storeObject);
-        } else {
-          Utils.showToast("${model.message}", true);
-          Utils.hideProgressDialog(context);
-        }
-      });
+    String encodedDoughnut = jsonEncode(jsonList);
+    String storeAddress = "";
+    try {
+      storeAddress = "${widget.model.storeName}, ${widget.model..location},"
+          "${widget.model.city}, ${widget.model.state}, ${widget.model.country}, ${widget.model.zipcode}";
+    } catch (e) {
+      print(e);
+    }
+
+    List<String> selectedDatesList = List();
+    try {
+      for (DateTime event in _markedDateMap.events.keys) {
+        var formatter = new DateFormat('yyyy-MM-dd');
+        String formatted = formatter.format(event);
+        selectedDatesList.add(formatted);
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    String encodedDateList = jsonEncode(selectedDatesList);
+    String start_date = '',
+        end_date = '',
+        single_day_shipping_charges = taxModel.singleDayShipping,
+        single_day_total = taxModel.singleDayTotal,
+        single_day_discount = taxModel.singleDayDiscount,
+        single_day_tax = taxModel.singleDayTax,
+        single_day_checkout = taxModel.singleDayTotal,
+        subscription_type =
+            widget.model.subscription.cycleType[selecteddays].key,
+        delivery_dates = encodedDateList,
+        total_deliveries = totalDeliveries.toString();
+    var formatter = new DateFormat('yyyy-MM-dd');
+    String formatted = formatter.format(selectedStartDate);
+    start_date = formatted;
+    formatted = formatter.format(selectedEndDate);
+    end_date = formatted;
+
+    String userId = user.id;
+
+    SubscriptionOrderDetailsModel detailsModel = SubscriptionOrderDetailsModel(
+      shippingCharges,
+      '',
+      totalPrice.toString(),
+      '3',
+      taxModel,
+      addressData,
+      false,
+      addressData.areaId,
+      widget.deliveryType,
+      "",
+      "",
+      deviceId,
+      "Razorpay",
+      userId,
+      deviceToken,
+      storeAddress,
+      selectedTimeSlotString,
+      totalSavingsText,
+      start_date: start_date,
+      end_date: end_date,
+      single_day_shipping_charges: single_day_shipping_charges,
+      single_day_total: single_day_total,
+      single_day_discount: single_day_discount,
+      single_day_tax: single_day_tax,
+      single_day_checkout: single_day_checkout,
+      subscription_type: subscription_type,
+      delivery_dates: delivery_dates,
+      total_deliveries: total_deliveries,
+    );
+    ApiController.subscriptionRazorpayCreateOrderApi(
+            mPrice, encodedDoughnut, detailsModel.orderDetails)
+        .then((response) {
+      CreateOrderData model = response;
+      if (model != null && response.success) {
+        print("----razorpayCreateOrderApi----${response.data.id}--");
+        openCheckout(model.data.id, storeObject);
+      } else {
+        Utils.showToast("${model.message}", true);
+        Utils.hideProgressDialog(context);
+      }
     });
   }
 
@@ -1878,7 +1913,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   void _handlePaymentSuccess(PaymentSuccessResponse responseObj) {
     //Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId, timeInSecForIos: 4);
     Utils.showProgressDialog(context);
-    ApiController.razorpayVerifyTransactionApi(responseObj.orderId)
+    ApiController.subscriptionRazorpayVerifyTransactionApi(responseObj.orderId)
         .then((response) {
       //print("----razorpayVerifyTransactionApi----${response}--");
       if (response != null) {

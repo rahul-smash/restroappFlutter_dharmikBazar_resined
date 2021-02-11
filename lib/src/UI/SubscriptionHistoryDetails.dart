@@ -33,17 +33,19 @@ class SubscriptionHistoryDetails extends StatefulWidget {
   bool isDeliveryResponseFalse = false;
   bool isSlotSelected = false;
   String initSelectedTimeSlotString = '';
-  SubscriptionHistoryDetails(this.orderHistoryData,
-      this.isRatingEnable,
-      this.deliverySlotModel,
-      this.selctedTag,
-      this.selectedTimeSlot,
-      this.timeslotList,
-      this.isInstantDelivery,
-      this.isDeliveryResponseFalse,
-      this.isSlotSelected,
-      this.initSelectedTimeSlotString,
-      );
+
+  SubscriptionHistoryDetails(
+    this.orderHistoryData,
+    this.isRatingEnable,
+    this.deliverySlotModel,
+    this.selctedTag,
+    this.selectedTimeSlot,
+    this.timeslotList,
+    this.isInstantDelivery,
+    this.isDeliveryResponseFalse,
+    this.isSlotSelected,
+    this.initSelectedTimeSlotString,
+  );
 
   @override
   _SubscriptionHistoryDetailsState createState() =>
@@ -75,7 +77,6 @@ class _SubscriptionHistoryDetailsState
   String initSelectedTimeSlotString = '';
   EventList<Event> _markedDateMap;
 
-
   @override
   void initState() {
     super.initState();
@@ -84,10 +85,10 @@ class _SubscriptionHistoryDetailsState
     );
     getOrderListApi();
 
-    deliverySlotModel=widget.deliverySlotModel;
-    selctedTag=widget.selctedTag;
-    selectedTimeSlot=widget.selectedTimeSlot;
-    timeslotList=widget.timeslotList;
+    deliverySlotModel = widget.deliverySlotModel;
+    selctedTag = widget.selctedTag;
+    selectedTimeSlot = widget.selectedTimeSlot;
+    timeslotList = widget.timeslotList;
     isInstantDelivery = widget.isInstantDelivery;
     isDeliveryResponseFalse = widget.isDeliveryResponseFalse;
     isSlotSelected = widget.isSlotSelected;
@@ -222,7 +223,7 @@ class _SubscriptionHistoryDetailsState
           )
         : new Scaffold(
             backgroundColor: Color(0xffDCDCDC),
-            appBar:  AppBar(
+            appBar: AppBar(
               title: Text(
                 'Detail',
                 style: TextStyle(),
@@ -238,80 +239,283 @@ class _SubscriptionHistoryDetailsState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Container(
-                        color:Colors.white,
-                        padding: EdgeInsets.only(left: 16,right: 16,top: 16),
+                        color: Colors.white,
+                        width: Utils.getDeviceWidth(context),
+                        padding: EdgeInsets.only(left: 16, right: 6, top: 10),
                         child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.max,
                             children: [
-                              Text(
-                                  "#${widget.orderHistoryData.displaySubscriptionId} (${widget.orderHistoryData.orderItems.length} ${widget.orderHistoryData.orderItems.length > 1 ? 'Items' : 'Item'})",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                  )),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.check_circle_outline,
-                                    size: 18,
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  Text(
-                                    "Order ${_getSubscriptionStatus(widget.orderHistoryData)}",
+                              Expanded(
+                                child: Text(
+                                    "#${widget.orderHistoryData.displaySubscriptionId} (${widget.orderHistoryData.orderItems.length} ${widget.orderHistoryData.orderItems.length > 1 ? 'Items' : 'Item'})",
                                     style: TextStyle(
-                                      fontSize: 14,
-                                      color: _getSubscriptionStatusColor(
-                                          widget.orderHistoryData),
-                                      decoration: TextDecoration.underline,
+                                      fontSize: 16,
+                                    )),
+                              ),
+                              Container(
+                                color: Colors.white,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_outline,
+                                      size: 16,
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 5,
-                                  ),
-                                  choices.length>0?
-                                  PopupMenuButton(
-                                    elevation: 1.2,
-                                    onSelected: (choice) {
-                                      if (choice == 'Change Delivery Slots') {
-                                        deliverySlotBottomSheet(
-                                            context, widget.orderHistoryData, true);
-                                        return;
-                                      }
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      "Order ${_getSubscriptionStatus(widget.orderHistoryData)}",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: _getSubscriptionStatusColor(
+                                            widget.orderHistoryData),
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    choices.length > 0
+                                        ? PopupMenuButton(
+                                            padding: EdgeInsets.zero,
+                                            child: Icon(
+                                              Icons.more_vert,
+                                            ),
+                                            elevation: 0,
+                                            onSelected: (choice) {
+                                              if (choice ==
+                                                  'Change Delivery Slots') {
+                                                deliverySlotBottomSheet(
+                                                    context,
+                                                    widget.orderHistoryData,
+                                                    true);
+                                                return;
+                                              }
 
-                                      String status = '1';
-                                      switch (choice) {
-                                        case 'Order Stop':
-                                          status = '6';
-                                          break;
-                                        case 'Pause':
-                                          status = '9';
-                                          break;
-                                        case 'Active':
-                                          status = '1';
-                                          break;
-                                      }
-                                      //hit api
-                                      Utils.showProgressDialog(context);
-                                      updateSubscriptionStatus(
-                                          widget.orderHistoryData.subscriptionOrderId,
-                                          status);
-                                    },
-                                    onCanceled: () {
-                                      print('You have not chossed anything');
-                                    },
-                                    itemBuilder: (BuildContext context) {
-                                      return choices.map((String choice) {
-                                        return PopupMenuItem(
-                                          value: choice,
-                                          child: Text(choice),
-                                        );
-                                      }).toList();
-                                    },
-                                  ):Container()
-                                ],
+                                              String status = '1';
+                                              switch (choice) {
+                                                case 'Order Stop':
+                                                  status = '6';
+                                                  break;
+                                                case 'Pause':
+                                                  status = '9';
+                                                  break;
+                                                case 'Active':
+                                                  status = '1';
+                                                  break;
+                                              }
+                                              //hit api
+                                              Utils.showProgressDialog(context);
+                                              updateSubscriptionStatus(
+                                                  widget.orderHistoryData
+                                                      .subscriptionOrderId,
+                                                  status);
+                                            },
+                                            onCanceled: () {
+                                              print(
+                                                  'You have not chossed anything');
+                                            },
+                                            itemBuilder:
+                                                (BuildContext context) {
+                                              return choices
+                                                  .map((String choice) {
+                                                return PopupMenuItem(
+                                                  value: choice,
+                                                  child: Text(choice),
+                                                );
+                                              }).toList();
+                                            },
+                                          )
+                                        : Container()
+                                  ],
+                                ),
                               )
                             ]),
+                      ),
+                      Container(
+//                        color: Color(0xFFDBDCDD),
+                        color: Colors.white,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 16, right: 16, top: 10),
+                          height: 1,
+                          color: Color(0xFFDBDCDD),
+                        ),
+                      ),
+                      Container(
+                        color: Colors.white,
+                        padding: EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Total Amount',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.only(top: 6),
+                                            child: Text(
+                                              '${AppConstant.currency}${widget.orderHistoryData.total}',
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: appTheme,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible: widget.orderHistoryData
+                                                        .paymentMethod !=
+                                                    null &&
+                                                widget.orderHistoryData
+                                                    .paymentMethod
+                                                    .trim()
+                                                    .isNotEmpty,
+                                            child: Container(
+                                                margin:
+                                                    EdgeInsets.only(left: 6),
+                                                padding: EdgeInsets.fromLTRB(
+                                                    8, 3, 8, 3),
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                      color: Color(0xFFE6E6E6)),
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.all(
+                                                          Radius.circular(
+                                                              15.0)),
+                                                ),
+                                                child: Text(
+                                                    '${widget.orderHistoryData.paymentMethod.trim().toUpperCase()}',
+                                                    style: TextStyle(
+                                                        color:
+                                                            Color(0xFF39444D),
+                                                        fontSize: 10))),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: false,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Paid Amount',
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                      Text(
+                                        '${AppConstant.currency}${widget.orderHistoryData.total}',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color: appTheme,
+                                            fontWeight: FontWeight.w400),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                    margin: EdgeInsets.only(left: 3),
+                                    padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
+                                    decoration: BoxDecoration(
+                                      border:
+                                          Border.all(color: Color(0xffD7D7D7)),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(5.0)),
+                                    ),
+                                    child: Text(
+                                        '${widget.orderHistoryData.orderFacility}',
+                                        style: TextStyle(
+                                            color: Color(0xFF968788),
+                                            fontSize: 13))),
+                              ],
+                            ),
+                            Visibility(
+                              visible: false,
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 10),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Pending Amount',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                            SizedBox(
+                                              width: 10,
+                                            ),
+                                            Text(
+                                              'Pay Pending Amount',
+                                              style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.green,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ],
+                                        ),
+                                        Text(
+                                          '${AppConstant.currency}${widget.orderHistoryData.total}',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              color: appTheme,
+                                              fontWeight: FontWeight.w400),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+//                        color: Color(0xFFDBDCDD),
+                        color: Colors.white,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 16, right: 16, top: 0),
+                          height: 1,
+                          color: Color(0xFFDBDCDD),
+                        ),
                       ),
                       firstRow(widget.orderHistoryData),
                       Container(
@@ -337,7 +541,7 @@ class _SubscriptionHistoryDetailsState
                           ),
                           markedDateIconMaxShown: 1,
                           headerTextStyle:
-                          TextStyle(color: Colors.black, fontSize: 18),
+                              TextStyle(color: Colors.black, fontSize: 18),
                           markedDateMoreShowTotal: null,
                           // null for not showing hidden events indicator
                           markedDateIconBuilder: (event) {
@@ -429,16 +633,45 @@ class _SubscriptionHistoryDetailsState
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           Text(
-            orderHistoryData.orderFacility.toLowerCase().contains('pick')
-                ? 'PickUp Address'
-                : 'Delivery Address',
+            'Date and Time of Booking Request',
             style: TextStyle(
                 fontSize: 14,
                 color: Color(0xFF7A7C80),
                 fontWeight: FontWeight.w300),
           ),
           Padding(
-            padding: EdgeInsets.only(top: 5),
+            padding: EdgeInsets.only(top: 5, bottom: 10),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                Expanded(
+                  child: Text(
+                    convertOrderDateTime(orderHistoryData.orderDate,pattern:'dd MMM, yyyy | hh:mm'),
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400),
+                  ),
+                ),
+                SizedBox(
+                  width: 80,
+                ),
+              ],
+            ),
+          ),
+//          Text(
+//            orderHistoryData.orderFacility.toLowerCase().contains('pick')
+//                ? 'PickUp Address'
+//                : 'Delivery Address',
+//            style: TextStyle(
+//                fontSize: 14,
+//                color: Color(0xFF7A7C80),
+//                fontWeight: FontWeight.w300),
+//          ),
+          Padding(
+            padding: EdgeInsets.only(top: 5,bottom: 15),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -453,21 +686,101 @@ class _SubscriptionHistoryDetailsState
                         fontWeight: FontWeight.w400),
                   ),
                 ),
-                SizedBox(
-                  width: 80,
-                ),
-                Container(
-                    margin: EdgeInsets.only(left: 3),
-                    padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color(0xffD7D7D7)),
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                    ),
-                    child: Text('${orderHistoryData.orderFacility}',
-                        style:
-                            TextStyle(color: Color(0xFF968788), fontSize: 13))),
               ],
             ),
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Date and Time of Booking',
+                  style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xFF7A7C80),
+                      fontWeight: FontWeight.w300),
+                ),
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 18,
+                   color: Color(0xFF7A7C80),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    orderHistoryData.subscriptionType,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF7A7C80),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+
+          Row(
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'images/calendargreyicon.png',
+                      fit: BoxFit.scaleDown,
+                      height: 20,
+                      color: Color(0xFF7A7C80),
+                    ),
+                    SizedBox(
+                      width: 5,
+                    ),
+                    Text('${convertOrderDateTime(orderHistoryData.startDate.toString(),pattern:'dd MMM, yyyy')} to ${convertOrderDateTime(orderHistoryData.endDate.toString(),pattern:'dd MMM, yyyy')}',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    )
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    'Next Delivery Date',
+                    style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF7A7C80),
+                        fontWeight: FontWeight.w300),
+                  ),
+                  Row(
+                    children: [
+                      Image.asset(
+                        'images/calendargreyicon.png',
+                        fit: BoxFit.scaleDown,
+                       height: 20,
+                        color: Color(0xFF7A7C80),
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        convertOrderDateTime(orderHistoryData.orderDate,pattern:'dd MMM, yyyy'),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      )
+                    ],
+                  ),
+                ],
+              )
+            ],
           ),
           Padding(
             padding: EdgeInsets.only(top: 15),
@@ -484,22 +797,6 @@ class _SubscriptionHistoryDetailsState
                         color: Colors.black,
                         fontWeight: FontWeight.w400),
                   ),
-                ),
-                Visibility(
-                  visible: orderHistoryData.paymentMethod != null &&
-                      orderHistoryData.paymentMethod.trim().isNotEmpty,
-                  child: Container(
-                      margin: EdgeInsets.only(left: 6),
-                      padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xFFE6E6E6)),
-                        color: Color(0xFFE6E6E6),
-                        borderRadius: BorderRadius.all(Radius.circular(15.0)),
-                      ),
-                      child: Text(
-                          '${orderHistoryData.paymentMethod.trim().toUpperCase()}',
-                          style: TextStyle(
-                              color: Color(0xFF39444D), fontSize: 13))),
                 ),
               ],
             ),
@@ -1358,7 +1655,6 @@ class _SubscriptionHistoryDetailsState
     );
   }
 
-
   deviderLine() {
     return Divider(
       color: Color(0xFFDBDCDD),
@@ -1417,11 +1713,11 @@ class _SubscriptionHistoryDetailsState
     if (orderHistoryData.deliveryAddress != null &&
         orderHistoryData.deliveryAddress.isNotEmpty) {
       String name = '${orderHistoryData.deliveryAddress.first.firstName}';
-      String address = ', ${orderHistoryData.deliveryAddress.first.address}';
+      String address = '${orderHistoryData.deliveryAddress.first.address}';
       String area = ', ${orderHistoryData.deliveryAddress.first.areaName}';
       String city = ', ${orderHistoryData.deliveryAddress.first.city}';
       String ZipCode = ', ${orderHistoryData.deliveryAddress.first.zipcode}';
-      return '$name$address$area$city$ZipCode';
+      return '$name\n$address$area$city$ZipCode';
     } else {
       String address = '${orderHistoryData.address}';
       return address;
@@ -1443,7 +1739,7 @@ class _SubscriptionHistoryDetailsState
     }
   }
 
-  String convertOrderDateTime(String date) {
+  String convertOrderDateTime(String date,{String pattern='dd MMM yyyy'}) {
     String formatted = date;
     try {
       DateFormat format = new DateFormat("yyyy-MM-dd");
@@ -1451,7 +1747,7 @@ class _SubscriptionHistoryDetailsState
       DateTime time = format.parse(date, true);
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
-      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      DateFormat formatter = new DateFormat(pattern);
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);

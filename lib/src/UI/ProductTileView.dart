@@ -482,8 +482,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Visibility(
-                                    visible: _isSubscriptionActive &&
-                                            widget.product.variantMap[variant == null ? widget.product.variantId : variant.id] ==
+                                    visible: (!_isProductOutOfStock) &&
+                                            _isSubscriptionActive &&
+                                            widget.product.variantMap[variant ==
+                                                        null
+                                                    ? widget.product.variantId
+                                                    : variant.id] ==
                                                 "1"
                                         ? true
                                         : false,
@@ -503,7 +507,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   AddSubscriptionScreen(
-                                                      product, model,counter.toString(),variant)),
+                                                      product,
+                                                      model,
+                                                      counter.toString(),
+                                                      variant)),
                                         );
                                       },
                                       child: Container(

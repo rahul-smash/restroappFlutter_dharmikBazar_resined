@@ -100,4 +100,6 @@ class ApiConstants {
   static String subscriptionStatusUpdate='/api_v1_subscription/subscriptionPauseStart';
   static String subscriptionOrderUpdate='/api_v1_subscription/subscriptionOrderUpdate';
   static String subscriptionDetailHistory='/api_v1_subscription/subscriptionDetailHistory';
+  static String subscriptionRazorpayCreateSubscription='/api_v1_online_subscription/razorpayCreateSubscription';
+  static String subscriptionRazorpayVerifyTransaction='/api_v1_online_subscription/razorpayVerifyTransaction';
 }
