@@ -320,8 +320,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         );
       },
       child: Container(
-        color: Colors.white,
-        //height: 100,
+        decoration: BoxDecoration(color:Colors.white,borderRadius: BorderRadius.circular(5) ),
         padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
         margin: EdgeInsets.fromLTRB(15, 15, 15, 0),
         child: Column(
@@ -729,7 +728,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
       case '0':
       case '1':
       case '5':
-        statusColor = Colors.green;
+        statusColor = appTheme;
         break;
       case '2':
       case '6':
