@@ -17,11 +17,8 @@ class SubscriptionTaxCalculationResponse {
   SubscriptionTaxCalculation data;
   String message;
 
-  SubscriptionTaxCalculationResponse copyWith({
-    bool success,
-    SubscriptionTaxCalculation data,
-    String message
-  }) =>
+  SubscriptionTaxCalculationResponse copyWith(
+          {bool success, SubscriptionTaxCalculation data, String message}) =>
       SubscriptionTaxCalculationResponse(
         success: success ?? this.success,
         data: data ?? this.data,
@@ -34,7 +31,7 @@ class SubscriptionTaxCalculationResponse {
           String couponCode, Map<String, dynamic> json) =>
       SubscriptionTaxCalculationResponse(
         success: json["success"] == null ? null : json["success"],
-        message: json["message"] == null ? null : json["message"],
+        message: json["message"] == '' ? null : json["message"],
         data: json["data"] == null
             ? null
             : SubscriptionTaxCalculation.fromJson(couponCode, json["data"]),
@@ -136,13 +133,17 @@ class SubscriptionTaxCalculation {
 
   String toRawJson() => json.encode(toJson());
 
-  factory SubscriptionTaxCalculation.fromJson(String couponCodePassed, Map<String, dynamic> json) =>
+  factory SubscriptionTaxCalculation.fromJson(
+          String couponCodePassed, Map<String, dynamic> json) =>
       SubscriptionTaxCalculation(
         total: json["total"] == null ? null : json["total"],
         singleDayTotal:
             json["single_day_total"] == null ? null : json["single_day_total"],
-        walletRefund:
-            json["wallet_refund"] == null ? null : json["wallet_refund"],
+        walletRefund: json["wallet_refund"] == null
+            ? null
+            : json["wallet_refund"] is int ||json["wallet_refund"] is double
+                ? json["wallet_refund"].toString()
+                : json["wallet_refund"],
         itemSubTotal:
             json["item_sub_total"] == null ? null : json["item_sub_total"],
         singleDayItemSubTotal: json["single_day_item_sub_total"] == null

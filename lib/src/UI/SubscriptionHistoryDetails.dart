@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -12,6 +13,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -33,19 +35,20 @@ class SubscriptionHistoryDetails extends StatefulWidget {
   bool isDeliveryResponseFalse = false;
   bool isSlotSelected = false;
   String initSelectedTimeSlotString = '';
+  StoreModel store;
 
   SubscriptionHistoryDetails(
-    this.orderHistoryData,
-    this.isRatingEnable,
-    this.deliverySlotModel,
-    this.selctedTag,
-    this.selectedTimeSlot,
-    this.timeslotList,
-    this.isInstantDelivery,
-    this.isDeliveryResponseFalse,
-    this.isSlotSelected,
-    this.initSelectedTimeSlotString,
-  );
+      this.orderHistoryData,
+      this.isRatingEnable,
+      this.deliverySlotModel,
+      this.selctedTag,
+      this.selectedTimeSlot,
+      this.timeslotList,
+      this.isInstantDelivery,
+      this.isDeliveryResponseFalse,
+      this.isSlotSelected,
+      this.initSelectedTimeSlotString,
+      this.store);
 
   @override
   _SubscriptionHistoryDetailsState createState() =>
@@ -111,6 +114,8 @@ class _SubscriptionHistoryDetailsState
         deliverySlotDate =
             _generalizedDeliverySlotTime(widget.orderHistoryData);
         calculateSaving();
+        //events add
+        addEvents();
       }
 
       if (!isLoading) {
@@ -520,6 +525,10 @@ class _SubscriptionHistoryDetailsState
                       firstRow(widget.orderHistoryData),
                       Container(
                         color: Colors.white,
+                        child: Center(child: Text("Deliveries Date")),
+                      ),
+                      Container(
+                        color: Colors.white,
                         child: CalendarCarousel<Event>(
                           childAspectRatio: 1.5,
                           height: 330,
@@ -550,9 +559,51 @@ class _SubscriptionHistoryDetailsState
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
-                        height: 1,
-                        color: Colors.grey,
+//                        color: Color(0xFFDBDCDD),
+                        color: Colors.white,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 16, right: 16, top: 0),
+                          height: 1,
+                          color: Color(0xFFDBDCDD),
+                        ),
+                      ),
+                      Container(
+//                        color: Color(0xFFDBDCDD),
+                      padding: EdgeInsets.all(16),
+                        color: Colors.white,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 7.5,
+                                    height: 7.5,
+                                    decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.grey),
+                                  ),
+
+                                  SizedBox(width: 5,),
+                                  Text("Completed Order Date"),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 7.5,
+                                  height: 7.5,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: appTheme),
+                                ),
+                                SizedBox(width: 5,),
+                                Text("Pending Order Date"),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                       secondRow(widget.orderHistoryData)
                     ],
@@ -648,7 +699,8 @@ class _SubscriptionHistoryDetailsState
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    convertOrderDateTime(orderHistoryData.orderDate,pattern:'dd MMM, yyyy | hh:mm'),
+                    convertOrderDateTime(orderHistoryData.orderDate,
+                        pattern: 'dd MMM, yyyy | hh:mm'),
                     style: TextStyle(
                         fontSize: 14,
                         color: Colors.black,
@@ -671,7 +723,7 @@ class _SubscriptionHistoryDetailsState
 //                fontWeight: FontWeight.w300),
 //          ),
           Padding(
-            padding: EdgeInsets.only(top: 5,bottom: 15),
+            padding: EdgeInsets.only(top: 5, bottom: 15),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -705,13 +757,14 @@ class _SubscriptionHistoryDetailsState
                   Icon(
                     Icons.check_circle_outline,
                     size: 18,
-                   color: Color(0xFF7A7C80),
+                    color: Color(0xFF7A7C80),
                   ),
                   SizedBox(
                     width: 5,
                   ),
                   Text(
-                    orderHistoryData.subscriptionType,
+                    _checkSubscriptionKey(orderHistoryData.subscriptionType)
+                        .label,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -722,83 +775,112 @@ class _SubscriptionHistoryDetailsState
               )
             ],
           ),
-
+          SizedBox(
+            height: 5,
+          ),
           Row(
             children: [
               Expanded(
-                child: Row(
+                child: Column(
                   children: [
-                    Image.asset(
-                      'images/calendargreyicon.png',
-                      fit: BoxFit.scaleDown,
-                      height: 20,
-                      color: Color(0xFF7A7C80),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          'images/calendargreyicon.png',
+                          fit: BoxFit.scaleDown,
+                          height: 20,
+                          color: Color(0xFF7A7C80),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          '${convertOrderDateTime(orderHistoryData.startDate.toString(), pattern: 'dd MMM, yyyy')} to\n ${convertOrderDateTime(orderHistoryData.endDate.toString(), pattern: 'dd MMM, yyyy')}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
+                          ),
+                        )
+                      ],
                     ),
                     SizedBox(
-                      width: 5,
+                      height: 20,
                     ),
-                    Text('${convertOrderDateTime(orderHistoryData.startDate.toString(),pattern:'dd MMM, yyyy')} to ${convertOrderDateTime(orderHistoryData.endDate.toString(),pattern:'dd MMM, yyyy')}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    )
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Image.asset(
+                          'images/timegreyicon.png',
+                          fit: BoxFit.scaleDown,
+                          height: 20,
+                          color: Color(0xFF7A7C80),
+                        ),
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          '${orderHistoryData.deliveryTimeSlot}',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
+                          ),
+                        )
+                      ],
+                    ),
                   ],
                 ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Next Delivery Date',
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF7A7C80),
-                        fontWeight: FontWeight.w300),
-                  ),
-                  Row(
-                    children: [
-                      Image.asset(
-                        'images/calendargreyicon.png',
-                        fit: BoxFit.scaleDown,
-                       height: 20,
-                        color: Color(0xFF7A7C80),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        convertOrderDateTime(orderHistoryData.orderDate,pattern:'dd MMM, yyyy'),
-                        style: TextStyle(
+              Visibility(
+                visible: checkstatus(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Next Delivery Date',
+                      style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black,
+                          color: Color(0xFF7A7C80),
+                          fontWeight: FontWeight.w300),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: [
+                        Image.asset(
+                          'images/calendargreyicon.png',
+                          fit: BoxFit.scaleDown,
+                          height: 20,
+                          color: Color(0xFF7A7C80),
                         ),
-                      )
-                    ],
-                  ),
-                ],
+                        SizedBox(
+                          width: 5,
+                        ),
+                        Text(
+                          _checkNextDeliveryDate(),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
               )
             ],
           ),
-          Padding(
-            padding: EdgeInsets.only(top: 15),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Expanded(
-                  child: Text(
-                    deliverySlotDate,
-                    style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400),
-                  ),
-                ),
-              ],
+          Container(
+//                        color: Color(0xFFDBDCDD),
+            color: Colors.white,
+            child: Container(
+              margin: EdgeInsets.only(top: 16),
+              height: 1,
+              color: Color(0xFFDBDCDD),
             ),
           ),
         ],
@@ -830,8 +912,13 @@ class _SubscriptionHistoryDetailsState
                 return listItem(context, orderHistoryData, index);
               }),
           Container(
-            height: 3,
-            color: Color(0xFFE1E1E1),
+//                        color: Color(0xFFDBDCDD),
+            color: Colors.white,
+            child: Container(
+              margin: EdgeInsets.only(left: 16, right: 16, top: 0),
+              height: 1,
+              color: Color(0xFFDBDCDD),
+            ),
           ),
           Container(
             color: Colors.white,
@@ -1013,7 +1100,7 @@ class _SubscriptionHistoryDetailsState
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Flexible(
-                            child: Text('Payable Amount',
+                            child: Text('To Pay',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 17,
@@ -1063,48 +1150,32 @@ class _SubscriptionHistoryDetailsState
     return Container(
       color: Colors.white,
       padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Flexible(
-                child: Text(
-                    '${cardOrderHistoryItems.orderItems[index].productName}',
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 16)),
-              ),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                      margin: EdgeInsets.only(right: 3),
-                      padding: EdgeInsets.fromLTRB(8, 1, 8, 1),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Color(0xFFE6E6E6)),
-                        color: Color(0xFFE6E6E6),
-                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                      ),
-                      child: Text(
-                          '${cardOrderHistoryItems.orderItems[index].quantity}',
-                          style: TextStyle(color: Colors.black, fontSize: 12))),
-                  Text('X ${cardOrderHistoryItems.orderItems[index].price}',
-                      style: TextStyle(
-                        color: Color(0xFF818387),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w300,
-                      )),
-                ],
-              ),
-            ],
-          ),
-          Padding(
-            padding: EdgeInsets.only(bottom: 0, top: 10),
+        children: [
+          cardOrderHistoryItems.orderItems[index].image == ""
+              ? Container(
+                  padding: EdgeInsets.only(left: 5, right: 20),
+                  width: 70.0,
+                  height: 70.0,
+                  child: Utils.getImgPlaceHolder(),
+                )
+              : Padding(
+                  padding: EdgeInsets.only(left: 5, right: 20),
+                  child: Container(
+                    width: 70.0,
+                    height: 70.0,
+                    child: CachedNetworkImage(
+                        imageUrl:
+                            "${cardOrderHistoryItems.orderItems[index].image}",
+                        fit: BoxFit.fill
+                        //placeholder: (context, url) => CircularProgressIndicator(),
+                        //errorWidget: (context, url, error) => Icon(Icons.error),
+                        ),
+                    /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                                          fit: BoxFit.cover),*/
+                  )),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
@@ -1115,124 +1186,186 @@ class _SubscriptionHistoryDetailsState
                   children: <Widget>[
                     Flexible(
                       child: Text(
-                          'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
+                          '${cardOrderHistoryItems.orderItems[index].productName}',
                           style: TextStyle(
-                            color: Color(0xFF818387),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300,
-                          )),
-                    ),
-                    Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                            cardOrderHistoryItems.orderItems[index].status ==
-                                    '2'
-                                ? "Rejected"
-                                : "${AppConstant.currency} ${(double.parse(cardOrderHistoryItems.orderItems[index].quantity) * double.parse(cardOrderHistoryItems.orderItems[index].price)).toStringAsFixed(2)}",
-                            style: TextStyle(
-                                color: cardOrderHistoryItems
-                                            .orderItems[index].status ==
-                                        '2'
-                                    ? Colors.red
-                                    : Colors.black,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500)),
-                        Visibility(
-                            visible: cardOrderHistoryItems
-                                        .orderItems[index].refundStatus ==
-                                    '2' ||
-                                cardOrderHistoryItems
-                                        .orderItems[index].refundStatus ==
-                                    '1',
-                            child: Text(
-                                cardOrderHistoryItems
-                                            .orderItems[index].refundStatus ==
-                                        '1'
-                                    ? "Refund Pending"
-                                    : "Refunded",
-                                style: TextStyle(
-                                    color: cardOrderHistoryItems
-                                                .orderItems[index]
-                                                .refundStatus ==
-                                            '1'
-                                        ? Colors.red
-                                        : Colors.green,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500)))
-                      ],
+                              color: Colors.black,
+                              fontWeight: FontWeight.w400,
+                              fontSize: 16)),
                     ),
                   ],
                 ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: <Widget>[
-                Expanded(
+                Padding(
+                  padding: EdgeInsets.only(bottom: 0, top: 5),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Visibility(
-                        visible: widget.isRatingEnable &&
-                            cardOrderHistoryItems.status.contains('5'),
-                        child: Padding(
-                          padding: EdgeInsets.only(top: 5),
-                          child: InkWell(
-                            child: RatingBar(
-                              initialRating: findRating,
-                              minRating: 0,
-                              itemSize: 26,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemPadding:
-                                  EdgeInsets.symmetric(horizontal: 2.0),
-                              ratingWidget: RatingWidget(
-                                full: Icon(
-                                  Icons.star,
-                                  color: appThemeSecondary,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        mainAxisSize: MainAxisSize.max,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Flexible(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
+                                    style: TextStyle(
+                                      color: Color(0xFF818387),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w300,
+                                    )),
+                                SizedBox(
+                                  height: 5,
                                 ),
-                                half: Icon(
-                                  Icons.star_half,
-                                  color: appThemeSecondary,
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    Container(
+                                        margin: EdgeInsets.only(
+                                          right: 3,
+                                        ),
+                                        padding:
+                                            EdgeInsets.fromLTRB(8, 1, 8, 1),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: Color(0xFFE6E6E6)),
+                                          color: Color(0xFFE6E6E6),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(8.0)),
+                                        ),
+                                        child: Text(
+                                            '${cardOrderHistoryItems.orderItems[index].quantity}',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 12))),
+                                    Text(
+                                        'X ${cardOrderHistoryItems.orderItems[index].price}',
+                                        style: TextStyle(
+                                          color: Color(0xFF818387),
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w300,
+                                        )),
+                                  ],
                                 ),
-                                empty: Icon(
-                                  Icons.star_border,
-                                  color: appThemeSecondary,
-                                ),
-                              ),
-                              ignoreGestures: true,
-                              onRatingUpdate: (rating) {},
+                              ],
                             ),
-                            onTap: () {
-                              if (findRating == 0)
-                                bottomSheet(
-                                    context, cardOrderHistoryItems, index);
-                            },
                           ),
-                        ),
-                      )
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                  cardOrderHistoryItems
+                                              .orderItems[index].status ==
+                                          '2'
+                                      ? "Rejected"
+                                      : "${AppConstant.currency} ${(double.parse(cardOrderHistoryItems.orderItems[index].quantity) * double.parse(cardOrderHistoryItems.orderItems[index].price)).toStringAsFixed(2)}",
+                                  style: TextStyle(
+                                      color: cardOrderHistoryItems
+                                                  .orderItems[index].status ==
+                                              '2'
+                                          ? Colors.red
+                                          : Colors.black,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500)),
+                              Visibility(
+                                  visible: cardOrderHistoryItems
+                                              .orderItems[index].refundStatus ==
+                                          '2' ||
+                                      cardOrderHistoryItems
+                                              .orderItems[index].refundStatus ==
+                                          '1',
+                                  child: Text(
+                                      cardOrderHistoryItems.orderItems[index]
+                                                  .refundStatus ==
+                                              '1'
+                                          ? "Refund Pending"
+                                          : "Refunded",
+                                      style: TextStyle(
+                                          color: cardOrderHistoryItems
+                                                      .orderItems[index]
+                                                      .refundStatus ==
+                                                  '1'
+                                              ? Colors.red
+                                              : Colors.green,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500)))
+                            ],
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
+                Padding(
+                  padding: EdgeInsets.only(top: 10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: <Widget>[
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Visibility(
+                              visible: widget.isRatingEnable &&
+                                  cardOrderHistoryItems.status.contains('5'),
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 5),
+                                child: InkWell(
+                                  child: RatingBar(
+                                    initialRating: findRating,
+                                    minRating: 0,
+                                    itemSize: 26,
+                                    direction: Axis.horizontal,
+                                    allowHalfRating: true,
+                                    itemCount: 5,
+                                    itemPadding:
+                                        EdgeInsets.symmetric(horizontal: 2.0),
+                                    ratingWidget: RatingWidget(
+                                      full: Icon(
+                                        Icons.star,
+                                        color: appThemeSecondary,
+                                      ),
+                                      half: Icon(
+                                        Icons.star_half,
+                                        color: appThemeSecondary,
+                                      ),
+                                      empty: Icon(
+                                        Icons.star_border,
+                                        color: appThemeSecondary,
+                                      ),
+                                    ),
+                                    ignoreGestures: true,
+                                    onRatingUpdate: (rating) {},
+                                  ),
+                                  onTap: () {
+                                    if (findRating == 0)
+                                      bottomSheet(context,
+                                          cardOrderHistoryItems, index);
+                                  },
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 16,
+                ),
+                Visibility(
+                  visible: index != cardOrderHistoryItems.orderItems.length - 1,
+                  child: Container(
+                    color: Color(0xFFE1E1E1),
+                    height: 1,
+                  ),
+                )
               ],
             ),
           ),
-          SizedBox(
-            height: 16,
-          ),
-          Visibility(
-            visible: index != cardOrderHistoryItems.orderItems.length - 1,
-            child: Container(
-              color: Color(0xFFE1E1E1),
-              height: 1,
-            ),
-          )
         ],
       ),
     );
@@ -1739,7 +1872,7 @@ class _SubscriptionHistoryDetailsState
     }
   }
 
-  String convertOrderDateTime(String date,{String pattern='dd MMM yyyy'}) {
+  String convertOrderDateTime(String date, {String pattern = 'dd MMM yyyy'}) {
     String formatted = date;
     try {
       DateFormat format = new DateFormat("yyyy-MM-dd");
@@ -1754,279 +1887,6 @@ class _SubscriptionHistoryDetailsState
     }
 
     return formatted;
-  }
-
-  Widget _getTrackWidget() {
-    // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
-    // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
-
-//    bool isPickup =widget.orderHistoryData.orderFacility.contains('Pick');
-
-    Color orderPlaced = Colors.black;
-    Color orderConfirmed = widget.orderHistoryData.status == '1' ||
-            widget.orderHistoryData.status == '4' ||
-            widget.orderHistoryData.status == '5'
-        ? Colors.black
-        : grayLightColorSecondary;
-
-    Color orderShipped = widget.orderHistoryData.status == '4' ||
-            widget.orderHistoryData.status == '5'
-        ? Colors.black
-        : grayLightColorSecondary;
-    Color orderDelivered = widget.orderHistoryData.status == '2' ||
-            widget.orderHistoryData.status == '6'
-        ? Colors.red
-        : widget.orderHistoryData.status == '5'
-            ? Colors.black
-            : grayLightColorSecondary;
-
-    double orderPlacedProgress = 100;
-    double orderConfirmedProgress = widget.orderHistoryData.status == '1' ||
-            widget.orderHistoryData.status == '4' ||
-            widget.orderHistoryData.status == '5'
-        ? 100
-        : 0;
-
-    double orderShippedProgress = widget.orderHistoryData.status == '4' ||
-            widget.orderHistoryData.status == '5'
-        ? 100
-        : 0;
-    double orderDeliveredProgress = widget.orderHistoryData.status == '2' ||
-            widget.orderHistoryData.status == '6'
-        ? 100
-        : widget.orderHistoryData.status == '5'
-            ? 100
-            : 0;
-    bool isOrderCanceledOrRejected = widget.orderHistoryData.status == '2' ||
-            widget.orderHistoryData.status == '6'
-        ? true
-        : false;
-    bool isNoteVisible = (widget.orderHistoryData.status == '2' ||
-            widget.orderHistoryData.status == '6') &&
-        widget.orderHistoryData.orderRejectionNote != null &&
-        widget.orderHistoryData.orderRejectionNote.isNotEmpty;
-    String noteHeading = widget.orderHistoryData.orderRejectionNote != null &&
-            widget.orderHistoryData.orderRejectionNote.isNotEmpty
-        ? widget.orderHistoryData.status == '6'
-            ? "Cancellation Comment:-"
-            : widget.orderHistoryData.status == '2'
-                ? "Reason of Rejection:-"
-                : ""
-        : "";
-    String orderRejectionNote =
-        widget.orderHistoryData.orderRejectionNote != null &&
-                widget.orderHistoryData.orderRejectionNote.isNotEmpty
-            ? widget.orderHistoryData.orderRejectionNote
-            : "";
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Stack(
-          children: <Widget>[
-            Container(
-              height: 25,
-              margin: EdgeInsets.only(left: 4, top: 5),
-              width: 2,
-              child: LinearProgressIndicator(
-                backgroundColor: grayLightColorSecondary,
-                value: orderPlacedProgress,
-                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-              ),
-            ),
-            Row(
-              children: <Widget>[
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10 / 2),
-                      color: appTheme),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                    child: Text(
-                  'Order Placed',
-                  style: TextStyle(fontSize: 16, color: orderPlaced),
-                )),
-                Text(
-                  '${Utils.convertOrderDate(widget.orderHistoryData.orderDate)}',
-                  style: TextStyle(color: orderPlaced),
-                )
-              ],
-            )
-          ],
-        ),
-        Visibility(
-          visible: !isOrderCanceledOrRejected,
-          child: Stack(
-            children: <Widget>[
-              Container(
-                height: 30,
-                margin: EdgeInsets.only(
-                  left: 4,
-                ),
-                width: 2,
-                child: LinearProgressIndicator(
-                  backgroundColor: grayLightColorSecondary,
-                  value: orderConfirmedProgress,
-                  valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                ),
-              ),
-              Row(
-                children: <Widget>[
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10 / 2),
-                        color: orderConfirmed == Colors.black
-                            ? appTheme
-                            : grayLightColorSecondary),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(
-                      child: Text(
-                    'Order Confirmed',
-                    style: TextStyle(fontSize: 16, color: orderConfirmed),
-                  )),
-                  Text(
-                    orderConfirmed == Colors.black ? 'Done' : 'Pending',
-                    style: TextStyle(color: orderConfirmed, fontSize: 16),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-        Visibility(
-          visible: !isOrderCanceledOrRejected &&
-              !widget.orderHistoryData.orderFacility
-                  .toLowerCase()
-                  .contains('pick'),
-          child: Stack(
-            children: <Widget>[
-              Container(
-                height: 30,
-                margin: EdgeInsets.only(
-                  left: 4,
-                ),
-                width: 2,
-                child: LinearProgressIndicator(
-                  backgroundColor: grayLightColorSecondary,
-                  value: orderShippedProgress,
-                  valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-                ),
-              ),
-              Row(
-                children: <Widget>[
-                  Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10 / 2),
-                        color: orderShipped == Colors.black
-                            ? appTheme
-                            : grayLightColorSecondary),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Expanded(
-                      child: Text(
-                    'Order Shipped',
-                    style: TextStyle(fontSize: 16, color: orderShipped),
-                  )),
-                  Text(
-                    orderShipped == Colors.black ? 'Done' : 'Pending',
-                    style: TextStyle(color: orderShipped, fontSize: 16),
-                  )
-                ],
-              )
-            ],
-          ),
-        ),
-        Stack(
-          children: <Widget>[
-            Container(
-              height: 15,
-              margin: EdgeInsets.only(
-                left: 4,
-              ),
-              width: 2,
-              child: LinearProgressIndicator(
-                backgroundColor: grayLightColorSecondary,
-                value: orderDeliveredProgress,
-                valueColor: AlwaysStoppedAnimation<Color>(appTheme),
-              ),
-            ),
-            Row(
-              children: <Widget>[
-                Container(
-                  width: 10,
-                  height: 10,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10 / 2),
-                      color: orderDelivered == Colors.black
-                          ? appTheme
-                          : orderDelivered),
-                ),
-                SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                    child: Text(
-                  isOrderCanceledOrRejected
-                      ? widget.orderHistoryData.status == '2'
-                          ? 'Order Rejected'
-                          : 'Order Cancelled'
-                      : !widget.orderHistoryData.orderFacility
-                              .toLowerCase()
-                              .contains('pick')
-                          ? 'Order Delivered'
-                          : 'Order Picked',
-                  style: TextStyle(fontSize: 16, color: orderDelivered),
-                )),
-                Text(
-                  orderDelivered == Colors.black || orderDelivered == Colors.red
-                      ? 'Done'
-                      : 'Pending',
-                  style: TextStyle(color: orderDelivered, fontSize: 16),
-                )
-              ],
-            )
-          ],
-        ),
-        Visibility(
-            visible: isNoteVisible,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  noteHeading,
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 4),
-                  child: Text(
-                    orderRejectionNote,
-                    style: TextStyle(color: Colors.grey, fontSize: 16),
-                  ),
-                )
-              ],
-            ))
-      ],
-    );
   }
 
   showAlertDialog(BuildContext context, setState) {
@@ -2112,5 +1972,109 @@ class _SubscriptionHistoryDetailsState
         getOrderListApi(isLoading: false);
       }
     });
+  }
+
+  CycleType _checkSubscriptionKey(String subscriptionType) {
+    CycleType label = widget.store.subscription.cycleType.first;
+    for (CycleType cycleType in widget.store.subscription.cycleType) {
+      if (cycleType.key == subscriptionType) label = cycleType;
+      break;
+    }
+    return label;
+  }
+
+  void addEvents() {
+    int days = int.parse(
+        _checkSubscriptionKey(widget.orderHistoryData.subscriptionType).days);
+    //final difference = selectedEndDate.difference(selectedStartDate).inDays;
+    //print("difference.inDays=${difference}");
+
+    if (days == 1) {
+      List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(
+          widget.orderHistoryData.startDate, widget.orderHistoryData.endDate);
+      _markedDateMap.clear();
+      for (var i = 0; i < getDatesInBeteween.length; i++) {
+        _markedDateMap.add(
+            getDatesInBeteween[i],
+            Event(
+              date: getDatesInBeteween[i],
+              title: '${getDatesInBeteween[i].day.toString()}',
+              icon: _presentIcon(getDatesInBeteween[i]),
+            ));
+      }
+//      totalDeliveries =
+//          _markedDateMap.events.length;
+//      multiTaxCalculationApi(
+//          couponCode: couponCodeApplied);
+      setState(() {
+//        selecteddays = index;
+      });
+    } else {
+      _markedDateMap.clear();
+      List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(
+          widget.orderHistoryData.startDate, widget.orderHistoryData.endDate);
+      for (var i = 0; i < getDatesInBeteween.length; i++) {
+        if (i % days == 0) {
+          _markedDateMap.add(
+              getDatesInBeteween[i],
+              Event(
+                date: getDatesInBeteween[i],
+                title: '${getDatesInBeteween[i].day.toString()}',
+                icon: _presentIcon(getDatesInBeteween[i]),
+              ));
+        }
+      }
+//      totalDeliveries =
+//          _markedDateMap.events.length;
+//      multiTaxCalculationApi(
+//          couponCode: couponCodeApplied);
+      setState(() {
+//        selecteddays = index;
+      });
+    }
+  }
+
+  Widget _presentIcon(DateTime day) => CircleAvatar(
+        backgroundColor: _checkCurrentDate(day) ? appTheme : Colors.grey,
+        child: Text(
+          day.day.toString(),
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      );
+
+  _checkCurrentDate(DateTime day) {
+    if (checkstatus()) {
+      DateTime dateTime = DateTime.now();
+      return day.isAfter(dateTime);
+    } else {
+      return false;
+    }
+  }
+
+  String _checkNextDeliveryDate() {
+    List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(
+        widget.orderHistoryData.startDate, widget.orderHistoryData.endDate);
+    DateTime deliveryDate = DateTime.now();
+    for (DateTime day in getDatesInBeteween) {
+      if (day.isAfter(deliveryDate)) {
+        deliveryDate = day;
+        break;
+      }
+    }
+
+    String formatted = '';
+    try {
+      DateFormat formatter = new DateFormat('dd MMM, yyyy');
+      formatted = formatter.format(deliveryDate.toLocal());
+    } catch (e) {
+      print(e);
+    }
+    return formatted;
+  }
+
+  bool checkstatus() {
+    return widget.orderHistoryData.status == '1';
   }
 }

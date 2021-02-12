@@ -109,6 +109,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   void initState() {
     super.initState();
     initRazorPay();
+    checkLoyalityPointsOption();
     hideRemoveCouponFirstTime = true;
     widget.product.quantity = widget.quantity;
     widget.product.variantId = widget.selectedVariant == null
@@ -140,6 +141,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       setState(() {
         this.addressData = event.addressData;
       });
+//      Utils.showProgressDialog(context);
       multiTaxCalculationApi(couponCode: couponCodeApplied);
     });
     eventBus.on<onSubscribeProduct>().listen((event) {
@@ -148,6 +150,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         widget.cartList.first.quantity = event.quanity;
       }
       setState(() {});
+      Utils.showProgressDialog(context);
       multiTaxCalculationApi(couponCode: couponCodeApplied);
     });
 
@@ -251,7 +254,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                       ),
                                     ),
                                     Text(
-                                      "${addressData.address}",
+                                      "${addressData.address} ${addressData.address2.isNotEmpty ? ', ' + addressData.address2 : ''}",
                                       style: TextStyle(fontSize: 16),
                                     ),
                                   ],
@@ -385,8 +388,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         controller: controllerEndDate,
                                         onTap: () async {
                                           selectedEndDate = await selectDate(
-                                              context,
-                                              isStartIndex: true);
+                                            context,
+                                            isStartIndex: true,
+                                            isEndIndex: true,
+                                          );
                                           if (selectedEndDate != null) {
                                             _markedDateMap.clear();
                                             selecteddays = -1;
@@ -496,6 +501,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         }
                                         totalDeliveries =
                                             _markedDateMap.events.length;
+//                                        Utils.showProgressDialog(context);
                                         multiTaxCalculationApi(
                                             couponCode: couponCodeApplied);
                                         setState(() {
@@ -526,6 +532,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         }
                                         totalDeliveries =
                                             _markedDateMap.events.length;
+//                                        Utils.showProgressDialog(context);
                                         multiTaxCalculationApi(
                                             couponCode: couponCodeApplied);
                                         setState(() {
@@ -861,7 +868,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         ),
                                       ),
                                       Text(
-                                        "${addressData.address}",
+                                        "${addressData.address}${addressData.address2.isNotEmpty ? ', ' + addressData.address2 : ""}",
                                         style: TextStyle(fontSize: 16),
                                       ),
                                     ],
@@ -879,7 +886,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         Container(
                           margin: EdgeInsets.fromLTRB(15, 10, 15, 3),
                           child: Text(
-                            'Your order amount is approximately.',
+                            'Your total deliveries amount is:',
                             style: TextStyle(color: Colors.black, fontSize: 16),
                           ),
                         ),
@@ -929,6 +936,65 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                             ],
                           ),
                         ),
+                        Visibility(
+                          visible: widget.model.wallet_setting == "1" ? true : false,
+                          child: Container(
+                            child: Padding(
+                                padding: EdgeInsets.only(left: 0, top: 10, bottom: 10),
+                                child: Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                                      child: Icon(
+                                        Icons.done,
+                                        color: appTheme,
+                                        size: 30,
+                                      ),
+                                    ),
+                                    Image.asset(
+                                      'images/walleticon.png',
+                                      color: appTheme,
+                                      fit: BoxFit.scaleDown,
+                                      height: 30,
+                                      width: 30,
+                                    ),
+                                    SizedBox(width: 10,),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text("My Wallet",
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text(
+                                              taxModel == null
+                                                  ? "Remaining Balance: ${AppConstant.currency}"
+                                                  : "Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
+                                              style:
+                                              TextStyle(color: Colors.black, fontSize: 15)),
+                                        ],
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(right: 5, top: 0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        children: [
+                                          Text("You Used",
+                                              style:
+                                              TextStyle(color: Colors.black, fontSize: 16)),
+                                          Text(
+                                              "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.walletRefund.toString()), 2).toStringAsFixed(2)}",
+                                              style: TextStyle(color: appTheme, fontSize: 15)),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(26, 16, 26, 16),
                           child: Row(
@@ -964,6 +1030,21 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           );
         });
   }
+  String getUserRemaningWallet() {
+    double balance = (double.parse(userWalleModel.data.userWallet) -
+        double.parse(taxModel.walletRefund.toString()) -
+        double.parse(taxModel.shipping));
+    //print("balance=${balance}");
+    if (balance > 0.0) {
+      // USer balance is greater than zero.
+      return databaseHelper.roundOffPrice(balance, 2).toStringAsFixed(2);
+    } else {
+      // USer balance is less than or equal to zero.
+      return "0.00";
+    }
+    //return "${userWalleModel == null ? "" : userWalleModel.data.userWallet}";
+  }
+
 
   void callOrderIdApi(StoreModel storeObject) async {
     Utils.showProgressDialog(context);
@@ -1240,8 +1321,72 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             ],
           ),
         ),
+        Visibility(
+          visible: taxModel!=null&&taxModel.taxDetail!=null&&taxModel.taxDetail.isNotEmpty&&taxModel.taxDetail.first.tax.isNotEmpty,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(taxModel == null ?'':taxModel.taxDetail.first.label, style: TextStyle(color: Colors.black)),
+                Text(
+                    "${AppConstant.currency}${taxModel == null ? '0': taxModel.taxDetail.first.tax}",
+                    style: TextStyle(color: Colors.black)),
+              ],
+            ),
+          ),
+        ),
         addMRPPrice(),
         addTotalSavingPrice(),
+        Visibility(
+          visible: widget.model.wallet_setting == "1" ? true : false,
+          child: Container(
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+//                    Padding(
+//                      padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+//                      child: Icon(
+//                        Icons.done,
+//                        color: appTheme,
+//                        size: 30,
+//                      ),
+//                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("My Wallet",
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          Text(
+                              taxModel == null
+                                  ? "Remaining Balance: ${AppConstant.currency}"
+                                  : "Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
+                              style:
+                              TextStyle(color: Colors.black, fontSize: 15)),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text("You Used",
+                            style:
+                            TextStyle(color: Colors.black, fontSize: 16)),
+                        Text(
+                            "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.walletRefund.toString()), 2).toStringAsFixed(2)}",
+                            style: TextStyle(color: appTheme, fontSize: 15)),
+                      ],
+                    ),
+                  ],
+                )),
+          ),
+        ),
       ]),
     );
   }
@@ -1739,7 +1884,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   Widget _presentIcon(String day) => CircleAvatar(
-        backgroundColor: Colors.blue,
+        backgroundColor: appTheme,
         child: Text(
           day,
           style: TextStyle(
@@ -1748,9 +1893,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         ),
       );
 
-  Future<DateTime> selectDate(BuildContext context, {bool isStartIndex}) async {
+  Future<DateTime> selectDate(
+    BuildContext context, {
+    bool isStartIndex,
+    bool isEndIndex,
+  }) async {
     DateTime selectedDate = DateTime.now();
     if (isStartIndex != null) {
+      selectedDate = selectedDate.add(Duration(days: 1));
+    }
+    if (isEndIndex != null) {
       selectedDate = selectedDate.add(Duration(days: 1));
     }
     final DateTime picked = await showDatePicker(
@@ -1885,7 +2037,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         var result = await DialogUtils.displayCommonDialog(
             context,
             widget.model == null ? "" : widget.model.storeName,
-            "${model.message}");
+            "Something went wrong");
+//            "${model.message}");
         if (result != null && result == true) {
           eventBus.fire(updateCartCount());
           Navigator.of(context).popUntil((route) => route.isFirst);

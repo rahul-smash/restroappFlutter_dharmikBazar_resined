@@ -130,7 +130,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   Future<Null> updateSubscriptionOrderDeliverySlots(
       String subscriptionOrderId, String deliverySlot) {
     isLoading = true;
-    return ApiController.subscriptionOrderUpdate(subscriptionOrderId, deliverySlot)
+    return ApiController.subscriptionOrderUpdate(
+            subscriptionOrderId, deliverySlot)
         .then((respone) {
       Utils.hideProgressDialog(context);
       if (respone != null && respone.success) {
@@ -142,7 +143,14 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
       }
     });
   }
-
+  CycleType _checkSubscriptionKey(String subscriptionType) {
+    CycleType label = widget.store.subscription.cycleType.first;
+    for (CycleType cycleType in widget.store.subscription.cycleType) {
+      if (cycleType.key == subscriptionType) label = cycleType;
+      break;
+    }
+    return label;
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,16 +159,16 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         title: Text("Subscribe"),
         centerTitle: true,
         actions: [
-          Icon(
-            Icons.search,
-            color: Colors.white,
-          ),
-          Container(
-              margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-              child: Icon(
-                Icons.filter_list,
-                color: Colors.white,
-              )),
+//          Icon(
+//            Icons.search,
+//            color: Colors.white,
+//          ),
+//          Container(
+//              margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+//              child: Icon(
+//                Icons.filter_list,
+//                color: Colors.white,
+//              )),
         ],
       ),
       body: PullToRefreshView(
@@ -292,21 +300,25 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         break;
     }
     return InkWell(
-      onTap: (){ Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SubscriptionHistoryDetails(
-            ordersList[index], false
-            ,deliverySlotModel,
-            selctedTag,
-            selectedTimeSlot,
-            timeslotList,
-            isInstantDelivery,
-            isDeliveryResponseFalse,
-            isSlotSelected,
-            initSelectedTimeSlotString,),
-        ),
-      );},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SubscriptionHistoryDetails(
+                ordersList[index],
+                false,
+                deliverySlotModel,
+                selctedTag,
+                selectedTimeSlot,
+                timeslotList,
+                isInstantDelivery,
+                isDeliveryResponseFalse,
+                isSlotSelected,
+                initSelectedTimeSlotString,
+                widget.store),
+          ),
+        );
+      },
       child: Container(
         color: Colors.white,
         //height: 100,
@@ -319,13 +331,13 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
               Text(
                   "#${ordersList[index].displaySubscriptionId} (${ordersList[index].orderItems.length} ${ordersList[index].orderItems.length > 1 ? 'Items' : 'Item'})",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                   )),
               Row(
                 children: [
                   Icon(
                     Icons.check_circle_outline,
-                    size: 18,
+                    size: 16,
                   ),
                   SizedBox(
                     width: 5,
@@ -342,27 +354,34 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                     width: 5,
                   ),
                   PopupMenuButton(
-                    elevation: 1.2,
+                    padding: EdgeInsets.zero,
+                    child: Icon(
+                      Icons.more_vert,
+                    ),
+                    elevation: 0,
                     onSelected: (choice) {
                       if (choice == 'View Details') {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => SubscriptionHistoryDetails(
-                                ordersList[index], false
-                            ,deliverySlotModel,
-                              selctedTag,
-                              selectedTimeSlot,
-                              timeslotList,
-                              isInstantDelivery,
-                              isDeliveryResponseFalse,
-                              isSlotSelected,
-                              initSelectedTimeSlotString,),
+                                ordersList[index],
+                                false,
+                                deliverySlotModel,
+                                selctedTag,
+                                selectedTimeSlot,
+                                timeslotList,
+                                isInstantDelivery,
+                                isDeliveryResponseFalse,
+                                isSlotSelected,
+                                initSelectedTimeSlotString,
+                                widget.store),
                           ),
                         );
                         return;
                       } else if (choice == 'Change Delivery Slots') {
-                        deliverySlotBottomSheet(context, ordersList[index],true);
+                        deliverySlotBottomSheet(
+                            context, ordersList[index], true);
                         return;
                       }
 
@@ -409,9 +428,11 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(
-                          Icons.calendar_today,
-                          size: 18,
+                        Image.asset(
+                          'images/calendargreyicon.png',
+                          fit: BoxFit.scaleDown,
+                          height: 18,
+                          color: Color(0xFF7A7C80),
                         ),
                         SizedBox(
                           width: 5,
@@ -432,9 +453,11 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Icon(
-                        Icons.access_time,
-                        size: 18,
+                      Image.asset(
+                        'images/timegreyicon.png',
+                        fit: BoxFit.scaleDown,
+                        height: 18,
+                        color: Color(0xFF7A7C80),
                       ),
                       SizedBox(
                         width: 5,
@@ -459,94 +482,113 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                   "Order ${ordersList[index].orderItems.length > 1 ? 'items' : 'item'}",
                   style: TextStyle(
                     fontSize: 18,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF7A7C80),
                   )),
-              Visibility(
-                visible: false,
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.check_circle_outline,
-                      size: 18,
+              Row(
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 18,
+                    color: Color(0xFF7A7C80),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    _checkSubscriptionKey(ordersList[index].subscriptionType)
+                        .label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF7A7C80),
                     ),
-                    SizedBox(
-                      width: 5,
-                    ),
-                    Text(
-                      _getDeliveryType(index),
-                      style: TextStyle(
-                        fontSize: 14,
-                      ),
-                    )
-                  ],
-                ),
+                  )
+                ],
               )
             ]),
             Container(
-              height: 50,
               padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
               //color: Colors.grey,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: ListView.builder(
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: ordersList[index].orderItems.length > 3
-                            ? 3
-                            : ordersList[index].orderItems.length,
-                        itemBuilder: (context, itemIndex) {
-                          return Container(
-                            margin: EdgeInsets.only(top: 5),
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                              child: Wrap(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Colors.grey[300],
-                                        ),
-                                        borderRadius:
-                                            BorderRadius.all(Radius.circular(5))),
-                                    padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                    child: Center(
-                                      child: Text(
-                                        "${ordersList[index].orderItems[itemIndex].productName}",
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 16,
+                    child: Container(
+                      height: 50,
+                      child: ListView.builder(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: ordersList[index].orderItems.length > 3
+                              ? 3
+                              : ordersList[index].orderItems.length,
+                          itemBuilder: (context, itemIndex) {
+                            return Container(
+                              margin: EdgeInsets.only(top: 5),
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                                child: Wrap(
+                                  children: [
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.grey[300],
+                                          ),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5))),
+                                      padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                      child: Center(
+                                        child: Text(
+                                          "${ordersList[index].orderItems[itemIndex].productName}",
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 16,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                          );
-                        }),
+                            );
+                          }),
+                    ),
                   ),
                   Visibility(
-                    visible: false,
-                    child: Container(
+                    visible: checkstatus(ordersList[index]),
+                    child: Padding(
+                      padding: EdgeInsets.only(top:5,bottom: 5),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text("Next Delivery Date"),
+                          Text(
+                            'Next Delivery Date',
+                            style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF7A7C80),
+                                fontWeight: FontWeight.w300),
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
                           Row(
                             children: [
-                              Icon(
-                                Icons.calendar_today,
-                                size: 18,
+                              Image.asset(
+                                'images/calendargreyicon.png',
+                                fit: BoxFit.scaleDown,
+                                height: 20,
+                                color: Color(0xFF7A7C80),
                               ),
                               SizedBox(
                                 width: 5,
                               ),
                               Text(
-                                "28 Jan 2021",
+                                _checkNextDeliveryDate(ordersList[index]),
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
                                 ),
                               )
                             ],
@@ -554,7 +596,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         ],
                       ),
                     ),
-                  ),
+                  )
                 ],
               ),
             ),
@@ -596,8 +638,9 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
               Row(
                 children: [
                   InkWell(
-                    onTap: (){
-                      deliverySlotBottomSheet(context, ordersList[index],false);
+                    onTap: () {
+                      deliverySlotBottomSheet(
+                          context, ordersList[index], false);
                     },
                     child: Text(
                       "Delivery Slots",
@@ -712,8 +755,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     return formatted;
   }
 
-  deliverySlotBottomSheet(
-      context, SubscriptionOrderData cardOrderHistoryItems,bool isEnable) async {
+  deliverySlotBottomSheet(context, SubscriptionOrderData cardOrderHistoryItems,
+      bool isEnable) async {
     String _selectedTimeSlotString = initSelectedTimeSlotString;
     await showModalBottomSheet(
         context: context,
@@ -863,8 +906,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                           visible: isEnable,
                           child: Container(
                             decoration: new BoxDecoration(
-                              borderRadius:
-                                  new BorderRadius.all(new Radius.circular(5.0)),
+                              borderRadius: new BorderRadius.all(
+                                  new Radius.circular(5.0)),
                             ),
                             child: FlatButton(
                               child: Text(
@@ -891,7 +934,29 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
           );
         });
   }
+  String _checkNextDeliveryDate(SubscriptionOrderData data) {
+    List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(
+        data.startDate, data.endDate);
+    DateTime deliveryDate = DateTime.now();
+    for (DateTime day in getDatesInBeteween) {
+      if (day.isAfter(deliveryDate)) {
+        deliveryDate = day;
+        break;
+      }
+    }
 
+    String formatted = '';
+    try {
+      DateFormat formatter = new DateFormat('dd MMM, yyyy');
+      formatted = formatter.format(deliveryDate.toLocal());
+    } catch (e) {
+      print(e);
+    }
+    return formatted;
+  }
+  bool checkstatus(SubscriptionOrderData data) {
+    return data.status == '1';
+  }
   Widget showDeliverySlot() {}
 }
 
@@ -943,4 +1008,5 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
     });
     return choices;
   }
+
 }

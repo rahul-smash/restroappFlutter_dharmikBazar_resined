@@ -383,43 +383,43 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                             height: variantsVisibility == true ? 0 : 20,
                           ),
                           Visibility(
-                            visible: /* variantsVisibility,*/ false,
+                            visible:  variantsVisibility,
                             child: Padding(
                               padding: EdgeInsets.only(top: 0, bottom: 10),
                               child: InkWell(
                                 onTap: () async {
-                                  //print("-variants.length--${widget.product.variants.length}");
-                                  if (widget.product.variants.length != null) {
-                                    if (widget.product.variants.length == 1) {
-                                      return;
-                                    }
-                                  }
-                                  variant =
-                                      await DialogUtils.displayVariantsDialog(
-                                          context,
-                                          "${widget.product.title}",
-                                          widget.product.variants,
-                                          selectedVariant: variant);
-                                  if (variant != null) {
-                                    /*print("variant.weight= ${variant.weight}");
-                                                  print("variant.discount= ${variant.discount}");
-                                                  print("variant.mrpPrice= ${variant.mrpPrice}");
-                                                  print("variant.price= ${variant.price}");*/
-                                    //TODO: Counter Update
-                                    eventBus.fire(onSubscribeProduct(
-                                        widget.product, counter.toString()));
-//                                    databaseHelper
-//                                        .getProductQuantitiy(variant.id)
-//                                        .then((cartDataObj) {
-//                                      //print("QUANTITY= ${cartDataObj.QUANTITY}");
-//                                      cartData = cartDataObj;
-//                                      counter = int.parse(cartData.QUANTITY);
-//                                      showAddButton =
-//                                          counter == 0 ? true : false;
-//                                      setState(() {});
-//                                    });
-                                  }
-                                  _checkOutOfStock(findNext: false);
+//                                  //print("-variants.length--${widget.product.variants.length}");
+//                                  if (widget.product.variants.length != null) {
+//                                    if (widget.product.variants.length == 1) {
+//                                      return;
+//                                    }
+//                                  }
+//                                  variant =
+//                                      await DialogUtils.displayVariantsDialog(
+//                                          context,
+//                                          "${widget.product.title}",
+//                                          widget.product.variants,
+//                                          selectedVariant: variant);
+//                                  if (variant != null) {
+//                                    /*print("variant.weight= ${variant.weight}");
+//                                                  print("variant.discount= ${variant.discount}");
+//                                                  print("variant.mrpPrice= ${variant.mrpPrice}");
+//                                                  print("variant.price= ${variant.price}");*/
+//                                    //TODO: Counter Update
+//                                    eventBus.fire(onSubscribeProduct(
+//                                        widget.product, counter.toString()));
+////                                    databaseHelper
+////                                        .getProductQuantitiy(variant.id)
+////                                        .then((cartDataObj) {
+////                                      //print("QUANTITY= ${cartDataObj.QUANTITY}");
+////                                      cartData = cartDataObj;
+////                                      counter = int.parse(cartData.QUANTITY);
+////                                      showAddButton =
+////                                          counter == 0 ? true : false;
+////                                      setState(() {});
+////                                    });
+//                                  }
+//                                  _checkOutOfStock(findNext: false);
                                 },
                                 child: Container(
                                   padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
@@ -439,10 +439,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                                         padding: EdgeInsets.only(
                                             top: 5,
                                             right: 5,
-                                            bottom: widget.classType ==
-                                                    ClassType.CART
-                                                ? 5
-                                                : 0),
+                                            bottom: 5),
                                         child: Text(
                                           "${weight}",
                                           textAlign: TextAlign.center,
@@ -450,17 +447,17 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                                               color: appThemeSecondary),
                                         ),
                                       ),
-                                      Visibility(
-                                        visible:
-                                            widget.classType == ClassType.CART
-                                                ? false
-                                                : true,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 10),
-                                          child: Utils.showVariantDropDown(
-                                              widget.classType, widget.product),
-                                        ),
-                                      ),
+//                                      Visibility(
+//                                        visible:
+//                                            widget.classType == ClassType.CART
+//                                                ? false
+//                                                : true,
+//                                        child: Padding(
+//                                          padding: EdgeInsets.only(left: 10),
+//                                          child: Utils.showVariantDropDown(
+//                                              widget.classType, widget.product),
+//                                        ),
+//                                      ),
                                     ],
                                   ),
                                 ),

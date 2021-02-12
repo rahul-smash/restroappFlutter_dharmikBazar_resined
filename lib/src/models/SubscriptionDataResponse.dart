@@ -67,6 +67,7 @@ class SubscriptionOrderData {
     this.couponType,
     this.couponCode,
     this.address,
+    this.image,
     this.subscriptionType,
     this.deliveryAddress,
     this.orderItems,
@@ -101,6 +102,7 @@ class SubscriptionOrderData {
   String couponCode;
   String address;
   String subscriptionType;
+  String image;
   List<DeliveryAddress> deliveryAddress;
   List<OrderItem> orderItems;
 
@@ -134,6 +136,7 @@ class SubscriptionOrderData {
     String couponCode,
     String address,
     String subscriptionType,
+    String image,
     List<DeliveryAddress> deliveryAddress,
     List<OrderItem> orderItems,
   }) =>
@@ -166,6 +169,7 @@ class SubscriptionOrderData {
         couponType: couponType ?? this.couponType,
         couponCode: couponCode ?? this.couponCode,
         address: address ?? this.address,
+        image: image ?? this.image,
         subscriptionType: subscriptionType ?? this.subscriptionType,
         deliveryAddress: deliveryAddress ?? this.deliveryAddress,
         orderItems: orderItems ?? this.orderItems,
@@ -204,6 +208,7 @@ class SubscriptionOrderData {
     couponType: json["coupon_type"] == null ? null : json["coupon_type"],
     couponCode: json["coupon_code"] == null ? null : json["coupon_code"],
     address: json["address"] == null ? null : json["address"],
+    image: json["image"] == null ? null : json["image"],
     subscriptionType: json["subscription_type"] == null ? null : json["subscription_type"],
     deliveryAddress: json["delivery_address"] == null ? null : List<DeliveryAddress>.from(json["delivery_address"].map((x) => DeliveryAddress.fromJson(x))),
     orderItems: json["order_items"] == null ? null : List<OrderItem>.from(json["order_items"].map((x) => OrderItem.fromJson(x))),
@@ -238,6 +243,7 @@ class SubscriptionOrderData {
     "coupon_type": couponType == null ? null : couponType,
     "coupon_code": couponCode == null ? null : couponCode,
     "address": address == null ? null : address,
+    "image": image == null ? null : image,
     "subscription_type": subscriptionType == null ? null : subscriptionType,
     "delivery_address": deliveryAddress == null ? null : List<dynamic>.from(deliveryAddress.map((x) => x.toJson())),
     "order_items": orderItems == null ? null : List<dynamic>.from(orderItems.map((x) => x.toJson())),
@@ -421,6 +427,7 @@ class OrderItem {
     this.productImage,
     this.productBrand,
     this.gst,
+    this.image,
   });
 
   String id;
@@ -456,6 +463,7 @@ class OrderItem {
   String categoryId;
   String productImage;
   String productBrand;
+  String image;
   List<dynamic> gst;
 
   OrderItem copyWith({
@@ -492,6 +500,7 @@ class OrderItem {
     String categoryId,
     String productImage,
     String productBrand,
+    String image,
     List<dynamic> gst,
   }) =>
       OrderItem(
@@ -528,6 +537,7 @@ class OrderItem {
         categoryId: categoryId ?? this.categoryId,
         productImage: productImage ?? this.productImage,
         productBrand: productBrand ?? this.productBrand,
+        image: image ?? this.image,
         gst: gst ?? this.gst,
       );
 
@@ -569,6 +579,7 @@ class OrderItem {
     categoryId: json["category_id"] == null ? null : json["category_id"],
     productImage: json["product_image"] == null ? null : json["product_image"],
     productBrand: json["product_brand"] == null ? null : json["product_brand"],
+    image: json["image"] == null ? null : json["image"],
     gst: json["gst"] == null ? null : List<dynamic>.from(json["gst"].map((x) => x)),
   );
 
@@ -606,6 +617,7 @@ class OrderItem {
     "category_id": categoryId == null ? null : categoryId,
     "product_image": productImage == null ? null : productImage,
     "product_brand": productBrand == null ? null : productBrand,
+    "image": image == null ? null : image,
     "gst": gst == null ? null : List<dynamic>.from(gst.map((x) => x)),
   };
 }
