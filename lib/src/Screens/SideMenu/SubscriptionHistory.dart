@@ -143,6 +143,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
       }
     });
   }
+
   CycleType _checkSubscriptionKey(String subscriptionType) {
     CycleType label = widget.store.subscription.cycleType.first;
     for (CycleType cycleType in widget.store.subscription.cycleType) {
@@ -151,6 +152,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     }
     return label;
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -320,8 +322,9 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         );
       },
       child: Container(
-        decoration: BoxDecoration(color:Colors.white,borderRadius: BorderRadius.circular(5) ),
-        padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+        decoration: BoxDecoration(
+            color: Colors.white, borderRadius: BorderRadius.circular(5)),
+        padding: EdgeInsets.all(16),
         margin: EdgeInsets.fromLTRB(15, 15, 15, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,24 +332,27 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(
                   "#${ordersList[index].displaySubscriptionId} (${ordersList[index].orderItems.length} ${ordersList[index].orderItems.length > 1 ? 'Items' : 'Item'})",
-                  style: TextStyle(
-                    fontSize: 16,
-                  )),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              SizedBox(
+                width: 20,
+              ),
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Icon(
                     Icons.check_circle_outline,
                     size: 16,
+                    color: _getSubscriptionStatusColor(ordersList[index]),
                   ),
                   SizedBox(
-                    width: 5,
+                    width: 3,
                   ),
                   Text(
                     "Order ${_getSubscriptionStatus(ordersList[index])}",
                     style: TextStyle(
                       fontSize: 14,
                       color: _getSubscriptionStatusColor(ordersList[index]),
-                      decoration: TextDecoration.underline,
                     ),
                   ),
                   SizedBox(
@@ -417,21 +423,22 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
               )
             ]),
             SizedBox(
-              height: 10,
+              height: 5,
             ),
             Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
+                    flex: 1,
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Image.asset(
                           'images/calendargreyicon.png',
                           fit: BoxFit.scaleDown,
-                          height: 18,
-                          color: Color(0xFF7A7C80),
+                          height: 14,
+                          color: Color(0xFFBDBDBF),
                         ),
                         SizedBox(
                           width: 5,
@@ -441,8 +448,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                             "${_getDateFormated(ordersList[index].startDate)} to ${_getDateFormated(ordersList[index].endDate)}",
                             maxLines: 2,
                             style: TextStyle(
-                              fontSize: 16,
-                              decoration: TextDecoration.underline,
+                              fontSize: 14,
                             ),
                           ),
                         )
@@ -450,22 +456,22 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                     ),
                   ),
                   Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Image.asset(
                         'images/timegreyicon.png',
                         fit: BoxFit.scaleDown,
-                        height: 18,
-                        color: Color(0xFF7A7C80),
+                        height: 14,
+                        color: Color(0xFFBDBDBF),
                       ),
                       SizedBox(
                         width: 5,
                       ),
                       Text(
-                        "${ordersList[index].deliveryTimeSlot}",
+                        "${ordersList[index].deliveryTimeSlot.replaceAll(':00', '')}",
+                        maxLines: 2,
                         style: TextStyle(
-                          fontSize: 16,
-                          decoration: TextDecoration.underline,
+                          fontSize: 14,
                         ),
                       )
                     ],
@@ -473,23 +479,23 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                 ]),
             Container(
               height: 1,
-              color: Colors.grey[300],
-              margin: EdgeInsets.fromLTRB(0, 15, 0, 10),
+              color: Color(0xffEBECED),
+              margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
             ),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(
                   "Order ${ordersList[index].orderItems.length > 1 ? 'items' : 'item'}",
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w400,
-                    color: Color(0xFF7A7C80),
+                    color: Color(0xFF807D8C),
                   )),
               Row(
                 children: [
                   Icon(
                     Icons.check_circle_outline,
-                    size: 18,
-                    color: Color(0xFF7A7C80),
+                    size: 14,
+                    color: Color(0xFF807D8C),
                   ),
                   SizedBox(
                     width: 5,
@@ -499,22 +505,23 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         .label,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF7A7C80),
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.italic,
+                      color: Color(0xFF807D8C),
                     ),
                   )
                 ],
               )
             ]),
             Container(
-              padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+              padding: EdgeInsets.fromLTRB(5, 2, 5, 0),
               //color: Colors.grey,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Expanded(
                     child: Container(
-                      height: 50,
+                      height: 80,
                       child: ListView.builder(
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
@@ -531,18 +538,18 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                                     Container(
                                       decoration: BoxDecoration(
                                           border: Border.all(
-                                            color: Colors.grey[300],
+                                            color: Color(0xFFBDBDBF),
                                           ),
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(5))),
-                                      padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                      padding: EdgeInsets.all(8.0),
                                       child: Center(
                                         child: Text(
                                           "${ordersList[index].orderItems[itemIndex].productName}",
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 16,
+                                            fontSize: 14,
                                           ),
                                         ),
                                       ),
@@ -557,7 +564,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                   Visibility(
                     visible: checkstatus(ordersList[index]),
                     child: Padding(
-                      padding: EdgeInsets.only(top:5,bottom: 5),
+                      padding: EdgeInsets.only(top: 5, bottom: 5),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -565,7 +572,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                             'Next Delivery Date',
                             style: TextStyle(
                                 fontSize: 14,
-                                color: Color(0xFF7A7C80),
+                                color: Color(0xFF807D8C),
                                 fontWeight: FontWeight.w300),
                           ),
                           SizedBox(
@@ -576,8 +583,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                               Image.asset(
                                 'images/calendargreyicon.png',
                                 fit: BoxFit.scaleDown,
-                                height: 20,
-                                color: Color(0xFF7A7C80),
+                                height: 14,
+                                color: Color(0xFFBDBDBF),
                               ),
                               SizedBox(
                                 width: 5,
@@ -601,6 +608,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
             ),
             Visibility(
               visible: ordersList[index].orderItems.length > 3,
+//              visible: true,
               child: InkWell(
                 onTap: () => _showOrderItemsDialog(ordersList[index]),
                 child: Padding(
@@ -619,38 +627,62 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
             Container(
               height: 1,
               width: Utils.getDeviceWidth(context) / 2,
-              color: Colors.grey[300],
+              color: Color(0xFFBDBDBF),
               margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
             ),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Row(
-                children: [
-                  Text("Total Amount: ",
-                      style: TextStyle(
-                        fontSize: 18,
-                      )),
-                  Text("${AppConstant.currency}${ordersList[index].total}",
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      deliverySlotBottomSheet(
-                          context, ordersList[index], false);
-                    },
-                    child: Text(
-                      "Delivery Slots",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: appTheme,
-                        decoration: TextDecoration.underline,
-                      ),
+              Expanded(
+                child: Wrap(
+                  children: [
+                    Padding(
+                        padding: EdgeInsets.only(top: 6.0),
+                        child: Text("Total Amount: ",
+                            style: TextStyle(
+                              color: Color(0xffA3A5A8),
+                              fontSize: 16,
+                            ))),
+                    Padding(
+                      padding: EdgeInsets.only(top: 6.0),
+                      child: Text(
+                          "${AppConstant.currency}${ordersList[index].total}",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
-                  )
-                ],
+                    Visibility(
+                      visible: ordersList[index].paymentMethod != null &&
+                          ordersList[index].paymentMethod.trim().isNotEmpty,
+                      child: Container(
+                          margin: EdgeInsets.only(left: 6),
+                          padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Color(0xFFE6E6E6)),
+                            color: Colors.white,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15.0)),
+                          ),
+                          child: Text(
+                              '${ordersList[index].paymentMethod.trim().toUpperCase()}',
+                              style: TextStyle(
+                                  color: Color(0xFF39444D), fontSize: 10))),
+                    ),
+                  ],
+                ),
+              ),
+              Visibility(
+                visible: false,
+                child: InkWell(
+                  onTap: () {
+                    deliverySlotBottomSheet(context, ordersList[index], false);
+                  },
+                  child: Text(
+                    "Delivery Slots",
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Color(0xff799A3F),
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
               )
             ]),
           ],
@@ -728,7 +760,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
       case '0':
       case '1':
       case '5':
-        statusColor = appTheme;
+        statusColor = Color(0xff799A3F);
         break;
       case '2':
       case '6':
@@ -749,7 +781,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   }
 
   _getDateFormated(DateTime event) {
-    var formatter = new DateFormat('yyyy-MM-dd');
+    var formatter = new DateFormat('dd-MMM-yyyy');
     String formatted = formatter.format(event);
     return formatted;
   }
@@ -933,9 +965,10 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
           );
         });
   }
+
   String _checkNextDeliveryDate(SubscriptionOrderData data) {
-    List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(
-        data.startDate, data.endDate);
+    List<DateTime> getDatesInBeteween =
+        Utils.getDatesInBeteween(data.startDate, data.endDate);
     DateTime deliveryDate = DateTime.now();
     for (DateTime day in getDatesInBeteween) {
       if (day.isAfter(deliveryDate)) {
@@ -953,9 +986,11 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     }
     return formatted;
   }
+
   bool checkstatus(SubscriptionOrderData data) {
     return data.status == '1';
   }
+
   Widget showDeliverySlot() {}
 }
 
@@ -1007,5 +1042,4 @@ class _MultiSelectChipState extends State<MultiSelectChip> {
     });
     return choices;
   }
-
 }

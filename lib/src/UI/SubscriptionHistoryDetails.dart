@@ -255,9 +255,7 @@ class _SubscriptionHistoryDetailsState
                               Expanded(
                                 child: Text(
                                     "#${widget.orderHistoryData.displaySubscriptionId} (${widget.orderHistoryData.orderItems.length} ${widget.orderHistoryData.orderItems.length > 1 ? 'Items' : 'Item'})",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    )),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                               ),
                               Container(
                                 color: Colors.white,
@@ -267,6 +265,7 @@ class _SubscriptionHistoryDetailsState
                                     Icon(
                                       Icons.check_circle_outline,
                                       size: 16,
+                                      color: _getSubscriptionStatusColor(widget.orderHistoryData),
                                     ),
                                     SizedBox(
                                       width: 5,
@@ -277,7 +276,6 @@ class _SubscriptionHistoryDetailsState
                                         fontSize: 14,
                                         color: _getSubscriptionStatusColor(
                                             widget.orderHistoryData),
-                                        decoration: TextDecoration.underline,
                                       ),
                                     ),
                                     SizedBox(
@@ -346,7 +344,7 @@ class _SubscriptionHistoryDetailsState
                         child: Container(
                           margin: EdgeInsets.only(left: 16, right: 16, top: 10),
                           height: 1,
-                          color: Color(0xFFDBDCDD),
+                          color: Color(0xffEBECED),
                         ),
                       ),
                       Container(
@@ -519,7 +517,7 @@ class _SubscriptionHistoryDetailsState
                         child: Container(
                           margin: EdgeInsets.only(left: 16, right: 16, top: 0),
                           height: 1,
-                          color: Color(0xFFDBDCDD),
+                          color: Color(0xffEBECED),
                         ),
                       ),
                       firstRow(widget.orderHistoryData),
@@ -564,7 +562,7 @@ class _SubscriptionHistoryDetailsState
                         child: Container(
                           margin: EdgeInsets.only(left: 16, right: 16, top: 0),
                           height: 1,
-                          color: Color(0xFFDBDCDD),
+                          color: Color(0xffEBECED),
                         ),
                       ),
                       Container(
@@ -661,7 +659,7 @@ class _SubscriptionHistoryDetailsState
       case '0':
       case '1':
       case '5':
-        statusColor = Colors.green;
+        statusColor = Color(0xff799A3F);
         break;
       case '2':
       case '6':
@@ -687,11 +685,11 @@ class _SubscriptionHistoryDetailsState
             'Date and Time of Booking Request',
             style: TextStyle(
                 fontSize: 14,
-                color: Color(0xFF7A7C80),
+                color: Color(0xFFA0A3A5),
                 fontWeight: FontWeight.w300),
           ),
           Padding(
-            padding: EdgeInsets.only(top: 5, bottom: 10),
+            padding: EdgeInsets.only(top: 7, bottom: 10),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -723,7 +721,7 @@ class _SubscriptionHistoryDetailsState
 //                fontWeight: FontWeight.w300),
 //          ),
           Padding(
-            padding: EdgeInsets.only(top: 5, bottom: 15),
+            padding: EdgeInsets.only(top: 15, bottom: 35),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -748,7 +746,7 @@ class _SubscriptionHistoryDetailsState
                   'Date and Time of Booking',
                   style: TextStyle(
                       fontSize: 14,
-                      color: Color(0xFF7A7C80),
+                      color: Color(0xFFA0A3A5),
                       fontWeight: FontWeight.w300),
                 ),
               ),
@@ -767,8 +765,9 @@ class _SubscriptionHistoryDetailsState
                         .label,
                     style: TextStyle(
                       fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF7A7C80),
+                      fontWeight: FontWeight.w400,
+                      fontStyle: FontStyle.italic,
+                      color: Color(0xFF807D8C),
                     ),
                   )
                 ],
@@ -776,7 +775,7 @@ class _SubscriptionHistoryDetailsState
             ],
           ),
           SizedBox(
-            height: 5,
+            height: 10,
           ),
           Row(
             children: [
@@ -789,8 +788,8 @@ class _SubscriptionHistoryDetailsState
                         Image.asset(
                           'images/calendargreyicon.png',
                           fit: BoxFit.scaleDown,
-                          height: 20,
-                          color: Color(0xFF7A7C80),
+                          height: 16,
+                          color: Color(0xFFBDBDBF),
                         ),
                         SizedBox(
                           width: 5,
@@ -814,8 +813,8 @@ class _SubscriptionHistoryDetailsState
                         Image.asset(
                           'images/timegreyicon.png',
                           fit: BoxFit.scaleDown,
-                          height: 20,
-                          color: Color(0xFF7A7C80),
+                          height: 16,
+                          color: Color(0xFFBDBDBF),
                         ),
                         SizedBox(
                           width: 5,
@@ -853,8 +852,8 @@ class _SubscriptionHistoryDetailsState
                         Image.asset(
                           'images/calendargreyicon.png',
                           fit: BoxFit.scaleDown,
-                          height: 20,
-                          color: Color(0xFF7A7C80),
+                          height: 16,
+                          color: Color(0xFFBDBDBF),
                         ),
                         SizedBox(
                           width: 5,
@@ -880,7 +879,7 @@ class _SubscriptionHistoryDetailsState
             child: Container(
               margin: EdgeInsets.only(top: 16),
               height: 1,
-              color: Color(0xFFDBDCDD),
+              color: Color(0xffEBECED),
             ),
           ),
         ],
@@ -917,7 +916,7 @@ class _SubscriptionHistoryDetailsState
             child: Container(
               margin: EdgeInsets.only(left: 16, right: 16, top: 0),
               height: 1,
-              color: Color(0xFFDBDCDD),
+              color: Color(0xffEBECED),
             ),
           ),
           Container(
@@ -1790,7 +1789,7 @@ class _SubscriptionHistoryDetailsState
 
   deviderLine() {
     return Divider(
-      color: Color(0xFFDBDCDD),
+      color: Color(0xffEBECED),
       height: 1,
       thickness: 1,
       indent: 12,
@@ -1800,7 +1799,7 @@ class _SubscriptionHistoryDetailsState
 
   sheetDeviderLine() {
     return Divider(
-      color: Color(0xFFDBDCDD),
+      color: Color(0xffEBECED),
       height: 1,
       thickness: 1,
       indent: 0,
@@ -1847,10 +1846,11 @@ class _SubscriptionHistoryDetailsState
         orderHistoryData.deliveryAddress.isNotEmpty) {
       String name = '${orderHistoryData.deliveryAddress.first.firstName}';
       String address = '${orderHistoryData.deliveryAddress.first.address}';
-      String area = ', ${orderHistoryData.deliveryAddress.first.areaName}';
+      String address2 = '${orderHistoryData.deliveryAddress.first.address2.isEmpty?'':',\n${orderHistoryData.deliveryAddress.first.address2}'}';
+      String area = ',\n${orderHistoryData.deliveryAddress.first.areaName}';
       String city = ', ${orderHistoryData.deliveryAddress.first.city}';
       String ZipCode = ', ${orderHistoryData.deliveryAddress.first.zipcode}';
-      return '$name\n$address$area$city$ZipCode';
+      return '$name\n$address$address2$area$city$ZipCode';
     } else {
       String address = '${orderHistoryData.address}';
       return address;
