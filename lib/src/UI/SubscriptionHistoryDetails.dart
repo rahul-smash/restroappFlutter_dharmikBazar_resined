@@ -10,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
-import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -19,7 +18,6 @@ import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
-import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SubscriptionHistoryDetails extends StatefulWidget {
@@ -36,9 +34,10 @@ class SubscriptionHistoryDetails extends StatefulWidget {
   bool isSlotSelected = false;
   String initSelectedTimeSlotString = '';
   StoreModel store;
+  String orderHistoryDataId = '';
 
   SubscriptionHistoryDetails(
-      this.orderHistoryData,
+      {this.orderHistoryData,
       this.isRatingEnable,
       this.deliverySlotModel,
       this.selctedTag,
@@ -48,7 +47,8 @@ class SubscriptionHistoryDetails extends StatefulWidget {
       this.isDeliveryResponseFalse,
       this.isSlotSelected,
       this.initSelectedTimeSlotString,
-      this.store);
+      this.store,
+      this.orderHistoryDataId});
 
   @override
   _SubscriptionHistoryDetailsState createState() =>
@@ -87,15 +87,6 @@ class _SubscriptionHistoryDetailsState
       events: {},
     );
     getOrderListApi();
-
-    deliverySlotModel = widget.deliverySlotModel;
-    selctedTag = widget.selctedTag;
-    selectedTimeSlot = widget.selectedTimeSlot;
-    timeslotList = widget.timeslotList;
-    isInstantDelivery = widget.isInstantDelivery;
-    isDeliveryResponseFalse = widget.isDeliveryResponseFalse;
-    isSlotSelected = widget.isSlotSelected;
-    initSelectedTimeSlotString = widget.initSelectedTimeSlotString;
   }
 
   Future<Null> getOrderListApi({bool isLoading = true}) async {
@@ -104,27 +95,94 @@ class _SubscriptionHistoryDetailsState
     userId = user.id;
 
     return ApiController.getSubscriptionDetailHistory(
-            widget.orderHistoryData.subscriptionOrderId)
+            widget.orderHistoryData != null
+                ? widget.orderHistoryData.subscriptionOrderId
+                : widget.orderHistoryDataId)
         .then((respone) {
       if (respone != null &&
           respone.success &&
           respone.data != null &&
           respone.data.isNotEmpty) {
         widget.orderHistoryData = respone.data.first;
+
+      }
+
+      if (deliverySlotModel != null) {
+        deliverySlotModel = widget.deliverySlotModel;
+        selctedTag = widget.selctedTag;
+        selectedTimeSlot = widget.selectedTimeSlot;
+        timeslotList = widget.timeslotList;
+        isInstantDelivery = widget.isInstantDelivery;
+        isDeliveryResponseFalse = widget.isDeliveryResponseFalse;
+        isSlotSelected = widget.isSlotSelected;
+        initSelectedTimeSlotString = widget.initSelectedTimeSlotString;
+
         deliverySlotDate =
             _generalizedDeliverySlotTime(widget.orderHistoryData);
         calculateSaving();
         //events add
         addEvents();
-      }
 
-      if (!isLoading) {
-        Utils.hideProgressDialog(context);
-      }
-      isLoading = false;
-      this.isLoading = isLoading;
-      if (mounted) {
-        setState(() {});
+        if (!isLoading) {
+          Utils.hideProgressDialog(context);
+        }
+        isLoading = false;
+        this.isLoading = isLoading;
+        if (mounted) {
+          setState(() {});
+        }
+
+      } else {
+        ApiController.deliveryTimeSlotApi().then((response) {
+          setState(() {
+            if (!response.success) {
+              isDeliveryResponseFalse = true;
+              return;
+            }
+            deliverySlotModel = response;
+            print(
+                "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+            isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
+            for (int i = 0;
+                i < deliverySlotModel.data.dateTimeCollection.length;
+                i++) {
+              timeslotList =
+                  deliverySlotModel.data.dateTimeCollection[i].timeslot;
+              for (int j = 0; j < timeslotList.length; j++) {
+                Timeslot timeslot = timeslotList[j];
+                if (timeslot.isEnable) {
+                  selectedTimeSlot = j;
+                  isSlotSelected = true;
+                  break;
+                }
+              }
+              if (isSlotSelected) {
+                selctedTag = i;
+                break;
+              }
+            }
+            if (selectedTimeSlot != null && selctedTag != null) {
+              initSelectedTimeSlotString = deliverySlotModel
+                  .data
+                  .dateTimeCollection[selctedTag]
+                  .timeslot[selectedTimeSlot]
+                  .label;
+            }
+            deliverySlotDate =
+                _generalizedDeliverySlotTime(widget.orderHistoryData);
+            calculateSaving();
+            //events add
+            addEvents();
+            if (!isLoading) {
+              Utils.hideProgressDialog(context);
+            }
+            isLoading = false;
+            this.isLoading = isLoading;
+            if (mounted) {
+              setState(() {});
+            }
+          });
+        });
       }
     });
   }
@@ -186,32 +244,28 @@ class _SubscriptionHistoryDetailsState
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = MediaQuery.of(context).size.width;
-    mainContext = context;
-    String itemText = widget.orderHistoryData.orderItems.length > 1
-        ? '${widget.orderHistoryData.orderItems.length} Items, '
-        : '${widget.orderHistoryData.orderItems.length} Item, ';
-    String orderFacility = widget.orderHistoryData.orderFacility != null
-        ? '${widget.orderHistoryData.orderFacility}, '
-        : '';
     List<String> choices = List();
-    switch (widget.orderHistoryData.status) {
-      case '0':
-      case '2':
-      case '5':
-      case '6':
-      case '10':
-        break;
-      case '1':
-        choices.add('Order Stop');
-        choices.add('Pause');
-        choices.add('Change Delivery Slots');
-        break;
-      case '9':
-        choices.add('Order Stop');
-        choices.add('Active');
-        choices.add('Change Delivery Slots');
-        break;
+    if(widget.orderHistoryData!=null){
+      screenWidth = MediaQuery.of(context).size.width;
+      mainContext = context;
+      switch (widget.orderHistoryData.status) {
+        case '0':
+        case '2':
+        case '5':
+        case '6':
+        case '10':
+          break;
+        case '1':
+          choices.add('Order Stop');
+          choices.add('Pause');
+          choices.add('Change Delivery Slots');
+          break;
+        case '9':
+          choices.add('Order Stop');
+          choices.add('Active');
+          choices.add('Change Delivery Slots');
+          break;
+      }
     }
     return isLoading
         ? Scaffold(

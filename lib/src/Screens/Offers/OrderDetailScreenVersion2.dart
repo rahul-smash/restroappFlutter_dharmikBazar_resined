@@ -5,10 +5,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:restroapp/src/UI/SubscriptionHistoryDetails.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -19,8 +21,10 @@ import 'package:restroapp/src/utils/Utils.dart';
 class OrderDetailScreenVersion2 extends StatefulWidget {
   OrderData orderHistoryData;
   bool isRatingEnable;
+  StoreModel store;
 
-  OrderDetailScreenVersion2(this.orderHistoryData, this.isRatingEnable);
+  OrderDetailScreenVersion2(
+      this.orderHistoryData, this.isRatingEnable, this.store);
 
   @override
   _OrderDetailScreenVersion2State createState() =>
@@ -182,9 +186,45 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              'Track Order',
-                              style: TextStyle(fontSize: 18),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Track Order',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: widget.orderHistoryData
+                                              .subscription_order_id !=
+                                          null &&
+                                      widget.orderHistoryData
+                                          .subscription_order_id.isNotEmpty,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              SubscriptionHistoryDetails(
+                                            orderHistoryDataId: widget
+                                                .orderHistoryData
+                                                .subscription_order_id
+                                                ,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Subscribed',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: appTheme,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(
                               height: 16,

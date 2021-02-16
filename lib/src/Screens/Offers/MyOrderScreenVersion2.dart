@@ -83,7 +83,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
           context,
           MaterialPageRoute(
             builder: (context) => OrderDetailScreenVersion2(
-                cardOrderHistoryItems, isRatingEnable),
+                cardOrderHistoryItems, isRatingEnable,widget.store),
           ),
         );
       },

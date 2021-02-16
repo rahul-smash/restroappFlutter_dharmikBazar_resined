@@ -148,20 +148,20 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                     fullscreenDialog: true,
                   ));
               setState(() {
-                if (result != null) {
-                  variant = result;
-                  discount = variant.discount.toString();
-                  price = variant.price.toString();
-                  weight = variant.weight;
-                  variantId = variant.id;
-                } else {
-                  variantId =
-                      variant == null ? widget.product.variantId : variant.id;
-                }
-                _checkOutOfStock(findNext: false);
+//                if (result != null) {
+//                  variant = result;
+//                  discount = variant.discount.toString();
+//                  price = variant.price.toString();
+//                  weight = variant.weight;
+//                  variantId = variant.id;
+//                } else {
+//                  variantId =
+//                      variant == null ? widget.product.variantId : variant.id;
+//                }
+//                _checkOutOfStock(findNext: false);
                 //TODO: Counter Update
-                eventBus.fire(
-                    onSubscribeProduct(widget.product, counter.toString()));
+//                eventBus.fire(
+//                    onSubscribeProduct(widget.product, counter.toString()));
 //                databaseHelper
 //                    .getProductQuantitiy(variantId)
 //                    .then((cartDataObj) {
