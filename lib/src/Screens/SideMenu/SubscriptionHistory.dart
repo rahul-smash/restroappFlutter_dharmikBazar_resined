@@ -24,18 +24,22 @@ class SubscriptionHistory extends StatefulWidget {
 }
 
 class _SubscriptionHistoryState extends State<SubscriptionHistory> {
+  String clear = "\u2715 Clear";
   List<String> filtersList = [
     "\u2715 Clear",
     "Active Orders",
     "Pause Orders",
-    "Completed Orders"
+    "Completed Orders",
+    "Due Orders",
   ];
 
-  int selectedFilter = -1;
+  String selectedFilter = '';
+  String searchedText = '';
 
   bool isLoading = true;
 
   List<SubscriptionOrderData> ordersList;
+  List<SubscriptionOrderData> filteredList = List();
 
   DeliveryTimeSlotModel deliverySlotModel;
   int selctedTag, selectedTimeSlot;
@@ -47,10 +51,16 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   bool isSlotSelected = false;
   String initSelectedTimeSlotString = '';
 
+  Icon actionIcon = Icon(Icons.search);
+
+  Widget appBarTitle = Text("Subscription");
+
+  bool _showFilters = false;
+
   @override
   void initState() {
     super.initState();
-    selectedFilter = -1;
+    selectedFilter = '';
     getSubscriptionOrderHistory();
     callDeliverySlotsApi();
   }
@@ -160,131 +170,200 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     return Scaffold(
       backgroundColor: grayColor,
       appBar: AppBar(
-        title: Text("Subscribe"),
+        title: appBarTitle,
         centerTitle: true,
         actions: [
-//          Icon(
-//            Icons.search,
-//            color: Colors.white,
-//          ),
-//          Container(
-//              margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-//              child: Icon(
-//                Icons.filter_list,
-//                color: Colors.white,
-//              )),
+          new IconButton(
+            icon: actionIcon,
+            onPressed: () {
+              _showFilters = false;
+              selectedFilter = '';
+              searchedText = '';
+              selectedFilter = '';
+              filteredList.clear();
+              setState(() {
+                if (this.actionIcon.icon == Icons.search) {
+                  this.actionIcon = new Icon(Icons.close);
+                  this.appBarTitle = new TextField(
+                    onChanged: (value) {
+                      searchedText = value;
+                    },
+                    onSubmitted: (value) {
+                      print("search");
+                      searchedText = value;
+                      findSearchList();
+                    },
+                    style: new TextStyle(
+                      color: Colors.white,
+                    ),
+                    decoration: new InputDecoration(
+                        hintText: "Search...",
+                        focusedBorder: InputBorder.none,
+                        border: InputBorder.none,
+                        hintStyle: new TextStyle(color: Colors.white)),
+                  );
+                } else {
+                  this.actionIcon = new Icon(Icons.search);
+                  this.appBarTitle = Text("Subscription");
+                }
+              });
+            },
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            onPressed: () {
+              setState(() {
+                this.actionIcon = new Icon(Icons.search);
+                this.appBarTitle = Text("Subscription");
+                _showFilters = !_showFilters;
+                selectedFilter = '';
+                searchedText = '';
+                filteredList.clear();
+              });
+            },
+            icon: Icon(
+              !_showFilters ? Icons.filter_list : Icons.close,
+              color: Colors.white,
+            ),
+          ),
         ],
       ),
-      body: PullToRefreshView(
-          onRefresh: () {
-            return getSubscriptionOrderHistory();
-          },
-          child: isLoading
-              ? Center(child: CircularProgressIndicator())
-              : ordersList == null
-                  ? SingleChildScrollView(
-                      child: Center(child: Text("Something went wrong!")))
-                  : Container(
-                      color: grayColor,
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: ListView(
-                              shrinkWrap: true,
-                              physics: ScrollPhysics(),
-                              children: [
-                                Visibility(
-                                  visible: false,
-                                  child: Container(
-                                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                                    height: 80,
-                                    color: blue3,
-                                    child: Center(
-                                      child: ListView.builder(
-                                          scrollDirection: Axis.horizontal,
-                                          itemCount: filtersList.length,
-                                          itemBuilder: (context, index) {
-                                            return Container(
-                                              child: Padding(
-                                                padding: EdgeInsets.fromLTRB(
-                                                    5, 0, 5, 0),
-                                                child: Row(
-                                                  children: [
-                                                    InkWell(
-                                                      onTap: () {
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : ordersList == null
+              ? SingleChildScrollView(
+                  child: Center(child: Text("Something went wrong!")))
+              : Container(
+                  color: grayColor,
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: ListView(
+                          shrinkWrap: true,
+                          physics: ScrollPhysics(),
+                          children: [
+                            Visibility(
+                              visible: _showFilters,
+                              child: Container(
+                                padding: EdgeInsets.all(10),
+                                color: appTheme,
+                                alignment: Alignment.center,
+                                child: Center(
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: filtersList.map((filter) {
+                                        return Container(
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                            child: Wrap(
+                                              children: [
+                                                InkWell(
+                                                  onTap: () {
+                                                    setState(() {
+                                                      if ((selectedFilter !=
+                                                                  '' &&
+                                                              filter ==
+                                                                  clear) ||
+                                                          filter == clear) {
+                                                        selectedFilter = '';
+                                                        filteredList.clear();
                                                         setState(() {
-                                                          selectedFilter =
-                                                              index;
+                                                          //refreshList
                                                         });
-                                                      },
-                                                      child: Container(
-                                                        padding:
-                                                            EdgeInsets.fromLTRB(
-                                                                10, 0, 10, 0),
-                                                        child: Center(
-                                                            child: Text(
-                                                          "${filtersList[index]}",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  selectedFilter ==
-                                                                          index
-                                                                      ? blue3
-                                                                      : Colors
-                                                                          .white,
-                                                              fontSize: 18,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w400),
-                                                        )),
-                                                        height: 40,
-                                                        color: selectedFilter ==
-                                                                index
-                                                            ? Colors.white
-                                                            : Colors.white
-                                                                .withOpacity(
-                                                                    0.3),
-                                                      ),
-                                                    ),
-                                                  ],
+                                                        return;
+                                                      }
+                                                      selectedFilter = filter;
+                                                      findfiltedList();
+                                                    });
+                                                  },
+                                                  child: Container(
+                                                    padding: EdgeInsets.all(10),
+                                                    child: Center(
+                                                        child: Text(
+                                                      "${filter}",
+                                                      style: TextStyle(
+                                                          color:
+                                                              selectedFilter ==
+                                                                      filter
+                                                                  ? appTheme
+                                                                  : Colors
+                                                                      .white,
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.w400),
+                                                    )),
+                                                    color: selectedFilter ==
+                                                            filter
+                                                        ? Colors.white
+                                                        : Colors.white
+                                                            .withOpacity(0.3),
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          }),
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(growable: true),
                                     ),
                                   ),
                                 ),
-                                Visibility(
-                                  visible: false,
-                                  child: Container(
-                                    padding: EdgeInsets.fromLTRB(15, 0, 10, 0),
-                                    height: 30,
-                                    color: blue3,
-                                    child: Text(
-                                      "Results 10",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                  ),
-                                ),
-                                ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: ScrollPhysics(),
-                                  itemCount: ordersList.length,
-                                  itemBuilder: (context, index) {
-                                    return showSubScribeView(index);
-                                  },
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                            Visibility(
+                              visible: (searchedText.isNotEmpty) ||
+                                  (_showFilters && selectedFilter.isNotEmpty),
+                              child: Container(
+                                padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+                                color: appTheme,
+                                child: Text(
+                                  searchedText.isNotEmpty ||
+                                          selectedFilter.isNotEmpty
+                                      ? "${filteredList.length} from Results ${ordersList.length}"
+                                      : '',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ),
+                            (searchedText.isNotEmpty && filteredList.isEmpty) ||
+                                    (selectedFilter.isNotEmpty &&
+                                        filteredList.isEmpty)
+                                ? Container(
+                                    height:
+                                        Utils.getDeviceHeight(context) - 165,
+                                    child: Center(
+                                        child: Text(
+                                      '${searchedText.isNotEmpty ? searchedText + ' is ' : selectedFilter + ' are '}not Found!',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
+                                          fontSize: 20),
+                                    )))
+                                : ListView.builder(
+                                    shrinkWrap: true,
+                                    physics: ScrollPhysics(),
+                                    itemCount: filteredList.isNotEmpty
+                                        ? filteredList.length
+                                        : ordersList.length,
+                                    itemBuilder: (context, index) {
+                                      return showSubScribeView(index);
+                                    },
+                                  ),
+                          ],
+                        ),
                       ),
-                    )),
+                    ],
+                  ),
+                ),
     );
   }
 
   Widget showSubScribeView(int index) {
+    SubscriptionOrderData data =
+        filteredList.isNotEmpty ? filteredList[index] : ordersList[index];
     List<String> choices = List();
-    switch (ordersList[index].status) {
+    switch (data.status) {
       case '0':
       case '2':
       case '5':
@@ -309,7 +388,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
           context,
           MaterialPageRoute(
             builder: (context) => SubscriptionHistoryDetails(
-                ordersList[index],
+                data,
                 false,
                 deliverySlotModel,
                 selctedTag,
@@ -333,7 +412,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(
-                  "#${ordersList[index].displaySubscriptionId} (${ordersList[index].orderItems.length} ${ordersList[index].orderItems.length > 1 ? 'Items' : 'Item'})",
+                  "#${data.displaySubscriptionId} (${data.orderItems.length} ${data.orderItems.length > 1 ? 'Items' : 'Item'})",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
               SizedBox(
                 width: 20,
@@ -345,16 +424,16 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                   Icon(
                     Icons.check_circle_outline,
                     size: 16,
-                    color: _getSubscriptionStatusColor(ordersList[index]),
+                    color: _getSubscriptionStatusColor(data),
                   ),
                   SizedBox(
                     width: 3,
                   ),
                   Text(
-                    "Order ${_getSubscriptionStatus(ordersList[index])}",
+                    "Order ${_getSubscriptionStatus(data)}",
                     style: TextStyle(
                       fontSize: 14,
-                      color: _getSubscriptionStatusColor(ordersList[index]),
+                      color: _getSubscriptionStatusColor(data),
                     ),
                   ),
                   SizedBox(
@@ -372,7 +451,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => SubscriptionHistoryDetails(
-                                ordersList[index],
+                                data,
                                 false,
                                 deliverySlotModel,
                                 selctedTag,
@@ -387,8 +466,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         );
                         return;
                       } else if (choice == 'Change Delivery Slots') {
-                        deliverySlotBottomSheet(
-                            context, ordersList[index], true);
+                        deliverySlotBottomSheet(context, data, true);
                         return;
                       }
 
@@ -407,7 +485,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                       //hit api
                       Utils.showProgressDialog(context);
                       updateSubscriptionStatus(
-                          ordersList[index].subscriptionOrderId, status);
+                          data.subscriptionOrderId, status);
                     },
                     onCanceled: () {
                       print('You have not chossed anything');
@@ -447,7 +525,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         ),
                         Expanded(
                           child: Text(
-                            "${_getDateFormated(ordersList[index].startDate)} to ${_getDateFormated(ordersList[index].endDate)}",
+                            "${_getDateFormated(data.startDate)} to ${_getDateFormated(data.endDate)}",
                             maxLines: 2,
                             style: TextStyle(
                               fontSize: 14,
@@ -470,7 +548,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         width: 5,
                       ),
                       Text(
-                        "${ordersList[index].deliveryTimeSlot.replaceAll(':00', '')}",
+                        "${data.deliveryTimeSlot.replaceAll(':00', '')}",
                         maxLines: 2,
                         style: TextStyle(
                           fontSize: 14,
@@ -485,8 +563,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
               margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
             ),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(
-                  "Order ${ordersList[index].orderItems.length > 1 ? 'items' : 'item'}",
+              Text("Order ${data.orderItems.length > 1 ? 'items' : 'item'}",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w400,
@@ -503,8 +580,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                     width: 5,
                   ),
                   Text(
-                    _checkSubscriptionKey(ordersList[index].subscriptionType)
-                        .label,
+                    _checkSubscriptionKey(data.subscriptionType).label,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w400,
@@ -527,9 +603,9 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                       child: ListView.builder(
                           shrinkWrap: true,
                           scrollDirection: Axis.horizontal,
-                          itemCount: ordersList[index].orderItems.length > 3
+                          itemCount: data.orderItems.length > 3
                               ? 3
-                              : ordersList[index].orderItems.length,
+                              : data.orderItems.length,
                           itemBuilder: (context, itemIndex) {
                             return Container(
                               margin: EdgeInsets.only(top: 5),
@@ -547,7 +623,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                                       padding: EdgeInsets.all(8.0),
                                       child: Center(
                                         child: Text(
-                                          "${ordersList[index].orderItems[itemIndex].productName}",
+                                          "${data.orderItems[itemIndex].productName}",
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             color: Colors.black,
@@ -564,7 +640,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                     ),
                   ),
                   Visibility(
-                    visible: checkstatus(ordersList[index]),
+                    visible: checkstatus(data),
                     child: Padding(
                       padding: EdgeInsets.only(top: 5, bottom: 5),
                       child: Column(
@@ -592,7 +668,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                                 width: 5,
                               ),
                               Text(
-                                _checkNextDeliveryDate(ordersList[index]),
+                                _checkNextDeliveryDate(data),
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
@@ -609,10 +685,10 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
               ),
             ),
             Visibility(
-              visible: ordersList[index].orderItems.length > 3,
+              visible: data.orderItems.length > 3,
 //              visible: true,
               child: InkWell(
-                onTap: () => _showOrderItemsDialog(ordersList[index]),
+                onTap: () => _showOrderItemsDialog(data),
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
                   child: Text(
@@ -645,14 +721,13 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                             ))),
                     Padding(
                       padding: EdgeInsets.only(top: 6.0),
-                      child: Text(
-                          "${AppConstant.currency}${ordersList[index].total}",
+                      child: Text("${AppConstant.currency}${data.total}",
                           style: TextStyle(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                     Visibility(
-                      visible: ordersList[index].paymentMethod != null &&
-                          ordersList[index].paymentMethod.trim().isNotEmpty,
+                      visible: data.paymentMethod != null &&
+                          data.paymentMethod.trim().isNotEmpty,
                       child: Container(
                           margin: EdgeInsets.only(left: 6),
                           padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
@@ -663,7 +738,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                                 BorderRadius.all(Radius.circular(15.0)),
                           ),
                           child: Text(
-                              '${ordersList[index].paymentMethod.trim().toUpperCase()}',
+                              '${data.paymentMethod.trim().toUpperCase()}',
                               style: TextStyle(
                                   color: Color(0xFF39444D), fontSize: 10))),
                     ),
@@ -674,7 +749,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                 visible: false,
                 child: InkWell(
                   onTap: () {
-                    deliverySlotBottomSheet(context, ordersList[index], false);
+                    deliverySlotBottomSheet(context, data, false);
                   },
                   child: Text(
                     "Delivery Slots",
@@ -774,12 +849,6 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         break;
     }
     return statusColor;
-  }
-
-  String _getDeliveryType(int index) {
-    return '';
-//    ordersList[index].ke
-//    Alternate
   }
 
   _getDateFormated(DateTime event) {
@@ -994,6 +1063,57 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   }
 
   Widget showDeliverySlot() {}
+
+  void findfiltedList() {
+    filteredList.clear();
+    if (ordersList != null && ordersList.isNotEmpty) {
+      for (int i = 0; i < ordersList.length; i++) {
+        String type = '';
+        switch (selectedFilter) {
+          case "Active Orders":
+            type = '1';
+            break;
+          case "Pause Orders":
+            type = '9';
+            break;
+          case "Completed Orders":
+            type = '5';
+            break;
+          case "Due Orders":
+            type = '0';
+            break;
+        }
+        if (type == ordersList[i].status) filteredList.add(ordersList[i]);
+      }
+      setState(() {});
+    }
+  }
+
+  void findSearchList() {
+    filteredList.clear();
+    if (ordersList != null && ordersList.isNotEmpty) {
+      for (int i = 0; i < ordersList.length; i++) {
+        if (ordersList[i].displaySubscriptionId.contains(searchedText)) {
+          filteredList.add(ordersList[i]);
+        } else {
+          for (int j = 0; j < ordersList[i].orderItems.length; j++) {
+            print(ordersList[i].orderItems[j].productName);
+            print(
+                ordersList[i].orderItems[j].productName.contains(searchedText));
+            if (ordersList[i]
+                .orderItems[j]
+                .productName
+                .toLowerCase()
+                .contains(searchedText.toLowerCase())) {
+              filteredList.add(ordersList[i]);
+              break;
+            }
+          }
+        }
+      }
+      setState(() {});
+    }
+  }
 }
 
 class MultiSelectChip extends StatefulWidget {
