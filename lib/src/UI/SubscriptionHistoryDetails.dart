@@ -255,7 +255,9 @@ class _SubscriptionHistoryDetailsState
                               Expanded(
                                 child: Text(
                                     "#${widget.orderHistoryData.displaySubscriptionId} (${widget.orderHistoryData.orderItems.length} ${widget.orderHistoryData.orderItems.length > 1 ? 'Items' : 'Item'})",
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500)),
                               ),
                               Container(
                                 color: Colors.white,
@@ -265,7 +267,8 @@ class _SubscriptionHistoryDetailsState
                                     Icon(
                                       Icons.check_circle_outline,
                                       size: 16,
-                                      color: _getSubscriptionStatusColor(widget.orderHistoryData),
+                                      color: _getSubscriptionStatusColor(
+                                          widget.orderHistoryData),
                                     ),
                                     SizedBox(
                                       width: 5,
@@ -567,7 +570,7 @@ class _SubscriptionHistoryDetailsState
                       ),
                       Container(
 //                        color: Color(0xFFDBDCDD),
-                      padding: EdgeInsets.all(16),
+                        padding: EdgeInsets.all(16),
                         color: Colors.white,
                         child: Row(
                           children: [
@@ -581,8 +584,9 @@ class _SubscriptionHistoryDetailsState
                                         shape: BoxShape.circle,
                                         color: Colors.grey),
                                   ),
-
-                                  SizedBox(width: 5,),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
                                   Text("Completed Order Date"),
                                 ],
                               ),
@@ -593,10 +597,11 @@ class _SubscriptionHistoryDetailsState
                                   width: 7.5,
                                   height: 7.5,
                                   decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: appTheme),
+                                      shape: BoxShape.circle, color: appTheme),
                                 ),
-                                SizedBox(width: 5,),
+                                SizedBox(
+                                  width: 5,
+                                ),
                                 Text("Pending Order Date"),
                               ],
                             )
@@ -1846,7 +1851,8 @@ class _SubscriptionHistoryDetailsState
         orderHistoryData.deliveryAddress.isNotEmpty) {
       String name = '${orderHistoryData.deliveryAddress.first.firstName}';
       String address = '${orderHistoryData.deliveryAddress.first.address}';
-      String address2 = '${orderHistoryData.deliveryAddress.first.address2.isEmpty?'':',\n${orderHistoryData.deliveryAddress.first.address2}'}';
+      String address2 =
+          '${orderHistoryData.deliveryAddress.first.address2.isEmpty ? '' : ',\n${orderHistoryData.deliveryAddress.first.address2}'}';
       String area = ',\n${orderHistoryData.deliveryAddress.first.areaName}';
       String city = ', ${orderHistoryData.deliveryAddress.first.city}';
       String ZipCode = ', ${orderHistoryData.deliveryAddress.first.zipcode}';
@@ -1977,8 +1983,10 @@ class _SubscriptionHistoryDetailsState
   CycleType _checkSubscriptionKey(String subscriptionType) {
     CycleType label = widget.store.subscription.cycleType.first;
     for (CycleType cycleType in widget.store.subscription.cycleType) {
-      if (cycleType.key == subscriptionType) label = cycleType;
-      break;
+      if (cycleType.key.contains(subscriptionType)) {
+        label = cycleType;
+        break;
+      }
     }
     return label;
   }

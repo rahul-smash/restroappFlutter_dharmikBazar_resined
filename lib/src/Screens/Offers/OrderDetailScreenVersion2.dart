@@ -666,9 +666,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Visibility(
-//                        visible: widget.isRatingEnable &&
-//                            cardOrderHistoryItems.status.contains('5'),
-                      visible: true,
+                        visible: widget.isRatingEnable &&
+                            cardOrderHistoryItems.status.contains('5'),
                         child: Padding(
                           padding: EdgeInsets.only(top: 5),
                           child: InkWell(

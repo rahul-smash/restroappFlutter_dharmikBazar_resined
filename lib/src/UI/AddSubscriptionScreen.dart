@@ -150,8 +150,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         widget.cartList.first.quantity = event.quanity;
       }
       setState(() {});
-      Utils.showProgressDialog(context);
-      multiTaxCalculationApi(couponCode: couponCodeApplied);
+//      Utils.showProgressDialog(context);
+//      multiTaxCalculationApi(couponCode: couponCodeApplied);
     });
 
 //    databaseHelper

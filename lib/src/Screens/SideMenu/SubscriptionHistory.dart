@@ -147,8 +147,10 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   CycleType _checkSubscriptionKey(String subscriptionType) {
     CycleType label = widget.store.subscription.cycleType.first;
     for (CycleType cycleType in widget.store.subscription.cycleType) {
-      if (cycleType.key == subscriptionType) label = cycleType;
-      break;
+      if (cycleType.key == subscriptionType) {
+        label = cycleType;
+        break;
+      }
     }
     return label;
   }
