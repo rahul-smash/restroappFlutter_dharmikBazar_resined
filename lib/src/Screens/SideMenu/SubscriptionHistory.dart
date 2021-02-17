@@ -228,134 +228,142 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
           ),
         ],
       ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : ordersList == null
-              ? SingleChildScrollView(
-                  child: Center(child: Text("Something went wrong!")))
-              : Container(
-                  color: grayColor,
-                  child: Column(
-                    children: [
-                      Expanded(
-                        child: ListView(
-                          shrinkWrap: true,
-                          physics: ScrollPhysics(),
-                          children: [
-                            Visibility(
-                              visible: _showFilters,
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                color: appTheme,
-                                alignment: Alignment.center,
-                                child: Center(
-                                  child: SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal,
-                                    child: Row(
-                                      children: filtersList.map((filter) {
-                                        return Container(
-                                          child: Padding(
-                                            padding:
-                                                EdgeInsets.fromLTRB(5, 0, 5, 0),
-                                            child: Wrap(
-                                              children: [
-                                                InkWell(
-                                                  onTap: () {
-                                                    setState(() {
-                                                      if ((selectedFilter !=
-                                                                  '' &&
-                                                              filter ==
-                                                                  clear) ||
-                                                          filter == clear) {
-                                                        selectedFilter = '';
-                                                        filteredList.clear();
-                                                        setState(() {
-                                                          //refreshList
-                                                        });
-                                                        return;
-                                                      }
-                                                      selectedFilter = filter;
-                                                      findfiltedList();
-                                                    });
-                                                  },
-                                                  child: Container(
-                                                    padding: EdgeInsets.all(10),
-                                                    child: Center(
-                                                        child: Text(
-                                                      "${filter}",
-                                                      style: TextStyle(
-                                                          color:
-                                                              selectedFilter ==
-                                                                      filter
-                                                                  ? appTheme
-                                                                  : Colors
-                                                                      .white,
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.w400),
-                                                    )),
-                                                    color: selectedFilter ==
-                                                            filter
-                                                        ? Colors.white
-                                                        : Colors.white
-                                                            .withOpacity(0.3),
+      body: PullToRefreshView(
+        onRefresh: () {
+          return getSubscriptionOrderHistory();
+        },
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : ordersList == null
+                ? SingleChildScrollView(
+                    child: Center(child: Text("Something went wrong!")))
+                : Container(
+                    color: grayColor,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: ListView(
+                            shrinkWrap: true,
+                            physics: ScrollPhysics(),
+                            children: [
+                              Visibility(
+                                visible: _showFilters,
+                                child: Container(
+                                  padding: EdgeInsets.all(10),
+                                  color: appTheme,
+                                  alignment: Alignment.center,
+                                  child: Center(
+                                    child: SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: filtersList.map((filter) {
+                                          return Container(
+                                            child: Padding(
+                                              padding: EdgeInsets.fromLTRB(
+                                                  5, 0, 5, 0),
+                                              child: Wrap(
+                                                children: [
+                                                  InkWell(
+                                                    onTap: () {
+                                                      setState(() {
+                                                        if ((selectedFilter !=
+                                                                    '' &&
+                                                                filter ==
+                                                                    clear) ||
+                                                            filter == clear) {
+                                                          selectedFilter = '';
+                                                          filteredList.clear();
+                                                          setState(() {
+                                                            //refreshList
+                                                          });
+                                                          return;
+                                                        }
+                                                        selectedFilter = filter;
+                                                        findfiltedList();
+                                                      });
+                                                    },
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.all(10),
+                                                      child: Center(
+                                                          child: Text(
+                                                        "${filter}",
+                                                        style: TextStyle(
+                                                            color:
+                                                                selectedFilter ==
+                                                                        filter
+                                                                    ? appTheme
+                                                                    : Colors
+                                                                        .white,
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      )),
+                                                      color: selectedFilter ==
+                                                              filter
+                                                          ? Colors.white
+                                                          : Colors.white
+                                                              .withOpacity(0.3),
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                      }).toList(growable: true),
+                                          );
+                                        }).toList(growable: true),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Visibility(
-                              visible: (searchedText.isNotEmpty) ||
-                                  (_showFilters && selectedFilter.isNotEmpty),
-                              child: Container(
-                                padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
-                                color: appTheme,
-                                child: Text(
-                                  searchedText.isNotEmpty ||
-                                          selectedFilter.isNotEmpty
-                                      ? "${filteredList.length} from Results ${ordersList.length}"
-                                      : '',
-                                  style: TextStyle(color: Colors.white),
+                              Visibility(
+                                visible: (searchedText.isNotEmpty) ||
+                                    (_showFilters && selectedFilter.isNotEmpty),
+                                child: Container(
+                                  padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+                                  color: appTheme,
+                                  child: Text(
+                                    searchedText.isNotEmpty ||
+                                            selectedFilter.isNotEmpty
+                                        ? "${filteredList.length} from Results ${ordersList.length}"
+                                        : '',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
                                 ),
                               ),
-                            ),
-                            (searchedText.isNotEmpty && filteredList.isEmpty) ||
-                                    (selectedFilter.isNotEmpty &&
-                                        filteredList.isEmpty)
-                                ? Container(
-                                    height:
-                                        Utils.getDeviceHeight(context) - 165,
-                                    child: Center(
-                                        child: Text(
-                                      '${searchedText.isNotEmpty ? searchedText + ' is ' : selectedFilter + ' are '}not Found!',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black,
-                                          fontSize: 20),
-                                    )))
-                                : ListView.builder(
-                                    shrinkWrap: true,
-                                    physics: ScrollPhysics(),
-                                    itemCount: filteredList.isNotEmpty
-                                        ? filteredList.length
-                                        : ordersList.length,
-                                    itemBuilder: (context, index) {
-                                      return showSubScribeView(index);
-                                    },
-                                  ),
-                          ],
+                              (searchedText.isNotEmpty &&
+                                          filteredList.isEmpty) ||
+                                      (selectedFilter.isNotEmpty &&
+                                          filteredList.isEmpty)
+                                  ? Container(
+                                      height:
+                                          Utils.getDeviceHeight(context) - 165,
+                                      child: Center(
+                                          child: Text(
+                                        '${searchedText.isNotEmpty ? searchedText + ' is ' : selectedFilter + ' are '}not Found!',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black,
+                                            fontSize: 20),
+                                      )))
+                                  : ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: ScrollPhysics(),
+                                      itemCount: filteredList.isNotEmpty
+                                          ? filteredList.length
+                                          : ordersList.length,
+                                      itemBuilder: (context, index) {
+                                        return showSubScribeView(index);
+                                      },
+                                    ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
+      ),
     );
   }
 
@@ -458,9 +466,11 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                                 selectedTimeSlot: selectedTimeSlot,
                                 timeslotList: timeslotList,
                                 isInstantDelivery: isInstantDelivery,
-                                isDeliveryResponseFalse: isDeliveryResponseFalse,
+                                isDeliveryResponseFalse:
+                                    isDeliveryResponseFalse,
                                 isSlotSelected: isSlotSelected,
-                                initSelectedTimeSlotString: initSelectedTimeSlotString,
+                                initSelectedTimeSlotString:
+                                    initSelectedTimeSlotString,
                                 store: widget.store),
                           ),
                         );
