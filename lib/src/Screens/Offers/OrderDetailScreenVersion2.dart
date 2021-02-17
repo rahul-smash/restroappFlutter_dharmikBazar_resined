@@ -199,6 +199,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                               .subscription_order_id !=
                                           null &&
                                       widget.orderHistoryData
+                                              .subscription_order_id !=
+                                          '0' &&
+                                      widget.orderHistoryData
                                           .subscription_order_id.isNotEmpty,
                                   child: InkWell(
                                     onTap: () {
@@ -209,8 +212,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                               SubscriptionHistoryDetails(
                                             orderHistoryDataId: widget
                                                 .orderHistoryData
-                                                .subscription_order_id
-                                                ,
+                                                .subscription_order_id,
+                                                store: widget.store,
                                           ),
                                         ),
                                       );

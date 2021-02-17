@@ -816,8 +816,10 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         title = 'Cancelled';
         break;
       case '9':
-      case '10':
         title = 'Paused';
+        break;
+      case '10':
+        title = 'Paused by Admin';
         break;
     }
     return title;

@@ -540,11 +540,11 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         });
                                       }
                                     } else if (selectedStartDate == null) {
-                                      Utils.showToast(
-                                          "Please select Start Date", false);
+                                       DialogUtils.displayErrorDialog(context,
+                                          "Please select Start Date");
                                     } else if (selectedEndDate == null) {
-                                      Utils.showToast(
-                                          "Please select End Date", false);
+                                       DialogUtils.displayErrorDialog(context,
+                                          "Please select End Date");
                                     }
                                   },
                                   child: Row(
@@ -656,29 +656,29 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             color: appTheme,
             onPressed: () async {
               if (addressData == null) {
-                Utils.showToast('Please Select Delivery Address', true);
+                 DialogUtils.displayErrorDialog(context, 'Please Select Delivery Address');
               } else if (taxModel == null) {
-                Utils.showToast(
-                    'Calculation are not done yet, Please try again', true);
+                 DialogUtils.displayErrorDialog(context,
+                    'Calculation are not done yet, Please try again');
               } else if (selectedTimeSlotString.isEmpty) {
-                Utils.showToast('Please Select time slot', true);
+                 DialogUtils.displayErrorDialog(context, 'Please Select time slot');
               } else if (selectedStartDate == null) {
-                Utils.showToast('Please Select Start Subscription Date', true);
+                 DialogUtils.displayErrorDialog(context, 'Please Select Start Subscription Date');
               } else if (selectedEndDate == null) {
-                Utils.showToast('Please Select End Subscription Date', true);
+                 DialogUtils.displayErrorDialog(context, 'Please Select End Subscription Date');
               } else if (_markedDateMap.events.isEmpty) {
-                Utils.showToast('Please Select Variant Dates', true);
+                 DialogUtils.displayErrorDialog(context, 'Please Select Variant Dates');
               } else if (widget.cartList.isEmpty) {
-                Utils.showToast(
-                    'Please add product to Subscription cart', true);
+                 DialogUtils.displayErrorDialog(context,
+                    'Please add product to Subscription cart');
               } else if (widget.cartList.first.quantity == '0') {
-                Utils.showToast('Please add Quantity', true);
+                 DialogUtils.displayErrorDialog(context, 'Please add Quantity');
               } else if (double.parse(
                       widget.model.subscription.minimumOrderDaily) >
                   double.parse(taxModel.singleDayTotal)) {
-                Utils.showToast(
-                    'Your single day subscription amount is low. Single day subscription amount should be grater than ${AppConstant.currency}${widget.model.subscription.minimumOrderDaily}',
-                    true);
+                 DialogUtils.displayErrorDialog(context,
+                    'Your Daily Minimun Order is very less for Subscription.',
+                   );
               } else {
                 bottomSheet(context);
               }
@@ -937,10 +937,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           ),
                         ),
                         Visibility(
-                          visible: widget.model.wallet_setting == "1" ? true : false,
+                          visible:
+                              widget.model.wallet_setting == "1" ? true : false,
                           child: Container(
                             child: Padding(
-                                padding: EdgeInsets.only(left: 0, top: 10, bottom: 10),
+                                padding: EdgeInsets.only(
+                                    left: 0, top: 10, bottom: 10),
                                 child: Row(
                                   children: [
                                     Padding(
@@ -958,10 +960,13 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                       height: 30,
                                       width: 30,
                                     ),
-                                    SizedBox(width: 10,),
+                                    SizedBox(
+                                      width: 10,
+                                    ),
                                     Expanded(
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           Text("My Wallet",
                                               style: TextStyle(
@@ -972,22 +977,28 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                               taxModel == null
                                                   ? "Remaining Balance: ${AppConstant.currency}"
                                                   : "Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
-                                              style:
-                                              TextStyle(color: Colors.black, fontSize: 15)),
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 15)),
                                         ],
                                       ),
                                     ),
                                     Padding(
-                                      padding: EdgeInsets.only(right: 5, top: 0),
+                                      padding:
+                                          EdgeInsets.only(right: 5, top: 0),
                                       child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
                                         children: [
                                           Text("You Used",
-                                              style:
-                                              TextStyle(color: Colors.black, fontSize: 16)),
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16)),
                                           Text(
                                               "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.walletRefund.toString()), 2).toStringAsFixed(2)}",
-                                              style: TextStyle(color: appTheme, fontSize: 15)),
+                                              style: TextStyle(
+                                                  color: appTheme,
+                                                  fontSize: 15)),
                                         ],
                                       ),
                                     ),
@@ -1030,6 +1041,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           );
         });
   }
+
   String getUserRemaningWallet() {
     double balance = (double.parse(userWalleModel.data.userWallet) -
         double.parse(taxModel.walletRefund.toString()) -
@@ -1044,7 +1056,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     }
     //return "${userWalleModel == null ? "" : userWalleModel.data.userWallet}";
   }
-
 
   void callOrderIdApi(StoreModel storeObject) async {
     Utils.showProgressDialog(context);
@@ -1140,7 +1151,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         print("----razorpayCreateOrderApi----${response.data.id}--");
         openCheckout(model.data.id, storeObject);
       } else {
-        Utils.showToast("${model.message}", true);
+         DialogUtils.displayErrorDialog(context, "${model.message}");
         Utils.hideProgressDialog(context);
       }
     });
@@ -1245,7 +1256,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                   }
                                 });
                               } else {
-                                Utils.showToast(slotsObject.innerText, false);
+                                 DialogUtils.displayErrorDialog(context, slotsObject.innerText);
                               }
                             },
                             child: Container(
@@ -1322,15 +1333,19 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           ),
         ),
         Visibility(
-          visible: taxModel!=null&&taxModel.taxDetail!=null&&taxModel.taxDetail.isNotEmpty&&taxModel.taxDetail.first.tax.isNotEmpty,
+          visible: taxModel != null &&
+              taxModel.taxDetail != null &&
+              taxModel.taxDetail.isNotEmpty &&
+              taxModel.taxDetail.first.tax.isNotEmpty,
           child: Padding(
             padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(taxModel == null ?'':taxModel.taxDetail.first.label, style: TextStyle(color: Colors.black)),
+                Text(taxModel == null ? '' : taxModel.taxDetail.first.label,
+                    style: TextStyle(color: Colors.black)),
                 Text(
-                    "${AppConstant.currency}${taxModel == null ? '0': taxModel.taxDetail.first.tax}",
+                    "${AppConstant.currency}${taxModel == null ? '0' : taxModel.taxDetail.first.tax}",
                     style: TextStyle(color: Colors.black)),
               ],
             ),
@@ -1368,7 +1383,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                   ? "Remaining Balance: ${AppConstant.currency}"
                                   : "Remaining Balance: ${AppConstant.currency} ${getUserRemaningWallet()}",
                               style:
-                              TextStyle(color: Colors.black, fontSize: 15)),
+                                  TextStyle(color: Colors.black, fontSize: 15)),
                         ],
                       ),
                     ),
@@ -1377,7 +1392,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       children: [
                         Text("You Used",
                             style:
-                            TextStyle(color: Colors.black, fontSize: 16)),
+                                TextStyle(color: Colors.black, fontSize: 16)),
                         Text(
                             "${AppConstant.currency} ${taxModel == null ? "0.00" : databaseHelper.roundOffPrice(double.parse(taxModel.walletRefund.toString()), 2).toStringAsFixed(2)}",
                             style: TextStyle(color: appTheme, fontSize: 15)),
@@ -1417,15 +1432,20 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 onTap: () async {
                   //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
                   //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
+
+                  if (widget.cartList.first.quantity == '0') {
+                    DialogUtils.displayErrorDialog(context, 'Please add some quantity!');
+                    return;
+                  }
                   if (isCouponsApplied) {
-                    Utils.showToast(
+                     DialogUtils.displayErrorDialog(context,
                         "Please remove Applied Coupon to Redeem Loyality Points",
-                        false);
+                        );
                     return;
                   }
                   if (appliedCouponCodeList.isNotEmpty) {
-                    Utils.showToast(
-                        "Please remove Applied Coupon to Redeem Points", false);
+                     DialogUtils.displayErrorDialog(context,
+                        "Please remove Applied Coupon to Redeem Points");
                     return;
                   }
                   if (taxModel != null &&
@@ -1433,7 +1453,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     removeCoupon();
                   } else {
                     if (addressData == null) {
-                      Utils.showToast("Please select Address", false);
+                       DialogUtils.displayErrorDialog(context, "Please select Address");
                       return;
                     }
 
@@ -1523,25 +1543,29 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             ),
             InkWell(
               onTap: () {
+                if (widget.cartList.first.quantity == '0') {
+                  DialogUtils.displayErrorDialog(context, 'Please add some quantity!');
+                  return;
+                }
                 print(
                     "appliedCouponCodeList = ${appliedCouponCodeList.length}");
                 print(
                     "appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
                 if (isCouponsApplied) {
-                  Utils.showToast(
-                      "Please remove Applied Coupon to Avail Offers", false);
+                   DialogUtils.displayErrorDialog(context,
+                      "Please remove Applied Coupon to Avail Offers");
                   return;
                 }
                 if (appliedReddemPointsCodeList.isNotEmpty) {
-                  Utils.showToast(
-                      "Please remove Applied Coupon to Avail Offers", false);
+                   DialogUtils.displayErrorDialog(context,
+                      "Please remove Applied Coupon to Avail Offers");
                   return;
                 }
                 if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
                   removeCoupon();
                 } else {
                   if (addressData == null) {
-                    Utils.showToast("Please select Address", false);
+                     DialogUtils.displayErrorDialog(context, "Please select Address");
                     return;
                   }
 
@@ -1632,7 +1656,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   Future<void> removeCoupon() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
-      Utils.showToast(AppConstant.noInternet, false);
+       DialogUtils.displayErrorDialog(context, AppConstant.noInternet);
       return;
     }
     Utils.showProgressDialog(context);
@@ -1701,7 +1725,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                   if (couponCodeController.text.trim().isEmpty) {
                   } else {
                     if (addressData == null) {
-                      Utils.showToast('Please select address', false);
+                       DialogUtils.displayErrorDialog(context, 'Please select address');
                       return;
                     }
 
@@ -1709,8 +1733,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         "--${appliedCouponCodeList.length}-and -${appliedReddemPointsCodeList.length}---");
                     if (appliedCouponCodeList.isNotEmpty ||
                         appliedReddemPointsCodeList.isNotEmpty) {
-                      Utils.showToast(
-                          "Please remove the applied coupon first!", false);
+                       DialogUtils.displayErrorDialog(context,
+                          "Please remove the applied coupon first!");
                       return;
                     }
                     if (isCouponsApplied) {
@@ -1726,7 +1750,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                               couponCodeController.text, '3', encodedDoughnut);
                       if (couponModel.success) {
                         print("---success----");
-                        Utils.showToast("${couponModel.message}", false);
+                         DialogUtils.displayErrorDialog(context, "${couponModel.message}");
                         SubscriptionTaxCalculationResponse modelResponse =
                             await ApiController
                                 .subscriptionMultipleTaxCalculationRequest(
@@ -1744,7 +1768,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         totalDeliveries.toString());
                         Utils.hideProgressDialog(context);
                         if (modelResponse != null && !modelResponse.success) {
-                          Utils.showToast(modelResponse.message, true);
+                           DialogUtils.displayErrorDialog(context, modelResponse.message);
                           Navigator.of(context)
                               .popUntil((route) => route.isFirst);
                         } else {
@@ -1789,7 +1813,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           });
                         }
                       } else {
-                        Utils.showToast("${couponModel.message}", false);
+                         DialogUtils.displayErrorDialog(context, "${couponModel.message}");
                         Utils.hideProgressDialog(context);
                         Utils.hideKeyboard(context);
                       }
@@ -1923,7 +1947,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     constraints();
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
-      Utils.showToast(AppConstant.noInternet, false);
+       DialogUtils.displayErrorDialog(context, AppConstant.noInternet);
       return;
     }
     userDeliveryAddress = '';
@@ -2077,18 +2101,18 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             payment_id: model.data.id,
           );
         } else {
-          Utils.showToast("Something went wrong!", true);
+           DialogUtils.displayErrorDialog(context, "Something went wrong!");
           Utils.hideProgressDialog(context);
         }
       } else {
-        Utils.showToast("Something went wrong!", true);
+         DialogUtils.displayErrorDialog(context, "Something went wrong!");
         Utils.hideProgressDialog(context);
       }
     });
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    Utils.showToast(response.message, true);
+     DialogUtils.displayErrorDialog(context, response.message);
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
   }
@@ -2134,7 +2158,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       {String payment_request_id = '', String payment_id}) async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
-      Utils.showToast(AppConstant.noInternet, false);
+       DialogUtils.displayErrorDialog(context, AppConstant.noInternet);
       return;
     }
     Utils.showProgressDialog(context);

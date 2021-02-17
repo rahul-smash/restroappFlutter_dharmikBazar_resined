@@ -22,7 +22,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class SubscriptionHistoryDetails extends StatefulWidget {
   SubscriptionOrderData orderHistoryData;
-  bool isRatingEnable;
+  bool isRatingEnable=false;
 
   DeliveryTimeSlotModel deliverySlotModel;
   int selctedTag, selectedTimeSlot;
@@ -38,7 +38,7 @@ class SubscriptionHistoryDetails extends StatefulWidget {
 
   SubscriptionHistoryDetails(
       {this.orderHistoryData,
-      this.isRatingEnable,
+      this.isRatingEnable=false,
       this.deliverySlotModel,
       this.selctedTag,
       this.selectedTimeSlot,
@@ -1909,7 +1909,7 @@ class _SubscriptionHistoryDetailsState
           '${orderHistoryData.deliveryAddress.first.address2.isEmpty ? '' : ',\n${orderHistoryData.deliveryAddress.first.address2}'}';
       String area = ',\n${orderHistoryData.deliveryAddress.first.areaName}';
       String city = ', ${orderHistoryData.deliveryAddress.first.city}';
-      String ZipCode = ', ${orderHistoryData.deliveryAddress.first.zipcode}';
+      String ZipCode = orderHistoryData.deliveryAddress.first.zipcode.isNotEmpty?', ${orderHistoryData.deliveryAddress.first.zipcode}':'';
       return '$name\n$address$address2$area$city$ZipCode';
     } else {
       String address = '${orderHistoryData.address}';
@@ -1925,7 +1925,8 @@ class _SubscriptionHistoryDetailsState
           orderHistoryData.deliveryTimeSlot.substring(0, dateEndIndex);
       String convertedDate = convertOrderDateTime(date);
       String returnedDate =
-          orderHistoryData.deliveryTimeSlot.replaceFirst(' ', ' | ');
+//          orderHistoryData.deliveryTimeSlot.replaceFirst(' ', ' | ');
+          orderHistoryData.deliveryTimeSlot;
       return returnedDate.replaceAll(date, convertedDate);
     } else {
       return '';

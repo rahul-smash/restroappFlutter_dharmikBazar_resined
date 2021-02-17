@@ -487,6 +487,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future showNotification(
       String title, String body, Map<String, dynamic> message) async {
+    print('$body');
     FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
         new FlutterLocalNotificationsPlugin();
 

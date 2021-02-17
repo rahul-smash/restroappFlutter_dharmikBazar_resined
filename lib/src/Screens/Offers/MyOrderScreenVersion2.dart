@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
+import 'package:restroapp/src/UI/SubscriptionHistoryDetails.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -83,7 +84,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
           context,
           MaterialPageRoute(
             builder: (context) => OrderDetailScreenVersion2(
-                cardOrderHistoryItems, isRatingEnable,widget.store),
+                cardOrderHistoryItems, isRatingEnable, widget.store),
           ),
         );
       },
@@ -201,130 +202,171 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
         : 0;
     return Padding(
       padding: EdgeInsets.only(top: 10),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Row(children: <Widget>[
-                  Container(
-                    width: 6,
-                    height: 6,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(3.0)),
-                        color: getStatusColor(cardOrderHistoryItems.status)),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(children: <Widget>[
+                      Container(
+                        width: 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(3.0)),
+                            color:
+                                getStatusColor(cardOrderHistoryItems.status)),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 5.0),
+                        child: Text(getStatus(cardOrderHistoryItems.status),
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400)),
+                      )
+                    ]),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: InkWell(
+                  onTap: () async {
+                    //Add to Cart
+                    var result = await DialogUtils.displayCommonDialog2(
+                        context,
+                        widget.store.storeName,
+                        'Do you want to reorder these items?',
+                        'No',
+                        'Yes');
+                    if (result == true) {
+                      Utils.reOrderItems(widget.store.storeName, context,
+                          cardOrderHistoryItems);
+                    }
+                  },
+                  child: Wrap(
+                    children: [
+                      Container(
+                          margin: EdgeInsets.only(right: 5, left: 10),
+                          child: Icon(
+                            Icons.refresh,
+                            size: 20,
+                            color: Colors.red,
+                          )),
+                      Text('Re-Order',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w300,
+                          )),
+                    ],
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 5.0),
-                    child: Text(getStatus(cardOrderHistoryItems.status),
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400)),
-                  )
-                ]),
-                Visibility(
-                  visible: isRatingEnable &&
-                      cardOrderHistoryItems.status == '5' &&
-                      _rating != 0,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: Row(children: <Widget>[
-                      RatingBar(
-                        initialRating: _rating,
-                        minRating: 1,
-                        itemSize: 26,
-                        direction: Axis.horizontal,
-                        allowHalfRating: true,
-                        itemCount: 5,
-                        itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
-                        ratingWidget: RatingWidget(
-                          full: Icon(
-                            Icons.star,
-                            color: appThemeSecondary,
+                ),
+              ),
+              Wrap(children: <Widget>[
+                Container(
+                  padding: EdgeInsets.fromLTRB(10, 8, 10, 8),
+                  decoration: BoxDecoration(
+                      color: appThemeSecondary,
+                      borderRadius: BorderRadius.circular(5)),
+                  child: Text(
+                    _getButtonStatus(cardOrderHistoryItems),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+              ])
+            ],
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: isRatingEnable &&
+                        cardOrderHistoryItems.status == '5' &&
+                        _rating != 0
+                    ? Padding(
+                        padding: EdgeInsets.only(top: 15),
+                        child: Row(children: <Widget>[
+                          RatingBar(
+                            initialRating: _rating,
+                            minRating: 1,
+                            itemSize: 26,
+                            direction: Axis.horizontal,
+                            allowHalfRating: true,
+                            itemCount: 5,
+                            itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
+                            ratingWidget: RatingWidget(
+                              full: Icon(
+                                Icons.star,
+                                color: appThemeSecondary,
+                              ),
+                              half: Icon(
+                                Icons.star_half,
+                                color: appThemeSecondary,
+                              ),
+                              empty: Icon(
+                                Icons.star_border,
+                                color: appThemeSecondary,
+                              ),
+                            ),
+                            ignoreGestures: true,
+                            onRatingUpdate: (rating) {},
                           ),
-                          half: Icon(
-                            Icons.star_half,
-                            color: appThemeSecondary,
-                          ),
-                          empty: Icon(
-                            Icons.star_border,
-                            color: appThemeSecondary,
+                          Container(
+                              margin: EdgeInsets.only(left: 6),
+                              padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0xFFE6E6E6)),
+                                color: Color(0xFFE6E6E6),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(15.0)),
+                              ),
+                              child: Text('${_rating}',
+                                  style: TextStyle(
+                                      color: Color(0xFF39444D),
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 13)))
+                        ]),
+                      )
+                    : Container(),
+              ),
+              Visibility(
+                  visible: cardOrderHistoryItems.subscription_order_id !=
+                          null &&
+                      cardOrderHistoryItems.subscription_order_id.isNotEmpty &&
+                      cardOrderHistoryItems.subscription_order_id != '0',
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SubscriptionHistoryDetails(
+                            orderHistoryDataId:
+                                cardOrderHistoryItems.subscription_order_id,
+                            store: widget.store,
                           ),
                         ),
-                        ignoreGestures: true,
-                        onRatingUpdate: (rating) {},
+                      );
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 15),
+                      child: Text(
+                        'Subscribed',
+                        style: TextStyle(
+                            decoration: TextDecoration.underline,
+                            color: appTheme,
+                            fontSize: 16),
                       ),
-                      Container(
-                          margin: EdgeInsets.only(left: 6),
-                          padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xFFE6E6E6)),
-                            color: Color(0xFFE6E6E6),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15.0)),
-                          ),
-                          child: Text('${_rating}',
-                              style: TextStyle(
-                                  color: Color(0xFF39444D),
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 13)))
-                    ]),
-                  ),
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            child: InkWell(
-              onTap: () async {
-                //Add to Cart
-                var result = await DialogUtils.displayCommonDialog2(
-                    context,
-                    widget.store.storeName,
-                    'Do you want to reorder these items?',
-                    'No',
-                    'Yes');
-                if (result == true) {
-                  Utils.reOrderItems(widget.store.storeName,context,cardOrderHistoryItems);
-                }
-              },
-              child: Wrap(
-                children: [
-                  Container(
-                      margin: EdgeInsets.only(right: 5, left: 10),
-                      child: Icon(
-                        Icons.refresh,
-                        size: 20,
-                        color: Colors.red,
-                      )),
-                  Text('Re-Order',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w300,
-                      )),
-                ],
-              ),
-            ),
-          ),
-          Wrap(children: <Widget>[
-            Container(
-              padding: EdgeInsets.fromLTRB(10, 8, 10, 8),
-              decoration: BoxDecoration(
-                  color: appThemeSecondary,
-                  borderRadius: BorderRadius.circular(5)),
-              child: Text(
-                _getButtonStatus(cardOrderHistoryItems),
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500),
-              ),
-            ),
-          ])
+                    ),
+                  ))
+            ],
+          )
         ],
       ),
     );
