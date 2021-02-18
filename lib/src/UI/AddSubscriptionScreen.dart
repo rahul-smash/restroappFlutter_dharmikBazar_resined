@@ -181,6 +181,32 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               shrinkWrap: true,
               physics: ScrollPhysics(),
               children: [
+//                Row(children: [Container(
+//                  width: double.maxFinite,
+//                  child: ListView.separated(
+//                    shrinkWrap: true,
+//                    itemCount: branchesModel.data.length,
+//                    separatorBuilder: (BuildContext context, int index) {
+//                      return Divider();
+//                    },
+//                    itemBuilder: (context, index) {
+//                      BranchData storeObject = branchesModel.data[index];
+//                      return  RadioListTile<String>(
+//                        title: Text(storeObject.storeName),
+//                        value: storeObject.storeName,
+//                        groupValue: _selectedStore,
+//                        onChanged: (String value) {
+//                          setState(() {
+//                            _selectedStore = value;
+//                          });
+//                          SharedPrefs.storeSharedValue(
+//                              AppConstant.branch_id, storeObject.id);
+//                          Navigator.pop(context, storeObject);
+//                        },
+//                      );
+//                    },
+//                  ),
+//                )],),
                 addressData == null
                     ? Container(
                         height: 60.0,
