@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_calendar_carousel/classes/event.dart';
 import 'package:intl/intl.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
+import 'package:restroapp/src/Screens/Address/StoreLocationScreenWithMultiplePick.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -13,6 +14,7 @@ import 'package:restroapp/src/models/CreateOrderData.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/OrderDetailsModel.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/SubscriptionOrderDetailsModel.dart';
@@ -104,10 +106,18 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   String couponCodeApplied = '';
 
   bool hideRemoveCouponFirstTime = false;
+  List<String> _deliveryOptions = List();
+
+  String _selectedDeliveryOption = '';
+
+  PickUpModel storeArea;
 
   @override
   void initState() {
     super.initState();
+    _deliveryOptions.add('Delivery');
+    _deliveryOptions.add('Pick Up');
+    _selectedDeliveryOption = _deliveryOptions.first;
     initRazorPay();
     checkLoyalityPointsOption();
     hideRemoveCouponFirstTime = true;
@@ -164,6 +174,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     multiTaxCalculationApi(
       couponCode: '',
     );
+
+    ApiController.getStorePickupAddress().then((response) {
+      Utils.hideProgressDialog(context);
+      storeArea = response;
+
+      print('---PickUpModel---${storeArea.data.length}--');
+      setState(() {});
+    });
   }
 
   @override
@@ -181,154 +199,179 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
               shrinkWrap: true,
               physics: ScrollPhysics(),
               children: [
-//                Row(children: [Container(
-//                  width: double.maxFinite,
-//                  child: ListView.separated(
-//                    shrinkWrap: true,
-//                    itemCount: branchesModel.data.length,
-//                    separatorBuilder: (BuildContext context, int index) {
-//                      return Divider();
-//                    },
-//                    itemBuilder: (context, index) {
-//                      BranchData storeObject = branchesModel.data[index];
-//                      return  RadioListTile<String>(
-//                        title: Text(storeObject.storeName),
-//                        value: storeObject.storeName,
-//                        groupValue: _selectedStore,
-//                        onChanged: (String value) {
-//                          setState(() {
-//                            _selectedStore = value;
-//                          });
-//                          SharedPrefs.storeSharedValue(
-//                              AppConstant.branch_id, storeObject.id);
-//                          Navigator.pop(context, storeObject);
-//                        },
-//                      );
-//                    },
-//                  ),
-//                )],),
-                addressData == null
-                    ? Container(
-                        height: 60.0,
-                        color: Colors.grey[200],
-                        child: InkWell(
-                          onTap: () async {
-                            if (AppConstant.isLoggedIn) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DeliveryAddressList(
-                                        true, OrderType.SubScription)),
-                              );
-                              Map<String, dynamic> attributeMap =
-                                  new Map<String, dynamic>();
-                              attributeMap["ScreenName"] =
-                                  "DeliveryAddressList";
-                              Utils.sendAnalyticsEvent(
-                                  "Clicked DeliveryAddressList", attributeMap);
-                            } else {
-                              Utils.showLoginDialog(context);
-                            }
-                          },
-                          child: Container(
-                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: <Widget>[
-                                Icon(
-                                  Icons.add,
-                                  color: Colors.black,
-                                  size: 25.0,
-                                ),
-                                Text(
-                                  "Add Delivery Address",
-                                  style: TextStyle(
-                                      color: Colors.black, fontSize: 16.0),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    : Container(
-                        margin: EdgeInsets.fromLTRB(0, 5, 0, 10),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
+                Row(
+                  children: [
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: Text('Delivery'),
+                        value: 'Delivery',
+                        activeColor: appTheme,
+                        groupValue: _selectedDeliveryOption,
+                        onChanged: (String value) {
+                          setState(() {
+                            _selectedDeliveryOption = value;
+                          });
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      child: RadioListTile<String>(
+                        title: Text('Pick Up'),
+                        value: 'Pick Up',
+                        activeColor: appTheme,
+                        groupValue: _selectedDeliveryOption,
+                        onChanged: (String value) {
+                          setState(() {
+                            _selectedDeliveryOption = value;
+                          });
+                          if (storeArea == null ||
+                              (storeArea != null && storeArea.data.isEmpty)) {
+                            Utils.showToast("No pickup data found!", true);
+                          }
+                        },
+                      ),
+                    )
+                  ],
+                ),
+                Container(
+                  height: 1,
+                  color: addressData != null ? Colors.grey : Colors.transparent,
+                ),
+                _selectedDeliveryOption == 'Delivery'
+                    ? addressData == null
+                        ? Container(
+                            color: Colors.grey[200],
+                            child: InkWell(
+                              onTap: () async {
+                                if (AppConstant.isLoggedIn) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DeliveryAddressList(
+                                                true, OrderType.SubScription)),
+                                  );
+                                  Map<String, dynamic> attributeMap =
+                                      new Map<String, dynamic>();
+                                  attributeMap["ScreenName"] =
+                                      "DeliveryAddressList";
+                                  Utils.sendAnalyticsEvent(
+                                      "Clicked DeliveryAddressList",
+                                      attributeMap);
+                                } else {
+                                  Utils.showLoginDialog(context);
+                                }
+                              },
                               child: Container(
-                                margin: EdgeInsets.fromLTRB(15, 10, 0, 0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      "Deliver To",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            "${addressData.firstName}",
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 18,
-                                                color: Colors.black),
-                                          ),
-                                        ],
-                                      ),
+                                margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    Icon(
+                                      Icons.add,
+                                      color: Colors.black,
+                                      size: 25.0,
                                     ),
                                     Text(
-                                      "${addressData.address} ${addressData.address2.isNotEmpty ? ', ' + addressData.address2 : ''}",
-                                      style: TextStyle(fontSize: 16),
+                                      "Add Delivery Address",
+                                      style: TextStyle(
+                                          color: Colors.black, fontSize: 16.0),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            Container(
-                              height: 35.0,
-                              margin: EdgeInsets.fromLTRB(0, 20, 10, 0),
-                              color: appTheme,
-                              child: ButtonTheme(
-                                minWidth: 80,
-                                child: RaisedButton(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                  textColor: Colors.grey[600],
-                                  color: Colors.grey[300],
-                                  onPressed: () async {
-                                    if (AppConstant.isLoggedIn) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                DeliveryAddressList(true,
-                                                    OrderType.SubScription)),
-                                      );
-                                      Map<String, dynamic> attributeMap =
-                                          new Map<String, dynamic>();
-                                      attributeMap["ScreenName"] =
-                                          "DeliveryAddressList";
-                                      Utils.sendAnalyticsEvent(
-                                          "Clicked DeliveryAddressList",
-                                          attributeMap);
-                                    } else {
-                                      Utils.showLoginDialog(context);
-                                    }
-                                  },
-                                  child: Text(
-                                    "Change",
-                                    style: TextStyle(
-                                      color: Colors.grey[700],
+                          )
+                        : Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    margin: EdgeInsets.fromLTRB(15, 10, 0, 0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Deliver To",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        Container(
+                                          margin:
+                                              EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                "${addressData.firstName}",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w700,
+                                                    fontSize: 18,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Text(
+                                          "${addressData.address} ${addressData.address2.isNotEmpty ? ', ' + addressData.address2 : ''}",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
+                                Container(
+                                  height: 35.0,
+                                  margin: EdgeInsets.fromLTRB(0, 20, 10, 0),
+                                  color: appTheme,
+                                  child: ButtonTheme(
+                                    minWidth: 80,
+                                    child: RaisedButton(
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      textColor: Colors.grey[600],
+                                      color: Colors.grey[300],
+                                      onPressed: () async {
+                                        if (AppConstant.isLoggedIn) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    DeliveryAddressList(
+                                                        true,
+                                                        OrderType
+                                                            .SubScription)),
+                                          );
+                                          Map<String, dynamic> attributeMap =
+                                              new Map<String, dynamic>();
+                                          attributeMap["ScreenName"] =
+                                              "DeliveryAddressList";
+                                          Utils.sendAnalyticsEvent(
+                                              "Clicked DeliveryAddressList",
+                                              attributeMap);
+                                        } else {
+                                          Utils.showLoginDialog(context);
+                                        }
+                                      },
+                                      child: Text(
+                                        "Change",
+                                        style: TextStyle(
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
+                            ),
+                          )
+                    : storeArea != null
+                        ? Container(
+                  height: 500,
+                          child: StoreLocationScreenWithMultiplePick(
+                              storeArea, OrderType.PickUp),
+                        )
+                        : Container(),
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
                   height: addressData == null ? 0 : 1,
@@ -1180,10 +1223,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     if (isFullPaymentFromWallet) {
       Utils.hideProgressDialog(context);
       placeOrderApi(
-        payment_request_id: '',
-        payment_id: '',
-          isFullPaymentFromWallet:isFullPaymentFromWallet
-      );
+          payment_request_id: '',
+          payment_id: '',
+          isFullPaymentFromWallet: isFullPaymentFromWallet);
     } else {
       ApiController.subscriptionRazorpayCreateOrderApi(
               mPrice, encodedDoughnut, detailsModel.orderDetails)
@@ -2208,7 +2250,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   Future<void> placeOrderApi(
-      {String payment_request_id = '', String payment_id='',bool isFullPaymentFromWallet=false}) async {
+      {String payment_request_id = '',
+      String payment_id = '',
+      bool isFullPaymentFromWallet = false}) async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
       DialogUtils.displayErrorDialog(context, AppConstant.noInternet);
@@ -2294,7 +2338,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       widget.deliveryType,
       payment_request_id,
       payment_id,
-     isFullPaymentFromWallet? 'Razorpay':'wallet',
+      isFullPaymentFromWallet ? 'Razorpay' : 'wallet',
       selectedTimeSlotString,
       cart_saving: totalSavings.toStringAsFixed(2),
       start_date: start_date,
