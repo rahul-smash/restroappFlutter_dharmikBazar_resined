@@ -446,8 +446,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
+//        print(message.toString());
         try {
-          print("------onMessage: $message");
+//          print("------onMessage: $message");
           if (AppConstant.isLoggedIn) {
             if (Platform.isIOS) {
               print("iosssssssssssssssss");
