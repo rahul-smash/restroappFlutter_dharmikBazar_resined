@@ -627,21 +627,28 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                     : Colors.black,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500)),
-                        Visibility(visible: cardOrderHistoryItems.orderItems[index].refundStatus ==
-                            '2'||cardOrderHistoryItems.orderItems[index].refundStatus=='1',
-                            child:
-                        Text(
-                            cardOrderHistoryItems.orderItems[index].refundStatus ==
-                                    '1'
-                                ? "Refund Pending"
-                                : "Refunded",
-                            style: TextStyle(
-                                color: cardOrderHistoryItems.orderItems[index].refundStatus ==
-                                    '1'
-                                    ? Colors.red
-                                    : Colors.green,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500)))
+                        Visibility(
+                            visible: cardOrderHistoryItems
+                                        .orderItems[index].refundStatus ==
+                                    '2' ||
+                                cardOrderHistoryItems
+                                        .orderItems[index].refundStatus ==
+                                    '1',
+                            child: Text(
+                                cardOrderHistoryItems
+                                            .orderItems[index].refundStatus ==
+                                        '1'
+                                    ? "Refund Pending"
+                                    : "Refunded",
+                                style: TextStyle(
+                                    color: cardOrderHistoryItems
+                                                .orderItems[index]
+                                                .refundStatus ==
+                                            '1'
+                                        ? Colors.red
+                                        : Colors.green,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500)))
                       ],
                     ),
                   ],
@@ -1150,7 +1157,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   }
 
   String _getAddress(OrderData orderHistoryData) {
-    if (orderHistoryData.deliveryAddress != null &&
+    if ((!orderHistoryData.orderFacility.toLowerCase().contains('pick')) &&
+        orderHistoryData.deliveryAddress != null &&
         orderHistoryData.deliveryAddress.isNotEmpty) {
       String name = '${orderHistoryData.deliveryAddress.first.firstName}';
       String address = ', ${orderHistoryData.deliveryAddress.first.address}';
