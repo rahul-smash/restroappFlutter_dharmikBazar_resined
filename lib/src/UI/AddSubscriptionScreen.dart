@@ -7,6 +7,7 @@ import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Address/StoreLocationScreenWithMultiplePick.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
+import 'package:restroapp/src/UI/PickUpBottomSheet.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -76,6 +77,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   EventList<Event> _markedDateMap;
   TextEditingController couponCodeController = TextEditingController();
   DeliveryAddressData addressData;
+  Area areaObject;
   bool isCouponsApplied = false;
   List<Product> cartListFromDB = List();
 
@@ -86,8 +88,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   String shippingCharges = '0';
 
   SubscriptionTaxCalculation taxModel;
-
-  bool isComingFromPickUpScreen = false;
 
   String pin = '';
 
@@ -111,10 +111,20 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   String _selectedDeliveryOption = '';
 
   PickUpModel storeArea;
+  UserModel user;
+
+  getProfileData() async {
+    try {
+      user = await SharedPrefs.getUser();
+    } catch (e) {
+      print(e);
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    getProfileData();
     _deliveryOptions.add('Delivery');
     _deliveryOptions.add('Pick Up');
     _selectedDeliveryOption = _deliveryOptions.first;
@@ -150,6 +160,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       print("<---onAddressSelected------->");
       setState(() {
         this.addressData = event.addressData;
+        this.areaObject = event.areaObject;
       });
 //      Utils.showProgressDialog(context);
       multiTaxCalculationApi(couponCode: couponCodeApplied);
@@ -210,6 +221,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         onChanged: (String value) {
                           setState(() {
                             _selectedDeliveryOption = value;
+                            widget.deliveryType = OrderType.Delivery;
                           });
                         },
                       ),
@@ -220,13 +232,17 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         value: 'Pick Up',
                         activeColor: appTheme,
                         groupValue: _selectedDeliveryOption,
-                        onChanged: (String value) {
+                        onChanged: (String value) async {
                           setState(() {
                             _selectedDeliveryOption = value;
+                            widget.deliveryType = OrderType.PickUp;
                           });
                           if (storeArea == null ||
                               (storeArea != null && storeArea.data.isEmpty)) {
                             Utils.showToast("No pickup data found!", true);
+                          } else {
+                            PickUpBottomSheet.showBottomSheet(
+                                context, storeArea, OrderType.PickUp);
                           }
                         },
                       ),
@@ -235,12 +251,11 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 ),
                 Container(
                   height: 1,
-                  color: addressData != null ? Colors.grey : Colors.transparent,
+                  color: Colors.grey,
                 ),
                 _selectedDeliveryOption == 'Delivery'
                     ? addressData == null
                         ? Container(
-                            color: Colors.grey[200],
                             child: InkWell(
                               onTap: () async {
                                 if (AppConstant.isLoggedIn) {
@@ -264,6 +279,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                               },
                               child: Container(
                                 margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
@@ -365,16 +381,55 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                               ],
                             ),
                           )
-                    : storeArea != null
-                        ? Container(
-                  height: 500,
-                          child: StoreLocationScreenWithMultiplePick(
-                              storeArea, OrderType.PickUp),
-                        )
-                        : Container(),
+                    : Container(
+                        padding: EdgeInsets.only(left: 12, right: 12),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    top: 10, left: 10, right: 10, bottom: 10),
+                                child: InkWell(
+                                  onTap: () {
+                                    if (storeArea == null ||
+                                        (storeArea != null &&
+                                            storeArea.data.isEmpty)) {
+                                      Utils.showToast(
+                                          "No pickup data found!", true);
+                                    } else {
+                                      PickUpBottomSheet.showBottomSheet(
+                                          context, storeArea, OrderType.PickUp);
+                                    }
+                                  },
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Pick Address",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: TextStyle(fontSize: 16)),
+                                      Container(
+                                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        child: Text(
+                                            areaObject != null
+                                                ? "${areaObject.pickupAdd}"
+                                                : "Add Pick Address",
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w400)),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ]),
+                      ),
                 Container(
-                  margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                  height: addressData == null ? 0 : 1,
+                  margin: EdgeInsets.fromLTRB(0, 0, 0, 5),
+                  height: 1,
                   color: Colors.grey,
                 ),
                 Container(
@@ -724,9 +779,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             textColor: Colors.white,
             color: appTheme,
             onPressed: () async {
-              if (addressData == null) {
+              if (_selectedDeliveryOption == 'Delivery' &&
+                  addressData == null) {
                 DialogUtils.displayErrorDialog(
                     context, 'Please Select Delivery Address');
+              } else if (_selectedDeliveryOption
+                      .toLowerCase()
+                      .contains('pick') &&
+                  areaObject == null) {
+                DialogUtils.displayErrorDialog(
+                    context, 'Please Select Pick Up Address');
               } else if (taxModel == null) {
                 DialogUtils.displayErrorDialog(
                     context, 'Calculation are not done yet, Please try again');
@@ -925,7 +987,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        "Address",
+                                      widget.deliveryType==OrderType.Delivery?  "Address":"Pick Up Address",
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       Container(
@@ -933,7 +995,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         child: Row(
                                           children: [
                                             Text(
-                                              "${addressData.firstName}",
+                                              "${_selectedDeliveryOption == 'Delivery' ? addressData.firstName : user.fullName}",
                                               style: TextStyle(
                                                   fontWeight: FontWeight.w700,
                                                   fontSize: 18,
@@ -943,7 +1005,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         ),
                                       ),
                                       Text(
-                                        "${addressData.address}${addressData.address2.isNotEmpty ? ', ' + addressData.address2 : ""}",
+                                        _selectedDeliveryOption == 'Delivery'
+                                            ? "${addressData.address}${addressData.address2.isNotEmpty ? ', ' + addressData.address2 : ""}"
+                                            : areaObject.pickupAdd,
                                         style: TextStyle(fontSize: 16),
                                       ),
                                     ],
@@ -1196,8 +1260,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       '3',
       taxModel,
       addressData,
-      false,
-      addressData.areaId,
+      _selectedDeliveryOption != 'Delivery',
+      _selectedDeliveryOption == 'Delivery'
+          ? addressData.areaId
+          : areaObject.areaId,
       widget.deliveryType,
       "",
       "",
@@ -1376,7 +1442,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             color: Colors.black45,
             width: MediaQuery.of(context).size.width),
         Visibility(
-          visible: addressData == null ? false : true,
+          visible:
+              widget.deliveryType == OrderType.Delivery && addressData == null
+                  ? false
+                  : true,
           child: Padding(
             padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
             child: Row(
@@ -1540,7 +1609,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       appliedReddemPointsCodeList.isNotEmpty) {
                     removeCoupon();
                   } else {
-                    if (addressData == null) {
+                    if (widget.deliveryType == OrderType.Delivery &&
+                            addressData == null ||
+                        widget.deliveryType == OrderType.PickUp &&
+                            areaObject == null) {
                       DialogUtils.displayErrorDialog(
                           context, "Please select Address");
                       return;
@@ -1551,8 +1623,15 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     Map<String, String> subcriptionMap = Map();
                     subcriptionMap.putIfAbsent(
                         'orderJson', () => encodedDoughnut);
-                    subcriptionMap.putIfAbsent('userAddressId',
-                        () => addressData == null ? '' : addressData.areaId);
+                    subcriptionMap.putIfAbsent(
+                        'userAddressId',
+                        () => widget.deliveryType == OrderType.Delivery
+                            ? addressData == null
+                                ? ''
+                                : addressData.areaId
+                            : areaObject == null
+                                ? ''
+                                : areaObject.areaId);
                     subcriptionMap.putIfAbsent(
                         'userAddress', () => userDeliveryAddress);
                     subcriptionMap.putIfAbsent(
@@ -1566,8 +1645,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           builder: (BuildContext context) => RedeemPointsScreen(
                               addressData,
                               "",
-                              false,
-                              addressData.areaId,
+                              widget.deliveryType != OrderType.Delivery,
+                              widget.deliveryType == OrderType.Delivery
+                                  ? addressData.areaId
+                                  : areaObject.areaId,
                               (model) async {},
                               appliedReddemPointsCodeList,
                               isOrderVariations,
@@ -1654,7 +1735,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 if (taxModel != null && appliedCouponCodeList.isNotEmpty) {
                   removeCoupon();
                 } else {
-                  if (addressData == null) {
+                  if (widget.deliveryType == OrderType.Delivery &&
+                          addressData == null ||
+                      widget.deliveryType == OrderType.PickUp &&
+                          areaObject == null) {
                     DialogUtils.displayErrorDialog(
                         context, "Please select Address");
                     return;
@@ -1665,8 +1749,11 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                   Map<String, String> subcriptionMap = Map();
                   subcriptionMap.putIfAbsent(
                       'orderJson', () => encodedDoughnut);
-                  subcriptionMap.putIfAbsent('userAddressId',
-                      () => addressData == null ? '' : addressData.areaId);
+                  subcriptionMap.putIfAbsent(
+                      'userAddressId',
+                      () => widget.deliveryType != OrderType.Delivery
+                          ? areaObject.areaId
+                          : addressData.areaId);
                   subcriptionMap.putIfAbsent(
                       'userAddress', () => userDeliveryAddress);
                   subcriptionMap.putIfAbsent(
@@ -1679,8 +1766,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     builder: (BuildContext context) => AvailableOffersDialog(
                         addressData,
                         '3',
-                        false,
-                        addressData.areaId,
+                        widget.deliveryType != OrderType.Delivery,
+                        widget.deliveryType == OrderType.Delivery
+                            ? addressData.areaId
+                            : areaObject.areaId,
                         (model) async {},
                         appliedCouponCodeList,
                         isOrderVariations,
@@ -1815,7 +1904,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                   print("---Apply Coupon----");
                   if (couponCodeController.text.trim().isEmpty) {
                   } else {
-                    if (addressData == null) {
+                    if (widget.deliveryType == OrderType.Delivery &&
+                            addressData == null ||
+                        widget.deliveryType == OrderType.PickUp &&
+                            areaObject == null) {
                       DialogUtils.displayErrorDialog(
                           context, 'Please select address');
                       return;
@@ -1851,9 +1943,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                     discount: couponModel.discountAmount,
                                     shipping: shippingCharges,
                                     orderJson: encodedDoughnut,
-                                    userAddressId: addressData == null
-                                        ? ''
-                                        : addressData.areaId,
+                                    userAddressId: widget.deliveryType !=
+                                            OrderType.Delivery
+                                        ? areaObject == null
+                                            ? ''
+                                            : areaObject.areaId
+                                        : addressData == null
+                                            ? ''
+                                            : addressData.areaId,
                                     userAddress: userDeliveryAddress,
                                     deliveryTimeSlot: selectedTimeSlotString,
                                     cartSaving: cartSaving,
@@ -2047,7 +2144,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     }
     userDeliveryAddress = '';
     pin = '';
-    if (addressData != null && !isComingFromPickUpScreen) {
+    if (addressData != null && widget.deliveryType == OrderType.Delivery) {
       if (addressData.address2 != null && addressData.address2.isNotEmpty) {
         if (addressData.address != null && addressData.address.isNotEmpty) {
           userDeliveryAddress = addressData.address +
@@ -2076,6 +2173,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
       if (addressData.zipCode != null && addressData.zipCode.isNotEmpty)
         pin = " " + addressData.zipCode;
+    } else if (areaObject != null && widget.deliveryType == OrderType.PickUp) {
+      userDeliveryAddress = areaObject.pickupAdd;
     }
     isLoading = true;
     userWalleModel = await ApiController.getUserWallet();
@@ -2088,7 +2187,13 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             discount: '',
             shipping: shippingCharges,
             orderJson: encodedDoughnut,
-            userAddressId: addressData == null ? '' : addressData.areaId,
+            userAddressId: widget.deliveryType == OrderType.Delivery
+                ? addressData == null
+                    ? ''
+                    : addressData.areaId
+                : areaObject == null
+                    ? ''
+                    : areaObject.areaId,
             userAddress: userDeliveryAddress,
             deliveryTimeSlot: selectedTimeSlotString,
             cartSaving: cartSaving,
@@ -2289,7 +2394,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     end_date = formatted;
     userDeliveryAddress = '';
     pin = '';
-    if (addressData != null && !isComingFromPickUpScreen) {
+    if (addressData != null && widget.deliveryType == OrderType.Delivery) {
       if (addressData.address2 != null && addressData.address2.isNotEmpty) {
         if (addressData.address != null && addressData.address.isNotEmpty) {
           userDeliveryAddress = addressData.address +
@@ -2318,6 +2423,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
       if (addressData.zipCode != null && addressData.zipCode.isNotEmpty)
         pin = " " + addressData.zipCode;
+    } else if (widget.deliveryType == OrderType.PickUp && areaObject != null) {
+      userDeliveryAddress = areaObject.pickupAdd;
     }
     isLoading = true;
     userWalleModel = await ApiController.getUserWallet();
@@ -2333,8 +2440,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       taxModel,
       addressData,
       encodedDoughnut,
-      false,
-      addressData.areaId,
+      widget.deliveryType != OrderType.Delivery,
+      widget.deliveryType == OrderType.Delivery
+          ? addressData.areaId
+          : areaObject.areaId,
       widget.deliveryType,
       payment_request_id,
       payment_id,
@@ -2488,15 +2597,15 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   Future<void> checkMinOrderPickAmount() async {
-    if (widget.deliveryType == OrderType.PickUp && addressData != null) {
-      print("----minAmount=${addressData.minAmount}");
-      print("----notAllow=${addressData.notAllow}");
+    if (widget.deliveryType == OrderType.PickUp && areaObject != null) {
+      print("----minAmount=${areaObject.minOrder}");
+      print("----notAllow=${areaObject.notAllow}");
       print("--------------------------------------------");
       int minAmount = 0;
       try {
         try {
-          if (addressData.minAmount.isNotEmpty)
-            minAmount = double.parse(addressData.minAmount).toInt();
+          if (areaObject.minOrder.isNotEmpty)
+            minAmount = double.parse(areaObject.minOrder).toInt();
         } catch (e) {
           print(e);
         }

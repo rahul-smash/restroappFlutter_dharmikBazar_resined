@@ -1901,17 +1901,27 @@ class _SubscriptionHistoryDetailsState
   }
 
   String _getAddress(SubscriptionOrderData orderHistoryData) {
-    if (orderHistoryData.deliveryAddress != null &&
-        orderHistoryData.deliveryAddress.isNotEmpty) {
-      String name = '${orderHistoryData.deliveryAddress.first.firstName}';
-      String address = '${orderHistoryData.deliveryAddress.first.address}';
-      String address2 =
-          '${orderHistoryData.deliveryAddress.first.address2.isEmpty ? '' : ',\n${orderHistoryData.deliveryAddress.first.address2}'}';
-      String area = ',\n${orderHistoryData.deliveryAddress.first.areaName}';
-      String city = ', ${orderHistoryData.deliveryAddress.first.city}';
-      String ZipCode = orderHistoryData.deliveryAddress.first.zipcode.isNotEmpty?', ${orderHistoryData.deliveryAddress.first.zipcode}':'';
-      return '$name\n$address$address2$area$city$ZipCode';
-    } else {
+    if(orderHistoryData.orderFacility.toLowerCase().contains('pick')) {
+      if (orderHistoryData.deliveryAddress != null &&
+          orderHistoryData.deliveryAddress.isNotEmpty) {
+        String name = '${orderHistoryData.deliveryAddress.first.firstName}';
+        String address = '${orderHistoryData.deliveryAddress.first.address}';
+        String address2 =
+            '${orderHistoryData.deliveryAddress.first.address2.isEmpty
+            ? ''
+            : ',\n${orderHistoryData.deliveryAddress.first.address2}'}';
+        String area = ',\n${orderHistoryData.deliveryAddress.first.areaName}';
+        String city = ', ${orderHistoryData.deliveryAddress.first.city}';
+        String ZipCode = orderHistoryData.deliveryAddress.first.zipcode
+            .isNotEmpty
+            ? ', ${orderHistoryData.deliveryAddress.first.zipcode}'
+            : '';
+        return '$name\n$address$address2$area$city$ZipCode';
+      } else {
+        String address = '${orderHistoryData.address}';
+        return address;
+      }
+    }else{
       String address = '${orderHistoryData.address}';
       return address;
     }

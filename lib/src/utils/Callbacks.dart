@@ -1,5 +1,6 @@
 import 'package:event_bus/event_bus.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 
 /// The global [EventBus] object.
@@ -21,15 +22,18 @@ class onPageFinished {
   onPageFinished(this.url);
 }
 
-
 class onAddressSelected {
   DeliveryAddressData addressData;
-  onAddressSelected(this.addressData);
+  Area areaObject;
+
+  onAddressSelected(this.addressData, {this.areaObject});
 }
+
 class onSubscribeProduct {
   Product product;
   String quanity;
-  onSubscribeProduct(this.product,this.quanity);
+
+  onSubscribeProduct(this.product, this.quanity);
 }
 
 class onPayTMPageFinished {

@@ -2163,11 +2163,11 @@ class ApiController {
         "total_deliveries": total_deliveries,
       });
 
-      //print("----${url}");
-      //print("--fields--${request.fields.toString()}--");
+      print("----${url}");
+      print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
-      //print("--respStr--${respStr}--");
+      print("--respStr--${respStr}--");
       final parsed = json.decode(respStr);
 
       ResponseModel model = ResponseModel.fromJson(parsed);
