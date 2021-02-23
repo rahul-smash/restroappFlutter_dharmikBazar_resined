@@ -20,11 +20,12 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class OrderDetailScreenVersion2 extends StatefulWidget {
   OrderData orderHistoryData;
+  String orderId = '';
   bool isRatingEnable;
   StoreModel store;
 
-  OrderDetailScreenVersion2(
-      this.orderHistoryData, this.isRatingEnable, this.store);
+  OrderDetailScreenVersion2(this.isRatingEnable, this.store,
+      {this.orderHistoryData, this.orderId = ''});
 
   @override
   _OrderDetailScreenVersion2State createState() =>
@@ -55,7 +56,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     UserModel user = await SharedPrefs.getUser();
     userId = user.id;
 
-    return ApiController.getOrderDetail(widget.orderHistoryData.orderId)
+    return ApiController.getOrderDetail(widget.orderHistoryData != null
+            ? widget.orderHistoryData.orderId
+            : widget.orderId)
         .then((respone) {
       if (respone != null &&
           respone.success &&
@@ -106,12 +109,16 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     mainContext = context;
-    String itemText = widget.orderHistoryData.orderItems.length > 1
-        ? '${widget.orderHistoryData.orderItems.length} Items, '
-        : '${widget.orderHistoryData.orderItems.length} Item, ';
-    String orderFacility = widget.orderHistoryData.orderFacility != null
-        ? '${widget.orderHistoryData.orderFacility}, '
-        : '';
+    String itemText = '';
+    String orderFacility = '';
+    if (widget.orderHistoryData != null) {
+      itemText = widget.orderHistoryData.orderItems.length > 1
+          ? '${widget.orderHistoryData.orderItems.length} Items, '
+          : '${widget.orderHistoryData.orderItems.length} Item, ';
+      orderFacility = widget.orderHistoryData.orderFacility != null
+          ? '${widget.orderHistoryData.orderFacility}, '
+          : '';
+    }
     return isLoading
         ? Scaffold(
             resizeToAvoidBottomInset: false,
@@ -213,7 +220,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                             orderHistoryDataId: widget
                                                 .orderHistoryData
                                                 .subscription_order_id,
-                                                store: widget.store,
+                                            store: widget.store,
                                           ),
                                         ),
                                       );

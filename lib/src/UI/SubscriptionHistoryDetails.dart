@@ -184,6 +184,7 @@ class _SubscriptionHistoryDetailsState
           });
         });
       }
+      Utils.hideProgressDialog(context);
     });
   }
 
@@ -699,8 +700,10 @@ class _SubscriptionHistoryDetailsState
         title = 'Cancelled';
         break;
       case '9':
-      case '10':
         title = 'Paused';
+        break;
+      case '10':
+        title = 'Paused by Admin';
         break;
     }
     return title;

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:badges/badges.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -10,8 +12,10 @@ import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
+import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
 import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
 import 'package:restroapp/src/UI/CategoryView.dart';
+import 'package:restroapp/src/UI/SubscriptionHistoryDetails.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -446,9 +450,9 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     _firebaseMessaging.configure(
       onMessage: (Map<String, dynamic> message) async {
-//        print(message.toString());
+        print(message.toString());
         try {
-//          print("------onMessage: $message");
+          print("------onMessage: $message");
           if (AppConstant.isLoggedIn) {
             if (Platform.isIOS) {
               print("iosssssssssssssssss");
@@ -467,17 +471,21 @@ class _HomeScreenState extends State<HomeScreen> {
         }
       },
       onLaunch: (Map<String, dynamic> message) async {
-        //print("onLaunch: $message");
+        print("onLaunch: $message");
+//        Utils.showToast('onLaunch', false);
+        onSelectNotification(jsonEncode(message));
       },
       onResume: (Map<String, dynamic> message) async {
-        //print("onResume: $message");
+        print("onResume: $message");
+//        Utils.showToast('onResume', false);
+        onSelectNotification(jsonEncode(message));
       },
     );
 
     _firebaseMessaging.requestNotificationPermissions(
         const IosNotificationSettings(sound: true, badge: true, alert: true));
     _firebaseMessaging.getToken().then((token) {
-      //print("----token---- ${token}");
+      print("----token---- ${token}");
       try {
         SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
       } catch (e) {
@@ -515,12 +523,62 @@ class _HomeScreenState extends State<HomeScreen> {
     var iOSPlatformChannelSpecifics = IOSNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin
-        .show(0, title, body, platformChannelSpecifics, payload: 'item x');
+    await flutterLocalNotificationsPlugin.show(
+        0, title, body, platformChannelSpecifics,
+        payload: jsonEncode(message));
   }
 
   Future<void> onSelectNotification(String payload) async {
     debugPrint('onSelectNotification : ');
+    if (payload != null) {
+      try {
+        Map<String, dynamic> map = json.decode(payload);
+        String id = '';
+        String type = '';
+        StoreModel store = await SharedPrefs.getStore();
+        bool isRatingEnable = store.reviewRatingDisplay != null &&
+            store.reviewRatingDisplay.compareTo('1') == 0;
+        Navigator.of(context)
+            .popUntil((route) => route.isFirst);
+        if (Platform.isIOS) {
+
+        } else {
+           id = map['data']['id'];
+           type = map['data']['type'];
+           type=type.toLowerCase();
+
+        }
+
+        switch(type){
+          case 'order':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => OrderDetailScreenVersion2(
+                    isRatingEnable,
+                    store,orderId: id,
+                  )),
+            );
+            break;
+          case 'subscription':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>  SubscriptionHistoryDetails(
+                    orderHistoryDataId: id,
+                    store: store,
+                  )),
+            );
+            break;
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+    attributeMap["ScreenName"] = "MyOrderScreen";
+    Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
   }
 
   Future<void> onDidReceiveLocalNotification(

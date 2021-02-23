@@ -906,6 +906,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         ),
                         widget.deliveryType == OrderType.Delivery
                             ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
