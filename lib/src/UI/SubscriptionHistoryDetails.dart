@@ -258,12 +258,14 @@ class _SubscriptionHistoryDetailsState
         case '1':
           choices.add('Order Stop');
           choices.add('Pause');
+        if(!widget.orderHistoryData.orderFacility.toLowerCase().contains('pick'))
           choices.add('Change Delivery Slots');
           break;
         case '9':
           choices.add('Order Stop');
           choices.add('Active');
-          choices.add('Change Delivery Slots');
+          if(!widget.orderHistoryData.orderFacility.toLowerCase().contains('pick'))
+            choices.add('Change Delivery Slots');
           break;
       }
     }
@@ -580,7 +582,7 @@ class _SubscriptionHistoryDetailsState
                       firstRow(widget.orderHistoryData),
                       Container(
                         color: Colors.white,
-                        child: Center(child: Text("Deliveries Date")),
+                        child: Center(child: Text(!widget.orderHistoryData.orderFacility.toLowerCase().contains('pick')?"Deliveries Date":"Subscribed Date")),
                       ),
                       Container(
                         color: Colors.white,
@@ -866,6 +868,7 @@ class _SubscriptionHistoryDetailsState
                     SizedBox(
                       height: 20,
                     ),
+                     ! orderHistoryData.orderFacility.toLowerCase().contains('pick')?
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -887,7 +890,7 @@ class _SubscriptionHistoryDetailsState
                           ),
                         )
                       ],
-                    ),
+                    ):Container(height: 20,),
                   ],
                 ),
               ),

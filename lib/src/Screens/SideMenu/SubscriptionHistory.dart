@@ -75,11 +75,12 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
           }
           deliverySlotModel = response;
           print(
-              "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data.is24X7Open}");
+              "deliverySlotModel.data.is24X7Open =${deliverySlotModel.data
+                  .is24X7Open}");
           isInstantDelivery = deliverySlotModel.data.is24X7Open == "1";
           for (int i = 0;
-              i < deliverySlotModel.data.dateTimeCollection.length;
-              i++) {
+          i < deliverySlotModel.data.dateTimeCollection.length;
+          i++) {
             timeslotList =
                 deliverySlotModel.data.dateTimeCollection[i].timeslot;
             for (int j = 0; j < timeslotList.length; j++) {
@@ -121,8 +122,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     });
   }
 
-  Future<Null> updateSubscriptionStatus(
-      String subscriptionOrderId, String status) {
+  Future<Null> updateSubscriptionStatus(String subscriptionOrderId,
+      String status) {
     isLoading = true;
     return ApiController.subscriptionStatusUpdate(subscriptionOrderId, status)
         .then((respone) {
@@ -137,11 +138,11 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
     });
   }
 
-  Future<Null> updateSubscriptionOrderDeliverySlots(
-      String subscriptionOrderId, String deliverySlot) {
+  Future<Null> updateSubscriptionOrderDeliverySlots(String subscriptionOrderId,
+      String deliverySlot) {
     isLoading = true;
     return ApiController.subscriptionOrderUpdate(
-            subscriptionOrderId, deliverySlot)
+        subscriptionOrderId, deliverySlot)
         .then((respone) {
       Utils.hideProgressDialog(context);
       if (respone != null && respone.success) {
@@ -235,141 +236,144 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         child: isLoading
             ? Center(child: CircularProgressIndicator())
             : ordersList == null
-                ? SingleChildScrollView(
-                    child: Center(child: Text("Something went wrong!")))
-                : Container(
-                    color: grayColor,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: ListView(
-                            shrinkWrap: true,
-                            physics: ScrollPhysics(),
-                            children: [
-                              Visibility(
-                                visible: _showFilters,
-                                child: Container(
-                                  padding: EdgeInsets.all(10),
-                                  color: appTheme,
-                                  alignment: Alignment.center,
-                                  child: Center(
-                                    child: SingleChildScrollView(
-                                      scrollDirection: Axis.horizontal,
-                                      child: Row(
-                                        children: filtersList.map((filter) {
-                                          return Container(
-                                            child: Padding(
-                                              padding: EdgeInsets.fromLTRB(
-                                                  5, 0, 5, 0),
-                                              child: Wrap(
-                                                children: [
-                                                  InkWell(
-                                                    onTap: () {
-                                                      setState(() {
-                                                        if ((selectedFilter !=
-                                                                    '' &&
-                                                                filter ==
-                                                                    clear) ||
-                                                            filter == clear) {
-                                                          selectedFilter = '';
-                                                          filteredList.clear();
-                                                          setState(() {
-                                                            //refreshList
-                                                          });
-                                                          return;
-                                                        }
-                                                        selectedFilter = filter;
-                                                        findfiltedList();
-                                                      });
-                                                    },
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.all(10),
-                                                      child: Center(
-                                                          child: Text(
-                                                        "${filter}",
-                                                        style: TextStyle(
-                                                            color:
-                                                                selectedFilter ==
-                                                                        filter
-                                                                    ? appTheme
-                                                                    : Colors
-                                                                        .white,
-                                                            fontSize: 13,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w400),
-                                                      )),
-                                                      color: selectedFilter ==
-                                                              filter
-                                                          ? Colors.white
-                                                          : Colors.white
-                                                              .withOpacity(0.3),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(growable: true),
-                                      ),
+            ? SingleChildScrollView(
+            child: Center(child: Text("Something went wrong!")))
+            : Container(
+          color: grayColor,
+          child: Column(
+            children: [
+              Expanded(
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: ScrollPhysics(),
+                  children: [
+                    Visibility(
+                      visible: _showFilters,
+                      child: Container(
+                        padding: EdgeInsets.all(10),
+                        color: appTheme,
+                        alignment: Alignment.center,
+                        child: Center(
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: filtersList.map((filter) {
+                                return Container(
+                                  child: Padding(
+                                    padding: EdgeInsets.fromLTRB(
+                                        5, 0, 5, 0),
+                                    child: Wrap(
+                                      children: [
+                                        InkWell(
+                                          onTap: () {
+                                            setState(() {
+                                              if ((selectedFilter !=
+                                                  '' &&
+                                                  filter ==
+                                                      clear) ||
+                                                  filter == clear) {
+                                                selectedFilter = '';
+                                                filteredList.clear();
+                                                setState(() {
+                                                  //refreshList
+                                                });
+                                                return;
+                                              }
+                                              selectedFilter = filter;
+                                              findfiltedList();
+                                            });
+                                          },
+                                          child: Container(
+                                            padding:
+                                            EdgeInsets.all(10),
+                                            child: Center(
+                                                child: Text(
+                                                  "${filter}",
+                                                  style: TextStyle(
+                                                      color:
+                                                      selectedFilter ==
+                                                          filter
+                                                          ? appTheme
+                                                          : Colors
+                                                          .white,
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                      FontWeight
+                                                          .w400),
+                                                )),
+                                            color: selectedFilter ==
+                                                filter
+                                                ? Colors.white
+                                                : Colors.white
+                                                .withOpacity(0.3),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ),
-                              ),
-                              Visibility(
-                                visible: (searchedText.isNotEmpty) ||
-                                    (_showFilters && selectedFilter.isNotEmpty),
-                                child: Container(
-                                  padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
-                                  color: appTheme,
-                                  child: Text(
-                                    searchedText.isNotEmpty ||
-                                            selectedFilter.isNotEmpty
-                                        ? "${filteredList.length} from Results ${ordersList.length}"
-                                        : '',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                ),
-                              ),
-                              (searchedText.isNotEmpty &&
-                                          filteredList.isEmpty) ||
-                                      (selectedFilter.isNotEmpty &&
-                                          filteredList.isEmpty)
-                                  ? Container(
-                                      height:
-                                          Utils.getDeviceHeight(context) - 165,
-                                      child: Center(
-                                          child: Text(
-                                        '${searchedText.isNotEmpty ? searchedText + ' is ' : selectedFilter + ' are '}not Found!',
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.black,
-                                            fontSize: 20),
-                                      )))
-                                  : ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: ScrollPhysics(),
-                                      itemCount: filteredList.isNotEmpty
-                                          ? filteredList.length
-                                          : ordersList.length,
-                                      itemBuilder: (context, index) {
-                                        return showSubScribeView(index);
-                                      },
-                                    ),
-                            ],
+                                );
+                              }).toList(growable: true),
+                            ),
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    Visibility(
+                      visible: (searchedText.isNotEmpty) ||
+                          (_showFilters && selectedFilter.isNotEmpty),
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+                        color: appTheme,
+                        child: Text(
+                          searchedText.isNotEmpty ||
+                              selectedFilter.isNotEmpty
+                              ? "${filteredList
+                              .length} from Results ${ordersList.length}"
+                              : '',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    (searchedText.isNotEmpty &&
+                        filteredList.isEmpty) ||
+                        (selectedFilter.isNotEmpty &&
+                            filteredList.isEmpty)
+                        ? Container(
+                        height:
+                        Utils.getDeviceHeight(context) - 165,
+                        child: Center(
+                            child: Text(
+                              '${searchedText.isNotEmpty
+                                  ? searchedText + ' is '
+                                  : selectedFilter + ' are '}not Found!',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                  fontSize: 20),
+                            )))
+                        : ListView.builder(
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
+                      itemCount: filteredList.isNotEmpty
+                          ? filteredList.length
+                          : ordersList.length,
+                      itemBuilder: (context, index) {
+                        return showSubScribeView(index);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
   Widget showSubScribeView(int index) {
     SubscriptionOrderData data =
-        filteredList.isNotEmpty ? filteredList[index] : ordersList[index];
+    filteredList.isNotEmpty ? filteredList[index] : ordersList[index];
     List<String> choices = List();
     switch (data.status) {
       case '0':
@@ -382,12 +386,14 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
       case '1':
         choices.add('Order Stop');
         choices.add('Pause');
-        choices.add('Change Delivery Slots');
+        if (!data.orderFacility.toLowerCase().contains('pick'))
+          choices.add('Change Delivery Slots');
         break;
       case '9':
         choices.add('Order Stop');
         choices.add('Active');
-        choices.add('Change Delivery Slots');
+        if (!data.orderFacility.toLowerCase().contains('pick'))
+          choices.add('Change Delivery Slots');
         break;
     }
     return InkWell(
@@ -395,59 +401,63 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => SubscriptionHistoryDetails(
-                orderHistoryData: data,
-                isRatingEnable: false,
-                deliverySlotModel: deliverySlotModel,
-                selctedTag: selctedTag,
-                selectedTimeSlot: selectedTimeSlot,
-                timeslotList: timeslotList,
-                isInstantDelivery: isInstantDelivery,
-                isDeliveryResponseFalse: isDeliveryResponseFalse,
-                isSlotSelected: isSlotSelected,
-                initSelectedTimeSlotString: initSelectedTimeSlotString,
-                store: widget.store),
+            builder: (context) =>
+                SubscriptionHistoryDetails(
+                    orderHistoryData: data,
+                    isRatingEnable: false,
+                    deliverySlotModel: deliverySlotModel,
+                    selctedTag: selctedTag,
+                    selectedTimeSlot: selectedTimeSlot,
+                    timeslotList: timeslotList,
+                    isInstantDelivery: isInstantDelivery,
+                    isDeliveryResponseFalse: isDeliveryResponseFalse,
+                    isSlotSelected: isSlotSelected,
+                    initSelectedTimeSlotString: initSelectedTimeSlotString,
+                    store: widget.store),
           ),
         );
       },
       child: Container(
-        decoration: BoxDecoration(
-            color: Colors.white, borderRadius: BorderRadius.circular(5)),
-        padding: EdgeInsets.all(16),
-        margin: EdgeInsets.fromLTRB(15, 15, 15, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(
-                  "#${data.displaySubscriptionId} (${data.orderItems.length} ${data.orderItems.length > 1 ? 'Items' : 'Item'})",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-              SizedBox(
-                width: 20,
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Icon(
-                    Icons.check_circle_outline,
-                    size: 16,
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(5)),
+          padding: EdgeInsets.all(16),
+          margin: EdgeInsets.fromLTRB(15, 15, 15, 0),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+            Text(
+                "#${data.displaySubscriptionId} (${data.orderItems
+                    .length} ${data.orderItems.length > 1 ? 'Items' : 'Item'})",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            SizedBox(
+              width: 20,
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.check_circle_outline,
+                  size: 16,
+                  color: _getSubscriptionStatusColor(data),
+                ),
+                SizedBox(
+                  width: 3,
+                ),
+                Text(
+                  "Order ${_getSubscriptionStatus(data)}",
+                  style: TextStyle(
+                    fontSize: 14,
                     color: _getSubscriptionStatusColor(data),
                   ),
-                  SizedBox(
-                    width: 3,
-                  ),
-                  Text(
-                    "Order ${_getSubscriptionStatus(data)}",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: _getSubscriptionStatusColor(data),
-                    ),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  PopupMenuButton(
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Visibility(
+                  visible: data.status!='2',
+                  child: PopupMenuButton(
                     padding: EdgeInsets.zero,
                     child: Icon(
                       Icons.more_vert,
@@ -458,20 +468,21 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SubscriptionHistoryDetails(
-                                orderHistoryData: data,
-                                isRatingEnable: false,
-                                deliverySlotModel: deliverySlotModel,
-                                selctedTag: selctedTag,
-                                selectedTimeSlot: selectedTimeSlot,
-                                timeslotList: timeslotList,
-                                isInstantDelivery: isInstantDelivery,
-                                isDeliveryResponseFalse:
+                            builder: (context) =>
+                                SubscriptionHistoryDetails(
+                                    orderHistoryData: data,
+                                    isRatingEnable: false,
+                                    deliverySlotModel: deliverySlotModel,
+                                    selctedTag: selctedTag,
+                                    selectedTimeSlot: selectedTimeSlot,
+                                    timeslotList: timeslotList,
+                                    isInstantDelivery: isInstantDelivery,
+                                    isDeliveryResponseFalse:
                                     isDeliveryResponseFalse,
-                                isSlotSelected: isSlotSelected,
-                                initSelectedTimeSlotString:
+                                    isSlotSelected: isSlotSelected,
+                                    initSelectedTimeSlotString:
                                     initSelectedTimeSlotString,
-                                store: widget.store),
+                                    store: widget.store),
                           ),
                         );
                         return;
@@ -508,21 +519,168 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         );
                       }).toList();
                     },
-                  )
-                ],
-              )
-            ]),
-            SizedBox(
-              height: 5,
+                  ),
+                )
+              ],
+            )
+          ]),
+          SizedBox(
+            height: 5,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            Expanded(
+            flex: 1,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Image.asset(
+                  'images/calendargreyicon.png',
+                  fit: BoxFit.scaleDown,
+                  height: 14,
+                  color: Color(0xFFBDBDBF),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                  child: Text(
+                    "${_getDateFormated(data.startDate)} to ${_getDateFormated(
+                        data.endDate)}",
+                    maxLines: 2,
+                    style: TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                )
+              ],
             ),
-            Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+          ),
+          !data.orderFacility.toLowerCase().contains('pick') ?
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                'images/timegreyicon.png',
+                fit: BoxFit.scaleDown,
+                height: 14,
+                color: Color(0xFFBDBDBF),
+              ),
+              SizedBox(
+                width: 5,
+              ),
+              Text(
+                "${data.deliveryTimeSlot.replaceAll(':00', '')}",
+                maxLines: 2,
+                style: TextStyle(
+                  fontSize: 14,
+                ),
+              )
+            ],
+          ) : Container(),
+          ]),
+      Container(
+        height: 1,
+        color: Color(0xffEBECED),
+        margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+      ),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text("Order ${data.orderItems.length > 1 ? 'items' : 'item'}",
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Color(0xFF807D8C),
+            )),
+        Row(
+          children: [
+            Icon(
+              Icons.check_circle_outline,
+              size: 14,
+              color: Color(0xFF807D8C),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              _checkSubscriptionKey(data.subscriptionType).label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w400,
+                fontStyle: FontStyle.italic,
+                color: Color(0xFF807D8C),
+              ),
+            )
+          ],
+        )
+      ]),
+      Container(
+        padding: EdgeInsets.fromLTRB(5, 2, 5, 0),
+        //color: Colors.grey,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Container(
+                height: 80,
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    itemCount: data.orderItems.length > 3
+                        ? 3
+                        : data.orderItems.length,
+                    itemBuilder: (context, itemIndex) {
+                      return Container(
+                        margin: EdgeInsets.only(top: 5),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          child: Wrap(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Color(0xFFBDBDBF),
+                                    ),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(5))),
+                                padding: EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: Text(
+                                    "${data.orderItems[itemIndex].productName}",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+              ),
+            ),
+            Visibility(
+              visible: checkstatus(data),
+              child: Padding(
+                padding: EdgeInsets.only(top: 5, bottom: 5),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Next Delivery Date',
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF807D8C),
+                          fontWeight: FontWeight.w300),
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
                       children: [
                         Image.asset(
                           'images/calendargreyicon.png',
@@ -533,248 +691,101 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         SizedBox(
                           width: 5,
                         ),
-                        Expanded(
-                          child: Text(
-                            "${_getDateFormated(data.startDate)} to ${_getDateFormated(data.endDate)}",
-                            maxLines: 2,
-                            style: TextStyle(
-                              fontSize: 14,
-                            ),
+                        Text(
+                          _checkNextDeliveryDate(data),
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                            color: Colors.black,
                           ),
                         )
                       ],
                     ),
-                  ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'images/timegreyicon.png',
-                        fit: BoxFit.scaleDown,
-                        height: 14,
-                        color: Color(0xFFBDBDBF),
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Text(
-                        "${data.deliveryTimeSlot.replaceAll(':00', '')}",
-                        maxLines: 2,
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                      )
-                    ],
-                  )
-                ]),
-            Container(
-              height: 1,
-              color: Color(0xffEBECED),
-              margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text("Order ${data.orderItems.length > 1 ? 'items' : 'item'}",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF807D8C),
-                  )),
-              Row(
-                children: [
-                  Icon(
-                    Icons.check_circle_outline,
-                    size: 14,
-                    color: Color(0xFF807D8C),
-                  ),
-                  SizedBox(
-                    width: 5,
-                  ),
-                  Text(
-                    _checkSubscriptionKey(data.subscriptionType).label,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                      fontStyle: FontStyle.italic,
-                      color: Color(0xFF807D8C),
-                    ),
-                  )
-                ],
-              )
-            ]),
-            Container(
-              padding: EdgeInsets.fromLTRB(5, 2, 5, 0),
-              //color: Colors.grey,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: Container(
-                      height: 80,
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: data.orderItems.length > 3
-                              ? 3
-                              : data.orderItems.length,
-                          itemBuilder: (context, itemIndex) {
-                            return Container(
-                              margin: EdgeInsets.only(top: 5),
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                child: Wrap(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: Color(0xFFBDBDBF),
-                                          ),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5))),
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Center(
-                                        child: Text(
-                                          "${data.orderItems[itemIndex].productName}",
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }),
-                    ),
-                  ),
-                  Visibility(
-                    visible: checkstatus(data),
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 5, bottom: 5),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Next Delivery Date',
-                            style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF807D8C),
-                                fontWeight: FontWeight.w300),
-                          ),
-                          SizedBox(
-                            height: 5,
-                          ),
-                          Row(
-                            children: [
-                              Image.asset(
-                                'images/calendargreyicon.png',
-                                fit: BoxFit.scaleDown,
-                                height: 14,
-                                color: Color(0xFFBDBDBF),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                _checkNextDeliveryDate(data),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.black,
-                                ),
-                              )
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Visibility(
-              visible: data.orderItems.length > 3,
-//              visible: true,
-              child: InkWell(
-                onTap: () => _showOrderItemsDialog(data),
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                  child: Text(
-                    "View More",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: appTheme,
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              height: 1,
-              width: Utils.getDeviceWidth(context) / 2,
-              color: Color(0xFFBDBDBF),
-              margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Expanded(
-                child: Wrap(
-                  children: [
-                    Padding(
-                        padding: EdgeInsets.only(top: 6.0),
-                        child: Text("Total Amount: ",
-                            style: TextStyle(
-                              color: Color(0xffA3A5A8),
-                              fontSize: 16,
-                            ))),
-                    Padding(
-                      padding: EdgeInsets.only(top: 6.0),
-                      child: Text("${AppConstant.currency}${data.total}",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.bold)),
-                    ),
-                    Visibility(
-                      visible: data.paymentMethod != null &&
-                          data.paymentMethod.trim().isNotEmpty,
-                      child: Container(
-                          margin: EdgeInsets.only(left: 6),
-                          padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Color(0xFFE6E6E6)),
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15.0)),
-                          ),
-                          child: Text(
-                              '${data.paymentMethod.trim().toUpperCase()}',
-                              style: TextStyle(
-                                  color: Color(0xFF39444D), fontSize: 10))),
-                    ),
                   ],
                 ),
               ),
-              Visibility(
-                visible: false,
-                child: InkWell(
-                  onTap: () {
-                    deliverySlotBottomSheet(context, data, false);
-                  },
-                  child: Text(
-                    "Delivery Slots",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xff799A3F),
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              )
-            ]),
+            )
           ],
         ),
       ),
+      Visibility(
+        visible: data.orderItems.length > 3,
+//              visible: true,
+        child: InkWell(
+          onTap: () => _showOrderItemsDialog(data),
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(0, 0, 0, 10),
+            child: Text(
+              "View More",
+              style: TextStyle(
+                fontSize: 14,
+                color: appTheme,
+                decoration: TextDecoration.underline,
+              ),
+            ),
+          ),
+        ),
+      ),
+      Container(
+        height: 1,
+        width: Utils.getDeviceWidth(context) / 2,
+        color: Color(0xFFBDBDBF),
+        margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+      ),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Expanded(
+          child: Wrap(
+            children: [
+              Padding(
+                  padding: EdgeInsets.only(top: 6.0),
+                  child: Text("Total Amount: ",
+                      style: TextStyle(
+                        color: Color(0xffA3A5A8),
+                        fontSize: 16,
+                      ))),
+              Padding(
+                padding: EdgeInsets.only(top: 6.0),
+                child: Text("${AppConstant.currency}${data.total}",
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
+              ),
+              Visibility(
+                visible: data.paymentMethod != null &&
+                    data.paymentMethod
+                        .trim()
+                        .isNotEmpty,
+                child: Container(
+                    margin: EdgeInsets.only(left: 6),
+                    padding: EdgeInsets.fromLTRB(8, 3, 8, 3),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Color(0xFFE6E6E6)),
+                      color: Colors.white,
+                      borderRadius:
+                      BorderRadius.all(Radius.circular(15.0)),
+                    ),
+                    child: Text(
+                        '${data.paymentMethod.trim().toUpperCase()}',
+                        style: TextStyle(
+                            color: Color(0xFF39444D), fontSize: 10))),
+              ),
+            ],
+          ),
+        ),
+        Visibility(
+          visible: data.status=='0',
+          child: Text(
+            "View Order",
+            style: TextStyle(
+              fontSize: 14,
+              color: Color(0xff799A3F),
+              decoration: TextDecoration.underline,
+            ),
+          ),
+        )
+      ]),
+      ],
+    ),)
+    ,
     );
   }
 
@@ -880,170 +891,179 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
             builder: (BuildContext context, setState) {
               return SafeArea(
                   child: Padding(
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.of(context).viewInsets.bottom),
-                child: Container(
-                  color: Colors.white,
-                  margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  child: Wrap(children: <Widget>[
-                    Column(
-                      children: <Widget>[
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Padding(
-                              padding: EdgeInsets.fromLTRB(5, 15, 5, 0),
-                              child: Image.asset(
-                                'images/cancelicon.png',
-                                fit: BoxFit.scaleDown,
-                                height: 15,
-                                width: 15,
+                    padding: EdgeInsets.only(
+                        bottom: MediaQuery
+                            .of(context)
+                            .viewInsets
+                            .bottom),
+                    child: Container(
+                      color: Colors.white,
+                      margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+                      child: Wrap(children: <Widget>[
+                        Column(
+                          children: <Widget>[
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Padding(
+                                  padding: EdgeInsets.fromLTRB(5, 15, 5, 0),
+                                  child: Image.asset(
+                                    'images/cancelicon.png',
+                                    fit: BoxFit.scaleDown,
+                                    height: 15,
+                                    width: 15,
+                                  ),
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(20, 5, 20, 15),
-                          child: Text(
-                            "Delivery Slots",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ),
-                        deliverySlotModel == null
-                            ? Container()
-                            :
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(20, 5, 20, 15),
+                              child: Text(
+                                "Delivery Slots",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ),
+                            deliverySlotModel == null
+                                ? Container()
+                                :
                             //print("--length = ${deliverySlotModel.data.dateTimeCollection.length}----");
                             deliverySlotModel.data != null &&
-                                    deliverySlotModel.data.dateTimeCollection !=
-                                        null &&
-                                    deliverySlotModel
-                                        .data.dateTimeCollection.isNotEmpty
+                                deliverySlotModel.data.dateTimeCollection !=
+                                    null &&
+                                deliverySlotModel
+                                    .data.dateTimeCollection.isNotEmpty
                                 ? Padding(
-                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                    child: Align(
-                                      alignment: Alignment.topLeft,
-                                      child: Container(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Container(
-                                              //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                                              height: 50.0,
-                                              child: ListView.builder(
-                                                itemCount: timeslotList.length,
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                itemBuilder: (context, index) {
-                                                  Timeslot slotsObject =
-                                                      timeslotList[index];
-                                                  //print("----${slotsObject.label}-and ${selctedTag}--");
-                                                  //selectedTimeSlot
-                                                  Color textColor;
-                                                  if (!slotsObject.isEnable) {
-                                                    textColor =
-                                                        Color(0xFFBDBDBD);
-                                                  } else {
-                                                    textColor =
-                                                        Color(0xFF000000);
-                                                  }
-                                                  if (selectedTimeSlot ==
-                                                          index &&
-                                                      (slotsObject.isEnable)) {
-                                                    textColor =
-                                                        Color(0xFFff4600);
-                                                  }
+                              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: Container(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Container(
+                                        //margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                                        height: 50.0,
+                                        child: ListView.builder(
+                                          itemCount: timeslotList.length,
+                                          scrollDirection:
+                                          Axis.horizontal,
+                                          itemBuilder: (context, index) {
+                                            Timeslot slotsObject =
+                                            timeslotList[index];
+                                            //print("----${slotsObject.label}-and ${selctedTag}--");
+                                            //selectedTimeSlot
+                                            Color textColor;
+                                            if (!slotsObject.isEnable) {
+                                              textColor =
+                                                  Color(0xFFBDBDBD);
+                                            } else {
+                                              textColor =
+                                                  Color(0xFF000000);
+                                            }
+                                            if (selectedTimeSlot ==
+                                                index &&
+                                                (slotsObject.isEnable)) {
+                                              textColor =
+                                                  Color(0xFFff4600);
+                                            }
 
-                                                  return Container(
-                                                    //color: selectedSlotColor,
-                                                    margin: EdgeInsets.fromLTRB(
-                                                        10, 0, 10, 0),
-                                                    child: InkWell(
-                                                      onTap: () {
-                                                        print(
-                                                            "${slotsObject.label}");
-                                                        if (slotsObject
-                                                            .isEnable) {
-                                                          setState(() {
-                                                            selectedTimeSlot =
-                                                                index;
-                                                            if (selectedTimeSlot !=
-                                                                    null &&
-                                                                selctedTag !=
-                                                                    null) {
-                                                              _selectedTimeSlotString =
-                                                                  deliverySlotModel
-                                                                      .data
-                                                                      .dateTimeCollection[
-                                                                          selctedTag]
-                                                                      .timeslot[
-                                                                          selectedTimeSlot]
-                                                                      .label;
-                                                            }
-                                                          });
-                                                        } else {
-                                                          Utils.showToast(
-                                                              slotsObject
-                                                                  .innerText,
-                                                              false);
-                                                        }
-                                                      },
-                                                      child: Container(
-                                                        child: Center(
-                                                          child: Text(
-                                                              '${slotsObject.isEnable == true ? slotsObject.label : "${slotsObject.label}(${slotsObject.innerText})"}',
-                                                              style: TextStyle(
-                                                                  color:
-                                                                      textColor)),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  );
+                                            return Container(
+                                              //color: selectedSlotColor,
+                                              margin: EdgeInsets.fromLTRB(
+                                                  10, 0, 10, 0),
+                                              child: InkWell(
+                                                onTap: () {
+                                                  print(
+                                                      "${slotsObject.label}");
+                                                  if (slotsObject
+                                                      .isEnable) {
+                                                    setState(() {
+                                                      selectedTimeSlot =
+                                                          index;
+                                                      if (selectedTimeSlot !=
+                                                          null &&
+                                                          selctedTag !=
+                                                              null) {
+                                                        _selectedTimeSlotString =
+                                                            deliverySlotModel
+                                                                .data
+                                                                .dateTimeCollection[
+                                                            selctedTag]
+                                                                .timeslot[
+                                                            selectedTimeSlot]
+                                                                .label;
+                                                      }
+                                                    });
+                                                  } else {
+                                                    Utils.showToast(
+                                                        slotsObject
+                                                            .innerText,
+                                                        false);
+                                                  }
                                                 },
+                                                child: Container(
+                                                  child: Center(
+                                                    child: Text(
+                                                        '${slotsObject
+                                                            .isEnable == true
+                                                            ? slotsObject.label
+                                                            : "${slotsObject
+                                                            .label}(${slotsObject
+                                                            .innerText})"}',
+                                                        style: TextStyle(
+                                                            color:
+                                                            textColor)),
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          ],
+                                            );
+                                          },
                                         ),
                                       ),
-                                    ),
-                                  )
-                                : Container(),
-                        Visibility(
-                          visible: isEnable,
-                          child: Container(
-                            decoration: new BoxDecoration(
-                              borderRadius: new BorderRadius.all(
-                                  new Radius.circular(5.0)),
-                            ),
-                            child: FlatButton(
-                              child: Text(
-                                'Save',
-                                style: TextStyle(fontSize: 17),
+                                    ],
+                                  ),
+                                ),
                               ),
-                              color: orangeColor,
-                              textColor: Colors.white,
-                              onPressed: () {
-                                Navigator.pop(context);
-                                updateSubscriptionOrderDeliverySlots(
-                                    cardOrderHistoryItems.subscriptionOrderId,
-                                    _selectedTimeSlotString);
-                              },
+                            )
+                                : Container(),
+                            Visibility(
+                              visible: isEnable,
+                              child: Container(
+                                decoration: new BoxDecoration(
+                                  borderRadius: new BorderRadius.all(
+                                      new Radius.circular(5.0)),
+                                ),
+                                child: FlatButton(
+                                  child: Text(
+                                    'Save',
+                                    style: TextStyle(fontSize: 17),
+                                  ),
+                                  color: orangeColor,
+                                  textColor: Colors.white,
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    updateSubscriptionOrderDeliverySlots(
+                                        cardOrderHistoryItems
+                                            .subscriptionOrderId,
+                                        _selectedTimeSlotString);
+                                  },
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ],
-                    )
-                  ]),
-                ),
-              ));
+                          ],
+                        )
+                      ]),
+                    ),
+                  ));
             },
           );
         });
@@ -1051,7 +1071,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
 
   String _checkNextDeliveryDate(SubscriptionOrderData data) {
     List<DateTime> getDatesInBeteween =
-        Utils.getDatesInBeteween(data.startDate, data.endDate);
+    Utils.getDatesInBeteween(data.startDate, data.endDate);
     DateTime deliveryDate = DateTime.now();
     for (DateTime day in getDatesInBeteween) {
       if (day.isAfter(deliveryDate)) {

@@ -559,12 +559,18 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     ],
                   ),
                 ),
-                showDeliverySlot(),
-                Container(
-                  margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                  height: 5,
-                  color: Colors.grey[400],
-                ),
+                widget.deliveryType != OrderType.PickUp
+                    ? Column(
+                        children: [
+                          showDeliverySlot(),
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                            height: 5,
+                            color: Colors.grey[400],
+                          ),
+                        ],
+                      )
+                    : Container(),
                 Container(
                   margin: EdgeInsets.fromLTRB(15, 10, 15, 5),
                   child: Column(
@@ -875,7 +881,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                                   child: Text(
-                                    "Your Total deliveries",
+                                    "Your Total${ widget.deliveryType == OrderType.Delivery?' deliveries':' Pick up'}",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: Colors.black,
@@ -898,82 +904,95 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                             ),
                           ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
-                          child: Text(
-                            "Date",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Color(0xff797C82),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                'images/calendargreyicon.png',
-                                fit: BoxFit.scaleDown,
-                                height: 15,
-                                width: 15,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(left: 10),
-                                child: Center(
-                                  child: Text('Delivery slots',
+                        widget.deliveryType == OrderType.Delivery
+                            ? Column(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                                    child: Text(
+                                      "Date",
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        color: appTheme,
-                                        decoration: TextDecoration.underline,
-                                      )),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
-                          child: Text(
-                            "Time",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                color: Color(0xff797C82),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
-                          child: Row(
-                            children: [
-                              Image.asset(
-                                'images/timegreyicon.png',
-                                fit: BoxFit.scaleDown,
-                                height: 15,
-                                width: 15,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(left: 10),
-                                child: Center(
-                                  child: Text('${selectedTimeSlotString}',
+                                          color: Color(0xff797C82),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          'images/calendargreyicon.png',
+                                          fit: BoxFit.scaleDown,
+                                          height: 15,
+                                          width: 15,
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(left: 10),
+                                          child: Center(
+                                            child: Text('Delivery slots',
+                                                style: TextStyle(
+                                                  color: appTheme,
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                )),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                                    child: Text(
+                                      "Time",
+                                      textAlign: TextAlign.center,
                                       style: TextStyle(
-                                        color: Colors.black,
-                                      )),
-                                ),
+                                          color: Color(0xff797C82),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
+                                    child: Row(
+                                      children: [
+                                        Image.asset(
+                                          'images/timegreyicon.png',
+                                          fit: BoxFit.scaleDown,
+                                          height: 15,
+                                          width: 15,
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(left: 10),
+                                          child: Center(
+                                            child: Text(
+                                                '${selectedTimeSlotString}',
+                                                style: TextStyle(
+                                                  color: Colors.black,
+                                                )),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(
+                                        top: 0,
+                                        bottom: 16,
+                                        left: 16,
+                                        right: 16),
+                                    color: Color(0xFFE1E1E1),
+                                    height: 1,
+                                  ),
+                                ],
                               )
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Container(
-                          margin: EdgeInsets.only(
-                              top: 0, bottom: 16, left: 16, right: 16),
-                          color: Color(0xFFE1E1E1),
-                          height: 1,
-                        ),
+                            : SizedBox(
+                                height: 10,
+                              ),
                         Container(
                           margin: EdgeInsets.fromLTRB(15, 10, 15, 10),
                           child: Row(
@@ -987,7 +1006,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                      widget.deliveryType==OrderType.Delivery?  "Address":"Pick Up Address",
+                                        widget.deliveryType ==
+                                                OrderType.Delivery
+                                            ? "Address"
+                                            : "Pick Up Address",
                                         style: TextStyle(fontSize: 16),
                                       ),
                                       Container(
@@ -1025,7 +1047,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         Container(
                           margin: EdgeInsets.fromLTRB(15, 10, 15, 3),
                           child: Text(
-                            'Your total deliveries amount is:',
+                            widget.deliveryType==OrderType.Delivery?'Your total deliveries amount is:':'Your total amount is:',
                             style: TextStyle(color: Colors.black, fontSize: 16),
                           ),
                         ),
@@ -1272,7 +1294,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       userId,
       deviceToken,
       storeAddress,
-      selectedTimeSlotString,
+      widget.deliveryType == OrderType.PickUp ? '' : selectedTimeSlotString,
       totalSavingsText,
       start_date: start_date,
       end_date: end_date,
@@ -1952,7 +1974,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                             ? ''
                                             : addressData.areaId,
                                     userAddress: userDeliveryAddress,
-                                    deliveryTimeSlot: selectedTimeSlotString,
+                                    deliveryTimeSlot:
+                                        widget.deliveryType == OrderType.PickUp
+                                            ? ''
+                                            : selectedTimeSlotString,
                                     cartSaving: cartSaving,
                                     totalDeliveries:
                                         totalDeliveries.toString());
@@ -2195,7 +2220,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     ? ''
                     : areaObject.areaId,
             userAddress: userDeliveryAddress,
-            deliveryTimeSlot: selectedTimeSlotString,
+            deliveryTimeSlot: widget.deliveryType == OrderType.PickUp
+                ? ''
+                : selectedTimeSlotString,
             cartSaving: cartSaving,
             totalDeliveries: totalDeliveries.toString())
         .then((response) async {
@@ -2448,7 +2475,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       payment_request_id,
       payment_id,
       isFullPaymentFromWallet ? 'Razorpay' : 'wallet',
-      selectedTimeSlotString,
+      widget.deliveryType == OrderType.PickUp ? '' : selectedTimeSlotString,
       cart_saving: totalSavings.toStringAsFixed(2),
       start_date: start_date,
       end_date: end_date,

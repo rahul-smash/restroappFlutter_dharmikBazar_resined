@@ -279,7 +279,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                   orderJson: widget.subcriptionMap['orderJson'],
                   userAddressId: widget.subcriptionMap['userAddressId'],
                   userAddress: widget.subcriptionMap['userAddress'],
-                  deliveryTimeSlot: widget.subcriptionMap['deliveryTimeSlot'],
+                  deliveryTimeSlot:widget.isComingFromPickUpScreen?'': widget.subcriptionMap['deliveryTimeSlot'],
                   cartSaving: widget.subcriptionMap['cartSaving'],
                   totalDeliveries: widget.subcriptionMap['totalDeliveries'])
               .then((value) {
