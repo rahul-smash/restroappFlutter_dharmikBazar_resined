@@ -108,6 +108,7 @@ class _SubscriptionHistoryDetailsState
       }
 
       if (deliverySlotModel != null) {
+        Utils.hideProgressDialog(context);
         deliverySlotModel = widget.deliverySlotModel;
         selctedTag = widget.selctedTag;
         selectedTimeSlot = widget.selectedTimeSlot;
@@ -134,6 +135,7 @@ class _SubscriptionHistoryDetailsState
 
       } else {
         ApiController.deliveryTimeSlotApi().then((response) {
+          Utils.hideProgressDialog(context);
           setState(() {
             if (!response.success) {
               isDeliveryResponseFalse = true;
@@ -184,7 +186,6 @@ class _SubscriptionHistoryDetailsState
           });
         });
       }
-      Utils.hideProgressDialog(context);
     });
   }
 
@@ -209,7 +210,6 @@ class _SubscriptionHistoryDetailsState
     return ApiController.subscriptionOrderUpdate(
             subscriptionOrderId, deliverySlot)
         .then((respone) {
-      Utils.hideProgressDialog(context);
       if (respone != null && respone.success) {
         if (mounted)
           setState(() {
@@ -371,7 +371,7 @@ class _SubscriptionHistoryDetailsState
                                                   break;
                                               }
                                               //hit api
-                                              Utils.showProgressDialog(context);
+//                                              Utils.showProgressDialog(context);
                                               updateSubscriptionStatus(
                                                   widget.orderHistoryData
                                                       .subscriptionOrderId,
