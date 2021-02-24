@@ -820,7 +820,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                   double.parse(taxModel.singleDayTotal)) {
                 DialogUtils.displayErrorDialog(
                   context,
-                  'Your Daily Minimun Order is very less for Subscription.',
+                  'Your Daily Minimum Order is very less for Subscription.',
                 );
               } else {
                 bottomSheet(context);
@@ -881,7 +881,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                                   child: Text(
-                                    "Your Total${ widget.deliveryType == OrderType.Delivery?' deliveries':' Pick up'}",
+                                    "Your Total${ widget.deliveryType == OrderType.Delivery?' deliveries':' Pick-ups'}",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: Colors.black,
@@ -2340,7 +2340,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    DialogUtils.displayErrorDialog(context, response.message);
+//    DialogUtils.displayErrorDialog(context, response.message);
+    DialogUtils.displayErrorDialog(context, 'Payment cancelled');
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
   }

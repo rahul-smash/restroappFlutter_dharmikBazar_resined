@@ -583,7 +583,7 @@ class _SubscriptionHistoryDetailsState
                       firstRow(widget.orderHistoryData),
                       Container(
                         color: Colors.white,
-                        child: Center(child: Text(!widget.orderHistoryData.orderFacility.toLowerCase().contains('pick')?"Deliveries Date":"Subscribed Date")),
+                        child: Center(child: Text(!widget.orderHistoryData.orderFacility.toLowerCase().contains('pick')?"Deliveries Dates":"Subscribed Dates")),
                       ),
                       Container(
                         color: Colors.white,
@@ -1164,7 +1164,7 @@ class _SubscriptionHistoryDetailsState
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: <Widget>[
                           Flexible(
-                            child: Text('To Pay',
+                            child: Text('Amount paid',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 17,
