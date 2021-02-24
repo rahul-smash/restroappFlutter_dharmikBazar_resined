@@ -1036,9 +1036,9 @@ class DatabaseHelper {
           }
         }
       }
+      return cartList;
     }else{
       return cartList;
     }
-    return productList;
   }
 }
