@@ -664,7 +664,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Next Delivery Date',
+                            'Next ${data.orderFacility.toLowerCase().contains('pick')?'PickUp':'Delivery'} Date',
                             style: TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF807D8C),
