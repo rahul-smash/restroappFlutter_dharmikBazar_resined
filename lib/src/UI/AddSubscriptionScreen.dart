@@ -881,7 +881,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                 Padding(
                                   padding: EdgeInsets.fromLTRB(20, 5, 20, 5),
                                   child: Text(
-                                    "Your Total${ widget.deliveryType == OrderType.Delivery?' deliveries':' Pick-ups'}",
+                                    "Your Total${widget.deliveryType == OrderType.Delivery ? ' deliveries' : ' Pick-ups'}",
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                         color: Colors.black,
@@ -906,7 +906,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         ),
                         widget.deliveryType == OrderType.Delivery
                             ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Padding(
                                     padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
@@ -1048,7 +1048,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         Container(
                           margin: EdgeInsets.fromLTRB(15, 10, 15, 3),
                           child: Text(
-                            widget.deliveryType==OrderType.Delivery?'Your total deliveries amount is:':'Your total amount is:',
+                            widget.deliveryType == OrderType.Delivery
+                                ? 'Your total deliveries amount is:'
+                                : 'Your total amount is:',
                             style: TextStyle(color: Colors.black, fontSize: 16),
                           ),
                         ),
@@ -1610,7 +1612,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 onTap: () async {
                   //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
                   //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-                  if(selectedStartDate==null||selectedEndDate==null||_markedDateMap.events.length==0||selecteddays==-1){
+                  if (selectedStartDate == null ||
+                      selectedEndDate == null ||
+                      _markedDateMap.events.length == 0 ||
+                      selecteddays == -1) {
                     return;
                   }
                   if (widget.cartList.first.quantity == '0') {
@@ -1738,7 +1743,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             ),
             InkWell(
               onTap: () {
-                if(selectedStartDate==null||selectedEndDate==null||_markedDateMap.events.length==0||selecteddays==-1){
+                if (selectedStartDate == null ||
+                    selectedEndDate == null ||
+                    _markedDateMap.events.length == 0 ||
+                    selecteddays == -1) {
                   return;
                 }
 
@@ -1931,10 +1939,20 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 color: appTheme,
                 onPressed: () async {
                   print("---Apply Coupon----");
-                  if(selectedStartDate==null||selectedEndDate==null||_markedDateMap.events.length==0||selecteddays==-1){
+                  if (selectedStartDate == null) {
+                    DialogUtils.displayErrorDialog(
+                        context, 'Please Select Start Subscription Date');
                     return;
-                  }
-                  if (couponCodeController.text.trim().isEmpty) {
+                  } else if (selectedEndDate == null) {
+                    DialogUtils.displayErrorDialog(
+                        context, 'Please Select End Subscription Date');
+                    return;
+                  } else if (_markedDateMap.events.isEmpty) {
+                    DialogUtils.displayErrorDialog(
+                        context, 'Please Select Variant Dates');
+                    return;
+                  } else if (couponCodeController.text.trim().isEmpty) {
+                    return;
                   } else {
                     if (widget.deliveryType == OrderType.Delivery &&
                             addressData == null ||
