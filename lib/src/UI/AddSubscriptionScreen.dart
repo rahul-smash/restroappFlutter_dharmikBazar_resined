@@ -1612,12 +1612,19 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 onTap: () async {
                   //print("appliedCouponCodeList = ${appliedCouponCodeList.length}");
                   //print("appliedReddemPointsCodeList = ${appliedReddemPointsCodeList.length}");
-                  if (selectedStartDate == null ||
-                      selectedEndDate == null ||
-                      _markedDateMap.events.length == 0 ||
-                      selecteddays == -1) {
+                  if (selectedStartDate == null) {
+                    DialogUtils.displayErrorDialog(
+                        context, 'Please Select Start Subscription Date');
                     return;
-                  }
+                  } else if (selectedEndDate == null) {
+                    DialogUtils.displayErrorDialog(
+                        context, 'Please Select End Subscription Date');
+                    return;
+                  } else if (_markedDateMap.events.isEmpty) {
+                    DialogUtils.displayErrorDialog(
+                        context, 'Please Select Variant Dates');
+                    return;
+                  } else
                   if (widget.cartList.first.quantity == '0') {
                     DialogUtils.displayErrorDialog(
                         context, 'Please add some quantity!');
@@ -1743,14 +1750,19 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             ),
             InkWell(
               onTap: () {
-                if (selectedStartDate == null ||
-                    selectedEndDate == null ||
-                    _markedDateMap.events.length == 0 ||
-                    selecteddays == -1) {
+                if (selectedStartDate == null) {
+                  DialogUtils.displayErrorDialog(
+                      context, 'Please Select Start Subscription Date');
                   return;
-                }
-
-                if (widget.cartList.first.quantity == '0') {
+                } else if (selectedEndDate == null) {
+                  DialogUtils.displayErrorDialog(
+                      context, 'Please Select End Subscription Date');
+                  return;
+                } else if (_markedDateMap.events.isEmpty) {
+                  DialogUtils.displayErrorDialog(
+                      context, 'Please Select Variant Dates');
+                  return;
+                } else if (widget.cartList.first.quantity == '0') {
                   DialogUtils.displayErrorDialog(
                       context, 'Please add some quantity!');
                   return;
