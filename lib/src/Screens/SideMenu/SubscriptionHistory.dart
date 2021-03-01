@@ -53,7 +53,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
 
   Icon actionIcon = Icon(Icons.search);
 
-  Widget appBarTitle = Text("Subscription");
+  Widget appBarTitle = Text("My Subscription");
 
   bool _showFilters = false;
 
