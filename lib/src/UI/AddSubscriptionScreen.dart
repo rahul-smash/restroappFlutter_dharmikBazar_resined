@@ -2692,8 +2692,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             //then Store will not charge shipping.
             setState(() {
               this.totalPrice = totalPrice;
-              shippingCharges = "0";
-              addressData.areaCharges = "0";
+//              shippingCharges = "0";
+//              addressData.areaCharges = "0";
             });
           }
         }
