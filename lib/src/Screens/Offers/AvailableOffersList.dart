@@ -216,7 +216,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                                   validateCouponApi(
                                                       offer.couponCode,
                                                       widget.subcriptionMap[
-                                                          'orderJson']);
+                                                          'jsonListCouponProduct']);
                                                 }
                                               } else {
                                                 Utils.showToast(

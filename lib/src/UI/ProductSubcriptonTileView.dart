@@ -23,9 +23,10 @@ class ProductSubcriptonTileView extends StatefulWidget {
   ClassType classType;
   String quantity = '';
   Variant globelVariant;
+  Function addQuantityFunction;
 
   ProductSubcriptonTileView(this.product, this.callback, this.classType,
-      this.quantity, this.globelVariant);
+      this.quantity, this.globelVariant, this.addQuantityFunction);
 
   @override
   _ProductSubcriptonTileViewState createState() =>
@@ -383,7 +384,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                             height: variantsVisibility == true ? 0 : 20,
                           ),
                           Visibility(
-                            visible:  variantsVisibility,
+                            visible: variantsVisibility,
                             child: Padding(
                               padding: EdgeInsets.only(top: 0, bottom: 10),
                               child: InkWell(
@@ -437,9 +438,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                                     children: <Widget>[
                                       Padding(
                                         padding: EdgeInsets.only(
-                                            top: 5,
-                                            right: 5,
-                                            bottom: 5),
+                                            top: 5, right: 5, bottom: 5),
                                         child: Text(
                                           "${weight}",
                                           textAlign: TextAlign.center,
@@ -559,15 +558,16 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
         margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
         child: showAddButton == true
             ? InkWell(
-                onTap: () {
+                onTap: () async {
+                  bool proceed = await widget.addQuantityFunction(
+                      widget.product, counter.toString());
                   //print("add onTap");
-                  if (_checkStockQuantity(counter)) {
+                  if (proceed && _checkStockQuantity(counter)) {
                     setState(() {});
                     counter++;
                     showAddButton = false;
                     eventBus.fire(
                         onSubscribeProduct(widget.product, counter.toString()));
-//                    insertInCartTable(widget.product, counter);
                     widget.callback();
                   }
                 },
@@ -589,19 +589,17 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                       padding: const EdgeInsets.all(0.0),
                       width: 30.0, // you can adjust the width as you need
                       child: GestureDetector(
-                          onTap: () {
-                            if (counter != 0) {
+                          onTap: () async {
+                            bool proceed = await widget.addQuantityFunction(
+                                widget.product, counter.toString());
+                            if (proceed && counter != 0) {
                               setState(() => counter--);
                               if (counter == 0) {
-                                // delete from cart table
                                 eventBus.fire(onSubscribeProduct(
                                     widget.product, counter.toString()));
-//                                removeFromCartTable(widget.product.variantId);
                               } else {
                                 eventBus.fire(onSubscribeProduct(
                                     widget.product, counter.toString()));
-                                // insert/update to cart table
-//                                insertInCartTable(widget.product, counter);
                               }
                               widget.callback();
                             }
@@ -645,8 +643,10 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                       padding: const EdgeInsets.all(0.0),
                       width: 30.0, // you can adjust the width as you need
                       child: GestureDetector(
-                        onTap: () {
-                          if (_checkStockQuantity(counter)) {
+                        onTap: () async {
+                          bool proceed = await widget.addQuantityFunction(
+                              widget.product, counter.toString());
+                          if (proceed && _checkStockQuantity(counter)) {
                             setState(() => counter++);
                             if (counter == 0) {
                               eventBus.fire(onSubscribeProduct(

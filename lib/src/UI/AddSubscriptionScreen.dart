@@ -195,6 +195,37 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     });
   }
 
+  Future<bool> addQuantityFunction(Product product, String quanity) async {
+    setState(() {});
+    if (taxModel != null &&
+        taxModel.discount != null &&
+        taxModel.discount.isNotEmpty) {
+      return await DialogUtils.displayDialog(
+          context,
+          'Are you sure?',
+          'Your Applied Coupon code will be removed!',
+          'No',
+          'Yes', button2: () {
+        if (product != null) {
+          widget.cartList.first = product;
+          widget.cartList.first.quantity = quanity;
+        }
+        setState(() {
+          hideRemoveCouponFirstTime = true;
+          appliedCouponCodeList.clear();
+          appliedReddemPointsCodeList.clear();
+          isCouponsApplied = false;
+          couponCodeController.text = "";
+        });
+        Navigator.of(context).pop(true);
+      }, button1: () {
+        Navigator.of(context).pop(false);
+      });
+    } else {
+      return Future(() => true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -746,7 +777,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     () {},
                     ClassType.SubCategory,
                     widget.cartList.first.quantity,
-                    widget.selectedVariant),
+                    widget.selectedVariant,
+                    addQuantityFunction),
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                   height: 1,
@@ -1624,8 +1656,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     DialogUtils.displayErrorDialog(
                         context, 'Please Select Variant Dates');
                     return;
-                  } else
-                  if (widget.cartList.first.quantity == '0') {
+                  } else if (widget.cartList.first.quantity == '0') {
                     DialogUtils.displayErrorDialog(
                         context, 'Please add some quantity!');
                     return;
@@ -1793,11 +1824,18 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     return;
                   }
 
+                  List jsonListCouponProduct =
+                      encodeToJsonForCoupon(widget.cartList);
+                  String encodedCouponProduct =
+                      jsonEncode(jsonListCouponProduct);
+
                   List jsonList = Product.encodeToJson(widget.cartList);
                   String encodedDoughnut = jsonEncode(jsonList);
                   Map<String, String> subcriptionMap = Map();
                   subcriptionMap.putIfAbsent(
                       'orderJson', () => encodedDoughnut);
+                  subcriptionMap.putIfAbsent(
+                      'jsonListCouponProduct', () => encodedCouponProduct);
                   subcriptionMap.putIfAbsent(
                       'userAddressId',
                       () => widget.deliveryType != OrderType.Delivery
@@ -1989,13 +2027,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       String couponCode = couponCodeController.text;
                       Utils.showProgressDialog(context);
                       Utils.hideKeyboard(context);
-                      List jsonList = Product.encodeToJson(widget.cartList);
+                      List jsonList = encodeToJsonForCoupon(widget.cartList);
                       String encodedDoughnut = jsonEncode(jsonList);
                       ValidateCouponResponse couponModel =
                           await ApiController.validateOfferApiRequest(
                               couponCodeController.text, '3', encodedDoughnut);
                       if (couponModel.success) {
                         print("---success----");
+                        Utils.hideProgressDialog(context);
                         DialogUtils.displayErrorDialog(
                             context, "${couponModel.message}");
                         SubscriptionTaxCalculationResponse modelResponse =
@@ -2819,5 +2858,24 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       }
     }
     return isFullPaymentFromWallet;
+  }
+
+  List encodeToJsonForCoupon(List<Product> cartList) {
+    List jsonList = List();
+    cartList
+        .map((item) => jsonList.add({
+              "product_id": item.id,
+              "product_name": item.title,
+              "variant_id": item.variantId,
+              "isTaxEnable": item.isTaxEnable,
+              "quantity":
+                  (totalDeliveries * double.parse(item.quantity)).toString(),
+              "price": item.price,
+              "weight": item.weight,
+              "mrp_price": item.mrpPrice,
+              "unit_type": item.isUnitType,
+            }))
+        .toList();
+    return jsonList;
   }
 }
