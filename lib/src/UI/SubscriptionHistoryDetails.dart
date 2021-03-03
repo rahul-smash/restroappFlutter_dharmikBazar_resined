@@ -761,8 +761,7 @@ class _SubscriptionHistoryDetailsState
               children: <Widget>[
                 Expanded(
                   child: Text(
-                    convertOrderDateTime(orderHistoryData.orderDate,
-                        pattern: 'dd MMM, yyyy | hh:mm'),
+                   orderHistoryData.orderDate,
                     style: TextStyle(
                         fontSize: 14,
                         color: Colors.black,

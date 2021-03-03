@@ -827,7 +827,7 @@ class ApiController {
         "user_id": user.id,
         "device_token": deviceToken,
         "user_address_id":
-        isComingFromPickUpScreen == true ? areaId : address.id,
+        isComingFromPickUpScreen == true ? '0'/*areaId */: address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
         "payment_method": paymentMethod == "2" ? "COD" : "online",
@@ -2292,7 +2292,7 @@ class ApiController {
         request.fields.addAll({
           "user_id": user.id,
           "subscription_order_id": orderID,
-          "platform": Platform.isIOS ? "IOS" : "android",
+//          "platform": Platform.isIOS ? "IOS" : "android",
         });
         print('--url===  $url');
         print('--user.id=== ${user.id}');
