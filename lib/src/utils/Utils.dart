@@ -690,9 +690,23 @@ class Utils {
 
     List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
         removeOutOfStockProducts: true);
-    String encodedDoughnut = jsonEncode(jsonList);
-    return encodedDoughnut;
+    if(jsonList.length!=0) {
+      String encodedDoughnut = jsonEncode(jsonList);
+      return encodedDoughnut;
+    }else{
+      return null;
+    }
   }
+
+  static bool checkIfStoreClosed(StoreModel store) {
+    if (store.storeStatus == "0") {
+      //0 mean Store close
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 
   static Color colorGeneralization(Color passedColor, String colorString) {
     Color returnedColor = passedColor;

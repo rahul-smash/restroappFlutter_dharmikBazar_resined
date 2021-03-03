@@ -2194,8 +2194,20 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         .then((orderJson) {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
+        Utils.hideProgressDialog(context);
+        databaseHelper
+            .deleteTable(DatabaseHelper.Favorite_Table);
+        databaseHelper
+            .deleteTable(DatabaseHelper.CART_Table);
+        databaseHelper
+            .deleteTable(DatabaseHelper.Products_Table);
+        eventBus.fire(updateCartCount());
+        Navigator.of(context)
+            .popUntil((route) => route.isFirst);
+        Utils.showToast("something went wrong", false);
         return;
       }
+
       String storeAddress = "";
       try {
         storeAddress = "${storeModel.storeName}, ${storeModel.location},"
@@ -2758,6 +2770,10 @@ class _StripeWebViewState extends State<StripeWebView> {
                 eventBus.fire(onPageFinished(
                     widget.stripeCheckOutModel.paymentRequestId));
                 Navigator.pop(context);
+              } else if (url
+                  .contains('stripeVerifyTransaction?response=error')) {
+                Navigator.pop(context);
+                Utils.showToast("Payment cancel", false);
               }
             },
             gestureNavigationEnabled: false,
