@@ -1358,8 +1358,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           print("----razorpayCreateOrderApi----${response.data.id}--");
           openCheckout(model.data.id, storeObject);
         } else {
-          DialogUtils.displayErrorDialog(context, "${model.message}");
           Utils.hideProgressDialog(context);
+          DialogUtils.displayErrorDialog(context, model.message??"${model.message}");
+
         }
       });
     }
@@ -1554,10 +1555,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(taxModel == null ? '' : taxModel.taxDetail.first.label,
+                Text(
+                    taxModel == null
+                        ? ''
+                        : taxModel.taxDetail != null &&
+                                taxModel.taxDetail.isNotEmpty
+                            ? taxModel.taxDetail.first.label
+                            : '',
                     style: TextStyle(color: Colors.black)),
                 Text(
-                    "${AppConstant.currency}${taxModel == null ? '0' : taxModel.taxDetail.first.tax}",
+                    "${AppConstant.currency}${taxModel == null ? '0' : taxModel.taxDetail != null && taxModel.taxDetail.isNotEmpty ? taxModel.taxDetail.first.tax : '0'}",
                     style: TextStyle(color: Colors.black)),
               ],
             ),
@@ -2407,12 +2414,13 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             payment_id: model.data.id,
           );
         } else {
-          DialogUtils.displayErrorDialog(context, "Something went wrong!");
           Utils.hideProgressDialog(context);
+          DialogUtils.displayErrorDialog(
+              context, model.message ?? "Something went wrong!");
         }
       } else {
-        DialogUtils.displayErrorDialog(context, "Something went wrong!");
         Utils.hideProgressDialog(context);
+        DialogUtils.displayErrorDialog(context, "Something went wrong!");
       }
     });
   }

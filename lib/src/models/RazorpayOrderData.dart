@@ -10,20 +10,24 @@ String razorpayOrderDataToJson(RazorpayOrderData data) => json.encode(data.toJso
 
 class RazorpayOrderData {
   bool success;
+  String message;
   Data data;
 
   RazorpayOrderData({
     this.success,
+    this.message,
     this.data,
   });
 
   factory RazorpayOrderData.fromJson(Map<String, dynamic> json) => RazorpayOrderData(
     success: json["success"],
+    message: json["message"],
     data: Data.fromJson(json["data"]),
   );
 
   Map<String, dynamic> toJson() => {
     "success": success,
+    "message": message,
     "data": data.toJson(),
   };
 }
