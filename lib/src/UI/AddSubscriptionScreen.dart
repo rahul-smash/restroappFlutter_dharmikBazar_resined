@@ -2044,6 +2044,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         Utils.hideProgressDialog(context);
                         DialogUtils.displayErrorDialog(
                             context, "${couponModel.message}");
+                        List jsonList = Product.encodeToJson(widget.cartList);
+                        String encodedDoughnut = jsonEncode(jsonList);
                         SubscriptionTaxCalculationResponse modelResponse =
                             await ApiController
                                 .subscriptionMultipleTaxCalculationRequest(
