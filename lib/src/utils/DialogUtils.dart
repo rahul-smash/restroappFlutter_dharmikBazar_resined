@@ -1598,4 +1598,148 @@ size: 100,
       },
     );
   }
+
+  static Future<bool> displaySubscriptionCompleteDialog(
+      BuildContext context,
+      {Function button1, String buttonText1 = '',Function cancelButton}) async {
+    return await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop: () {
+              return Future(() => false);
+            },
+            child: Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                //title: Text(title,textAlign: TextAlign.center,),
+                child: Container(
+                    child: Wrap(
+                      children: <Widget>[
+                    Align(
+                    alignment: Alignment.centerRight,
+                      child: InkWell(
+                        onTap: cancelButton??() {
+                          Navigator.pop(context);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(5, 15, 15, 5),
+                          child: Image.asset(
+                            'images/cancelicon.png',
+                            fit: BoxFit.scaleDown,
+                            height: 15,
+                            width: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(10.0, 00.0, 10.0, 10.0),
+                          padding: EdgeInsets.all(10.0),
+                          child: new Row(
+                            children: [
+                              new Expanded(
+                                child: new Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      margin: const EdgeInsets.fromLTRB(
+                                          10.0, 0.0, 10.0, 10.0),
+                                      height: 70.0,
+                                      width: 70.0,
+                                      decoration: new BoxDecoration(
+                                        image: DecorationImage(
+                                          image: new AssetImage(
+                                            'images/thankyouicon.png',
+                                          ),
+                                          fit: BoxFit.scaleDown,
+                                        ),
+                                        shape: BoxShape.rectangle,
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 30,
+                                      margin: EdgeInsets.only(
+                                        top: 5,
+                                      ),
+                                      height: 2,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(color: appTheme),
+                                          borderRadius:
+                                          BorderRadius.circular(5)),
+                                    ),
+                                    // Code to create the view for address.
+                                  ],
+                                ),
+                              ),
+                              // Icon to indicate the phone number.
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
+                          child: Center(
+                            child: Text(
+                              "THANK YOU FOR",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(30, 0, 30, 10),
+                          child: Center(
+                            child: Text(
+                              "SUBSCRIBING",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Stack(
+                          children: [
+                            Padding(padding: EdgeInsets.only(top: 50),
+                                child: Image.asset("images/thankyoubg.png",fit: BoxFit.fitWidth,)),
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 20, top: 20),
+                              child: Align(
+                                alignment: Alignment.center,
+                                child: ButtonTheme(
+                                  minWidth: 180.0,
+                                  height: 40.0,
+                                  child: RaisedButton(
+                                    shape: new RoundedRectangleBorder(
+                                        borderRadius:
+                                        new BorderRadius.circular(5.0),
+                                        side: BorderSide(color: appTheme)),
+                                    onPressed: button1 ??
+                                            () async {
+                                          Navigator.pop(context, true);
+                                        },
+                                    color: appTheme,
+                                    padding: EdgeInsets.all(5.0),
+                                    textColor: Colors.white,
+                                    child: Text(buttonText1.isNotEmpty
+                                        ? buttonText1
+                                        : "Change Location"),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ))),
+          );
+        });
+  }
 }

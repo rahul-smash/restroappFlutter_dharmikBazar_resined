@@ -157,6 +157,8 @@ flutter:
     - images/google_logo.png
     - images/f_logo_white.png
     - images/bg_subscription.jpg
+    - images/thankyoubg.png
+    - images/thankyouicon.png
     - assets/en.json
     - assets/malay.json
 

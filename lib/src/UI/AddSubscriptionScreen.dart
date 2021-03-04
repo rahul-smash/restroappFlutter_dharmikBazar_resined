@@ -7,6 +7,7 @@ import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Address/StoreLocationScreenWithMultiplePick.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
+import 'package:restroapp/src/Screens/SideMenu/SubscriptionHistory.dart';
 import 'package:restroapp/src/UI/PickUpBottomSheet.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -113,6 +114,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   PickUpModel storeArea;
   UserModel user;
 
+  bool yearlySubscriptionPack = false;
+
   getProfileData() async {
     try {
       user = await SharedPrefs.getUser();
@@ -193,6 +196,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       print('---PickUpModel---${storeArea.data.length}--');
       setState(() {});
     });
+
   }
 
   Future<bool> addQuantityFunction(Product product, String quanity) async {
@@ -494,6 +498,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                               isStartIndex: true);
                                           if (selectedStartDate != null) {
                                             _markedDateMap.clear();
+                                            yearlySubscriptionPack = false;
                                             selecteddays = -1;
                                             if (selectedEndDate != null) {
                                               bool isBefore = selectedStartDate
@@ -549,6 +554,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                           );
                                           if (selectedEndDate != null) {
                                             _markedDateMap.clear();
+                                            yearlySubscriptionPack = false;
                                             selecteddays = -1;
                                             if (selectedStartDate != null) {
                                               bool isBefore = selectedStartDate
@@ -645,9 +651,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                                 selectedStartDate,
                                                 selectedEndDate);
                                         _markedDateMap.clear();
+                                        yearlySubscriptionPack = false;
+                                        int year =
+                                            getDatesInBeteween.first.year;
                                         for (var i = 0;
                                             i < getDatesInBeteween.length;
                                             i++) {
+                                          if (getDatesInBeteween[i].year !=
+                                              year) {
+                                            yearlySubscriptionPack = true;
+                                          }
                                           _markedDateMap.add(
                                               getDatesInBeteween[i],
                                               Event(
@@ -670,14 +683,21 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                         });
                                       } else {
                                         _markedDateMap.clear();
+                                        yearlySubscriptionPack = false;
                                         List<DateTime> getDatesInBeteween =
                                             Utils.getDatesInBeteween(
                                                 selectedStartDate,
                                                 selectedEndDate);
+                                        int year =
+                                            getDatesInBeteween.first.year;
                                         for (var i = 0;
                                             i < getDatesInBeteween.length;
                                             i++) {
                                           if (i % days == 0) {
+                                            if (getDatesInBeteween[i].year !=
+                                                year) {
+                                              yearlySubscriptionPack = true;
+                                            }
                                             _markedDateMap.add(
                                                 getDatesInBeteween[i],
                                                 Event(
@@ -936,45 +956,49 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                             ),
                           ],
                         ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
+                          child: Text(
+                            "Date",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Color(0xff797C82),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
+                          child: Row(
+                            children: [
+                              Image.asset(
+                                'images/calendargreyicon.png',
+                                fit: BoxFit.scaleDown,
+                                height: 15,
+                                width: 15,
+                              ),
+                              InkWell(
+                                onTap: () {
+                                  subscribedDatesBottomSheet(context);
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(left: 10),
+                                  child: Center(
+                                    child: Text('Delivery slots',
+                                        style: TextStyle(
+                                          color: appTheme,
+                                          decoration: TextDecoration.underline,
+                                        )),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                         widget.deliveryType == OrderType.Delivery
                             ? Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Padding(
-                                    padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
-                                    child: Text(
-                                      "Date",
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Color(0xff797C82),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w400),
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.fromLTRB(15, 5, 15, 10),
-                                    child: Row(
-                                      children: [
-                                        Image.asset(
-                                          'images/calendargreyicon.png',
-                                          fit: BoxFit.scaleDown,
-                                          height: 15,
-                                          width: 15,
-                                        ),
-                                        Container(
-                                          margin: EdgeInsets.only(left: 10),
-                                          child: Center(
-                                            child: Text('Delivery slots',
-                                                style: TextStyle(
-                                                  color: appTheme,
-                                                  decoration:
-                                                      TextDecoration.underline,
-                                                )),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ),
                                   Padding(
                                     padding: EdgeInsets.fromLTRB(15, 5, 15, 5),
                                     child: Text(
@@ -1238,6 +1262,169 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         });
   }
 
+  subscribedDatesBottomSheet(context) async {
+    Map<String, List<String>> datesMap = Map();
+    if (_markedDateMap.events.isNotEmpty) {
+      var monthYearFormatter = new DateFormat('MMMM yyyy');
+
+      String monthYear =
+          monthYearFormatter.format(_markedDateMap.events.keys.first);
+
+      try {
+        for (DateTime event in _markedDateMap.events.keys) {
+          String monthYearLocal = monthYearFormatter.format(event);
+          if (monthYear != monthYearLocal) {
+            monthYear = monthYearLocal;
+          }
+          var formatter = new DateFormat('dd-MM-yyyy');
+          String formatted = formatter.format(event);
+
+          if (datesMap[monthYear] == null) {
+            List<String> selectedDatesList = List();
+            selectedDatesList.add(formatted);
+            datesMap.putIfAbsent(monthYear, () => selectedDatesList);
+          } else {
+            List<String> selectedDatesList = datesMap[monthYear];
+            selectedDatesList.add(formatted);
+            datesMap[monthYear] = selectedDatesList;
+          }
+        }
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    await showModalBottomSheet(
+        context: context,
+        isScrollControlled: false,
+        enableDrag: false,
+        builder: (BuildContext bc) {
+          return StatefulBuilder(
+            builder: (BuildContext context, setStateBottomSheet) {
+              return SafeArea(
+                  child: Padding(
+                padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom),
+                child: Container(
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(5, 15, 15, 5),
+                            child: Image.asset(
+                              'images/cancelicon.png',
+                              fit: BoxFit.scaleDown,
+                              height: 16,
+                              width: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(20, 5, 20, 15),
+                        child: Text(
+                          'Selected Dates',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              color: Color(0xFFBDBDBF),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListView(
+                          children: datesMap.keys
+                              .map((e) => Container(
+                                    margin: EdgeInsets.all(20),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Image.asset(
+                                              'images/calendargreyicon.png',
+                                              fit: BoxFit.scaleDown,
+                                              height: 14,
+                                              color: Color(0xFFBDBDBF),
+                                            ),
+                                            SizedBox(
+                                              width: 15,
+                                            ),
+                                            Text(
+                                              '${e}',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 16),
+                                            ),
+
+//                                      Wrap()
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 10,
+                                        ),
+                                        Wrap(
+                                          spacing: 15,
+                                          children: datesMap[e]
+                                              .map((z) => Container(
+                                                    margin: EdgeInsets.all(10),
+                                                    child: Text(
+                                                      z,
+                                                      style: TextStyle(
+                                                          fontSize: 16),
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                        )
+                                      ],
+                                    ),
+                                  ))
+                              .toList(),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(26, 16, 26, 16),
+                        child: Row(
+                          children: [
+                            Expanded(
+                                child: Container(
+                              decoration: new BoxDecoration(
+                                borderRadius: new BorderRadius.all(
+                                    new Radius.circular(5.0)),
+                              ),
+                              child: FlatButton(
+                                child: Text(
+                                  'Place Order',
+                                  style: TextStyle(fontSize: 17),
+                                ),
+                                color: appTheme,
+                                textColor: Colors.white,
+                                onPressed: () {
+                                  //todo:hit api
+                                  callOrderIdApi(widget.model);
+                                },
+                              ),
+                            ))
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ));
+            },
+          );
+        });
+  }
+
   String getUserRemaningWallet() {
     double balance = (double.parse(userWalleModel.data.userWallet) -
         double.parse(taxModel.walletRefund.toString()) -
@@ -1359,8 +1546,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
           openCheckout(model.data.id, storeObject);
         } else {
           Utils.hideProgressDialog(context);
-          DialogUtils.displayErrorDialog(context, model.message??"${model.message}");
-
+          DialogUtils.displayErrorDialog(
+              context, model.message ?? "${model.message}");
         }
       });
     }
@@ -2579,32 +2766,26 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       total_deliveries: total_deliveries,
     ).then((response) async {
       Utils.hideProgressDialog(context);
-      if (response == null) {
-        print("--response == null-response == null-");
-        return;
-      }
-      eventBus.fire(updateCartCount());
-      print("${widget.deliveryType}");
-      if (widget.deliveryType == OrderType.PickUp) {
-        bool result =
-            await DialogUtils.displayPickUpDialog(context, widget.model);
-        if (result == true) {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          eventBus.fire(updateCartCount());
-          DialogUtils.openMap(widget.model, double.parse(widget.model.lat),
-              double.parse(widget.model.lng));
-        } else {
-          await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-          eventBus.fire(updateCartCount());
-          Navigator.of(context).popUntil((route) => route.isFirst);
-        }
-      } else {
-        bool result = await DialogUtils.displayThankYouDialog(context,
-            response.success ? AppConstant.orderAdded : response.message);
-        if (result == true) {
-          Navigator.of(context).popUntil((route) => route.isFirst);
-          eventBus.fire(updateCartCount());
-        }
+      if (response != null && response.success) {
+        eventBus.fire(updateCartCount());
+        print("${widget.deliveryType}");
+        DialogUtils.displaySubscriptionCompleteDialog(context,
+            button1: () {
+              eventBus.fire(updateCartCount());
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => SubscriptionHistory(
+                          widget.model,
+                        )),
+              );
+            },
+            buttonText1: 'Track Your Subscription',
+            cancelButton: () {
+              eventBus.fire(updateCartCount());
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            });
       }
     });
   }
