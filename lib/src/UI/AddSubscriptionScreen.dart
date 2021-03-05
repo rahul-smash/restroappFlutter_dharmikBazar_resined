@@ -869,7 +869,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 DialogUtils.displayErrorDialog(context, 'Please add Quantity');
               } else if (double.parse(
                       widget.model.subscription.minimumOrderDaily) >
-                  double.parse(taxModel.singleDayTotal)) {
+                  double.parse(taxModel.singleDayTotal)-double.parse(
+                      shippingCharges)) {
                 DialogUtils.displayErrorDialog(
                   context,
                   'Your Daily Minimum Order is very less for Subscription.',
