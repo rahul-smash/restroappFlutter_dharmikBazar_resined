@@ -5,10 +5,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:restroapp/src/UI/SubscriptionHistoryDetails.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CancelOrderModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -18,9 +20,12 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class OrderDetailScreenVersion2 extends StatefulWidget {
   OrderData orderHistoryData;
+  String orderId = '';
   bool isRatingEnable;
+  StoreModel store;
 
-  OrderDetailScreenVersion2(this.orderHistoryData, this.isRatingEnable);
+  OrderDetailScreenVersion2(this.isRatingEnable, this.store,
+      {this.orderHistoryData, this.orderId = ''});
 
   @override
   _OrderDetailScreenVersion2State createState() =>
@@ -51,7 +56,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
     UserModel user = await SharedPrefs.getUser();
     userId = user.id;
 
-    return ApiController.getOrderDetail(widget.orderHistoryData.orderId)
+    return ApiController.getOrderDetail(widget.orderHistoryData != null
+            ? widget.orderHistoryData.orderId
+            : widget.orderId)
         .then((respone) {
       if (respone != null &&
           respone.success &&
@@ -102,12 +109,16 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     mainContext = context;
-    String itemText = widget.orderHistoryData.orderItems.length > 1
-        ? '${widget.orderHistoryData.orderItems.length} Items, '
-        : '${widget.orderHistoryData.orderItems.length} Item, ';
-    String orderFacility = widget.orderHistoryData.orderFacility != null
-        ? '${widget.orderHistoryData.orderFacility}, '
-        : '';
+    String itemText = '';
+    String orderFacility = '';
+    if (widget.orderHistoryData != null) {
+      itemText = widget.orderHistoryData.orderItems.length > 1
+          ? '${widget.orderHistoryData.orderItems.length} Items, '
+          : '${widget.orderHistoryData.orderItems.length} Item, ';
+      orderFacility = widget.orderHistoryData.orderFacility != null
+          ? '${widget.orderHistoryData.orderFacility}, '
+          : '';
+    }
     return isLoading
         ? Scaffold(
             resizeToAvoidBottomInset: false,
@@ -182,9 +193,48 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              'Track Order',
-                              style: TextStyle(fontSize: 18),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    'Track Order',
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                                Visibility(
+                                  visible: widget.orderHistoryData
+                                              .subscription_order_id !=
+                                          null &&
+                                      widget.orderHistoryData
+                                              .subscription_order_id !=
+                                          '0' &&
+                                      widget.orderHistoryData
+                                          .subscription_order_id.isNotEmpty,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              SubscriptionHistoryDetails(
+                                            orderHistoryDataId: widget
+                                                .orderHistoryData
+                                                .subscription_order_id,
+                                            store: widget.store,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Subscribed',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          color: appTheme,
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(
                               height: 16,
@@ -680,9 +730,19 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                               itemCount: 5,
                               itemPadding:
                                   EdgeInsets.symmetric(horizontal: 2.0),
-                              itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: appThemeSecondary,
+                              ratingWidget: RatingWidget(
+                                full: Icon(
+                                  Icons.star,
+                                  color: appThemeSecondary,
+                                ),
+                                half: Icon(
+                                  Icons.star_half,
+                                  color: appThemeSecondary,
+                                ),
+                                empty: Icon(
+                                  Icons.star_border,
+                                  color: appThemeSecondary,
+                                ),
                               ),
                               ignoreGestures: true,
                               onRatingUpdate: (rating) {},
@@ -809,13 +869,23 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           allowHalfRating: false,
                           itemCount: 5,
                           itemPadding: EdgeInsets.symmetric(horizontal: 2.0),
-                          itemBuilder: (context, _) => Icon(
-                            Icons.star,
-                            color: appThemeSecondary,
-                          ),
                           onRatingUpdate: (rating) {
                             _rating = rating;
                           },
+                          ratingWidget: RatingWidget(
+                            full: Icon(
+                              Icons.star,
+                              color: appThemeSecondary,
+                            ),
+                            half: Icon(
+                              Icons.star_half,
+                              color: appThemeSecondary,
+                            ),
+                            empty: Icon(
+                              Icons.star_border,
+                              color: appThemeSecondary,
+                            ),
+                          ),
                         ),
                         Container(
                           height: 120,

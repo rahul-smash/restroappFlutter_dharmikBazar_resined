@@ -37,6 +37,9 @@ import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
 import 'package:restroapp/src/models/StripeVerifyModel.dart';
+import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
+import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
+import 'package:restroapp/src/models/SubscriptionUpdationResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -81,7 +84,7 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       StoreResponse storeData =
-          StoreResponse.fromJson(json.decode(response.data));
+      StoreResponse.fromJson(json.decode(response.data));
       print("-------store.success ---${storeData.success}");
       SharedPrefs.saveStore(storeData.store);
       //check older version
@@ -90,7 +93,8 @@ class ApiController {
       if (version != storeData.store.version) {
         //TODO: store version saved
         print(
-            "version not matched older version is $version and new version is ${storeData.store.version}.");
+            "version not matched older version is $version and new version is ${storeData
+                .store.version}.");
         SharedPrefs.saveAPiDetailsVersion(storeData.store.version);
         DatabaseHelper databaseHelper = DatabaseHelper();
         databaseHelper.clearDataBase();
@@ -103,8 +107,8 @@ class ApiController {
     return null;
   }
 
-  static Future<UserResponse> registerApiRequest(
-      UserData user, String referralCode) async {
+  static Future<UserResponse> registerApiRequest(UserData user,
+      String referralCode) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -142,8 +146,8 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> loginApiRequest(
-      String username, String password) async {
+  static Future<UserResponse> loginApiRequest(String username,
+      String password) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -220,7 +224,7 @@ class ApiController {
 
     try {
       int dbCount =
-          await databaseHelper.getCount(DatabaseHelper.Categories_Table);
+      await databaseHelper.getCount(DatabaseHelper.Categories_Table);
       bool isNetworkAviable = await Utils.isNetworkAvailable();
       if (dbCount == 0 && isNetworkAviable) {
         print("*************database zero*************");
@@ -248,17 +252,23 @@ class ApiController {
         categoryResponse.success = false;
         return categoryResponse;
       } else {
-        print("1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
+        print(
+            "1-millisecondsSinceEpoch=${DateTime
+                .now()
+                .millisecondsSinceEpoch}");
         //prepare model object
         List<CategoryModel> categoryList = await databaseHelper.getCategories();
         categoryResponse.categories = categoryList;
         for (var i = 0; i < categoryResponse.categories.length; i++) {
           String parent_id = categoryResponse.categories[i].id;
           categoryResponse.categories[i].subCategory =
-              await databaseHelper.getSubCategories(parent_id);
+          await databaseHelper.getSubCategories(parent_id);
         }
         categoryResponse.success = true;
-        print("2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
+        print(
+            "2-millisecondsSinceEpoch=${DateTime
+                .now()
+                .millisecondsSinceEpoch}");
       }
     } catch (e) {
       print(e);
@@ -303,8 +313,8 @@ class ApiController {
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-
-          await databaseHelper.batchInsertProducts(subCategoryResponse.subCategories);
+          await databaseHelper
+              .batchInsertProducts(subCategoryResponse.subCategories);
 
           /*for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
             for (int j = 0;j < subCategoryResponse.subCategories[i].products.length; j++) {
@@ -324,14 +334,14 @@ class ApiController {
         subCategoryResponse = SubCategoryResponse();
         //prepare model object
         List<SubCategoryModel> categoryList =
-            await databaseHelper.getSubCategoriesFromID(subCategoryId);
+        await databaseHelper.getSubCategoriesFromID(subCategoryId);
 
         subCategoryResponse.subCategories = categoryList;
 
         for (var i = 0; i < subCategoryResponse.subCategories.length; i++) {
           String parent_id = subCategoryResponse.subCategories[i].id;
           subCategoryResponse.subCategories[i].products =
-              await databaseHelper.getProducts(parent_id);
+          await databaseHelper.getProducts(parent_id);
 //          for (int j = 0;
 //              j < subCategoryResponse.subCategories[i].products.length;
 //              j++) {
@@ -408,7 +418,7 @@ class ApiController {
       print("-1--getAddress-respStr---${respStr}");
       final parsed = json.decode(respStr);
       DeliveryAddressResponse deliveryAddressResponse =
-          DeliveryAddressResponse.fromJson(parsed);
+      DeliveryAddressResponse.fromJson(parsed);
       //print("----respStr---${deliveryAddressResponse.success}");
       return deliveryAddressResponse;
     } catch (e) {
@@ -431,7 +441,7 @@ class ApiController {
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       StoreDeliveryAreasResponse storeArea =
-          StoreDeliveryAreasResponse.fromJson(parsed);
+      StoreDeliveryAreasResponse.fromJson(parsed);
       return storeArea;
     } catch (e) {
       print("----catch---${e.toString()}");
@@ -493,7 +503,8 @@ class ApiController {
       String city,
       String cityId,
       String lat,
-      String lng,{String address2=''}) async {
+      String lng,
+      {String address2 = ''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
@@ -517,7 +528,7 @@ class ApiController {
         "area_id": areaId,
         "first_name": fullname,
         "email": user.email,
-        "address2":address2
+        "address2": address2
       });
 
       if (addressId != null) {
@@ -664,7 +675,7 @@ class ApiController {
         "fixed_discount_amount": "${discount}",
         "tax": "0",
         "user_id": user.id,
-        "user_wallet":userWallet == null ? "0" : userWallet.data.userWallet,
+        "user_wallet": userWallet == null ? "0" : userWallet.data.userWallet,
         "discount": "0",
         "shipping": shipping,
         "order_detail": orderJson,
@@ -677,7 +688,7 @@ class ApiController {
       final parsed = json.decode(respStr);
 
       TaxCalculationResponse model =
-          TaxCalculationResponse.fromJson(couponCode, parsed);
+      TaxCalculationResponse.fromJson(couponCode, parsed);
       return model;
     } catch (e) {
       print("--multipleTax--respStr---${e.toString()}");
@@ -686,8 +697,7 @@ class ApiController {
     }
   }
 
-  static Future<ResponseModel> placeOrderRequest(
-      String shipping_charges,
+  static Future<ResponseModel> placeOrderRequest(String shipping_charges,
       String note,
       String totalPrice,
       String paymentMethod,
@@ -739,7 +749,7 @@ class ApiController {
 
       try {
         List jsonfixedTaxList =
-            taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+        taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
         encodedFixedTax = jsonEncode(jsonfixedTaxList);
         //print("encodedFixedTax= ${encodedFixedTax}");
       } catch (e) {
@@ -748,7 +758,7 @@ class ApiController {
 
       try {
         List jsontaxDetailList =
-            taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+        taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
         encodedtaxDetail = jsonEncode(jsontaxDetailList);
         //print("encodedtaxDetail= ${encodedtaxDetail}");
       } catch (e) {
@@ -757,7 +767,7 @@ class ApiController {
 
       try {
         List jsontaxLabelList =
-            taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+        taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
         encodedtaxLabel = jsonEncode(jsontaxLabelList);
         //print("encodedtaxLabel= ${encodedtaxLabel}");
       } catch (e) {
@@ -767,48 +777,47 @@ class ApiController {
       print(e);
     }
 
-    String userDeliveryAddress='',pin='';
-    if (address != null&&!isComingFromPickUpScreen) {
-      if (address.address2 != null &&
-          address.address2.isNotEmpty) {
-        if (address.address != null &&
-            address.address.isNotEmpty) {
-          userDeliveryAddress = address.address + ", "+ address.address2+
+    String userDeliveryAddress = '',
+        pin = '';
+    if (address != null && !isComingFromPickUpScreen) {
+      if (address.address2 != null && address.address2.isNotEmpty) {
+        if (address.address != null && address.address.isNotEmpty) {
+          userDeliveryAddress = address.address +
+              ", " +
+              address.address2 +
               " " +
               address.areaName +
               " " +
               address.city;
-        }else{
-          userDeliveryAddress = address.address2 +
-              " " +
-              address.areaName +
-              " " +
-              address.city;
+        } else {
+          userDeliveryAddress =
+              address.address2 + " " + address.areaName + " " + address.city;
         }
       } else {
-        if (address.address != null &&
-            address.address.isNotEmpty) {
-          userDeliveryAddress =address.address +
-              " " +
-              address.areaName +
-              " " +
-              address.city;
+        if (address.address != null && address.address.isNotEmpty) {
+          userDeliveryAddress =
+              address.address + " " + address.areaName + " " + address.city;
         }
       }
 
       if (address.zipCode != null && address.zipCode.isNotEmpty)
-        pin = " "+ address.zipCode;
+        pin = " " + address.zipCode;
     }
     try {
       request.fields.addAll({
         "shipping_charges": "${shipping_charges}",
         "note": note,
-        "wallet_refund": store.wallet_setting == "0" ? "" : taxModel == null ? "0" : "${taxModel.wallet_refund}" ,
+        "wallet_refund": store.wallet_setting == "0"
+            ? ""
+            : taxModel == null
+            ? "0"
+            : "${taxModel.wallet_refund}",
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
-        "user_address":
-            isComingFromPickUpScreen == true ? storeAddress :userDeliveryAddress+pin,
+        "user_address": isComingFromPickUpScreen == true
+            ? storeAddress
+            : userDeliveryAddress + pin,
         "store_fixed_tax_detail": "",
         "tax": taxModel == null ? "0" : '${taxModel.tax}',
         "store_tax_rate_detail": "",
@@ -818,7 +827,7 @@ class ApiController {
         "user_id": user.id,
         "device_token": deviceToken,
         "user_address_id":
-            isComingFromPickUpScreen == true ? '0'/*areaId*/ : address.id,
+        isComingFromPickUpScreen == true ? '0'/*areaId */: address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
         "payment_method": paymentMethod == "2" ? "COD" : "online",
@@ -849,8 +858,7 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> updateProfileRequest(
-      String fullName,
+  static Future<UserResponse> updateProfileRequest(String fullName,
       String emailId,
       String phoneNumber,
       bool isComingFromOtpScreen,
@@ -947,7 +955,7 @@ class ApiController {
         print('--url===  $url');
         print('--user.id=== ${user.id}');
         final response =
-            await request.send().timeout(Duration(seconds: timeout));
+        await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
         print('--respStr===  $respStr');
@@ -980,7 +988,7 @@ class ApiController {
         print('--url===  $url');
         print('--user.id=== ${user.id}');
         final response =
-            await request.send().timeout(Duration(seconds: timeout));
+        await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
         print('--respStr===  $respStr');
@@ -996,8 +1004,8 @@ class ApiController {
     }
   }
 
-  static Future<ProductRatingResponse> postProductRating(
-      String orderID, String productID, String rating,
+  static Future<ProductRatingResponse> postProductRating(String orderID,
+      String productID, String rating,
       {String desc = '', File imageFile}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -1034,12 +1042,12 @@ class ApiController {
         print('--url===  $url');
         print('--user.id=== ${user.id}');
         final response =
-            await request.send().timeout(Duration(seconds: timeout));
+        await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
         print('--respStr===  $respStr');
         ProductRatingResponse ratingResponse =
-            ProductRatingResponse.fromJson(parsed);
+        ProductRatingResponse.fromJson(parsed);
         return ratingResponse;
       } catch (e) {
         Utils.showToast(e.toString(), true);
@@ -1088,8 +1096,8 @@ class ApiController {
     }
   }
 
-  static Future<OtpVerified> otpVerified(
-      OTPData otpData, LoginMobile phone) async {
+  static Future<OtpVerified> otpVerified(OTPData otpData,
+      LoginMobile phone) async {
     UserModelMobile userMobile = await SharedPrefs.getUserMobile();
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1170,8 +1178,8 @@ class ApiController {
     }
   }
 
-  static Future<CreateOrderData> razorpayCreateOrderApi(
-      String amount, String orderJson, dynamic detailsJson) async {
+  static Future<CreateOrderData> razorpayCreateOrderApi(String amount,
+      String orderJson, dynamic detailsJson) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.razorpayCreateOrder;
@@ -1226,8 +1234,8 @@ class ApiController {
     }
   }
 
-  static Future<AdminLoginModel> getAdminApiRequest(
-      String username, String password) async {
+  static Future<AdminLoginModel> getAdminApiRequest(String username,
+      String password) async {
     var url = ApiConstants.baseUrl + ApiConstants.storeLogin;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
@@ -1275,7 +1283,8 @@ class ApiController {
     }
   }
 
-  static Future<StripeCheckOutModel> stripePaymentApi(String amount,String orderJson,dynamic detailsJson,
+  static Future<StripeCheckOutModel> stripePaymentApi(String amount,
+      String orderJson, dynamic detailsJson,
       {String currencyAbbr}) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1382,7 +1391,7 @@ class ApiController {
 
       final parsed = json.decode(respStr);
       SubCategoryResponse subCategoryResponse =
-          SubCategoryResponse.fromJson(parsed);
+      SubCategoryResponse.fromJson(parsed);
       return subCategoryResponse;
     } catch (e) {
       print(e.toString());
@@ -1409,7 +1418,8 @@ class ApiController {
     }
   }
 
-  static Future<CancelOrderModel> orderCancelApi(String order_id,{String order_rejection_note=""}) async {
+  static Future<CancelOrderModel> orderCancelApi(String order_id,
+      {String order_rejection_note = ""}) async {
     // 0 => 'pending' ,  1 =>'processing', 2 =>'rejected',
     // 4 =>'shipped', 5 =>'delivered', 6 => 'cancel'
     StoreModel store = await SharedPrefs.getStore();
@@ -1422,7 +1432,7 @@ class ApiController {
       request.fields.addAll({
         "user_id": user.id,
         "order_id": order_id,
-        "order_rejection_note":order_rejection_note
+        "order_rejection_note": order_rejection_note
       });
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -1457,7 +1467,7 @@ class ApiController {
       final parsed = json.decode(respStr);
 
       DeliveryAddressResponse deliveryAddressResponse =
-          DeliveryAddressResponse.fromJson(parsed);
+      DeliveryAddressResponse.fromJson(parsed);
       //print("----respStr---${deliveryAddressResponse.success}");
       return deliveryAddressResponse;
     } catch (e) {
@@ -1476,7 +1486,7 @@ class ApiController {
     print(url);
     print(response.data);
     StoreBranchesModel storeBranchesModel =
-        StoreBranchesModel.fromJson(json.decode(response.data));
+    StoreBranchesModel.fromJson(json.decode(response.data));
     print("---storeBranchesModel ---${storeBranchesModel.data.length}");
 
     return storeBranchesModel;
@@ -1504,7 +1514,7 @@ class ApiController {
       print(response.data);
 
       LoyalityPointsModel storeData =
-          LoyalityPointsModel.fromJson(json.decode(response.data));
+      LoyalityPointsModel.fromJson(json.decode(response.data));
       print("-----LoyalityPointsModel ---${storeData.success}");
 
       return storeData;
@@ -1522,8 +1532,11 @@ class ApiController {
         StoreModel store = await SharedPrefs.getStore();
         SharedPreferences prefs = await SharedPreferences.getInstance();
         UserModel user = await SharedPrefs.getUser();
-        String email =
-            user.email == null ? 'NA' : user.email.isEmpty ? "NA" : user.email;
+        String email = user.email == null
+            ? 'NA'
+            : user.email.isEmpty
+            ? "NA"
+            : user.email;
 //        address = "170,phase1";
         String firstName = user.fullName.contains(" ") == true
             ? user.fullName.substring(0, user.fullName.indexOf(" "))
@@ -1559,7 +1572,7 @@ class ApiController {
             options: new Options(responseType: ResponseType.plain));
         print(response.data);
         CreatePaytmTxnTokenResponse txnTokenResponse =
-            CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
+        CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
         if (txnTokenResponse.success) {
           return txnTokenResponse;
         } else {
@@ -1595,7 +1608,7 @@ class ApiController {
         });
         print("${url}");
         final response =
-            await request.send().timeout(Duration(seconds: timeout));
+        await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
@@ -1633,12 +1646,12 @@ class ApiController {
         });
         print("${url}");
         final response =
-            await request.send().timeout(Duration(seconds: timeout));
+        await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
         NotificationResponseModel model =
-            NotificationResponseModel.fromJson(parsed);
+        NotificationResponseModel.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
@@ -1671,12 +1684,12 @@ class ApiController {
         });
         print("${url}");
         final response =
-            await request.send().timeout(Duration(seconds: timeout));
+        await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
         RecommendedProductsResponse model =
-            RecommendedProductsResponse.fromJson(parsed);
+        RecommendedProductsResponse.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
@@ -1757,15 +1770,14 @@ class ApiController {
   }
 
   static Future<FacebookModel> getFbUserData(String fbtoken) async {
-
     //String url1 = "https://graph.facebook.com/${user_id}?fields=name,first_name,last_name,email,&access_token=${fbtoken}";
-    String url = 'https://graph.facebook.com/v8.0/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
+    String url =
+        'https://graph.facebook.com/v8.0/me?fields=name,first_name,last_name,email&access_token=${fbtoken}';
 
     var request = new http.MultipartRequest("GET", Uri.parse(url));
 
     try {
-      final response = await request.send()
-          .timeout(Duration(seconds: timeout));
+      final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----url---${url}");
       print("----respStr---${respStr}");
@@ -1781,14 +1793,13 @@ class ApiController {
 
   static Future<MobileVerified> verifyEmail(String email) async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) + ApiConstants.verifyEmail;
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.verifyEmail;
 
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
-      request.fields.addAll({
-        "email": email,
-        "platform": Platform.isIOS ? "IOS" : "Android"
-      });
+      request.fields.addAll(
+          {"email": email, "platform": Platform.isIOS ? "IOS" : "Android"});
       print('@@url=${url}');
 
       final response = await request.send().timeout(Duration(seconds: timeout));
@@ -1804,7 +1815,6 @@ class ApiController {
     }
   }
 
-
   static Future<MobileVerified> socialSignUp(FacebookModel fbModel,
       GoogleSignInAccount googleResult,
       String fullName,
@@ -1812,7 +1822,6 @@ class ApiController {
       String phoneNumber,
       String user_refer_code,
       String gstNumber) async {
-
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -1824,16 +1833,16 @@ class ApiController {
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
     String socialPlatform;
-    if(fbModel != null){
+    if (fbModel != null) {
       socialPlatform = "facebook";
-    }else if(googleResult != null){
+    } else if (googleResult != null) {
       socialPlatform = "google";
     }
 
     try {
       request.fields.addAll({
         "phone": phoneNumber,
-        "country": store.internationalOtp == "0" ? "92" :"0",
+        "country": store.internationalOtp == "0" ? "92" : "0",
         "email": emailId,
         "social_platform": socialPlatform,
         "full_name": fullName,
@@ -1863,9 +1872,7 @@ class ApiController {
     }
   }
 
-
-  static Future<HtmlModelResponse> getHtmlForOptions(
-      String appScreen) async {
+  static Future<HtmlModelResponse> getHtmlForOptions(String appScreen) async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     try {
       if (isNetworkAvailable) {
@@ -1873,7 +1880,7 @@ class ApiController {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         String deviceId = prefs.getString(AppConstant.deviceId);
         String deviceToken = prefs.getString(AppConstant.deviceToken);
-        var url='';
+        var url = '';
         switch (appScreen) {
           case AdditionItemsConstants.TERMS_CONDITIONS:
             url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -1897,12 +1904,11 @@ class ApiController {
         });
         print("${url}");
         final response =
-            await request.send().timeout(Duration(seconds: timeout));
+        await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
-        HtmlModelResponse model =
-        HtmlModelResponse.fromJson(parsed);
+        HtmlModelResponse model = HtmlModelResponse.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
@@ -1912,4 +1918,456 @@ class ApiController {
     }
     return null;
   }
+
+  /*Subscription module*/
+  static Future<SubscriptionTaxCalculationResponse>
+  subscriptionMultipleTaxCalculationRequest({String couponCode = '',
+    String discount = '',
+    String shipping = '',
+    String orderJson = '',
+    String userAddressId = '',
+    String userAddress = '',
+//          String total='',
+//          String paymentMethod='',
+//          String checkout='',
+    String deliveryTimeSlot = '',
+//          String paymentRequestId='',
+//          String paymentId='',
+//          String onlineMethod='',
+//          String note='',
+//          String walletRefund='',
+    String cartSaving = '',
+    String totalDeliveries = ''}) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    WalleModel userWallet = await SharedPrefs.getUserWallet();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+    var url = ApiConstants.baseUrl
+        .replaceAll("storeId", store.id)
+        .replaceAll("api_v1", "api_v1_tax") +
+        ApiConstants.subscriptionTaxCalculation;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    print("----url---${url}");
+    //print("----orderJson---${orderJson}");
+    print("--discount-${discount}");
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "device_id": deviceId,
+        "device_token": deviceToken,
+        "user_address_id": userAddressId,
+        "user_address": userAddress,
+        "shipping": shipping,
+        "platform": Platform.isIOS ? "IOS" : "Android",
+//        "total": total,
+//        "discount": "$discount",
+        "discount": "0",
+//        "payment_method": paymentMethod,
+        "coupon_code": couponCode,
+//        "checkout": checkout,
+        "delivery_time_slot": deliveryTimeSlot,
+//        "payment_request_id": paymentRequestId,
+//        "payment_id": paymentId,
+//        "online_method": onlineMethod,
+//        "note": note,
+//        "wallet_refund": walletRefund,
+        "cart_saving": cartSaving,
+        "total_deliveries": totalDeliveries,
+        "fixed_discount_amount": "${discount}",
+        "tax": "0",
+        "user_wallet": userWallet == null ? "0" : userWallet.data.userWallet,
+        "order_detail": orderJson,
+      });
+      print("--fields---${request.fields.toString()}");
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("--Tax--respStr---${respStr}");
+      final parsed = json.decode(respStr);
+
+      SubscriptionTaxCalculationResponse model =
+      SubscriptionTaxCalculationResponse.fromJson(couponCode, parsed);
+      return model;
+    } catch (e) {
+      print("--multipleTax--respStr---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<ResponseModel> subscriptionPlaceOrderRequest(
+      String shipping_charges,
+      String note,
+      String totalPrice,
+      String paymentMethod,
+      SubscriptionTaxCalculation taxModel,
+      DeliveryAddressData address,
+      String orderJson,
+      bool isComingFromPickUpScreen,
+      String areaId,
+      OrderType deliveryType,
+      String razorpay_order_id,
+      String razorpay_payment_id,
+      String online_method,
+      String selectedDeliverSlotValue,
+      {String cart_saving = "0.00",
+        String start_date = '',
+        String end_date = '',
+        String single_day_shipping_charges = '',
+        String single_day_total = '',
+        String single_day_discount = '',
+        String single_day_tax = '',
+        String single_day_checkout = '',
+        String subscription_type = '',
+        String delivery_dates = '',
+        String total_deliveries = ''}) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+    var url;
+    if (deliveryType == OrderType.Delivery) {
+      url = ApiConstants.base.replaceAll("storeId", store.id) +
+          ApiConstants.subscriptionPlaceOrder;
+    } else {
+      url = ApiConstants.base.replaceAll("storeId", store.id) +
+          ApiConstants.subscriptionPickupPlaceOrder;
+    }
+    String storeAddress = "";
+    try {
+      storeAddress = "${store.storeName}, ${store.location},"
+          "${store.city}, ${store.state}, ${store.country}, ${store.zipcode}";
+      print("storeAddress= ${storeAddress}");
+    } catch (e) {
+      print(e);
+    }
+
+    /*var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.placeOrder;*/
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    //print("==orderJson==${orderJson}====");
+    String encodedtaxDetail = "[]";
+    String encodedtaxLabel = "[]";
+    String encodedFixedTax = "[]";
+    try {
+      /*print("fixedTax= ${taxModel.fixedTax}");
+      print("taxLabel= ${taxModel.taxLabel}");
+      print("taxDetail= ${taxModel.taxDetail}");*/
+
+      try {
+        List jsonfixedTaxList =
+        taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+        encodedFixedTax = jsonEncode(jsonfixedTaxList);
+        //print("encodedFixedTax= ${encodedFixedTax}");
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        List jsontaxDetailList =
+        taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+        encodedtaxDetail = jsonEncode(jsontaxDetailList);
+        //print("encodedtaxDetail= ${encodedtaxDetail}");
+      } catch (e) {
+        print(e);
+      }
+
+      try {
+        List jsontaxLabelList =
+        taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+        encodedtaxLabel = jsonEncode(jsontaxLabelList);
+        //print("encodedtaxLabel= ${encodedtaxLabel}");
+      } catch (e) {
+        print(e);
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    String userDeliveryAddress = '',
+        pin = '';
+    if (address != null && !isComingFromPickUpScreen) {
+      if (address.address2 != null && address.address2.isNotEmpty) {
+        if (address.address != null && address.address.isNotEmpty) {
+          userDeliveryAddress = address.address +
+              ", " +
+              address.address2 +
+              " " +
+              address.areaName +
+              " " +
+              address.city;
+        } else {
+          userDeliveryAddress =
+              address.address2 + " " + address.areaName + " " + address.city;
+        }
+      } else {
+        if (address.address != null && address.address.isNotEmpty) {
+          userDeliveryAddress =
+              address.address + " " + address.areaName + " " + address.city;
+        }
+      }
+
+      if (address.zipCode != null && address.zipCode.isNotEmpty)
+        pin = " " + address.zipCode;
+    }
+    try {
+      request.fields.addAll({
+        "shipping_charges": "${shipping_charges}",
+        "note": note,
+        "wallet_refund": store.wallet_setting == "0"
+            ? ""
+            : taxModel == null
+            ? "0"
+            : "${taxModel.walletRefund}",
+        "calculated_tax_detail": "",
+        "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
+        "device_id": deviceId,
+        "user_address": isComingFromPickUpScreen == true
+            ? storeAddress
+            : userDeliveryAddress + pin,
+        "store_fixed_tax_detail": "",
+        "tax": taxModel == null ? "0" : '${taxModel.tax}',
+        "store_tax_rate_detail": "",
+        "platform": Platform.isIOS ? "IOS" : "Android",
+        "tax_rate": "0",
+        "total": /*taxModel == null ? '${totalPrice}' : */ '${taxModel.total}',
+        "user_id": user.id,
+        "device_token": deviceToken,
+        "user_address_id":
+        isComingFromPickUpScreen == true ? areaId : address.id,
+        "orders": orderJson,
+        "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
+        "payment_method": paymentMethod == "2" ? "COD" : "online",
+        "discount": taxModel == null ? "" : '${taxModel.discount}',
+        "payment_request_id": razorpay_order_id,
+        "payment_id": razorpay_payment_id,
+        "online_method": online_method,
+        "delivery_time_slot": selectedDeliverSlotValue,
+        "store_fixed_tax_detail": encodedFixedTax,
+        "store_tax_rate_detail": encodedtaxLabel,
+        "calculated_tax_detail": encodedtaxDetail,
+        "cart_saving": cart_saving,
+        "start_date": start_date,
+        "end_date": end_date,
+        "single_day_shipping_charges": single_day_shipping_charges,
+        "single_day_total": single_day_total,
+        "single_day_discount": single_day_discount,
+        "single_day_tax": single_day_tax,
+        "single_day_checkout": single_day_checkout,
+        "subscription_type": subscription_type,
+        "delivery_dates": delivery_dates,
+        "total_deliveries": total_deliveries,
+      });
+
+      print("----${url}");
+      print("--fields--${request.fields.toString()}--");
+      final response = await request.send();
+      final respStr = await response.stream.bytesToString();
+      print("--respStr--${respStr}--");
+      final parsed = json.decode(respStr);
+
+      ResponseModel model = ResponseModel.fromJson(parsed);
+      return model;
+    } catch (e) {
+      print("-x-fields--${e.toString()}--");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<SubscriptionDataResponse> getSubscriptionOrderHistory() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    var url = ApiConstants.base.replaceAll("storeId", store.id) +
+        ApiConstants.subscriptionHistory;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    if (isNetworkAvailable) {
+      try {
+        request.fields.addAll({
+          "user_id": user.id,
+          "platform": Platform.isIOS ? "IOS" : "android",
+        });
+        print('--url===  $url');
+        print('--user.id=== ${user.id}');
+        final response =
+        await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        final parsed = json.decode(respStr);
+        print('--respStr===  $respStr');
+        SubscriptionDataResponse getOrderHistory = SubscriptionDataResponse
+            .fromJson(parsed);
+        return getOrderHistory;
+      } catch (e) {
+        Utils.showToast(e.toString(), true);
+        return null;
+      }
+    } else {
+      Utils.showToast(AppConstant.noInternet, true);
+      return null;
+    }
+  }
+
+  static Future<SubscriptionUpdationResponse> subscriptionStatusUpdate(
+      String subsciptionOrderID, String status) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    var url = '';
+    if (status == '6') {
+      url = ApiConstants.base.replaceAll("storeId", store.id) +
+          ApiConstants.subscriptionCancel;
+    } else {
+      url = ApiConstants.base.replaceAll("storeId", store.id) +
+          ApiConstants.subscriptionStatusUpdate;
+    }
+    print(url);
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "subscription_order_id": subsciptionOrderID,
+        "status": status,
+      });
+      print(request.fields.toString());
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('--response===  $respStr');
+      final parsed = json.decode(respStr);
+      SubscriptionUpdationResponse referEarn = SubscriptionUpdationResponse
+          .fromJson(parsed);
+      return referEarn;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      print('---CancelOrderModel catch' + e.toString());
+      return null;
+    }
+  }
+
+  static Future<SubscriptionUpdationResponse> subscriptionOrderUpdate(
+      String subsciptionOrderID, String deliverySlots) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    var url = '';
+    {
+      url = ApiConstants.base.replaceAll("storeId", store.id) +
+          ApiConstants.subscriptionOrderUpdate;
+
+      print(url);
+      var request = new http.MultipartRequest("POST", Uri.parse(url));
+      try {
+        request.fields.addAll({
+          "user_id": user.id,
+          "subscription_order_id": subsciptionOrderID,
+          "delivery_time_slot": deliverySlots,
+        });
+        print(request.fields.toString());
+        final response = await request.send().timeout(
+            Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        print('--response===  $respStr');
+        final parsed = json.decode(respStr);
+        SubscriptionUpdationResponse referEarn = SubscriptionUpdationResponse
+            .fromJson(parsed);
+        return referEarn;
+      } catch (e) {
+        //Utils.showToast(e.toString(), true);
+        print('---CancelOrderModel catch' + e.toString());
+        return null;
+      }
+    }
+  }
+  static Future<SubscriptionDataResponse> getSubscriptionDetailHistory(String orderID) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    var url = ApiConstants.base.replaceAll("storeId", store.id) +
+        ApiConstants.subscriptionDetailHistory;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    if (isNetworkAvailable) {
+      try {
+        request.fields.addAll({
+          "user_id": user.id,
+          "subscription_order_id": orderID,
+//          "platform": Platform.isIOS ? "IOS" : "android",
+        });
+        print('--url===  $url');
+        print('--user.id=== ${user.id}');
+        final response =
+        await request.send().timeout(Duration(seconds: timeout));
+        final respStr = await response.stream.bytesToString();
+        final parsed = json.decode(respStr);
+        print('--respStr===  $respStr');
+        SubscriptionDataResponse getOrderHistory = SubscriptionDataResponse.fromJson(parsed);
+        return getOrderHistory;
+      } catch (e) {
+        Utils.showToast(e.toString(), true);
+        return null;
+      }
+    } else {
+      Utils.showToast(AppConstant.noInternet, true);
+      return null;
+    }
+  }
+
+  static Future<CreateOrderData> subscriptionRazorpayCreateOrderApi(String amount,
+      String orderJson, dynamic detailsJson) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.base.replaceAll("storeId", store.id) +
+        ApiConstants.subscriptionRazorpayCreateSubscription;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "amount": amount,
+        "currency": "INR",
+        "receipt": "Order",
+        "payment_capture": "1",
+        "subscription_info": detailsJson, //JSONObject details
+        "subscriptions": orderJson //cart jsonObject
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      CreateOrderData model = CreateOrderData.fromJson(parsed);
+      return model;
+    } catch (e) {
+      print('---catch-razorpayCreateOrder-----' + e.toString());
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<RazorpayOrderData> subscriptionRazorpayVerifyTransactionApi(
+      String razorpay_order_id) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.base.replaceAll("storeId", store.id) +
+        ApiConstants.subscriptionRazorpayVerifyTransaction;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      request.fields.addAll({
+        "razorpay_order_id": razorpay_order_id,
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      RazorpayOrderData model = RazorpayOrderData.fromJson(parsed);
+      return model;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+
 }

@@ -109,12 +109,14 @@ class Product {
   List<Variant> variants;
   SelectedVariant selectedVariant;
 
+  Map variantMap = Map<String, String>();
   String variantId;
   String weight;
   String mrpPrice;
   String price;
   String discount;
   String isUnitType;
+  String isSubscriptionOn;
 
   String quantity;
   String productJson = "";
@@ -156,6 +158,7 @@ class Product {
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
+    Map productMap = Map<String, String>();
     Product product = Product();
     product.id = json["id"];
     product.isFav = json["fav"];
@@ -178,8 +181,7 @@ class Product {
     product.image10080 = json["image_100_80"] ?? "";
     product.image300200 = json["image_300_200"] ?? "";
 
-    product.variants =
-    List<Variant>.from(json["variants"].map((x) => Variant.fromJson(x)));
+    product.variants = List<Variant>.from(json["variants"].map((x) => Variant.fromJson(x)));
     product.selectedVariant = SelectedVariant.fromJson(json["selectedVariant"]);
 
     dynamic variant = json["variants"] != null
@@ -192,6 +194,12 @@ class Product {
     product.discount = variant == null ? null : variant["discount"];
     product.isUnitType = variant == null ? null : variant["unit_type"];
     product.productImages= json["product_images"] == null ? null : List<ProductImage>.from(json["product_images"].map((x) => ProductImage.fromJson(x)));
+
+    for (var i=0; i < product.variants.length; i++) {
+      productMap[product.variants[i].id] = product.variants[i].isSubscriptionOn;
+      //print("==${variantsList[i].id}=isSubscriptionOn===${variantsList[i].isSubscriptionOn}");
+    }
+    product.variantMap = productMap;
 
     return product;
   }
@@ -347,9 +355,11 @@ class SelectedVariant {
   String customField2;
   String customField3;
   String customField4;
+  String is_subscription_on;
 
   SelectedVariant({
     this.variantId,
+    this.is_subscription_on,
     this.sku,
     this.weight,
     this.mrpPrice,
@@ -366,6 +376,7 @@ class SelectedVariant {
   factory SelectedVariant.fromJson(Map<String, dynamic> json) =>
       SelectedVariant(
         variantId: json["variant_id"],
+        is_subscription_on: json["is_subscription_on"],
         sku: json["sku"],
         weight: json["weight"],
         mrpPrice: json["mrp_price"],
@@ -383,6 +394,7 @@ class SelectedVariant {
       {
         "variant_id": variantId,
         "sku": sku,
+        "is_subscription_on": is_subscription_on,
         "weight": weight,
         "mrp_price": mrpPrice,
         "price": price,
@@ -416,10 +428,12 @@ class Variant {
   String stockType;
   String minStockAlert;
   String stock;
+  String isSubscriptionOn;
   String maxQuantityPerOrder;
 
   Variant({
     this.id,
+    this.isSubscriptionOn,
     this.storeId,
     this.productId,
     this.sku,
@@ -444,6 +458,7 @@ class Variant {
   factory Variant.fromJson(Map<String, dynamic> json) =>
       Variant(
         id: json["id"],
+        isSubscriptionOn: json["is_subscription_on"],
         storeId: json["store_id"],
         productId: json["product_id"],
         sku: json["sku"],
@@ -468,6 +483,7 @@ class Variant {
   Map<String, dynamic> toJson() =>
       {
         "id": id,
+        "is_subscription_on": isSubscriptionOn,
         "store_id": storeId,
         "product_id": productId,
         "sku": sku,
@@ -492,6 +508,7 @@ class Variant {
   Map<String, dynamic> toMap() {
     var map = new Map<String, dynamic>();
     map["id"] = id;
+    map["is_subscription_on"] = isSubscriptionOn;
     map["store_id"] = storeId;
     map["product_id"] = productId;
     map["sku"] = sku;

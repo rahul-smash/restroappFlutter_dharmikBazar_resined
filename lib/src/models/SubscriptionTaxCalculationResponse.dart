@@ -1,0 +1,253 @@
+// To parse this JSON data, do
+//
+//     final subscriptionTaxCalculationResponse = subscriptionTaxCalculationResponseFromJson(jsonString);
+
+import 'dart:convert';
+
+import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+
+class SubscriptionTaxCalculationResponse {
+  SubscriptionTaxCalculationResponse({
+    this.success,
+    this.data,
+    this.message,
+  });
+
+  bool success;
+  SubscriptionTaxCalculation data;
+  String message;
+
+  SubscriptionTaxCalculationResponse copyWith(
+          {bool success, SubscriptionTaxCalculation data, String message}) =>
+      SubscriptionTaxCalculationResponse(
+        success: success ?? this.success,
+        data: data ?? this.data,
+        message: message ?? this.message,
+      );
+
+  String toRawJson() => json.encode(toJson());
+
+  factory SubscriptionTaxCalculationResponse.fromJson(
+          String couponCode, Map<String, dynamic> json) =>
+      SubscriptionTaxCalculationResponse(
+        success: json["success"] == null ? null : json["success"],
+        message: json["message"] == '' ? null : json["message"],
+        data: json["data"] == null
+            ? null
+            : SubscriptionTaxCalculation.fromJson(couponCode, json["data"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "success": success == null ? null : success,
+        "message": message == null ? null : message,
+        "data": data == null ? null : data.toJson(),
+      };
+}
+
+class SubscriptionTaxCalculation {
+  SubscriptionTaxCalculation({
+    this.total,
+    this.singleDayTotal,
+    this.walletRefund,
+    this.itemSubTotal,
+    this.singleDayItemSubTotal,
+    this.tax,
+    this.singleDayTax,
+    this.discount,
+    this.singleDayDiscount,
+    this.shipping,
+    this.singleDayShipping,
+    this.fixedTaxAmount,
+    this.singleDayFixedTaxAmount,
+    this.taxDetail,
+    this.taxLabel,
+    this.fixedTax,
+    this.orderDetail,
+    this.isChanged,
+    this.couponCode,
+  });
+
+  String total;
+  String singleDayTotal;
+  String walletRefund;
+  String itemSubTotal;
+  String singleDayItemSubTotal;
+  String tax;
+  String singleDayTax;
+  String discount;
+  String singleDayDiscount;
+  String shipping;
+  String singleDayShipping;
+  String fixedTaxAmount;
+  String singleDayFixedTaxAmount;
+  List<TaxDetail> taxDetail;
+  List<TaxLabel> taxLabel;
+  List<dynamic> fixedTax;
+  List<OrderDetail> orderDetail;
+  bool isChanged;
+  String couponCode;
+
+  SubscriptionTaxCalculation copyWith({
+    String total,
+    String singleDayTotal,
+    String walletRefund,
+    String itemSubTotal,
+    String singleDayItemSubTotal,
+    String tax,
+    String singleDayTax,
+    String discount,
+    String singleDayDiscount,
+    String shipping,
+    String singleDayShipping,
+    String fixedTaxAmount,
+    String singleDayFixedTaxAmount,
+    List<TaxDetail> taxDetail,
+    List<TaxLabel> taxLabel,
+    List<dynamic> fixedTax,
+    List<OrderDetail> orderDetail,
+    bool isChanged,
+    String couponCode,
+  }) =>
+      SubscriptionTaxCalculation(
+          total: total ?? this.total,
+          singleDayTotal: singleDayTotal ?? this.singleDayTotal,
+          walletRefund: walletRefund ?? this.walletRefund,
+          itemSubTotal: itemSubTotal ?? this.itemSubTotal,
+          singleDayItemSubTotal:
+              singleDayItemSubTotal ?? this.singleDayItemSubTotal,
+          tax: tax ?? this.tax,
+          singleDayTax: singleDayTax ?? this.singleDayTax,
+          discount: discount ?? this.discount,
+          singleDayDiscount: singleDayDiscount ?? this.singleDayDiscount,
+          shipping: shipping ?? this.shipping,
+          singleDayShipping: singleDayShipping ?? this.singleDayShipping,
+          fixedTaxAmount: fixedTaxAmount ?? this.fixedTaxAmount,
+          singleDayFixedTaxAmount:
+              singleDayFixedTaxAmount ?? this.singleDayFixedTaxAmount,
+          taxDetail: taxDetail ?? this.taxDetail,
+          taxLabel: taxLabel ?? this.taxLabel,
+          fixedTax: fixedTax ?? this.fixedTax,
+          orderDetail: orderDetail ?? this.orderDetail,
+          isChanged: isChanged ?? this.isChanged,
+          couponCode: couponCode ?? this.couponCode);
+
+  String toRawJson() => json.encode(toJson());
+
+  factory SubscriptionTaxCalculation.fromJson(
+          String couponCodePassed, Map<String, dynamic> json) =>
+      SubscriptionTaxCalculation(
+        total: json["total"] == null ? null : json["total"],
+        singleDayTotal:
+            json["single_day_total"] == null ? null : json["single_day_total"],
+        walletRefund: json["wallet_refund"] == null
+            ? null
+            : json["wallet_refund"] is int ||json["wallet_refund"] is double
+                ? json["wallet_refund"].toString()
+                : json["wallet_refund"],
+        itemSubTotal:
+            json["item_sub_total"] == null ? null : json["item_sub_total"],
+        singleDayItemSubTotal: json["single_day_item_sub_total"] == null
+            ? null
+            : json["single_day_item_sub_total"],
+        tax: json["tax"] == null ? null : json["tax"],
+        singleDayTax:
+            json["single_day_tax"] == null ? null : json["single_day_tax"],
+        discount: json["discount"] == null ? null : json["discount"],
+        singleDayDiscount: json["single_day_discount"] == null
+            ? null
+            : json["single_day_discount"],
+        shipping: json["shipping"] == null ? null : json["shipping"],
+        singleDayShipping: json["single_day_shipping"] == null
+            ? null
+            : json["single_day_shipping"],
+        fixedTaxAmount:
+            json["fixed_tax_amount"] == null ? null : json["fixed_tax_amount"],
+        singleDayFixedTaxAmount: json["single_day_fixed_tax_amount"] == null
+            ? null
+            : json["single_day_fixed_tax_amount"],
+        taxDetail: json["tax_detail"] == null
+            ? null
+            : List<TaxDetail>.from(
+                json["tax_detail"].map((x) => TaxDetail.fromJson(x))),
+        taxLabel: json["tax_label"] == null
+            ? null
+            : List<TaxLabel>.from(
+                json["tax_label"].map((x) => TaxLabel.fromJson(x))),
+        fixedTax: json["fixed_Tax"] == null
+            ? null
+            : List<dynamic>.from(json["fixed_Tax"].map((x) => x)),
+        orderDetail: json["order_detail"] == null
+            ? null
+            : List<OrderDetail>.from(
+                json["order_detail"].map((x) => OrderDetail.fromJson(x))),
+        isChanged: json["is_changed"] == null ? null : json["is_changed"],
+        couponCode: couponCodePassed,
+      );
+
+  Map<String, dynamic> toJson() => {
+        "total": total == null ? null : total,
+        "single_day_total": singleDayTotal == null ? null : singleDayTotal,
+        "wallet_refund": walletRefund == null ? null : walletRefund,
+        "item_sub_total": itemSubTotal == null ? null : itemSubTotal,
+        "single_day_item_sub_total":
+            singleDayItemSubTotal == null ? null : singleDayItemSubTotal,
+        "tax": tax == null ? null : tax,
+        "single_day_tax": singleDayTax == null ? null : singleDayTax,
+        "discount": discount == null ? null : discount,
+        "single_day_discount":
+            singleDayDiscount == null ? null : singleDayDiscount,
+        "shipping": shipping == null ? null : shipping,
+        "single_day_shipping":
+            singleDayShipping == null ? null : singleDayShipping,
+        "fixed_tax_amount": fixedTaxAmount == null ? null : fixedTaxAmount,
+        "single_day_fixed_tax_amount":
+            singleDayFixedTaxAmount == null ? null : singleDayFixedTaxAmount,
+        "tax_detail": taxDetail == null
+            ? null
+            : List<dynamic>.from(taxDetail.map((x) => x.toJson())),
+        "tax_label": taxLabel == null
+            ? null
+            : List<dynamic>.from(taxLabel.map((x) => x.toJson())),
+        "fixed_Tax": fixedTax == null
+            ? null
+            : List<dynamic>.from(fixedTax.map((x) => x)),
+        "order_detail": orderDetail == null
+            ? null
+            : List<dynamic>.from(orderDetail.map((x) => x.toJson())),
+        "is_changed": isChanged == null ? null : isChanged,
+      };
+}
+
+class TaxLabel {
+  TaxLabel({
+    this.label,
+    this.rate,
+  });
+
+  String label;
+  String rate;
+
+  TaxLabel copyWith({
+    String label,
+    String rate,
+  }) =>
+      TaxLabel(
+        label: label ?? this.label,
+        rate: rate ?? this.rate,
+      );
+
+  factory TaxLabel.fromRawJson(String str) =>
+      TaxLabel.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory TaxLabel.fromJson(Map<String, dynamic> json) => TaxLabel(
+        label: json["label"] == null ? null : json["label"],
+        rate: json["rate"] == null ? null : json["rate"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "label": label == null ? null : label,
+        "rate": rate == null ? null : rate,
+      };
+}

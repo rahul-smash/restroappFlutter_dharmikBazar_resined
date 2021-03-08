@@ -13,6 +13,7 @@ import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
@@ -414,15 +415,22 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             print("minAmount=${addressList[selectedIndex].minAmount}");
             print("notAllow=${addressList[selectedIndex].notAllow}");
             if (addressList[selectedIndex].note.isEmpty) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ConfirmOrderScreen(
+
+              if(widget.delivery == OrderType.SubScription){
+                eventBus.fire(onAddressSelected(addressList[selectedIndex]));
+                Navigator.pop(context);
+              }else{
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ConfirmOrderScreen(
                         addressList[selectedIndex],
                         false,
                         "",
                         widget.delivery,storeModel: storeModel,)),
-              );
+                );
+              }
+
             } else {
               var result = await DialogUtils.displayOrderConfirmationDialog(
                 context,
@@ -430,15 +438,21 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 addressList[selectedIndex].note,
               );
               if (result == true) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ConfirmOrderScreen(
+                if(widget.delivery == OrderType.SubScription){
+                  eventBus.fire(onAddressSelected(addressList[selectedIndex]));
+                  Navigator.pop(context);
+                }else{
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ConfirmOrderScreen(
                           addressList[selectedIndex],
                           false,
                           "",
                           widget.delivery,storeModel: storeModel,)),
-                );
+                  );
+                }
+
               }
             }
           //Code Commented Due to not approved by client
@@ -493,9 +507,9 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              "Proceed",
-              style: TextStyle(color: Colors.white, fontSize: 20.0),
+            widget.delivery == OrderType.SubScription
+                ? Text("Select", style: TextStyle(color: Colors.white, fontSize: 20.0),)
+                : Text("Proceed",style: TextStyle(color: Colors.white, fontSize: 20.0),
             ),
           ],
         ),

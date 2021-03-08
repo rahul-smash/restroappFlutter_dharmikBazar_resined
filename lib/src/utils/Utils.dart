@@ -845,11 +845,19 @@ class Utils {
     }
     DeviceInfo.getInstance(deviceInfo: param);
   }
+
+  static List<DateTime> getDatesInBeteween(DateTime startDate, DateTime endDate) {
+    List<DateTime> days = [];
+    for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
+      days.add(startDate.add(Duration(days: i)));
+    }
+    return days;
+  }
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }
 
-enum OrderType { Delivery, PickUp, Menu }
+enum OrderType { Delivery, PickUp, Menu, SubScription }
 
 enum PaymentType { COD, ONLINE, ONLINE_PAYTM, CANCEL }
 enum RadioButtonEnum { SELECTD, UNSELECTED }

@@ -4,6 +4,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreOffersResponse.dart';
+import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -14,11 +15,14 @@ class AvailableOffersDialog extends StatefulWidget {
   final String paymentMode;
   String shippingCharges = '0'; // 2 = COD, 3 = Online Payment
   final Function(TaxCalculationModel) callback;
+  final Function(SubscriptionTaxCalculation) subcriptionCallback;
   bool isComingFromPickUpScreen;
   String areaId;
   List<String> appliedCouponCodeList;
   bool isOrderVariations = false;
+  bool isSubcriptionScreen = false;
   List<OrderDetail> responseOrderDetail = List();
+  Map<String, String> subcriptionMap = Map();
 
   AvailableOffersDialog(
       this.address,
@@ -29,7 +33,10 @@ class AvailableOffersDialog extends StatefulWidget {
       this.appliedCouponCodeList,
       this.isOrderVariations,
       this.responseOrderDetail,
-      this.shippingCharges);
+      this.shippingCharges,
+      {this.isSubcriptionScreen = false,
+      this.subcriptionCallback,
+      this.subcriptionMap});
 
   @override
   AvailableOffersState createState() => AvailableOffersState();
@@ -186,22 +193,31 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                             } else {
                                               if (widget.appliedCouponCodeList
                                                   .isEmpty) {
-                                                databaseHelper
-                                                    .getCartItemsListToJson(
-                                                        isOrderVariations: widget
-                                                            .isOrderVariations,
-                                                        responseOrderDetail: widget
-                                                            .responseOrderDetail)
-                                                    .then((json) {
-                                                  if (json.length == 2) {
-                                                    Utils.showToast(
-                                                        "All Items are out of stock.",
-                                                        true);
-                                                    return;
-                                                  }
+                                                if (!widget
+                                                    .isSubcriptionScreen) {
+                                                  databaseHelper
+                                                      .getCartItemsListToJson(
+                                                          isOrderVariations: widget
+                                                              .isOrderVariations,
+                                                          responseOrderDetail:
+                                                              widget
+                                                                  .responseOrderDetail)
+                                                      .then((json) {
+                                                    if (json.length == 2) {
+                                                      Utils.showToast(
+                                                          "All Items are out of stock.",
+                                                          true);
+                                                      return;
+                                                    }
+                                                    validateCouponApi(
+                                                        offer.couponCode, json);
+                                                  });
+                                                } else {
                                                   validateCouponApi(
-                                                      offer.couponCode, json);
-                                                });
+                                                      offer.couponCode,
+                                                      widget.subcriptionMap[
+                                                          'jsonListCouponProduct']);
+                                                }
                                               } else {
                                                 Utils.showToast(
                                                     "Please remove the applied coupon first!",
@@ -255,15 +271,35 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
       if (validCouponModel != null && validCouponModel.success) {
         Utils.showToast(validCouponModel.message, true);
         print("-discountAmount-=${validCouponModel.discountAmount}-");
-        ApiController.multipleTaxCalculationRequest(
-                couponCode, validCouponModel.discountAmount, widget.shippingCharges, json)
-            .then((response) async {
-          Utils.hideProgressDialog(context);
-          if (response.success) {
-            widget.callback(response.taxCalculation);
-          }
-          Navigator.pop(context, true);
-        });
+        if (widget.isSubcriptionScreen) {
+          ApiController.subscriptionMultipleTaxCalculationRequest(
+                  couponCode: couponCode,
+                  discount: validCouponModel.discountAmount,
+                  shipping: widget.shippingCharges,
+                  orderJson: widget.subcriptionMap['orderJson'],
+                  userAddressId: widget.subcriptionMap['userAddressId'],
+                  userAddress: widget.subcriptionMap['userAddress'],
+                  deliveryTimeSlot:widget.isComingFromPickUpScreen?'': widget.subcriptionMap['deliveryTimeSlot'],
+                  cartSaving: widget.subcriptionMap['cartSaving'],
+                  totalDeliveries: widget.subcriptionMap['totalDeliveries'])
+              .then((value) {
+            Utils.hideProgressDialog(context);
+            if (value.success) {
+              widget.subcriptionCallback(value.data);
+            }
+            Navigator.pop(context, true);
+          });
+        } else {
+          ApiController.multipleTaxCalculationRequest(couponCode,
+                  validCouponModel.discountAmount, widget.shippingCharges, json)
+              .then((response) async {
+            Utils.hideProgressDialog(context);
+            if (response.success) {
+              widget.callback(response.taxCalculation);
+            }
+            Navigator.pop(context, true);
+          });
+        }
       } else {
         Utils.hideProgressDialog(context);
         Utils.showToast(validCouponModel.message, true);

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -18,36 +17,59 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 import 'AddSubscriptionScreen.dart';
 
-class ProductTileItem extends StatefulWidget {
+class ProductSubcriptonTileView extends StatefulWidget {
   Product product;
   VoidCallback callback;
   ClassType classType;
+  String quantity = '';
+  Variant globelVariant;
+  Function addQuantityFunction;
 
-  ProductTileItem(this.product, this.callback, this.classType);
+  ProductSubcriptonTileView(this.product, this.callback, this.classType,
+      this.quantity, this.globelVariant, this.addQuantityFunction);
 
   @override
-  _ProductTileItemState createState() => new _ProductTileItemState();
+  _ProductSubcriptonTileViewState createState() =>
+      new _ProductSubcriptonTileViewState();
 }
 
-class _ProductTileItemState extends State<ProductTileItem> {
+class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   int counter = 0;
-  CartData cartData;
+
+//  CartData cartData;
   Variant variant;
   bool showAddButton;
-  StoreModel storeModel;
-  bool _isSubscriptionActive = false;
+
   bool _isProductOutOfStock = false;
 
   @override
   initState() {
     super.initState();
-
-    SharedPrefs.getStore().then((value) {
-      storeModel = value;
-      _isSubscriptionActive = storeModel.subscription.status == '1';
-      if (mounted) setState(() {});
-    });
+    variant = widget.globelVariant;
+    widget.product.variantId = widget.globelVariant == null
+        ? widget.product.variantId
+        : widget.globelVariant.id;
+    widget.product.weight = widget.globelVariant == null
+        ? widget.product.weight
+        : widget.globelVariant.weight;
+    widget.product.mrpPrice = widget.globelVariant == null
+        ? widget.product.mrpPrice
+        : widget.globelVariant.mrpPrice;
+    widget.product.price = widget.globelVariant == null
+        ? widget.product.price
+        : widget.globelVariant.price;
+    widget.product.discount = widget.globelVariant == null
+        ? widget.product.discount
+        : widget.globelVariant.discount;
+    widget.product.isUnitType = widget.globelVariant == null
+        ? widget.product.isUnitType
+        : widget.globelVariant.unitType;
+    counter = widget.quantity != null
+        ? widget.quantity.isEmpty
+            ? 0
+            : int.parse(widget.quantity)
+        : 0;
     showAddButton = false;
     //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
@@ -55,15 +77,16 @@ class _ProductTileItemState extends State<ProductTileItem> {
   }
 
   void getDataFromDB() {
-    databaseHelper
-        .getProductQuantitiy(widget.product.variantId)
-        .then((cartDataObj) {
-      cartData = cartDataObj;
-      counter = int.parse(cartData.QUANTITY);
-      showAddButton = counter == 0 ? true : false;
-      //print("-QUANTITY-${counter}=");
-      setState(() {});
-    });
+    showAddButton = counter == 0 ? true : false;
+//    databaseHelper
+//        .getProductQuantitiy(widget.product.variantId,isSubscriptionTable: true)
+//        .then((cartDataObj) {
+//      cartData = cartDataObj;
+//      counter = int.parse(cartData.QUANTITY);
+//      showAddButton = counter == 0 ? true : false;
+    //print("-QUANTITY-${counter}=");
+//      setState(() {});
+//    });
     databaseHelper
         .checkProductsExistInFavTable(
             DatabaseHelper.Favorite_Table, widget.product.id)
@@ -111,8 +134,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
       variantsVisibility = false;
     }
 
-    //print("==variantMap=${widget.product.variantId} and ${widget.product.variantMap[widget.product.variantId]}");
-
     return Container(
       color: Colors.white,
       child: Column(children: [
@@ -128,27 +149,30 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     fullscreenDialog: true,
                   ));
               setState(() {
-                if (result != null) {
-                  variant = result;
-                  discount = variant.discount.toString();
-                  price = variant.price.toString();
-                  weight = variant.weight;
-                  variantId = variant.id;
-                } else {
-                  variantId =
-                      variant == null ? widget.product.variantId : variant.id;
-                }
-                _checkOutOfStock(findNext: false);
-                databaseHelper
-                    .getProductQuantitiy(variantId)
-                    .then((cartDataObj) {
-                  setState(() {
-                    cartData = cartDataObj;
-                    counter = int.parse(cartData.QUANTITY);
-                    showAddButton = counter == 0 ? true : false;
-                    //print("-QUANTITY-${counter}=");
-                  });
-                });
+//                if (result != null) {
+//                  variant = result;
+//                  discount = variant.discount.toString();
+//                  price = variant.price.toString();
+//                  weight = variant.weight;
+//                  variantId = variant.id;
+//                } else {
+//                  variantId =
+//                      variant == null ? widget.product.variantId : variant.id;
+//                }
+//                _checkOutOfStock(findNext: false);
+                //TODO: Counter Update
+//                eventBus.fire(
+//                    onSubscribeProduct(widget.product, counter.toString()));
+//                databaseHelper
+//                    .getProductQuantitiy(variantId)
+//                    .then((cartDataObj) {
+//                  setState(() {
+//                    cartData = cartDataObj;
+//                    counter = int.parse(cartData.QUANTITY);
+//                    showAddButton = counter == 0 ? true : false;
+//                    //print("-QUANTITY-${counter}=");
+//                  });
+//                });
                 databaseHelper
                     .checkProductsExistInFavTable(
                         DatabaseHelper.Favorite_Table, widget.product.id)
@@ -165,7 +189,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
             }
           },
           child: Padding(
-            padding: EdgeInsets.only(top: 15, bottom: 15),
+            padding: EdgeInsets.only(top: 0, bottom: 15),
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -365,35 +389,38 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               padding: EdgeInsets.only(top: 0, bottom: 10),
                               child: InkWell(
                                 onTap: () async {
-                                  //print("-variants.length--${widget.product.variants.length}");
-                                  if (widget.product.variants.length != null) {
-                                    if (widget.product.variants.length == 1) {
-                                      return;
-                                    }
-                                  }
-                                  variant =
-                                      await DialogUtils.displayVariantsDialog(
-                                          context,
-                                          "${widget.product.title}",
-                                          widget.product.variants,
-                                          selectedVariant: variant);
-                                  if (variant != null) {
-                                    /*print("variant.weight= ${variant.weight}");
-                                                  print("variant.discount= ${variant.discount}");
-                                                  print("variant.mrpPrice= ${variant.mrpPrice}");
-                                                  print("variant.price= ${variant.price}");*/
-                                    databaseHelper
-                                        .getProductQuantitiy(variant.id)
-                                        .then((cartDataObj) {
-                                      //print("QUANTITY= ${cartDataObj.QUANTITY}");
-                                      cartData = cartDataObj;
-                                      counter = int.parse(cartData.QUANTITY);
-                                      showAddButton =
-                                          counter == 0 ? true : false;
-                                      setState(() {});
-                                    });
-                                  }
-                                  _checkOutOfStock(findNext: false);
+//                                  //print("-variants.length--${widget.product.variants.length}");
+//                                  if (widget.product.variants.length != null) {
+//                                    if (widget.product.variants.length == 1) {
+//                                      return;
+//                                    }
+//                                  }
+//                                  variant =
+//                                      await DialogUtils.displayVariantsDialog(
+//                                          context,
+//                                          "${widget.product.title}",
+//                                          widget.product.variants,
+//                                          selectedVariant: variant);
+//                                  if (variant != null) {
+//                                    /*print("variant.weight= ${variant.weight}");
+//                                                  print("variant.discount= ${variant.discount}");
+//                                                  print("variant.mrpPrice= ${variant.mrpPrice}");
+//                                                  print("variant.price= ${variant.price}");*/
+//                                    //TODO: Counter Update
+//                                    eventBus.fire(onSubscribeProduct(
+//                                        widget.product, counter.toString()));
+////                                    databaseHelper
+////                                        .getProductQuantitiy(variant.id)
+////                                        .then((cartDataObj) {
+////                                      //print("QUANTITY= ${cartDataObj.QUANTITY}");
+////                                      cartData = cartDataObj;
+////                                      counter = int.parse(cartData.QUANTITY);
+////                                      showAddButton =
+////                                          counter == 0 ? true : false;
+////                                      setState(() {});
+////                                    });
+//                                  }
+//                                  _checkOutOfStock(findNext: false);
                                 },
                                 child: Container(
                                   padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
@@ -411,12 +438,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                     children: <Widget>[
                                       Padding(
                                         padding: EdgeInsets.only(
-                                            top: 5,
-                                            right: 5,
-                                            bottom: widget.classType ==
-                                                    ClassType.CART
-                                                ? 5
-                                                : 0),
+                                            top: 5, right: 5, bottom: 5),
                                         child: Text(
                                           "${weight}",
                                           textAlign: TextAlign.center,
@@ -424,17 +446,17 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                               color: appThemeSecondary),
                                         ),
                                       ),
-                                      Visibility(
-                                        visible:
-                                            widget.classType == ClassType.CART
-                                                ? false
-                                                : true,
-                                        child: Padding(
-                                          padding: EdgeInsets.only(left: 10),
-                                          child: Utils.showVariantDropDown(
-                                              widget.classType, widget.product),
-                                        ),
-                                      ),
+//                                      Visibility(
+//                                        visible:
+//                                            widget.classType == ClassType.CART
+//                                                ? false
+//                                                : true,
+//                                        child: Padding(
+//                                          padding: EdgeInsets.only(left: 10),
+//                                          child: Utils.showVariantDropDown(
+//                                              widget.classType, widget.product),
+//                                        ),
+//                                      ),
                                     ],
                                   ),
                                 ),
@@ -478,42 +500,14 @@ class _ProductTileItemState extends State<ProductTileItem> {
                           //0 => subscription is on
                           //1 => subscription is off
                           Padding(
-                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Visibility(
-                                    visible: (!_isProductOutOfStock) &&
-                                            _isSubscriptionActive &&
-                                            widget.product.variantMap[variant ==
-                                                        null
-                                                    ? widget.product.variantId
-                                                    : variant.id] ==
-                                                "1"
-                                        ? true
-                                        : false,
+                                    visible: false,
                                     child: InkWell(
-                                      onTap: () async {
-                                        if (!AppConstant.isLoggedIn) {
-                                          Utils.showLoginDialog(context);
-                                          return;
-                                        }
-                                        Product product = widget.product;
-                                        StoreModel model =
-                                            await SharedPrefs.getStore();
-//                                        await insertInSubscribeCartTable(
-//                                            product, counter);
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  AddSubscriptionScreen(
-                                                      product,
-                                                      model,
-                                                      counter.toString(),
-                                                      variant)),
-                                        );
-                                      },
+                                      onTap: () async {},
                                       child: Container(
                                           decoration: BoxDecoration(
                                               border: Border.all(
@@ -542,7 +536,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
           ),
         ),
         Container(
-            height: 1,
+            height: 0.1,
             width: MediaQuery.of(context).size.width,
             color: Color(0xFFBDBDBD))
       ]),
@@ -564,13 +558,16 @@ class _ProductTileItemState extends State<ProductTileItem> {
         margin: EdgeInsets.fromLTRB(0, 0, 15, 0),
         child: showAddButton == true
             ? InkWell(
-                onTap: () {
+                onTap: () async {
+                  bool proceed = await widget.addQuantityFunction(
+                      widget.product, counter.toString());
                   //print("add onTap");
-                  if (_checkStockQuantity(counter)) {
+                  if (proceed && _checkStockQuantity(counter)) {
                     setState(() {});
                     counter++;
                     showAddButton = false;
-                    insertInCartTable(widget.product, counter);
+                    eventBus.fire(
+                        onSubscribeProduct(widget.product, counter.toString()));
                     widget.callback();
                   }
                 },
@@ -592,15 +589,17 @@ class _ProductTileItemState extends State<ProductTileItem> {
                       padding: const EdgeInsets.all(0.0),
                       width: 30.0, // you can adjust the width as you need
                       child: GestureDetector(
-                          onTap: () {
-                            if (counter != 0) {
+                          onTap: () async {
+                            bool proceed = await widget.addQuantityFunction(
+                                widget.product, counter.toString());
+                            if (proceed && counter != 0) {
                               setState(() => counter--);
                               if (counter == 0) {
-                                // delete from cart table
-                                removeFromCartTable(widget.product.variantId);
+                                eventBus.fire(onSubscribeProduct(
+                                    widget.product, counter.toString()));
                               } else {
-                                // insert/update to cart table
-                                insertInCartTable(widget.product, counter);
+                                eventBus.fire(onSubscribeProduct(
+                                    widget.product, counter.toString()));
                               }
                               widget.callback();
                             }
@@ -644,15 +643,21 @@ class _ProductTileItemState extends State<ProductTileItem> {
                       padding: const EdgeInsets.all(0.0),
                       width: 30.0, // you can adjust the width as you need
                       child: GestureDetector(
-                        onTap: () {
-                          if (_checkStockQuantity(counter)) {
+                        onTap: () async {
+                          bool proceed = await widget.addQuantityFunction(
+                              widget.product, counter.toString());
+                          if (proceed && _checkStockQuantity(counter)) {
                             setState(() => counter++);
                             if (counter == 0) {
+                              eventBus.fire(onSubscribeProduct(
+                                  widget.product, counter.toString()));
                               // delete from cart table
-                              removeFromCartTable(widget.product.variantId);
+//                              removeFromCartTable(widget.product.variantId);
                             } else {
+                              eventBus.fire(onSubscribeProduct(
+                                  widget.product, counter.toString()));
                               // insert/update to cart table
-                              insertInCartTable(widget.product, counter);
+//                              insertInCartTable(widget.product, counter);
                             }
                           }
                         },
@@ -707,70 +712,19 @@ class _ProductTileItemState extends State<ProductTileItem> {
     );
   }
 
-  void insertInCartTable(Product product, int quantity) {
-    String variantId, weight, mrpPrice, price, discount, isUnitType;
-    variantId = variant == null ? widget.product.variantId : variant.id;
-    weight = variant == null ? widget.product.weight : variant.weight;
-    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
-    price = variant == null ? widget.product.price : variant.price;
-    discount = variant == null ? widget.product.discount : variant.discount;
-    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
-
-    var mId = int.parse(product.id);
-    //String variantId = product.variantId;
-
-    Map<String, dynamic> row = {
-      DatabaseHelper.ID: mId,
-      DatabaseHelper.VARIENT_ID: variantId,
-      DatabaseHelper.WEIGHT: weight,
-      DatabaseHelper.MRP_PRICE: mrpPrice,
-      DatabaseHelper.PRICE: price,
-      DatabaseHelper.DISCOUNT: discount,
-      DatabaseHelper.UNIT_TYPE: isUnitType,
-      DatabaseHelper.PRODUCT_ID: product.id,
-      DatabaseHelper.isFavorite: product.isFav,
-      DatabaseHelper.QUANTITY: quantity.toString(),
-      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
-      DatabaseHelper.Product_Name: product.title,
-      DatabaseHelper.nutrient: product.nutrient,
-      DatabaseHelper.description: product.description,
-      DatabaseHelper.imageType: product.imageType,
-      DatabaseHelper.imageUrl: product.imageUrl,
-      DatabaseHelper.image_100_80: product.image10080,
-      DatabaseHelper.image_300_200: product.image300200,
-    };
-
-    databaseHelper
-        .checkIfProductsExistInDb(DatabaseHelper.CART_Table, variantId)
-        .then((count) {
-      //print("-count-- ${count}");
-      if (count == 0) {
-        databaseHelper.addProductToCart(row).then((count) {
-          widget.callback();
-          eventBus.fire(updateCartCount());
-        });
-      } else {
-        databaseHelper.updateProductInCart(row, variantId).then((count) {
-          widget.callback();
-          eventBus.fire(updateCartCount());
-        });
-      }
-    });
-  }
-
-  void removeFromCartTable(String variant_Id) {
-    try {
-      //print("------removeFromCartTable-------");
-      String variantId;
-      variantId = variant == null ? variant_Id : variant.id;
-      databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {
-        widget.callback();
-        eventBus.fire(updateCartCount());
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
+//  void removeFromCartTable(String variant_Id) {
+//    try {
+//      //print("------removeFromCartTable-------");
+//      String variantId;
+//      variantId = variant == null ? variant_Id : variant.id;
+//      databaseHelper.delete(DatabaseHelper.SUBSCRIPTION_CART_Table, variantId).then((count) {
+//        widget.callback();
+//        eventBus.fire(updateCartCount());
+//      });
+//    } catch (e) {
+//      print(e);
+//    }
+//  }
 
   void insertInFavTable(Product product, int quantity) {
     var mId = int.parse(product.id);
@@ -873,11 +827,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
     if (selectedVariant != null &&
         selectedVariant.stockType != null &&
         selectedVariant.stockType.isNotEmpty) {
-      if (selectedVariant.maxQuantityPerOrder.isNotEmpty&& counter >= int.parse(selectedVariant.maxQuantityPerOrder)) {
-        Utils.showToast(
-            "Maximum quantity per order is " + selectedVariant.maxQuantityPerOrder.toString(), true);
-        return false;
-      }
       switch (selectedVariant.stockType) {
         case 'threshold_quantity':
           if (selectedVariant.stock != null) {
@@ -933,4 +882,56 @@ class _ProductTileItemState extends State<ProductTileItem> {
       }
     return foundVariant;
   }
+
+//  void insertInCartTable(Product product, int quantity) {
+//    String variantId, weight, mrpPrice, price, discount, isUnitType;
+//    variantId = variant == null ? widget.product.variantId : variant.id;
+//    weight = variant == null ? widget.product.weight : variant.weight;
+//    mrpPrice = variant == null ? widget.product.mrpPrice : variant.mrpPrice;
+//    price = variant == null ? widget.product.price : variant.price;
+//    discount = variant == null ? widget.product.discount : variant.discount;
+//    isUnitType = variant == null ? widget.product.isUnitType : variant.unitType;
+//
+//    var mId = int.parse(product.id);
+//    //String variantId = product.variantId;
+//
+//    Map<String, dynamic> row = {
+//      DatabaseHelper.ID: mId,
+//      DatabaseHelper.VARIENT_ID: variantId,
+//      DatabaseHelper.WEIGHT: weight,
+//      DatabaseHelper.MRP_PRICE: mrpPrice,
+//      DatabaseHelper.PRICE: price,
+//      DatabaseHelper.DISCOUNT: discount,
+//      DatabaseHelper.UNIT_TYPE: isUnitType,
+//      DatabaseHelper.PRODUCT_ID: product.id,
+//      DatabaseHelper.isFavorite: product.isFav,
+//      DatabaseHelper.QUANTITY: quantity.toString(),
+//      DatabaseHelper.IS_TAX_ENABLE: product.isTaxEnable,
+//      DatabaseHelper.Product_Name: product.title,
+//      DatabaseHelper.nutrient: product.nutrient,
+//      DatabaseHelper.description: product.description,
+//      DatabaseHelper.imageType: product.imageType,
+//      DatabaseHelper.imageUrl: product.imageUrl,
+//      DatabaseHelper.image_100_80: product.image10080,
+//      DatabaseHelper.image_300_200: product.image300200,
+//    };
+//
+//    databaseHelper
+//        .checkIfProductsExistInDb(DatabaseHelper.SUBSCRIPTION_CART_Table, variantId)
+//        .then((count) {
+//      //print("-count-- ${count}");
+//      if (count == 0) {
+//        databaseHelper.addProductToCart(row,isSubscriptionTable: true).then((count) {
+//          widget.callback();
+//          eventBus.fire(updateCartCount());
+//        });
+//      } else {
+//        databaseHelper.updateProductInCart(row, variantId,isSubscriptionTable: true).then((count) {
+//          widget.callback();
+//          eventBus.fire(updateCartCount());
+//        });
+//      }
+//    });
+//  }
+
 }

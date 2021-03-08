@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
+
 class GetOrderHistory {
   bool success;
   List<OrderData> orders;
@@ -44,6 +46,9 @@ class OrderData {
   List<OrderItems> orderItems;
   List<DeliveryAddress> deliveryAddress;
   String rating;
+  String subscription_order_id;
+
+//  List<SubscriptionOrderData> subscriptionDetail;
 
   OrderData({
     this.orderId,
@@ -73,6 +78,7 @@ class OrderData {
     this.deliveryAddress,
     this.orderRejectionNote,
     this.walletRefund,
+    this.subscription_order_id,
   });
 
   OrderData.fromJson(Map<String, dynamic> json) {
@@ -98,6 +104,7 @@ class OrderData {
     address = json['address'];
     orderRejectionNote = json['order_rejection_note'];
     walletRefund = json['wallet_refund'];
+    subscription_order_id = json['subscription_order_id'];
     if (json['order_items'] != null) {
       orderItems = new List<OrderItems>();
       json['order_items'].forEach((v) {
@@ -110,6 +117,11 @@ class OrderData {
         deliveryAddress.add(new DeliveryAddress.fromJson(v));
       });
     }
+//    if (json["subscriptionDetail"] != null) {
+//      subscriptionDetail = List<SubscriptionOrderData>.from(
+//          json["subscriptionDetail"]
+//              .map((x) => SubscriptionOrderData.fromJson(x)));
+//    }
   }
 }
 

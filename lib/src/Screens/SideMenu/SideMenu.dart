@@ -31,6 +31,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'AdditionalInformations.dart';
 import 'LoyalityPoints.dart';
 import 'ProfileScreen.dart';
+import 'SubscriptionHistory.dart';
 import 'WalletHistory.dart';
 
 
@@ -73,6 +74,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         DrawerChildConstants.DELIVERY_ADDRESS, "images/deliveryaddress.png"));
     _drawerItems.add(
         DrawerChildItem(DrawerChildConstants.MY_ORDERS, "images/my_order.png"));
+    _drawerItems.add(
+        DrawerChildItem(DrawerChildConstants.Subscription, "images/my_order.png"));
     if (widget.store.loyality == "1")
       _drawerItems.add(DrawerChildItem(
           DrawerChildConstants.LOYALITY_POINTS, "images/loyality.png"));
@@ -448,6 +451,22 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Utils.showLoginDialog(context);
         }
         break;
+      case DrawerChildConstants.Subscription:
+        if (AppConstant.isLoggedIn) {
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => SubscriptionHistory(widget.store)),
+          );
+          Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+          attributeMap["ScreenName"] = "Subscription";
+          Utils.sendAnalyticsEvent("Clicked Subscription", attributeMap);
+        } else {
+          Navigator.pop(context);
+          Utils.showLoginDialog(context);
+        }
+        break;
       case DrawerChildConstants.LOYALITY_POINTS:
         if (AppConstant.isLoggedIn) {
           Navigator.pop(context);
@@ -706,6 +725,7 @@ class DrawerChildItem {
 
 class DrawerChildConstants {
   static const HOME = "Home";
+  static const Subscription = "Subscription";
   static const MY_PROFILE = "My Profile";
   static const DELIVERY_ADDRESS = "Delivery Address";
   static const MY_ORDERS = "My Orders";
