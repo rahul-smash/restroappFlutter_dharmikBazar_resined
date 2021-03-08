@@ -196,10 +196,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
       print('---PickUpModel---${storeArea.data.length}--');
       setState(() {});
     });
-
   }
 
-  Future<bool> addQuantityFunction(Product product, String quanity) async {
+  Future<bool> couponAppliedCheck(Product product, String quanity) async {
     setState(() {});
     if (taxModel != null &&
         taxModel.discount != null &&
@@ -253,11 +252,18 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         value: 'Delivery',
                         activeColor: appTheme,
                         groupValue: _selectedDeliveryOption,
-                        onChanged: (String value) {
-                          setState(() {
-                            _selectedDeliveryOption = value;
-                            widget.deliveryType = OrderType.Delivery;
-                          });
+                        onChanged: (String value) async {
+                          bool proceed = await couponAppliedCheck(
+                              widget.cartList.first,
+                              widget.cartList.first.quantity);
+                          if (proceed) {
+                            setState(() {
+                              _selectedDeliveryOption = value;
+                              widget.deliveryType = OrderType.Delivery;
+                              multiTaxCalculationApi(
+                                  couponCode: couponCodeApplied);
+                            });
+                          }
                         },
                       ),
                     ),
@@ -268,6 +274,11 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                         activeColor: appTheme,
                         groupValue: _selectedDeliveryOption,
                         onChanged: (String value) async {
+                          bool proceed = await couponAppliedCheck(
+                              widget.cartList.first,
+                              widget.cartList.first.quantity);
+                          if (!proceed) return;
+
                           setState(() {
                             _selectedDeliveryOption = value;
                             widget.deliveryType = OrderType.PickUp;
@@ -798,7 +809,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                     ClassType.SubCategory,
                     widget.cartList.first.quantity,
                     widget.selectedVariant,
-                    addQuantityFunction),
+                    couponAppliedCheck),
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                   height: 1,
@@ -869,8 +880,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                 DialogUtils.displayErrorDialog(context, 'Please add Quantity');
               } else if (double.parse(
                       widget.model.subscription.minimumOrderDaily) >
-                  double.parse(taxModel.singleDayTotal)-double.parse(
-                      shippingCharges)) {
+                  double.parse(taxModel.singleDayTotal) -
+                      double.parse(shippingCharges)) {
                 DialogUtils.displayErrorDialog(
                   context,
                   'Your Daily Minimum Order is very less for Subscription.',

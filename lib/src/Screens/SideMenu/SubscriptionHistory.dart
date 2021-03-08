@@ -617,43 +617,49 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                   Expanded(
                     child: Container(
                       height: 80,
-                      child: ListView.builder(
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          itemCount: data.orderItems.length > 3
-                              ? 3
-                              : data.orderItems.length,
-                          itemBuilder: (context, itemIndex) {
-                            return Container(
-                              margin: EdgeInsets.only(top: 5),
-                              child: Padding(
-                                padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                child: Wrap(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: Color(0xFFBDBDBF),
-                                          ),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5))),
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Center(
-                                        child: Text(
-                                          "${data.orderItems[itemIndex].productName}",
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                        //Commented due to future Scope
+
+//                      child: ListView.builder(
+//                          shrinkWrap: true,
+//                          scrollDirection: Axis.horizontal,
+//                          itemCount: data.orderItems.length > 3
+//                              ? 3
+//                              : data.orderItems.length,
+//                          itemBuilder: (context, itemIndex) {
+//                            return Container(
+//                              margin: EdgeInsets.only(top: 5),
+//                              child: Padding(
+//                                padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+//                                child: Wrap(
+//                                  children: [
+//
+//                                  ],
+//                                ),
+//                              ),
+//                            );
+//                          }),
+                   child:   Wrap(
+                     children: [
+                       Container(
+                         margin: EdgeInsets.only(right: 20),
+                            decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xFFBDBDBF),
                                 ),
+                                borderRadius: BorderRadius.all(
+                                    Radius.circular(5))),
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              "${data.orderItems.first.productName}",
+                            overflow: TextOverflow.ellipsis,
+                             style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 14,
                               ),
-                            );
-                          }),
+                            ),
+                          ),
+                     ],
+                   ),
                     ),
                   ),
                   Visibility(
