@@ -21,6 +21,7 @@ import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CategoryResponseModel.dart';
 import 'package:restroapp/src/models/ConfigModel.dart';
+import 'package:restroapp/src/models/SocialModel.dart';
 import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
@@ -66,6 +67,8 @@ class _HomeScreenState extends State<HomeScreen> {
   bool isLoading;
   CategoryResponse categoryResponse;
 
+  SocialModel socialModel;
+
   _HomeScreenState(this.store);
 
   @override
@@ -80,6 +83,9 @@ class _HomeScreenState extends State<HomeScreen> {
     checkForMultiStore();
     getCategoryApi();
     ApiController.getUserWallet();
+    ApiController.getStoreSocialOptions().then((value) {
+      this.socialModel = value;
+    });
     try {
       AppConstant.placeholderUrl = store.banner10080;
       //print("-----store.banners-----${store.banners.length}------");
@@ -159,7 +165,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      drawer: NavDrawerMenu(store, user == null ? "" : user.fullName),
+      drawer: NavDrawerMenu(
+        store,
+        user == null ? "" : user.fullName,
+        socialModel: socialModel,
+      ),
       bottomNavigationBar: SafeArea(
         child: addBottomBar(),
       ),

@@ -951,38 +951,6 @@ class DatabaseHelper {
     }
 
     var dbClient = await db;
-    List<String> columnsToSelect = [
-      "id",
-      "store_id",
-      "category_ids",
-      "title",
-      "brand",
-      "nutrient",
-      "description",
-      "tags",
-      "isfavorite",
-      "image",
-      "image_url",
-      "status",
-      "image_type",
-      "show_price",
-      "isTaxEnable",
-      "image_100_80",
-      "image_300_200",
-      "gst_tax_rate",
-      "gst_tax_type",
-      "status",
-      "deleted",
-      "sort",
-      "selectedVariant",
-      "variantId",
-      "weight",
-      "mrpPrice",
-      "price",
-      "discount",
-      "isUnitType",
-      "variants"
-    ];
 
 //    List<Map> resultList = await dbClient.query(Products_Table,
 //        columns: columnsToSelect, where: 'id = ?', whereArgs: ids);

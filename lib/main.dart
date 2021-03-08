@@ -69,7 +69,7 @@ Future<void> main() async {
   // Pass all uncaught errors to Crashlytics.
   FlutterError.onError = Crashlytics.instance.recordFlutterError;
   SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "${isAdminLogin}");
-  print("-subscription.status-${storeData.store.subscription.status}");
+
   PackageInfo packageInfo = await Utils.getAppVersionDetails(storeData);
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

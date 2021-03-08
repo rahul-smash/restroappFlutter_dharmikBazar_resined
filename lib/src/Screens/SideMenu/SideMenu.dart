@@ -34,12 +34,12 @@ import 'ProfileScreen.dart';
 import 'SubscriptionHistory.dart';
 import 'WalletHistory.dart';
 
-
 class NavDrawerMenu extends StatefulWidget {
   final StoreModel store;
   final String userName;
+  SocialModel socialModel;
 
-  NavDrawerMenu(this.store, this.userName);
+  NavDrawerMenu(this.store, this.userName, {this.socialModel});
 
   @override
   _NavDrawerMenuState createState() {
@@ -49,7 +49,7 @@ class NavDrawerMenu extends StatefulWidget {
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
   List<dynamic> _drawerItems = List();
-  SocialModel socialModel;
+
   WalleModel walleModel;
   double iconHeight = 25;
   GoogleSignIn _googleSignIn;
@@ -74,8 +74,10 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         DrawerChildConstants.DELIVERY_ADDRESS, "images/deliveryaddress.png"));
     _drawerItems.add(
         DrawerChildItem(DrawerChildConstants.MY_ORDERS, "images/my_order.png"));
-    _drawerItems.add(
-        DrawerChildItem(DrawerChildConstants.Subscription, "images/my_order.png"));
+    if (widget.store.subscription.status == '1') {
+      _drawerItems.add(DrawerChildItem(
+          DrawerChildConstants.Subscription, "images/my_order.png"));
+    }
     if (widget.store.loyality == "1")
       _drawerItems.add(DrawerChildItem(
           DrawerChildConstants.LOYALITY_POINTS, "images/loyality.png"));
@@ -104,10 +106,10 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         });
       });
     }
-
-    ApiController.getStoreSocialOptions().then((value) {
-      this.socialModel = value;
-    });
+    if (widget.socialModel == null)
+      ApiController.getStoreSocialOptions().then((value) {
+        widget.socialModel = value;
+      });
   }
 
   @override
@@ -167,14 +169,16 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                           ),
                         ),
                         Visibility(
-                            visible: socialModel != null &&
-                                socialModel.data != null &&
-                                socialModel.data.facebook.isNotEmpty,
+                            visible: widget.socialModel != null &&
+                                widget.socialModel.data != null &&
+                                widget.socialModel.data.facebook.isNotEmpty,
                             child: InkWell(
                               onTap: () {
-                                if (socialModel != null) {
-                                  if (socialModel.data.facebook.isNotEmpty)
-                                    Utils.launchURL(socialModel.data.facebook);
+                                if (widget.socialModel != null) {
+                                  if (widget
+                                      .socialModel.data.facebook.isNotEmpty)
+                                    Utils.launchURL(
+                                        widget.socialModel.data.facebook);
                                 }
                               },
                               child: Image.asset(
@@ -184,14 +188,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                               ),
                             )),
                         Visibility(
-                          visible: socialModel != null &&
-                              socialModel.data != null &&
-                              socialModel.data.twitter.isNotEmpty,
+                          visible: widget.socialModel != null &&
+                              widget.socialModel.data != null &&
+                              widget.socialModel.data.twitter.isNotEmpty,
                           child: InkWell(
                             onTap: () {
-                              if (socialModel != null) {
-                                if (socialModel.data.twitter.isNotEmpty)
-                                  Utils.launchURL(socialModel.data.twitter);
+                              if (widget.socialModel != null) {
+                                if (widget.socialModel.data.twitter.isNotEmpty)
+                                  Utils.launchURL(
+                                      widget.socialModel.data.twitter);
                               }
                             },
                             child: Padding(
@@ -205,14 +210,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                           ),
                         ),
                         Visibility(
-                          visible: socialModel != null &&
-                              socialModel.data != null &&
-                              socialModel.data.linkedin.isNotEmpty,
+                          visible: widget.socialModel != null &&
+                              widget.socialModel.data != null &&
+                              widget.socialModel.data.linkedin.isNotEmpty,
                           child: InkWell(
                             onTap: () {
-                              if (socialModel != null) {
-                                if (socialModel.data.linkedin.isNotEmpty)
-                                  Utils.launchURL(socialModel.data.linkedin);
+                              if (widget.socialModel != null) {
+                                if (widget.socialModel.data.linkedin.isNotEmpty)
+                                  Utils.launchURL(
+                                      widget.socialModel.data.linkedin);
                               }
                             },
                             child: Image.asset(
@@ -223,14 +229,15 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                           ),
                         ),
                         Visibility(
-                          visible: socialModel != null &&
-                              socialModel.data != null &&
-                              socialModel.data.youtube.isNotEmpty,
+                          visible: widget.socialModel != null &&
+                              widget.socialModel.data != null &&
+                              widget.socialModel.data.youtube.isNotEmpty,
                           child: InkWell(
                             onTap: () {
-                              if (socialModel != null) {
-                                if (socialModel.data.youtube.isNotEmpty)
-                                  Utils.launchURL(socialModel.data.youtube);
+                              if (widget.socialModel != null) {
+                                if (widget.socialModel.data.youtube.isNotEmpty)
+                                  Utils.launchURL(
+                                      widget.socialModel.data.youtube);
                               }
                             },
                             child: Padding(
@@ -244,14 +251,16 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                           ),
                         ),
                         Visibility(
-                          visible: socialModel != null &&
-                              socialModel.data != null &&
-                              socialModel.data.instagram.isNotEmpty,
+                          visible: widget.socialModel != null &&
+                              widget.socialModel.data != null &&
+                              widget.socialModel.data.instagram.isNotEmpty,
                           child: InkWell(
                             onTap: () {
-                              if (socialModel != null) {
-                                if (socialModel.data.instagram.isNotEmpty)
-                                  Utils.launchURL(socialModel.data.instagram);
+                              if (widget.socialModel != null) {
+                                if (widget
+                                    .socialModel.data.instagram.isNotEmpty)
+                                  Utils.launchURL(
+                                      widget.socialModel.data.instagram);
                               }
                             },
                             child: Image.asset(

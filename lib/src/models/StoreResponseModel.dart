@@ -577,7 +577,7 @@ class Subscription {
   });
 
   String status;
-  String feeType;
+  dynamic feeType;
   List<CycleType> cycleType;
   String minimumOrderDaily;
 
