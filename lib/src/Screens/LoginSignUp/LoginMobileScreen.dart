@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -154,7 +156,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                           ),
 
                           Visibility(
-                            visible: store == null ? false : store.social_login == "0" ? false : true,
+                            visible:Platform.isIOS?false: store == null ? false : store.social_login == "0" ? false : true,
                             child: Container(
                               margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
                               width: Utils.getDeviceWidth(context),
@@ -168,7 +170,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
 
 
                           Visibility(
-                            visible: store == null ? false : store.social_login == "0" ? false : true,
+                            visible: Platform.isIOS?false: store == null ? false : store.social_login == "0" ? false : true,
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
