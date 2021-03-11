@@ -48,6 +48,8 @@ class DeliveryAddressData {
   bool isDeleted;
   String lat;
   String lng;
+  String isShippingMandatory;
+
   //DeliveryTimeSlot deliveryTimeSlot;
 
   DeliveryAddressData({
@@ -73,7 +75,8 @@ class DeliveryAddressData {
     this.minAmount,
     this.note,
     this.cityId,
-    this.isDeleted
+    this.isDeleted,
+    this.isShippingMandatory,
     //this.deliveryTimeSlot
   });
 
@@ -102,6 +105,7 @@ class DeliveryAddressData {
         note: json["note"],
         cityId: json["city_id"],
         isDeleted: json["is_deleted"],
+        isShippingMandatory: json["is_shipping_mandatory"],
         //deliveryTimeSlot: DeliveryTimeSlot.fromJson(json["delivery_time_slot"]),
       );
 
@@ -129,6 +133,7 @@ class DeliveryAddressData {
         "note": note,
         "city_id": cityId,
         "is_deleted": isDeleted,
+        "is_shipping_mandatory": isShippingMandatory,
         //"delivery_time_slot": deliveryTimeSlot.toJson(),
       };
 }

@@ -22,7 +22,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class SubscriptionHistoryDetails extends StatefulWidget {
   SubscriptionOrderData orderHistoryData;
-  bool isRatingEnable=false;
+  bool isRatingEnable = false;
 
   DeliveryTimeSlotModel deliverySlotModel;
   int selctedTag, selectedTimeSlot;
@@ -38,7 +38,7 @@ class SubscriptionHistoryDetails extends StatefulWidget {
 
   SubscriptionHistoryDetails(
       {this.orderHistoryData,
-      this.isRatingEnable=false,
+      this.isRatingEnable = false,
       this.deliverySlotModel,
       this.selctedTag,
       this.selectedTimeSlot,
@@ -104,7 +104,6 @@ class _SubscriptionHistoryDetailsState
           respone.data != null &&
           respone.data.isNotEmpty) {
         widget.orderHistoryData = respone.data.first;
-
       }
 
       if (deliverySlotModel != null) {
@@ -132,7 +131,6 @@ class _SubscriptionHistoryDetailsState
         if (mounted) {
           setState(() {});
         }
-
       } else {
         ApiController.deliveryTimeSlotApi().then((response) {
           Utils.hideProgressDialog(context);
@@ -246,7 +244,7 @@ class _SubscriptionHistoryDetailsState
   @override
   Widget build(BuildContext context) {
     List<String> choices = List();
-    if(widget.orderHistoryData!=null){
+    if (widget.orderHistoryData != null) {
       screenWidth = MediaQuery.of(context).size.width;
       mainContext = context;
       switch (widget.orderHistoryData.status) {
@@ -259,14 +257,16 @@ class _SubscriptionHistoryDetailsState
         case '1':
           choices.add('Order Stop');
           choices.add('Pause');
-        if(!widget.orderHistoryData.orderFacility.toLowerCase().contains('pick'))
-          choices.add('Change Delivery Slots');
+          if (!widget.orderHistoryData.orderFacility
+              .toLowerCase()
+              .contains('pick')) choices.add('Change Delivery Slots');
           break;
         case '9':
           choices.add('Order Stop');
           choices.add('Active');
-          if(!widget.orderHistoryData.orderFacility.toLowerCase().contains('pick'))
-            choices.add('Change Delivery Slots');
+          if (!widget.orderHistoryData.orderFacility
+              .toLowerCase()
+              .contains('pick')) choices.add('Change Delivery Slots');
           break;
       }
     }
@@ -583,7 +583,12 @@ class _SubscriptionHistoryDetailsState
                       firstRow(widget.orderHistoryData),
                       Container(
                         color: Colors.white,
-                        child: Center(child: Text(!widget.orderHistoryData.orderFacility.toLowerCase().contains('pick')?"Deliveries Dates":"Subscribed Dates")),
+                        child: Center(
+                            child: Text(!widget.orderHistoryData.orderFacility
+                                    .toLowerCase()
+                                    .contains('pick')
+                                ? "Deliveries Dates"
+                                : "Subscribed Dates")),
                       ),
                       Container(
                         color: Colors.white,
@@ -761,7 +766,7 @@ class _SubscriptionHistoryDetailsState
               children: <Widget>[
                 Expanded(
                   child: Text(
-                   orderHistoryData.orderDate,
+                    orderHistoryData.orderDate,
                     style: TextStyle(
                         fontSize: 14,
                         color: Colors.black,
@@ -870,29 +875,34 @@ class _SubscriptionHistoryDetailsState
                     SizedBox(
                       height: 20,
                     ),
-                     ! orderHistoryData.orderFacility.toLowerCase().contains('pick')?
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.asset(
-                          'images/timegreyicon.png',
-                          fit: BoxFit.scaleDown,
-                          height: 16,
-                          color: Color(0xFFBDBDBF),
-                        ),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text(
-                          '${orderHistoryData.deliveryTimeSlot}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                            color: Colors.black,
+                    !orderHistoryData.orderFacility
+                            .toLowerCase()
+                            .contains('pick')
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Image.asset(
+                                'images/timegreyicon.png',
+                                fit: BoxFit.scaleDown,
+                                height: 16,
+                                color: Color(0xFFBDBDBF),
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text(
+                                '${orderHistoryData.deliveryTimeSlot}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                ),
+                              )
+                            ],
+                          )
+                        : Container(
+                            height: 20,
                           ),
-                        )
-                      ],
-                    ):Container(height: 20,),
                   ],
                 ),
               ),
@@ -902,7 +912,7 @@ class _SubscriptionHistoryDetailsState
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Next ${orderHistoryData.orderFacility.toLowerCase().contains('pick')?'PickUp':'Delivery'} Date',
+                      'Next ${orderHistoryData.orderFacility.toLowerCase().contains('pick') ? 'PickUp' : 'Delivery'} Date',
                       style: TextStyle(
                           fontSize: 14,
                           color: Color(0xFF7A7C80),
@@ -1043,7 +1053,7 @@ class _SubscriptionHistoryDetailsState
                                         )),
                                   ),
                                   Text(
-                                      "${AppConstant.currency} ${orderHistoryData.shippingCharges}",
+                                      "${AppConstant.currency} ${double.parse(orderHistoryData.totalDeliveries) * double.parse(orderHistoryData.shippingCharges)}",
                                       style: TextStyle(
                                           color: Colors.black,
                                           fontSize: 16,
@@ -1906,27 +1916,25 @@ class _SubscriptionHistoryDetailsState
   }
 
   String _getAddress(SubscriptionOrderData orderHistoryData) {
-    if(orderHistoryData.orderFacility.toLowerCase().contains('pick')) {
+    if (orderHistoryData.orderFacility.toLowerCase().contains('pick')) {
       if (orderHistoryData.deliveryAddress != null &&
           orderHistoryData.deliveryAddress.isNotEmpty) {
         String name = '${orderHistoryData.deliveryAddress.first.firstName}';
         String address = '${orderHistoryData.deliveryAddress.first.address}';
         String address2 =
-            '${orderHistoryData.deliveryAddress.first.address2.isEmpty
-            ? ''
-            : ',\n${orderHistoryData.deliveryAddress.first.address2}'}';
+            '${orderHistoryData.deliveryAddress.first.address2.isEmpty ? '' : ',\n${orderHistoryData.deliveryAddress.first.address2}'}';
         String area = ',\n${orderHistoryData.deliveryAddress.first.areaName}';
         String city = ', ${orderHistoryData.deliveryAddress.first.city}';
-        String ZipCode = orderHistoryData.deliveryAddress.first.zipcode
-            .isNotEmpty
-            ? ', ${orderHistoryData.deliveryAddress.first.zipcode}'
-            : '';
+        String ZipCode =
+            orderHistoryData.deliveryAddress.first.zipcode.isNotEmpty
+                ? ', ${orderHistoryData.deliveryAddress.first.zipcode}'
+                : '';
         return '$name\n$address$address2$area$city$ZipCode';
       } else {
         String address = '${orderHistoryData.address}';
         return address;
       }
-    }else{
+    } else {
       String address = '${orderHistoryData.address}';
       return address;
     }
@@ -2132,13 +2140,19 @@ class _SubscriptionHistoryDetailsState
   }
 
   String _checkNextDeliveryDate() {
+    CycleType cycleType =
+        _checkSubscriptionKey(widget.orderHistoryData.subscriptionType);
     List<DateTime> getDatesInBeteween = Utils.getDatesInBeteween(
         widget.orderHistoryData.startDate, widget.orderHistoryData.endDate);
     DateTime deliveryDate = DateTime.now();
-    for (DateTime day in getDatesInBeteween) {
-      if (day.isAfter(deliveryDate)) {
-        deliveryDate = day;
-        break;
+    for (int i = 0; i < getDatesInBeteween.length; i++) {
+      DateTime day = getDatesInBeteween[i];
+      int days = int.parse(cycleType.days);
+      if (i % days == 0) {
+        if (day.isAfter(deliveryDate)) {
+          deliveryDate = day;
+          break;
+        }
       }
     }
 

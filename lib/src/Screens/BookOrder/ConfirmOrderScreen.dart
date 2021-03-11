@@ -1982,8 +1982,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             //then Store will not charge shipping.
             setState(() {
               this.totalPrice = totalPrice;
-//              shippingCharges = "0";
-//              widget.address.areaCharges = "0";
+              if(widget.address.isShippingMandatory=='1') {
+                shippingCharges = "0";
+                widget.address.areaCharges = "0";
+              }
             });
           }
         }

@@ -278,7 +278,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                               widget.cartList.first,
                               widget.cartList.first.quantity);
                           if (!proceed) return;
-
+                          multiTaxCalculationApi(couponCode: couponCodeApplied);
                           setState(() {
                             _selectedDeliveryOption = value;
                             widget.deliveryType = OrderType.PickUp;
@@ -1769,6 +1769,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             ),
           ),
         ),
+        addFixedTax(),
         addMRPPrice(),
         addTotalSavingPrice(),
         Visibility(
@@ -2138,16 +2139,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
 
   Future<void> updateTaxDetails(SubscriptionTaxCalculation taxModel) async {
 //    widget.cartList = await databaseHelper.getCartItemList();
-    for (int i = 0; i < taxModel.taxDetail.length; i++) {
-      Product product = Product();
-      product.taxDetail = taxModel.taxDetail[i];
+//    for (int i = 0; i < taxModel.taxDetail.length; i++) {
+//      Product product = Product();
+//      product.taxDetail = taxModel.taxDetail[i];
 //      widget.cartList.add(product);
-    }
-    for (var i = 0; i < taxModel.fixedTax.length; i++) {
-      Product product = Product();
-      product.fixedTax = taxModel.fixedTax[i];
+//    }
+//    for (var i = 0; i < taxModel.fixedTax.length; i++) {
+//      Product product = Product();
+//      product.fixedTax = taxModel.fixedTax[i];
 //      widget.cartList.add(product);
-    }
+//    }
   }
 
   Widget addEnterCouponCodeView() {
@@ -2895,8 +2896,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             //then Store will not charge shipping.
             setState(() {
               this.totalPrice = totalPrice;
-//              shippingCharges = "0";
-//              addressData.areaCharges = "0";
+              if (addressData.isShippingMandatory == '1') {
+                shippingCharges = "0";
+                addressData.areaCharges = "0";
+              }
             });
           }
         }
@@ -3080,5 +3083,33 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             }))
         .toList();
     return jsonList;
+  }
+
+  Widget addFixedTax() {
+    return Visibility(
+      visible: taxModel != null &&
+          taxModel.fixedTax != null &&
+          taxModel.fixedTax.isNotEmpty,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+                taxModel == null
+                    ? ''
+                    : taxModel.fixedTax != null && taxModel.fixedTax.isNotEmpty
+                        ? taxModel.fixedTax.first.fixedTaxLabel
+                        : '',
+                style: TextStyle(color: Colors.black)),
+            Text(
+                "${AppConstant.currency}${taxModel == null ? '0' : taxModel.fixedTax != null && taxModel.fixedTax.isNotEmpty ? taxModel.fixedTax.first.fixedTaxAmount : '0'}",
+                style: TextStyle(
+                  color: Colors.black,
+                )),
+          ],
+        ),
+      ),
+    );
   }
 }

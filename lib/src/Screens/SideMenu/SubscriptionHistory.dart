@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_pull_to_refresh/flutter_pull_to_refresh.dart';
 import 'package:intl/intl.dart';
@@ -318,15 +319,19 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                                 ),
                               ),
                               Visibility(
-                                visible: (searchedText.isNotEmpty&&filteredList.isNotEmpty) ||
-                                    (_showFilters && selectedFilter.isNotEmpty&&filteredList.isNotEmpty),
+                                visible: (searchedText.isNotEmpty &&
+                                        filteredList.isNotEmpty) ||
+                                    (_showFilters &&
+                                        selectedFilter.isNotEmpty &&
+                                        filteredList.isNotEmpty),
                                 child: Container(
                                   padding: EdgeInsets.fromLTRB(15, 10, 10, 10),
                                   color: appTheme,
                                   child: Text(
                                     searchedText.isNotEmpty ||
-                                            selectedFilter.isNotEmpty&&filteredList.isNotEmpty
-                                        ? "${filteredList.length>1?'${filteredList.length} Results':'${filteredList.length} Result' } Found"
+                                            selectedFilter.isNotEmpty &&
+                                                filteredList.isNotEmpty
+                                        ? "${filteredList.length > 1 ? '${filteredList.length} Results' : '${filteredList.length} Result'} Found"
                                         : '',
                                     style: TextStyle(color: Colors.white),
                                   ),
@@ -617,7 +622,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                   Expanded(
                     child: Container(
                       height: 80,
-                        //Commented due to future Scope
+                      //Commented due to future Scope
 
 //                      child: ListView.builder(
 //                          shrinkWrap: true,
@@ -638,28 +643,28 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
 //                              ),
 //                            );
 //                          }),
-                   child:   Wrap(
-                     children: [
-                       Container(
-                         margin: EdgeInsets.only(right: 20),
+                      child: Wrap(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(right: 20),
                             decoration: BoxDecoration(
                                 border: Border.all(
                                   color: Color(0xFFBDBDBF),
                                 ),
-                                borderRadius: BorderRadius.all(
-                                    Radius.circular(5))),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5))),
                             padding: EdgeInsets.all(8.0),
                             child: Text(
                               "${data.orderItems.first.productName}",
-                            overflow: TextOverflow.ellipsis,
-                             style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 14,
                               ),
                             ),
                           ),
-                     ],
-                   ),
+                        ],
+                      ),
                     ),
                   ),
                   Visibility(
@@ -670,7 +675,7 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            'Next ${data.orderFacility.toLowerCase().contains('pick')?'PickUp':'Delivery'} Date',
+                            'Next ${data.orderFacility.toLowerCase().contains('pick') ? 'PickUp' : 'Delivery'} Date',
                             style: TextStyle(
                                 fontSize: 14,
                                 color: Color(0xFF807D8C),
@@ -1058,13 +1063,21 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
   }
 
   String _checkNextDeliveryDate(SubscriptionOrderData data) {
+    CycleType cycleType = _checkSubscriptionKey(data.subscriptionType);
+
     List<DateTime> getDatesInBeteween =
         Utils.getDatesInBeteween(data.startDate, data.endDate);
+
     DateTime deliveryDate = DateTime.now();
-    for (DateTime day in getDatesInBeteween) {
-      if (day.isAfter(deliveryDate)) {
-        deliveryDate = day;
-        break;
+
+    for (int i = 0; i < getDatesInBeteween.length; i++) {
+      DateTime day = getDatesInBeteween[i];
+      int days = int.parse(cycleType.days);
+      if (i % days == 0) {
+        if (day.isAfter(deliveryDate)) {
+          deliveryDate = day;
+          break;
+        }
       }
     }
 
@@ -1100,7 +1113,8 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
             type = '0';
             break;
         }
-        if (selectedFilter == 'Pause Orders'&&('9' == ordersList[i].status||'10' == ordersList[i].status)) {
+        if (selectedFilter == 'Pause Orders' &&
+            ('9' == ordersList[i].status || '10' == ordersList[i].status)) {
           filteredList.add(ordersList[i]);
         } else if (type == ordersList[i].status)
           filteredList.add(ordersList[i]);

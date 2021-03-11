@@ -141,7 +141,7 @@ class SubscriptionTaxCalculation {
             json["single_day_total"] == null ? null : json["single_day_total"],
         walletRefund: json["wallet_refund"] == null
             ? null
-            : json["wallet_refund"] is int ||json["wallet_refund"] is double
+            : json["wallet_refund"] is int || json["wallet_refund"] is double
                 ? json["wallet_refund"].toString()
                 : json["wallet_refund"],
         itemSubTotal:
@@ -175,7 +175,8 @@ class SubscriptionTaxCalculation {
                 json["tax_label"].map((x) => TaxLabel.fromJson(x))),
         fixedTax: json["fixed_Tax"] == null
             ? null
-            : List<dynamic>.from(json["fixed_Tax"].map((x) => x)),
+            : List<FixedTax>.from(
+                json["fixed_Tax"].map((x) => FixedTax.fromJson(x))),
         orderDetail: json["order_detail"] == null
             ? null
             : List<OrderDetail>.from(
@@ -210,7 +211,7 @@ class SubscriptionTaxCalculation {
             : List<dynamic>.from(taxLabel.map((x) => x.toJson())),
         "fixed_Tax": fixedTax == null
             ? null
-            : List<dynamic>.from(fixedTax.map((x) => x)),
+            : List<dynamic>.from(fixedTax.map((x) => x.toJson())),
         "order_detail": orderDetail == null
             ? null
             : List<dynamic>.from(orderDetail.map((x) => x.toJson())),
@@ -249,5 +250,63 @@ class TaxLabel {
   Map<String, dynamic> toJson() => {
         "label": label == null ? null : label,
         "rate": rate == null ? null : rate,
+      };
+}
+
+class FixedTax {
+  FixedTax({
+    this.sort,
+    this.fixedTaxLabel,
+    this.fixedTaxAmount,
+    this.isTaxEnable,
+    this.isDiscountApplicable,
+  });
+
+  String sort;
+  String fixedTaxLabel;
+  String fixedTaxAmount;
+  String isTaxEnable;
+  String isDiscountApplicable;
+
+  FixedTax copyWith({
+    String sort,
+    String fixedTaxLabel,
+    String fixedTaxAmount,
+    String isTaxEnable,
+    String isDiscountApplicable,
+  }) =>
+      FixedTax(
+        sort: sort ?? this.sort,
+        fixedTaxLabel: fixedTaxLabel ?? this.fixedTaxLabel,
+        fixedTaxAmount: fixedTaxAmount ?? this.fixedTaxAmount,
+        isTaxEnable: isTaxEnable ?? this.isTaxEnable,
+        isDiscountApplicable: isDiscountApplicable ?? this.isDiscountApplicable,
+      );
+
+  factory FixedTax.fromRawJson(String str) =>
+      FixedTax.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory FixedTax.fromJson(Map<String, dynamic> json) => FixedTax(
+        sort: json["sort"] == null ? null : json["sort"],
+        fixedTaxLabel:
+            json["fixed_tax_label"] == null ? null : json["fixed_tax_label"],
+        fixedTaxAmount:
+            json["fixed_tax_amount"] == null ? null : json["fixed_tax_amount"],
+        isTaxEnable:
+            json["is_tax_enable"] == null ? null : json["is_tax_enable"],
+        isDiscountApplicable: json["is_discount_applicable"] == null
+            ? null
+            : json["is_discount_applicable"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "sort": sort == null ? null : sort,
+        "fixed_tax_label": fixedTaxLabel == null ? null : fixedTaxLabel,
+        "fixed_tax_amount": fixedTaxAmount == null ? null : fixedTaxAmount,
+        "is_tax_enable": isTaxEnable == null ? null : isTaxEnable,
+        "is_discount_applicable":
+            isDiscountApplicable == null ? null : isDiscountApplicable,
       };
 }
