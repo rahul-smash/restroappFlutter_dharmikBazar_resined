@@ -2317,9 +2317,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                           });
                         }
                       } else {
+                        Utils.hideProgressDialog(context);
                         DialogUtils.displayErrorDialog(
                             context, "${couponModel.message}");
-                        Utils.hideProgressDialog(context);
                         Utils.hideKeyboard(context);
                       }
                     }
@@ -2498,7 +2498,9 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     ApiController.subscriptionMultipleTaxCalculationRequest(
             couponCode: couponCode,
             discount: '',
-            shipping: shippingCharges,
+            shipping: widget.deliveryType == OrderType.PickUp
+                ? ''
+                : shippingCharges,
             orderJson: encodedDoughnut,
             userAddressId: widget.deliveryType == OrderType.Delivery
                 ? addressData == null
