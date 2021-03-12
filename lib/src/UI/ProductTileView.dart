@@ -571,6 +571,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     showAddButton = false;
                     insertInCartTable(widget.product, counter);
                     widget.callback();
+                    Utils.sendAnalyticsAddToCart(widget.product,counter);
                   }
                 },
                 child: Container(
@@ -597,9 +598,11 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               if (counter == 0) {
                                 // delete from cart table
                                 removeFromCartTable(widget.product.variantId);
+                                Utils.sendAnalyticsRemovedToCart(widget.product,counter);
                               } else {
                                 // insert/update to cart table
                                 insertInCartTable(widget.product, counter);
+                                Utils.sendAnalyticsAddToCart(widget.product,counter);
                               }
                               widget.callback();
                             }
@@ -649,9 +652,11 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             if (counter == 0) {
                               // delete from cart table
                               removeFromCartTable(widget.product.variantId);
+                              Utils.sendAnalyticsRemovedToCart(widget.product,counter);
                             } else {
                               // insert/update to cart table
                               insertInCartTable(widget.product, counter);
+                              Utils.sendAnalyticsAddToCart(widget.product,counter);
                             }
                           }
                         },

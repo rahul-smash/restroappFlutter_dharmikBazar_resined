@@ -630,6 +630,48 @@ class Utils {
     );
   }
 
+  static Future<void> sendAnalyticsAddToCart(Product product,int quantity) async {
+    await analytics.logAddToCart(
+        itemId: product.id,
+        itemName: product.title,
+        itemCategory: product.categoryIds,
+        quantity: quantity);
+  }
+
+  static Future<void> sendAnalyticsRemovedToCart(Product product,int quantity) async {
+    await analytics.logRemoveFromCart(
+        itemId: product.id,
+        itemName: product.title,
+        itemCategory: product.categoryIds,
+        quantity: quantity);
+  }
+
+  static Future<void> sendAnalyticsCheckOut(
+    double amount ,String productJson ) async {
+    await analytics.logBeginCheckout(
+      //amount
+      value: amount,
+      currency: AppConstant.currency,
+      destination:productJson
+    );
+  }
+
+  //checkout step
+  //case COD
+  // 1 = place order init
+  // 2 = order placed
+  // case online/Paytm
+  // 1 = place order init
+  // 2 = payment gateway init
+  // 3 = payment done
+  // 4 = order placed
+
+  static Future<void> sendAnalyticsCheckoutOption(
+      int checkoutStep,String checkoutOption) async {
+    await analytics.logSetCheckoutOption(
+        checkoutStep: checkoutStep, checkoutOption: checkoutOption);
+  }
+
   static Future<void> sendSearchAnalyticsEvent(String searchTerm) async {
     await analytics.logSearch(
       searchTerm: '${searchTerm}',
@@ -682,7 +724,7 @@ class Utils {
       for (int j = 0; j < responseOrderDetail.length; j++) {
         if (cartList[i].id == responseOrderDetail[j].productId &&
             cartList[i].variantId == responseOrderDetail[j].variantId) {
-          responseOrderDetail[j].discount=cartList[i].discount;
+          responseOrderDetail[j].discount = cartList[i].discount;
           break;
         }
       }
@@ -690,10 +732,10 @@ class Utils {
 
     List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
         removeOutOfStockProducts: true);
-    if(jsonList.length!=0) {
+    if (jsonList.length != 0) {
       String encodedDoughnut = jsonEncode(jsonList);
       return encodedDoughnut;
-    }else{
+    } else {
       return null;
     }
   }
@@ -706,7 +748,6 @@ class Utils {
       return false;
     }
   }
-
 
   static Color colorGeneralization(Color passedColor, String colorString) {
     Color returnedColor = passedColor;
@@ -789,7 +830,10 @@ class Utils {
           respone.orders != null &&
           respone.orders.isNotEmpty) {
         for (int i = 0; i < respone.orders.first.orderItems.length; i++) {
-          insertInCartTable(storeName, context, respone.orders.first.orderItems[i],
+          insertInCartTable(
+              storeName,
+              context,
+              respone.orders.first.orderItems[i],
               int.parse(respone.orders.first.orderItems[i].quantity));
         }
       }
@@ -813,7 +857,6 @@ class Utils {
       param['device_model'] = androidInfo.model;
       param['device_os'] = androidInfo.version.sdkInt;
       param['device_os_version'] = androidInfo.version.sdkInt;
-
 
       param['platform'] = 'android';
       param['model'] = androidInfo.model;
@@ -846,7 +889,8 @@ class Utils {
     DeviceInfo.getInstance(deviceInfo: param);
   }
 
-  static List<DateTime> getDatesInBeteween(DateTime startDate, DateTime endDate) {
+  static List<DateTime> getDatesInBeteween(
+      DateTime startDate, DateTime endDate) {
     List<DateTime> days = [];
     for (int i = 0; i <= endDate.difference(startDate).inDays; i++) {
       days.add(startDate.add(Duration(days: i)));
