@@ -172,10 +172,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                       child: Row(
                     children: [
                       SizedBox(width: 10),
-                      Visibility(
-                        visible: AppConstant.isRestroApp,
-                        child: addVegNonVegOption(),
-                      ),
+                      addVegNonVegOption(),
                       Stack(
                         children: <Widget>[
                           imageUrl == ""
