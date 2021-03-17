@@ -686,28 +686,31 @@ class _ProductTileItemState extends State<ProductTileItem> {
   Widget addVegNonVegOption() {
     Color foodOption =
         widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
-    return Padding(
-      padding: EdgeInsets.only(left: 0, right: 7),
-      child: widget.product.nutrient == "None"
-          ? Container()
-          : Container(
-              decoration: new BoxDecoration(
-                color: Colors.white,
-                border: new Border.all(
-                  color: foodOption,
-                  width: 1.0,
+    return Visibility(
+      visible: widget.product.nutrient!=null&&widget.product.nutrient.isNotEmpty,
+      child: Padding(
+        padding: EdgeInsets.only(left: 0, right: 7),
+        child: widget.product.nutrient == "None"
+            ? Container()
+            : Container(
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  border: new Border.all(
+                    color: foodOption,
+                    width: 1.0,
+                  ),
                 ),
-              ),
-              width: 16,
-              height: 16,
-              child: Padding(
-                padding: EdgeInsets.all(3),
-                child: Container(
-                    decoration: new BoxDecoration(
-                  color: foodOption,
-                  borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                width: 16,
+                height: 16,
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: Container(
+                      decoration: new BoxDecoration(
+                    color: foodOption,
+                    borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                  )),
                 )),
-              )),
+      ),
     );
   }
 
