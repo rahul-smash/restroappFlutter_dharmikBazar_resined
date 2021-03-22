@@ -736,6 +736,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            addVegNonVegOption(product),
             imageUrl == ""
                 ? Container(
                     width: 70.0,
@@ -2720,6 +2721,38 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       performPlaceOrderOperation(storeObject);
     }
   }
+
+  Widget addVegNonVegOption(Product product) {
+    Color foodOption =
+    product.nutrient == "Non Veg" ? Colors.red : Colors.green;
+    return Visibility(
+      visible: product.nutrient!=null&&product.nutrient.isNotEmpty,
+      child: Padding(
+        padding: EdgeInsets.only(left: 0, right: 7),
+        child: product.nutrient == "None"
+            ? Container()
+            : Container(
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              border: new Border.all(
+                color: foodOption,
+                width: 1.0,
+              ),
+            ),
+            width: 16,
+            height: 16,
+            child: Padding(
+              padding: EdgeInsets.all(3),
+              child: Container(
+                  decoration: new BoxDecoration(
+                    color: foodOption,
+                    borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                  )),
+            )),
+      ),
+    );
+  }
+
 }
 
 /*Code for ios*/
