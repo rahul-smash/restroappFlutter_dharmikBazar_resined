@@ -812,7 +812,7 @@ class ApiController {
             : taxModel == null
             ? "0"
             : "${taxModel.wallet_refund}",
-        "calculated_tax_detail": "",
+
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
         "user_address": isComingFromPickUpScreen == true
