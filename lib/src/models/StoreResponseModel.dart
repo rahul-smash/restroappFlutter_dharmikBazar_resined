@@ -574,7 +574,7 @@ class StoreModel {
     data['powered_by_link'] = this.poweredByLink;
     data['review_rating_display'] = this.reviewRatingDisplay;
     data['allow_customer_for_gst'] = this.allowCustomerForGst;
-    data['store_offer'] = this.allowCustomerForGst;
+    data['store_offer'] = this.storeOffer;
     return data;
   }
 }
