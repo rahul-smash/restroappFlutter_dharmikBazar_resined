@@ -28,8 +28,9 @@ import 'HomeScreen.dart';
 class ProductDetailsScreen extends StatefulWidget {
   Product product;
   bool isApiLoading = true;
+  String productID = '';
 
-  ProductDetailsScreen(this.product);
+  ProductDetailsScreen(this.product, {this.productID});
 
   @override
   State<StatefulWidget> createState() {
@@ -48,7 +49,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   int selctedTag;
   StoreModel _storeModel;
   bool isVisible = true;
-  List<Product> _recommendedProducts = List();
+  List<Product> _recommendedProducts = List.empty(growable: true);
   double totalPrice = 0.00;
 
   bool _isProductOutOfStock = false;
@@ -65,8 +66,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     selctedTag = 0;
     showAddButton = false;
     _carouselController = CarouselController();
-    getDataFromDB();
-    getProductDetail(widget.product.id);
+    if (widget.product != null) getDataFromDB();
+    getProductDetail(widget.product?.id ?? widget.productID);
   }
 
   void getDataFromDB() {
@@ -81,6 +82,24 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   Widget build(BuildContext context) {
+    if (widget.product == null) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              return Navigator.pop(context, variant);
+            },
+          ),
+        ),
+        body: Center(
+          child: CircularProgressIndicator(
+              backgroundColor: Colors.black26,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+        ),
+      );
+    }
     variantId = variant == null ? widget.product.variantId : variant.id;
     if (variant == null) {
       discount = widget.product.discount.toString();
@@ -122,8 +141,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                   ),
                   onPressed: () {
                     share(widget.product,
-                        '${_storeModel.domain}/shop/product/${widget.product
-                            .id}');
+                        '${_storeModel.domain}/shop/product/${widget.product.id}');
                   },
                 )),
             InkWell(
@@ -132,7 +150,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               },
               child: Padding(
                 padding:
-                EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+                    EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
                 child: Icon(
                   Icons.home,
                   color: Colors.white,
@@ -175,20 +193,18 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           children: <Widget>[
             Padding(
               padding:
-              EdgeInsets.only(top: 10.0, bottom: 10.0, left: 0, right: 0),
+                  EdgeInsets.only(top: 10.0, bottom: 10.0, left: 0, right: 0),
 //              EdgeInsets.all(0),
               child: _getImageView(),
             ),
             Visibility(
               visible:
-              (discount == "0.00" || discount == "0" || discount == "0.0")
-                  ? false
-                  : true,
+                  (discount == "0.00" || discount == "0" || discount == "0.0")
+                      ? false
+                      : true,
               child: Container(
                 child: Text(
-                  "${discount.contains(".00")
-                      ? discount.replaceAll(".00", "")
-                      : discount}% OFF",
+                  "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
                   style: TextStyle(color: Colors.white),
                 ),
                 margin: EdgeInsets.only(left: 10, top: 10),
@@ -223,8 +239,13 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                 ),
               ),
             ),
-            Container(padding: EdgeInsets.all(20),child:Align(alignment: Alignment.topRight,child: addVegNonVegOption(),),),
-
+            Container(
+              padding: EdgeInsets.all(20),
+              child: Align(
+                alignment: Alignment.topRight,
+                child: addVegNonVegOption(),
+              ),
+            ),
           ],
           overflow: Overflow.clip,
         ),
@@ -251,30 +272,30 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                 Padding(
                   padding: EdgeInsets.only(top: 10.0, left: 20.0),
                   child: (discount == "0.00" ||
-                      discount == "0" ||
-                      discount == "0.0")
+                          discount == "0" ||
+                          discount == "0.0")
                       ? Text(
-                    "${AppConstant.currency}${price}",
-                    style: TextStyle(
-                        color: grayColorTitle,
-                        fontWeight: FontWeight.w600),
-                  )
-                      : Row(
-                    children: <Widget>[
-                      Text(
-                        "${AppConstant.currency}${price}",
-                        style: TextStyle(
-                            color: grayColorTitle,
-                            fontWeight: FontWeight.w700),
-                      ),
-                      Text(" "),
-                      Text("${AppConstant.currency}${mrpPrice}",
+                          "${AppConstant.currency}${price}",
                           style: TextStyle(
-                              decoration: TextDecoration.lineThrough,
                               color: grayColorTitle,
-                              fontWeight: FontWeight.w400)),
-                    ],
-                  ),
+                              fontWeight: FontWeight.w600),
+                        )
+                      : Row(
+                          children: <Widget>[
+                            Text(
+                              "${AppConstant.currency}${price}",
+                              style: TextStyle(
+                                  color: grayColorTitle,
+                                  fontWeight: FontWeight.w700),
+                            ),
+                            Text(" "),
+                            Text("${AppConstant.currency}${mrpPrice}",
+                                style: TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: grayColorTitle,
+                                    fontWeight: FontWeight.w400)),
+                          ],
+                        ),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
@@ -315,66 +336,66 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         ),
 
         !widget.isApiLoading &&
-            widget.product.description != null &&
-            widget.product.description.isNotEmpty
+                widget.product.description != null &&
+                widget.product.description.isNotEmpty
             ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Visibility(
-              visible: isVisible,
-              child: addDividerView(),
-            ),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-              child: Text(
-                "Product Detail",
-                style: TextStyle(fontSize: 16.0),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(
-                  top: 5.0, left: 10.0, right: 10.0),
-              child: Html(
-                data: "${widget.product.description}",
-                padding: EdgeInsets.all(10.0),
-              ),
-            )
-          ],
-        )
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Visibility(
+                    visible: isVisible,
+                    child: addDividerView(),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                    child: Text(
+                      "Product Detail",
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 5.0, left: 10.0, right: 10.0),
+                    child: Html(
+                      data: "${widget.product.description}",
+                      padding: EdgeInsets.all(10.0),
+                    ),
+                  )
+                ],
+              )
             : !widget.isApiLoading
-            ? Container()
-            : Center(
-          child: CircularProgressIndicator(
-              backgroundColor: Colors.black26,
-              valueColor:
-              AlwaysStoppedAnimation<Color>(Colors.black26)),
-        ),
+                ? Container()
+                : Center(
+                    child: CircularProgressIndicator(
+                        backgroundColor: Colors.black26,
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.black26)),
+                  ),
         _recommendedProducts.length > 0
             ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            addDividerView(),
-            Padding(
-              padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
-              child: Text(
-                "Recommended Products",
-                style: TextStyle(
-                    fontSize: 16.0, fontWeight: FontWeight.bold),
-              ),
-            ),
-            ListView.builder(
-              itemCount: _recommendedProducts.length,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index) {
-                Product product = _recommendedProducts[index];
-                return ProductTileItem(product, () {
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  addDividerView(),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 0, 10),
+                    child: Text(
+                      "Recommended Products",
+                      style: TextStyle(
+                          fontSize: 16.0, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  ListView.builder(
+                    itemCount: _recommendedProducts.length,
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, index) {
+                      Product product = _recommendedProducts[index];
+                      return ProductTileItem(product, () {
 //              bottomBar.state.updateTotalPrice();
-                }, ClassType.SubCategory);
-              },
-            )
-          ],
-        )
+                      }, ClassType.SubCategory);
+                    },
+                  )
+                ],
+              )
             : Container(),
       ],
     );
@@ -394,8 +415,9 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         itemBuilder: (context, index) {
           Variant tagName = variants[index];
           if (selctedTag == index) {
-            chipSelectedColor =
-            variants[index].weight.trim() == "" ? whiteColor : appThemeSecondary;
+            chipSelectedColor = variants[index].weight.trim() == ""
+                ? whiteColor
+                : appThemeSecondary;
             textColor = Color(0xFFFFFFFF);
           } else {
             chipSelectedColor = Color(0xFFBDBDBD);
@@ -445,36 +467,40 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     );
     return horizontalList;
   }
+
   Widget addVegNonVegOption() {
     Color foodOption =
-    widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
+        widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
     return Visibility(
-      visible: widget.product.nutrient!=null&&widget.product.nutrient.isNotEmpty,
+      visible:
+          widget.product.nutrient != null && widget.product.nutrient.isNotEmpty,
       child: Padding(
         padding: EdgeInsets.only(left: 0, right: 7),
         child: widget.product.nutrient == "None"
             ? Container()
             : Container(
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              border: new Border.all(
-                color: foodOption,
-                width: 1.0,
-              ),
-            ),
-            width: 16,
-            height: 16,
-            child: Padding(
-              padding: EdgeInsets.all(3),
-              child: Container(
-                  decoration: new BoxDecoration(
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  border: new Border.all(
                     color: foodOption,
-                    borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                    width: 1.0,
+                  ),
+                ),
+                width: 16,
+                height: 16,
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: Container(
+                      decoration: new BoxDecoration(
+                    color: foodOption,
+                    borderRadius:
+                        new BorderRadius.all(new Radius.circular(5.0)),
                   )),
-            )),
+                )),
       ),
     );
   }
+
   Widget addQuantityView() {
     return Visibility(
       visible: !_isProductOutOfStock,
@@ -488,123 +514,127 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
         child: showAddButton == true
             ? InkWell(
-          onTap: () {
-            //print("add onTap");
-            if (_checkStockQuantity(counter)) {
-              setState(() {
-                counter++;
-                showAddButton = false;
-                // insert/update to cart table
-                insertInCartTable(widget.product, counter);
-                Utils.sendAnalyticsAddToCart(widget.product,counter);
-              });
-            }
-          },
-          child: Container(
-            child: Center(
-              child: Text(
-                "Add",
-                style: TextStyle(color: whiteColor),
-              ),
-            ),
-          ),
-        )
-            : Visibility(
-          visible: showAddButton == true ? false : true,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Container(
-                padding: const EdgeInsets.all(0.0),
-                width: 30.0, // you can adjust the width as you need
-                child: GestureDetector(
-                    onTap: () {
-                      if (counter != 0) {
-                        setState(() => counter--);
-                        if (counter == 0) {
-                          // delete from cart table
-                          removeFromCartTable(widget.product.variantId);
-                          Utils.sendAnalyticsRemovedToCart(widget.product,counter);
-                        } else {
-                          // insert/update to cart table
-                          insertInCartTable(widget.product, counter);
-                          Utils.sendAnalyticsAddToCart(widget.product,counter);
-                        }
-                        //widget.callback();
-                      }
-                    },
-                    child: Container(
-                      width: 35,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        color: grayColor,
-                        border: Border.all(
-                          color: grayColor,
-                          width: 1,
-                        ),
-                        borderRadius:
-                        BorderRadius.all(Radius.circular(5.0)),
-                      ),
-                      child: Icon(Icons.remove,
-                          color: Colors.white, size: 20),
-                    )),
-              ),
-              Container(
-                margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                width: 30.0,
-                height: 30.0,
-                decoration: new BoxDecoration(
-                  color: Colors.white,
-                  borderRadius:
-                  new BorderRadius.all(new Radius.circular(15.0)),
-                  border: new Border.all(
-                    color: Colors.white,
-                    width: 1.0,
+                onTap: () {
+                  //print("add onTap");
+                  if (_checkStockQuantity(counter)) {
+                    setState(() {
+                      counter++;
+                      showAddButton = false;
+                      // insert/update to cart table
+                      insertInCartTable(widget.product, counter);
+                      Utils.sendAnalyticsAddToCart(widget.product, counter);
+                    });
+                  }
+                },
+                child: Container(
+                  child: Center(
+                    child: Text(
+                      "Add",
+                      style: TextStyle(color: whiteColor),
+                    ),
                   ),
                 ),
-                child: Center(
-                    child: Text(
-                      "$counter",
-                      style: TextStyle(fontSize: 18),
-                    )),
-              ),
-              Container(
-                padding: const EdgeInsets.all(0.0),
-                width: 30.0, // you can adjust the width as you need
-                child: GestureDetector(
-                  onTap: () {
-                    if (_checkStockQuantity(counter)) {
-                      setState(() => counter++);
-                      if (counter == 0) {
-                        // delete from cart table
-                        removeFromCartTable(widget.product.variantId);
-                        Utils.sendAnalyticsRemovedToCart(widget.product,counter);
-                      } else {
-                        // insert/update to cart table
-                        insertInCartTable(widget.product, counter);
-                        Utils.sendAnalyticsAddToCart(widget.product,counter);
-                      }
-                    }
-                  },
-                  child: Container(
-                      width: 35,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        color: appThemeSecondary,
-                        border: Border.all(
-                          color: appThemeSecondary,
-                          width: 1,
-                        ),
+              )
+            : Visibility(
+                visible: showAddButton == true ? false : true,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.all(0.0),
+                      width: 30.0, // you can adjust the width as you need
+                      child: GestureDetector(
+                          onTap: () {
+                            if (counter != 0) {
+                              setState(() => counter--);
+                              if (counter == 0) {
+                                // delete from cart table
+                                removeFromCartTable(widget.product.variantId);
+                                Utils.sendAnalyticsRemovedToCart(
+                                    widget.product, counter);
+                              } else {
+                                // insert/update to cart table
+                                insertInCartTable(widget.product, counter);
+                                Utils.sendAnalyticsAddToCart(
+                                    widget.product, counter);
+                              }
+                              //widget.callback();
+                            }
+                          },
+                          child: Container(
+                            width: 35,
+                            height: 25,
+                            decoration: BoxDecoration(
+                              color: grayColor,
+                              border: Border.all(
+                                color: grayColor,
+                                width: 1,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            ),
+                            child: Icon(Icons.remove,
+                                color: Colors.white, size: 20),
+                          )),
+                    ),
+                    Container(
+                      margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                      width: 30.0,
+                      height: 30.0,
+                      decoration: new BoxDecoration(
+                        color: Colors.white,
                         borderRadius:
-                        BorderRadius.all(Radius.circular(5.0)),
+                            new BorderRadius.all(new Radius.circular(15.0)),
+                        border: new Border.all(
+                          color: Colors.white,
+                          width: 1.0,
+                        ),
                       ),
-                      child:
-                      Icon(Icons.add, color: Colors.white, size: 20)),
+                      child: Center(
+                          child: Text(
+                        "$counter",
+                        style: TextStyle(fontSize: 18),
+                      )),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(0.0),
+                      width: 30.0, // you can adjust the width as you need
+                      child: GestureDetector(
+                        onTap: () {
+                          if (_checkStockQuantity(counter)) {
+                            setState(() => counter++);
+                            if (counter == 0) {
+                              // delete from cart table
+                              removeFromCartTable(widget.product.variantId);
+                              Utils.sendAnalyticsRemovedToCart(
+                                  widget.product, counter);
+                            } else {
+                              // insert/update to cart table
+                              insertInCartTable(widget.product, counter);
+                              Utils.sendAnalyticsAddToCart(
+                                  widget.product, counter);
+                            }
+                          }
+                        },
+                        child: Container(
+                            width: 35,
+                            height: 25,
+                            decoration: BoxDecoration(
+                              color: appThemeSecondary,
+                              border: Border.all(
+                                color: appThemeSecondary,
+                                width: 1,
+                              ),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(5.0)),
+                            ),
+                            child:
+                                Icon(Icons.add, color: Colors.white, size: 20)),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -674,10 +704,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   Widget addDividerView() {
     return Container(
       height: 1,
-      width: MediaQuery
-          .of(context)
-          .size
-          .width,
+      width: MediaQuery.of(context).size.width,
       color: grayColor,
       margin: EdgeInsets.only(top: 5.0, bottom: 10.0, left: 20, right: 20),
     );
@@ -686,8 +713,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   void getProductDetail(String productID) async {
     _storeModel = await SharedPrefs.getStore();
     ApiController.getSubCategoryProductDetail(productID).then((value) {
+      Product product = value.subCategories.first.products.first;
+      if (widget.product == null) {
+        widget.product = product;
+      }
+      getDataFromDB();
       setState(() {
-        Product product = value.subCategories.first.products.first;
         widget.product.productImages = product.productImages;
         widget.product.description = product.description;
         widget.isApiLoading = false;
@@ -726,97 +757,97 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
   Widget _getImageView() {
     return widget.product.productImages != null &&
-        widget.product.productImages.isNotEmpty
+            widget.product.productImages.isNotEmpty
         ? Column(
-      children: <Widget>[
-        Container(
-          child: CarouselSlider.builder(
-            itemCount: widget.product.productImages.length,
-            carouselController: _carouselController,
-            options: CarouselOptions(
+            children: <Widget>[
+              Container(
+                child: CarouselSlider.builder(
+                  itemCount: widget.product.productImages.length,
+                  carouselController: _carouselController,
+                  options: CarouselOptions(
 //                    aspectRatio: 16 / 9,
-              height: 280,
-              initialPage: 0,
-              enableInfiniteScroll: false,
-              reverse: false,
-              autoPlay: false,
-              onPageChanged: (index, reason) {
-                setState(() {
-                  _current = index;
-                });
-              },
-              enlargeCenterPage: false,
-              autoPlayInterval: Duration(seconds: 3),
-              autoPlayAnimationDuration: Duration(milliseconds: 800),
-              autoPlayCurve: Curves.ease,
-              scrollDirection: Axis.horizontal,
-            ),
-            itemBuilder: (BuildContext context, int itemIndex) =>
-                Container(
-                  child: _makeBanner(context, itemIndex),
+                    height: 280,
+                    initialPage: 0,
+                    enableInfiniteScroll: false,
+                    reverse: false,
+                    autoPlay: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        _current = index;
+                      });
+                    },
+                    enlargeCenterPage: false,
+                    autoPlayInterval: Duration(seconds: 3),
+                    autoPlayAnimationDuration: Duration(milliseconds: 800),
+                    autoPlayCurve: Curves.ease,
+                    scrollDirection: Axis.horizontal,
+                  ),
+                  itemBuilder: (BuildContext context, int itemIndex) =>
+                      Container(
+                    child: _makeBanner(context, itemIndex),
+                  ),
                 ),
-          ),
-        ),
-        Visibility(
-            visible: widget.product.productImages.length > 1,
-            child: Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: widget.product.productImages.map((url) {
-                  int index = widget.product.productImages.indexOf(url);
-                  return _current == index
-                      ? Container(
-                    width: 7.0,
-                    height: 7.0,
-                    margin: EdgeInsets.symmetric(
-                        vertical: 0.0, horizontal: 2.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: dotIncreasedColor,
-                    ),
-                  )
-                      : Container(
-                    width: 6.0,
-                    height: 6.0,
-                    margin: EdgeInsets.symmetric(
-                        vertical: 0.0, horizontal: 2.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color.fromRGBO(0, 0, 0, 0.4),
-                    ),
-                  );
-                }).toList(),
               ),
-            ))
-      ],
-    )
+              Visibility(
+                  visible: widget.product.productImages.length > 1,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: widget.product.productImages.map((url) {
+                        int index = widget.product.productImages.indexOf(url);
+                        return _current == index
+                            ? Container(
+                                width: 7.0,
+                                height: 7.0,
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 0.0, horizontal: 2.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: dotIncreasedColor,
+                                ),
+                              )
+                            : Container(
+                                width: 6.0,
+                                height: 6.0,
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 0.0, horizontal: 2.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Color.fromRGBO(0, 0, 0, 0.4),
+                                ),
+                              );
+                      }).toList(),
+                    ),
+                  ))
+            ],
+          )
         : imageUrl == ""
-        ? Container(
-      child: Center(
-        child: Utils.getImgPlaceHolder(),
-      ),
-    )
-        : Padding(
-        padding: EdgeInsets.all(0),
-        child: Container(
-          /*child: AspectRatio(
+            ? Container(
+                child: Center(
+                  child: Utils.getImgPlaceHolder(),
+                ),
+              )
+            : Padding(
+                padding: EdgeInsets.all(0),
+                child: Container(
+                  /*child: AspectRatio(
                   aspectRatio: 16 / 9,
                   child: CachedNetworkImage(
                     imageUrl: "${imageUrl}", fit: BoxFit.cover
                   ),
                 ),*/
-          child: Center(
-            child: CachedNetworkImage(
-              imageUrl: "${imageUrl}",
-              height: 280,
-              fit: BoxFit.scaleDown,
-              placeholder: (context, url) =>
-                  CircularProgressIndicator(),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            ),
-          ),
-        ));
+                  child: Center(
+                    child: CachedNetworkImage(
+                      imageUrl: "${imageUrl}",
+                      height: 280,
+                      fit: BoxFit.scaleDown,
+                      placeholder: (context, url) =>
+                          CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
+                    ),
+                  ),
+                ));
   }
 
   Widget _makeBanner(BuildContext context, int _index) {
@@ -842,7 +873,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 //3)continue_selling -> no out of stock
 
     Variant selectedVariant =
-    variant != null ? variant : findVariant(widget.product.variantId);
+        variant != null ? variant : findVariant(widget.product.variantId);
     if (selectedVariant != null &&
         selectedVariant.stockType != null &&
         selectedVariant.stockType.isNotEmpty) {
@@ -908,9 +939,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         selectedVariant.stockType != null &&
         selectedVariant.stockType.isNotEmpty) {
       {
-        if (selectedVariant.maxQuantityPerOrder.isNotEmpty&&counter >= int.parse(selectedVariant.maxQuantityPerOrder)) {
+        if (selectedVariant.maxQuantityPerOrder.isNotEmpty &&
+            counter >= int.parse(selectedVariant.maxQuantityPerOrder)) {
           Utils.showToast(
-              "Maximum quantity per order is " + selectedVariant.maxQuantityPerOrder.toString(), true);
+              "Maximum quantity per order is " +
+                  selectedVariant.maxQuantityPerOrder.toString(),
+              true);
           return false;
         }
         switch (selectedVariant.stockType) {

@@ -433,7 +433,10 @@ class StoreModel {
     allowCustomerForGst = json["allow_customer_for_gst"] == null
         ? null
         : json["allow_customer_for_gst"];
-    storeOffer = json["store_offer"] == null ? null : StoreOffer.fromJson(
+    storeOffer =
+    json["store_offer"] == null ? null : json["store_offer"] is List<dynamic>
+        ? null
+        : StoreOffer.fromJson(
         json["store_offer"]);
   }
 
