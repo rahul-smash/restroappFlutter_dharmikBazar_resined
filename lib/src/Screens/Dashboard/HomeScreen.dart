@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
+import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
@@ -119,11 +120,88 @@ class _HomeScreenState extends State<HomeScreen> {
                 DialogUtils.showInviteEarnAlert2(context);
               }
             }
+            if (store.storeOffer != null)
+              DialogUtils.displayofferDialog(context, store.storeOffer,
+                  onButtonPressed: _offerPressed);
           });
         }
       }
     } catch (e) {
       print(e);
+    }
+  }
+
+  _offerPressed() {
+    Navigator.of(context).pop(true);
+    if (store.storeOffer.linkTo.isNotEmpty) {
+      if (store.storeOffer.linkTo == "category") {
+        if (store.storeOffer.categoryId == "0" &&
+            store.storeOffer.subCategoryId == "0" &&
+            store.storeOffer.productId == "0") {
+          print("return");
+          return;
+        }
+
+        if (store.storeOffer.categoryId != "0" &&
+            store.storeOffer.subCategoryId != "0" &&
+            store.storeOffer.productId != "0") {
+          // here we have to open the product detail
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ProductDetailsScreen(null,
+                      productID: store.storeOffer.productId)));
+        } else if (store.storeOffer.categoryId != "0" &&
+            store.storeOffer.subCategoryId != "0" &&
+            store.storeOffer.productId == "0") {
+          //here open the banner sub category
+
+          for (int i = 0; i < categoryResponse.categories.length; i++) {
+            CategoryModel categories = categoryResponse.categories[i];
+            if (store.storeOffer.categoryId == categories.id) {
+              print(
+                  "title ${categories.title} and ${categories.id} and ${store.storeOffer.categoryId}");
+              if (categories.subCategory != null) {
+                for (int j = 0; j < categories.subCategory.length; j++) {
+                  SubCategory subCategory = categories.subCategory[j];
+                  if (subCategory.id == store.storeOffer.subCategoryId) {
+                    print(
+                        "open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.storeOffer.subCategoryId}");
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return SubCategoryProductScreen(categories, true, j);
+                      }),
+                    );
+
+                    break;
+                  }
+                }
+              }
+            }
+            //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
+          }
+        } else if (store.storeOffer.categoryId != "0" &&
+            store.storeOffer.subCategoryId == "0" &&
+            store.storeOffer.productId == "0") {
+          for (int i = 0; i < categoryResponse.categories.length; i++) {
+            CategoryModel categories = categoryResponse.categories[i];
+            if (store.storeOffer.categoryId == categories.id) {
+              print(
+                  "title ${categories.title} and ${categories.id} and ${store.storeOffer.categoryId}");
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return SubCategoryProductScreen(categories, true, 0);
+                }),
+              );
+              break;
+            }
+          }
+        }
+        //-----------------------------------------------
+      }
     }
   }
 
@@ -548,36 +626,34 @@ class _HomeScreenState extends State<HomeScreen> {
         StoreModel store = await SharedPrefs.getStore();
         bool isRatingEnable = store.reviewRatingDisplay != null &&
             store.reviewRatingDisplay.compareTo('1') == 0;
-        Navigator.of(context)
-            .popUntil((route) => route.isFirst);
+        Navigator.of(context).popUntil((route) => route.isFirst);
         if (Platform.isIOS) {
-
         } else {
-           id = map['data']['id'];
-           type = map['data']['type'];
-           type=type.toLowerCase();
-
+          id = map['data']['id'];
+          type = map['data']['type'];
+          type = type.toLowerCase();
         }
 
-        switch(type){
+        switch (type) {
           case 'order':
             Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => OrderDetailScreenVersion2(
-                    isRatingEnable,
-                    store,orderId: id,
-                  )),
+                        isRatingEnable,
+                        store,
+                        orderId: id,
+                      )),
             );
             break;
           case 'subscription':
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) =>  SubscriptionHistoryDetails(
-                    orderHistoryDataId: id,
-                    store: store,
-                  )),
+                  builder: (context) => SubscriptionHistoryDetails(
+                        orderHistoryDataId: id,
+                        store: store,
+                      )),
             );
             break;
         }

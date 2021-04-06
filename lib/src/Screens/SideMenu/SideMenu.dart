@@ -14,6 +14,7 @@ import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/FAQScreen.dart';
+import 'package:restroapp/src/UI/ChatSupport.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -94,6 +95,8 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
         DrawerChildConstants.ADDITION_INFORMATION, "images/about.png"));
     _drawerItems
         .add(DrawerChildItem(DrawerChildConstants.LOGIN, "images/sign_in.png"));
+//    _drawerItems.add(DrawerChildItem(DrawerChildConstants.SUPPORT,
+//        "images/sign_in.png"));
     try {
       _setSetUserId();
     } catch (e) {
@@ -408,6 +411,18 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
   _openPageForIndex(DrawerChildItem item, int pos, BuildContext context) async {
     switch (item.title) {
+//      case DrawerChildConstants.SUPPORT:
+//        if (AppConstant.isLoggedIn) {
+//          Navigator.push(
+//            context,
+//            MaterialPageRoute(
+//                builder: (context) => ChatSupport(),
+//            ));
+//        } else {
+//          Navigator.pop(context);
+//          Utils.showLoginDialog(context);
+//        }
+//        break;
       case DrawerChildConstants.HOME:
         Navigator.pop(context);
         break;
@@ -750,4 +765,5 @@ class DrawerChildConstants {
   static const ReferEarn = "Refer & Earn";
   static const LOGIN = "Login";
   static const LOGOUT = "Logout";
+  static const SUPPORT = "Support";
 }
