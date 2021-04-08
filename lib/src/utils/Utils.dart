@@ -464,7 +464,9 @@ class Utils {
     String openhours_To =
         store.openhoursTo.replaceAll("am", " AM").replaceAll("pm", " PM");
     // print("--${getCurrentDate()}--openhoursFrom----${openhours_From} and ${openhours_To}");
-
+    if (openhours_To.contains('12:00 AM')) {
+      openhours_To=openhours_To.replaceAll('12:00 AM', '11:59 PM');
+    }
     String openhoursFrom =
         "${getCurrentDate()} ${openhours_From}"; //"2020-06-02 09:30 AM";
     String openhoursTo =

@@ -316,7 +316,7 @@ class _ContactUsState extends State<ContactUs> {
 
                       String queryString = json.encode({
                         "name": "${firstNameController.text} ${lastNameController.text}",
-                        "email": lastNameController.text,
+                        "email": emailNameController.text,
                         "mobile": mobileNameController.text,
                         "city": cityNameController.text,
                         "datetime": "${Utils.getCurrentDateTime()}",
