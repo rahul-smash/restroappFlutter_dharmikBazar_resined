@@ -1,4 +1,6 @@
 PODS:
+  - "app_settings (3.0.0+1)":
+    - Flutter
   - AppAuth (1.4.0):
     - AppAuth/Core (= 1.4.0)
     - AppAuth/ExternalUserAgent (= 1.4.0)
@@ -172,11 +174,13 @@ PODS:
   - PromisesObjC (1.2.11)
   - Protobuf (3.14.0)
   - razorpay-pod (1.1.10)
-  - razorpay_flutter (1.1.5):
+  - razorpay_flutter (1.1.10):
     - Flutter
     - razorpay-pod
   - Reachability (3.2)
   - shared_preferences (0.0.1):
+    - Flutter
+  - sms_autofill (0.0.1):
     - Flutter
   - sqflite (0.0.1):
     - Flutter
@@ -187,6 +191,7 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - app_settings (from `.symlinks/plugins/app_settings/ios`)
   - compressimage (from `.symlinks/plugins/compressimage/ios`)
   - connectivity (from `.symlinks/plugins/connectivity/ios`)
   - device_info (from `.symlinks/plugins/device_info/ios`)
@@ -210,6 +215,7 @@ DEPENDENCIES:
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - razorpay_flutter (from `.symlinks/plugins/razorpay_flutter/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+  - sms_autofill (from `.symlinks/plugins/sms_autofill/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - url_launcher (from `.symlinks/plugins/url_launcher/ios`)
   - webview_flutter (from `.symlinks/plugins/webview_flutter/ios`)
@@ -243,6 +249,8 @@ SPEC REPOS:
     - Reachability
 
 EXTERNAL SOURCES:
+  app_settings:
+    :path: ".symlinks/plugins/app_settings/ios"
   compressimage:
     :path: ".symlinks/plugins/compressimage/ios"
   connectivity:
@@ -289,6 +297,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/razorpay_flutter/ios"
   shared_preferences:
     :path: ".symlinks/plugins/shared_preferences/ios"
+  sms_autofill:
+    :path: ".symlinks/plugins/sms_autofill/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
   url_launcher:
@@ -297,6 +307,7 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/webview_flutter/ios"
 
 SPEC CHECKSUMS:
+  app_settings: d103828c9f5d515c4df9ee754dabd443f7cedcf3
   AppAuth: 31bcec809a638d7bd2f86ea8a52bd45f6e81e7c7
   compressimage: 4f597b00f6e66bdc43d0aec5f0b9e415f3b03bbd
   connectivity: 6e94255659cc86dcbef1d452ad3e0491bb1b3e75
@@ -315,7 +326,7 @@ SPEC CHECKSUMS:
   FirebaseInstallations: 466c7b4d1f58fe16707693091da253726a731ed2
   FirebaseInstanceID: bd3ffc24367f901a43c063b36c640b345a4a5dd1
   FirebaseMessaging: 5eca4ef173de76253352511aafef774caa1cba2a
-  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
   flutter_facebook_login: cfb5659f686b1c575ef205c6b6fd20db9679d3c4
   flutter_local_notifications: 9e4738ce2471c5af910d961a6b7eadcf57c50186
   flutter_open_whatsapp: 4b54cd5403cfe53414e4252fd52fc27f79635f58
@@ -342,13 +353,14 @@ SPEC CHECKSUMS:
   PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
   Protobuf: 0cde852566359049847168e51bd1c690e0f70056
   razorpay-pod: ee8dc073c65baee8df6e8c4275b1c989bab614a2
-  razorpay_flutter: bf22a7c0e12d9f906b6a493f546ee9afe7f8b508
+  razorpay_flutter: 84b3bfd206ae9c9c2a9ba585524a1b3d8102b6c1
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
+  sms_autofill: c461043483362c3f1709ee76eaae6eb570b31686
   sqflite: 4001a31ff81d210346b500c55b17f4d6c7589dd0
   url_launcher: a1c0cc845906122c4784c542523d8cacbded5626
   webview_flutter: d2b4d6c66968ad042ad94cbb791f5b72b4678a96
 
 PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.10.1
