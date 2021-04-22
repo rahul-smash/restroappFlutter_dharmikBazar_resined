@@ -635,7 +635,7 @@ class ApiController {
         "user_id": user.id,
         "device_token": deviceToken,
         "orders": "$orderJson",
-        "order_facilities": ,
+        "order_facilities": orderFacilities,
         "payment_method": paymentMode,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
