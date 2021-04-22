@@ -2238,7 +2238,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       String encodedDoughnut = jsonEncode(jsonList);
                       ValidateCouponResponse couponModel =
                           await ApiController.validateOfferApiRequest(
-                              couponCodeController.text, '3', encodedDoughnut);
+                              couponCodeController.text, '3', encodedDoughnut,widget.deliveryType==OrderType.PickUp?'1':'2');
                       if (couponModel.success) {
                         print("---success----");
                         Utils.hideProgressDialog(context);

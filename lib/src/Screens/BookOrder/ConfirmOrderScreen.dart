@@ -100,6 +100,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool isAnotherOnlinePaymentGatwayFound = false;
 
+  String thirdOptionPGText = 'Paytm';
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() async {
@@ -1401,7 +1403,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       }
                     },
                   ),
-                  Text('Paytm',
+                  Text(thirdOptionPGText,
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -1487,7 +1489,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             await ApiController.validateOfferApiRequest(
                                 couponCodeController.text,
                                 widget.paymentMode,
-                                json);
+                                json,
+                                widget.deliveryType == OrderType.PickUp
+                                    ? '1'
+                                    : '2');
                         if (couponModel.success) {
                           print("---success----");
                           Utils.showToast("${couponModel.message}", false);
@@ -1907,7 +1912,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             //then Store will not charge shipping.
             setState(() {
               this.totalPrice = totalPrice;
-              if(widget.address.isShippingMandatory=='0') {
+              if (widget.address.isShippingMandatory == '0') {
                 shippingCharges = "0";
                 widget.address.areaCharges = "0";
               }
@@ -2122,15 +2127,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
         Utils.hideProgressDialog(context);
-        databaseHelper
-            .deleteTable(DatabaseHelper.Favorite_Table);
-        databaseHelper
-            .deleteTable(DatabaseHelper.CART_Table);
-        databaseHelper
-            .deleteTable(DatabaseHelper.Products_Table);
+        databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+        databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+        databaseHelper.deleteTable(DatabaseHelper.Products_Table);
         eventBus.fire(updateCartCount());
-        Navigator.of(context)
-            .popUntil((route) => route.isFirst);
+        Navigator.of(context).popUntil((route) => route.isFirst);
         Utils.showToast("something went wrong", false);
         return;
       }
@@ -2447,6 +2448,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         paymentGateway = storeModel.paymentGatewaySettings.first.paymentGateway;
         if (paymentGateway.toLowerCase().contains('paytm')) {
           isPayTmActive = true;
+          thirdOptionPGText = 'Online';
         } else {
           isPayTmActive = false;
           isAnotherOnlinePaymentGatwayFound = true;
@@ -2648,35 +2650,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addVegNonVegOption(Product product) {
     Color foodOption =
-    product.nutrient == "Non Veg" ? Colors.red : Colors.green;
+        product.nutrient == "Non Veg" ? Colors.red : Colors.green;
     return Visibility(
-      visible: product.nutrient!=null&&product.nutrient.isNotEmpty,
+      visible: product.nutrient != null && product.nutrient.isNotEmpty,
       child: Padding(
         padding: EdgeInsets.only(left: 0, right: 7),
         child: product.nutrient == "None"
             ? Container()
             : Container(
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              border: new Border.all(
-                color: foodOption,
-                width: 1.0,
-              ),
-            ),
-            width: 16,
-            height: 16,
-            child: Padding(
-              padding: EdgeInsets.all(3),
-              child: Container(
-                  decoration: new BoxDecoration(
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  border: new Border.all(
                     color: foodOption,
-                    borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                    width: 1.0,
+                  ),
+                ),
+                width: 16,
+                height: 16,
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: Container(
+                      decoration: new BoxDecoration(
+                    color: foodOption,
+                    borderRadius:
+                        new BorderRadius.all(new Radius.circular(5.0)),
                   )),
-            )),
+                )),
       ),
     );
   }
-
 }
 
 /*Code for ios*/
