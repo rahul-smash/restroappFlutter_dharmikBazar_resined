@@ -100,6 +100,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   bool isAnotherOnlinePaymentGatwayFound = false;
 
+  String thirdOptionPGText = 'Paytm';
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() async {
@@ -403,6 +405,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   WalleModel userWalleModel;
+
+  Future<bool> couponAppliedCheck() async {
+    setState(() {});
+    if (taxModel != null &&
+        taxModel.discount != null &&
+        taxModel.discount.isNotEmpty &&
+        double.parse(taxModel.discount) > 0) {
+      return await DialogUtils.displayDialog(
+          context,
+          'Are you sure?',
+          'Your Applied Coupon code will be removed!',
+          'No',
+          'Yes', button2: () async {
+        Navigator.of(context).pop(true);
+        removeCoupon();
+      }, button1: () {
+        Navigator.of(context).pop(false);
+      });
+    } else {
+      return Future(() => true);
+    }
+  }
 
   Future<void> multiTaxCalculationApi() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
@@ -1265,114 +1289,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
-  Widget addPaymentOptionsold() {
-    bool showOptions = false;
-//    if (storeModel != null) {
-//      return Container();
-//    }
-    if (widget.storeModel.onlinePayment != null) {
-      if (widget.storeModel.onlinePayment == "1") {
-        showOptions = true;
-      } else {
-        showOptions = false; //cod
-      }
-    }
-    return Visibility(
-      visible: showOptions,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
-        child: Wrap(
-          children: <Widget>[
-            Utils.showDivider(context),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Text("Select Payment",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: appTheme,
-                      fontWeight: FontWeight.w600,
-                    )),
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: <Widget>[
-                    Radio(
-                      value: PaymentType.COD,
-                      groupValue: widget._character,
-                      activeColor: appTheme,
-                      onChanged: (PaymentType value) async {
-                        setState(() {
-                          widget._character = value;
-                          if (value == PaymentType.COD) {
-                            widget.paymentMode = "2";
-                            ispaytmSelected = false;
-                          }
-                        });
-                      },
-                    ),
-                    Text('COD',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                        )),
-                  ],
-                ),
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: <Widget>[
-                    Radio(
-                      value: PaymentType.ONLINE,
-                      activeColor: appTheme,
-                      groupValue: widget._character,
-                      onChanged: (PaymentType value) async {
-                        setState(() {
-                          widget._character = value;
-                          if (value == PaymentType.ONLINE) {
-                            widget.paymentMode = "3";
-                            ispaytmSelected = false;
-                          }
-                        });
-                      },
-                    ),
-                    Text('Online',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                        )),
-                  ],
-                ),
-                Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: <Widget>[
-                    Radio(
-                      value: PaymentType.ONLINE_PAYTM,
-                      activeColor: appTheme,
-                      groupValue: widget._character,
-                      onChanged: (PaymentType value) async {
-                        setState(() {
-                          widget._character = value;
-                          if (value == PaymentType.ONLINE_PAYTM) {
-                            widget.paymentMode = "3";
-                            ispaytmSelected = true;
-                          }
-                        });
-                      },
-                    ),
-                    Text('Paytm',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                        )),
-                  ],
-                )
-              ],
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget addPaymentOptions() {
     bool showOptions = false;
     if (widget.storeModel.onlinePayment != null) {
@@ -1413,13 +1329,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     groupValue: widget._character,
                     activeColor: appTheme,
                     onChanged: (PaymentType value) async {
-                      setState(() {
-                        widget._character = value;
-                        if (value == PaymentType.COD) {
-                          widget.paymentMode = "2";
-                          ispaytmSelected = false;
-                        }
-                      });
+                      bool proceed = await couponAppliedCheck();
+                      if (proceed) {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.COD) {
+                            widget.paymentMode = "2";
+                            ispaytmSelected = false;
+                          }
+                        });
+                      }
                     },
                   ),
                   Text('COD',
@@ -1442,13 +1361,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     activeColor: appTheme,
                     groupValue: widget._character,
                     onChanged: (PaymentType value) async {
-                      setState(() {
-                        widget._character = value;
-                        if (value == PaymentType.ONLINE) {
-                          widget.paymentMode = "3";
-                          ispaytmSelected = false;
-                        }
-                      });
+                      bool proceed = await couponAppliedCheck();
+                      if (proceed) {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.ONLINE) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = false;
+                          }
+                        });
+                      }
                     },
                   ),
                   Text('Online',
@@ -1469,16 +1391,19 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     activeColor: appTheme,
                     groupValue: widget._character,
                     onChanged: (PaymentType value) async {
-                      setState(() {
-                        widget._character = value;
-                        if (value == PaymentType.ONLINE_PAYTM) {
-                          widget.paymentMode = "3";
-                          ispaytmSelected = true;
-                        }
-                      });
+                      bool proceed = await couponAppliedCheck();
+                      if (proceed) {
+                        setState(() {
+                          widget._character = value;
+                          if (value == PaymentType.ONLINE_PAYTM) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = true;
+                          }
+                        });
+                      }
                     },
                   ),
-                  Text('Paytm',
+                  Text(thirdOptionPGText,
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -1564,7 +1489,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             await ApiController.validateOfferApiRequest(
                                 couponCodeController.text,
                                 widget.paymentMode,
-                                json);
+                                json,
+                                widget.deliveryType == OrderType.PickUp
+                                    ? '1'
+                                    : '2');
                         if (couponModel.success) {
                           print("---success----");
                           Utils.showToast("${couponModel.message}", false);
@@ -1868,11 +1796,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     });
   }
 
-  Future<void> removeCoupon() async {
+  Future<bool> removeCoupon() async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
       Utils.showToast(AppConstant.noInternet, false);
-      return;
+      return Future(() => false);
     }
     Utils.showProgressDialog(context);
     databaseHelper
@@ -1931,6 +1859,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             isCouponsApplied = false;
             couponCodeController.text = "";
           });
+          return Future(() => true);
         }
       });
     });
@@ -1983,7 +1912,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             //then Store will not charge shipping.
             setState(() {
               this.totalPrice = totalPrice;
-              if(widget.address.isShippingMandatory=='0') {
+              if (widget.address.isShippingMandatory == '0') {
                 shippingCharges = "0";
                 widget.address.areaCharges = "0";
               }
@@ -2198,15 +2127,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       if (orderJson == null) {
         print("--orderjson == null-orderjson == null-");
         Utils.hideProgressDialog(context);
-        databaseHelper
-            .deleteTable(DatabaseHelper.Favorite_Table);
-        databaseHelper
-            .deleteTable(DatabaseHelper.CART_Table);
-        databaseHelper
-            .deleteTable(DatabaseHelper.Products_Table);
+        databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+        databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+        databaseHelper.deleteTable(DatabaseHelper.Products_Table);
         eventBus.fire(updateCartCount());
-        Navigator.of(context)
-            .popUntil((route) => route.isFirst);
+        Navigator.of(context).popUntil((route) => route.isFirst);
         Utils.showToast("something went wrong", false);
         return;
       }
@@ -2523,6 +2448,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         paymentGateway = storeModel.paymentGatewaySettings.first.paymentGateway;
         if (paymentGateway.toLowerCase().contains('paytm')) {
           isPayTmActive = true;
+          thirdOptionPGText = 'Online';
         } else {
           isPayTmActive = false;
           isAnotherOnlinePaymentGatwayFound = true;
@@ -2724,35 +2650,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addVegNonVegOption(Product product) {
     Color foodOption =
-    product.nutrient == "Non Veg" ? Colors.red : Colors.green;
+        product.nutrient == "Non Veg" ? Colors.red : Colors.green;
     return Visibility(
-      visible: product.nutrient!=null&&product.nutrient.isNotEmpty,
+      visible: product.nutrient != null && product.nutrient.isNotEmpty,
       child: Padding(
         padding: EdgeInsets.only(left: 0, right: 7),
         child: product.nutrient == "None"
             ? Container()
             : Container(
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              border: new Border.all(
-                color: foodOption,
-                width: 1.0,
-              ),
-            ),
-            width: 16,
-            height: 16,
-            child: Padding(
-              padding: EdgeInsets.all(3),
-              child: Container(
-                  decoration: new BoxDecoration(
+                decoration: new BoxDecoration(
+                  color: Colors.white,
+                  border: new Border.all(
                     color: foodOption,
-                    borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                    width: 1.0,
+                  ),
+                ),
+                width: 16,
+                height: 16,
+                child: Padding(
+                  padding: EdgeInsets.all(3),
+                  child: Container(
+                      decoration: new BoxDecoration(
+                    color: foodOption,
+                    borderRadius:
+                        new BorderRadius.all(new Radius.circular(5.0)),
                   )),
-            )),
+                )),
       ),
     );
   }
-
 }
 
 /*Code for ios*/
