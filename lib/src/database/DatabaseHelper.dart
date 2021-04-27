@@ -1020,9 +1020,9 @@ class DatabaseHelper {
             cartList[i].image10080 = productList[j].image10080;
             cartList[i].image300200 = productList[j].image300200;
             cartList[i].variants = productList[j].variants;
-            cartList[i].mrpPrice = productList[j].mrpPrice;
-            cartList[i].price = productList[j].price;
-            cartList[i].discount = productList[j].discount;
+//            cartList[i].mrpPrice = productList[j].mrpPrice;
+//            cartList[i].price = productList[j].price;
+//            cartList[i].discount = productList[j].discount;
             break;
           }
         }
