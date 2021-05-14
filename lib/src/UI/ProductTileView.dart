@@ -361,6 +361,9 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               padding: EdgeInsets.only(top: 0, bottom: 10),
                               child: InkWell(
                                 onTap: () async {
+                                  if (widget.classType == ClassType.CART) {
+                                    return;
+                                  }
                                   //print("-variants.length--${widget.product.variants.length}");
                                   if (widget.product.variants.length != null) {
                                     if (widget.product.variants.length == 1) {

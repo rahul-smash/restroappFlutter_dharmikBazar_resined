@@ -618,7 +618,7 @@ class ApiController {
   }
 
   static Future<ValidateCouponResponse> validateOfferApiRequest(
-      String couponCode, String paymentMode, String orderJson) async {
+      String couponCode, String paymentMode, String orderJson,String orderFacilities) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -635,6 +635,7 @@ class ApiController {
         "user_id": user.id,
         "device_token": deviceToken,
         "orders": "$orderJson",
+        "order_facilities": orderFacilities,
         "payment_method": paymentMode,
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
