@@ -12,10 +12,13 @@ import 'package:restroapp/src/Screens/SideMenu/WalletTopUp.dart';
 
 class WalletHistoryScreen extends StatefulWidget {
   WalletHistoryScreen(this.store);
-StoreModel store;
+
+  StoreModel store;
+
   @override
   _WalletHistoryScreenState createState() => _WalletHistoryScreenState();
 }
+
 //subscription_payment//subscription_refund
 class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
   WalleModel walleModel;
@@ -166,16 +169,21 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               borderRadius: BorderRadius.circular(20.0),
               border: Border.all(
                 width: 0.0,
-                color:
-                    walletHistory.refund_type != "order_refund"||walletHistory.refund_type!="subscription_refund" ? red1 : green1,
+                color: walletHistory.refund_type != "order_refund" ||
+                        walletHistory.refund_type != "subscription_refund"
+                    ? red1
+                    : green1,
               ),
-              color:
-                  walletHistory.refund_type != "order_refund"||walletHistory.refund_type!="subscription_refund" ? red1 : green1,
+              color: walletHistory.refund_type != "order_refund" ||
+                      walletHistory.refund_type != "subscription_refund"
+                  ? red1
+                  : green1,
             ),
             child: Padding(
               padding: EdgeInsets.all(6),
               child: Image.asset(
-                walletHistory.refund_type != "order_refund"||walletHistory.refund_type!="subscription_refund"
+                walletHistory.refund_type != "order_refund" ||
+                        walletHistory.refund_type != "subscription_refund"
                     ? "images/orderrefund.png"
                     : "images/cashbackicon.png",
                 height: 20,
@@ -210,9 +218,11 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Text(
-                    '${walletHistory.refund_type == "order_refund"||walletHistory.refund_type=="subscription_refund" ? " + " : " - "}${AppConstant.currency}${walletHistory.refund}',
+                    '${walletHistory.refund_type == "order_refund" || walletHistory.refund_type == "subscription_refund" ? " + " : " - "}${AppConstant.currency}${walletHistory.refund}',
                     style: TextStyle(
-                        color: walletHistory.refund_type == "order_refund"||walletHistory.refund_type=="subscription_refund"
+                        color: walletHistory.refund_type == "order_refund" ||
+                                walletHistory.refund_type ==
+                                    "subscription_refund"
                             ? green2
                             : Colors.black,
                         fontSize: 18,
@@ -251,26 +261,24 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                       children: [
                         Text(
                           "Wallet Balance",
-                          style: TextStyle(
-                              color: Colors.grey[400], fontSize: 16),
+                          style:
+                              TextStyle(color: Colors.grey[400], fontSize: 16),
                         ),
-                        SizedBox(height: 5,),
+                        SizedBox(
+                          height: 5,
+                        ),
                         Row(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
                               child: Text("${AppConstant.currency}",
                                   style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 16)),
-                              padding:
-                              EdgeInsets.fromLTRB(0, 1, 0, 0),
+                                      color: Colors.white, fontSize: 16)),
+                              padding: EdgeInsets.fromLTRB(0, 1, 0, 0),
                             ),
                             Text("${walleModel.data.userWallet}",
                                 style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 24)),
+                                    color: Colors.white, fontSize: 24)),
                           ],
                         )
                       ],
@@ -297,8 +305,8 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                   SizedBox(
                     height: 20,
                   ),
-                 // Text("AS per discussed we remove this text",style: TextStyle(color: Colors.grey[500]),),
-                 // Text("in your wallet at that moment"),
+                  // Text("AS per discussed we remove this text",style: TextStyle(color: Colors.grey[500]),),
+                  // Text("in your wallet at that moment"),
                   //Text("kindly purchase more to continue"),
                   SizedBox(
                     height: 60,
@@ -306,26 +314,26 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                   Container(
                     width: 180,
                     child: ElevatedButton(
-                        onPressed: (){
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => WalletTopUp(widget.store)),
-                          );
-                        },
-                        child: Text('Add Money'),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => WalletTopUp(widget.store)),
+                        );
+                      },
+                      child: Text('Add Money'),
                       style: ButtonStyle(
-                          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
-                          backgroundColor: MaterialStateProperty.all<Color>(appTheme),
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-
-                              )
-                          )
-                      ),
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white),
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(appTheme),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ))),
                     ),
                   ),
-
                 ],
               ),
             ),
