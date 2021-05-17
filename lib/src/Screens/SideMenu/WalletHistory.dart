@@ -3,14 +3,16 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:restroapp/src/Screens/SideMenu/WalletTopUp.dart';
 
 class WalletHistoryScreen extends StatefulWidget {
-  WalletHistoryScreen();
-
+  WalletHistoryScreen(this.store);
+StoreModel store;
   @override
   _WalletHistoryScreenState createState() => _WalletHistoryScreenState();
 }
@@ -41,18 +43,19 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: appTheme,
-        title: Text(
-          "Wallet Balance",
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
+        // title: Text(
+        //   "Wallet Balance",
+        //   style: TextStyle(
+        //     color: Colors.white,
+        //   ),
+        // ),
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: Icon(Icons.arrow_back),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
       ),
       body: walleModel == null
           ? Utils.showIndicator()
@@ -238,15 +241,48 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               child: ClipPath(
                 clipper: ClippingClass(),
                 child: Container(
-                  color: Colors.grey[300],
-                  //child: Text("Textview"),
+                  padding: EdgeInsets.only(left: 20),
+                  color: appTheme,
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Wallet Balance",
+                          style: TextStyle(
+                              color: Colors.grey[400], fontSize: 16),
+                        ),
+                        SizedBox(height: 5,),
+                        Row(
+                          crossAxisAlignment:
+                          CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              child: Text("${AppConstant.currency}",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16)),
+                              padding:
+                              EdgeInsets.fromLTRB(0, 1, 0, 0),
+                            ),
+                            Text("${walleModel.data.userWallet}",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24)),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
                 ),
               ),
             )),
         Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            height: 140,
+            height: 250,
             //color: Colors.grey,
             child: Center(
               child: Column(
@@ -254,19 +290,42 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                   Text(
                     "Your Wallet is Empty",
                     style: TextStyle(
-                        color: blue1,
+                        color: Colors.black,
                         fontSize: 20,
                         fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
                     height: 20,
                   ),
-                  Text("Look like there are no credit"),
-                  Text("in your wallet at that moment"),
-                  Text("kindly purchase more to continue"),
+                 // Text("AS per discussed we remove this text",style: TextStyle(color: Colors.grey[500]),),
+                 // Text("in your wallet at that moment"),
+                  //Text("kindly purchase more to continue"),
                   SizedBox(
-                    height: 20,
+                    height: 60,
                   ),
+                  Container(
+                    width: 180,
+                    child: ElevatedButton(
+                        onPressed: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => WalletTopUp(widget.store)),
+                          );
+                        },
+                        child: Text('Add Money'),
+                      style: ButtonStyle(
+                          foregroundColor: MaterialStateProperty.all<Color>(Colors.white),
+                          backgroundColor: MaterialStateProperty.all<Color>(appTheme),
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+
+                              )
+                          )
+                      ),
+                    ),
+                  ),
+
                 ],
               ),
             ),

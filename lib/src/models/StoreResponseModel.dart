@@ -143,6 +143,9 @@ class StoreModel {
   String allowCustomerForGst;
   StoreOffer storeOffer;
 
+  WalletSettings walletSettings;
+
+
   StoreModel({this.id,
     this.storeName,
     this.aboutusBanner,
@@ -257,7 +260,9 @@ class StoreModel {
     this.poweredByLink,
     this.reviewRatingDisplay,
     this.allowCustomerForGst,
-    this.storeOffer
+    this.storeOffer,
+    this.walletSettings
+
   });
 
   StoreModel.fromJson(Map<String, dynamic> json) {
@@ -438,6 +443,9 @@ class StoreModel {
         ? null
         : StoreOffer.fromJson(
         json["store_offer"]);
+
+    walletSettings= json["wallet_settings"] == null ? null : WalletSettings.fromJson(json["wallet_settings"]);
+
   }
 
   Map<String, dynamic> toJson() {
@@ -578,6 +586,7 @@ class StoreModel {
     data['review_rating_display'] = this.reviewRatingDisplay;
     data['allow_customer_for_gst'] = this.allowCustomerForGst;
     data['store_offer'] = this.storeOffer;
+    data['wallet_settings']= walletSettings == null ? null : walletSettings.toJson();
     return data;
   }
 }
@@ -1207,4 +1216,98 @@ class StoreOffer {
         "image_300_200": image300200 == null ? null : image300200,
         "image_100_80": image10080 == null ? null : image10080,
       };
+}
+
+
+class WalletSettings {
+  WalletSettings({
+    this.id,
+    this.storeId,
+    this.status,
+    this.customerWalletTopUpStatus,
+    this.adminWalletTopUpStatus,
+    this.minTopUpAmount,
+    this.maxTopUpAmount,
+    this.minTopUpHoldAmount,
+    this.maxTopUpHoldAmount,
+    this.defaultTopUpAmount,
+    this.created,
+    this.modified,
+  });
+
+  String id;
+  String storeId;
+  String status;
+  String customerWalletTopUpStatus;
+  String adminWalletTopUpStatus;
+  String minTopUpAmount;
+  String maxTopUpAmount;
+  String minTopUpHoldAmount;
+  String maxTopUpHoldAmount;
+  String defaultTopUpAmount;
+  DateTime created;
+  DateTime modified;
+
+  WalletSettings copyWith({
+    String id,
+    String storeId,
+    String status,
+    String customerWalletTopUpStatus,
+    String adminWalletTopUpStatus,
+    String minTopUpAmount,
+    String maxTopUpAmount,
+    String minTopUpHoldAmount,
+    String maxTopUpHoldAmount,
+    String defaultTopUpAmount,
+    DateTime created,
+    DateTime modified,
+  }) =>
+      WalletSettings(
+        id: id ?? this.id,
+        storeId: storeId ?? this.storeId,
+        status: status ?? this.status,
+        customerWalletTopUpStatus: customerWalletTopUpStatus ?? this.customerWalletTopUpStatus,
+        adminWalletTopUpStatus: adminWalletTopUpStatus ?? this.adminWalletTopUpStatus,
+        minTopUpAmount: minTopUpAmount ?? this.minTopUpAmount,
+        maxTopUpAmount: maxTopUpAmount ?? this.maxTopUpAmount,
+        minTopUpHoldAmount: minTopUpHoldAmount ?? this.minTopUpHoldAmount,
+        maxTopUpHoldAmount: maxTopUpHoldAmount ?? this.maxTopUpHoldAmount,
+        defaultTopUpAmount: defaultTopUpAmount ?? this.defaultTopUpAmount,
+        created: created ?? this.created,
+        modified: modified ?? this.modified,
+      );
+
+  factory WalletSettings.fromRawJson(String str) => WalletSettings.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory WalletSettings.fromJson(Map<String, dynamic> json) => WalletSettings(
+    id: json["id"] == null ? null : json["id"],
+    storeId: json["store_id"] == null ? null : json["store_id"],
+    status: json["status"] == null ? null : json["status"],
+    customerWalletTopUpStatus: json["customer_wallet_top_up_status"] == null ? null : json["customer_wallet_top_up_status"],
+    adminWalletTopUpStatus: json["admin_wallet_top_up_status"] == null ? null : json["admin_wallet_top_up_status"],
+    minTopUpAmount: json["min_top_up_amount"] == null ? null : json["min_top_up_amount"],
+    maxTopUpAmount: json["max_top_up_amount"] == null ? null : json["max_top_up_amount"],
+    minTopUpHoldAmount: json["min_top_up_hold_amount"] == null ? null : json["min_top_up_hold_amount"],
+    maxTopUpHoldAmount: json["max_top_up_hold_amount"] == null ? null : json["max_top_up_hold_amount"],
+    defaultTopUpAmount: json["default_top_up_amount"] == null ? null : json["default_top_up_amount"],
+    created: json["created"] == null ? null : DateTime.parse(json["created"]),
+    modified: json["modified"] == null ? null : DateTime.parse(json["modified"]),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id == null ? null : id,
+    "store_id": storeId == null ? null : storeId,
+    "status": status == null ? null : status,
+    "customer_wallet_top_up_status": customerWalletTopUpStatus == null ? null : customerWalletTopUpStatus,
+    "admin_wallet_top_up_status": adminWalletTopUpStatus == null ? null : adminWalletTopUpStatus,
+    "min_top_up_amount": minTopUpAmount == null ? null : minTopUpAmount,
+    "max_top_up_amount": maxTopUpAmount == null ? null : maxTopUpAmount,
+    "min_top_up_hold_amount": minTopUpHoldAmount == null ? null : minTopUpHoldAmount,
+    "max_top_up_hold_amount": maxTopUpHoldAmount == null ? null : maxTopUpHoldAmount,
+    "default_top_up_amount": defaultTopUpAmount == null ? null : defaultTopUpAmount,
+    "created": created == null ? null : created.toIso8601String(),
+    "modified": modified == null ? null : modified.toIso8601String(),
+  };
 }
