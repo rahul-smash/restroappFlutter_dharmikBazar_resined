@@ -2411,7 +2411,7 @@ class ApiController {
   }
 
   static Future<RazorPayOnlineTopUp> onlineTopUP(
-      String paymentId, String paymentRequestId, int amount) async {
+      String paymentId, String paymentRequestId, String amount) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
