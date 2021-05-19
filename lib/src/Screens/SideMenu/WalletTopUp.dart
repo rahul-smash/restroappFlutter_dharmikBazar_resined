@@ -31,12 +31,12 @@ class _WalletTopUpState extends State<WalletTopUp> {
   final _enterMoney = new TextEditingController();
 
   Razorpay _razorpay;
-  List _paymentMethod = ['Razor Pay', 'Paytm'];
 
   @override
   void initState() {
     super.initState();
     initRazorPay();
+
     ApiController.getUserWallet().then((response) {
       setState(() {
         this.walleModel = response;
@@ -200,6 +200,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
                                           ],
                                           onChanged: (text) {
                                             print(text);
+                                            print('${_enterMoney.text}');
                                           },
                                           controller: _enterMoney,
                                           textAlign: TextAlign.left,
@@ -231,8 +232,8 @@ class _WalletTopUpState extends State<WalletTopUp> {
                                   width: 180,
                                   child: ElevatedButton(
                                     onPressed: () {
-
-                                      print(_enterMoney.text);
+                                      print(
+                                          'Button pressed ${_enterMoney.text}');
                                       setState(() {
                                         checkTopUpCondition(_enterMoney);
                                       });
@@ -271,43 +272,47 @@ class _WalletTopUpState extends State<WalletTopUp> {
     );
   }
 
-  void checkTopUpCondition(TextEditingController enterMoney)  async{
+  void checkTopUpCondition(TextEditingController enterMoney) async {
+    //If user not entered his own amount then pick default amount
+    String amount = enterMoney.text.trim().isNotEmpty
+        ? enterMoney.text.trim()
+        : widget.store.walletSettings.defaultTopUpAmount;
+
     StoreModel storeObject = await SharedPrefs.getStore();
     double wallet_balance = double.parse(walleModel.data.userWallet);
-    print(wallet_balance);
-    double topupAmount = double.parse(enterMoney.text);
-    double min = double.parse(widget.store.walletSettings.minTopUpAmount);
-    double max = double.parse(widget.store.walletSettings.maxTopUpAmount);
-    double max_topUp_limit =
+
+    double topupAmount = double.parse(amount);
+    double minTopUpLimit =
+        double.parse(widget.store.walletSettings.minTopUpAmount);
+    double maxTopUpLimit =
+        double.parse(widget.store.walletSettings.maxTopUpAmount);
+    double maxWalletHoldingLimit =
         double.parse(widget.store.walletSettings.maxTopUpHoldAmount);
 
-    if (topupAmount < min) {
-      print("Min top Up amount is ${min}");
+    if (topupAmount < minTopUpLimit) {
+      print("Min top Up amount is ${minTopUpLimit}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Min top Up amount is ${widget.store.walletSettings.minTopUpAmount}'),
+          content: Text(
+              'Min top Up amount is ${widget.store.walletSettings.minTopUpAmount}'),
         ),
       );
-    }
-    else if (topupAmount > max) {
-      print("Maximum topup limit is ${max}");
+    } else if (topupAmount > maxTopUpLimit) {
+      print("Maximum topup limit is ${maxTopUpLimit}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Maximum topup limit is ${widget.store.walletSettings.maxTopUpAmount}'),
+          content: Text(
+              'Maximum topup limit is ${widget.store.walletSettings.maxTopUpAmount}'),
         ),
       );
-    }
-    else if (max_topUp_limit < topupAmount + wallet_balance) {
-      print(
-          "you can only topup if your topup amount is less than ${enterMoney.text + walleModel.data.userWallet}");
+    } else if (maxWalletHoldingLimit < (topupAmount + wallet_balance)) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('you can only topup if your topup amount is less than ${enterMoney.text + walleModel.data.userWallet}'),
+          content: Text(
+              'Your total wallet holding capacity is ${widget.store.walletSettings.maxTopUpHoldAmount}'),
         ),
       );
-    }
-    else {
-      print("done");
+    } else {
       // showModalBottomSheet<void>(
       //     backgroundColor: Colors.transparent,
       //     context: context,
@@ -343,7 +348,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
       //       );
       //     },);
 
-      callCreateToken(enterMoney.text.trim(), storeObject);
+      callCreateToken(amount, storeObject);
     }
   }
 
@@ -351,32 +356,25 @@ class _WalletTopUpState extends State<WalletTopUp> {
   //RazorPay Code Start
   callCreateToken(String mPrice, StoreModel store) {
     Utils.showProgressDialog(context);
-    //TODO: amount--- Number 1
-    ApiController.razorpayCreateOrderApi(
-//            mPrice, orderJson, detailsModel.orderDetails)
-            mPrice,
-            "",
-            "")
+    ApiController.razorpayCreateOrderApi(mPrice, "", "", isWalletTopUP: true)
         .then((response) {
       CreateOrderData model = response;
-
       if (model != null && response.success) {
         print("----razorpayCreateOrderApi----${response.data.id}--");
-            Utils.hideProgressDialog(context);
-        //TODO: Hit Walltet Api -createOnlineTopUP---Number 2
-        ApiController.createOnlineTopUPApi(
-            mPrice, model.data.id )
+        print("----razorpayCreateOrderApi----${response}--");
+        // Hit createOnlineTopUpApi
+        ApiController.createOnlineTopUPApi(mPrice, model.data.id)
             .then((response) {
           RazorPayTopUP modelPay = response;
+          Utils.hideProgressDialog(context);
           if (modelPay != null && response.success) {
-            openCheckout(store,mPrice);
+            //Opening Gateway
+            openCheckout(store, mPrice, model.data.id);
           } else {
             Utils.showToast("${model.message}", true);
             Utils.hideProgressDialog(context);
           }
         });
-        //TODO: orderID
-//        model.data.id
       } else {
         Utils.showToast("${model.message}", true);
         Utils.hideProgressDialog(context);
@@ -384,20 +382,23 @@ class _WalletTopUpState extends State<WalletTopUp> {
     });
   }
 
-  //TODO: This Method is used for opening RazorPay Gateway--- Number 3
   void openCheckout(
-      StoreModel storeObject,String mprice) async {
+      StoreModel storeObject, String mprice, String razorPayID) async {
     Utils.hideProgressDialog(context);
     UserModel user = await SharedPrefs.getUser();
-    //double price = totalPrice ;
+    print('${double.parse(mprice) * 100}');
     var options = {
       'key': '${storeObject.paymentSetting.apiKey}',
-      'currency': "INR",
-
-      'amount': (double.parse(mprice) * 100),
-      /*'external': {
-        'wallets': ['paytm']
-      }*/
+      'currency': 'INR',
+      'order_id': razorPayID,
+      'amount': (double.parse(mprice).round() * 100),
+      'name': '${storeObject.storeName}',
+      'description': '',
+      'prefill': {
+        'contact': '${user.phone}',
+        'email': '${user.email}',
+        'name': '${user.fullName}'
+      },
     };
     try {
       //open payment gateway
@@ -417,24 +418,20 @@ class _WalletTopUpState extends State<WalletTopUp> {
   void _handlePaymentSuccess(PaymentSuccessResponse responseObj) {
     //Show Loading....
     Utils.showProgressDialog(context);
+    print( ' razorpay------------------------- $responseObj');
     ApiController.razorpayVerifyTransactionApi(responseObj.orderId)
         .then((response) {
       print("----razorpayVerifyTransactionApi----${response}--");
       if (response != null) {
         RazorpayOrderData model = response;
         if (model.success) {
-          //TODO: Remove loading After implementing WalletApi
-         // Utils.hideProgressDialog(context);
-          //TODO: hit here Wallet Api -onlineTopUP-- Number 4
-          ApiController.onlineTopUP( responseObj.paymentId, model.data.id, model.data.amount
-          )
+          ApiController.onlineTopUP(
+                  responseObj.paymentId, model.data.id, model.data.amount)
               .then((response) {
             RazorPayOnlineTopUp modelPay = response;
             print(modelPay);
-
           });
-
-        }else{
+        } else {
           Utils.showToast("Something went wrong!", true);
           Utils.hideProgressDialog(context);
         }
