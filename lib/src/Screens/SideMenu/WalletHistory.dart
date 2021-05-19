@@ -44,22 +44,22 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white70,
-      // appBar: AppBar(
+      backgroundColor: Colors.white,
+      //  appBar: AppBar(
       //   elevation: 0,
-      //   backgroundColor: appTheme,
-      //   // title: Text(
-      //   //   "Wallet Balance",
-      //   //   style: TextStyle(
-      //   //     color: Colors.white,
-      //   //   ),
-      //   // ),
-      //   centerTitle: true,
-      //   // leading: IconButton(
-      //   //   icon: Icon(Icons.arrow_back),
-      //   //   onPressed: () => Navigator.pop(context),
-      //   // ),
-      // ),
+      //    backgroundColor: appTheme,
+      // //   // title: Text(
+      // //   //   "Wallet Balance",
+      // //   //   style: TextStyle(
+      // //   //     color: Colors.white,
+      // //   //   ),
+      // //   // ),
+      // //   centerTitle: true,
+      // //   // leading: IconButton(
+      // //   //   icon: Icon(Icons.arrow_back),
+      // //   //   onPressed: () => Navigator.pop(context),
+      // //   // ),
+      //  ),
       body: walleModel == null
           ? Utils.showIndicator()
           : walleModel.data.walletHistory.isEmpty
@@ -381,7 +381,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
     return Stack(
       children: [
         Container(
-            height: Utils.getDeviceHeight(context) / 2.2,
+            height: Utils.getDeviceHeight(context) / 2.0,
             width: Utils.getDeviceWidth(context),
             //color: Colors.white,
             child: Container(
@@ -396,6 +396,18 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        IconButton(
+
+                          padding: EdgeInsets.only(top: 50),
+                          //iconSize: 15,
+                          alignment: Alignment.topLeft,
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: Colors.white,
+                          ),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        Size
                         Text(
                           "Wallet Balance",
                           style:
