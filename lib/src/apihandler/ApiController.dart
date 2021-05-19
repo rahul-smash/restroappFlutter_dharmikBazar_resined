@@ -27,6 +27,8 @@ import 'package:restroapp/src/models/NotificationResponseModel.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/ProductRatingResponse.dart';
+import 'package:restroapp/src/models/RazorPayOnlineTopUp.dart';
+import 'package:restroapp/src/models/RazorPayTopUP.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/RecommendedProductsResponse.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
@@ -1178,6 +1180,67 @@ class ApiController {
       return null;
     }
   }
+  static Future<RazorPayTopUP> createOnlineTopUPApi(String price, dynamic Id) async{
+    UserModel user = await SharedPrefs.getUser();
+    StoreModel store = await SharedPrefs.getStore();
+    var url  = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.createOnlineTopUP;
+    print(url);
+    try{
+      FormData formData = new FormData.fromMap({
+        "amount": price,
+        "user_id": user.id,
+        "payment_request_id": Id,
+        "payment_type": "razorpay",
+        "currency": "INR"
+
+      });
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(contentType: "application/json", responseType: ResponseType.plain));
+      print(response.statusCode);
+      print(response.data);
+      RazorPayTopUP razorTopStore =
+      RazorPayTopUP.fromJson(json.decode(response.data));
+      print("-----RazortopUpData---${razorTopStore.success}");
+      return razorTopStore;
+    }catch(e)
+    {print(e);
+    }
+  }
+  static Future<RazorPayOnlineTopUp> onlineTopUP( String paymentId, String paymentRequestId, int amount) async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.onlineTopUP;
+    print(url);
+    try{
+      FormData formData = new FormData.fromMap({
+        "price": amount,
+        "user_id": user.id,
+        "payment_request_id": paymentRequestId,
+        "online_method": "razorpay",
+        "payment_id": paymentId,
+
+      });
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(contentType: "application/json", responseType: ResponseType.plain));
+      print(response.statusCode);
+      print(response.data);
+      RazorPayOnlineTopUp razorTopStore =
+      RazorPayOnlineTopUp.fromJson(json.decode(response.data));
+      print("-----RazortopUpData---${razorTopStore.success}");
+      return razorTopStore;
+    }catch(e)
+    {print(e);
+    }
+
+
+  }
+
 
   static Future<CreateOrderData> razorpayCreateOrderApi(String amount,
       String orderJson, dynamic detailsJson) async {

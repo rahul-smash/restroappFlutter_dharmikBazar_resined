@@ -6,6 +6,8 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
+import 'package:restroapp/src/models/RazorPayOnlineTopUp.dart';
+import 'package:restroapp/src/models/RazorPayTopUP.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
@@ -29,6 +31,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
   final _enterMoney = new TextEditingController();
 
   Razorpay _razorpay;
+  List _paymentMethod = ['Razor Pay', 'Paytm'];
 
   @override
   void initState() {
@@ -228,6 +231,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
                                   width: 180,
                                   child: ElevatedButton(
                                     onPressed: () {
+
                                       print(_enterMoney.text);
                                       setState(() {
                                         checkTopUpCondition(_enterMoney);
@@ -267,7 +271,8 @@ class _WalletTopUpState extends State<WalletTopUp> {
     );
   }
 
-  void checkTopUpCondition(TextEditingController enterMoney) {
+  void checkTopUpCondition(TextEditingController enterMoney)  async{
+    StoreModel storeObject = await SharedPrefs.getStore();
     double wallet_balance = double.parse(walleModel.data.userWallet);
     print(wallet_balance);
     double topupAmount = double.parse(enterMoney.text);
@@ -280,30 +285,71 @@ class _WalletTopUpState extends State<WalletTopUp> {
       print("Min top Up amount is ${min}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Min top Up amount is ${min}'),
+          content: Text('Min top Up amount is ${widget.store.walletSettings.minTopUpAmount}'),
         ),
       );
     }
-    if (topupAmount > max) {
+    else if (topupAmount > max) {
       print("Maximum topup limit is ${max}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Maximum topup limit is ${max}'),
+          content: Text('Maximum topup limit is ${widget.store.walletSettings.maxTopUpAmount}'),
         ),
       );
     }
-    if (max_topUp_limit < topupAmount + wallet_balance) {
+    else if (max_topUp_limit < topupAmount + wallet_balance) {
       print(
-          "you can only topup if your topup amount is less than ${topupAmount + wallet_balance}");
-    } else {
+          "you can only topup if your topup amount is less than ${enterMoney.text + walleModel.data.userWallet}");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('you can only topup if your topup amount is less than ${enterMoney.text + walleModel.data.userWallet}'),
+        ),
+      );
+    }
+    else {
       print("done");
-      callCreateToken(enterMoney.text.trim());
+      // showModalBottomSheet<void>(
+      //     backgroundColor: Colors.transparent,
+      //     context: context,
+      //     builder: (BuildContext context) {
+      //       return Container(
+      //         decoration: BoxDecoration(
+      //           borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight:Radius.circular(15) ),
+      //           color: Colors.white,
+      //         ),
+      //         height: 200,
+      //
+      //         child: ListView.builder(
+      //             itemCount: _paymentMethod.length,
+      //             itemBuilder: (context, index)
+      //             {
+      //               return Container(
+      //                 color:(_paymentMethod.contains(index)) ? Colors.blue.withOpacity(0.5) : Colors.transparent,
+      //                 child: ListTile(
+      //                   onTap: (){
+      //                     if(! _paymentMethod.contains(index)){
+      //                       setState(() {
+      //                         _paymentMethod.add(index);
+      //
+      //                       });
+      //                     }
+      //                   },
+      //                   title: Text('${_paymentMethod[index]}'),
+      //                 ),
+      //               );
+      //             }
+      //         ) ,
+      //
+      //       );
+      //     },);
+
+      callCreateToken(enterMoney.text.trim(), storeObject);
     }
   }
 
   //-----------------------------------------------------------------------------------------------
   //RazorPay Code Start
-  callCreateToken(String mPrice) {
+  callCreateToken(String mPrice, StoreModel store) {
     Utils.showProgressDialog(context);
     //TODO: amount--- Number 1
     ApiController.razorpayCreateOrderApi(
@@ -313,10 +359,22 @@ class _WalletTopUpState extends State<WalletTopUp> {
             "")
         .then((response) {
       CreateOrderData model = response;
+
       if (model != null && response.success) {
         print("----razorpayCreateOrderApi----${response.data.id}--");
             Utils.hideProgressDialog(context);
         //TODO: Hit Walltet Api -createOnlineTopUP---Number 2
+        ApiController.createOnlineTopUPApi(
+            mPrice, model.data.id )
+            .then((response) {
+          RazorPayTopUP modelPay = response;
+          if (modelPay != null && response.success) {
+            openCheckout(store,mPrice);
+          } else {
+            Utils.showToast("${model.message}", true);
+            Utils.hideProgressDialog(context);
+          }
+        });
         //TODO: orderID
 //        model.data.id
       } else {
@@ -328,22 +386,15 @@ class _WalletTopUpState extends State<WalletTopUp> {
 
   //TODO: This Method is used for opening RazorPay Gateway--- Number 3
   void openCheckout(
-      String razorpay_order_id, StoreModel storeObject, String mprice) async {
+      StoreModel storeObject,String mprice) async {
     Utils.hideProgressDialog(context);
     UserModel user = await SharedPrefs.getUser();
     //double price = totalPrice ;
     var options = {
       'key': '${storeObject.paymentSetting.apiKey}',
       'currency': "INR",
-      'order_id': razorpay_order_id,
+
       'amount': (double.parse(mprice) * 100),
-      'name': '${widget.store.storeName}',
-      'description': '',
-      'prefill': {
-        'contact': '${user.phone}',
-        'email': '${user.email}',
-        'name': '${user.fullName}'
-      },
       /*'external': {
         'wallets': ['paytm']
       }*/
@@ -368,15 +419,22 @@ class _WalletTopUpState extends State<WalletTopUp> {
     Utils.showProgressDialog(context);
     ApiController.razorpayVerifyTransactionApi(responseObj.orderId)
         .then((response) {
-      //print("----razorpayVerifyTransactionApi----${response}--");
+      print("----razorpayVerifyTransactionApi----${response}--");
       if (response != null) {
         RazorpayOrderData model = response;
         if (model.success) {
           //TODO: Remove loading After implementing WalletApi
-          Utils.hideProgressDialog(context);
+         // Utils.hideProgressDialog(context);
           //TODO: hit here Wallet Api -onlineTopUP-- Number 4
+          ApiController.onlineTopUP( responseObj.paymentId, model.data.id, model.data.amount
+          )
+              .then((response) {
+            RazorPayOnlineTopUp modelPay = response;
+            print(modelPay);
 
-        } else {
+          });
+
+        }else{
           Utils.showToast("Something went wrong!", true);
           Utils.hideProgressDialog(context);
         }
