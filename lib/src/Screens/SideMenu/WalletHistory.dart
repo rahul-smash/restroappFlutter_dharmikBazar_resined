@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
@@ -26,270 +27,169 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    ApiController.getUserWallet().then((response) {
-      setState(() {
-        this.walleModel = response;
-        if (walleModel != null &&
-            walleModel.success &&
-            walleModel.data.walletHistory.isNotEmpty) {
-          //sorting
-          walleModel.data.walletHistory.sort((a, b) {
-            return b.dateTime.compareTo(a.dateTime);
-          });
-        }
-      });
-    });
+    _callWalletApi();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      //  appBar: AppBar(
-      //   elevation: 0,
-      //    backgroundColor: appTheme,
-      // //   // title: Text(
-      // //   //   "Wallet Balance",
-      // //   //   style: TextStyle(
-      // //   //     color: Colors.white,
-      // //   //   ),
-      // //   // ),
-      // //   centerTitle: true,
-      // //   // leading: IconButton(
-      // //   //   icon: Icon(Icons.arrow_back),
-      // //   //   onPressed: () => Navigator.pop(context),
-      // //   // ),
-      //  ),
-      body: walleModel == null
-          ? Utils.showIndicator()
-          : walleModel.data.walletHistory.isEmpty
-              ? Container(
-                  child: showEmptyWidget(),
-                )
-              : SafeArea(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: Container(
-
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Stack(
-                            children: [
-                              Container(
-                                //height: 180,
-                                  color: appTheme,
-                                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          IconButton(
-                                            padding: EdgeInsets.all(0),
-                                            //iconSize: 15,
-                                            alignment: Alignment.topLeft,
-                                            icon: Icon(
-                                              Icons.arrow_back,
-                                              color: Colors.white,
-                                            ),
-                                            onPressed: () => Navigator.pop(context),
-                                          ),
-                                          Text(
-                                            "Wallet Balance",
-                                            style: TextStyle(
-                                                color: Colors.grey[400], fontSize: 16),
-                                          ),
-                                          walleModel == null
-                                              ? Container()
-                                              : Row(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                child: Text(
-                                                    "${AppConstant.currency}",
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16)),
-                                                padding: EdgeInsets.fromLTRB(
-                                                    0, 1, 0, 0),
-                                              ),
-                                              Text(
-                                                  "${walleModel.data.userWallet}",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 24)),
-                                            ],
-                                          ),
-                                          SizedBox(
-                                            height: 50,
-                                          )
-                                        ],
-                                      ),
-                                      Align(
-                                        alignment: Alignment.center,
-                                        child: Image.asset(
-                                          "images/walletbalancegreaphics.png",
-                                          width: 200,
-                                          height: 200,
-                                        ),
-                                      ),
-                                    ],
-                                  )),
-                              Container(
-
-                                margin: EdgeInsets.fromLTRB(20, 172, 20, 0),
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Container(
-                                    width: MediaQuery.of(context).size.width,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5),
-                                      color: Colors.white,),
-                                    child: Column(
+      appBar: AppBar(
+//        toolbarHeight: 40,
+        elevation: 0,
+      ),
+      backgroundColor: Colors.white70,
+      body: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          walleModel == null
+              ? Utils.showIndicator()
+              : walleModel.data.walletHistory.isEmpty
+                  ? Container(
+                      child: showEmptyWidget(),
+                    )
+                  : SafeArea(
+                      child: Container(
+                        child: Column(
+                          children: [
+                            Container(
+                                color: appTheme,
+                                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                      Container(
-                                        margin: EdgeInsets.fromLTRB(0, 20, 240, 10),
-                                        child: Text("Transcations",
-                                            style:
-                                                TextStyle(color: Colors.black, fontSize: 16)),
-                                      ),
-                                       SizedBox(
-                                         height: MediaQuery.of(context).size.height/1.45,
-                                         child: Container(
-                                              child: ListView.builder(
-                                                  shrinkWrap: true,
-                                                  scrollDirection: Axis.vertical,
-                                                  itemCount: walleModel.data.walletHistory.length,
-                                                  itemBuilder: (context, index){
-                                                    return Container(
-                                                      margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                                                      child: Column(
-                                                        children: [
-                                                          showWalletView(
-                                                              walleModel.data.walletHistory[index]),
-                                                          SizedBox(
-                                                            height: 15,
-                                                          ),
-                                                          Utils.showDivider(context),
-                                                        ],
-                                                      ),
-                                                    );
-                                                  }
+//                              IconButton(
+//                                padding: EdgeInsets.all(0),
+//                                //iconSize: 15,
+//                                alignment: Alignment.topLeft,
+//                                icon: Icon(
+//                                  Icons.arrow_back,
+//                                  color: Colors.white,
+//                                ),
+//                                onPressed: () =>
+//                                    Navigator.pop(context),
+//                              ),
+                                        Text(
+                                          "Wallet Balance",
+                                          style: TextStyle(
+                                              color: Colors.grey[400],
+                                              fontSize: 16),
+                                        ),
+                                        walleModel == null
+                                            ? Container()
+                                            : Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Padding(
+                                                    child: Text(
+                                                        "${AppConstant.currency}",
+                                                        style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 16)),
+                                                    padding:
+                                                        EdgeInsets.fromLTRB(
+                                                            0, 1, 0, 0),
+                                                  ),
+                                                  Text(
+                                                      "${walleModel.data.userWallet}",
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 24)),
+                                                ],
                                               ),
-                                          ),
-                                       ),
-
-                                      // Expanded(
-                                      //     child: Container(
-                                      //   decoration: BoxDecoration(
-                                      //       border: Border.all(color: Colors.white, width: 1),
-                                      //       color: Colors.white,
-                                      //       borderRadius: BorderRadius.circular(5)),
-                                      //   //margin: EdgeInsets.only(top: 0, left: 15, right: 15),
-                                      //   child: ListView.builder(
-                                      //     itemBuilder: (context, index) {
-                                      //       return Container(
-                                      //         margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                                      //         child: Column(
-                                      //           children: [
-                                      //             showWalletView(
-                                      //                 walleModel.data.walletHistory[index]),
-                                      //             SizedBox(
-                                      //               height: 15,
-                                      //             ),
-                                      //             Utils.showDivider(context),
-                                      //           ],
-                                      //         ),
-                                      //       );
-                                      //     },
-                                      //     itemCount: walleModel.data.walletHistory.length,
-                                      //     shrinkWrap: true,
-                                      //   ),
-                                      // )),
-
+                                        SizedBox(
+                                          height: 50,
+                                        )
                                       ],
                                     ),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child: Image.asset(
+                                        "images/walletbalancegreaphics.png",
+                                        width: 200,
+                                      ),
+                                    ),
+                                  ],
+                                )),
+                            Expanded(
+                              child: Stack(
+                                children: [
+                                  Container(height: 40, color: appTheme),
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(5),
+                                        color: Colors.white,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            margin: EdgeInsets.fromLTRB(
+                                                0, 20, 240, 10),
+                                            child: Text("Transcations",
+                                                style: TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 16)),
+                                          ),
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              child: Column(
+                                                children: [
+                                                  ListView.builder(
+                                                      shrinkWrap: true,
+                                                      physics:
+                                                          NeverScrollableScrollPhysics(),
+                                                      scrollDirection:
+                                                          Axis.vertical,
+                                                      itemCount: walleModel.data
+                                                          .walletHistory.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        return Container(
+                                                          margin:
+                                                              EdgeInsets.fromLTRB(
+                                                                  10, 10, 10, 0),
+                                                          child: Column(
+                                                            children: [
+                                                              showWalletView(walleModel
+                                                                      .data
+                                                                      .walletHistory[
+                                                                 index]),
+                                                              SizedBox(
+                                                                height: 15,
+                                                              ),
+                                                              Utils.showDivider(
+                                                                  context),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      }),
+                                                  Container(height: 100,)
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Container(
-                        margin: EdgeInsets.fromLTRB(100,650, 100,0),
-
-                        child: Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            width: 180,
-                            height: 45,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => WalletTopUp(widget.store)),
-                                );
-                              },
-                              child: Text('Add Money'),
-                              style: ButtonStyle(
-                                backgroundColor:
-                                MaterialStateProperty.all<Color>(
-                                    appTheme),
-                                shape: MaterialStateProperty.all<
-                                    RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                                    borderRadius:
-                                    BorderRadius.circular(20),
-                                  ),
-                                ),
+                                ],
                               ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
-                              //_buttonVisibility(),
-                            ],
-                          ),
-
-                          // Container(
-                          //   margin: EdgeInsets.fromLTRB(25, 20, 10, 10),
-                          //   child: Text("Transcations",
-                          //       style:
-                          //           TextStyle(color: Colors.black, fontSize: 16)),
-                          // ),
-                          // Expanded(
-                          //     child: Container(
-                          //   decoration: BoxDecoration(
-                          //       border: Border.all(color: Colors.white, width: 1),
-                          //       color: Colors.white,
-                          //       borderRadius: BorderRadius.circular(5)),
-                          //   margin: EdgeInsets.only(top: 0, left: 15, right: 15),
-                          //   child: ListView.builder(
-                          //     itemBuilder: (context, index) {
-                          //       return Container(
-                          //         margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                          //         child: Column(
-                          //           children: [
-                          //             showWalletView(
-                          //                 walleModel.data.walletHistory[index]),
-                          //             SizedBox(
-                          //               height: 15,
-                          //             ),
-                          //             Utils.showDivider(context),
-                          //           ],
-                          //         ),
-                          //       );
-                          //     },
-                          //     itemCount: walleModel.data.walletHistory.length,
-                          //     shrinkWrap: true,
-                          //   ),
-                          // )),
-                        ],
-                      ),
                     ),
-                  ),
-                ),
+          _addMoneyButton(),
+        ],
+      ),
     );
   }
 
@@ -306,23 +206,16 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               borderRadius: BorderRadius.circular(20.0),
               border: Border.all(
                 width: 0.0,
-                color: walletHistory.refund_type != "order_refund" ||
-                        walletHistory.refund_type != "subscription_refund"
-                    ? red1
-                    : green1,
+                color: _isCheckType(walletHistory) ? green1 : red1,
               ),
-              color: walletHistory.refund_type != "order_refund" ||
-                      walletHistory.refund_type != "subscription_refund"
-                  ? red1
-                  : green1,
+              color: _isCheckType(walletHistory) ? green1 : red1,
             ),
             child: Padding(
               padding: EdgeInsets.all(6),
               child: Image.asset(
-                walletHistory.refund_type != "order_refund" ||
-                        walletHistory.refund_type != "subscription_refund"
-                    ? "images/orderrefund.png"
-                    : "images/cashbackicon.png",
+                _isCheckType(walletHistory)
+                    ? "images/cashbackicon.png"
+                    : "images/orderrefund.png",
                 height: 20,
                 width: 20,
                 fit: BoxFit.fill,
@@ -355,13 +248,10 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Text(
-                    '${walletHistory.refund_type == "order_refund" || walletHistory.refund_type == "subscription_refund" ? " + " : " - "}${AppConstant.currency}${walletHistory.refund}',
+                    '${_isCheckType(walletHistory) ? " + " : " - "}${AppConstant.currency}${walletHistory.refund}',
                     style: TextStyle(
-                        color: walletHistory.refund_type == "order_refund" ||
-                                walletHistory.refund_type ==
-                                    "subscription_refund"
-                            ? green2
-                            : Colors.black,
+                        color:
+                            _isCheckType(walletHistory) ? green2 : Colors.black,
                         fontSize: 18,
                         fontWeight: FontWeight.normal)),
                 SizedBox(height: 5),
@@ -378,170 +268,161 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
 
   Widget showEmptyWidget() {
     print("-------showEmptyWidget-----------");
-    return Stack(
-      children: [
-        Container(
-            height: Utils.getDeviceHeight(context) / 2.0,
-            width: Utils.getDeviceWidth(context),
-            //color: Colors.white,
-            child: Container(
-              child: ClipPath(
-                clipper: ClippingClass(),
-                child: Container(
-                  padding: EdgeInsets.only(left: 20),
-                  color: appTheme,
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        IconButton(
-
-                          padding: EdgeInsets.only(top: 50),
-                          //iconSize: 15,
-                          alignment: Alignment.topLeft,
-                          icon: Icon(
-                            Icons.arrow_back,
-                            color: Colors.white,
+    return Container(
+      color: Colors.white,
+      child: Stack(
+        children: [
+          Container(
+              height: Utils.getDeviceHeight(context) / 2.2,
+              width: Utils.getDeviceWidth(context),
+              //color: Colors.white,
+              child: Container(
+                child: ClipPath(
+                  clipper: ClippingClass(),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 20),
+                    color: appTheme,
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Wallet Balance",
+                            style: TextStyle(
+                                color: Colors.grey[400], fontSize: 16),
                           ),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                        Size
-                        Text(
-                          "Wallet Balance",
-                          style:
-                              TextStyle(color: Colors.grey[400], fontSize: 16),
-                        ),
-                        SizedBox(
-                          height: 5,
-                        ),
-                        Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              child: Text("${AppConstant.currency}",
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                child: Text("${AppConstant.currency}",
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 16)),
+                                padding: EdgeInsets.fromLTRB(0, 1, 0, 0),
+                              ),
+                              Text("${walleModel.data.userWallet}",
                                   style: TextStyle(
-                                      color: Colors.white, fontSize: 16)),
-                              padding: EdgeInsets.fromLTRB(0, 1, 0, 0),
-                            ),
-                            Text("${walleModel.data.userWallet}",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 24)),
-                          ],
-                        )
-                      ],
+                                      color: Colors.white, fontSize: 24)),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            )),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            height: 250,
-            //color: Colors.grey,
-            child: Center(
-              child: Column(
-                children: [
-                  Text(
-                    "Your Wallet is Empty",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  // Text("AS per discussed we remove this text",style: TextStyle(color: Colors.grey[500]),),
-                  // Text("in your wallet at that moment"),
-                  //Text("kindly purchase more to continue"),
-                  SizedBox(
-                    height: 60,
-                  ),
-                  Container(
-                    width: 180,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => WalletTopUp(widget.store)),
-                        );
-                      },
-                      child: Text('Add Money'),
-                      style: ButtonStyle(
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.white),
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(appTheme),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ))),
+              )),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 250,
+              //color: Colors.grey,
+              child: Center(
+                child: Column(
+                  children: [
+                    Text(
+                      "Your Wallet is Empty",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
                     ),
-                  ),
-                ],
+                    SizedBox(
+                      height: 20,
+                    ),
+                    // Text("AS per discussed we remove this text",style: TextStyle(color: Colors.grey[500]),),
+                    // Text("in your wallet at that moment"),
+                    //Text("kindly purchase more to continue"),
+                    SizedBox(
+                      height: 60,
+                    ),
+//                  _addMoneyButton()
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-              40, 0, 0, (Utils.getDeviceHeight(context) / 3.5)),
-          child: Align(
-            alignment: Alignment.center,
-            child: Image.asset(
-              "images/emptywalletbalancegreaphics.png",
-              width: 240,
-              height: 240,
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+                40, 0, 0, (Utils.getDeviceHeight(context) / 3.5)),
+            child: Align(
+              alignment: Alignment.center,
+              child: Image.asset(
+                "images/emptywalletbalancegreaphics.png",
+                width: 240,
+                height: 240,
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  _buttonVisibility() {
-    if(widget.store.walletSettings.status == 1
-        && widget.store.walletSettings.customerWalletTopUpStatus == 1){
-      return Container(
-        margin: EdgeInsets.fromLTRB(100,650, 100,0),
+  void _openWalletTopScreen() async {
+    bool isTopUpSuccess = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => WalletTopUp(widget.store)),
+    );
+    if (isTopUpSuccess) {
+      _callWalletApi(showLoading: true);
+    }
+  }
 
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            width: 180,
-            height: 45,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => WalletTopUp(widget.store)),
-                );
-              },
-              child: Text('Add Money'),
-              style: ButtonStyle(
-                backgroundColor:
-                MaterialStateProperty.all<Color>(
-                    appTheme),
-                shape: MaterialStateProperty.all<
-                    RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                    borderRadius:
-                    BorderRadius.circular(20),
-                  ),
-                ),
+  void _callWalletApi({bool showLoading = false}) {
+    if (showLoading) Utils.showProgressDialog(context);
+    ApiController.getUserWallet().then((response) {
+      if (showLoading) Utils.hideProgressDialog(context);
+      if (mounted)
+        setState(() {
+          this.walleModel = response;
+          if (walleModel != null &&
+              walleModel.success &&
+              walleModel.data.walletHistory.isNotEmpty) {
+            //sorting
+            walleModel.data.walletHistory.sort((a, b) {
+              return b.dateTime.compareTo(a.dateTime);
+            });
+          }
+        });
+    });
+  }
+
+  Widget _addMoneyButton() {
+    return Visibility(
+//      visible: widget.store.walletSettings.status == '1' &&
+//          widget.store.walletSettings.customerWalletTopUpStatus == '1',
+      visible: true,
+      child: Container(
+        width: 180,
+        height: 45,
+        margin: EdgeInsets.only(bottom: 40),
+        child: ElevatedButton(
+          onPressed: () {
+            _openWalletTopScreen();
+          },
+          child: Text('Add Money'),
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(appTheme),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
               ),
             ),
           ),
         ),
-      );
-    }
-    else return Container();
+      ),
+    );
+  }
+
+  bool _isCheckType(WalletHistory walletHistory) {
+    return walletHistory.refund_type == "order_refund" ||
+        walletHistory.refund_type == "subscription_refund" ||
+        walletHistory.refund_type == "wallet_topup";
   }
 }
 
