@@ -239,7 +239,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                 Text("#${walletHistory.displayOrderId}",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey[500], fontSize: 15)),
+                    style: TextStyle(color: Colors.grey[500], fontSize: 12)),
               ]),
         ),
         Container(
@@ -259,7 +259,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                     "${Utils.convertWalletDate(walletHistory.dateTime.toString())}",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey[500], fontSize: 15)),
+                    style: TextStyle(color: Colors.grey[500], fontSize: 12)),
               ]),
         ),
       ],

@@ -31,6 +31,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
   final _enterMoney = new TextEditingController();
 
   Razorpay _razorpay;
+  List _paymentMethod = ["Razor Pay", "PayTm"];
 
   @override
   void initState() {
@@ -307,42 +308,49 @@ class _WalletTopUpState extends State<WalletTopUp> {
         ),
       );
     } else {
-      // showModalBottomSheet<void>(
-      //     backgroundColor: Colors.transparent,
-      //     context: context,
-      //     builder: (BuildContext context) {
-      //       return Container(
-      //         decoration: BoxDecoration(
-      //           borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight:Radius.circular(15) ),
-      //           color: Colors.white,
-      //         ),
-      //         height: 200,
-      //
-      //         child: ListView.builder(
-      //             itemCount: _paymentMethod.length,
-      //             itemBuilder: (context, index)
-      //             {
-      //               return Container(
-      //                 color:(_paymentMethod.contains(index)) ? Colors.blue.withOpacity(0.5) : Colors.transparent,
-      //                 child: ListTile(
-      //                   onTap: (){
-      //                     if(! _paymentMethod.contains(index)){
-      //                       setState(() {
-      //                         _paymentMethod.add(index);
-      //
-      //                       });
-      //                     }
-      //                   },
-      //                   title: Text('${_paymentMethod[index]}'),
-      //                 ),
-      //               );
-      //             }
-      //         ) ,
-      //
-      //       );
-      //     },);
 
-      callCreateToken(amount, storeObject);
+      showModalBottomSheet<void>(
+          backgroundColor: Colors.transparent,
+          context: context,
+          builder: (BuildContext context) {
+            return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight:Radius.circular(20) ),
+                color: Colors.white,
+              ),
+              height: 200,
+              child: ListView.builder(
+                  itemCount: _paymentMethod.length,
+                  itemBuilder: (context, index)
+                  {
+                    return Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white70,
+                        border: Border.all(
+                          //color: Colors.blue,
+                          width: 0.5,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      margin: EdgeInsets.all(10),
+                      child: ListTile(
+                        onTap: (){
+                          if(index == 0){
+                            Navigator.pop(context);
+                            callCreateToken(amount, storeObject);
+                          }
+                          else{
+                            print('Choose Paytm');
+
+                          }
+                        },
+                        title: Text('* ${_paymentMethod[index]}',style: TextStyle(fontSize: 18,),),
+                      ),
+                    );
+                  }
+              ) ,
+            );
+          },);
     }
   }
 
@@ -429,13 +437,15 @@ class _WalletTopUpState extends State<WalletTopUp> {
           double amount= model.data.amount/100;
           ApiController.onlineTopUP(
                   responseObj.paymentId, model.data.id, amount.toString())
-              .then((response) {
+              .then((response)  {
             RazorPayOnlineTopUp modelPay = response;
             print(modelPay);
             Utils.hideProgressDialog(context);
-            Navigator.pop(context, true);
+            Navigator.pop(context);
+            _showSuccessDialog();
           });
         } else {
+          _showFailedDialog();
           Utils.showToast("Something went wrong!", true);
           Utils.hideProgressDialog(context);
         }
@@ -447,6 +457,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
+    _showFailedDialog();
     Fluttertoast.showToast(msg: response.message, timeInSecForIosWeb: 4);
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
@@ -458,6 +469,105 @@ class _WalletTopUpState extends State<WalletTopUp> {
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
   }
 
+  Future<void> _showFailedDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(child: const Text('Sorry!',style: TextStyle(fontWeight: FontWeight.bold),)),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Center(child: Text('Your transaction has failed.')),
+                Center(child: Text('Please go back and try again.')),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 150,
+                    child: ElevatedButton(
+                      child:  Text('Ok'),
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.all<Color>(
+                            appTheme),
+                        shape: MaterialStateProperty.all<
+                            RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  Future<void> _showSuccessDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(child: const Text('Successful!',style: TextStyle(fontWeight: FontWeight.bold),)),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Center(child: Text('Your transaction is successful.')),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 150,
+                    child: ElevatedButton(
+                      child:  Text('Ok'),
+                      style: ButtonStyle(
+                        backgroundColor:
+                        MaterialStateProperty.all<Color>(
+                            appTheme),
+                        shape: MaterialStateProperty.all<
+                            RoundedRectangleBorder>(
+                          RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 //Razor Code End
 //-----------------------------------------------------------------------------------------------
 
