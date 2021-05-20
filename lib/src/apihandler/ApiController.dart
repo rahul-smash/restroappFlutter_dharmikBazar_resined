@@ -1571,6 +1571,9 @@ class ApiController {
           "orders": orderJson
         });
         Dio dio = new Dio();
+        dio.options.headers['Accept'] = 'application/json';
+        dio.options.contentType="application/json";
+        dio.options.followRedirects = false;
         Response response = await dio.post(url,
             data: formData,
             options: new Options(responseType: ResponseType.plain));

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:restroapp/src/Screens/BookOrder/ConfirmOrderScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
@@ -31,7 +32,12 @@ class _WalletTopUpState extends State<WalletTopUp> {
   final _enterMoney = new TextEditingController();
 
   Razorpay _razorpay;
+  StoreModel storeModel;
+
   List _paymentMethod = ["Razor Pay", "PayTm"];
+  bool isPayTmSelected = false;
+  bool isAnotherOnlinePaymentGatwayFound = false;
+  bool isPayTmActive = false;
 
   @override
   void initState() {
@@ -214,7 +220,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
                                        indent: 60,
                                        endIndent: 60,
                                      ),
-                                       SizedBox(height: 130,),
+                                       SizedBox(height: 250,),
                                        Container(
                                          margin: EdgeInsets.only(bottom: 50),
                                          width: 180,
@@ -260,212 +266,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
 
            ],
          ),
-         //SafeArea(
-        //   child: GestureDetector(
-        //     onTap: () {
-        //       Utils.hideKeyboard(context);
-        //     },
-        //     child: SingleChildScrollView(
-        //       scrollDirection: Axis.vertical,
-        //       child: Container(
-        //         child: Column(
-        //           crossAxisAlignment: CrossAxisAlignment.start,
-        //           children: [
-        //             Stack(
-        //               children: [
-        //                 Container(
-        //                     //height: 180,
-        //                     color: appTheme,
-        //                     padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-        //                     child: Row(
-        //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //                       children: [
-        //                         Column(
-        //                           crossAxisAlignment: CrossAxisAlignment.start,
-        //                           mainAxisAlignment: MainAxisAlignment.start,
-        //                           children: [
-        //                             // IconButton(
-        //                             //   padding: EdgeInsets.all(0),
-        //                             //   //iconSize: 15,
-        //                             //   alignment: Alignment.topLeft,
-        //                             //   icon: Icon(
-        //                             //     Icons.arrow_back,
-        //                             //     color: Colors.white,
-        //                             //   ),
-        //                             //   onPressed: () => Navigator.pop(context,false),
-        //                             // ),
-        //                             Text(
-        //                               "Wallet Balance",
-        //                               style: TextStyle(
-        //                                   color: Colors.grey[400],
-        //                                   fontSize: 16),
-        //                             ),
-        //                             walleModel == null
-        //                                 ? Container()
-        //                                 : Row(
-        //                                     crossAxisAlignment:
-        //                                         CrossAxisAlignment.start,
-        //                                     children: [
-        //                                       Padding(
-        //                                         child: Text(
-        //                                             "${AppConstant.currency}",
-        //                                             style: TextStyle(
-        //                                                 color: Colors.white,
-        //                                                 fontSize: 16)),
-        //                                         padding: EdgeInsets.fromLTRB(
-        //                                             0, 1, 0, 0),
-        //                                       ),
-        //                                       Text(
-        //                                           "${walleModel.data.userWallet}",
-        //                                           style: TextStyle(
-        //                                               color: Colors.white,
-        //                                               fontSize: 24)),
-        //                                     ],
-        //                                   ),
-        //                             SizedBox(
-        //                               height: 50,
-        //                             )
-        //                           ],
-        //                         ),
-        //                         Align(
-        //                           alignment: Alignment.center,
-        //                           child: Image.asset(
-        //                             "images/walletbalancegreaphics.png",
-        //                             width: 200,
-        //                             height: 200,
-        //                           ),
-        //                         ),
-        //                       ],
-        //                     )),
-        //                 Container(
-        //                   margin: EdgeInsets.fromLTRB(30, 172, 30, 0),
-        //                   child: Align(
-        //                     alignment: Alignment.bottomCenter,
-        //                     child: Container(
-        //                       width: MediaQuery.of(context).size.width,
-        //                       height:
-        //                           MediaQuery.of(context).size.height / 1.370,
-        //                       decoration: BoxDecoration(
-        //                         borderRadius: BorderRadius.circular(5),
-        //                         color: Colors.white,
-        //                       ),
-        //                       //width: 200,
-        //                       child: Column(
-        //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //                         children: [
-        //                           Column(
-        //                             children: [
-        //                               SizedBox(
-        //                                 height: 50,
-        //                               ),
-        //                               Text(
-        //                                 'TopUp amount',
-        //                                 style: TextStyle(
-        //                                     fontSize: 20, color: Colors.grey[400]),
-        //                               ),
-        //                               SizedBox(
-        //                                 height: 15,
-        //                               ),
-        //                               Row(
-        //                                 crossAxisAlignment:
-        //                                     CrossAxisAlignment.center,
-        //                                 mainAxisAlignment: MainAxisAlignment.center,
-        //                                 mainAxisSize: MainAxisSize.min,
-        //                                 children: [
-        //                                   Container(
-        //                                       margin:
-        //                                           EdgeInsets.fromLTRB(30, 0, 0, 0),
-        //                                       child: Text(
-        //                                         AppConstant.currency,
-        //                                         style: TextStyle(
-        //                                             fontSize: 22,
-        //                                             fontWeight: FontWeight.bold),
-        //                                       )),
-        //                                   SizedBox(
-        //                                     width: 5,
-        //                                   ),
-        //                                   Flexible(
-        //                                     child: Container(
-        //                                       width: 100,
-        //                                       //margin: EdgeInsets.fromLTRB(0,0,0,0),
-        //                                       child: TextFormField(
-        //                                         style: TextStyle(fontSize: 20),
-        //                                         keyboardType: TextInputType.number,
-        //                                         inputFormatters: [
-        //                                           FilteringTextInputFormatter
-        //                                               .digitsOnly
-        //                                         ],
-        //                                         onChanged: (text) {
-        //                                           print(text);
-        //                                           print('${_enterMoney.text}');
-        //                                         },
-        //                                         controller: _enterMoney,
-        //                                         textAlign: TextAlign.left,
-        //                                         decoration: InputDecoration(
-        //                                           focusedBorder: InputBorder.none,
-        //                                           hintStyle:
-        //                                               TextStyle(fontSize: 20),
-        //                                           hintText: widget
-        //                                               .store
-        //                                               .walletSettings
-        //                                               .defaultTopUpAmount,
-        //                                           border: InputBorder.none,
-        //                                           errorBorder: InputBorder.none,
-        //                                         ),
-        //                                       ),
-        //                                     ),
-        //                                   ),
-        //                                 ],
-        //                               ),
-        //                               Divider(
-        //                                 color: Colors.grey,
-        //                                 height: 1.8,
-        //                                 indent: 60,
-        //                                 endIndent: 60,
-        //                               ),
-        //                             ],
-        //                           ),
-        //                           Container(
-        //                             margin: EdgeInsets.only(bottom: 100),
-        //                             width: 180,
-        //                             child: ElevatedButton(
-        //                               onPressed: () {
-        //                                 print(
-        //                                     'Button pressed ${_enterMoney.text}');
-        //                                 setState(() {
-        //                                   checkTopUpCondition(_enterMoney);
-        //                                 });
-        //                               },
-        //                               child: Text('Submit'),
-        //                               style: ButtonStyle(
-        //                                 foregroundColor:
-        //                                 MaterialStateProperty.all<Color>(
-        //                                     Colors.white),
-        //                                 backgroundColor:
-        //                                 MaterialStateProperty.all<Color>(
-        //                                     appTheme),
-        //                                 shape: MaterialStateProperty.all<
-        //                                     RoundedRectangleBorder>(
-        //                                   RoundedRectangleBorder(
-        //                                     borderRadius:
-        //                                     BorderRadius.circular(20),
-        //                                   ),
-        //                                 ),
-        //                               ),
-        //                             ),
-        //                           ),
-        //                         ],
-        //                       ),
-        //                     ),
-        //                   ),
-        //                 ),
-        //               ],
-        //             ),
-        //           ],
-        //         ),
-        //       ),
-        //     ),
-        //   ),
+
         ),
 
     );
@@ -545,6 +346,8 @@ class _WalletTopUpState extends State<WalletTopUp> {
                           }
                           else{
                             print('Choose Paytm');
+                            Navigator.pop(context);
+                            callPayTmApi(amount, storeObject);
                           }
                         },
                         title: Text('* ${_paymentMethod[index]}',style: TextStyle(fontSize: 18,),),
@@ -672,6 +475,36 @@ class _WalletTopUpState extends State<WalletTopUp> {
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
   }
 
+  void callPayTmApi(String mPrice, StoreModel store) async {
+    String address = "NA", pin = "NA";
+    double price = double.parse(mPrice); //totalPrice ;
+    print("=======1===${price}===total==${mPrice}======");
+    price = price * 100;
+    print("=======2===${price}===========");
+    String mPriceUpdated =
+    price.toString().substring(0, price.toString().indexOf('.'));
+    double mpriceUpdatedNew = double.parse(mPriceUpdated);
+    print('$mpriceUpdatedNew + check');
+
+    //Utils.showProgressDialog(context);
+    ApiController.createPaytmTxnToken(
+        address, pin, mpriceUpdatedNew, "", "")
+        .then((value) async {
+      Utils.hideProgressDialog(context);
+      if (value != null && value.success) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => PaytmWebView(value, storeModel)),
+        );
+      } else {
+        Utils.hideProgressDialog(context);
+        Utils.showToast("Api Error", false);
+      }
+    });
+  }
+
+
   Future<void> _showFailedDialog() async {
     return showDialog<void>(
       context: context,
@@ -775,3 +608,211 @@ class _WalletTopUpState extends State<WalletTopUp> {
 //-----------------------------------------------------------------------------------------------
 
 }
+
+
+//SafeArea(
+//   child: GestureDetector(
+//     onTap: () {
+//       Utils.hideKeyboard(context);
+//     },
+//     child: SingleChildScrollView(
+//       scrollDirection: Axis.vertical,
+//       child: Container(
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Stack(
+//               children: [
+//                 Container(
+//                     //height: 180,
+//                     color: appTheme,
+//                     padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+//                     child: Row(
+//                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                       children: [
+//                         Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           mainAxisAlignment: MainAxisAlignment.start,
+//                           children: [
+//                             // IconButton(
+//                             //   padding: EdgeInsets.all(0),
+//                             //   //iconSize: 15,
+//                             //   alignment: Alignment.topLeft,
+//                             //   icon: Icon(
+//                             //     Icons.arrow_back,
+//                             //     color: Colors.white,
+//                             //   ),
+//                             //   onPressed: () => Navigator.pop(context,false),
+//                             // ),
+//                             Text(
+//                               "Wallet Balance",
+//                               style: TextStyle(
+//                                   color: Colors.grey[400],
+//                                   fontSize: 16),
+//                             ),
+//                             walleModel == null
+//                                 ? Container()
+//                                 : Row(
+//                                     crossAxisAlignment:
+//                                         CrossAxisAlignment.start,
+//                                     children: [
+//                                       Padding(
+//                                         child: Text(
+//                                             "${AppConstant.currency}",
+//                                             style: TextStyle(
+//                                                 color: Colors.white,
+//                                                 fontSize: 16)),
+//                                         padding: EdgeInsets.fromLTRB(
+//                                             0, 1, 0, 0),
+//                                       ),
+//                                       Text(
+//                                           "${walleModel.data.userWallet}",
+//                                           style: TextStyle(
+//                                               color: Colors.white,
+//                                               fontSize: 24)),
+//                                     ],
+//                                   ),
+//                             SizedBox(
+//                               height: 50,
+//                             )
+//                           ],
+//                         ),
+//                         Align(
+//                           alignment: Alignment.center,
+//                           child: Image.asset(
+//                             "images/walletbalancegreaphics.png",
+//                             width: 200,
+//                             height: 200,
+//                           ),
+//                         ),
+//                       ],
+//                     )),
+//                 Container(
+//                   margin: EdgeInsets.fromLTRB(30, 172, 30, 0),
+//                   child: Align(
+//                     alignment: Alignment.bottomCenter,
+//                     child: Container(
+//                       width: MediaQuery.of(context).size.width,
+//                       height:
+//                           MediaQuery.of(context).size.height / 1.370,
+//                       decoration: BoxDecoration(
+//                         borderRadius: BorderRadius.circular(5),
+//                         color: Colors.white,
+//                       ),
+//                       //width: 200,
+//                       child: Column(
+//                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                         children: [
+//                           Column(
+//                             children: [
+//                               SizedBox(
+//                                 height: 50,
+//                               ),
+//                               Text(
+//                                 'TopUp amount',
+//                                 style: TextStyle(
+//                                     fontSize: 20, color: Colors.grey[400]),
+//                               ),
+//                               SizedBox(
+//                                 height: 15,
+//                               ),
+//                               Row(
+//                                 crossAxisAlignment:
+//                                     CrossAxisAlignment.center,
+//                                 mainAxisAlignment: MainAxisAlignment.center,
+//                                 mainAxisSize: MainAxisSize.min,
+//                                 children: [
+//                                   Container(
+//                                       margin:
+//                                           EdgeInsets.fromLTRB(30, 0, 0, 0),
+//                                       child: Text(
+//                                         AppConstant.currency,
+//                                         style: TextStyle(
+//                                             fontSize: 22,
+//                                             fontWeight: FontWeight.bold),
+//                                       )),
+//                                   SizedBox(
+//                                     width: 5,
+//                                   ),
+//                                   Flexible(
+//                                     child: Container(
+//                                       width: 100,
+//                                       //margin: EdgeInsets.fromLTRB(0,0,0,0),
+//                                       child: TextFormField(
+//                                         style: TextStyle(fontSize: 20),
+//                                         keyboardType: TextInputType.number,
+//                                         inputFormatters: [
+//                                           FilteringTextInputFormatter
+//                                               .digitsOnly
+//                                         ],
+//                                         onChanged: (text) {
+//                                           print(text);
+//                                           print('${_enterMoney.text}');
+//                                         },
+//                                         controller: _enterMoney,
+//                                         textAlign: TextAlign.left,
+//                                         decoration: InputDecoration(
+//                                           focusedBorder: InputBorder.none,
+//                                           hintStyle:
+//                                               TextStyle(fontSize: 20),
+//                                           hintText: widget
+//                                               .store
+//                                               .walletSettings
+//                                               .defaultTopUpAmount,
+//                                           border: InputBorder.none,
+//                                           errorBorder: InputBorder.none,
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ],
+//                               ),
+//                               Divider(
+//                                 color: Colors.grey,
+//                                 height: 1.8,
+//                                 indent: 60,
+//                                 endIndent: 60,
+//                               ),
+//                             ],
+//                           ),
+//                           Container(
+//                             margin: EdgeInsets.only(bottom: 100),
+//                             width: 180,
+//                             child: ElevatedButton(
+//                               onPressed: () {
+//                                 print(
+//                                     'Button pressed ${_enterMoney.text}');
+//                                 setState(() {
+//                                   checkTopUpCondition(_enterMoney);
+//                                 });
+//                               },
+//                               child: Text('Submit'),
+//                               style: ButtonStyle(
+//                                 foregroundColor:
+//                                 MaterialStateProperty.all<Color>(
+//                                     Colors.white),
+//                                 backgroundColor:
+//                                 MaterialStateProperty.all<Color>(
+//                                     appTheme),
+//                                 shape: MaterialStateProperty.all<
+//                                     RoundedRectangleBorder>(
+//                                   RoundedRectangleBorder(
+//                                     borderRadius:
+//                                     BorderRadius.circular(20),
+//                                   ),
+//                                 ),
+//                               ),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ],
+//         ),
+//       ),
+//     ),
+//   ),
