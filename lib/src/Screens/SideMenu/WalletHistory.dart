@@ -62,17 +62,6 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-//                              IconButton(
-//                                padding: EdgeInsets.all(0),
-//                                //iconSize: 15,
-//                                alignment: Alignment.topLeft,
-//                                icon: Icon(
-//                                  Icons.arrow_back,
-//                                  color: Colors.white,
-//                                ),
-//                                onPressed: () =>
-//                                    Navigator.pop(context),
-//                              ),
                                         Text(
                                           "Wallet Balance",
                                           style: TextStyle(

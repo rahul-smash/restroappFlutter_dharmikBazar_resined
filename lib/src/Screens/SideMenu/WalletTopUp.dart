@@ -60,210 +60,403 @@ class _WalletTopUpState extends State<WalletTopUp> {
       },
       child: Scaffold(
         backgroundColor: Colors.white70,
-        body: SafeArea(
-          child: GestureDetector(
-            onTap: () {
-              Utils.hideKeyboard(context);
-            },
-            child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: Container(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Stack(
-                      children: [
-                        Container(
-                            //height: 180,
-                            color: appTheme,
-                            padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    IconButton(
-                                      padding: EdgeInsets.all(0),
-                                      //iconSize: 15,
-                                      alignment: Alignment.topLeft,
-                                      icon: Icon(
-                                        Icons.arrow_back,
-                                        color: Colors.white,
-                                      ),
-                                      onPressed: () => Navigator.pop(context,false),
-                                    ),
-                                    Text(
-                                      "Wallet Balance",
-                                      style: TextStyle(
-                                          color: Colors.grey[400],
-                                          fontSize: 16),
-                                    ),
-                                    walleModel == null
-                                        ? Container()
-                                        : Row(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Padding(
-                                                child: Text(
-                                                    "${AppConstant.currency}",
-                                                    style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16)),
-                                                padding: EdgeInsets.fromLTRB(
-                                                    0, 1, 0, 0),
-                                              ),
-                                              Text(
-                                                  "${walleModel.data.userWallet}",
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 24)),
-                                            ],
-                                          ),
-                                    SizedBox(
-                                      height: 50,
-                                    )
-                                  ],
-                                ),
-                                Align(
-                                  alignment: Alignment.center,
-                                  child: Image.asset(
-                                    "images/walletbalancegreaphics.png",
-                                    width: 200,
-                                    height: 200,
-                                  ),
-                                ),
-                              ],
-                            )),
-                        Container(
-                          margin: EdgeInsets.fromLTRB(30, 172, 30, 0),
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Container(
-                              width: MediaQuery.of(context).size.width,
-                              height:
-                                  MediaQuery.of(context).size.height / 1.370,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(5),
-                                color: Colors.white,
-                              ),
-                              //width: 200,
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 50,
-                                  ),
-                                  Text(
-                                    'TopUp amount',
-                                    style: TextStyle(
-                                        fontSize: 20, color: Colors.grey[400]),
-                                  ),
-                                  SizedBox(
-                                    height: 15,
-                                  ),
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                          margin:
-                                              EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                          child: Text(
-                                            AppConstant.currency,
-                                            style: TextStyle(
-                                                fontSize: 22,
-                                                fontWeight: FontWeight.bold),
-                                          )),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Flexible(
-                                        child: Container(
-                                          width: 100,
-                                          //margin: EdgeInsets.fromLTRB(0,0,0,0),
-                                          child: TextFormField(
-                                            style: TextStyle(fontSize: 20),
-                                            keyboardType: TextInputType.number,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly
-                                            ],
-                                            onChanged: (text) {
-                                              print(text);
-                                              print('${_enterMoney.text}');
-                                            },
-                                            controller: _enterMoney,
-                                            textAlign: TextAlign.left,
-                                            decoration: InputDecoration(
-                                              focusedBorder: InputBorder.none,
-                                              hintStyle:
-                                                  TextStyle(fontSize: 20),
-                                              hintText: widget
-                                                  .store
-                                                  .walletSettings
-                                                  .defaultTopUpAmount,
-                                              border: InputBorder.none,
-                                              errorBorder: InputBorder.none,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Divider(
-                                    color: Colors.grey,
-                                    height: 1.8,
-                                    indent: 60,
-                                    endIndent: 60,
-                                  ),
-                                  SizedBox(
-                                    height: 250,
-                                  ),
-                                  Container(
-                                    width: 180,
-                                    child: ElevatedButton(
-                                      onPressed: () {
-                                        print(
-                                            'Button pressed ${_enterMoney.text}');
-                                        setState(() {
-                                          checkTopUpCondition(_enterMoney);
-                                        });
-                                      },
-                                      child: Text('Submit'),
-                                      style: ButtonStyle(
-                                        foregroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                Colors.white),
-                                        backgroundColor:
-                                            MaterialStateProperty.all<Color>(
-                                                appTheme),
-                                        shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                          RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(20),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+        appBar: AppBar(
+          elevation: 0,
         ),
-      ),
+         body: Stack(
+           alignment: Alignment.bottomCenter,
+           children: [
+             SafeArea(
+               child: Container(
+                 child: Column(
+                   children: [
+                     Container(
+                         color: appTheme,
+                         padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                         child: Row(
+                           mainAxisAlignment:
+                           MainAxisAlignment.spaceBetween,
+                           children: [
+                             Column(
+                               crossAxisAlignment:
+                               CrossAxisAlignment.start,
+                               children: [
+                                 Text(
+                                   "Wallet Balance",
+                                   style: TextStyle(
+                                       color: Colors.grey[400],
+                                       fontSize: 16),
+                                 ),
+                                 walleModel == null
+                                     ? Container()
+                                     : Row(
+                                   crossAxisAlignment:
+                                   CrossAxisAlignment.start,
+                                   children: [
+                                     Padding(
+                                       child: Text(
+                                           "${AppConstant.currency}",
+                                           style: TextStyle(
+                                               color: Colors.white,
+                                               fontSize: 16)),
+                                       padding:
+                                       EdgeInsets.fromLTRB(
+                                           0, 1, 0, 0),
+                                     ),
+                                     Text(
+                                         "${walleModel.data.userWallet}",
+                                         style: TextStyle(
+                                             color: Colors.white,
+                                             fontSize: 24)),
+                                   ],
+                                 ),
+                                 SizedBox(
+                                   height: 50,
+                                 )
+                               ],
+                             ),
+                             Align(
+                               alignment: Alignment.topCenter,
+                               child: Image.asset(
+                                 "images/walletbalancegreaphics.png",
+                                 width: 200,
+                               ),
+                             ),
+                           ],
+                         )),
+                     Expanded(
+                       child: Stack(
+                         children: [
+                           Container(height: 50, color: appTheme),
+                           Container(
+                             margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                             child: Container(
+                               width: MediaQuery.of(context).size.width,
+                               decoration: BoxDecoration(
+                                 borderRadius: BorderRadius.circular(5),
+                                 color: Colors.white,
+                               ),
+                               child: Column(
+                                 children: [
+                                 SizedBox(
+                                   height: 50,
+                                 ),
+                                 Text(
+                                   'TopUp amount',
+                                   style: TextStyle(
+                                       fontSize: 20, color: Colors.grey[400]),
+                                 ),
+                                 SizedBox(
+                                   height: 15,
+                                 ),
+                                 Row(
+                                   crossAxisAlignment:
+                                       CrossAxisAlignment.center,
+                                   mainAxisAlignment: MainAxisAlignment.center,
+                                   mainAxisSize: MainAxisSize.min,
+                                   children: [
+                                     Container(
+                                         margin:
+                                             EdgeInsets.fromLTRB(30, 0, 0, 0),
+                                         child: Text(
+                                           AppConstant.currency,
+                                           style: TextStyle(
+                                               fontSize: 22,
+                                               fontWeight: FontWeight.bold),
+                                         )),
+                                     SizedBox(
+                                       width: 5,
+                                     ),
+                                     Flexible(
+                                       child: Container(
+                                         width: 100,
+                                         //margin: EdgeInsets.fromLTRB(0,0,0,0),
+                                         child: TextFormField(
+                                           style: TextStyle(fontSize: 20),
+                                           keyboardType: TextInputType.number,
+                                           inputFormatters: [
+                                             FilteringTextInputFormatter
+                                                 .digitsOnly
+                                           ],
+                                           onChanged: (text) {
+                                             print(text);
+                                             print('${_enterMoney.text}');
+                                           },
+                                           controller: _enterMoney,
+                                           textAlign: TextAlign.left,
+                                           decoration: InputDecoration(
+                                             focusedBorder: InputBorder.none,
+                                             hintStyle:
+                                                 TextStyle(fontSize: 20),
+                                             hintText: widget
+                                                 .store
+                                                 .walletSettings
+                                                 .defaultTopUpAmount,
+                                             border: InputBorder.none,
+                                             errorBorder: InputBorder.none,
+                                           ),
+                                         ),
+                                       ),
+                                     ),
+                                   ],
+                                 ),
+                                 Divider(
+                                   color: Colors.grey,
+                                   height: 1.8,
+                                   indent: 60,
+                                   endIndent: 60,
+                                 ),
+
+                                 ],
+                               ),
+                             ),
+                           ),
+                         ],
+                       ),
+                     ),
+                   ],
+                 ),
+               ),
+             ),
+             Container(
+               margin: EdgeInsets.only(bottom: 50),
+               width: 180,
+               child: ElevatedButton(
+                 onPressed: () {
+                   print(
+                       'Button pressed ${_enterMoney.text}');
+                   setState(() {
+                     checkTopUpCondition(_enterMoney);
+                   });
+                 },
+                 child: Text('Submit'),
+                 style: ButtonStyle(
+                   foregroundColor:
+                   MaterialStateProperty.all<Color>(
+                       Colors.white),
+                   backgroundColor:
+                   MaterialStateProperty.all<Color>(
+                       appTheme),
+                   shape: MaterialStateProperty.all<
+                       RoundedRectangleBorder>(
+                     RoundedRectangleBorder(
+                       borderRadius:
+                       BorderRadius.circular(20),
+                     ),
+                   ),
+                 ),
+               ),
+             ),
+           ],
+         ),
+         //SafeArea(
+        //   child: GestureDetector(
+        //     onTap: () {
+        //       Utils.hideKeyboard(context);
+        //     },
+        //     child: SingleChildScrollView(
+        //       scrollDirection: Axis.vertical,
+        //       child: Container(
+        //         child: Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           children: [
+        //             Stack(
+        //               children: [
+        //                 Container(
+        //                     //height: 180,
+        //                     color: appTheme,
+        //                     padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+        //                     child: Row(
+        //                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //                       children: [
+        //                         Column(
+        //                           crossAxisAlignment: CrossAxisAlignment.start,
+        //                           mainAxisAlignment: MainAxisAlignment.start,
+        //                           children: [
+        //                             // IconButton(
+        //                             //   padding: EdgeInsets.all(0),
+        //                             //   //iconSize: 15,
+        //                             //   alignment: Alignment.topLeft,
+        //                             //   icon: Icon(
+        //                             //     Icons.arrow_back,
+        //                             //     color: Colors.white,
+        //                             //   ),
+        //                             //   onPressed: () => Navigator.pop(context,false),
+        //                             // ),
+        //                             Text(
+        //                               "Wallet Balance",
+        //                               style: TextStyle(
+        //                                   color: Colors.grey[400],
+        //                                   fontSize: 16),
+        //                             ),
+        //                             walleModel == null
+        //                                 ? Container()
+        //                                 : Row(
+        //                                     crossAxisAlignment:
+        //                                         CrossAxisAlignment.start,
+        //                                     children: [
+        //                                       Padding(
+        //                                         child: Text(
+        //                                             "${AppConstant.currency}",
+        //                                             style: TextStyle(
+        //                                                 color: Colors.white,
+        //                                                 fontSize: 16)),
+        //                                         padding: EdgeInsets.fromLTRB(
+        //                                             0, 1, 0, 0),
+        //                                       ),
+        //                                       Text(
+        //                                           "${walleModel.data.userWallet}",
+        //                                           style: TextStyle(
+        //                                               color: Colors.white,
+        //                                               fontSize: 24)),
+        //                                     ],
+        //                                   ),
+        //                             SizedBox(
+        //                               height: 50,
+        //                             )
+        //                           ],
+        //                         ),
+        //                         Align(
+        //                           alignment: Alignment.center,
+        //                           child: Image.asset(
+        //                             "images/walletbalancegreaphics.png",
+        //                             width: 200,
+        //                             height: 200,
+        //                           ),
+        //                         ),
+        //                       ],
+        //                     )),
+        //                 Container(
+        //                   margin: EdgeInsets.fromLTRB(30, 172, 30, 0),
+        //                   child: Align(
+        //                     alignment: Alignment.bottomCenter,
+        //                     child: Container(
+        //                       width: MediaQuery.of(context).size.width,
+        //                       height:
+        //                           MediaQuery.of(context).size.height / 1.370,
+        //                       decoration: BoxDecoration(
+        //                         borderRadius: BorderRadius.circular(5),
+        //                         color: Colors.white,
+        //                       ),
+        //                       //width: 200,
+        //                       child: Column(
+        //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        //                         children: [
+        //                           Column(
+        //                             children: [
+        //                               SizedBox(
+        //                                 height: 50,
+        //                               ),
+        //                               Text(
+        //                                 'TopUp amount',
+        //                                 style: TextStyle(
+        //                                     fontSize: 20, color: Colors.grey[400]),
+        //                               ),
+        //                               SizedBox(
+        //                                 height: 15,
+        //                               ),
+        //                               Row(
+        //                                 crossAxisAlignment:
+        //                                     CrossAxisAlignment.center,
+        //                                 mainAxisAlignment: MainAxisAlignment.center,
+        //                                 mainAxisSize: MainAxisSize.min,
+        //                                 children: [
+        //                                   Container(
+        //                                       margin:
+        //                                           EdgeInsets.fromLTRB(30, 0, 0, 0),
+        //                                       child: Text(
+        //                                         AppConstant.currency,
+        //                                         style: TextStyle(
+        //                                             fontSize: 22,
+        //                                             fontWeight: FontWeight.bold),
+        //                                       )),
+        //                                   SizedBox(
+        //                                     width: 5,
+        //                                   ),
+        //                                   Flexible(
+        //                                     child: Container(
+        //                                       width: 100,
+        //                                       //margin: EdgeInsets.fromLTRB(0,0,0,0),
+        //                                       child: TextFormField(
+        //                                         style: TextStyle(fontSize: 20),
+        //                                         keyboardType: TextInputType.number,
+        //                                         inputFormatters: [
+        //                                           FilteringTextInputFormatter
+        //                                               .digitsOnly
+        //                                         ],
+        //                                         onChanged: (text) {
+        //                                           print(text);
+        //                                           print('${_enterMoney.text}');
+        //                                         },
+        //                                         controller: _enterMoney,
+        //                                         textAlign: TextAlign.left,
+        //                                         decoration: InputDecoration(
+        //                                           focusedBorder: InputBorder.none,
+        //                                           hintStyle:
+        //                                               TextStyle(fontSize: 20),
+        //                                           hintText: widget
+        //                                               .store
+        //                                               .walletSettings
+        //                                               .defaultTopUpAmount,
+        //                                           border: InputBorder.none,
+        //                                           errorBorder: InputBorder.none,
+        //                                         ),
+        //                                       ),
+        //                                     ),
+        //                                   ),
+        //                                 ],
+        //                               ),
+        //                               Divider(
+        //                                 color: Colors.grey,
+        //                                 height: 1.8,
+        //                                 indent: 60,
+        //                                 endIndent: 60,
+        //                               ),
+        //                             ],
+        //                           ),
+        //                           Container(
+        //                             margin: EdgeInsets.only(bottom: 100),
+        //                             width: 180,
+        //                             child: ElevatedButton(
+        //                               onPressed: () {
+        //                                 print(
+        //                                     'Button pressed ${_enterMoney.text}');
+        //                                 setState(() {
+        //                                   checkTopUpCondition(_enterMoney);
+        //                                 });
+        //                               },
+        //                               child: Text('Submit'),
+        //                               style: ButtonStyle(
+        //                                 foregroundColor:
+        //                                 MaterialStateProperty.all<Color>(
+        //                                     Colors.white),
+        //                                 backgroundColor:
+        //                                 MaterialStateProperty.all<Color>(
+        //                                     appTheme),
+        //                                 shape: MaterialStateProperty.all<
+        //                                     RoundedRectangleBorder>(
+        //                                   RoundedRectangleBorder(
+        //                                     borderRadius:
+        //                                     BorderRadius.circular(20),
+        //                                   ),
+        //                                 ),
+        //                               ),
+        //                             ),
+        //                           ),
+        //                         ],
+        //                       ),
+        //                     ),
+        //                   ),
+        //                 ),
+        //               ],
+        //             ),
+        //           ],
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        ),
+
     );
   }
 
