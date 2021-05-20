@@ -121,11 +121,11 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                         children: [
                                           Container(
                                             margin: EdgeInsets.fromLTRB(
-                                                0, 20, 240, 10),
+                                                0, 20, 200, 10),
                                             child: Text("Transcations",
                                                 style: TextStyle(
                                                     color: Colors.black,
-                                                    fontSize: 16)),
+                                                    fontSize: 14)),
                                           ),
                                           Expanded(
                                             child: SingleChildScrollView(

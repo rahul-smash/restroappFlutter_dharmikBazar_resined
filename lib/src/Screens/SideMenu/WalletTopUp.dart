@@ -534,7 +534,6 @@ class _WalletTopUpState extends State<WalletTopUp> {
                           }
                           else{
                             print('Choose Paytm');
-
                           }
                         },
                         title: Text('* ${_paymentMethod[index]}',style: TextStyle(fontSize: 18,),),
@@ -634,7 +633,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
             RazorPayOnlineTopUp modelPay = response;
             print(modelPay);
             Utils.hideProgressDialog(context);
-            Navigator.pop(context);
+            Navigator.pop(context,true);
             _showSuccessDialog();
           });
         } else {
