@@ -114,7 +114,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
                                              0, 1, 0, 0),
                                        ),
                                        Text(
-                                           "${walleModel.data.userWallet}",
+                                           "${walleModel.data.userWallet == '0.00' ? '':walleModel.data.userWallet}",
                                            style: TextStyle(
                                                color: Colors.white,
                                                fontSize: 24)),
@@ -144,107 +144,120 @@ class _WalletTopUpState extends State<WalletTopUp> {
                                  margin: EdgeInsets.fromLTRB(20, 0, 20, 0),
                                  child: Container(
                                    width: MediaQuery.of(context).size.width,
+                                   height: MediaQuery.of(context).size.height/1.5,
                                    decoration: BoxDecoration(
                                      borderRadius: BorderRadius.circular(5),
                                      color: Colors.white,
                                    ),
                                    child: Column(
+                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                      mainAxisSize: MainAxisSize.max,
                                      children: [
-
-                                     SizedBox(
-                                       height: 50,
-                                     ),
-                                     Text(
-                                       'TopUp amount',
-                                       style: TextStyle(
-                                           fontSize: 20, color: Colors.grey[400]),
-                                     ),
-                                     SizedBox(
-                                       height: 15,
-                                     ),
-                                     Row(
-                                       crossAxisAlignment:
-                                           CrossAxisAlignment.center,
-                                       mainAxisAlignment: MainAxisAlignment.center,
-                                       mainAxisSize: MainAxisSize.min,
-                                       children: [
-                                         Container(
-                                             margin:
-                                                 EdgeInsets.fromLTRB(30, 0, 0, 0),
-                                             child: Text(
-                                               AppConstant.currency,
-                                               style: TextStyle(
-                                                   fontSize: 22,
-                                                   fontWeight: FontWeight.bold),
-                                             )),
+                                       Column(
+                                         mainAxisSize: MainAxisSize.max,
+                                         children: [
                                          SizedBox(
-                                           width: 5,
+                                           height: 50,
                                          ),
-                                         Flexible(
-                                           child: Container(
-                                             width: 100,
-                                             //margin: EdgeInsets.fromLTRB(0,0,0,0),
-                                             child: TextFormField(
-                                               style: TextStyle(fontSize: 20),
-                                               keyboardType: TextInputType.number,
-                                               inputFormatters: [
-                                                 FilteringTextInputFormatter
-                                                     .digitsOnly
-                                               ],
-                                               onChanged: (text) {
-                                                 print(text);
-                                                 print('${_enterMoney.text}');
-                                               },
-                                               controller: _enterMoney,
-                                               textAlign: TextAlign.left,
-                                               decoration: InputDecoration(
-                                                 focusedBorder: InputBorder.none,
-                                                 hintStyle:
-                                                     TextStyle(fontSize: 20),
-                                                 hintText: widget
-                                                     .store
-                                                     .walletSettings
-                                                     .defaultTopUpAmount,
-                                                 border: InputBorder.none,
-                                                 errorBorder: InputBorder.none,
+                                         Text(
+                                           'TopUp amount',
+                                           style: TextStyle(
+                                               fontSize: 20, color: Colors.grey[400],fontWeight: FontWeight.bold),
+                                         ),
+                                         SizedBox(
+                                           height: 15,
+                                         ),
+                                         Row(
+                                           crossAxisAlignment:
+                                               CrossAxisAlignment.center,
+                                           mainAxisAlignment: MainAxisAlignment.center,
+                                           mainAxisSize: MainAxisSize.min,
+                                           children: [
+                                             Container(
+                                                 margin:
+                                                     EdgeInsets.fromLTRB(30, 0, 0, 0),
+                                                 child: Text(
+                                                   AppConstant.currency,
+                                                   style: TextStyle(
+                                                       fontSize: 22,
+                                                       fontWeight: FontWeight.bold),
+                                                 )),
+                                             SizedBox(
+                                               width: 5,
+                                             ),
+                                             Flexible(
+                                               child: Container(
+                                                 width: 100,
+                                                 //margin: EdgeInsets.fromLTRB(0,0,0,0),
+                                                 child: TextFormField(
+                                                   style: TextStyle(fontSize: 20),
+                                                   keyboardType: TextInputType.number,
+                                                   inputFormatters: [
+                                                     FilteringTextInputFormatter
+                                                         .digitsOnly,
+                                                     new LengthLimitingTextInputFormatter(4),
+                                                   ],
+                                                   onChanged: (text) {
+                                                     print(text);
+                                                     print('${_enterMoney.text}');
+                                                   },
+                                                   controller: _enterMoney,
+                                                   textAlign: TextAlign.left,
+                                                   decoration: InputDecoration(
+                                                     focusedBorder: InputBorder.none,
+                                                     hintStyle:
+                                                         TextStyle(fontSize: 20),
+                                                     hintText: widget
+                                                         .store
+                                                         .walletSettings
+                                                         .defaultTopUpAmount,
+                                                     border: InputBorder.none,
+                                                     errorBorder: InputBorder.none,
+                                                   ),
+                                                 ),
                                                ),
                                              ),
-                                           ),
+                                           ],
                                          ),
-                                       ],
-                                     ),
-                                     Divider(
-                                       color: Colors.grey,
-                                       height: 1.8,
-                                       indent: 60,
-                                       endIndent: 60,
-                                     ),
-                                       SizedBox(height: 250,),
-                                       Container(
-                                         margin: EdgeInsets.only(bottom: 50),
-                                         width: 180,
-                                         child: ElevatedButton(
-                                           onPressed: () {
-                                             print(
-                                                 'Button pressed ${_enterMoney.text}');
-                                             setState(() {
-                                               checkTopUpCondition(_enterMoney);
-                                             });
-                                           },
-                                           child: Text('Submit'),
-                                           style: ButtonStyle(
-                                             foregroundColor:
-                                             MaterialStateProperty.all<Color>(
-                                                 Colors.white),
-                                             backgroundColor:
-                                             MaterialStateProperty.all<Color>(
-                                                 appTheme),
-                                             shape: MaterialStateProperty.all<
-                                                 RoundedRectangleBorder>(
-                                               RoundedRectangleBorder(
-                                                 borderRadius:
-                                                 BorderRadius.circular(20),
+                                         Divider(
+                                           color: Colors.grey,
+                                           height: 1.8,
+                                           indent: 60,
+                                           endIndent: 60,
+                                         ),
+                                           // SizedBox(height: 250,),
+
+
+                                         ],
+                                       ),
+                                       Visibility(
+                                         visible: widget.store.walletSettings.status == '1' &&
+                                             widget.store.walletSettings.customerWalletTopUpStatus == '1',
+                                         child: Container(
+                                           margin: EdgeInsets.only(bottom: 50),
+                                           width: 180,
+                                           child: ElevatedButton(
+                                             onPressed: () {
+                                               print(
+                                                   'Button pressed ${_enterMoney.text}');
+                                               setState(() {
+                                                 checkTopUpCondition(_enterMoney);
+                                               });
+                                             },
+                                             child: Text('Submit'),
+                                             style: ButtonStyle(
+                                               foregroundColor:
+                                               MaterialStateProperty.all<Color>(
+                                                   Colors.white),
+                                               backgroundColor:
+                                               MaterialStateProperty.all<Color>(
+                                                   appTheme),
+                                               shape: MaterialStateProperty.all<
+                                                   RoundedRectangleBorder>(
+                                                 RoundedRectangleBorder(
+                                                   borderRadius:
+                                                   BorderRadius.circular(20),
+                                                 ),
                                                ),
                                              ),
                                            ),
@@ -323,21 +336,22 @@ class _WalletTopUpState extends State<WalletTopUp> {
                 borderRadius: BorderRadius.only(topLeft: Radius.circular(15),topRight:Radius.circular(20) ),
                 color: Colors.white,
               ),
-              height: 200,
+              height: 170,
               child: ListView.builder(
                   itemCount: _paymentMethod.length,
                   itemBuilder: (context, index)
                   {
                     return Container(
+
                       decoration: BoxDecoration(
-                        color: Colors.white70,
+                        color: appTheme,
                         border: Border.all(
-                          //color: Colors.blue,
+                          color: appTheme,
                           width: 0.5,
                         ),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      margin: EdgeInsets.all(10),
+                      margin: EdgeInsets.only(left: 10, right: 10,top: 20),
                       child: ListTile(
                         onTap: (){
                           if(index == 0){
@@ -350,7 +364,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
                             callPayTmApi(amount, storeObject);
                           }
                         },
-                        title: Text('* ${_paymentMethod[index]}',style: TextStyle(fontSize: 18,),),
+                        title: Text('* ${_paymentMethod[index]}',style: TextStyle(fontSize: 18,color: Colors.white,fontWeight: FontWeight.bold),),
                       ),
                     );
                   }
@@ -386,11 +400,13 @@ class _WalletTopUpState extends State<WalletTopUp> {
             //Opening Gateway
             openCheckout(store, mPrice, model.data.id);
           } else {
+            print('Abc123');
             Utils.showToast("${model.message}", true);
             Utils.hideProgressDialog(context);
           }
         });
       } else {
+        print('def123');
         Utils.showToast("${model.message}", true);
         Utils.hideProgressDialog(context);
       }
@@ -451,7 +467,6 @@ class _WalletTopUpState extends State<WalletTopUp> {
             _showSuccessDialog();
           });
         } else {
-          _showFailedDialog();
           Utils.showToast("Something went wrong!", true);
           Utils.hideProgressDialog(context);
         }
@@ -470,7 +485,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
-    /*print("----ExternalWalletResponse----${response.walletName}--");
+   /*print("----ExternalWalletResponse----${response.walletName}--");
     Fluttertoast.showToast(
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
   }

@@ -159,6 +159,7 @@ flutter:
     - images/bg_subscription.jpg
     - images/thankyoubg.png
     - images/thankyouicon.png
+    - images/order_place.png
     - assets/en.json
     - assets/malay.json
 

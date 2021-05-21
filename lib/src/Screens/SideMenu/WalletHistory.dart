@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
@@ -39,9 +40,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
       ),
       backgroundColor: Colors.white70,
       body: Stack(
-        alignment: Alignment.bottomCenter,
-        children: [
-          walleModel == null
+           alignment: Alignment.bottomCenter,
+           children: [
+           walleModel == null
               ? Utils.showIndicator()
               : walleModel.data.walletHistory.isEmpty
                   ? Container(
@@ -120,12 +121,14 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                       child: Column(
                                         children: [
                                           Container(
-                                            margin: EdgeInsets.fromLTRB(
-                                                0, 20, 200, 10),
-                                            child: Text("Transcations",
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 14)),
+                                          margin: EdgeInsets.fromLTRB(20, 20,0 , 10),
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text("Transactions",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14)),
+                                            ),
                                           ),
                                           Expanded(
                                             child: SingleChildScrollView(
@@ -225,6 +228,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.normal)),
                 SizedBox(height: 5),
+                walletHistory.displayOrderId == ""? Container():
                 Text("#${walletHistory.displayOrderId}",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -294,7 +298,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                         color: Colors.white, fontSize: 16)),
                                 padding: EdgeInsets.fromLTRB(0, 1, 0, 0),
                               ),
-                              Text("${walleModel.data.userWallet}",
+                              Text("${walleModel.data.userWallet == '0.00' ? '':walleModel.data.userWallet}",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 24)),
                             ],
@@ -329,7 +333,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                     SizedBox(
                       height: 60,
                     ),
-//                  _addMoneyButton()
+                  //_addMoneyButton()
                   ],
                 ),
               ),
@@ -383,9 +387,8 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
 
   Widget _addMoneyButton() {
     return Visibility(
-//      visible: widget.store.walletSettings.status == '1' &&
-//          widget.store.walletSettings.customerWalletTopUpStatus == '1',
-      visible: true,
+     visible: widget.store.walletSettings.status == '1' &&
+         widget.store.walletSettings.customerWalletTopUpStatus == '1',
       child: Container(
         width: 180,
         height: 45,
@@ -412,6 +415,18 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
     return walletHistory.refund_type == "order_refund" ||
         walletHistory.refund_type == "subscription_refund" ||
         walletHistory.refund_type == "wallet_topup";
+  }
+
+  String _checkIcon( WalletHistory walletHistory) {
+    if(walletHistory.refund_type == "order_refund"){
+      return "images/orderrefund.png" ;
+    }
+    else if(walletHistory.refund_type == "wallet_topup"){
+      return "images/cashbackicon.png" ;
+    }
+    else if(walletHistory.refund_type == "subscription_refund"){
+      return "images/cashbackicon.png" ;
+    }
   }
 }
 
