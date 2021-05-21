@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,6 +10,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CreateOrderData.dart';
+import 'package:restroapp/src/models/RazorpayError.dart';
 import 'package:restroapp/src/models/WalletOnlineTopUp.dart';
 import 'package:restroapp/src/models/RazorPayTopUP.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
@@ -498,7 +501,14 @@ class _WalletTopUpState extends State<WalletTopUp> {
 
   void _handlePaymentError(PaymentFailureResponse response) {
     _showFailedDialog();
-    Fluttertoast.showToast(msg: response.message, timeInSecForIosWeb: 4);
+    try{
+     String string= response.message;
+    RazorpayError error =jsonDecode(string);
+     Fluttertoast.showToast(msg: error.error.description, timeInSecForIosWeb: 4);
+
+    }catch(e){
+
+    }
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
   }
