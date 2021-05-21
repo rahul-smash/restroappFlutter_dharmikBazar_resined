@@ -27,7 +27,7 @@ import 'package:restroapp/src/models/NotificationResponseModel.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/ProductRatingResponse.dart';
-import 'package:restroapp/src/models/RazorPayOnlineTopUp.dart';
+import 'package:restroapp/src/models/WalletOnlineTopUp.dart';
 import 'package:restroapp/src/models/RazorPayTopUP.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/RecommendedProductsResponse.dart';
@@ -1553,10 +1553,10 @@ class ApiController {
         String mobile = user.phone;
 //        String pin = '160002';
 //        String amount = '34.00';
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-            ApiConstants.createPaytmTxnToken;
+//        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+//            ApiConstants.createPaytmTxnToken;
         //TODO: remove this static url
-//        url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
+      var  url = "https://stage.grocersapp.com/393/api/createPaytmTxnToken";
         print(url);
         FormData formData = new FormData.fromMap({
           "customer_id": user.id,
@@ -1570,7 +1570,11 @@ class ApiController {
           "order_info": detailsJson, //JSONObject details
           "orders": orderJson
         });
+        print(formData.fields);
         Dio dio = new Dio();
+        dio.options.headers['Accept'] = 'application/json';
+        dio.options.contentType="application/json";
+        dio.options.followRedirects = false;
         Response response = await dio.post(url,
             data: formData,
             options: new Options(responseType: ResponseType.plain));
@@ -1719,7 +1723,7 @@ class ApiController {
           "user_id": user.id,
           "store_id": store.id,
         });
-        //print("fields=${request.fields.toString()}");
+        print("fields=${request.fields.toString()}");
         print("${url}");
         final response =
             await request.send().timeout(Duration(seconds: timeout));
@@ -2410,8 +2414,8 @@ class ApiController {
     }
   }
 
-  static Future<RazorPayOnlineTopUp> onlineTopUP(
-      String paymentId, String paymentRequestId, String amount) async {
+  static Future<WalletOnlineTopUp> onlineTopUP(
+      String paymentId, String paymentRequestId, String amount,String paymentType) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -2422,7 +2426,7 @@ class ApiController {
         "price": amount,
         "user_id": user.id,
         "payment_request_id": paymentRequestId,
-        "online_method": "razorpay",
+        "online_method": paymentType,
         "payment_id": paymentId,
         "platform": Platform.isIOS ? "IOS" : "android",
       });
@@ -2434,8 +2438,8 @@ class ApiController {
               responseType: ResponseType.plain));
       print(response.statusCode);
       print(response.data);
-      RazorPayOnlineTopUp razorTopStore =
-      RazorPayOnlineTopUp.fromJson(json.decode(response.data));
+      WalletOnlineTopUp razorTopStore =
+      WalletOnlineTopUp.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${razorTopStore.success}");
       return razorTopStore;
     } catch (e) {

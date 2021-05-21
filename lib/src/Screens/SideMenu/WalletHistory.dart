@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
@@ -62,17 +63,6 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-//                              IconButton(
-//                                padding: EdgeInsets.all(0),
-//                                //iconSize: 15,
-//                                alignment: Alignment.topLeft,
-//                                icon: Icon(
-//                                  Icons.arrow_back,
-//                                  color: Colors.white,
-//                                ),
-//                                onPressed: () =>
-//                                    Navigator.pop(context),
-//                              ),
                                         Text(
                                           "Wallet Balance",
                                           style: TextStyle(
@@ -132,11 +122,14 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                         children: [
                                           Container(
                                             margin: EdgeInsets.fromLTRB(
-                                                0, 20, 240, 10),
-                                            child: Text("Transcations",
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 16)),
+                                                20, 20, 0, 10),
+                                            child: Align(
+                                              alignment: Alignment.centerLeft,
+                                              child: Text("Transactions",
+                                                  style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 14)),
+                                            ),
                                           ),
                                           Expanded(
                                             child: SingleChildScrollView(
@@ -153,15 +146,16 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                                       itemBuilder:
                                                           (context, index) {
                                                         return Container(
-                                                          margin:
-                                                              EdgeInsets.fromLTRB(
-                                                                  10, 10, 10, 0),
+                                                          margin: EdgeInsets
+                                                              .fromLTRB(10, 10,
+                                                                  10, 0),
                                                           child: Column(
                                                             children: [
-                                                              showWalletView(walleModel
-                                                                      .data
-                                                                      .walletHistory[
-                                                                 index]),
+                                                              showWalletView(
+                                                                  walleModel
+                                                                          .data
+                                                                          .walletHistory[
+                                                                      index]),
                                                               SizedBox(
                                                                 height: 15,
                                                               ),
@@ -171,7 +165,9 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                                           ),
                                                         );
                                                       }),
-                                                  Container(height: 100,)
+                                                  Container(
+                                                    height: 100,
+                                                  )
                                                 ],
                                               ),
                                             ),
@@ -206,16 +202,17 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
               borderRadius: BorderRadius.circular(20.0),
               border: Border.all(
                 width: 0.0,
-                color: _isCheckType(walletHistory) ? green1 : red1,
+                color: _checkItemColor(walletHistory),
               ),
-              color: _isCheckType(walletHistory) ? green1 : red1,
+              color:_checkItemColor(walletHistory) ,
             ),
             child: Padding(
-              padding: EdgeInsets.all(6),
+              padding: EdgeInsets.all(10),
               child: Image.asset(
-                _isCheckType(walletHistory)
+                /*_isCheckType(walletHistory)
                     ? "images/cashbackicon.png"
-                    : "images/orderrefund.png",
+                    : "images/orderrefund.png",*/
+                _checkIcon(walletHistory),
                 height: 20,
                 width: 20,
                 fit: BoxFit.fill,
@@ -236,10 +233,13 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                         fontSize: 18,
                         fontWeight: FontWeight.normal)),
                 SizedBox(height: 5),
-                Text("#${walletHistory.displayOrderId}",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey[500], fontSize: 15)),
+                walletHistory.displayOrderId == ""
+                    ? Container()
+                    : Text("#${walletHistory.displayOrderId}",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style:
+                            TextStyle(color: Colors.grey[500], fontSize: 12)),
               ]),
         ),
         Container(
@@ -259,7 +259,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                     "${Utils.convertWalletDate(walletHistory.dateTime.toString())}",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: Colors.grey[500], fontSize: 15)),
+                    style: TextStyle(color: Colors.grey[500], fontSize: 12)),
               ]),
         ),
       ],
@@ -305,7 +305,8 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                         color: Colors.white, fontSize: 16)),
                                 padding: EdgeInsets.fromLTRB(0, 1, 0, 0),
                               ),
-                              Text("${walleModel.data.userWallet}",
+                              Text(
+                                  "${walleModel.data.userWallet == '0.00' ? '' : walleModel.data.userWallet}",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 24)),
                             ],
@@ -340,7 +341,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                     SizedBox(
                       height: 60,
                     ),
-//                  _addMoneyButton()
+                    //_addMoneyButton()
                   ],
                 ),
               ),
@@ -366,7 +367,8 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
   void _openWalletTopScreen() async {
     bool isTopUpSuccess = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => WalletTopUp(widget.store)),
+      MaterialPageRoute(
+          builder: (context) => WalletTopUp(widget.store, walleModel)),
     );
     if (isTopUpSuccess) {
       _callWalletApi(showLoading: true);
@@ -394,9 +396,8 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
 
   Widget _addMoneyButton() {
     return Visibility(
-//      visible: widget.store.walletSettings.status == '1' &&
-//          widget.store.walletSettings.customerWalletTopUpStatus == '1',
-      visible: true,
+      visible: widget.store.walletSettings.status == '1' &&
+          widget.store.walletSettings.customerWalletTopUpStatus == '1',
       child: Container(
         width: 180,
         height: 45,
@@ -423,6 +424,52 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
     return walletHistory.refund_type == "order_refund" ||
         walletHistory.refund_type == "subscription_refund" ||
         walletHistory.refund_type == "wallet_topup";
+  }
+
+  String _checkIcon(WalletHistory walletHistory) {
+    switch (walletHistory.refund_type) {
+      case 'order_payment':
+        return "images/order_place.png";
+        break;
+      case 'order_refund':
+        return "images/orderrefund.png";
+        break;
+      case 'wallet_topup':
+        return "images/cashbackicon.png";
+        break;
+      case 'subscription_payment':
+        return "images/order_place.png";
+        break;
+      case 'subscription_refund':
+        return "images/orderrefund.png";
+        break;
+      default:
+        return "images/order_place.png";
+    }
+  }
+
+ Color _checkItemColor(WalletHistory walletHistory) {
+
+
+    switch (walletHistory.refund_type) {
+      case 'order_payment':
+        return Colors.blue[50];
+        break;
+      case 'order_refund':
+        return red1;
+        break;
+      case 'wallet_topup':
+        return green1;
+        break;
+      case 'subscription_payment':
+        return Colors.blue[50];
+        break;
+      case 'subscription_refund':
+        return red1;
+        break;
+      default:
+        return Colors.blue[50];
+    }
   }
 }
 

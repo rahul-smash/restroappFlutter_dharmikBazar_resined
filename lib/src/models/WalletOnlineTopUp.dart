@@ -1,8 +1,8 @@
 
 import 'dart:convert';
 
-class RazorPayOnlineTopUp {
-  RazorPayOnlineTopUp({
+class WalletOnlineTopUp {
+  WalletOnlineTopUp({
     this.success,
     this.message,
   });
@@ -10,20 +10,20 @@ class RazorPayOnlineTopUp {
   bool success;
   String message;
 
-  RazorPayOnlineTopUp copyWith({
+  WalletOnlineTopUp copyWith({
     bool success,
     String message,
   }) =>
-      RazorPayOnlineTopUp(
+      WalletOnlineTopUp(
         success: success ?? this.success,
         message: message ?? this.message,
       );
 
-  factory RazorPayOnlineTopUp.fromRawJson(String str) => RazorPayOnlineTopUp.fromJson(json.decode(str));
+  factory WalletOnlineTopUp.fromRawJson(String str) => WalletOnlineTopUp.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
-  factory RazorPayOnlineTopUp.fromJson(Map<String, dynamic> json) => RazorPayOnlineTopUp(
+  factory WalletOnlineTopUp.fromJson(Map<String, dynamic> json) => WalletOnlineTopUp(
     success: json["success"] == null ? null : json["success"],
     message: json["message"] == null ? null : json["message"],
   );
