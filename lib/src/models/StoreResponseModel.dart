@@ -444,7 +444,7 @@ class StoreModel {
         : StoreOffer.fromJson(
         json["store_offer"]);
 
-    walletSettings= json["wallet_settings"] == null ? null : WalletSettings.fromJson(json["wallet_settings"]);
+    walletSettings= json['wallet_setting']=='0'?null: json["wallet_settings"] == null ? null : WalletSettings.fromJson(json["wallet_settings"]);
 
   }
 

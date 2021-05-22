@@ -1730,9 +1730,9 @@ class ApiController {
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
-        WalleModel model = WalleModel.fromJson(parsed);
-        SharedPrefs.saveUserWallet(model);
-        return model;
+        WalleModel welleModel = WalleModel.fromJson(parsed);
+        SharedPrefs.saveUserWallet(welleModel);
+        return welleModel;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
       }
