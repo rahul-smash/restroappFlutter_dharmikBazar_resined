@@ -123,7 +123,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
                                                   0, 1, 0, 0),
                                             ),
                                             Text(
-                                                "${walleModel.data.userWallet == '0.00' ? '' : walleModel.data.userWallet}",
+                                                "${walleModel.data.userWallet}",
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 24)),
