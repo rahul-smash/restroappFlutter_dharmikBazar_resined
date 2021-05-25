@@ -60,6 +60,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
 
     //event bus
     eventBus.on<onPayTMPageFinished>().listen((event) {
+      print(event.amount);
       callWalletOnlineTopApi(event.orderId, event.txnId, event.amount, 'paytm');
     });
   }
@@ -68,6 +69,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
   void dispose() {
     super.dispose();
     _razorpay.clear();
+
   }
 
   @override
@@ -322,8 +324,8 @@ class _WalletTopUpState extends State<WalletTopUp> {
         double.parse(widget.store.walletSettings.maxTopUpAmount);
     double maxWalletHoldingLimit =
         double.parse(widget.store.walletSettings.maxTopUpHoldAmount);
-
-    if (topupAmount < minTopUpLimit) {
+//minTopUpLimit
+    if (topupAmount < 1) {
       print("Min top Up amount is ${minTopUpLimit}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -347,60 +349,60 @@ class _WalletTopUpState extends State<WalletTopUp> {
         ),
       );
     } else {
-      callRazorPayToken(amount, storeObject);
-//      showModalBottomSheet<void>(
-//        backgroundColor: Colors.transparent,
-//        context: context,
-//        builder: (BuildContext context) {
-//          return Container(
-//            decoration: BoxDecoration(
-//              borderRadius: BorderRadius.only(
-//                  topLeft: Radius.circular(15), topRight: Radius.circular(20)),
-//              color: Colors.white,
-//            ),
-//            height: 170,
-//            child: ListView.builder(
-//                itemCount: widget.store.paymentGatewaySettings.length,
-//                itemBuilder: (context, index) {
-//                  PaymentGatewaySettings paymentGatewaySettings =
-//                      widget.store.paymentGatewaySettings[index];
-//                  return Container(
-//                    decoration: BoxDecoration(
-//                      color: appTheme,
-//                      border: Border.all(
-//                        color: appTheme,
-//                        width: 0.5,
-//                      ),
-//                      borderRadius: BorderRadius.circular(12),
-//                    ),
-//                    margin: EdgeInsets.only(left: 10, right: 10, top: 20),
-//                    child: ListTile(
-//                      onTap: () {
-//                        if (paymentGatewaySettings.paymentGateway
-//                            .toLowerCase()
-//                            .contains('paytm')) {
-//                          Navigator.pop(context);
-//                          callPayTmApi(amount, storeObject);
-//                        } else if (paymentGatewaySettings.paymentGateway
-//                            .toLowerCase()
-//                            .contains('razorpay')) {
-//                          Navigator.pop(context);
-//                          callRazorPayToken(amount, storeObject);
-//                        }
-//                      },
-//                      title: Text(
-//                        '* ${paymentGatewaySettings.paymentGateway}',
-//                        style: TextStyle(
-//                            fontSize: 18,
-//                            color: Colors.white,
-//                            fontWeight: FontWeight.bold),
-//                      ),
-//                    ),
-//                  );
-//                }),
-//          );
-//        },
-//      );
+      //callRazorPayToken(amount, storeObject);
+     showModalBottomSheet<void>(
+       backgroundColor: Colors.transparent,
+       context: context,
+       builder: (BuildContext context) {
+         return Container(
+           decoration: BoxDecoration(
+             borderRadius: BorderRadius.only(
+                 topLeft: Radius.circular(15), topRight: Radius.circular(20)),
+             color: Colors.white,
+           ),
+           height: 170,
+           child: ListView.builder(
+               itemCount: widget.store.paymentGatewaySettings.length,
+               itemBuilder: (context, index) {
+                 PaymentGatewaySettings paymentGatewaySettings =
+                     widget.store.paymentGatewaySettings[index];
+                 return Container(
+                   decoration: BoxDecoration(
+                     color: appTheme,
+                     border: Border.all(
+                       color: appTheme,
+                       width: 0.5,
+                     ),
+                     borderRadius: BorderRadius.circular(12),
+                   ),
+                   margin: EdgeInsets.only(left: 10, right: 10, top: 20),
+                   child: ListTile(
+                     onTap: () {
+                       if (paymentGatewaySettings.paymentGateway
+                           .toLowerCase()
+                           .contains('paytm')) {
+                         Navigator.pop(context);
+                         callPayTmApi(amount, storeObject);
+                       } else if (paymentGatewaySettings.paymentGateway
+                           .toLowerCase()
+                           .contains('razorpay')) {
+                         Navigator.pop(context);
+                         callRazorPayToken(amount, storeObject);
+                       }
+                     },
+                     title: Text(
+                       '* ${paymentGatewaySettings.paymentGateway}',
+                       style: TextStyle(
+                           fontSize: 18,
+                           color: Colors.white,
+                           fontWeight: FontWeight.bold),
+                     ),
+                   ),
+                 );
+               }),
+         );
+       },
+     );
     }
   }
 
@@ -647,6 +649,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
     DatabaseHelper databaseHelper = new DatabaseHelper();
     String address = "NA", pin = "NA";
     double amount = databaseHelper.roundOffPrice(double.parse(mPrice), 2);
+    print("----amount----- ${amount}");
     Utils.showProgressDialog(context);
     ApiController.createPaytmTxnToken(address, pin, amount, "", "")
         .then((value) async {
@@ -654,6 +657,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
         ApiController.createOnlineTopUPApi(mPrice, value.orderid)
             .then((response) {
           RazorPayTopUP modelPay = response;
+          print(response);
           Utils.hideProgressDialog(context);
           if (modelPay != null && response.success) {
             Navigator.push(
