@@ -62,6 +62,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
     eventBus.on<onPayTMPageFinished>().listen((event) {
       print(event.amount);
       callWalletOnlineTopApi(event.orderId, event.txnId, event.amount, 'paytm');
+
     });
   }
 
@@ -636,6 +637,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
     ApiController.onlineTopUP(paymentId, paymentRequestId, amount, paymentType)
         .then((response) {
       WalletOnlineTopUp modelPay = response;
+
       Utils.hideProgressDialog(context);
       _showSuccessDialog().then((value) => Navigator.pop(context, true));
     });
