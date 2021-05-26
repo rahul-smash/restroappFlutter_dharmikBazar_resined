@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -45,7 +46,11 @@ class _WalletTopUpState extends State<WalletTopUp> {
   bool isAnotherOnlinePaymentGatwayFound = false;
   bool isPayTmActive = false;
 
-  _WalletTopUpState(this.walleModel,);
+  _WalletTopUpState(
+    this.walleModel,
+  );
+
+  StreamSubscription onPayTMPageFinishedStream;
 
   @override
   void initState() {
@@ -59,7 +64,8 @@ class _WalletTopUpState extends State<WalletTopUp> {
     });
 
     //event bus
-    eventBus.on<onPayTMPageFinished>().listen((event) {
+    onPayTMPageFinishedStream =
+        eventBus.on<onPayTMPageFinished>().listen((event) {
       callWalletOnlineTopApi(event.orderId, event.txnId, event.amount, 'paytm');
     });
   }
@@ -67,6 +73,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
   @override
   void dispose() {
     super.dispose();
+    if (onPayTMPageFinishedStream != null) onPayTMPageFinishedStream.cancel();
     _razorpay.clear();
   }
 
@@ -308,9 +315,9 @@ class _WalletTopUpState extends State<WalletTopUp> {
 
   void checkTopUpCondition(TextEditingController enterMoney) async {
     //If user not entered his own amount then pick default amount
-      String amount = enterMoney.text.trim().isNotEmpty
-          ? enterMoney.text.trim()
-          : widget.store.walletSettings.defaultTopUpAmount;
+    String amount = enterMoney.text.trim().isNotEmpty
+        ? enterMoney.text.trim()
+        : widget.store.walletSettings.defaultTopUpAmount;
 
     StoreModel storeObject = await SharedPrefs.getStore();
     double wallet_balance = double.parse(walleModel.data.userWallet);
@@ -322,8 +329,8 @@ class _WalletTopUpState extends State<WalletTopUp> {
         double.parse(widget.store.walletSettings.maxTopUpAmount);
     double maxWalletHoldingLimit =
         double.parse(widget.store.walletSettings.maxTopUpHoldAmount);
-
-    if (topupAmount < minTopUpLimit) {
+//minTopUpLimit
+    if (topupAmount < 1) {
       print("Min top Up amount is ${minTopUpLimit}");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -347,60 +354,60 @@ class _WalletTopUpState extends State<WalletTopUp> {
         ),
       );
     } else {
-      callRazorPayToken(amount, storeObject);
-//      showModalBottomSheet<void>(
-//        backgroundColor: Colors.transparent,
-//        context: context,
-//        builder: (BuildContext context) {
-//          return Container(
-//            decoration: BoxDecoration(
-//              borderRadius: BorderRadius.only(
-//                  topLeft: Radius.circular(15), topRight: Radius.circular(20)),
-//              color: Colors.white,
-//            ),
-//            height: 170,
-//            child: ListView.builder(
-//                itemCount: widget.store.paymentGatewaySettings.length,
-//                itemBuilder: (context, index) {
-//                  PaymentGatewaySettings paymentGatewaySettings =
-//                      widget.store.paymentGatewaySettings[index];
-//                  return Container(
-//                    decoration: BoxDecoration(
-//                      color: appTheme,
-//                      border: Border.all(
-//                        color: appTheme,
-//                        width: 0.5,
-//                      ),
-//                      borderRadius: BorderRadius.circular(12),
-//                    ),
-//                    margin: EdgeInsets.only(left: 10, right: 10, top: 20),
-//                    child: ListTile(
-//                      onTap: () {
-//                        if (paymentGatewaySettings.paymentGateway
-//                            .toLowerCase()
-//                            .contains('paytm')) {
-//                          Navigator.pop(context);
-//                          callPayTmApi(amount, storeObject);
-//                        } else if (paymentGatewaySettings.paymentGateway
-//                            .toLowerCase()
-//                            .contains('razorpay')) {
-//                          Navigator.pop(context);
-//                          callRazorPayToken(amount, storeObject);
-//                        }
-//                      },
-//                      title: Text(
-//                        '* ${paymentGatewaySettings.paymentGateway}',
-//                        style: TextStyle(
-//                            fontSize: 18,
-//                            color: Colors.white,
-//                            fontWeight: FontWeight.bold),
-//                      ),
-//                    ),
-//                  );
-//                }),
-//          );
-//        },
-//      );
+      //callRazorPayToken(amount, storeObject);
+      showModalBottomSheet<void>(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(15), topRight: Radius.circular(20)),
+              color: Colors.white,
+            ),
+            height: 170,
+            child: ListView.builder(
+                itemCount: widget.store.paymentGatewaySettings.length,
+                itemBuilder: (context, index) {
+                  PaymentGatewaySettings paymentGatewaySettings =
+                      widget.store.paymentGatewaySettings[index];
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: appTheme,
+                      border: Border.all(
+                        color: appTheme,
+                        width: 0.5,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: EdgeInsets.only(left: 10, right: 10, top: 20),
+                    child: ListTile(
+                      onTap: () {
+                        if (paymentGatewaySettings.paymentGateway
+                            .toLowerCase()
+                            .contains('paytm')) {
+                          Navigator.pop(context);
+                          callPayTmApi(amount, storeObject);
+                        } else if (paymentGatewaySettings.paymentGateway
+                            .toLowerCase()
+                            .contains('razorpay')) {
+                          Navigator.pop(context);
+                          callRazorPayToken(amount, storeObject);
+                        }
+                      },
+                      title: Text(
+                        '* ${paymentGatewaySettings.paymentGateway}',
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                }),
+          );
+        },
+      );
     }
   }
 
@@ -501,14 +508,12 @@ class _WalletTopUpState extends State<WalletTopUp> {
 
   void _handlePaymentError(PaymentFailureResponse response) {
     _showFailedDialog();
-    try{
-     String string= response.message;
-    RazorpayError error =jsonDecode(string);
-     Fluttertoast.showToast(msg: error.error.description, timeInSecForIosWeb: 4);
-
-    }catch(e){
-
-    }
+    try {
+      String string = response.message;
+      RazorpayError error = jsonDecode(string);
+      Fluttertoast.showToast(
+          msg: error.error.description, timeInSecForIosWeb: 4);
+    } catch (e) {}
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
   }
@@ -647,6 +652,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
     DatabaseHelper databaseHelper = new DatabaseHelper();
     String address = "NA", pin = "NA";
     double amount = databaseHelper.roundOffPrice(double.parse(mPrice), 2);
+    print("----amount----- ${amount}");
     Utils.showProgressDialog(context);
     ApiController.createPaytmTxnToken(address, pin, amount, "", "")
         .then((value) async {
@@ -654,6 +660,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
         ApiController.createOnlineTopUPApi(mPrice, value.orderid)
             .then((response) {
           RazorPayTopUP modelPay = response;
+          print(response);
           Utils.hideProgressDialog(context);
           if (modelPay != null && response.success) {
             Navigator.push(

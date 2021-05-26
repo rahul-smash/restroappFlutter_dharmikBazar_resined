@@ -2787,6 +2787,7 @@ class PaytmWebView extends StatelessWidget {
               if (url.contains("/api/paytmPaymentResult/orderId:") &&
                   !isPaytmPaymentSuccessed) {
                 isPaytmPaymentSuccessed = true;
+                print('==2====onLoadStop======:isPaytmPaymentSuccessed $url');
                 String txnId =
                     url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
                 url = url.replaceAll("/TxnId:" + txnId, "");
