@@ -2095,14 +2095,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-   // Fluttertoast.showToast(msg: response.message, timeInSecForIosWeb: 4);
-     Utils.hideProgressDialog(context);
-    try {
-      String string = response.message;
-      RazorpayError error = jsonDecode(string);
-      Fluttertoast.showToast(
-          msg: error.error.description, timeInSecForIosWeb: 4);
-    } catch (e) {}
+    Fluttertoast.showToast(msg: response.message, timeInSecForIosWeb: 4);
+    // Utils.hideProgressDialog(context);
+    // try {
+    //   String string = response.message;
+    //   RazorpayError error = jsonDecode(string);
+    //   Fluttertoast.showToast(
+    //       msg: error.error.description, timeInSecForIosWeb: 4);
+    // } catch (e) {}
 
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
