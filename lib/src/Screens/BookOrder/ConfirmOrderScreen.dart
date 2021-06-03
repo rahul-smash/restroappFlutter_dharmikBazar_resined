@@ -21,6 +21,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/OrderDetailsModel.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/RazorPayError.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
@@ -959,7 +960,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         double.parse(taxModel.wallet_refund) -
         double.parse(taxModel.shipping));
     //print("balance=${balance}");
-    if (balance > 0.0) {
+    if (balance >= 0.0) {
       // USer balance is greater than zero.
       return databaseHelper.roundOffPrice(balance, 2).toStringAsFixed(2);
     } else {
@@ -2094,10 +2095,19 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    Fluttertoast.showToast(msg: response.message, timeInSecForIosWeb: 4);
+   // Fluttertoast.showToast(msg: response.message, timeInSecForIosWeb: 4);
+     Utils.hideProgressDialog(context);
+    try {
+      String string = response.message;
+      RazorpayError error = jsonDecode(string);
+      Fluttertoast.showToast(
+          msg: error.error.description, timeInSecForIosWeb: 4);
+    } catch (e) {}
+
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
   }
+
 
   void _handleExternalWallet(ExternalWalletResponse response) {
     /*print("----ExternalWalletResponse----${response.walletName}--");
