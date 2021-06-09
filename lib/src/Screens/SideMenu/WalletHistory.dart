@@ -306,7 +306,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                 padding: EdgeInsets.fromLTRB(0, 1, 0, 0),
                               ),
                               Text(
-                                  "${walleModel.data.userWallet == '0.00' ? '' : walleModel.data.userWallet}",
+                                  "${walleModel.data.userWallet}",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 24)),
                             ],

@@ -1553,10 +1553,10 @@ class ApiController {
         String mobile = user.phone;
 //        String pin = '160002';
 //        String amount = '34.00';
-//         var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-//             ApiConstants.createPaytmTxnToken;
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+            ApiConstants.createPaytmTxnToken;
 //        TODO: remove this static url
-      var  url = "https://stage.grocersapp.com/393/api_v1/createPaytmTxnToken";
+  //    var  url = "https://stage.grocersapp.com/393/api_v1/createPaytmTxnToken";
         print(url);
         FormData formData = new FormData.fromMap({
           "customer_id": user.id,
@@ -2405,7 +2405,7 @@ class ApiController {
               responseType: ResponseType.plain));
       print(response.statusCode);
       print(response.data);
-      RazorPayTopUP razorTopStore =
+      RazorPayTopUP razorTopStore = RazorPayTopUP.fromJson(json.decode(response.data));
       RazorPayTopUP.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${razorTopStore.success}");
       return razorTopStore;
