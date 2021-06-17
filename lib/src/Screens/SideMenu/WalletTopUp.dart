@@ -511,7 +511,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
     _showFailedDialog();
     try {
       String string = response.message;
-      RazorpayError error = jsonDecode(string);
+      RazorpayError error = RazorpayError.fromRawJson(jsonDecode(string));
       Fluttertoast.showToast(
           msg: error.error.description, timeInSecForIosWeb: 4);
     } catch (e) {}
