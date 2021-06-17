@@ -1,6 +1,6 @@
 class ApiConstants {
 //  static String base = "https://app.restroapp.com/storeId";
-  static String base = "https://app.restroapp.com/storeId";
+  static String base = "https://stage.restroapp.com/storeId";
 
   //static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
   static String baseUrl = base + '/api_v1/';
@@ -50,6 +50,9 @@ class ApiConstants {
   static String verifyEmail = 'verifyEmail';
 
   static String deliveryAreasArea = 'deliveryAreas/Area';
+
+  static String createOnlineTopUP = 'createOnlineTopUP';
+  static String onlineTopUP = 'onlineTopUP';
 
   static String razorpayCreateOrder = 'razorpayCreateOrder';
   static String razorpayVerifyTransaction = 'razorpayVerifyTransaction';

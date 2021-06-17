@@ -40,6 +40,7 @@ class onPayTMPageFinished {
   String url;
   String orderId;
   String txnId;
+  String amount;
 
-  onPayTMPageFinished(this.url, this.orderId, this.txnId);
+  onPayTMPageFinished(this.url, this.orderId, this.txnId,{this.amount=''});
 }

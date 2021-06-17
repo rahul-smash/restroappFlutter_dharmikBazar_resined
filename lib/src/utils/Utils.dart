@@ -413,7 +413,7 @@ class Utils {
       DateTime time = format.parse(date, true);
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
-      DateFormat formatter = new DateFormat('dd MMM, yyyy hh:mm:aa');
+      DateFormat formatter = new DateFormat('dd MMM, yyyy hh:mm aa');  // Change hh:mm:aa to hh:mm aa
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);
