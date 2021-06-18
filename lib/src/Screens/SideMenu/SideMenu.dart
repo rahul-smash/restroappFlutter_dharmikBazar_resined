@@ -185,10 +185,13 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                                         widget.socialModel.data.facebook);
                                 }
                               },
-                              child: Image.asset(
-                                "images/fbicon.png",
-                                width: iconHeight,
-                                height: iconHeight,
+                              child: Padding(
+                                padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                                child: Image.asset(
+                                  "images/fbicon.png",
+                                  width: iconHeight,
+                                  height: iconHeight,
+                                ),
                               ),
                             )),
                         Visibility(
@@ -204,7 +207,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                               }
                             },
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                               child: Image.asset(
                                 "images/twittericon.png",
                                 width: iconHeight,
@@ -225,10 +228,13 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                                       widget.socialModel.data.linkedin);
                               }
                             },
-                            child: Image.asset(
-                              "images/linkedinicon.png",
-                              width: iconHeight,
-                              height: iconHeight,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                              child: Image.asset(
+                                "images/linkedinicon.png",
+                                width: iconHeight,
+                                height: iconHeight,
+                              ),
                             ),
                           ),
                         ),
@@ -245,7 +251,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                               }
                             },
                             child: Padding(
-                              padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                              padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
                               child: Image.asset(
                                 "images/youtubeicon.png",
                                 width: iconHeight,
@@ -267,10 +273,13 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                                       widget.socialModel.data.instagram);
                               }
                             },
-                            child: Image.asset(
-                              "images/instagram.png",
-                              width: iconHeight,
-                              height: iconHeight,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                              child: Image.asset(
+                                "images/instagram.png",
+                                width: iconHeight,
+                                height: iconHeight,
+                              ),
                             ),
                           ),
                         ),
