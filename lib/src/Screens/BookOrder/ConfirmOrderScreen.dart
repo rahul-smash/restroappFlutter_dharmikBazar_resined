@@ -2758,11 +2758,12 @@ class _StripeWebViewState extends State<StripeWebView> {
 class PaytmWebView extends StatelessWidget {
   CreatePaytmTxnTokenResponse stripeCheckOutModel;
   StoreModel storeModel;
+  String amount;
   Completer<WebViewController> _controller = Completer<WebViewController>();
 
   bool isPaytmPaymentSuccessed = false;
 
-  PaytmWebView(this.stripeCheckOutModel, this.storeModel);
+  PaytmWebView(this.stripeCheckOutModel, this.storeModel,{this.amount=''});
 
   @override
   Widget build(BuildContext context) {
@@ -2796,6 +2797,7 @@ class PaytmWebView extends StatelessWidget {
               if (url.contains("/api/paytmPaymentResult/orderId:") &&
                   !isPaytmPaymentSuccessed) {
                 isPaytmPaymentSuccessed = true;
+                print('==2====onLoadStop======:isPaytmPaymentSuccessed $url');
                 String txnId =
                     url.substring(url.indexOf("/TxnId:") + "/TxnId:".length);
                 url = url.replaceAll("/TxnId:" + txnId, "");
@@ -2804,7 +2806,7 @@ class PaytmWebView extends StatelessWidget {
                 print(txnId);
                 print(orderId);
                 eventBus.fire(
-                    onPayTMPageFinished(url, orderId = orderId, txnId = txnId));
+                    onPayTMPageFinished(url, orderId = orderId, txnId = txnId,amount: amount));
                 Navigator.pop(context);
               } else if (url.contains("api/paytmPaymentResult/failure:")) {
                 Navigator.pop(context);

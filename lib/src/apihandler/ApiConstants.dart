@@ -51,6 +51,9 @@ class ApiConstants {
 
   static String deliveryAreasArea = 'deliveryAreas/Area';
 
+  static String createOnlineTopUP = 'createOnlineTopUP';
+  static String onlineTopUP = 'onlineTopUP';
+
   static String razorpayCreateOrder = 'razorpayCreateOrder';
   static String razorpayVerifyTransaction = 'razorpayVerifyTransaction';
   static String getReferDetails = 'getReferDetails';

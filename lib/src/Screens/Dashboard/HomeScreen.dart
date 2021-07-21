@@ -26,6 +26,7 @@ import 'package:restroapp/src/models/SocialModel.dart';
 import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -67,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
   BranchData branchData;
   bool isLoading;
   CategoryResponse categoryResponse;
-
+  WalleModel welleModel;
   SocialModel socialModel;
 
   _HomeScreenState(this.store);
@@ -83,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
     listenCartChanges();
     checkForMultiStore();
     getCategoryApi();
-    ApiController.getUserWallet();
+    _getWellet();
     ApiController.getStoreSocialOptions().then((value) {
       this.socialModel = value;
     });
@@ -247,6 +248,7 @@ class _HomeScreenState extends State<HomeScreen> {
         store,
         user == null ? "" : user.fullName,
         socialModel: socialModel,
+        walleModel: welleModel,
       ),
       bottomNavigationBar: SafeArea(
         child: addBottomBar(),
@@ -907,5 +909,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  void _getWellet() async {
+   welleModel= await ApiController.getUserWallet();
   }
 }
