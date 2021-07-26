@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final razorpayError = razorpayErrorFromJson(jsonString);
-
 import 'dart:convert';
 
 class RazorpayError {
