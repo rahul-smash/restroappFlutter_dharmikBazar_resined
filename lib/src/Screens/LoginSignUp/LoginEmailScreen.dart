@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -82,7 +80,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: whiteColor,
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomPadding: true,
       appBar: AppBar(
         centerTitle: true,
         title: new Text('Login',style: new TextStyle(
@@ -179,7 +177,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                       addLoginButton(),
 
                       Visibility(
-                        visible: Platform.isIOS?false: storeModel == null ? false : storeModel.social_login == "0" ? false : true,
+                        visible: true,
                         //visible: storeModel == null ? false : storeModel.social_login == "0" ? false : true,
                         child: Container(
                           margin: EdgeInsets.fromLTRB(0, 15, 0, 10),
@@ -192,7 +190,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                       ),
 
                       Visibility(
-                        visible: Platform.isIOS?false: storeModel == null ? false : storeModel.social_login == "0" ? false : true,
+                        visible: true,
                         //visible: storeModel == null ? false : storeModel.social_login == "0" ? false : true,
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
