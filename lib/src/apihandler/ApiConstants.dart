@@ -1,6 +1,6 @@
 class ApiConstants {
 //  static String base = "https://app.restroapp.com/storeId";
-  static String base = "https://app.restroapp.com/storeId";
+  static String base = "https://stage.restroapp.com/storeId";
 
   //static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
   static String baseUrl = base + '/api_v1/';
@@ -98,11 +98,17 @@ class ApiConstants {
   static String subscriptionHistory =
       '/api_v1_subscription/subscriptionHistory';
 
-  static String subscriptionCancel='/api_v1_subscription/subscriptionOrderCancel';
+  static String subscriptionCancel =
+      '/api_v1_subscription/subscriptionOrderCancel';
 
-  static String subscriptionStatusUpdate='/api_v1_subscription/subscriptionPauseStart';
-  static String subscriptionOrderUpdate='/api_v1_subscription/subscriptionOrderUpdate';
-  static String subscriptionDetailHistory='/api_v1_subscription/subscriptionDetailHistory';
-  static String subscriptionRazorpayCreateSubscription='/api_v1_online_subscription/razorpayCreateSubscription';
-  static String subscriptionRazorpayVerifyTransaction='/api_v1_online_subscription/razorpayVerifyTransaction';
+  static String subscriptionStatusUpdate =
+      '/api_v1_subscription/subscriptionPauseStart';
+  static String subscriptionOrderUpdate =
+      '/api_v1_subscription/subscriptionOrderUpdate';
+  static String subscriptionDetailHistory =
+      '/api_v1_subscription/subscriptionDetailHistory';
+  static String subscriptionRazorpayCreateSubscription =
+      '/api_v1_online_subscription/razorpayCreateSubscription';
+  static String subscriptionRazorpayVerifyTransaction =
+      '/api_v1_online_subscription/razorpayVerifyTransaction';
 }
