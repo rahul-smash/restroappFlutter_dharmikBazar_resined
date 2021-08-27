@@ -6,8 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-
-//import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
@@ -39,13 +37,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
+  StoreModel storeModel;
   bool isComingFromPickUpScreen;
   DeliveryAddressData address;
   String paymentMode = "2"; // 2 = COD, 3 = Online Payment
   String areaId;
   OrderType deliveryType;
   Area areaObject;
-  StoreModel storeModel;
   List<Product> cartList = new List();
   PaymentType _character = PaymentType.COD;
 
@@ -97,6 +95,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool isOrderVariations = false;
 
   bool showCOD = true;
+  bool showOnline = true;
 
   bool isAnotherOnlinePaymentGatwayFound = false;
 
@@ -293,21 +292,58 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     multiTaxCalculationApi();
 
     if (widget.storeModel != null) {
-      if (widget.storeModel.cod == "1") {
-        showCOD = true;
-        widget.paymentMode = "2";
-      } else if (widget.storeModel.cod == "0") {
-        showCOD = false;
-      }
-      if (widget.storeModel.onlinePayment == "0" &&
-          widget.storeModel.cod == "0") {
-        showCOD = true;
-        widget.paymentMode = "2";
-      }
-      if (widget.storeModel.cod == "0" &&
-          widget.storeModel.onlinePayment == "1") {
-        widget._character = PaymentType.ONLINE;
-        widget.paymentMode = "3";
+      if (widget.storeModel.areaWisePaymentOption == false ||
+          widget.deliveryType != OrderType.Delivery) {
+        if (widget.storeModel.cod == "1") {
+          showCOD = true;
+          widget.paymentMode = "2";
+        } else if (widget.storeModel.cod == "0") {
+          showCOD = false;
+        }
+        if (widget.storeModel.onlinePayment == "0" &&
+            widget.storeModel.cod == "0") {
+          showCOD = true;
+          widget.paymentMode = "2";
+        }
+        if (widget.storeModel.cod == "0" &&
+            widget.storeModel.onlinePayment == "1") {
+          widget._character = PaymentType.ONLINE;
+          widget.paymentMode = "3";
+          if (widget.storeModel.onlinePayment.compareTo('1') == 0 &&
+              isAnotherOnlinePaymentGatwayFound) {
+            showOnline = true;
+          }
+          showOnline = true;
+        }
+      } else {
+        if (widget.deliveryType == OrderType.Delivery) {
+          if (widget.address.areaWisePaymentMethod == '1') {
+            showCOD = true;
+            if (widget.storeModel.onlinePayment != null &&
+                widget.storeModel.onlinePayment.compareTo('1') == 0 &&
+                isAnotherOnlinePaymentGatwayFound) {
+              showOnline = true;
+            }
+
+            if (widget.address.defaultPaymentMethod == '1') {
+              widget._character = PaymentType.COD;
+              widget.paymentMode = "2";
+            } else {
+              widget._character = PaymentType.ONLINE;
+              widget.paymentMode = "3";
+            }
+          } else if (widget.address.areaWisePaymentMethod == '2') {
+            showCOD = true;
+            widget._character = PaymentType.COD;
+            showOnline = false;
+            widget.paymentMode = "2";
+          } else {
+            showCOD = false;
+            showOnline = true;
+            widget._character = PaymentType.ONLINE;
+            widget.paymentMode = "3";
+          }
+        }
       }
     }
   }
@@ -1350,9 +1386,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               ),
             ),
             Visibility(
-              visible: widget.storeModel.onlinePayment != null &&
-                  widget.storeModel.onlinePayment.compareTo('1') == 0 &&
-                  isAnotherOnlinePaymentGatwayFound,
+              visible: showOnline,
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: <Widget>[
@@ -2094,7 +2128,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    Fluttertoast.showToast(msg: response.message, timeInSecForIosWeb: 4);
+    Fluttertoast.showToast(msg: 'Payment Cancelled', timeInSecForIosWeb: 4);
     print("----_handlePaymentError--message--${response.message}--");
     print("----_handlePaymentError--code--${response.code.toString()}--");
   }
@@ -2753,7 +2787,7 @@ class PaytmWebView extends StatelessWidget {
 
   bool isPaytmPaymentSuccessed = false;
 
-  PaytmWebView(this.stripeCheckOutModel, this.storeModel,{this.amount=''});
+  PaytmWebView(this.stripeCheckOutModel, this.storeModel, {this.amount = ''});
 
   @override
   Widget build(BuildContext context) {

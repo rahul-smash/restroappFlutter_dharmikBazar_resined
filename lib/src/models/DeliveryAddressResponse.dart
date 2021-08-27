@@ -1,11 +1,13 @@
 class DeliveryAddressResponse {
   bool success;
   String message;
+  int errorCode;
   List<DeliveryAddressData> data;
 
   DeliveryAddressResponse({
     this.success,
     this.message,
+    this.errorCode,
     this.data,
   });
 
@@ -13,13 +15,17 @@ class DeliveryAddressResponse {
       DeliveryAddressResponse(
         success: json["success"],
         message: json["message"],
-        data: json["data"] == null ? null : List<DeliveryAddressData>.from(
-            json["data"].map((x) => DeliveryAddressData.fromJson(x))),
+        errorCode: json["error_code"] == null ? null : json["error_code"],
+        data: json["data"] == null
+            ? null
+            : List<DeliveryAddressData>.from(
+                json["data"].map((x) => DeliveryAddressData.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
         "success": success,
         "message": message,
+        "error_code": errorCode == null ? null : errorCode,
         "data": List<dynamic>.from(data.map((x) => x.toJson())),
       };
 }
@@ -49,6 +55,9 @@ class DeliveryAddressData {
   String lat;
   String lng;
   String isShippingMandatory;
+  //new added fields as required feature
+  String areaWisePaymentMethod;
+  String defaultPaymentMethod;
 
   //DeliveryTimeSlot deliveryTimeSlot;
 
@@ -77,6 +86,8 @@ class DeliveryAddressData {
     this.cityId,
     this.isDeleted,
     this.isShippingMandatory,
+    this.areaWisePaymentMethod,
+    this.defaultPaymentMethod,
     //this.deliveryTimeSlot
   });
 
@@ -106,6 +117,12 @@ class DeliveryAddressData {
         cityId: json["city_id"],
         isDeleted: json["is_deleted"],
         isShippingMandatory: json["is_shipping_mandatory"],
+        areaWisePaymentMethod: json["area_wise_payment_method"] == null
+            ? null
+            : json["area_wise_payment_method"],
+        defaultPaymentMethod: json["default_payment_method"] == null
+            ? null
+            : json["default_payment_method"],
         //deliveryTimeSlot: DeliveryTimeSlot.fromJson(json["delivery_time_slot"]),
       );
 
@@ -134,6 +151,10 @@ class DeliveryAddressData {
         "city_id": cityId,
         "is_deleted": isDeleted,
         "is_shipping_mandatory": isShippingMandatory,
+        "area_wise_payment_method":
+            areaWisePaymentMethod == null ? null : areaWisePaymentMethod,
+        "default_payment_method":
+            defaultPaymentMethod == null ? null : defaultPaymentMethod,
         //"delivery_time_slot": deliveryTimeSlot.toJson(),
       };
 }
@@ -147,13 +168,14 @@ class DeliveryTimeSlot {
     this.is24X7Open,
   });
 
-  factory DeliveryTimeSlot.fromJson(Map<String, dynamic> json) => DeliveryTimeSlot(
-    zoneId: json["zone_id"],
-    is24X7Open: json["is24x7_open"],
-  );
+  factory DeliveryTimeSlot.fromJson(Map<String, dynamic> json) =>
+      DeliveryTimeSlot(
+        zoneId: json["zone_id"],
+        is24X7Open: json["is24x7_open"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "zone_id": zoneId,
-    "is24x7_open": is24X7Open,
-  };
+        "zone_id": zoneId,
+        "is24x7_open": is24X7Open,
+      };
 }

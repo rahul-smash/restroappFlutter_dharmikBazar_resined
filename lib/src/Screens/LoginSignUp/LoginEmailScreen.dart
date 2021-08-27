@@ -47,7 +47,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
     _googleSignIn = GoogleSignIn(
       scopes: [
         'email',
-        'https://www.googleapis.com/auth/contacts.readonly',
+        //'https://www.googleapis.com/auth/contacts.readonly',
       ],
     );
     _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
@@ -324,7 +324,12 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
               print("result.id=${result.id}");
               MobileVerified verifyEmailModel =
                   await ApiController.verifyEmail(result.email);
-              if (verifyEmailModel.userExists == 0) {
+              if (verifyEmailModel != null &&
+                  !verifyEmailModel.success &&
+                  verifyEmailModel.errorCode == 403) {
+                print('${verifyEmailModel.message}');
+                Utils.showBlockedDialog(context, verifyEmailModel.message);
+              } else if (verifyEmailModel.userExists == 0) {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
@@ -342,9 +347,9 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                 user.id = verifyEmailModel.user.id;
                 SharedPrefs.saveUser(user);
                 Navigator.pop(context);
+              } else {
+                Utils.showToast("Something went wrong while login!", false);
               }
-            } else {
-              Utils.showToast("Something went wrong while login!", false);
             }
           } catch (error) {
             print("catch.googleSignIn=${error}");
@@ -392,7 +397,9 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
           MobileVerified verifyEmailModel =
               await ApiController.verifyEmail(fbModel.email);
           Utils.hideProgressDialog(context);
-          if (verifyEmailModel.userExists == 0) {
+          if (!verifyEmailModel.success && verifyEmailModel.errorCode == 403) {
+            Utils.showBlockedDialog(context, verifyEmailModel.message);
+          } else if (verifyEmailModel.userExists == 0) {
             Navigator.pop(context);
             Navigator.push(
               context,
