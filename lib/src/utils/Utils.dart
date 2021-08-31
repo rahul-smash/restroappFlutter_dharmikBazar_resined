@@ -25,6 +25,7 @@ import 'package:restroapp/src/models/DeviceInfo.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -636,6 +637,234 @@ class Utils {
       return true;
     }
   }
+
+  // Tax calculation *******************************************************************************************************************************
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  // Tax calculation *******************************************************************************************************************************
+
+  static bool checkStoreTaxOpenTime(TaxCalculationModel taxModel,
+      StoreModel storeObject, OrderType deliveryType) {
+    // in case of deliver ignore is24x7Open
+    bool status = false;
+    try {
+      print("****************************check******");
+      // user selct deliver  = is24x7Open ignore , if delivery slots is 1
+      //if delivery slots = 0 , is24x7Open == 0, proced aage, then check time
+      if (taxModel.storeTimeSetting.is24X7Open == "1") {
+        // 1 = means store open 24x7
+        // 0 = not open for 24x7
+        status = true;
+      } else if (taxModel.storeTimeSetting.openhoursFrom.isEmpty ||
+          taxModel.storeTimeSetting.openhoursFrom.isEmpty) {
+        status = true;
+      } else {
+        bool isStoreOpenToday = Utils.checkStoreTaxOpenDays(taxModel);
+        if (isStoreOpenToday) {
+          bool isStoreOpen = Utils.getDayTaxOfWeek(taxModel);
+          status = isStoreOpen;
+        } else {
+          status = false;
+        }
+      }
+      return status;
+    } catch (e) {
+      print(e);
+      return true;
+    }
+  }
+
+  static bool checkStoreTaxOpenDays(TaxCalculationModel taxModel) {
+    bool isStoreOpenToday;
+    var date = DateTime.now();
+    //print(DateFormat('EEE').format(date)); // prints Tuesday
+    String dayName = DateFormat('EEE').format(date).toLowerCase();
+
+    List<String> storeOpenDaysList =
+        taxModel.storeTimeSetting.storeOpenDays.split(",");
+    print("${dayName} and ${storeOpenDaysList}");
+
+    if (storeOpenDaysList.contains(dayName)) {
+      print("true contains");
+      isStoreOpenToday = true;
+    } else {
+      print("false contains");
+      isStoreOpenToday = false;
+    }
+    return isStoreOpenToday;
+  }
+
+  static bool getDayTaxOfWeek(TaxCalculationModel taxModel) {
+    bool isStoreOpen;
+    DateFormat dateFormat = DateFormat("hh:mma");
+    DateFormat apiDateFormat = new DateFormat("yyyy-MM-dd hh:mm a");
+
+    var currentDate = DateTime.now();
+    print(currentDate
+        .toString()); // prints something like 2019-12-10 10:02:22.287949
+
+    String currentTime = apiDateFormat.format(currentDate);
+    //currentTime = currentTime.replaceAll("AM", "am").replaceAll("PM","pm");
+    /*print("----------------------------------------------");
+    print("openhoursFrom= ${store.openhoursFrom}");
+    print("openhoursTo=   ${store.openhoursTo}");
+    print("currentTime=   ${currentTime}");
+    print("----------------------------------------------");*/
+
+    String openhours_From = taxModel.storeTimeSetting.openhoursFrom
+        .replaceAll("am", " AM")
+        .replaceAll("pm", " PM");
+    String openhours_To = taxModel.storeTimeSetting.openhoursTo
+        .replaceAll("am", " AM")
+        .replaceAll("pm", " PM");
+    // print("--${getCurrentDate()}--openhoursFrom----${openhours_From} and ${openhours_To}");
+    if (openhours_To.contains('12:00 AM')) {
+      openhours_To = openhours_To.replaceAll('12:00 AM', '11:59 PM');
+    }
+    String openhoursFrom =
+        "${getCurrentDate()} ${openhours_From}"; //"2020-06-02 09:30 AM";
+    String openhoursTo =
+        "${getCurrentDate()} ${openhours_To}"; //"2020-06-02 06:30 PM";
+    String currentDateTime = currentTime; //"2020-06-02 08:30 AM";
+
+    DateTime storeOpenTime = apiDateFormat.parse(openhoursFrom);
+    DateTime storeCloseTime = apiDateFormat.parse(openhoursTo);
+    DateTime currentTimeObj = apiDateFormat.parse(currentDateTime);
+
+    //print("${dateFormat.format(storeOpenTime)} and ${dateFormat.format(storeCloseTime)}");
+    //print("currentTimeObj = ${currentTimeObj.toString()}");
+    //print("----------------------------------------------");
+    //print("openhoursFrom=   ${openhoursFrom}");
+    //print("openhoursTo=     ${openhoursTo}");
+    //print("currentDateTime= ${currentDateTime}");
+    //print("----------------------------------------------");
+    if (currentTimeObj.isAfter(storeOpenTime) &&
+        currentTimeObj.isBefore(storeCloseTime)) {
+      // do something
+      //print("---if----isAfter---and --isBefore---}");
+      print("*********00******${isStoreOpen}*******00");
+      isStoreOpen = true;
+    } else {
+      //print("---else---else--else---else----else-------------}");
+      isStoreOpen = false;
+    }
+    return isStoreOpen;
+  }
+
+  //Subscription Tax calculation *******************************************************************************************************************************
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+  //Subscription Tax calculation *******************************************************************************************************************************
+
+  static bool checkStoreSubsTaxOpenTime(SubscriptionTaxCalculation taxModel,
+      StoreModel storeObject, OrderType deliveryType) {
+    // in case of deliver ignore is24x7Open
+    bool status = false;
+    try {
+      // user selct deliver  = is24x7Open ignore , if delivery slots is 1
+      //if delivery slots = 0 , is24x7Open == 0, proced aage, then check time
+      if (taxModel.storeTimeSetting.is24X7Open == "1") {
+        // 1 = means store open 24x7
+        // 0 = not open for 24x7
+        status = true;
+      } else if (taxModel.storeTimeSetting.openhoursFrom.isEmpty ||
+          taxModel.storeTimeSetting.openhoursFrom.isEmpty) {
+        status = true;
+      } else {
+        bool isStoreOpenToday = Utils.checkStoreSubsTaxOpenDays(taxModel);
+        if (isStoreOpenToday) {
+          bool isStoreOpen = Utils.getDaySubsTaxOfWeek(taxModel);
+          status = isStoreOpen;
+        } else {
+          status = false;
+        }
+      }
+      return status;
+    } catch (e) {
+      print(e);
+      return true;
+    }
+  }
+
+  static bool checkStoreSubsTaxOpenDays(SubscriptionTaxCalculation taxModel) {
+    bool isStoreOpenToday;
+    var date = DateTime.now();
+    //print(DateFormat('EEE').format(date)); // prints Tuesday
+    String dayName = DateFormat('EEE').format(date).toLowerCase();
+
+    List<String> storeOpenDaysList =
+        taxModel.storeTimeSetting.storeOpenDays.split(",");
+    //print("${dayName} and ${storeOpenDaysList}");
+
+    if (storeOpenDaysList.contains(dayName)) {
+      //print("true contains");
+      isStoreOpenToday = true;
+    } else {
+      //print("false contains");
+      isStoreOpenToday = false;
+    }
+    return isStoreOpenToday;
+  }
+
+  static bool getDaySubsTaxOfWeek(SubscriptionTaxCalculation taxModel) {
+    bool isStoreOpen;
+    DateFormat dateFormat = DateFormat("hh:mma");
+    DateFormat apiDateFormat = new DateFormat("yyyy-MM-dd hh:mm a");
+
+    var currentDate = DateTime.now();
+    print(currentDate
+        .toString()); // prints something like 2019-12-10 10:02:22.287949
+
+    String currentTime = apiDateFormat.format(currentDate);
+    //currentTime = currentTime.replaceAll("AM", "am").replaceAll("PM","pm");
+    /*print("----------------------------------------------");
+    print("openhoursFrom= ${store.openhoursFrom}");
+    print("openhoursTo=   ${store.openhoursTo}");
+    print("currentTime=   ${currentTime}");
+    print("----------------------------------------------");*/
+
+    String openhours_From = taxModel.storeTimeSetting.openhoursFrom
+        .replaceAll("am", " AM")
+        .replaceAll("pm", " PM");
+    String openhours_To = taxModel.storeTimeSetting.openhoursTo
+        .replaceAll("am", " AM")
+        .replaceAll("pm", " PM");
+    // print("--${getCurrentDate()}--openhoursFrom----${openhours_From} and ${openhours_To}");
+    if (openhours_To.contains('12:00 AM')) {
+      openhours_To = openhours_To.replaceAll('12:00 AM', '11:59 PM');
+    }
+    String openhoursFrom =
+        "${getCurrentDate()} ${openhours_From}"; //"2020-06-02 09:30 AM";
+    String openhoursTo =
+        "${getCurrentDate()} ${openhours_To}"; //"2020-06-02 06:30 PM";
+    String currentDateTime = currentTime; //"2020-06-02 08:30 AM";
+
+    DateTime storeOpenTime = apiDateFormat.parse(openhoursFrom);
+    DateTime storeCloseTime = apiDateFormat.parse(openhoursTo);
+    DateTime currentTimeObj = apiDateFormat.parse(currentDateTime);
+
+    //print("${dateFormat.format(storeOpenTime)} and ${dateFormat.format(storeCloseTime)}");
+    //print("currentTimeObj = ${currentTimeObj.toString()}");
+    //print("----------------------------------------------");
+    //print("openhoursFrom=   ${openhoursFrom}");
+    //print("openhoursTo=     ${openhoursTo}");
+    //print("currentDateTime= ${currentDateTime}");
+    //print("----------------------------------------------");
+    if (currentTimeObj.isAfter(storeOpenTime) &&
+        currentTimeObj.isBefore(storeCloseTime)) {
+      // do something
+      //print("---if----isAfter---and --isBefore---}");
+      isStoreOpen = true;
+    } else {
+      //print("---else---else--else---else----else-------------}");
+      isStoreOpen = false;
+    }
+    return isStoreOpen;
+  }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   static launchURL(String url) async {
     if (await canLaunch(url)) {

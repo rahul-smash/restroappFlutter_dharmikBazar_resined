@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/ProfileScreen.dart';
 import 'package:restroapp/src/UI/Language.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -36,6 +38,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   FacebookLogin facebookSignIn = new FacebookLogin();
   GoogleSignIn _googleSignIn;
   GoogleSignInAccount _currentUser;
+  String hideSign_up;
 
   _LoginMobileScreen(this.menu);
 
@@ -63,6 +66,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
     store = await SharedPrefs.getStore();
     setState(() {
       otpSkip = store.otpSkip;
+      hideSign_up = store.hideSignup;
       String delieveryAdress = store.deliveryFacility;
       print('@@HomeModel   ${otpSkip} and ${delieveryAdress}');
     });
@@ -261,6 +265,16 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                               ],
                             ),
                           ),
+                          Visibility(
+                            visible: hideSign_up == "0",
+                            child: InkWell(
+                              onTap: () {
+                                print(
+                                    "************${hideSign_up}*********************");
+                              },
+                              child: addSignUpButton(),
+                            ),
+                          ),
                         ],
                       )),
                 ),
@@ -454,6 +468,38 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
     } else {
       Utils.showToast("Please enter Mobile number", true);
     }
+  }
+
+  Widget addSignUpButton() {
+    return Padding(
+      padding: EdgeInsets.only(top: 10, bottom: 0),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: RichText(
+          text: TextSpan(
+            text: 'Don\'t have an account?',
+            style: TextStyle(
+                fontFamily: 'Medium', fontSize: 16, color: Colors.grey),
+            children: [
+              TextSpan(
+                  text: ' Sign Up',
+                  style: TextStyle(
+                      fontFamily: 'Medium',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: appThemeSecondary),
+                  recognizer: (TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterUser()),
+                      );
+                    })),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

@@ -38,12 +38,13 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   GoogleSignIn _googleSignIn;
   GoogleSignInAccount _currentUser;
   FacebookLogin facebookSignIn = new FacebookLogin();
-
+  String hideSign_up;
   _LoginEmailScreenState(this.menu);
 
   @override
   void initState() {
     super.initState();
+    getHideSignUp();
     _googleSignIn = GoogleSignIn(
       scopes: [
         'email',
@@ -283,15 +284,15 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                           ],
                         ),
                       ),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => RegisterUser()),
-                          );
-                        },
-                        child: addSignUpButton(),
+                      Visibility(
+                        visible: hideSign_up == "0",
+                        child: InkWell(
+                          onTap: () {
+                            print(
+                                "************${storeModel.hideSignup}*********************");
+                          },
+                          child: addSignUpButton(),
+                        ),
                       ),
                     ],
                   ),
@@ -496,7 +497,13 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: appThemeSecondary),
-                  recognizer: (TapGestureRecognizer()..onTap = () {})),
+                  recognizer: (TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterUser()),
+                      );
+                    })),
             ],
           ),
         ),
@@ -566,6 +573,13 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
       } else {
         Utils.showToast(AppConstant.noInternet, true);
       }
+    });
+  }
+
+  void getHideSignUp() async {
+    storeModel = await SharedPrefs.getStore();
+    setState(() {
+      hideSign_up = storeModel.hideSignup;
     });
   }
 }

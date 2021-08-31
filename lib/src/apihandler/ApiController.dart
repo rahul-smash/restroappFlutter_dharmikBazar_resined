@@ -1233,7 +1233,7 @@ class ApiController {
       request.fields.addAll({
         "razorpay_order_id": razorpay_order_id,
       });
-
+      print(url);
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print('----respStr-----' + respStr);
