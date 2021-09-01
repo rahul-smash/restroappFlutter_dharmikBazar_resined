@@ -1,12 +1,14 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:compressimage/compressimage.dart';
 import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
-import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
 import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -19,15 +21,15 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/DeviceInfo.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
-import 'package:restroapp/src/models/HtmlModelResponse.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
+import 'package:restroapp/src/models/GetOrderHistory.dart';
+import 'package:restroapp/src/models/HtmlModelResponse.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/ProductRatingResponse.dart';
-import 'package:restroapp/src/models/WalletOnlineTopUp.dart';
 import 'package:restroapp/src/models/RazorPayTopUP.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/RecommendedProductsResponse.dart';
@@ -36,29 +38,25 @@ import 'package:restroapp/src/models/SearchTagsModel.dart';
 import 'package:restroapp/src/models/SocialModel.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
 import 'package:restroapp/src/models/StoreBranchesModel.dart';
+import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
+import 'package:restroapp/src/models/StoreOffersResponse.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
 import 'package:restroapp/src/models/StripeVerifyModel.dart';
+import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/SubscriptionUpdationResponse.dart';
-import 'package:restroapp/src/models/UserResponseModel.dart';
-import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
-import 'package:restroapp/src/models/StoreResponseModel.dart';
-import 'package:restroapp/src/models/StoreOffersResponse.dart';
-import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
-import 'package:restroapp/src/models/GetOrderHistory.dart';
-import 'package:restroapp/src/models/VerifyEmailModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
+import 'package:restroapp/src/models/WalletOnlineTopUp.dart';
 import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:io';
 
 class ApiController {
   static final int timeout = 18;
@@ -470,18 +468,29 @@ class ApiController {
 
   static Future<PickUpModel> getStorePickupAddress() async {
     StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getStorePickupAddress;
 
-    var request = new http.MultipartRequest("GET", Uri.parse(url));
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
+      request.fields.addAll({
+        "user_id": user.id,
+      });
+
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----url---${url}");
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       PickUpModel storeArea = PickUpModel.fromJson(parsed);
-      return storeArea;
+      if (storeArea.success == false) {
+        storeArea.message;
+        //Utils.showToast(storeArea.message, true);
+        return storeArea;
+      } else {
+        return storeArea;
+      }
     } catch (e) {
       print("----catch---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -1233,7 +1242,7 @@ class ApiController {
       RazorpayOrderData model = RazorpayOrderData.fromJson(parsed);
       return model;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      //Utils.showToast(e.toString(), true);
       return null;
     }
   }
@@ -1556,7 +1565,7 @@ class ApiController {
         var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
             ApiConstants.createPaytmTxnToken;
 //        TODO: remove this static url
-  //    var  url = "https://stage.grocersapp.com/393/api_v1/createPaytmTxnToken";
+        //    var  url = "https://stage.grocersapp.com/393/api_v1/createPaytmTxnToken";
         print(url);
         FormData formData = new FormData.fromMap({
           "customer_id": user.id,
@@ -1573,7 +1582,7 @@ class ApiController {
         print(formData.fields);
         Dio dio = new Dio();
         dio.options.headers['Accept'] = 'application/json';
-        dio.options.contentType="application/json";
+        dio.options.contentType = "application/json";
         dio.options.followRedirects = false;
         Response response = await dio.post(url,
             data: formData,
@@ -2376,7 +2385,7 @@ class ApiController {
       RazorpayOrderData model = RazorpayOrderData.fromJson(parsed);
       return model;
     } catch (e) {
-      Utils.showToast(e.toString(), true);
+      // Utils.showToast(e.toString(), true);
       return null;
     }
   }
@@ -2405,7 +2414,8 @@ class ApiController {
               responseType: ResponseType.plain));
       print(response.statusCode);
       print(response.data);
-      RazorPayTopUP razorTopStore = RazorPayTopUP.fromJson(json.decode(response.data));
+      RazorPayTopUP razorTopStore =
+          RazorPayTopUP.fromJson(json.decode(response.data));
       RazorPayTopUP.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${razorTopStore.success}");
       return razorTopStore;
@@ -2414,8 +2424,8 @@ class ApiController {
     }
   }
 
-  static Future<WalletOnlineTopUp> onlineTopUP(
-      String paymentId, String paymentRequestId, String amount,String paymentType) async {
+  static Future<WalletOnlineTopUp> onlineTopUP(String paymentId,
+      String paymentRequestId, String amount, String paymentType) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -2439,12 +2449,11 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       WalletOnlineTopUp razorTopStore =
-      WalletOnlineTopUp.fromJson(json.decode(response.data));
+          WalletOnlineTopUp.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${razorTopStore.success}");
       return razorTopStore;
     } catch (e) {
       print(e);
     }
   }
-
 }

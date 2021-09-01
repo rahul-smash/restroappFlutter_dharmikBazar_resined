@@ -2,19 +2,21 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 import 'dart:math';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connectivity/connectivity.dart';
 import 'package:device_info/device_info.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:intl/intl.dart';
 import 'package:package_info/package_info.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
-import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
+import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -34,6 +36,7 @@ import 'DialogUtils.dart';
 
 class Utils {
   static ProgressDialog pr;
+  HomeScreen homeScreen;
 
   static void showToast(String msg, bool shortLength) {
     try {
@@ -179,6 +182,75 @@ class Utils {
             ),
           ],
         );
+      },
+    );
+  }
+
+  static void showBlockedDialog(BuildContext context, String message) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(5.0))),
+            //title: Text(title,textAlign: TextAlign.center,),
+            child: Container(
+              child: Wrap(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                    child: Center(
+                      child: Text(
+                        "Account Issue",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: grayColorTitle, fontSize: 18),
+                      ),
+                    ),
+                  ),
+                  Container(
+                      height: 1,
+                      color: Colors.black45,
+                      width: MediaQuery.of(context).size.width),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
+                    child: Center(
+                      child: Text(
+                        "${message}",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                          child: FlatButton(
+                            child: Text('OK'),
+                            color: appThemeSecondary,
+                            textColor: Colors.white,
+                            onPressed: () {
+                              Navigator.pop(context);
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //       builder: (context) =>
+                              //           LoginMobileScreen("menu")),
+                            },
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ));
       },
     );
   }
@@ -413,7 +485,8 @@ class Utils {
       DateTime time = format.parse(date, true);
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
-      DateFormat formatter = new DateFormat('dd MMM, yyyy hh:mm aa');  // Change hh:mm:aa to hh:mm aa
+      DateFormat formatter = new DateFormat(
+          'dd MMM, yyyy hh:mm aa'); // Change hh:mm:aa to hh:mm aa
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);
@@ -465,7 +538,7 @@ class Utils {
         store.openhoursTo.replaceAll("am", " AM").replaceAll("pm", " PM");
     // print("--${getCurrentDate()}--openhoursFrom----${openhours_From} and ${openhours_To}");
     if (openhours_To.contains('12:00 AM')) {
-      openhours_To=openhours_To.replaceAll('12:00 AM', '11:59 PM');
+      openhours_To = openhours_To.replaceAll('12:00 AM', '11:59 PM');
     }
     String openhoursFrom =
         "${getCurrentDate()} ${openhours_From}"; //"2020-06-02 09:30 AM";
@@ -632,7 +705,8 @@ class Utils {
     );
   }
 
-  static Future<void> sendAnalyticsAddToCart(Product product,int quantity) async {
+  static Future<void> sendAnalyticsAddToCart(
+      Product product, int quantity) async {
     await analytics.logAddToCart(
         itemId: product.id,
         itemName: product.title,
@@ -640,7 +714,8 @@ class Utils {
         quantity: quantity);
   }
 
-  static Future<void> sendAnalyticsRemovedToCart(Product product,int quantity) async {
+  static Future<void> sendAnalyticsRemovedToCart(
+      Product product, int quantity) async {
     await analytics.logRemoveFromCart(
         itemId: product.id,
         itemName: product.title,
@@ -649,13 +724,12 @@ class Utils {
   }
 
   static Future<void> sendAnalyticsCheckOut(
-    double amount ,String productJson ) async {
+      double amount, String productJson) async {
     await analytics.logBeginCheckout(
-      //amount
-      value: amount,
-      currency: AppConstant.currency,
-      destination:productJson
-    );
+        //amount
+        value: amount,
+        currency: AppConstant.currency,
+        destination: productJson);
   }
 
   //checkout step
@@ -669,7 +743,7 @@ class Utils {
   // 4 = order placed
 
   static Future<void> sendAnalyticsCheckoutOption(
-      int checkoutStep,String checkoutOption) async {
+      int checkoutStep, String checkoutOption) async {
     await analytics.logSetCheckoutOption(
         checkoutStep: checkoutStep, checkoutOption: checkoutOption);
   }

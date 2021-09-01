@@ -1,19 +1,42 @@
-
 class MobileVerified {
   int userExists;
   bool success;
   UserModelMobile user;
+  int errorCode;
+  String message;
+
+  MobileVerified({
+    this.userExists,
+    this.success,
+    this.user,
+    this.errorCode,
+    this.message,
+  });
 
   MobileVerified.fromJson(Map<String, dynamic> json) {
     userExists = json['user_exists'];
     success = json['success'];
-    user = json['data'] != null ? new UserModelMobile.fromJson(json['data']) : null;
+    user = json['data'] != null
+        ? new UserModelMobile.fromJson(json['data'])
+        : null;
+    errorCode:
+    errorCode = json["error_code"] == null ? null : json["error_code"];
+    message:
+    message = json["message"] == null ? null : json["message"];
   }
+
+  Map<String, dynamic> toJson() => {
+        "user_exists": userExists == null ? null : userExists,
+        "success": success == null ? null : success,
+        "data": user == null ? null : user.toJson(),
+        "error_code": errorCode == null ? null : errorCode,
+        "message": message == null ? null : message,
+      };
 }
 
 class UserModelMobile {
   String id;
-  String fullName="";
+  String fullName = "";
   String fbId;
   String email;
   String decodedPassword;
@@ -37,27 +60,27 @@ class UserModelMobile {
 
   UserModelMobile(
       {this.id,
-        this.fullName,
-        this.fbId,
-        this.email,
-        this.decodedPassword,
-        this.phone,
-        this.profileImage,
-        this.otp,
-        this.otpVerify,
-        this.userReferCode,
-        this.roleId,
-        this.status,
-        this.loginStatus,
-        this.type,
-        this.deviceId,
-        this.deviceToken,
-        this.platform,
-        this.verfCode,
-        this.verfStatus,
-        this.created,
-        this.deliveryAddress,
-        this.isRefererFnEnable});
+      this.fullName,
+      this.fbId,
+      this.email,
+      this.decodedPassword,
+      this.phone,
+      this.profileImage,
+      this.otp,
+      this.otpVerify,
+      this.userReferCode,
+      this.roleId,
+      this.status,
+      this.loginStatus,
+      this.type,
+      this.deviceId,
+      this.deviceToken,
+      this.platform,
+      this.verfCode,
+      this.verfStatus,
+      this.created,
+      this.deliveryAddress,
+      this.isRefererFnEnable});
 
   UserModelMobile.fromJson(Map<String, dynamic> json) {
     id = json['id'];

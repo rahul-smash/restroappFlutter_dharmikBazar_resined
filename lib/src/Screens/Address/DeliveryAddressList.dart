@@ -2,13 +2,16 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:progress_dialog/progress_dialog.dart';
+import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
+import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
+import 'package:restroapp/src/models/CategoryResponseModel.dart';
+import 'package:restroapp/src/models/ConfigModel.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
+import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -16,6 +19,7 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+
 import '../BookOrder/ConfirmOrderScreen.dart';
 
 class DeliveryAddressList extends StatefulWidget {
@@ -35,6 +39,12 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   Coordinates coordinates;
   bool isLoading = false;
   DeliveryAddressResponse responsesData;
+  BranchData branchData;
+  StoreModel store;
+  CategoryResponse categoryResponse;
+
+  ConfigModel configObject;
+  PackageInfo packageInfo;
 
   @override
   void initState() {
@@ -59,35 +69,103 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Delivery Addresses"),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context, false),
-        ),
-        actions: <Widget>[
-          InkWell(
-            onTap: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            child: Padding(
-              padding:
-                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
-              child: Icon(
-                Icons.home,
-                color: Colors.white,
-                size: 30,
+      appBar: addressList != null
+          ? AppBar(
+              title: Text("Delivery Addresses"),
+              centerTitle: true,
+              leading: IconButton(
+                icon: Icon(Icons.arrow_back_ios),
+                onPressed: () => Navigator.pop(context, false),
               ),
+              actions: <Widget>[
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        top: 0.0, bottom: 0.0, left: 0, right: 10),
+                    child: Icon(
+                      Icons.home,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : AppBar(
+              title: Text("Account Issue"),
+              centerTitle: true,
+              automaticallyImplyLeading: false,
             ),
-          ),
-        ],
-      ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : addressList == null
-              ? SingleChildScrollView(
-                  child: Center(child: Text("Something went wrong!")))
+              ? WillPopScope(
+                  onWillPop: () {
+                    logout(context, branchData);
+                    Navigator.popUntil(context, (route) => route.isFirst);
+                  },
+                  child: Dialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                      //title: Text(title,textAlign: TextAlign.center,),
+                      child: Container(
+                        child: Wrap(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                              child: Center(
+                                child: Text(
+                                  "Account Issue",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      color: grayColorTitle, fontSize: 18),
+                                ),
+                              ),
+                            ),
+                            Container(
+                                height: 1,
+                                color: Colors.black45,
+                                width: MediaQuery.of(context).size.width),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
+                              child: Center(
+                                child: Text(
+                                  "${responsesData.message}",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Container(
+                                    margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                    child: FlatButton(
+                                      child: Text('OK'),
+                                      color: appThemeSecondary,
+                                      textColor: Colors.white,
+                                      onPressed: () {
+                                        logout(context, branchData);
+                                        Navigator.popUntil(
+                                            context, (route) => route.isFirst);
+                                      },
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      )),
+                )
               : Column(
                   children: <Widget>[
                     Divider(color: Colors.white, height: 2.0),
@@ -95,9 +173,13 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     addAddressList()
                   ],
                 ),
-      bottomNavigationBar: SafeArea(
-        child: widget.showProceedBar ? addProceedBar() : Container(height: 5),
-      ),
+      bottomNavigationBar: addressList == null
+          ? Container(height: 5)
+          : SafeArea(
+              child: widget.showProceedBar
+                  ? addProceedBar()
+                  : Container(height: 5),
+            ),
     );
   }
 
@@ -213,6 +295,41 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     );
   }
 
+  Future logout(BuildContext context, BranchData selectedStore) async {
+    try {
+      Utils.showProgressDialog(context);
+      SharedPrefs.setUserLoggedIn(false);
+      SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "false");
+      SharedPrefs.removeKey(AppConstant.showReferEarnAlert);
+      SharedPrefs.removeKey(AppConstant.referEarnMsg);
+      AppConstant.isLoggedIn = false;
+      DatabaseHelper databaseHelper = new DatabaseHelper();
+      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
+      databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      eventBus.fire(updateCartCount());
+
+      StoreResponse storeData =
+          await ApiController.versionApiRequest(selectedStore.id);
+      print(storeData);
+      CategoryResponse categoryResponse =
+          await ApiController.getCategoriesApiRequest(storeData.store.id);
+      print(categoryResponse);
+      setState(() {
+        this.store = storeData.store;
+        this.branchData = selectedStore;
+        this.categoryResponse = categoryResponse;
+        Utils.hideProgressDialog(context);
+      });
+      print(store);
+      print(configObject);
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Widget addAddressList() {
     //Utils.hideProgressDialog(context);
     if (addressList.isEmpty) {
@@ -258,11 +375,12 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     ),
                   ),
                   addAddressInfoRow(Icons.phone, area.mobile),
-                  addAddressInfoRow(Icons.location_on,  area.address2!=null&&area.address2.trim().isNotEmpty?
-                  '${area.address!=null&&area.address.trim().isNotEmpty?
-                  '${area.address}, ${area.address2}'
-                      :"${area.address2}"}'
-                      : area.address,),
+                  addAddressInfoRow(
+                    Icons.location_on,
+                    area.address2 != null && area.address2.trim().isNotEmpty
+                        ? '${area.address != null && area.address.trim().isNotEmpty ? '${area.address}, ${area.address2}' : "${area.address2}"}'
+                        : area.address,
+                  ),
                   addAddressInfoRow(Icons.email, area.email),
                 ],
               ),
@@ -415,22 +533,22 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             print("minAmount=${addressList[selectedIndex].minAmount}");
             print("notAllow=${addressList[selectedIndex].notAllow}");
             if (addressList[selectedIndex].note.isEmpty) {
-
-              if(widget.delivery == OrderType.SubScription){
+              if (widget.delivery == OrderType.SubScription) {
                 eventBus.fire(onAddressSelected(addressList[selectedIndex]));
                 Navigator.pop(context);
-              }else{
+              } else {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => ConfirmOrderScreen(
-                        addressList[selectedIndex],
-                        false,
-                        "",
-                        widget.delivery,storeModel: storeModel,)),
+                            addressList[selectedIndex],
+                            false,
+                            "",
+                            widget.delivery,
+                            storeModel: storeModel,
+                          )),
                 );
               }
-
             } else {
               var result = await DialogUtils.displayOrderConfirmationDialog(
                 context,
@@ -438,25 +556,26 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 addressList[selectedIndex].note,
               );
               if (result == true) {
-                if(widget.delivery == OrderType.SubScription){
+                if (widget.delivery == OrderType.SubScription) {
                   eventBus.fire(onAddressSelected(addressList[selectedIndex]));
                   Navigator.pop(context);
-                }else{
+                } else {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => ConfirmOrderScreen(
-                          addressList[selectedIndex],
-                          false,
-                          "",
-                          widget.delivery,storeModel: storeModel,)),
+                              addressList[selectedIndex],
+                              false,
+                              "",
+                              widget.delivery,
+                              storeModel: storeModel,
+                            )),
                   );
                 }
-
               }
             }
-          //Code Commented Due to not approved by client
-           /* StoreModel storeModel = await SharedPrefs.getStore();
+            //Code Commented Due to not approved by client
+            /* StoreModel storeModel = await SharedPrefs.getStore();
             bool isPaymentModeOnline = false;
 
             if (storeModel.onlinePayment == "1") {
@@ -508,9 +627,14 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             widget.delivery == OrderType.SubScription
-                ? Text("Select", style: TextStyle(color: Colors.white, fontSize: 20.0),)
-                : Text("Proceed",style: TextStyle(color: Colors.white, fontSize: 20.0),
-            ),
+                ? Text(
+                    "Select",
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
+                  )
+                : Text(
+                    "Proceed",
+                    style: TextStyle(color: Colors.white, fontSize: 20.0),
+                  ),
           ],
         ),
       ),

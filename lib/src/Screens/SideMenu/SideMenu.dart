@@ -3,23 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 import 'package:flutter_share/flutter_share.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
+import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/SideMenu/AboutScreen.dart';
-import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
-import 'package:restroapp/src/Screens/LoginSignUp/LoginEmailScreen.dart';
-import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/FAQScreen.dart';
-import 'package:restroapp/src/UI/ChatSupport.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ReferEarnData.dart';
 import 'package:restroapp/src/models/SocialModel.dart';
+import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -27,7 +25,6 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:restroapp/src/models/StoreResponseModel.dart';
 
 import 'AdditionalInformations.dart';
 import 'LoyalityPoints.dart';
@@ -64,7 +61,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     _googleSignIn = GoogleSignIn(
       scopes: [
         'email',
-        'https://www.googleapis.com/auth/contacts.readonly',
+        // 'https://www.googleapis.com/auth/contacts.readonly',
       ],
     );
     //print("isRefererFnEnable=${widget.store.isRefererFnEnable}");
