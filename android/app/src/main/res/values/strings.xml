@@ -21,4 +21,5 @@
       **NOTE**: The scheme needs to start with `fb` and then your ID.
     &ndash;&gt;
     <string name="fb_login_protocol_scheme">fb3522925701099597</string>-->
+
 </resources>
