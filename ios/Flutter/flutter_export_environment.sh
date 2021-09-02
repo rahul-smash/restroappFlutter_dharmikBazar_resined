@@ -1,12 +1,11 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/home/signity/Documents/21MarchSoftware/flutter-sdk/extract-flutter-sdk/flutter_linux_v1.12.13+hotfix.8-stable/flutter"
-export "FLUTTER_APPLICATION_PATH=/home/signity/Documents/signity/karan_restroapp/restroapp-flutter"
+export "FLUTTER_ROOT=/home/signity/flutter_development/flutter"
+export "FLUTTER_APPLICATION_PATH=/home/signity/workspace_signity/1_Flutter_projects/restro_flutter_updated_code"
+export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_TARGET=lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "SYMROOT=${SOURCE_ROOT}/../build/ios"
-export "OTHER_LDFLAGS=$(inherited) -framework Flutter"
-export "FLUTTER_FRAMEWORK_DIR=/home/signity/Documents/21MarchSoftware/flutter-sdk/extract-flutter-sdk/flutter_linux_v1.12.13+hotfix.8-stable/flutter/bin/cache/artifacts/engine/ios"
 export "FLUTTER_BUILD_NAME=1.0.0"
 export "FLUTTER_BUILD_NUMBER=1"
 export "DART_OBFUSCATION=false"
