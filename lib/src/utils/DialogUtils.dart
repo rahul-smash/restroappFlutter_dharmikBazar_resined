@@ -214,21 +214,41 @@ class DialogUtils {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    InkWell(
-                      onTap: onButtonPressed ??
-                          () {
-                            Navigator.of(context).pop(true);
-                          },
-                      child: Container(
-                        child: CachedNetworkImage(
-                          imageUrl: "${storeOffer.image}",
-                          fit: BoxFit.scaleDown,
-                          placeholder: (context, url) =>
-                              CircularProgressIndicator(),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                    Stack(
+                      children: [
+                        InkWell(
+                          onTap: onButtonPressed ??
+                                  () {
+                                Navigator.of(context).pop(true);
+                              },
+                          child: Container(
+                            child: CachedNetworkImage(
+                              imageUrl: "${storeOffer.image}",
+                              fit: BoxFit.scaleDown,
+                              placeholder: (context, url) =>
+                                  CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            ),
+                          ),
                         ),
-                      ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                              child: Icon(
+                                Icons.cancel,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      ],
                     ),
                     Padding(
                       padding: EdgeInsets.fromLTRB(0, 15, 0, 10),

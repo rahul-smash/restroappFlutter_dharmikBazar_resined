@@ -139,9 +139,13 @@ class _ProfileState extends State<ProfileScreen> {
     //print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     return WillPopScope(
         onWillPop: () async {
-          return await nameValidation() &&
-              isValidEmail(emailController.text) &&
-              emailValidation();
+          if(!widget.isComingFromOtpScreen){
+            return Future(()=>true);
+          }else {
+            return await nameValidation() &&
+                isValidEmail(emailController.text) &&
+                emailValidation();
+          }
         },
         child: new Scaffold(
           backgroundColor: Colors.white,
@@ -240,7 +244,7 @@ class _ProfileState extends State<ProfileScreen> {
                               keyboardType: TextInputType.emailAddress,
                               controller: emailController,
                               decoration: InputDecoration(
-                                labelText: 'Email',
+                                labelText: 'Email *',
                               ),
                               style: TextStyle(
                                   fontSize: 18,

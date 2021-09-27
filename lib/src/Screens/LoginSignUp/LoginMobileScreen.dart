@@ -22,6 +22,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class LoginMobileScreen extends StatefulWidget {
   String menu;
+
   LoginMobileScreen(this.menu);
 
   @override
@@ -265,16 +266,16 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                               ],
                             ),
                           ),
-                          Visibility(
-                            visible: hideSign_up == "0",
-                            child: InkWell(
-                              onTap: () {
-                                print(
-                                    "************${hideSign_up}*********************");
-                              },
-                              child: addSignUpButton(),
-                            ),
-                          ),
+                          // Visibility(
+                          //   visible: hideSign_up == "0",
+                          //   child: InkWell(
+                          //     onTap: () {
+                          //       print(
+                          //           "************${hideSign_up}*********************");
+                          //     },
+                          //     child: addSignUpButton(),
+                          //   ),
+                          // ),
                         ],
                       )),
                 ),
@@ -312,7 +313,8 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
 
               if (verifyEmailModel != null &&
                   !verifyEmailModel.success &&
-                  verifyEmailModel.errorCode == 403) {
+                  verifyEmailModel.errorCode == 403 &&
+                  verifyEmailModel.userExists == 0) {
                 print('${verifyEmailModel.message}');
                 Utils.showBlockedDialog(context, verifyEmailModel.message);
               } else if (verifyEmailModel.userExists == 0) {
@@ -383,7 +385,9 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           MobileVerified verifyEmailModel =
               await ApiController.verifyEmail(fbModel.email);
           Utils.hideProgressDialog(context);
-          if (!verifyEmailModel.success && verifyEmailModel.errorCode == 403) {
+          if (!verifyEmailModel.success &&
+              verifyEmailModel.errorCode == 403 &&
+              verifyEmailModel.userExists == 0) {
             Utils.showBlockedDialog(context, verifyEmailModel.message);
           } else if (verifyEmailModel.userExists == 0) {
             Navigator.pop(context);
@@ -456,7 +460,8 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
               }
             } else if (response != null &&
                 !response.success &&
-                response.errorCode == 403) {
+                response.errorCode == 403 &&
+                response.userExists == 0) {
               print('${response.message}');
               Utils.showBlockedDialog(context, response.message);
             }

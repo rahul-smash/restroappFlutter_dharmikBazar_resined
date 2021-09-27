@@ -145,6 +145,7 @@ class StoreModel {
 
   WalletSettings walletSettings;
   String hideSignup;
+  String promiseToPay;
   StoreModel({
     this.id,
     this.storeName,
@@ -259,6 +260,7 @@ class StoreModel {
     this.poweredByText,
     this.areaWisePaymentOption,
     this.poweredByLink,
+    this.promiseToPay,
     this.reviewRatingDisplay,
     this.allowCustomerForGst,
     this.storeOffer,
@@ -322,6 +324,7 @@ class StoreModel {
     taxLabelName = json['tax_label_name'];
     taxRate = json['tax_rate'];
     istaxenable = json['istaxenable'];
+    promiseToPay = json['promise_to_pay'];
     paymentGateway = json["payment_gateway"];
     subscription = Subscription.fromJson(json["Subscription"]);
     paymentSetting = PaymentSetting.fromJson(json["payment_setting"]);
@@ -546,6 +549,7 @@ class StoreModel {
     data['sms_notifications'] = this.smsNotifications;
     data['gst'] = this.gst;
     data['ga_code'] = this.gaCode;
+    data['promise_to_pay'] = this.promiseToPay;
     data['category_layout'] = this.categoryLayout;
     data['radius_in'] = this.radiusIn;
     data['product_image'] = this.productImage;
