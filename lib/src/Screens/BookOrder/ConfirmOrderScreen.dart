@@ -2588,11 +2588,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void actionConfirmOrder() async {
     StoreModel storeObject = await SharedPrefs.getStore();
-    bool status = Utils.checkStoreOpenTime(storeObject, widget.deliveryType);
-    print("----checkStoreOpenTime----${status}--");
+    if (taxModel.storeStatus == "0") {
+      Utils.showToast("${taxModel.storeMsg}", false);
+      return;
+    }
+    bool status =
+        Utils.checkStoreTaxOpenTime(taxModel, storeObject, widget.deliveryType);
+    print("----checkStoreOpenTime----${status}--*****************");
 
     if (!status) {
-      Utils.showToast("${storeObject.closehoursMessage}", false);
+      Utils.showToast("${taxModel.storeTimeSetting.closehoursMessage}", false);
       return;
     }
     if (widget.deliveryType == OrderType.Delivery && widget.address.notAllow) {
@@ -2829,8 +2834,9 @@ class PaytmWebView extends StatelessWidget {
                     .substring(url.indexOf("/orderId:") + "/orderId:".length);
                 print(txnId);
                 print(orderId);
-                eventBus.fire(
-                    onPayTMPageFinished(url, orderId = orderId, txnId = txnId,amount: amount));
+                eventBus.fire(onPayTMPageFinished(
+                    url, orderId = orderId, txnId = txnId,
+                    amount: amount));
                 Navigator.pop(context);
               } else if (url.contains("api/paytmPaymentResult/failure:")) {
                 Navigator.pop(context);

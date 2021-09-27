@@ -848,6 +848,17 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             textColor: Colors.white,
             color: appTheme,
             onPressed: () async {
+              StoreModel model = await SharedPrefs.getStore();
+              bool status = Utils.checkStoreSubsTaxOpenTime(
+                  taxModel, model, widget.deliveryType);
+              print("----checkStoreOpenTime----${status}--");
+
+              if (!status) {
+                Utils.showToast(
+                    "${taxModel.storeTimeSetting.closehoursMessage}", false);
+                return;
+              }
+
               if (_selectedDeliveryOption == 'Delivery' &&
                   addressData == null) {
                 DialogUtils.displayErrorDialog(
@@ -1257,7 +1268,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                   textColor: Colors.white,
                                   onPressed: () {
                                     //todo:hit api
-                                    callOrderIdApi(widget.model);
+                                    taxModel.storeStatus == "0"
+                                        ? Utils.showToast(
+                                            "${taxModel.storeMsg}", false)
+                                        : callOrderIdApi(widget.model);
                                   },
                                 ),
                               ))
@@ -1421,7 +1435,10 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                 textColor: Colors.white,
                                 onPressed: () {
                                   //todo:hit api
-                                  callOrderIdApi(widget.model);
+                                  taxModel.storeStatus == "0"
+                                      ? Utils.showToast(
+                                          "${taxModel.storeMsg}", false)
+                                      : callOrderIdApi(widget.model);
                                 },
                               ),
                             ))
@@ -2238,7 +2255,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                       String encodedDoughnut = jsonEncode(jsonList);
                       ValidateCouponResponse couponModel =
                           await ApiController.validateOfferApiRequest(
-                              couponCodeController.text, '3', encodedDoughnut,widget.deliveryType==OrderType.PickUp?'1':'2');
+                              couponCodeController.text,
+                              '3',
+                              encodedDoughnut,
+                              widget.deliveryType == OrderType.PickUp
+                                  ? '1'
+                                  : '2');
                       if (couponModel.success) {
                         print("---success----");
                         Utils.hideProgressDialog(context);
@@ -2498,9 +2520,8 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
     ApiController.subscriptionMultipleTaxCalculationRequest(
             couponCode: couponCode,
             discount: '',
-            shipping: widget.deliveryType == OrderType.PickUp
-                ? ''
-                : shippingCharges,
+            shipping:
+                widget.deliveryType == OrderType.PickUp ? '' : shippingCharges,
             orderJson: encodedDoughnut,
             userAddressId: widget.deliveryType == OrderType.Delivery
                 ? addressData == null

@@ -14,7 +14,6 @@ import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ProfileScreen extends StatefulWidget {
-
   bool isComingFromOtpScreen;
   String id;
   String fullName = "";
@@ -22,7 +21,7 @@ class ProfileScreen extends StatefulWidget {
   GoogleSignInAccount googleResult;
 
   ProfileScreen(this.isComingFromOtpScreen, this.id, String fullName,
-      this.fbModel,this.googleResult);
+      this.fbModel, this.googleResult);
 
   @override
   _ProfileState createState() => new _ProfileState();
@@ -31,7 +30,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileState extends State<ProfileScreen> {
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   UserModel user;
-  bool showGstNumber=false;
+  bool showGstNumber = false;
   final firstNameController = new TextEditingController();
   final emailController = new TextEditingController();
   final phoneController = new TextEditingController();
@@ -63,7 +62,7 @@ class _ProfileState extends State<ProfileScreen> {
     }
     storeModel = await SharedPrefs.getStore();
     setState(() {
-      if(user != null){
+      if (user != null) {
         firstNameController.text = user.fullName;
         emailController.text = user.email;
         phoneController.text = user.phone;
@@ -77,10 +76,11 @@ class _ProfileState extends State<ProfileScreen> {
       if (!widget.isComingFromOtpScreen) {
         showReferralCodeView = false;
       }
-      if(storeModel.allowCustomerForGst!=null&& storeModel.allowCustomerForGst.toLowerCase()=='yes'){
-        showGstNumber=true;
-      }else{
-        showGstNumber=false;
+      if (storeModel.allowCustomerForGst != null &&
+          storeModel.allowCustomerForGst.toLowerCase() == 'yes') {
+        showGstNumber = true;
+      } else {
+        showGstNumber = false;
       }
       if (storeModel.internationalOtp == "0") {
         isEmailEditable = false;
@@ -90,14 +90,14 @@ class _ProfileState extends State<ProfileScreen> {
         showReferralCodeView = false;
       }
 
-      if(widget.fbModel != null){
+      if (widget.fbModel != null) {
         print("----------widget.fbModel != null---------");
         firstNameController.text = widget.fbModel.name;
         emailController.text = widget.fbModel.email;
         isPhonereadOnly = false;
         isLoginViaSocial = true;
       }
-      if(widget.googleResult != null){
+      if (widget.googleResult != null) {
         print("----------widget.googleResult != null---------");
         firstNameController.text = widget.googleResult.displayName;
         emailController.text = widget.googleResult.email;
@@ -106,24 +106,24 @@ class _ProfileState extends State<ProfileScreen> {
       }
 
       if (isLoginViaSocial) {
-        if(widget.fbModel != null){
-          if(widget.fbModel.email.isEmpty){
+        if (widget.fbModel != null) {
+          if (widget.fbModel.email.isEmpty) {
             isEmailEditable = false;
           }
-        }else if(widget.googleResult != null){
-          if(widget.googleResult.email.isEmpty){
+        } else if (widget.googleResult != null) {
+          if (widget.googleResult.email.isEmpty) {
             isEmailEditable = false;
           }
         }
       }
 
       if (storeModel.internationalOtp == "1" && isLoginViaSocial) {
-        if(widget.fbModel != null){
-          if(widget.fbModel.email.isNotEmpty){
+        if (widget.fbModel != null) {
+          if (widget.fbModel.email.isNotEmpty) {
             isEmailEditable = true;
           }
-        }else if(widget.googleResult != null){
-          if(widget.googleResult.email.isNotEmpty){
+        } else if (widget.googleResult != null) {
+          if (widget.googleResult.email.isNotEmpty) {
             isEmailEditable = true;
           }
         }
@@ -139,7 +139,9 @@ class _ProfileState extends State<ProfileScreen> {
     //print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     return WillPopScope(
         onWillPop: () async {
-          return await nameValidation() && isValidEmail(emailController.text);
+          return await nameValidation() &&
+              isValidEmail(emailController.text) &&
+              emailValidation();
         },
         child: new Scaffold(
           backgroundColor: Colors.white,
@@ -206,7 +208,8 @@ class _ProfileState extends State<ProfileScreen> {
                               controller: firstNameController,
                               decoration: InputDecoration(
                                 //labelText: 'Full name *',
-                                labelText: Language.localizedValues["Full_name_txt"],
+                                labelText:
+                                    Language.localizedValues["Full_name_txt"],
                               ),
                               style: TextStyle(
                                   fontSize: 18,
@@ -260,7 +263,8 @@ class _ProfileState extends State<ProfileScreen> {
                             ),
                           ),
                           Visibility(
-                            visible: widget.isComingFromOtpScreen&&showGstNumber,
+                            visible:
+                                widget.isComingFromOtpScreen && showGstNumber,
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15.0),
                               child: TextField(
@@ -314,8 +318,7 @@ class _ProfileState extends State<ProfileScreen> {
               ),
             ),
           ),
-        )
-    );
+        ));
   }
 
   bool isValidEmail(String input) {
@@ -337,8 +340,20 @@ class _ProfileState extends State<ProfileScreen> {
     }
   }
 
+  bool emailValidation() {
+    if (emailController.text.trim().isEmpty) {
+      Utils.showToast("Please enter your email", false);
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   Future<void> _submitForm() async {
     if (!nameValidation()) {
+      return;
+    }
+    if (!emailValidation()) {
       return;
     }
     if (!isValidEmail(emailController.text.trim())) {
@@ -350,8 +365,8 @@ class _ProfileState extends State<ProfileScreen> {
     } else {
       form.save();
 
-      if(storeModel != null){
-        if(storeModel.internationalOtp == "0"){
+      if (storeModel != null) {
+        if (storeModel.internationalOtp == "0") {
           if (phoneController.text.trim().isEmpty) {
             Utils.showToast("Please enter your valid mobile number", false);
             return;
@@ -359,15 +374,16 @@ class _ProfileState extends State<ProfileScreen> {
         }
       }
 
-      if(isLoginViaSocial){
+      if (isLoginViaSocial) {
         Utils.showProgressDialog(context);
-        MobileVerified userResponse = await ApiController.socialSignUp(widget.fbModel,widget.googleResult,
-          firstNameController.text.trim(),
-          emailController.text.trim(),
-          phoneController.text.trim(),
-          referCodeController.text.trim(),
-          gstCodeController.text.trim()
-        );
+        MobileVerified userResponse = await ApiController.socialSignUp(
+            widget.fbModel,
+            widget.googleResult,
+            firstNameController.text.trim(),
+            emailController.text.trim(),
+            phoneController.text.trim(),
+            referCodeController.text.trim(),
+            gstCodeController.text.trim());
 
         UserModel user = UserModel();
         user.fullName = firstNameController.text.trim();
@@ -378,15 +394,15 @@ class _ProfileState extends State<ProfileScreen> {
 
         Utils.hideProgressDialog(context);
         Navigator.pop(context);
-
-      }else{
+      } else {
         ApiController.updateProfileRequest(
-            firstNameController.text.trim(),
-            emailController.text.trim(),
-            phoneController.text.trim(),
-            widget.isComingFromOtpScreen,
-            widget.id,
-            referCodeController.text.trim(),gstCodeController.text.trim())
+                firstNameController.text.trim(),
+                emailController.text.trim(),
+                phoneController.text.trim(),
+                widget.isComingFromOtpScreen,
+                widget.id,
+                referCodeController.text.trim(),
+                gstCodeController.text.trim())
             .then((response) {
           Utils.hideProgressDialog(context);
           if (response.success) {
@@ -413,7 +429,6 @@ class _ProfileState extends State<ProfileScreen> {
           }
         });
       }
-
     }
   }
 }

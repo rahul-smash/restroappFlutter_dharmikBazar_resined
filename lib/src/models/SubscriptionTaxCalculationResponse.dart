@@ -65,6 +65,9 @@ class SubscriptionTaxCalculation {
     this.orderDetail,
     this.isChanged,
     this.couponCode,
+    this.storeStatus,
+    this.storeMsg,
+    this.storeTimeSetting,
   });
 
   String total;
@@ -86,6 +89,9 @@ class SubscriptionTaxCalculation {
   List<OrderDetail> orderDetail;
   bool isChanged;
   String couponCode;
+  String storeStatus;
+  String storeMsg;
+  StoreTimeSetting storeTimeSetting;
 
   SubscriptionTaxCalculation copyWith({
     String total,
@@ -107,29 +113,36 @@ class SubscriptionTaxCalculation {
     List<OrderDetail> orderDetail,
     bool isChanged,
     String couponCode,
+    String storeStatus,
+    String storeMsg,
+    StoreTimeSetting storeTimeSetting,
   }) =>
       SubscriptionTaxCalculation(
-          total: total ?? this.total,
-          singleDayTotal: singleDayTotal ?? this.singleDayTotal,
-          walletRefund: walletRefund ?? this.walletRefund,
-          itemSubTotal: itemSubTotal ?? this.itemSubTotal,
-          singleDayItemSubTotal:
-              singleDayItemSubTotal ?? this.singleDayItemSubTotal,
-          tax: tax ?? this.tax,
-          singleDayTax: singleDayTax ?? this.singleDayTax,
-          discount: discount ?? this.discount,
-          singleDayDiscount: singleDayDiscount ?? this.singleDayDiscount,
-          shipping: shipping ?? this.shipping,
-          singleDayShipping: singleDayShipping ?? this.singleDayShipping,
-          fixedTaxAmount: fixedTaxAmount ?? this.fixedTaxAmount,
-          singleDayFixedTaxAmount:
-              singleDayFixedTaxAmount ?? this.singleDayFixedTaxAmount,
-          taxDetail: taxDetail ?? this.taxDetail,
-          taxLabel: taxLabel ?? this.taxLabel,
-          fixedTax: fixedTax ?? this.fixedTax,
-          orderDetail: orderDetail ?? this.orderDetail,
-          isChanged: isChanged ?? this.isChanged,
-          couponCode: couponCode ?? this.couponCode);
+        total: total ?? this.total,
+        singleDayTotal: singleDayTotal ?? this.singleDayTotal,
+        walletRefund: walletRefund ?? this.walletRefund,
+        itemSubTotal: itemSubTotal ?? this.itemSubTotal,
+        singleDayItemSubTotal:
+            singleDayItemSubTotal ?? this.singleDayItemSubTotal,
+        tax: tax ?? this.tax,
+        singleDayTax: singleDayTax ?? this.singleDayTax,
+        discount: discount ?? this.discount,
+        singleDayDiscount: singleDayDiscount ?? this.singleDayDiscount,
+        shipping: shipping ?? this.shipping,
+        singleDayShipping: singleDayShipping ?? this.singleDayShipping,
+        fixedTaxAmount: fixedTaxAmount ?? this.fixedTaxAmount,
+        singleDayFixedTaxAmount:
+            singleDayFixedTaxAmount ?? this.singleDayFixedTaxAmount,
+        taxDetail: taxDetail ?? this.taxDetail,
+        taxLabel: taxLabel ?? this.taxLabel,
+        fixedTax: fixedTax ?? this.fixedTax,
+        orderDetail: orderDetail ?? this.orderDetail,
+        isChanged: isChanged ?? this.isChanged,
+        couponCode: couponCode ?? this.couponCode,
+        storeStatus: storeStatus ?? this.storeStatus,
+        storeMsg: storeMsg ?? this.storeMsg,
+        storeTimeSetting: storeTimeSetting ?? this.storeTimeSetting,
+      );
 
   String toRawJson() => json.encode(toJson());
 
@@ -183,6 +196,11 @@ class SubscriptionTaxCalculation {
                 json["order_detail"].map((x) => OrderDetail.fromJson(x))),
         isChanged: json["is_changed"] == null ? null : json["is_changed"],
         couponCode: couponCodePassed,
+        storeStatus: json["store_status"] == null ? null : json["store_status"],
+        storeMsg: json["store_msg"] == null ? null : json["store_msg"],
+        storeTimeSetting: json["StoreTimeSetting"] == null
+            ? null
+            : StoreTimeSetting.fromJson(json["StoreTimeSetting"]),
       );
 
   Map<String, dynamic> toJson() => {
@@ -216,6 +234,10 @@ class SubscriptionTaxCalculation {
             ? null
             : List<dynamic>.from(orderDetail.map((x) => x.toJson())),
         "is_changed": isChanged == null ? null : isChanged,
+        "store_status": storeStatus == null ? null : storeStatus,
+        "store_msg": storeMsg == null ? null : storeMsg,
+        "StoreTimeSetting":
+            storeTimeSetting == null ? null : storeTimeSetting.toJson(),
       };
 }
 
@@ -250,6 +272,64 @@ class TaxLabel {
   Map<String, dynamic> toJson() => {
         "label": label == null ? null : label,
         "rate": rate == null ? null : rate,
+      };
+}
+
+class StoreTimeSetting {
+  StoreTimeSetting({
+    this.is24X7Open,
+    this.openhoursFrom,
+    this.openhoursTo,
+    this.closehoursMessage,
+    this.storeOpenDays,
+  });
+
+  String is24X7Open;
+  String openhoursFrom;
+  String openhoursTo;
+  String closehoursMessage;
+  String storeOpenDays;
+
+  StoreTimeSetting copyWith({
+    String is24X7Open,
+    String openhoursFrom,
+    String openhoursTo,
+    String closehoursMessage,
+    String storeOpenDays,
+  }) =>
+      StoreTimeSetting(
+        is24X7Open: is24X7Open ?? this.is24X7Open,
+        openhoursFrom: openhoursFrom ?? this.openhoursFrom,
+        openhoursTo: openhoursTo ?? this.openhoursTo,
+        closehoursMessage: closehoursMessage ?? this.closehoursMessage,
+        storeOpenDays: storeOpenDays ?? this.storeOpenDays,
+      );
+
+  factory StoreTimeSetting.fromRawJson(String str) =>
+      StoreTimeSetting.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory StoreTimeSetting.fromJson(Map<String, dynamic> json) =>
+      StoreTimeSetting(
+        is24X7Open: json["is24x7_open"] == null ? null : json["is24x7_open"],
+        openhoursFrom:
+            json["openhours_from"] == null ? null : json["openhours_from"],
+        openhoursTo: json["openhours_to"] == null ? null : json["openhours_to"],
+        closehoursMessage: json["closehours_message"] == null
+            ? null
+            : json["closehours_message"],
+        storeOpenDays:
+            json["store_open_days"] == null ? null : json["store_open_days"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "is24x7_open": is24X7Open == null ? null : is24X7Open,
+        "openhours_from": openhoursFrom == null ? null : openhoursFrom,
+        "openhours_to": openhoursTo == null ? null : openhoursTo,
+        "closehours_message":
+            closehoursMessage == null ? null : closehoursMessage,
+        "store_open_days": storeOpenDays == null ? null : storeOpenDays,
       };
 }
 
