@@ -496,7 +496,13 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: appThemeSecondary),
-                  recognizer: (TapGestureRecognizer()..onTap = () {})),
+                  recognizer: (TapGestureRecognizer()
+                    ..onTap = () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RegisterUser()),
+                      );
+                    })),
             ],
           ),
         ),
