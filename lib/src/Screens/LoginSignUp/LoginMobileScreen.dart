@@ -313,8 +313,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
 
               if (verifyEmailModel != null &&
                   !verifyEmailModel.success &&
-                  verifyEmailModel.errorCode == 403 &&
-                  verifyEmailModel.userExists == 0) {
+                  verifyEmailModel.errorCode == 403) {
                 print('${verifyEmailModel.message}');
                 Utils.showBlockedDialog(context, verifyEmailModel.message);
               } else if (verifyEmailModel.userExists == 0) {
@@ -386,8 +385,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
               await ApiController.verifyEmail(fbModel.email);
           Utils.hideProgressDialog(context);
           if (!verifyEmailModel.success &&
-              verifyEmailModel.errorCode == 403 &&
-              verifyEmailModel.userExists == 0) {
+              verifyEmailModel.errorCode == 403) {
             Utils.showBlockedDialog(context, verifyEmailModel.message);
           } else if (verifyEmailModel.userExists == 0) {
             Navigator.pop(context);
@@ -460,8 +458,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
               }
             } else if (response != null &&
                 !response.success &&
-                response.errorCode == 403 &&
-                response.userExists == 0) {
+                response.errorCode == 403) {
               print('${response.message}');
               Utils.showBlockedDialog(context, response.message);
             }
