@@ -40,12 +40,12 @@ class ConfirmOrderScreen extends StatefulWidget {
   StoreModel storeModel;
   bool isComingFromPickUpScreen;
   DeliveryAddressData address;
-  String paymentMode = "2"; // 2 = COD, 3 = Online Payment
+  String paymentMode = "2"; // 2 = COD, 3 = Online Payment, //4 =promise to pay
   String areaId;
   OrderType deliveryType;
   Area areaObject;
-  List<Product> cartList = new List();
-  PaymentType _character = PaymentType.COD;
+  List<Product> cartList = new List.empty(growable: true);
+  PaymentType _selectedPaymentTypeValue = PaymentType.COD;
 
   ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen, this.areaId,
       this.deliveryType,
@@ -86,11 +86,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool isDeliveryResponseFalse = false;
   bool ispaytmSelected = false;
 
-  bool isPayTmActive = false;
+  bool isPayTmActive = false, isPromiseToPay = false;
 
   double totalMRpPrice = 0.0;
-  List<OrderDetail> responseOrderDetail = List();
-  List<Product> cartListFromDB = List();
+  List<OrderDetail> responseOrderDetail = List.empty(growable: true);
+  List<Product> cartListFromDB = List.empty(growable: true);
 
   bool isOrderVariations = false;
 
@@ -307,7 +307,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         }
         if (widget.storeModel.cod == "0" &&
             widget.storeModel.onlinePayment == "1") {
-          widget._character = PaymentType.ONLINE;
+          widget._selectedPaymentTypeValue = PaymentType.ONLINE;
           widget.paymentMode = "3";
           if (widget.storeModel.onlinePayment.compareTo('1') == 0 &&
               isAnotherOnlinePaymentGatwayFound) {
@@ -323,28 +323,42 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 widget.storeModel.onlinePayment.compareTo('1') == 0 &&
                 isAnotherOnlinePaymentGatwayFound) {
               showOnline = true;
+            } else {
+              showOnline = false;
             }
 
             if (widget.address.defaultPaymentMethod == '1') {
-              widget._character = PaymentType.COD;
+              widget._selectedPaymentTypeValue = PaymentType.COD;
               widget.paymentMode = "2";
             } else {
-              widget._character = PaymentType.ONLINE;
+              widget._selectedPaymentTypeValue = PaymentType.ONLINE;
               widget.paymentMode = "3";
             }
           } else if (widget.address.areaWisePaymentMethod == '2') {
             showCOD = true;
-            widget._character = PaymentType.COD;
+            widget._selectedPaymentTypeValue = PaymentType.COD;
             showOnline = false;
             widget.paymentMode = "2";
           } else {
+            if (widget.storeModel.onlinePayment != null &&
+                widget.storeModel.onlinePayment.compareTo('1') == 0 &&
+                isAnotherOnlinePaymentGatwayFound) {
+              showOnline = true;
+            } else {
+              showOnline = false;
+            }
+            widget._selectedPaymentTypeValue = PaymentType.NONE;
+            widget.paymentMode = "0";
             showCOD = false;
-            showOnline = true;
-            widget._character = PaymentType.ONLINE;
-            widget.paymentMode = "3";
           }
         }
       }
+      //check Promise to pay
+      if (widget.storeModel.promiseToPay == "1") {
+        isPromiseToPay = true;
+      }
+      // payment Widget
+
     }
   }
 
@@ -1338,6 +1352,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         showOptions = true;
       }
     }
+    if (isPromiseToPay) {
+      showOptions = true;
+    }
 
     return Visibility(
       visible: showOptions,
@@ -1362,13 +1379,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 children: <Widget>[
                   Radio(
                     value: PaymentType.COD,
-                    groupValue: widget._character,
+                    groupValue: widget._selectedPaymentTypeValue,
                     activeColor: appTheme,
                     onChanged: (PaymentType value) async {
                       bool proceed = await couponAppliedCheck();
                       if (proceed) {
                         setState(() {
-                          widget._character = value;
+                          widget._selectedPaymentTypeValue = value;
                           if (value == PaymentType.COD) {
                             widget.paymentMode = "2";
                             ispaytmSelected = false;
@@ -1393,12 +1410,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   Radio(
                     value: PaymentType.ONLINE,
                     activeColor: appTheme,
-                    groupValue: widget._character,
+                    groupValue: widget._selectedPaymentTypeValue,
                     onChanged: (PaymentType value) async {
                       bool proceed = await couponAppliedCheck();
                       if (proceed) {
                         setState(() {
-                          widget._character = value;
+                          widget._selectedPaymentTypeValue = value;
                           if (value == PaymentType.ONLINE) {
                             widget.paymentMode = "3";
                             ispaytmSelected = false;
@@ -1423,12 +1440,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   Radio(
                     value: PaymentType.ONLINE_PAYTM,
                     activeColor: appTheme,
-                    groupValue: widget._character,
+                    groupValue: widget._selectedPaymentTypeValue,
                     onChanged: (PaymentType value) async {
                       bool proceed = await couponAppliedCheck();
                       if (proceed) {
                         setState(() {
-                          widget._character = value;
+                          widget._selectedPaymentTypeValue = value;
                           if (value == PaymentType.ONLINE_PAYTM) {
                             widget.paymentMode = "3";
                             ispaytmSelected = true;
@@ -1438,6 +1455,35 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     },
                   ),
                   Text(thirdOptionPGText,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: isPromiseToPay,
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.PROMISE_TO_PAY,
+                    activeColor: appTheme,
+                    groupValue: widget._selectedPaymentTypeValue,
+                    onChanged: (PaymentType value) async {
+                      bool proceed = await couponAppliedCheck();
+                      if (proceed) {
+                        setState(() {
+                          widget._selectedPaymentTypeValue = value;
+                          if (value == PaymentType.PROMISE_TO_PAY) {
+                            widget.paymentMode = "4";
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  Text("Promise To Pay",
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -1794,6 +1840,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           callPaymentGateWay(paymentGateway, storeObject);
         }
       }
+    } else if (widget.paymentMode == '0') {
+      Utils.hideProgressDialog(context);
+      DialogUtils.displayCommonDialog(
+          context, "Alert", "Payment method not available!");
     } else {
       placeOrderApiCall("", "", "");
     }

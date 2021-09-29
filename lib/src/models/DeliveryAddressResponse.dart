@@ -56,8 +56,8 @@ class DeliveryAddressData {
   String lng;
   String isShippingMandatory;
   //new added fields as required feature
-  String areaWisePaymentMethod;
-  String defaultPaymentMethod;
+  String areaWisePaymentMethod;// 1=both, 2=COD, 3=Online
+  String defaultPaymentMethod;//1=COD, 2=Online
 
   //DeliveryTimeSlot deliveryTimeSlot;
 

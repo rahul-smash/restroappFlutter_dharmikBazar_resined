@@ -137,7 +137,7 @@ class StoreModel {
 
   String domain;
   String poweredByText;
-  bool areaWisePaymentOption;
+  bool areaWisePaymentOption;//true, false
   String poweredByLink;
   String reviewRatingDisplay;
   String allowCustomerForGst;

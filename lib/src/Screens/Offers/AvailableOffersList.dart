@@ -21,7 +21,7 @@ class AvailableOffersDialog extends StatefulWidget {
   List<String> appliedCouponCodeList;
   bool isOrderVariations = false;
   bool isSubcriptionScreen = false;
-  List<OrderDetail> responseOrderDetail = List();
+  List<OrderDetail> responseOrderDetail = List.empty(growable: true);
   Map<String, String> subcriptionMap = Map();
 
   AvailableOffersDialog(
