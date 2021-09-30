@@ -94,9 +94,10 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
                             Navigator.pop(context);
                             return;
                           }
-
+                          Utils.showProgressDialog(context);
                           ApiController.getAddressApiRequest()
                               .then((responses) {
+                            Utils.hideProgressDialog(context);
                             DeliveryAddressResponse responseData = responses;
                             if (!responses.success &&
                                 responses.errorCode == 403) {
