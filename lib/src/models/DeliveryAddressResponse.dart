@@ -119,10 +119,10 @@ class DeliveryAddressData {
         isShippingMandatory: json["is_shipping_mandatory"],
         areaWisePaymentMethod: json["area_wise_payment_method"] == null
             ? null
-            : json["area_wise_payment_method"],
+            : json["area_wise_payment_method"].toString(),
         defaultPaymentMethod: json["default_payment_method"] == null
             ? null
-            : json["default_payment_method"],
+            : json["default_payment_method"].toString(),
         //deliveryTimeSlot: DeliveryTimeSlot.fromJson(json["delivery_time_slot"]),
       );
 

@@ -300,6 +300,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         } else if (widget.storeModel.cod == "0") {
           showCOD = false;
         }
+        if(widget.storeModel.onlinePayment == "0"){
+          showOnline=false;
+        }
         if (widget.storeModel.onlinePayment == "0" &&
             widget.storeModel.cod == "0") {
           showCOD = true;
