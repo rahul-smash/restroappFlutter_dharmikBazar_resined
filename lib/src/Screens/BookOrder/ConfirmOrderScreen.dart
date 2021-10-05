@@ -19,6 +19,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/OrderDetailsModel.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
+import 'package:restroapp/src/models/PromiseToPayUserResponse.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/StripeCheckOutModel.dart';
@@ -232,6 +233,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     });
   }
 
+  void checkPromiseToPayForUser() async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if (!isNetworkAvailable) {
+      Utils.showToast(AppConstant.noInternet, true);
+      return;
+    }
+    PromiseToPayUserResponse response =
+        await ApiController.checkPromiseToPayForUser();
+    if (response != null && response.success) {
+      if (response.data.promiseToPay == "1") {
+        isPromiseToPay = true;
+        setState(() {});
+      }
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -300,8 +317,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         } else if (widget.storeModel.cod == "0") {
           showCOD = false;
         }
-        if(widget.storeModel.onlinePayment == "0"){
-          showOnline=false;
+        if (widget.storeModel.onlinePayment == "0") {
+          showOnline = false;
         }
         if (widget.storeModel.onlinePayment == "0" &&
             widget.storeModel.cod == "0") {
@@ -357,11 +374,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         }
       }
       //check Promise to pay
-      if (widget.storeModel.promiseToPay == "1") {
+      if (widget.storeModel.promiseToPay == "1" &&
+          widget.storeModel.promiseToPayForAll == "1") {
         isPromiseToPay = true;
+      } else if (widget.storeModel.promiseToPay == "1" &&
+          widget.storeModel.promiseToPayForAll == "0") {
+        checkPromiseToPayForUser();
+      } else {
+        isPromiseToPay = false;
       }
-      // payment Widget
-
     }
   }
 

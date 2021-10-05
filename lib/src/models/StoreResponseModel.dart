@@ -146,6 +146,7 @@ class StoreModel {
   WalletSettings walletSettings;
   String hideSignup;
   String promiseToPay;
+  String promiseToPayForAll;
   StoreModel({
     this.id,
     this.storeName,
@@ -261,6 +262,7 @@ class StoreModel {
     this.areaWisePaymentOption,
     this.poweredByLink,
     this.promiseToPay,
+    this.promiseToPayForAll,
     this.reviewRatingDisplay,
     this.allowCustomerForGst,
     this.storeOffer,
@@ -325,6 +327,7 @@ class StoreModel {
     taxRate = json['tax_rate'];
     istaxenable = json['istaxenable'];
     promiseToPay = json['promise_to_pay'];
+    promiseToPayForAll = json['promise_to_pay_for_all'];
     paymentGateway = json["payment_gateway"];
     subscription = Subscription.fromJson(json["Subscription"]);
     paymentSetting = PaymentSetting.fromJson(json["payment_setting"]);
@@ -550,6 +553,7 @@ class StoreModel {
     data['gst'] = this.gst;
     data['ga_code'] = this.gaCode;
     data['promise_to_pay'] = this.promiseToPay;
+    data['promise_to_pay_for_all'] = this.promiseToPayForAll;
     data['category_layout'] = this.categoryLayout;
     data['radius_in'] = this.radiusIn;
     data['product_image'] = this.productImage;

@@ -30,6 +30,7 @@ import 'package:restroapp/src/models/NotificationResponseModel.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/ProductRatingResponse.dart';
+import 'package:restroapp/src/models/PromiseToPayUserResponse.dart';
 import 'package:restroapp/src/models/RazorPayTopUP.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
 import 'package:restroapp/src/models/RecommendedProductsResponse.dart';
@@ -2452,6 +2453,36 @@ class ApiController {
           WalletOnlineTopUp.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${razorTopStore.success}");
       return razorTopStore;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  //promise to pay
+  static Future<PromiseToPayUserResponse> checkPromiseToPayForUser() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        ApiConstants.isPromiseToPay;
+    print(url);
+    try {
+      FormData formData = new FormData.fromMap({
+        "user_id": user.id,
+        // "user_id": '23345656578',
+        "platform": Platform.isIOS ? "IOS" : "android",
+      });
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(
+              contentType: "application/json",
+              responseType: ResponseType.plain));
+      print(response.statusCode);
+      print(response.data);
+      PromiseToPayUserResponse promiseToPayUserResponse =
+      PromiseToPayUserResponse.fromJson(json.decode(response.data));
+      print("-----RazortopUpData---${promiseToPayUserResponse.success}");
+      return promiseToPayUserResponse;
     } catch (e) {
       print(e);
     }
