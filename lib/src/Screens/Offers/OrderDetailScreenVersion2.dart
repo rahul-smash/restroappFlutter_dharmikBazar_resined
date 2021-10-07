@@ -1235,6 +1235,13 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
       String area = ', ${orderHistoryData.deliveryAddress.first.areaName}';
       String city = ', ${orderHistoryData.deliveryAddress.first.city}';
       String ZipCode = ', ${orderHistoryData.deliveryAddress.first.zipcode}';
+
+      if (orderHistoryData.deliveryAddress.first.firstName.isEmpty) name = "";
+      if (orderHistoryData.deliveryAddress.first.address.isEmpty) address = "";
+      if (orderHistoryData.deliveryAddress.first.areaName.isEmpty) area = "";
+      if (orderHistoryData.deliveryAddress.first.city.isEmpty) city = "";
+      if (orderHistoryData.deliveryAddress.first.zipcode.isEmpty) ZipCode = "";
+
       return '$name$address$area$city$ZipCode';
     } else {
       String address = '${orderHistoryData.address}';

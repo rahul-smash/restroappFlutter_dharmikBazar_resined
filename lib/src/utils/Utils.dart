@@ -1114,22 +1114,13 @@ class Utils {
 //          widget.callback();
       eventBus.fire(updateCartCount());
     }
-    var result = await DialogUtils.displayCommonDialog(context, storeName,
-        'Your order is successfully added to your cart. Please check your cart to proceed',
-        buttonText: 'Ok');
-    if (result == true) {
-      Navigator.of(context).popUntil((route) => route.isFirst);
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext context) => MyCartScreen(() {})));
-    }
   }
 
   static void reOrderItems(
-      String storeName, BuildContext context, OrderData orderData) {
+      String storeName, BuildContext context, OrderData orderData){
     Utils.showProgressDialog(context);
-    ApiController.getOrderDetail(orderData.orderId).then((respone) {
+    ApiController.getOrderDetail(orderData.orderId).then((respone) async{
+      Utils.hideProgressDialog(context);
       if (respone != null &&
           respone.success &&
           respone.orders != null &&
@@ -1141,8 +1132,17 @@ class Utils {
               respone.orders.first.orderItems[i],
               int.parse(respone.orders.first.orderItems[i].quantity));
         }
+        var result = await DialogUtils.displayCommonDialog(context, storeName,
+            'Your order is successfully added to your cart. Please check your cart to proceed',
+            buttonText: 'Ok');
+        if (result == true) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => MyCartScreen(() {})));
+        }
       }
-      Utils.hideProgressDialog(context);
     });
   }
 
