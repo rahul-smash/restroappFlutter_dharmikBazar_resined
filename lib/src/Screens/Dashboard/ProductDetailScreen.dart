@@ -270,7 +270,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, left: 20.0),
+                  padding: EdgeInsets.only(top: 10.0, left: 20.0,bottom: 10.0),
                   child: (discount == "0.00" ||
                           discount == "0" ||
                           discount == "0.0")
@@ -297,13 +297,13 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                           ],
                         ),
                 ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
-                  child: Text(
-                    "( Inclusive of all Taxes )",
-                    style: TextStyle(fontSize: 11.0, color: Colors.grey),
-                  ),
-                ),
+                // Padding(
+                //   padding: EdgeInsets.fromLTRB(20, 0, 0, 10),
+                //   child: Text(
+                //     "( Inclusive of all Taxes )",
+                //     style: TextStyle(fontSize: 11.0, color: Colors.grey),
+                //   ),
+                // ),
               ],
             ),
             addQuantityView(),
