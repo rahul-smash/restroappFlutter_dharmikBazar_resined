@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:device_info/device_info.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/material.dart';
-import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
@@ -13,10 +16,8 @@ import 'package:restroapp/src/models/ConfigModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
-import 'dart:io';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+
 import 'src/UI/Language.dart';
 
 Future<void> main() async {
@@ -107,7 +108,8 @@ class ValueApp extends StatelessWidget {
   }
 }
 
-Widget showHomeScreen(StoreResponse model, ConfigModel configObject, PackageInfo packageInfo) {
+Widget showHomeScreen(
+    StoreResponse model, ConfigModel configObject, PackageInfo packageInfo) {
   String version = packageInfo.version;
   if (model.success) {
     setStoreCurrency(model.store, configObject);
