@@ -1,17 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:badges/badges.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
-import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
-import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
 import 'package:restroapp/src/Screens/SideMenu/SideMenu.dart';
@@ -32,11 +31,10 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import 'SearchScreen.dart';
-import 'dart:io';
-import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
+// import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
@@ -53,12 +51,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   StoreModel store;
-  FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
+
+  // FirebaseMessaging _firebaseMessaging = new FirebaseMessaging();
   List<NetworkImage> imgList = [];
   GlobalKey<ScaffoldState> _key = new GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
   UserModel user;
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
   bool isStoreClosed;
@@ -130,6 +129,76 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       print(e);
     }
+
+    // Remove app from battery optimization for custom rom devices
+/*    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      bool isBatteryOptimization = await NotificationServiceHelper.instance
+          .isManufacturerBatteryOptimizationDisabled();
+      if (!isBatteryOptimization) {
+        await showDialog(
+          context: context,
+          builder: (context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(5.0))),
+              child: Container(
+                child: Wrap(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
+                      child: Center(
+                        child: Text(
+                          "Disable Battery Optimization",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: grayColorTitle, fontSize: 18),
+                        ),
+                      ),
+                    ),
+                    Container(
+                        height: 1,
+                        color: Colors.black45,
+                        width: MediaQuery.of(context).size.width),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
+                      child: Center(
+                        child: Text(
+                          "Disable the optimizations to allow smooth functioning of this app",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
+                            child: FlatButton(
+                              child: Text('OK'),
+                              color: appThemeSecondary,
+                              textColor: Colors.white,
+                              onPressed: () async {
+                                Navigator.pop(context, true);
+                                await NotificationServiceHelper.instance
+                                    .showDisableManufacturerBatteryOptimizationSettings();
+                              },
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }
+    });*/
   }
 
   _offerPressed() {
@@ -538,84 +607,84 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       AppConstant.isRestroApp = true;
     }
-    _firebaseMessaging.configure(
-      onMessage: (Map<String, dynamic> message) async {
-        print(message.toString());
-        try {
-          print("------onMessage: $message");
-          if (AppConstant.isLoggedIn) {
-            if (Platform.isIOS) {
-              print("iosssssssssssssssss");
-              String title = message['aps']['alert']['title'];
-              String body = message['aps']['alert']['body'];
-              showNotification(title, body, message);
-            } else {
-              print("androiddddddddddd");
-              String title = message['notification']['title'];
-              String body = message['notification']['body'];
-              showNotification(title, body, message);
-            }
-          }
-        } catch (e) {
-          print(e);
-        }
-      },
-      onLaunch: (Map<String, dynamic> message) async {
-        print("onLaunch: $message");
-//        Utils.showToast('onLaunch', false);
-        onSelectNotification(jsonEncode(message));
-      },
-      onResume: (Map<String, dynamic> message) async {
-        print("onResume: $message");
-//        Utils.showToast('onResume', false);
-        onSelectNotification(jsonEncode(message));
-      },
-    );
-
-    _firebaseMessaging.requestNotificationPermissions(
-        const IosNotificationSettings(sound: true, badge: true, alert: true));
-    _firebaseMessaging.getToken().then((token) {
-      print("----token---- ${token}");
-      try {
-        SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
-      } catch (e) {
-        print(e);
-      }
-    });
+//     _firebaseMessaging.configure(
+//       onMessage: (Map<String, dynamic> message) async {
+//         print(message.toString());
+//         try {
+//           print("------onMessage: $message");
+//           if (AppConstant.isLoggedIn) {
+//             if (Platform.isIOS) {
+//               print("iosssssssssssssssss");
+//               String title = message['aps']['alert']['title'];
+//               String body = message['aps']['alert']['body'];
+//               showNotification(title, body, message);
+//             } else {
+//               print("androiddddddddddd");
+//               String title = message['notification']['title'];
+//               String body = message['notification']['body'];
+//               showNotification(title, body, message);
+//             }
+//           }
+//         } catch (e) {
+//           print(e);
+//         }
+//       },
+//       onLaunch: (Map<String, dynamic> message) async {
+//         print("onLaunch: $message");
+// //        Utils.showToast('onLaunch', false);
+//         onSelectNotification(jsonEncode(message));
+//       },
+//       onResume: (Map<String, dynamic> message) async {
+//         print("onResume: $message");
+// //        Utils.showToast('onResume', false);
+//         onSelectNotification(jsonEncode(message));
+//       },
+//     );
+//
+//     _firebaseMessaging.requestNotificationPermissions(
+//         const IosNotificationSettings(sound: true, badge: true, alert: true));
+//     _firebaseMessaging.getToken().then((token) {
+//       print("----token---- ${token}");
+//       try {
+//         SharedPrefs.storeSharedValue(AppConstant.deviceToken, token.toString());
+//       } catch (e) {
+//         print(e);
+//       }
+//     });
   }
 
   Future showNotification(
       String title, String body, Map<String, dynamic> message) async {
-    print('$body');
-    FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-        new FlutterLocalNotificationsPlugin();
-
-    String appName = await SharedPrefs.getStoreSharedValue(AppConstant.appName);
-
-    var initializationSettingsAndroid =
-        AndroidInitializationSettings('ic_notification');
-    var initializationSettingsIOS = IOSInitializationSettings(
-        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
-    var initializationSettings = InitializationSettings(
-        initializationSettingsAndroid, initializationSettingsIOS);
-    flutterLocalNotificationsPlugin.initialize(initializationSettings,
-        onSelectNotification: onSelectNotification);
-
-    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      '${appName}',
-      '${appName}',
-      '${appName}',
-      importance: Importance.Max,
-      priority: Priority.High,
-      ticker: 'ticker',
-      style: AndroidNotificationStyle.BigText,
-    );
-    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
-    var platformChannelSpecifics = NotificationDetails(
-        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-    await flutterLocalNotificationsPlugin.show(
-        0, title, body, platformChannelSpecifics,
-        payload: jsonEncode(message));
+    // print('$body');
+    // FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    //     new FlutterLocalNotificationsPlugin();
+    //
+    // String appName = await SharedPrefs.getStoreSharedValue(AppConstant.appName);
+    //
+    // var initializationSettingsAndroid =
+    //     AndroidInitializationSettings('ic_notification');
+    // var initializationSettingsIOS = IOSInitializationSettings(
+    //     onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+    // var initializationSettings = InitializationSettings(
+    //     initializationSettingsAndroid, initializationSettingsIOS);
+    // flutterLocalNotificationsPlugin.initialize(initializationSettings,
+    //     onSelectNotification: onSelectNotification);
+    //
+    // var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+    //   '${appName}',
+    //   '${appName}',
+    //   '${appName}',
+    //   importance: Importance.Max,
+    //   priority: Priority.High,
+    //   ticker: 'ticker',
+    //   style: AndroidNotificationStyle.BigText,
+    // );
+    // var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    // var platformChannelSpecifics = NotificationDetails(
+    //     androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+    // await flutterLocalNotificationsPlugin.show(
+    //     0, title, body, platformChannelSpecifics,
+    //     payload: jsonEncode(message));
   }
 
   Future<void> onSelectNotification(String payload) async {
@@ -879,8 +948,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  FlutterOpenWhatsapp.sendSingleMessage(
-                      store.homePageDisplayNumber, "");
+                  //TODO - open whatsapp
+                  // FlutterOpenWhatsapp.sendSingleMessage(
+                  //     store.homePageDisplayNumber, "");
                 },
               )),
         ),
@@ -912,6 +982,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _getWellet() async {
-   welleModel= await ApiController.getUserWallet();
+    welleModel = await ApiController.getUserWallet();
   }
 }

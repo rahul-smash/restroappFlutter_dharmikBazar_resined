@@ -1,17 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
-import 'package:restroapp/src/utils/Utils.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:restroapp/src/Screens/BookOrder/ConfirmOrderScreen.dart';
-import 'package:restroapp/src/database/SharedPrefs.dart';
-import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
-import 'package:restroapp/src/models/PickUpModel.dart';
-import 'package:restroapp/src/models/StoreResponseModel.dart';
-import 'package:restroapp/src/utils/AppColor.dart';
-import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 

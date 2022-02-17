@@ -4,13 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_share/flutter_share.dart';
-import 'package:flutter_tags/flutter_tags.dart';
-import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
-import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
-import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
-import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -19,11 +13,8 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
-import 'package:restroapp/src/utils/Callbacks.dart';
-import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-
-import 'HomeScreen.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   Product product;
@@ -270,7 +261,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, left: 20.0,bottom: 10.0),
+                  padding: EdgeInsets.only(top: 10.0, left: 20.0, bottom: 10.0),
                   child: (discount == "0.00" ||
                           discount == "0" ||
                           discount == "0.0")
@@ -748,11 +739,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   Future<void> share(Product product, String link) async {
-    await FlutterShare.share(
-        title: product.title,
-        text: 'You may like this ${product.title}',
-        linkUrl: link,
-        chooserTitle: 'Share');
+    Share.share('You may like this ${product.title} $link', subject: 'Share');
   }
 
   Widget _getImageView() {
@@ -782,10 +769,11 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                     autoPlayCurve: Curves.ease,
                     scrollDirection: Axis.horizontal,
                   ),
-                  itemBuilder: (BuildContext context, int itemIndex) =>
-                      Container(
-                    child: _makeBanner(context, itemIndex),
-                  ),
+                  itemBuilder: (context, index, realIndex) {
+                    return Container(
+                      child: _makeBanner(context, index),
+                    );
+                  },
                 ),
               ),
               Visibility(

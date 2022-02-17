@@ -2,27 +2,38 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
+// import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ConfigModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/notifications/notification_service_helper.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 import 'src/UI/Language.dart';
 
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await NotificationServiceHelper.instance.initialize();
+  NotificationServiceHelper.instance.showNotification(message);
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  Firebase.initializeApp();
+  await NotificationServiceHelper.instance.initialize();
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   String value =
       await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);
   if (value == null) {
@@ -63,12 +74,13 @@ Future<void> main() async {
   }
   //print(configObject.storeId);
 
-  Crashlytics.instance.enableInDevMode = true;
+  // Crashlytics.instance.enableInDevMode = true;
   StoreResponse storeData =
       await ApiController.versionApiRequest("${configObject.storeId}");
   setAppThemeColors(storeData.store);
   // Pass all uncaught errors to Crashlytics.
-  FlutterError.onError = Crashlytics.instance.recordFlutterError;
+  // FlutterError.onError = Crashlytics.instance.recordFlutterError;
+  FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
   SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "${isAdminLogin}");
 
   PackageInfo packageInfo = await Utils.getAppVersionDetails(storeData);
@@ -78,12 +90,12 @@ Future<void> main() async {
   // To turn off landscape mode
   runZoned(() {
     runApp(ValueApp(packageInfo, configObject, storeData));
-  }, onError: Crashlytics.instance.recordError);
+  }, onError: FirebaseCrashlytics.instance.recordError);
 }
 
-class ValueApp extends StatelessWidget {
+class ValueApp extends StatefulWidget {
   ConfigModel configObject;
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
   StoreResponse storeData;
@@ -92,18 +104,33 @@ class ValueApp extends StatelessWidget {
   ValueApp(this.packageInfo, this.configObject, this.storeData);
 
   @override
+  State<ValueApp> createState() => _ValueAppState();
+}
+
+class _ValueAppState extends State<ValueApp> {
+  GlobalKey<NavigatorState> _globalKey;
+
+  @override
+  void initState() {
+    _globalKey = GlobalKey<NavigatorState>();
+    NotificationServiceHelper.instance.setGlobalNavigationKey(_globalKey);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // define it once at root level.
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '${storeData.store.storeName}',
+      title: '${widget.storeData.store.storeName}',
+      navigatorKey: _globalKey,
       theme: ThemeData(
         primaryColor: appTheme,
       ),
-      navigatorObservers: <NavigatorObserver>[observer],
+      navigatorObservers: <NavigatorObserver>[ValueApp.observer],
       //home: isAdminLogin == true? LoginEmailScreen("menu"):SplashScreen(configObject,storeData),
-      home: showHomeScreen(storeData, configObject,
-          packageInfo), //SplashScreen(configObject,storeData),
+      home: showHomeScreen(widget.storeData, widget.configObject,
+          widget.packageInfo), //SplashScreen(configObject,storeData),
     );
   }
 }

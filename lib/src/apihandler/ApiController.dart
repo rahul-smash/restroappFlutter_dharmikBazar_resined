@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:compressimage/compressimage.dart';
 import 'package:dio/dio.dart';
+// import 'package:compressimage/compressimage.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
@@ -840,7 +842,9 @@ class ApiController {
             isComingFromPickUpScreen == true ? '0' /*areaId */ : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
-        "payment_method": paymentMethod == "2" ? "COD" :(paymentMethod == "4" ? "promise_to_pay" : "online"),
+        "payment_method": paymentMethod == "2"
+            ? "COD"
+            : (paymentMethod == "4" ? "promise_to_pay" : "online"),
         "discount": taxModel == null ? "" : '${taxModel.discount}',
         "payment_request_id": razorpay_order_id,
         "payment_id": razorpay_payment_id,
@@ -1026,11 +1030,15 @@ class ApiController {
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     if (isNetworkAvailable) {
       if (imageFile != null) {
-        //print("====FILE SIZE BEFORE: " + imageFile.lengthSync().toString());
-        await CompressImage.compress(
-            imageSrc: imageFile.path,
-            desiredQuality: 80); //desiredQuality ranges from 0 to 100
-        //print("====FILE SIZE  AFTER: " + imageFile.lengthSync().toString());
+        final dir = await path_provider.getTemporaryDirectory();
+        File file = createFile("${dir.absolute.path}/test.png");
+        final targetPath = dir.absolute.path + "/temp.jpg";
+        var result = await FlutterImageCompress.compressAndGetFile(
+          imageFile.absolute.path,
+          targetPath,
+          quality: 80,
+        );
+        imageFile = result;
       }
       try {
         request.fields.addAll({
@@ -2160,7 +2168,9 @@ class ApiController {
             isComingFromPickUpScreen == true ? areaId : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
-        "payment_method": paymentMethod == "2" ? "COD" : (paymentMethod == "4" ? "promise_to_pay" : "online"),
+        "payment_method": paymentMethod == "2"
+            ? "COD"
+            : (paymentMethod == "4" ? "promise_to_pay" : "online"),
         "discount": taxModel == null ? "" : '${taxModel.discount}',
         "payment_request_id": razorpay_order_id,
         "payment_id": razorpay_payment_id,
@@ -2480,11 +2490,20 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       PromiseToPayUserResponse promiseToPayUserResponse =
-      PromiseToPayUserResponse.fromJson(json.decode(response.data));
+          PromiseToPayUserResponse.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${promiseToPayUserResponse.success}");
       return promiseToPayUserResponse;
     } catch (e) {
       print(e);
     }
+  }
+
+  static File createFile(String path) {
+    final file = File(path);
+    if (!file.existsSync()) {
+      file.createSync(recursive: true);
+    }
+
+    return file;
   }
 }

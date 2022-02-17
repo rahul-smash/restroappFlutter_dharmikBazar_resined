@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:geocoding/geocoding.dart';
+// import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -14,7 +15,6 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class DragMarkerMap extends StatefulWidget {
-
   StoreRadiousResponse data;
 
   DragMarkerMap(this.data);
@@ -24,7 +24,6 @@ class DragMarkerMap extends StatefulWidget {
 }
 
 class _DragMarkerMapState extends State<DragMarkerMap> {
-
   GoogleMapController _mapController;
   Set<Marker> markers = Set();
   LatLng center, selectedLocation;
@@ -67,42 +66,49 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
       body: Column(
         children: <Widget>[
           InkWell(
-              onTap: () async {
-                print("-------onTap---------");
-                if (enableDialog == true) {
-                  RadiousData areaObject = await displayRadiusCityDialog(
-                      context, "Select City", widget.data.data);
-                  //print("-------onTap----${areaObject.city.city}-----");
-                  setState(() {
-                    cityValue = "${areaObject.city.city}";
-                    cityId = "${areaObject.city.id}";
-                    if (areaList != null && areaList.isNotEmpty) {
-                      areaList.clear();
-                    }
-                    areaList.addAll(areaObject.area);
-                  });
-                }
-              },
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(10, 15, 0, 10),
-                  color: Colors.white,
-                  child: cityValue.compareTo("Click here...")==0?
-                  RichText(
-                    text:
-                    TextSpan(text: "Select City:",
-                        style: TextStyle(
-                        color: Colors.black,),children: <TextSpan>[
-                      TextSpan(
-                        text: " ${cityValue}",
-                        style: TextStyle(
-                            color: Colors.blue,
-                            fontWeight: FontWeight.bold),
+            onTap: () async {
+              print("-------onTap---------");
+              if (enableDialog == true) {
+                RadiousData areaObject = await displayRadiusCityDialog(
+                    context, "Select City", widget.data.data);
+                //print("-------onTap----${areaObject.city.city}-----");
+                setState(() {
+                  cityValue = "${areaObject.city.city}";
+                  cityId = "${areaObject.city.id}";
+                  if (areaList != null && areaList.isNotEmpty) {
+                    areaList.clear();
+                  }
+                  areaList.addAll(areaObject.area);
+                });
+              }
+            },
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(
+                padding: EdgeInsets.fromLTRB(10, 15, 0, 10),
+                color: Colors.white,
+                child: cityValue.compareTo("Click here...") == 0
+                    ? RichText(
+                        text: TextSpan(
+                            text: "Select City:",
+                            style: TextStyle(
+                              color: Colors.black,
+                            ),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: " ${cityValue}",
+                                style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold),
+                              )
+                            ]),
+                        textAlign: TextAlign.left,
                       )
-                    ]), textAlign: TextAlign.left,):Text("Select City: ${cityValue}",),
-                ),
+                    : Text(
+                        "Select City: ${cityValue}",
+                      ),
               ),
+            ),
           ),
           Divider(color: Colors.grey, height: 2.0),
           Container(
@@ -112,8 +118,8 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: EdgeInsets.only(
-                    left: 10.0, right: 10, top: 5, bottom: 5),
+                padding:
+                    EdgeInsets.only(left: 10.0, right: 10, top: 5, bottom: 5),
                 child: RichText(
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -130,7 +136,9 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
               onMapCreated: _onMapCreated,
               myLocationEnabled: true,
               initialCameraPosition: CameraPosition(
-                target: center, zoom: 15.0,),
+                target: center,
+                zoom: 15.0,
+              ),
               mapType: MapType.normal,
               markers: markers,
               onCameraMove: _onCameraMove,
@@ -145,11 +153,13 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
             onTap: () async {
               StoreModel store = await SharedPrefs.getStore();
 
-              print("====${selectedLocation.latitude},${selectedLocation
-                  .longitude}===");
+              print(
+                  "====${selectedLocation.latitude},${selectedLocation.longitude}===");
               double distanceInKm = Utils.calculateDistance(
-                  selectedLocation.latitude, selectedLocation.longitude,
-                  double.parse(store.lat), double.parse(store.lng));
+                  selectedLocation.latitude,
+                  selectedLocation.longitude,
+                  double.parse(store.lat),
+                  double.parse(store.lng));
               int distanceInKms = distanceInKm.toInt();
 
               print("==distanceInKm==${distanceInKm}=AND=${distanceInKms}=");
@@ -165,7 +175,8 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
                   child: RichText(
                     text: TextSpan(
                       text: "Save Address",
-                      style: TextStyle(fontWeight: FontWeight.bold,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
                           fontSize: 16,
                           color: Colors.white),
                     ),
@@ -181,8 +192,8 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
 
   Future<void> getLocation() async {
     Utils.showToast("Getting your location...", true);
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     // final coordinates = new Coordinates(position.latitude, position.longitude);
     center = LatLng(position.latitude, position.longitude);
     getAddressFromLocation(position.latitude, position.longitude);
@@ -206,16 +217,17 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
   getAddressFromLocation(double latitude, double longitude) async {
     try {
       selectedLocation = LatLng(latitude, longitude);
-      Coordinates coordinates = new Coordinates(latitude, longitude);
-      var addresses = await Geocoder.local.findAddressesFromCoordinates(
-          coordinates);
+      // Coordinates coordinates = new Coordinates(latitude, longitude);
+      // var addresses = await Geocoder.local.findAddressesFromCoordinates(
+      //     coordinates);
+      var addresses = await placemarkFromCoordinates(latitude, longitude);
       var first = addresses.first;
       //print("--addresses-${addresses} and ${first}");
-      print("----------${first.featureName} and ${first
-          .addressLine}-postalCode-${first.postalCode}------");
+      print(
+          "----------${first.name} and ${first.street}-postalCode-${first.postalCode}------");
 
       setState(() {
-        address = first.addressLine;
+        address = first.street;
         zipCode = first.postalCode;
       });
     } catch (e) {
@@ -225,15 +237,11 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
   }
 
   void _onCameraMove(CameraPosition position) {
-    CameraPosition newPos = CameraPosition(
-        target: position.target
-    );
+    CameraPosition newPos = CameraPosition(target: position.target);
     Marker marker = markers.first;
 
     setState(() {
-      markers.first.copyWith(
-          positionParam: newPos.target
-      );
+      markers.first.copyWith(positionParam: newPos.target);
     });
   }
 
@@ -241,9 +249,11 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
     _mapController = controller;
   }
 
-
-  Future<RadiousData> displayRadiusCityDialog(BuildContext context,
-      String title, List<RadiousData> data,) async {
+  Future<RadiousData> displayRadiusCityDialog(
+    BuildContext context,
+    String title,
+    List<RadiousData> data,
+  ) async {
     return await showDialog<RadiousData>(
       context: context,
       builder: (BuildContext context) {
@@ -321,25 +331,25 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
         Utils.showProgressDialog(context);
         UserModel user = await SharedPrefs.getUser();
         ApiController.saveDeliveryAddressApiRequest(
-            "ADD",
-            zipCode,
-            address,
-            area.areaId,
-            area.area,
-            null,
-            user.fullName,
-            cityValue,
-            cityId,
-            "${selectedLocation.latitude}",
-            "${selectedLocation.longitude}").then((response) {
+                "ADD",
+                zipCode,
+                address,
+                area.areaId,
+                area.area,
+                null,
+                user.fullName,
+                cityValue,
+                cityId,
+                "${selectedLocation.latitude}",
+                "${selectedLocation.longitude}")
+            .then((response) {
           Utils.hideProgressDialog(context);
           if (response != null && response.success) {
             Utils.showToast(response.message, false);
             //Navigator.pop(context);
             Navigator.pop(context, area);
           } else {
-            if (response != null)
-              Utils.showToast(response.message, false);
+            if (response != null) Utils.showToast(response.message, false);
           }
         });
       } else {
@@ -350,6 +360,4 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
       print(e);
     }
   }
-
-
 }

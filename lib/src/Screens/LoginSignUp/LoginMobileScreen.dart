@@ -4,7 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+// import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
@@ -36,7 +37,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   final phoneController = new TextEditingController();
   StoreModel store;
   String otpSkip;
-  FacebookLogin facebookSignIn = new FacebookLogin();
+  FacebookAuth facebookSignIn = FacebookAuth.instance;
   GoogleSignIn _googleSignIn;
   GoogleSignInAccount _currentUser;
   String hideSign_up;
@@ -212,12 +213,13 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                                       return;
                                     }
 
-                                    bool isFbLoggedIn =
-                                        await facebookSignIn.isLoggedIn;
-                                    print("isFbLoggedIn=${isFbLoggedIn}");
-                                    if (isFbLoggedIn) {
-                                      await facebookSignIn.logOut();
-                                    }
+                                    // bool isFbLoggedIn =
+                                    //     await facebookSignIn.isLoggedIn;
+                                    // print("isFbLoggedIn=${isFbLoggedIn}");
+                                    // if (isFbLoggedIn) {
+                                    //   await facebookSignIn.logOut();
+                                    // }
+                                    await facebookSignIn.logOut();
 
                                     fblogin();
                                   },
@@ -370,11 +372,12 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   }
 
   Future<Null> fblogin() async {
-    final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
+    // final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
+    final result = await facebookSignIn.login(permissions: ['email']);
 
     switch (result.status) {
-      case FacebookLoginStatus.loggedIn:
-        FacebookAccessToken accessToken = result.accessToken;
+      case LoginStatus.success:
+        AccessToken accessToken = result.accessToken;
         Utils.showProgressDialog(context);
         FacebookModel fbModel =
             await ApiController.getFbUserData(accessToken.token);
@@ -384,8 +387,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           MobileVerified verifyEmailModel =
               await ApiController.verifyEmail(fbModel.email);
           Utils.hideProgressDialog(context);
-          if (!verifyEmailModel.success &&
-              verifyEmailModel.errorCode == 403) {
+          if (!verifyEmailModel.success && verifyEmailModel.errorCode == 403) {
             Utils.showBlockedDialog(context, verifyEmailModel.message);
           } else if (verifyEmailModel.userExists == 0) {
             Navigator.pop(context);
@@ -413,12 +415,15 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           Utils.hideProgressDialog(context);
         }
         break;
-      case FacebookLoginStatus.cancelledByUser:
+      case LoginStatus.cancelled:
         //_showMessage('Login cancelled by the user.');
         Utils.showToast("Login cancelled", false);
         break;
-      case FacebookLoginStatus.error:
-        Utils.showToast("Something went wrong ${result.errorMessage}", false);
+      case LoginStatus.failed:
+        Utils.showToast("Something went wrong ${result.message}", false);
+        break;
+      case LoginStatus.operationInProgress:
+        // TODO: Handle this case.
         break;
     }
   }

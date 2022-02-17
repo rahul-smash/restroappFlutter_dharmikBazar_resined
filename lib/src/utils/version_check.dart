@@ -5,23 +5,21 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:package_info/package_info.dart';
-import 'package:restroapp/src/database/SharedPrefs.dart';
+// import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
-import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-const APP_STORE_URL =
-    '';
-String PLAY_STORE_URL_ios,PLAY_STORE_URL_android;
+const APP_STORE_URL = '';
+String PLAY_STORE_URL_ios, PLAY_STORE_URL_android;
 const PLAY_STORE_URL =
     'https://play.google.com/store/apps/details?id=com.valueapp.cropcart&hl=en';
-versionCheck(context) async {
 
+versionCheck(context) async {
   StoreModel storeModel;
-  PLAY_STORE_URL_ios=storeModel.iphoneShareLink;
-  String PLAY_STORE_URL_android =storeModel.androidShareLink;
+  PLAY_STORE_URL_ios = storeModel.iphoneShareLink;
+  String PLAY_STORE_URL_android = storeModel.androidShareLink;
   //Get Current installed version of app
   SharedPreferences prefs = await SharedPreferences.getInstance();
 
@@ -29,12 +27,16 @@ versionCheck(context) async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
   //String versionName = packageInfo.version;
 
-  double currentVersion = double.parse(packageInfo.version.trim().replaceAll(".", ""));
+  double currentVersion =
+      double.parse(packageInfo.version.trim().replaceAll(".", ""));
 
-  print('@@currentVeriosn_aPP'+currentVersion.toString()+" ----- "+currentVersion.toString());
+  print('@@currentVeriosn_aPP' +
+      currentVersion.toString() +
+      " ----- " +
+      currentVersion.toString());
   //Get Latest version info from firebase config
 
- //final RemoteConfig remoteConfig = await RemoteConfig.instance;
+  //final RemoteConfig remoteConfig = await RemoteConfig.instance;
 
   try {
     // Using default duration to force fetching from remote server.
@@ -45,10 +47,11 @@ versionCheck(context) async {
         .getString('force_update_current_version')
         .trim()
         .replaceAll(".", ""));*/
-    if (currentVersion > 101) {//Get the value in place of 100
+    if (currentVersion > 101) {
+      //Get the value in place of 100
       _showVersionDialog(context);
     }
-  }  catch (exception) {
+  } catch (exception) {
     // Fetch throttled.
     print(exception);
   } catch (exception) {
@@ -56,6 +59,7 @@ versionCheck(context) async {
         'used');
   }
 }
+
 //Show Dialog to force user to update
 _showVersionDialog(context) async {
   await showDialog<String>(
@@ -69,33 +73,33 @@ _showVersionDialog(context) async {
       String btnLabelCancel = "Later";
       return Platform.isIOS
           ? new CupertinoAlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: <Widget>[
-          FlatButton(
-            child: Text(btnLabel),
-            onPressed: () => _launchURL(PLAY_STORE_URL_ios),
-          ),
-          FlatButton(
-            child: Text(btnLabelCancel),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      )
+              title: Text(title),
+              content: Text(message),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(btnLabel),
+                  onPressed: () => _launchURL(PLAY_STORE_URL_ios),
+                ),
+                FlatButton(
+                  child: Text(btnLabelCancel),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            )
           : new AlertDialog(
-        title: Text(title),
-        content: Text(message),
-        actions: <Widget>[
-          FlatButton(
-            child: Text(btnLabel),
-            onPressed: () => _launchURL(PLAY_STORE_URL_android),
-          ),
-          FlatButton(
-            child: Text(btnLabelCancel),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
-      );
+              title: Text(title),
+              content: Text(message),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text(btnLabel),
+                  onPressed: () => _launchURL(PLAY_STORE_URL_android),
+                ),
+                FlatButton(
+                  child: Text(btnLabelCancel),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            );
     },
   );
 }

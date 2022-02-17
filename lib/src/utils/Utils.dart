@@ -4,14 +4,17 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:connectivity/connectivity.dart';
-import 'package:device_info/device_info.dart';
+// import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:package_info/package_info.dart';
+// import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
@@ -913,7 +916,7 @@ class Utils {
     );
   }
 
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
 
@@ -936,29 +939,33 @@ class Utils {
 
   static Future<void> sendAnalyticsAddToCart(
       Product product, int quantity) async {
-    await analytics.logAddToCart(
-        itemId: product.id,
-        itemName: product.title,
-        itemCategory: product.categoryIds,
-        quantity: quantity);
+    await analytics.logAddToCart(items: [
+      AnalyticsEventItem(
+          itemId: product.id,
+          itemName: product.title,
+          itemCategory: product.categoryIds,
+          quantity: quantity),
+    ], currency: AppConstant.currency);
   }
 
   static Future<void> sendAnalyticsRemovedToCart(
       Product product, int quantity) async {
-    await analytics.logRemoveFromCart(
-        itemId: product.id,
-        itemName: product.title,
-        itemCategory: product.categoryIds,
-        quantity: quantity);
+    await analytics.logRemoveFromCart(items: [
+      AnalyticsEventItem(
+          itemId: product.id,
+          itemName: product.title,
+          itemCategory: product.categoryIds,
+          quantity: quantity)
+    ], currency: AppConstant.currency);
   }
 
   static Future<void> sendAnalyticsCheckOut(
       double amount, String productJson) async {
     await analytics.logBeginCheckout(
-        //amount
-        value: amount,
-        currency: AppConstant.currency,
-        destination: productJson);
+      //amount
+      value: amount,
+      currency: AppConstant.currency,
+    );
   }
 
   //checkout step
@@ -1117,9 +1124,9 @@ class Utils {
   }
 
   static void reOrderItems(
-      String storeName, BuildContext context, OrderData orderData){
+      String storeName, BuildContext context, OrderData orderData) {
     Utils.showProgressDialog(context);
-    ApiController.getOrderDetail(orderData.orderId).then((respone) async{
+    ApiController.getOrderDetail(orderData.orderId).then((respone) async {
       Utils.hideProgressDialog(context);
       if (respone != null &&
           respone.success &&
@@ -1208,7 +1215,7 @@ enum ClassType { CART, SubCategory, Favourites, Search }
 
 enum OrderType { Delivery, PickUp, Menu, SubScription }
 
-enum PaymentType { COD, ONLINE, ONLINE_PAYTM,PROMISE_TO_PAY, NONE }
+enum PaymentType { COD, ONLINE, ONLINE_PAYTM, PROMISE_TO_PAY, NONE }
 enum RadioButtonEnum { SELECTD, UNSELECTED }
 
 class AdditionItemsConstants {
