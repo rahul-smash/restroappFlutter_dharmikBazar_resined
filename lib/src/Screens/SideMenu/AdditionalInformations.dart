@@ -30,6 +30,8 @@ class _AdditionalInformationState extends State<AdditionalInformation> {
     _drawerItems.add(AdditionChildItem(
         AdditionItemsConstants.REFUND_POLICY, "images/about_image.png"));
     _drawerItems.add(AdditionChildItem(
+        AdditionItemsConstants.SHIPPING_POLICY, "images/about_image.png"));
+    _drawerItems.add(AdditionChildItem(
         AdditionItemsConstants.ABOUT_US, "images/about_image.png"));
     _drawerItems.add(AdditionChildItem(
         AdditionItemsConstants.FAQ, "images/about_image.png"));
@@ -127,6 +129,18 @@ class _AdditionalInformationState extends State<AdditionalInformation> {
         Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "REFUND_POLICY";
         Utils.sendAnalyticsEvent("Clicked REFUND_POLICY", attributeMap);
+        break;
+
+        case AdditionItemsConstants.SHIPPING_POLICY:
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  HtmlDisplayScreen(AdditionItemsConstants.SHIPPING_POLICY)),
+        );
+        Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+        attributeMap["ScreenName"] = "SHIPPING_POLICY";
+        Utils.sendAnalyticsEvent("Clicked SHIPPING_POLICY", attributeMap);
         break;
 
       case AdditionItemsConstants.FAQ:

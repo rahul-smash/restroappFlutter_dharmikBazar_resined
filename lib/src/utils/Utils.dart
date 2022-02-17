@@ -1217,4 +1217,5 @@ class AdditionItemsConstants {
   static const TERMS_CONDITIONS = "Terms and Conditions";
   static const PRIVACY_POLICY = "Privacy Policy";
   static const REFUND_POLICY = "Refund Policy";
+  static const SHIPPING_POLICY = "Shipping Policy";
 }

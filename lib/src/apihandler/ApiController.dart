@@ -1913,6 +1913,10 @@ class ApiController {
             url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
                 ApiConstants.refundPolicy;
             break;
+            case AdditionItemsConstants.SHIPPING_POLICY:
+            url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+                ApiConstants.shipping_charges_policy;
+            break;
         }
         var request = new http.MultipartRequest("POST", Uri.parse(url));
         request.fields.addAll({

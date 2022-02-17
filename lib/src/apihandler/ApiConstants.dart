@@ -76,6 +76,7 @@ class ApiConstants {
   static String termCondition = 'getHtmlPages/term_condition';
   static String privacyPolicy = 'getHtmlPages/privacy_policy';
   static String refundPolicy = 'getHtmlPages/refund_policy';
+  static String shipping_charges_policy = 'getHtmlPages/shipping_charges_policy';
 
   static final String txt_mobile =
       "Please enter your Mobile No. to proceed further";
