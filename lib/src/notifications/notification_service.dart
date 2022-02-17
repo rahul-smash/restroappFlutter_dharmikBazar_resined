@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -27,6 +29,8 @@ abstract class NotificationService {
 
   /// Handle notification when user click on it, for re-direction
   void handleNotificationClick(RemoteMessage message);
+
+  void onSelectNotification(String payload);
 
   /// Save the fcm token
   void saveFCMToken(String token);
@@ -58,7 +62,8 @@ abstract class NotificationService {
 
     _flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    await _flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
     await _createChannelAndroid();
   }
 
@@ -145,7 +150,8 @@ abstract class NotificationService {
         remoteMessage.hashCode,
         remoteMessage.notification.title,
         remoteMessage.notification.body,
-        notificationDetails);
+        notificationDetails,
+        payload: jsonEncode(remoteMessage.data ?? ""));
   }
 
   /// Print error message information

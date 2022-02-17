@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -34,10 +35,61 @@ class NotificationServiceHelper extends NotificationService {
 
   @override
   Future<void> handleNotificationClick(RemoteMessage message) async {
+    debugPrint('On Notification Tap');
     if (message == null || message.notification == null) return;
     debugPrint('On Notification Tap: ${message.notification.title}');
     try {
       Map<String, dynamic> map = message.data;
+      String id = '';
+      String type = '';
+      StoreModel store = await SharedPrefs.getStore();
+      bool isRatingEnable = store.reviewRatingDisplay != null &&
+          store.reviewRatingDisplay.compareTo('1') == 0;
+      _globalKey.currentState.popUntil((route) => route.isFirst);
+      if (Platform.isIOS) {
+      } else {
+        id = map['id'];
+        type = map['type'];
+        type = type.toLowerCase();
+      }
+
+      switch (type) {
+        case 'order':
+          _globalKey.currentState.push(
+            MaterialPageRoute(
+                builder: (context) => OrderDetailScreenVersion2(
+                      isRatingEnable,
+                      store,
+                      orderId: id,
+                    )),
+          );
+          break;
+        case 'subscription':
+          _globalKey.currentState.push(
+            MaterialPageRoute(
+                builder: (context) => SubscriptionHistoryDetails(
+                      orderHistoryDataId: id,
+                      store: store,
+                    )),
+          );
+          break;
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+    attributeMap["ScreenName"] = "MyOrderScreen";
+    Utils.sendAnalyticsEvent("Clicked MyOrderScreen", attributeMap);
+  }
+
+  @override
+  Future<void> onSelectNotification(String payload) async {
+    if (payload == null || payload.isEmpty) {
+      return;
+    }
+    try {
+      Map<String, dynamic> map = jsonDecode(payload);
       String id = '';
       String type = '';
       StoreModel store = await SharedPrefs.getStore();
