@@ -458,14 +458,14 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon: Image.asset('images/contacticon.png',
                   width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              //title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
-              label: 'Contact',
+              title:
+                  Text('Contact', style: TextStyle(color: bottomBarTextColor)),
             ),
             BottomNavigationBarItem(
               icon: Image.asset('images/searchcion.png',
                   width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              //title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
-              label: 'Search',
+              title:
+                  Text('Search', style: TextStyle(color: bottomBarTextColor)),
             ),
             BottomNavigationBarItem(
               icon: Icon(
@@ -473,14 +473,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
                 size: 0,
               ),
-              //title: Text(''),
-              label: '',
+              title: Text(''),
             ),
             BottomNavigationBarItem(
               icon: Image.asset('images/historyicon.png',
                   width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              //title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
-              label: 'My Orders',
+              title: Text('My Orders',
+                  style: TextStyle(color: bottomBarTextColor)),
             ),
             BottomNavigationBarItem(
               icon: Badge(
@@ -493,7 +492,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     fit: BoxFit.scaleDown,
                     color: bottomBarIconColor),
               ),
-              /*title: Padding(
+              title: Padding(
                 padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
                 child:
                     Text('Cart', style: TextStyle(color: bottomBarTextColor)),
