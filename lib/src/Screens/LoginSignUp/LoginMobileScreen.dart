@@ -121,7 +121,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                   padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Form(
                       key: _formKey,
-                      autovalidate: true,
+                      autovalidateMode: AutovalidateMode.always,
                       child: ListView(
                         shrinkWrap: true,
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -149,7 +149,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                             validator: (val) =>
                                 val.isEmpty ? AppConstant.enterPhone : null,
                             inputFormatters: [
-                              WhitelistingTextInputFormatter.digitsOnly,
+                              FilteringTextInputFormatter.digitsOnly,
                             ],
                             onSaved: (val) {
                               loginMobile.phone = val;

@@ -99,7 +99,7 @@ class _OtpScreen extends State<OtpScreen> {
               alignment: Alignment.topCenter,
               child: Form(
                   key: _formKey,
-                  autovalidate: true,
+                  autovalidateMode: AutovalidateMode.always,
                   child: new ListView(
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -124,7 +124,7 @@ class _OtpScreen extends State<OtpScreen> {
                         validator: (val) =>
                             val.isEmpty ? AppConstant.enterOtp : null,
                         inputFormatters: [
-                          WhitelistingTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.digitsOnly,
                         ],
                         onSaved: (val) {
                           otpModel.otp = val;

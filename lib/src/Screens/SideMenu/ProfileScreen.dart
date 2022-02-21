@@ -189,7 +189,7 @@ class _ProfileState extends State<ProfileScreen> {
                 bottom: false,
                 child: new Form(
                   key: _formKey,
-                  autovalidate: true,
+                  autovalidateMode: AutovalidateMode.always,
                   child: Padding(
                     padding: EdgeInsets.all(0),
                     child: SingleChildScrollView(
