@@ -32,7 +32,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   Firebase.initializeApp();
-  await NotificationServiceHelper.instance.initialize();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   String value =
       await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);

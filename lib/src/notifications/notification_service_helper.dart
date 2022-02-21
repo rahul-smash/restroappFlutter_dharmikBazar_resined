@@ -24,7 +24,7 @@ class NotificationServiceHelper extends NotificationService {
 
   @override
   void setGlobalNavigationKey(GlobalKey<NavigatorState> globalKey) {
-    _instance._globalKey = globalKey;
+    _globalKey = globalKey;
   }
 
   @override
@@ -36,8 +36,8 @@ class NotificationServiceHelper extends NotificationService {
   @override
   Future<void> handleNotificationClick(RemoteMessage message) async {
     debugPrint('On Notification Tap');
-    if (message == null || message.notification == null) return;
-    debugPrint('On Notification Tap: ${message.notification.title}');
+    if (message == null || message.data == null) return;
+    debugPrint('On Notification Data: ${message.data.toString()}');
     try {
       Map<String, dynamic> map = message.data;
       String id = '';
