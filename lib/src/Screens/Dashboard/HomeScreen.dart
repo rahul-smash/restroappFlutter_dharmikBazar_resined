@@ -26,6 +26,7 @@ import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
+import 'package:restroapp/src/notifications/notification_service_helper.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -76,7 +77,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     isStoreClosed = false;
-    initFirebase();
+    // initFirebase();
+    NotificationServiceHelper.instance.initialize();
     _setSetCurrentScreen();
     cartBadgeCount = 0;
     getCartCount();
