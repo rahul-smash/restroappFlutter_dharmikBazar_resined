@@ -174,7 +174,7 @@ PODS:
   - PromisesObjC (1.2.11)
   - Protobuf (3.14.0)
   - razorpay-pod (1.1.10)
-  - razorpay_flutter (1.1.10):
+  - razorpay_flutter (1.1.5):
     - Flutter
     - razorpay-pod
   - Reachability (3.2)
@@ -353,7 +353,7 @@ SPEC CHECKSUMS:
   PromisesObjC: 8c196f5a328c2cba3e74624585467a557dcb482f
   Protobuf: 0cde852566359049847168e51bd1c690e0f70056
   razorpay-pod: ee8dc073c65baee8df6e8c4275b1c989bab614a2
-  razorpay_flutter: 84b3bfd206ae9c9c2a9ba585524a1b3d8102b6c1
+  razorpay_flutter: bf22a7c0e12d9f906b6a493f546ee9afe7f8b508
   Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
   shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
   sms_autofill: c461043483362c3f1709ee76eaae6eb570b31686

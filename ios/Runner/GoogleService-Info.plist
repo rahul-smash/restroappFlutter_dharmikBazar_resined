@@ -3,23 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>771670170221-732j2nlvgjl9q8hdkp2vd96eecr0kpb3.apps.googleusercontent.com</string>
+	<string>60897211741-10m8sli1kpsi6r94feo1jepr222stdjh.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.771670170221-732j2nlvgjl9q8hdkp2vd96eecr0kpb3</string>
+	<string>com.googleusercontent.apps.60897211741-10m8sli1kpsi6r94feo1jepr222stdjh</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>771670170221-v3ulh5cgik6ibkmvpnpq80qgrq2230t7.apps.googleusercontent.com</string>
+	<string>60897211741-i8f5ttor7hpi9sodcdqhcht4qupaobkp.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyDwWsP2a9qP7PA-aojp81sOGE_bJrSw6AM</string>
+	<string>AIzaSyC4iHnDOox9ELA7cEjspOS3aY1iv77XqvA</string>
 	<key>GCM_SENDER_ID</key>
-	<string>771670170221</string>
+	<string>60897211741</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.signity.iRestro</string>
+	<string>com.supermarket.restro</string>
 	<key>PROJECT_ID</key>
-	<string>flutter-valueappz</string>
+	<string>flutter-valueappz-13</string>
 	<key>STORAGE_BUCKET</key>
-	<string>flutter-valueappz.appspot.com</string>
+	<string>flutter-valueappz-13.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,8 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:771670170221:ios:7f61c3237278f0da35fd64</string>
-	<key>DATABASE_URL</key>
-	<string>https://flutter-valueappz.firebaseio.com</string>
+	<string>1:60897211741:ios:cfbedbc696ee1bc34d24b4</string>
 </dict>
 </plist>
