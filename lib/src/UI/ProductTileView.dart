@@ -15,6 +15,7 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import '../singleton/app_version_singleton.dart';
 import 'AddSubscriptionScreen.dart';
 
 class ProductTileItem extends StatefulWidget {
@@ -440,6 +441,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               ),
                             ),
                           ),
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
@@ -474,6 +476,24 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             ],
                           ),
 
+                          Visibility(
+                            visible: AppVersionSingleton.instance.appVersion.store.product_coupon
+                                == "1" && widget.product.product_offer == 1
+                                ? true : false,
+                            child: Container(
+                              width: 60,
+                              child: Center(
+                                  child: Text("OFFER", style: TextStyle(color: Colors.white, fontSize: 10.0),)
+                              ),
+                              margin: EdgeInsets.only(left: 5,top: 5),
+                              padding: EdgeInsets.all(5),
+                              decoration: new BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                color: appThemeSecondary,
+                                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                              ),
+                            ),
+                          ),
                           //0 => subscription is on
                           //1 => subscription is off
                           Padding(
