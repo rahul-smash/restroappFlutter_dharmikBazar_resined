@@ -16,8 +16,8 @@ class ApiConstants {
 
   static String getStoreBranches = 'getStoreBranches';
 
-  static String search = 'searchProducts';
-  static String getTagsList = 'getTagsList';
+  static String search = 'inventory/searchProducts';
+  static String getTagsList = 'inventory/getTagsList';
 
   static String getAddress = 'deliveryAddress';
   static String getAddressArea = 'deliveryAreas/Area';
@@ -68,7 +68,7 @@ class ApiConstants {
 
   static String faqs = 'faqs';
   static String allNotifications = 'allNotifications';
-  static String recommendedProduct = 'recommendedProduct';
+  static String recommendedProduct = 'inventory/recommendedProduct';
   static String orderDetailHistory = 'orderDetailHistory';
   static String reviewRating = 'review_rating';
   static String userWallet = 'user_wallet';

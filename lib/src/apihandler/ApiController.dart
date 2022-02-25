@@ -1363,9 +1363,9 @@ class ApiController {
 
   static Future<SearchTagsModel> searchTagsAPI() async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.getTagsList;
-
+    print("----url---${url}");
     var request = new http.MultipartRequest("GET", Uri.parse(url));
     try {
       final response = await request.send().timeout(Duration(seconds: timeout));
@@ -1388,7 +1388,7 @@ class ApiController {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.search;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
@@ -1692,7 +1692,7 @@ class ApiController {
         String deviceId = prefs.getString(AppConstant.deviceId);
         String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll("api_v1", "api_v11") +
             ApiConstants.recommendedProduct;
         var request = new http.MultipartRequest("POST", Uri.parse(url));
         request.fields.addAll({
