@@ -428,6 +428,7 @@ class DatabaseHelper {
       "price",
       "discount",
       "isUnitType",
+      "product_offer",
       "variants"
     ];
 
@@ -473,6 +474,7 @@ class DatabaseHelper {
         product.isSubscriptionOn = row["is_subscription_on"];
         product.discount = row["discount"];
         product.isUnitType = row["isUnitType"];
+        product.product_offer = int.parse(row["product_offer"]);
 
         for (var i = 0; i < variantsList.length; i++) {
           productMap[variantsList[i].id] = variantsList[i].isSubscriptionOn;

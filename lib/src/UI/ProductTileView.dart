@@ -111,7 +111,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
     }
 
     //print("==variantMap=${widget.product.variantId} and ${widget.product.variantMap[widget.product.variantId]}");
-
+    //print("=====product_offer====${widget.product.product_offer}=");
     return Container(
       color: Colors.white,
       child: Column(children: [
