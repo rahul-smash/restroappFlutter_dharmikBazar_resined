@@ -219,7 +219,7 @@ class ApiController {
 
   static Future<CategoryResponse> getCategoriesApiRequest(
       String storeId) async {
-    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId).replaceAll('api_v1', 'api_v11') +
         ApiConstants.getCategories;
     CategoryResponse categoryResponse = CategoryResponse();
     DatabaseHelper databaseHelper = new DatabaseHelper();
@@ -361,8 +361,9 @@ class ApiController {
         print("deviceID $deviceId");
         String deviceToken = prefs.getString(AppConstant.deviceToken);
         print("deviceToken $deviceToken");
+        print("productID $productID");
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
             ApiConstants.getProductDetail;
         print(url);
         FormData formData = new FormData.fromMap({
