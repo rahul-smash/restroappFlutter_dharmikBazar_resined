@@ -105,6 +105,7 @@ class Product {
   bool deleted;
   String image10080;
   String image300200;
+  int product_offer;
 
   List<Variant> variants;
   SelectedVariant selectedVariant;
@@ -127,6 +128,7 @@ class Product {
 
   Product({
     this.id,
+    this.product_offer,
     this.storeId,
     this.categoryIds,
     this.title,
@@ -161,6 +163,7 @@ class Product {
     Map productMap = Map<String, String>();
     Product product = Product();
     product.id = json["id"];
+    product.product_offer = json["product_offer"];
     product.isFav = json["fav"];
     product.storeId = json["store_id"];
     product.categoryIds = json["category_ids"];
@@ -208,6 +211,7 @@ class Product {
     var map = new Map<String, dynamic>();
     map["id"] = id;
     map["isfavorite"] = isFav;
+    map["product_offer"] = product_offer;
     map["store_id"] = storeId;
     map["category_ids"] = categoryIds;
     map["title"] = title;
@@ -244,6 +248,7 @@ class Product {
         "id": id,
         "isFav": isFav,
         "store_id": storeId,
+        "product_offer": product_offer,
         "category_ids": categoryIds,
         "title": title,
         "brand": brand,

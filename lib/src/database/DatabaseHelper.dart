@@ -62,8 +62,7 @@ class DatabaseHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "RestroApp.db");
     // Open/create the database at a given path
-    var theDb = await openDatabase(path,
-        version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
+    var theDb = await openDatabase(path, version: 3, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -119,6 +118,7 @@ class DatabaseHelper {
         "price TEXT, "
         "discount TEXT, "
         "isUnitType TEXT, "
+        "product_offer TEXT, "
         "variants TEXT"
         ")");
     /* await db.execute("CREATE TABLE ${Products_Table}("
@@ -186,6 +186,10 @@ class DatabaseHelper {
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
 //    db.execute("ALTER TABLE ${Products_Table} ADD COLUMN newCol TEXT;");
+    if (oldVersion < newVersion) {
+      // you can execute drop table and create table
+      db.execute("ALTER TABLE ${Products_Table} ADD COLUMN product_offer TEXT;");
+    }
   }
 
   Future<int> saveCategories(CategoryModel categoryModel) async {
@@ -233,8 +237,7 @@ class DatabaseHelper {
       for (SubCategoryModel category in subCategoriesList) {
         if (category.products != null) {
           for (int j = 0; j < category.products.length; j++) {
-            batch.insert(
-                Products_Table, category.products[j].toMap(category.id));
+            batch.insert(Products_Table, category.products[j].toMap(category.id));
           }
 //          batch.commit();
         }

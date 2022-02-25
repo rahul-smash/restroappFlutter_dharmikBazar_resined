@@ -18,6 +18,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/ConfigModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/notifications/notification_service_helper.dart';
+import 'package:restroapp/src/singleton/app_version_singleton.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -74,8 +75,8 @@ Future<void> main() async {
   //print(configObject.storeId);
 
   // Crashlytics.instance.enableInDevMode = true;
-  StoreResponse storeData =
-      await ApiController.versionApiRequest("${configObject.storeId}");
+  StoreResponse storeData = await ApiController.versionApiRequest("${configObject.storeId}");
+  AppVersionSingleton.instance.appVersion = storeData;
   setAppThemeColors(storeData.store);
   // Pass all uncaught errors to Crashlytics.
   // FlutterError.onError = Crashlytics.instance.recordFlutterError;

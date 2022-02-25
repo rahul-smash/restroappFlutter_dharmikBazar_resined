@@ -223,14 +223,13 @@ class ApiController {
         ApiConstants.getCategories;
     CategoryResponse categoryResponse = CategoryResponse();
     DatabaseHelper databaseHelper = new DatabaseHelper();
-
+    print("url=${url}");
     try {
       int dbCount =
           await databaseHelper.getCount(DatabaseHelper.Categories_Table);
       bool isNetworkAviable = await Utils.isNetworkAvailable();
       if (dbCount == 0 && isNetworkAviable) {
         print("*************database zero*************");
-        print("catttttt  $url");
         Response response = await Dio()
             .get(url, options: new Options(responseType: ResponseType.plain));
         //print(response);
@@ -254,19 +253,16 @@ class ApiController {
         categoryResponse.success = false;
         return categoryResponse;
       } else {
-        print(
-            "1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
+        print("1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
         //prepare model object
         List<CategoryModel> categoryList = await databaseHelper.getCategories();
         categoryResponse.categories = categoryList;
         for (var i = 0; i < categoryResponse.categories.length; i++) {
           String parent_id = categoryResponse.categories[i].id;
-          categoryResponse.categories[i].subCategory =
-              await databaseHelper.getSubCategories(parent_id);
+          categoryResponse.categories[i].subCategory = await databaseHelper.getSubCategories(parent_id);
         }
         categoryResponse.success = true;
-        print(
-            "2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
+        print("2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
       }
     } catch (e) {
       print(e);
@@ -291,9 +287,8 @@ class ApiController {
         String deviceToken = prefs.getString(AppConstant.deviceToken);
         print("deviceToken $deviceToken");
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-            ApiConstants.getProducts +
-            subCategoryId;
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+            ApiConstants.getProducts + subCategoryId;
         print(url);
         FormData formData = new FormData.fromMap({
           "user_id": "",
@@ -307,12 +302,11 @@ class ApiController {
             options: new Options(
                 contentType: "application/json",
                 responseType: ResponseType.plain));
-        //print(response.data);
+        print(response.data);
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-          await databaseHelper
-              .batchInsertProducts(subCategoryResponse.subCategories);
+          await databaseHelper.batchInsertProducts(subCategoryResponse.subCategories);
 
           /*for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
             for (int j = 0;j < subCategoryResponse.subCategories[i].products.length; j++) {
@@ -338,8 +332,7 @@ class ApiController {
 
         for (var i = 0; i < subCategoryResponse.subCategories.length; i++) {
           String parent_id = subCategoryResponse.subCategories[i].id;
-          subCategoryResponse.subCategories[i].products =
-              await databaseHelper.getProducts(parent_id);
+          subCategoryResponse.subCategories[i].products = await databaseHelper.getProducts(parent_id);
 //          for (int j = 0;
 //              j < subCategoryResponse.subCategories[i].products.length;
 //              j++) {
