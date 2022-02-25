@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 import 'dart:math';
-
+import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:connectivity/connectivity.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
@@ -270,7 +270,7 @@ class Utils {
     return isNetworkAvailable;
   }
 
-  static void showProgressDialog(BuildContext context) {
+  static void showProgressDialog1(BuildContext context) {
     //For normal dialog
     if (pr != null && pr.isShowing()) {
       pr.hide();
@@ -280,7 +280,7 @@ class Utils {
     pr.show();
   }
 
-  static void hideProgressDialog(BuildContext context) {
+  static void hideProgressDialog1(BuildContext context) {
     //For normal dialog
     try {
       if (pr != null && pr.isShowing()) {
@@ -294,6 +294,21 @@ class Utils {
     } catch (e) {
       print(e);
     }
+  }
+
+  static void showProgressDialog(BuildContext context) {
+    Loader.show(context,
+        isAppbarOverlay: true,
+        isBottomBarOverlay: true,
+        progressIndicator: CircularProgressIndicator(
+          backgroundColor: Color(0xFFFF7443),
+        ),
+        themeData: Theme.of(context).copyWith(accentColor: Colors.black38),
+        overlayColor: Color(0x99E8EAF6));
+  }
+
+  static void hideProgressDialog(BuildContext context) {
+    Loader.hide();
   }
 
   static double roundOffPrice(double val, int places) {
