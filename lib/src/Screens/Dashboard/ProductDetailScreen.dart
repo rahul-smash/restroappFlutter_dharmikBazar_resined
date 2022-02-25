@@ -15,6 +15,9 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:dotted_border/dotted_border.dart';
+
+import '../../singleton/app_version_singleton.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   Product product;
@@ -50,12 +53,14 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   CarouselController _carouselController;
 
   var _pageController;
+  OfferDetails offerDetails;
 
   @override
   initState() {
     super.initState();
     selctedTag = 0;
     showAddButton = false;
+    print("-----product_offer----${widget.product.product_offer}");
     _carouselController = CarouselController();
     if (widget.product != null) getDataFromDB();
     getProductDetail(widget.product?.id ?? widget.productID);
@@ -301,6 +306,11 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           ],
         ),
         Visibility(
+          visible: true,
+          child: addDividerView(),
+        ),
+        buildProductOfferView(),
+        Visibility(
           visible: isVisible,
           child: addDividerView(),
         ),
@@ -325,7 +335,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
             ],
           ),
         ),
-
         !widget.isApiLoading &&
                 widget.product.description != null &&
                 widget.product.description.isNotEmpty
@@ -389,6 +398,81 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               )
             : Container(),
       ],
+    );
+  }
+
+  Widget buildProductOfferView(){
+
+    return Visibility(
+      visible: AppVersionSingleton.instance.appVersion.store.product_coupon == "1" && widget.product.product_offer == 1
+          ? true : false,
+      child: this.offerDetails == null ? Container() : Container(
+        margin: EdgeInsets.only(top: 10.0, left: 20.0, bottom: 10.0,right: 10),
+        width: Utils.getDeviceWidth(context),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(Icons.ac_unit,color: appThemeSecondary),
+                SizedBox(width: 5,),
+                Expanded(
+                  child: Text("${this.offerDetails.name}",
+                    maxLines: 1,overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 16)),
+                ),
+                Text("MORE",
+                    style: TextStyle(
+                        decoration: TextDecoration.underline,
+                        color: appThemeSecondary,
+                        fontWeight: FontWeight.w500,fontSize: 16)),
+                Icon(Icons.arrow_forward_ios_sharp,color: appThemeSecondary,size: 16),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Row(
+              children: [
+                Text("COUPON",
+                    style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500)),
+                SizedBox(width: 10,),
+                Text("(use at checkout)",
+                    style: TextStyle(fontSize: 16,color: Colors.black54)),
+              ],
+            ),
+            SizedBox(height: 10,),
+
+            InkWell(
+              child: Row(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 30,
+                    color: appThemeSecondary.withOpacity(0.15),
+                    child: DottedBorder(
+                      color: appThemeSecondary,
+                      strokeWidth: 1,
+                      child: Center(
+                        child: Text("${this.offerDetails.couponCode}",
+                            maxLines: 1,overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20,),
+                  Text("Copy",
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,fontSize: 16)),
+                ],
+              ),
+              onTap: (){
+                Utils.copyToClipboard(context);
+              },
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -705,6 +789,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     _storeModel = await SharedPrefs.getStore();
     ApiController.getSubCategoryProductDetail(productID).then((value) {
       Product product = value.subCategories.first.products.first;
+      this.offerDetails = product.offerDetails;
       if (widget.product == null) {
         widget.product = product;
       }

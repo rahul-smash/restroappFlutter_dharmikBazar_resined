@@ -5,6 +5,8 @@ import 'dart:math';
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 // import 'package:connectivity/connectivity.dart';
+import 'package:flutter/services.dart';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 // import 'package:device_info/device_info.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -1224,6 +1226,14 @@ class Utils {
     }
     return days;
   }
+
+  static copyToClipboard(BuildContext context){
+    Clipboard.setData(new ClipboardData()).then((_){
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Copied to clipboard")));
+    });
+  }
+
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }

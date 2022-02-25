@@ -105,7 +105,9 @@ class Product {
   bool deleted;
   String image10080;
   String image300200;
+
   int product_offer;
+  OfferDetails offerDetails;
 
   List<Variant> variants;
   SelectedVariant selectedVariant;
@@ -129,6 +131,7 @@ class Product {
   Product({
     this.id,
     this.product_offer,
+    this.offerDetails,
     this.storeId,
     this.categoryIds,
     this.title,
@@ -183,6 +186,8 @@ class Product {
     product.deleted = json["deleted"];
     product.image10080 = json["image_100_80"] ?? "";
     product.image300200 = json["image_300_200"] ?? "";
+
+    product.offerDetails = json["offer_details"] == null ? null : OfferDetails.fromJson(json["offer_details"]);
 
     product.variants = List<Variant>.from(json["variants"].map((x) => Variant.fromJson(x)));
     product.selectedVariant = SelectedVariant.fromJson(json["selectedVariant"]);
@@ -266,6 +271,7 @@ class Product {
         "deleted": deleted,
         "image_100_80": image10080,
         "image_300_200": image300200,
+        "offer_details": offerDetails.toJson(),
         "variants": List<dynamic>.from(variants.map((x) => x.toJson())),
         "selectedVariant": selectedVariant.toJson(),
       };
@@ -288,6 +294,114 @@ class Product {
         .toList();
     return jsonList;
   }
+}
+
+class OfferDetails {
+  OfferDetails({
+    this.id,
+    this.storeId,
+    this.discountType,
+    this.isForAllOrSegment,
+    this.orderFacilities,
+    this.allCategories,
+    this.paymentMethod,
+    this.name,
+    this.couponCode,
+    this.discount,
+    this.discountUpto,
+    this.minimumOrderAmount,
+    this.usageLimit,
+    this.validFrom,
+    this.validTo,
+    this.offerNotification,
+    this.offerTermCondition,
+    this.offerDescription,
+    this.banner,
+    this.status,
+    this.show,
+    this.sort,
+    this.created,
+    this.modified,
+  });
+
+  String id;
+  String storeId;
+  String discountType;
+  String isForAllOrSegment;
+  String orderFacilities;
+  String allCategories;
+  String paymentMethod;
+  String name;
+  String couponCode;
+  String discount;
+  String discountUpto;
+  String minimumOrderAmount;
+  String usageLimit;
+  String validFrom;
+  String validTo;
+  String offerNotification;
+  String offerTermCondition;
+  String offerDescription;
+  String banner;
+  String status;
+  String show;
+  String sort;
+  String created;
+  String modified;
+
+  factory OfferDetails.fromJson(Map<String, dynamic> json) => OfferDetails(
+    id: json["id"],
+    storeId: json["store_id"],
+    discountType: json["discount_type"],
+    isForAllOrSegment: json["is_for_all_or_segment"],
+    orderFacilities: json["order_facilities"],
+    allCategories: json["all_categories"],
+    paymentMethod: json["payment_method"],
+    name: json["name"],
+    couponCode: json["coupon_code"],
+    discount: json["discount"],
+    discountUpto: json["discount_upto"],
+    minimumOrderAmount: json["minimum_order_amount"],
+    usageLimit: json["usage_limit"],
+    validFrom: json["valid_from"],
+    validTo: json["valid_to"],
+    offerNotification: json["offer_notification"],
+    offerTermCondition: json["offer_term_condition"],
+    offerDescription: json["offer_description"],
+    banner: json["banner"],
+    status: json["status"],
+    show: json["show"],
+    sort: json["sort"],
+    created: json["created"],
+    modified: json["modified"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "store_id": storeId,
+    "discount_type": discountType,
+    "is_for_all_or_segment": isForAllOrSegment,
+    "order_facilities": orderFacilities,
+    "all_categories": allCategories,
+    "payment_method": paymentMethod,
+    "name": name,
+    "coupon_code": couponCode,
+    "discount": discount,
+    "discount_upto": discountUpto,
+    "minimum_order_amount": minimumOrderAmount,
+    "usage_limit": usageLimit,
+    "valid_from": validFrom,
+    "valid_to": validTo,
+    "offer_notification": offerNotification,
+    "offer_term_condition": offerTermCondition,
+    "offer_description": offerDescription,
+    "banner": banner,
+    "status": status,
+    "show": show,
+    "sort": sort,
+    "created": created,
+    "modified": modified,
+  };
 }
 
 class ProductImage {
