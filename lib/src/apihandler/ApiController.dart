@@ -589,11 +589,11 @@ class ApiController {
   }
 
   static Future<StoreOffersResponse> storeOffersApiRequest(
-      String areaId) async {
+      String areaId, {jsonProductIds}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.storeOffers;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
@@ -601,6 +601,7 @@ class ApiController {
       request.fields.addAll({
         "store_id": store.id,
         "user_id": user.id,
+        "productIds": jsonProductIds,
         "order_facility": "Delivery"
       });
 
@@ -630,7 +631,7 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.validateCoupon;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");

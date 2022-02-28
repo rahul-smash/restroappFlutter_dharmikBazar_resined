@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -9,6 +11,8 @@ import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+
+import '../../models/SubCategoryResponse.dart';
 
 class AvailableOffersDialog extends StatefulWidget {
   final DeliveryAddressData address;
@@ -23,6 +27,7 @@ class AvailableOffersDialog extends StatefulWidget {
   bool isSubcriptionScreen = false;
   List<OrderDetail> responseOrderDetail = List.empty(growable: true);
   Map<String, String> subcriptionMap = Map();
+  List<Product> cartListFromDB;
 
   AvailableOffersDialog(
       this.address,
@@ -34,24 +39,48 @@ class AvailableOffersDialog extends StatefulWidget {
       this.isOrderVariations,
       this.responseOrderDetail,
       this.shippingCharges,
-      {this.isSubcriptionScreen = false,
-      this.subcriptionCallback,
-      this.subcriptionMap});
+      {
+        this.isSubcriptionScreen = false,
+        this.subcriptionCallback,
+        this.subcriptionMap,
+        this.cartListFromDB
+      }
+      );
 
   @override
   AvailableOffersState createState() => AvailableOffersState();
 }
 
 class AvailableOffersState extends State<AvailableOffersDialog> {
+
   DatabaseHelper databaseHelper = new DatabaseHelper();
   String area_id_value;
+  String jsonProductIds = '';
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    area_id_value =
-        widget.isComingFromPickUpScreen ? widget.areaId : widget.address.areaId;
+    //print("---cartListFromDB--=${widget.cartListFromDB.length}");
+    if(!widget.isSubcriptionScreen){
+      cartListToJson();
+    }
+    area_id_value = widget.isComingFromPickUpScreen ? widget.areaId : widget.address.areaId;
   }
+
+  cartListToJson() async {
+    isLoading = true;
+    await Future.forEach(widget.cartListFromDB, (cartItem) async {
+      List<ProductId> productIdList = [];
+      ProductId productId = ProductId(cartItem.id);
+      productIdList.add(productId);
+      jsonProductIds = jsonEncode(productIdList);
+      print(jsonProductIds);
+      isLoading = false;
+      //await longFunc(item);
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +93,13 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
               icon: Icon(Icons.arrow_back_ios),
               onPressed: () => Navigator.pop(context, false),
             )),
-        //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0),),
-        //elevation: 0.0,
-        body: Container(
+        body: isLoading ? Utils.showIndicator() : Container(
           color: Color(0xffdbdbdb),
           child: Column(
             children: <Widget>[
               FutureBuilder(
-                future: ApiController.storeOffersApiRequest(area_id_value),
+                future: ApiController.storeOffersApiRequest(area_id_value,
+                    jsonProductIds: jsonProductIds),
                 builder: (context, projectSnap) {
                   if (projectSnap.connectionState == ConnectionState.none &&
                       projectSnap.hasData == null) {
@@ -260,7 +288,8 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
               ),
             ],
           ),
-        ));
+        )
+    );
   }
 
   void validateCouponApi(String couponCode, String json) {
@@ -327,4 +356,11 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
     }
     return offerName;
   }
+}
+class ProductId {
+  String productId;
+  ProductId(this.productId);
+  Map toJson() => {
+    'product_id': productId,
+  };
 }

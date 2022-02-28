@@ -734,7 +734,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addProductCart(Product product) {
-    print("product_offer=${product.product_offer}");
+    //print("product_offer=${product.product_offer}");
     OrderDetail detail;
     if (product.id != null)
       for (int i = 0; i < responseOrderDetail.length; i++) {
@@ -1340,8 +1340,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         print("===couponCode=== ${model.couponCode}");
                         print("taxModel.total=${taxModel.total}");
                       });
-                    }, appliedCouponCodeList, isOrderVariations,
-                        responseOrderDetail, shippingCharges),
+                    }, appliedCouponCodeList,
+                        isOrderVariations,
+                        responseOrderDetail,
+                        shippingCharges,cartListFromDB: cartListFromDB,
+                    ),
                   );
                 }
               },

@@ -467,6 +467,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                 ],
               ),
               onTap: (){
+                print(this.offerDetails.couponCode);
                 Utils.copyToClipboard(context);
               },
             )
