@@ -711,9 +711,9 @@ class DatabaseHelper {
     ];
 
     List<Map> resultList;
-      resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
+    resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
     if (resultList != null && resultList.isNotEmpty) {
-      resultList.forEach((row) {
+      await Future.forEach(resultList, (row) async {
         Product product = new Product();
         product.mrpPrice = row[MRP_PRICE];
         product.price = row[PRICE];
@@ -732,13 +732,39 @@ class DatabaseHelper {
         product.imageUrl = row[imageUrl];
         product.image10080 = row[image_100_80];
         product.image300200 = row[image_300_200];
-
+        try {
+          int productOffer = await getProductOfferInProductTable(product.id);
+          product.product_offer = productOffer;
+        } catch (e) {
+          print(e);
+        }
         cartList.add(product);
       });
     } else {
       //print("-empty cart-in db--");
     }
     return cartList;
+  }
+
+  Future<int> getProductOfferInProductTable(String id) async {
+    int productOffer = 0;
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      "id",
+      "product_offer",
+    ];
+    List<Map> resultList = await dbClient.query(Products_Table,
+        columns: columnsToSelect,
+        where: '$ID = ?',
+        whereArgs: [id]);
+
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        productOffer = int.parse(row["product_offer"]);
+        //print("-product.product_offer--=${productOffer}");
+      });
+    }
+    return productOffer;
   }
 
   Future<List<Product>> getFavouritesList() async {

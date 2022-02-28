@@ -35,7 +35,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
   CartData cartData;
   Variant variant;
   bool showAddButton;
-  StoreModel storeModel;
+  StoreModel storeModel = AppVersionSingleton.instance.appVersion.store;
   bool _isSubscriptionActive = false;
   bool _isProductOutOfStock = false;
 
@@ -43,11 +43,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
   initState() {
     super.initState();
 
-    SharedPrefs.getStore().then((value) {
-      storeModel = value;
-      _isSubscriptionActive = storeModel.subscription.status == '1';
-      if (mounted) setState(() {});
-    });
+    //storeModel = value;
+    _isSubscriptionActive = storeModel.subscription.status == '1';
+    if (mounted) setState(() {});
+
+    /*SharedPrefs.getStore().then((value) {
+
+    });*/
     showAddButton = false;
     //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
@@ -64,10 +66,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
       //print("-QUANTITY-${counter}=");
       setState(() {});
     });
-    databaseHelper
-        .checkProductsExistInFavTable(
-            DatabaseHelper.Favorite_Table, widget.product.id)
-        .then((favValue) {
+    databaseHelper.checkProductsExistInFavTable(
+            DatabaseHelper.Favorite_Table, widget.product.id).then((favValue) {
       //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
       setState(() {
         widget.product.isFav = favValue.toString();
