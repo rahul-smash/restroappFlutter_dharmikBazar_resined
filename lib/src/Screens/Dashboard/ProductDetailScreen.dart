@@ -792,7 +792,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   void getProductDetail(String productID) async {
-    _storeModel = await SharedPrefs.getStore();
+    //_storeModel = await SharedPrefs.getStore();
+    _storeModel = AppVersionSingleton.instance.appVersion.store;
     ApiController.getSubCategoryProductDetail(productID).then((value) {
       Product product = value.subCategories.first.products.first;
       this.offerDetails = product.offerDetails;
