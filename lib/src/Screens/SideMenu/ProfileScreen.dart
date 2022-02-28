@@ -61,6 +61,7 @@ class _ProfileState extends State<ProfileScreen> {
       print(e);
     }
     storeModel = await SharedPrefs.getStore();
+
     setState(() {
       if (user != null) {
         firstNameController.text = user.fullName;
@@ -139,9 +140,9 @@ class _ProfileState extends State<ProfileScreen> {
     //print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     return WillPopScope(
         onWillPop: () async {
-          if(!widget.isComingFromOtpScreen){
-            return Future(()=>true);
-          }else {
+          if (!widget.isComingFromOtpScreen) {
+            return Future(() => true);
+          } else {
             return await nameValidation() &&
                 isValidEmail(emailController.text) &&
                 emailValidation();
@@ -244,7 +245,8 @@ class _ProfileState extends State<ProfileScreen> {
                               keyboardType: TextInputType.emailAddress,
                               controller: emailController,
                               decoration: InputDecoration(
-                                labelText: 'Email *',
+                                labelText:
+                                    'Email',
                               ),
                               style: TextStyle(
                                   fontSize: 18,
@@ -357,10 +359,10 @@ class _ProfileState extends State<ProfileScreen> {
     if (!nameValidation()) {
       return;
     }
-    if (!emailValidation()) {
-      return;
-    }
-    if (!isValidEmail(emailController.text.trim())) {
+    // if (!emailValidation()) {
+    //   return;
+    // }
+    if (emailController.text.trim().isNotEmpty&& !isValidEmail(emailController.text.trim())) {
       Utils.showToast("Please enter valid email", false);
       return;
     }
