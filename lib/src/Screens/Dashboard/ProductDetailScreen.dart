@@ -414,7 +414,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           children: [
             Row(
               children: [
-                Icon(Icons.ac_unit,color: appThemeSecondary),
+                //Icon(Icons.ac_unit,color: appThemeSecondary),
+                Image.asset("images/offericon_dis.png",
+                  height: 22,
+                  width: 22,
+                  fit: BoxFit.fill,
+                ),
                 SizedBox(width: 5,),
                 Expanded(
                   child: Text("${this.offerDetails.name}",

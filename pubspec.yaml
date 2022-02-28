@@ -171,6 +171,7 @@ flutter:
     - images/thankyoubg.png
     - images/thankyouicon.png
     - images/order_place.png
+    - images/offericon_dis.png
     - assets/en.json
     - assets/malay.json
 
