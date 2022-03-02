@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:restroapp/src/Screens/Dashboard/more_detail_screen.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -426,11 +427,21 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                     maxLines: 1,overflow: TextOverflow.ellipsis,
                     style: TextStyle(fontSize: 16)),
                 ),
-                Text("MORE",
-                    style: TextStyle(
-                        decoration: TextDecoration.underline,
-                        color: appThemeSecondary,
-                        fontWeight: FontWeight.w500,fontSize: 16)),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              MoreDetailScreen(widget.product),
+                        ));
+                  },
+                  child: Text("MORE",
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: appThemeSecondary,
+                          fontWeight: FontWeight.w500,fontSize: 16)),
+                ),
                 Icon(Icons.arrow_forward_ios_sharp,color: appThemeSecondary,size: 16),
               ],
             ),
