@@ -498,6 +498,23 @@ class Utils {
     return formatted;
   }
 
+  static convertValidTillDate(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM yyyy');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
   static convertWalletDate(String date) {
     String formatted = date;
     try {
@@ -1233,6 +1250,13 @@ class Utils {
           .showSnackBar(SnackBar(content: Text("Copied to clipboard")));
     });
   }
+  static Widget showSpinner({Color color = Colors.black}) {
+    return Center(
+      child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(color)),
+    );
+  }
+
 
 }
 

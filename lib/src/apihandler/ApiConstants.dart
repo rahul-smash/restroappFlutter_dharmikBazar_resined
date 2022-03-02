@@ -13,6 +13,7 @@ class ApiConstants {
   static String getCategories = 'inventory/getCategories';
   static String getProducts = 'inventory/getSubCategoryProducts/';
   static String getProductDetail = 'inventory/productDetail/';
+  static String getEligibleProductDetail = 'coupons/eligibleProducts';
 
   static String getStoreBranches = 'getStoreBranches';
 

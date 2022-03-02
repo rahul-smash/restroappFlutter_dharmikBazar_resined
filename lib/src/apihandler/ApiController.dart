@@ -22,6 +22,7 @@ import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/DeviceInfo.dart';
+import 'package:restroapp/src/models/EligibleProductResponse.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
@@ -384,6 +385,46 @@ class ApiController {
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
           return subCategoryResponse;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<EligibleProductResponse> getEligibleProductDetail(
+      String offerID) async {
+    EligibleProductResponse eligibleProductResponse = EligibleProductResponse();
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+            ApiConstants.getEligibleProductDetail;
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "user_id": "",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android",
+          "offer_id": offerID
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                contentType: "application/json",
+                responseType: ResponseType.plain));
+        print(response.data);
+        eligibleProductResponse =
+            EligibleProductResponse.fromJson(json.decode(response.data));
+        if (eligibleProductResponse.success) {
+          return eligibleProductResponse;
         }
       }
     } catch (e) {

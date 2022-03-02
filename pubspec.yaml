@@ -172,6 +172,10 @@ flutter:
     - images/thankyouicon.png
     - images/order_place.png
     - images/offericon_dis.png
+    - images/my_coupon.png
+    - images/coupon_detail_graphic.png
+    - images/coupon_icon.png
+    - images/available_coupon_icon.png
     - assets/en.json
     - assets/malay.json
 
