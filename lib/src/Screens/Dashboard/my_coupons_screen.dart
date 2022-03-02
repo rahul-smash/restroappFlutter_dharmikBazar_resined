@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +12,7 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
+import 'package:restroapp/src/models/StoreOffersResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -31,10 +34,27 @@ class MyCouponScreen extends StatefulWidget {
 
 class _MyCouponState extends State<MyCouponScreen> {
 
+  bool isLoading = true;
+  StoreOffersResponse storeOffersResponse = new StoreOffersResponse();
 
   @override
   initState() {
     super.initState();
+    getOfferDetail();
+  }
+
+  void getOfferDetail() async {
+    ApiController.storeOfferApiRequest().then((value) {
+      storeOffersResponse = value;
+      setState(() {
+        isLoading  = false;
+      });
+    }).catchError((error) {
+      print(error);
+      setState(() {
+        isLoading = false;
+      });
+    });
   }
 
 
@@ -42,14 +62,6 @@ class _MyCouponState extends State<MyCouponScreen> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
-        // appBar: AppBar(
-        //   leading: IconButton(
-        //     icon: Icon(Icons.arrow_back, color: Colors.white),
-        //     onPressed: () {
-        //       return Navigator.pop(context, variant);
-        //     },
-        //   ),
-        // ),
         body: Container(
           child: SingleChildScrollView(
             child: Column(
@@ -108,16 +120,19 @@ class _MyCouponState extends State<MyCouponScreen> {
                     ),
                   ),
 
-                  ListView.separated(
+                  (isLoading || storeOffersResponse.offers == null) ? Container(
+                      child: Center(
+                          child: Utils.showSpinner())
+                  ) : ListView.separated(
                     shrinkWrap: true,
                     scrollDirection: Axis.vertical,
                     physics: NeverScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 10),
                     itemBuilder: (context, index) {
-                      return getCouponView();
+                      return getCouponView(index);
                     },
-                    itemCount: 5,
+                    itemCount: storeOffersResponse.offers.length,
                     separatorBuilder:
                         (BuildContext context, int index) {
                       return Divider(
@@ -170,19 +185,19 @@ class _MyCouponState extends State<MyCouponScreen> {
     );
   }
 
-  Widget getCouponView() {
+  Widget getCouponView(int index) {
     return Container(
       margin: EdgeInsets.only(top: 10.0, left: 20.0, bottom: 10.0,right: 10),
       width: Utils.getDeviceWidth(context),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Get 20% discount using Kotak Bank Credit card or Debit card",
+          Text(storeOffersResponse.offers[index].name,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
           SizedBox(height: 10,),
-          Text("Use code KOTAK125 and get 20% discount upto Rs 125 on orders above Rs 500",
+          Text(getDiscountTest(storeOffersResponse.offers[index]),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 16)),
@@ -193,7 +208,7 @@ class _MyCouponState extends State<MyCouponScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (BuildContext context) =>
-                        OfferDetailScreen(),
+                        OfferDetailScreen(offerID : storeOffersResponse.offers[index].id),
                   ));
             },
             child: Text("VIEW T&C",
@@ -204,6 +219,13 @@ class _MyCouponState extends State<MyCouponScreen> {
         ],
       ),
     );
+  }
+
+  String getDiscountTest(OfferModel offer) {
+    String couponCode = 'Use code ${offer.couponCode} and get ';
+    String discount = (offer.discount_type == "3" || offer.discount_type == "4") ? '${offer.discount} % ' : '' ;
+    String afterUpto = 'upto Rs ${offer.discount_upto} on orders above Rs. ${offer.minimumOrderAmount}';
+    return couponCode+discount+afterUpto;
   }
 
 }

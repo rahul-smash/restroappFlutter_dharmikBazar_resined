@@ -9,6 +9,8 @@ import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
+import 'package:restroapp/src/models/OfferDetailResponse.dart';
+import 'package:restroapp/src/models/StoreOffersResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -20,7 +22,9 @@ import 'package:dotted_border/dotted_border.dart';
 import '../../singleton/app_version_singleton.dart';
 
 class OfferDetailScreen extends StatefulWidget {
-  OfferDetailScreen();
+  final String offerID;
+
+  OfferDetailScreen({this.offerID = ''});
 
   @override
   State<StatefulWidget> createState() {
@@ -29,9 +33,28 @@ class OfferDetailScreen extends StatefulWidget {
 }
 
 class _OfferDetailState extends State<OfferDetailScreen> {
+  OfferDetailResponse offerDetailResponse = OfferDetailResponse();
+  bool isLoading = true;
+
   @override
   initState() {
     super.initState();
+
+    getOfferDetail();
+  }
+
+  void getOfferDetail() async {
+    ApiController.getOfferDetail(widget.offerID).then((value) {
+      offerDetailResponse = value;
+      setState(() {
+        isLoading = false;
+      });
+    }).catchError((error) {
+      print(error);
+      setState(() {
+        isLoading = false;
+      });
+    });
   }
 
   Widget build(BuildContext context) {
@@ -100,120 +123,69 @@ class _OfferDetailState extends State<OfferDetailScreen> {
   }
 
   Widget getCouponView() {
-    return Container(
-      margin: EdgeInsets.only(top: 10.0, left: 20.0, bottom: 10.0, right: 10),
-      width: Utils.getDeviceWidth(context),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: 10,
-          ),
-          Text("Terms and Conditions",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-              "s simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard ",
-              style: TextStyle(fontSize: 16)),
-          SizedBox(
-            height: 10,
-          ),
-          addDividerView(),
-          SizedBox(
-            height: 10,
-          ),
-          Text("Offer Validity",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Row(
+    return (isLoading || offerDetailResponse == null)
+        ? Container(child: Center(child: Utils.showSpinner()))
+        : Container(
+            margin:
+                EdgeInsets.only(top: 10.0, left: 20.0, bottom: 10.0, right: 10),
+            width: Utils.getDeviceWidth(context),
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("• "),
-                Expanded(
-                  child: Text('Monday to Thursday : 9am to 9 pm'),
+              children: [
+                SizedBox(
+                  height: 10,
                 ),
+                Text("Terms and Conditions",
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                SizedBox(
+                  height: 10,
+                ),
+                Text(offerDetailResponse.data.offerTermCondition,
+                    style: TextStyle(fontSize: 16)),
+                SizedBox(
+                  height: 10,
+                ),
+                addDividerView(),
+                SizedBox(
+                  height: 10,
+                ),
+                Text("Offer Validity",
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                SizedBox(
+                  height: 10,
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("• "),
+                      Expanded(
+                        child: Text('Valid from : ${Utils.convertValidTillDate(offerDetailResponse.data.validFrom)}'),
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("• "),
+                      Expanded(
+                        child: Text('Valid to : ${Utils.convertValidTillDate(offerDetailResponse.data.validTo)}'),
+                      ),
+                    ],
+                  ),
+                ),
+
               ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("• "),
-                Expanded(
-                  child: Text('Friday : 9am to 5 pm'),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("• "),
-                Expanded(
-                  child: Text('Saturday : 9am to 2 pm'),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text("Offer eligibility",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          SizedBox(
-            height: 10,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("• "),
-                Expanded(
-                  child: Text('letters, as opposed to using Content here'),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("• "),
-                Expanded(
-                  child: Text(
-                      'Letraset sheets containing Lorem Ipsum passages, and more recently with desktop'),
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text("• "),
-                Expanded(
-                  child: Text(
-                      'Letraset sheets containing Lorem Ipsum passages, and more recently with desktop'),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   Widget addDividerView() {

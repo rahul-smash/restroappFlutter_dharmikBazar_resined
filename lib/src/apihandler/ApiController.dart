@@ -31,6 +31,7 @@ import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
+import 'package:restroapp/src/models/OfferDetailResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/ProductRatingResponse.dart';
 import 'package:restroapp/src/models/PromiseToPayUserResponse.dart';
@@ -432,6 +433,46 @@ class ApiController {
     }
   }
 
+  static Future<OfferDetailResponse> getOfferDetail(
+      String offerID) async {
+    OfferDetailResponse eligibleProductResponse = OfferDetailResponse();
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+            ApiConstants.getOfferDetail;
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "user_id": "",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android",
+          "offer_id": offerID
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                contentType: "application/json",
+                responseType: ResponseType.plain));
+        print(response.data);
+        eligibleProductResponse =
+            OfferDetailResponse.fromJson(json.decode(response.data));
+        if (eligibleProductResponse.success) {
+          return eligibleProductResponse;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
   static Future<DeliveryAddressResponse> getAddressApiRequest() async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -649,6 +690,34 @@ class ApiController {
       if (areaId != null) {
         request.fields["area_id"] = areaId;
       }
+      print("----url---${url}");
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+      print("----respStr---${respStr}");
+      StoreOffersResponse res = StoreOffersResponse.fromJson(parsed);
+      return res;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<StoreOffersResponse> storeOfferApiRequest() async {
+    StoreModel store = await SharedPrefs.getStore();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+        ApiConstants.storeOffers;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      UserModel user = await SharedPrefs.getUser();
+      request.fields.addAll({
+        "store_id": store.id,
+        "user_id": user.id,
+        "order_facility": "Delivery"
+      });
+
       print("----url---${url}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();

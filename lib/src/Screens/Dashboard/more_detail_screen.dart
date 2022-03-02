@@ -13,6 +13,7 @@ import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -73,8 +74,7 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
       cartData = cartDataObj;
       counter = int.parse(cartData.QUANTITY);
       showAddButton = counter == 0 ? true : false;
-      setState(() {
-      });
+      setState(() {});
     });
   }
 
@@ -88,12 +88,18 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
           ),
         ),
         bottomNavigationBar: InkWell(
-          onTap: (){
+          onTap: () async {
+            try {
+              UserModel user = await SharedPrefs.getUser();
+            } catch (e) {
+              Utils.showToast('You need to login first', true);
+              return;
+            }
+
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      MyCouponScreen(),
+                  builder: (BuildContext context) => MyCouponScreen(),
                 ));
           },
           child: Container(
@@ -124,8 +130,7 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
-                  },
+                  onTap: () {},
                   child: Icon(Icons.arrow_forward_ios_sharp,
                       color: Colors.grey, size: 16),
                 ),
@@ -159,74 +164,79 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                   padding: EdgeInsets.only(
                       top: 0.0, bottom: 15.0, left: 30.0, right: 30.0),
 //              EdgeInsets.all(0),
-
                 ),
               ],
             ),
             isLoading
                 ? Container(
-              height: MediaQuery.of(context).size.height,
-                child: Utils.showSpinner()
-            )
+                    height: MediaQuery.of(context).size.height,
+                    child: Utils.showSpinner())
                 : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconButton(onPressed: (){
-                  Navigator.of(context).pop();
-                }, icon: Icon(Icons.arrow_back_ios)),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                  child: Text(
-                    "My Coupons",
-                    style: TextStyle(color: Colors.black, fontSize: 22),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric( horizontal: 30),
-                  child: Text(
-                    "my coupons aenean\n net vec leo",
-                    style: TextStyle(color: Colors.black, fontSize: 15),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric( horizontal: 15),
-                  child: _getImageView(),
-                ),
-                addDividerView(),
-                buildProductOfferView(),
-                addDividerView(),
-                Center(
-                  child: Container(
-                      child: Padding(
-                        padding: EdgeInsets.all(5),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          icon: Icon(Icons.arrow_back_ios)),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 30),
                         child: Text(
-                          "VALID TILL : ${(widget.product.offerDetails != null) ? Utils.convertValidTillDate(widget.product.offerDetails.validTo) : ''}",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18),
+                          "My Coupons",
+                          style: TextStyle(color: Colors.black, fontSize: 22),
                         ),
-                      )),
-                ),
-                addDividerView(),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                  child: Text(
-                    "Terms and Conditions",
-                    style: TextStyle(color: Colors.black, fontSize: 18),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 30),
+                        child: Text(
+                          "my coupons aenean\n net vec leo",
+                          style: TextStyle(color: Colors.black, fontSize: 15),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 15),
+                        child: _getImageView(),
+                      ),
+                      addDividerView(),
+                      buildProductOfferView(),
+                      addDividerView(),
+                      Center(
+                        child: Container(
+                            child: Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                            "VALID TILL : ${(widget.product.offerDetails != null) ? Utils.convertValidTillDate(widget.product.offerDetails.validTo) : ''}",
+                            style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18),
+                          ),
+                        )),
+                      ),
+                      addDividerView(),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                        child: Text(
+                          "Terms and Conditions",
+                          style: TextStyle(color: Colors.black, fontSize: 18),
+                        ),
+                      ),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 0, horizontal: 30),
+                        child: Html(
+                          data:
+                              "${(widget.product.offerDetails != null) ? widget.product.offerDetails.offerTermCondition : ''}",
+                          padding: EdgeInsets.all(10.0),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      )
+                    ],
                   ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 30),
-                  child: Html(
-                    data:
-                    "${(widget.product.offerDetails != null) ? widget.product.offerDetails.offerTermCondition : ''}",
-                    padding: EdgeInsets.all(10.0),
-                  ),
-                ),
-                SizedBox(height: 20,)
-              ],
-            ),
           ],
           overflow: Overflow.clip,
         ),
@@ -347,7 +357,9 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                               builder: (context) {
                                 return Padding(
                                   padding: MediaQuery.of(context).viewInsets,
-                                  child: EligibleProductScreen(offerId: widget.product.offerDetails.id,),
+                                  child: EligibleProductScreen(
+                                    offerId: widget.product.offerDetails.id,
+                                  ),
                                 );
                               });
                         },
