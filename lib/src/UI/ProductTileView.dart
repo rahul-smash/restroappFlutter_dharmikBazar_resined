@@ -36,20 +36,18 @@ class _ProductTileItemState extends State<ProductTileItem> {
   Variant variant;
   bool showAddButton;
   StoreModel storeModel = AppVersionSingleton.instance.appVersion.store;
-  bool _isSubscriptionActive = false;
+  //bool _isSubscriptionActive = false;
   bool _isProductOutOfStock = false;
 
   @override
   initState() {
     super.initState();
-
-    //storeModel = value;
-    _isSubscriptionActive = storeModel.subscription.status == '1';
-    if (mounted) setState(() {});
-
+    //if (mounted) setState(() {});
     /*SharedPrefs.getStore().then((value) {
-
+      storeModel = value;
+      _isSubscriptionActive = storeModel.subscription.status == '1';
     });*/
+
     showAddButton = false;
     //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
@@ -503,7 +501,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               children: [
                                 Visibility(
                                     visible: (!_isProductOutOfStock) &&
-                                            _isSubscriptionActive &&
+                                        storeModel.subscription.status == '1' &&
                                             widget.product.variantMap[variant ==
                                                         null
                                                     ? widget.product.variantId
