@@ -428,7 +428,12 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                     style: TextStyle(fontSize: 16)),
                 ),
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
+                    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+                    if (!isNetworkAvailable) {
+                      Utils.showToast(AppConstant.noInternet, false);
+                      return;
+                    }
                     Navigator.push(
                         context,
                         MaterialPageRoute(

@@ -30,27 +30,7 @@ class MyCouponScreen extends StatefulWidget {
 }
 
 class _MyCouponState extends State<MyCouponScreen> {
-  DatabaseHelper databaseHelper = new DatabaseHelper();
-  String imageUrl;
-  Variant variant;
-  String discount, price, variantId, weight, mrpPrice;
-  int counter = 0;
-  CartData cartData;
-  bool showAddButton;
-  int selctedTag;
-  StoreModel _storeModel;
-  bool isVisible = true;
-  List<Product> _recommendedProducts = List.empty(growable: true);
-  double totalPrice = 0.00;
 
-  bool _isProductOutOfStock = false;
-
-  int _current = 0;
-
-  CarouselController _carouselController;
-
-  var _pageController;
-  OfferDetails offerDetails;
 
   @override
   initState() {
@@ -93,93 +73,92 @@ class _MyCouponState extends State<MyCouponScreen> {
       children: <Widget>[
         Stack(
           children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 160),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width,
+                    margin: EdgeInsets.only(top: 0),
+                    height: 50,
+                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    color: Colors.grey[200],
+                    child: Row(
+                      children: [
+                        //Icon(Icons.ac_unit,color: appThemeSecondary),
+                        Image.asset("images/available_coupon_icon.png",
+                          height: 22,
+                          width: 22,
+                          fit: BoxFit.fill,
+                          color: Colors.grey,
+                        ),
+                        SizedBox(width: 5,),
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text("Available coupons",
+                                maxLines: 1,overflow: TextOverflow.ellipsis,
+                                style: TextStyle(fontSize: 16)),
+                          ),
+                        ),
 
-            Column(
+
+                      ],
+                    ),
+                  ),
+
+                  ListView.separated(
+                    shrinkWrap: true,
+                    scrollDirection: Axis.vertical,
+                    physics: NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10),
+                    itemBuilder: (context, index) {
+                      return getCouponView();
+                    },
+                    itemCount: 5,
+                    separatorBuilder:
+                        (BuildContext context, int index) {
+                      return Divider(
+                        color: Colors.grey,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+
+            Stack(
               children: [
                 Container(
                   width: MediaQuery.of(context).size.width,
+                  height: 180,
                   child: Image.asset("images/my_coupon.png",
                     fit: BoxFit.fill,
                   ),
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  alignment: Alignment.centerLeft,
-                  padding:
-                  EdgeInsets.only(top: 0.0, bottom: 30.0, left: 30.0, right: 30.0),
-//              EdgeInsets.all(0),
-                ),
-              ],
-            ),
-
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconButton(onPressed: (){
-                  Navigator.of(context).pop();
-                }, icon: Icon(Icons.arrow_back_ios)),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
-                  child: Text(
-                    "My Coupons",
-                    style: TextStyle(color: Colors.black, fontSize: 22),
-                  ),
-                ),
-
-                Padding(
-                  padding: EdgeInsets.symmetric( horizontal: 30),
-                  child: Text(
-                    "my coupons aenean\n net vec leo",
-                    style: TextStyle(color: Colors.black, fontSize: 15),
-                  ),
-                ),
-
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  margin: EdgeInsets.only(top: 50),
-                  height: 50,
-                  padding: EdgeInsets.symmetric(horizontal: 30),
-                  color: Colors.grey[200],
-                  child: Row(
-                    children: [
-                      //Icon(Icons.ac_unit,color: appThemeSecondary),
-                      Image.asset("images/available_coupon_icon.png",
-                        height: 22,
-                        width: 22,
-                        fit: BoxFit.fill,
-                        color: Colors.grey,
+                Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconButton(onPressed: (){
+                      Navigator.of(context).pop();
+                    }, icon: Icon(Icons.arrow_back_ios)),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                      child: Text(
+                        "My Coupons",
+                        style: TextStyle(color: Colors.black, fontSize: 20,fontWeight: FontWeight.w600),
                       ),
-                      SizedBox(width: 5,),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text("Available coupons",
-                              maxLines: 1,overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 16)),
-                        ),
+                    ),
+                    /*Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 30),
+                      child: Text(
+                        "my coupons aenean\n net vec leo",
+                        style: TextStyle(color: Colors.black, fontSize: 15),
                       ),
-
-
-                    ],
-                  ),
-                ),
-
-                ListView.separated(
-                  shrinkWrap: true,
-                  scrollDirection: Axis.vertical,
-                  physics: NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10),
-                  itemBuilder: (context, index) {
-                    return getCouponView();
-                  },
-                  itemCount: 5,
-                  separatorBuilder:
-                      (BuildContext context, int index) {
-                    return Divider(
-                      color: Colors.grey,
-                    );
-                  },
+                    ),*/
+                  ],
                 ),
               ],
             ),

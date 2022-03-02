@@ -87,6 +87,52 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
             child: getProductDetailsView(),
           ),
         ),
+        bottomNavigationBar: InkWell(
+          onTap: (){
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (BuildContext context) =>
+                      MyCouponScreen(),
+                ));
+          },
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: 50,
+            padding: EdgeInsets.symmetric(horizontal: 30),
+            color: Colors.grey[200],
+            child: Row(
+              children: [
+                //Icon(Icons.ac_unit,color: appThemeSecondary),
+                Image.asset(
+                  "images/available_coupon_icon.png",
+                  height: 22,
+                  width: 22,
+                  fit: BoxFit.fill,
+                  color: Colors.grey,
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                  child: Container(
+                    padding: EdgeInsets.only(left: 20),
+                    child: Text("Available more coupons",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontSize: 16)),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                  },
+                  child: Icon(Icons.arrow_forward_ios_sharp,
+                      color: Colors.grey, size: 16),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -117,7 +163,6 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                 ),
               ],
             ),
-
             isLoading
                 ? Container(
               height: MediaQuery.of(context).size.height,
@@ -136,7 +181,6 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                     style: TextStyle(color: Colors.black, fontSize: 22),
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.symmetric( horizontal: 30),
                   child: Text(
@@ -144,12 +188,10 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                     style: TextStyle(color: Colors.black, fontSize: 15),
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.symmetric( horizontal: 15),
                   child: _getImageView(),
                 ),
-
                 addDividerView(),
                 buildProductOfferView(),
                 addDividerView(),
@@ -168,66 +210,23 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                 ),
                 addDividerView(),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20, horizontal: 30),
+                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
                   child: Text(
                     "Terms and Conditions",
-                    style: TextStyle(color: Colors.black, fontSize: 22),
+                    style: TextStyle(color: Colors.black, fontSize: 18),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 30),
+                  padding: EdgeInsets.symmetric(vertical: 0, horizontal: 30),
                   child: Html(
                     data:
                     "${(widget.product.offerDetails != null) ? widget.product.offerDetails.offerTermCondition : ''}",
                     padding: EdgeInsets.all(10.0),
                   ),
                 ),
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: 50,
-                  padding: EdgeInsets.symmetric(horizontal: 30),
-                  color: Colors.grey[200],
-                  child: Row(
-                    children: [
-                      //Icon(Icons.ac_unit,color: appThemeSecondary),
-                      Image.asset(
-                        "images/available_coupon_icon.png",
-                        height: 22,
-                        width: 22,
-                        fit: BoxFit.fill,
-                        color: Colors.grey,
-                      ),
-                      SizedBox(
-                        width: 5,
-                      ),
-                      Expanded(
-                        child: Container(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text("Available more coupons",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(fontSize: 16)),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    MyCouponScreen(),
-                              ));
-                        },
-                        child: Icon(Icons.arrow_forward_ios_sharp,
-                            color: Colors.grey, size: 16),
-                      ),
-                    ],
-                  ),
-                )
+                SizedBox(height: 20,)
               ],
             ),
-
-
           ],
           overflow: Overflow.clip,
         ),
@@ -329,13 +328,13 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                   SizedBox(
                     height: 10,
                   ),
-                  Text(
+                  /*Text(
                       "Orders above : Rs ${(widget.product.offerDetails != null) ? widget.product.offerDetails.minimumOrderAmount : ''}",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                   SizedBox(
                     height: 10,
-                  ),
+                  ),*/
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
