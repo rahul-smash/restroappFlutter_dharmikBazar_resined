@@ -123,6 +123,7 @@ class _EligibleProductState extends State<EligibleProductScreen> {
         SizedBox(
           height: 10,
         ),
+
         ListView.separated(
           shrinkWrap: true,
           scrollDirection: Axis.vertical,
