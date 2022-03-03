@@ -469,13 +469,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   addEnterCouponCodeView(),
                   addCouponCodeRow(),
                   addPaymentOptions(),
-                  addConfirmOrder()
+                  //addConfirmOrder()
                 ],
               ),
             ),
           ),
         ],
       ),
+      bottomNavigationBar: addConfirmOrder(),
     );
   }
 
