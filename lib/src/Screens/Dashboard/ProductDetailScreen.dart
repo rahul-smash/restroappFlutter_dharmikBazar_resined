@@ -61,7 +61,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     super.initState();
     selctedTag = 0;
     showAddButton = false;
-    print("-----product_offer----${widget.product.product_offer}");
+    //print("-----product_offer----${widget.product.product_offer}");
     _carouselController = CarouselController();
     if (widget.product != null) getDataFromDB();
     getProductDetail(widget.product?.id ?? widget.productID);
@@ -489,7 +489,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               ),
               onTap: (){
                 print(this.offerDetails.couponCode);
-                Utils.copyToClipboard(context);
+                Utils.copyToClipboard(context,this.offerDetails.couponCode);
               },
             )
           ],

@@ -332,7 +332,7 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                     ),
                     onTap: () {
                       print(this.offerDetails.couponCode);
-                      Utils.copyToClipboard(context);
+                      Utils.copyToClipboard(context,this.offerDetails.couponCode);
                     },
                   ),
                   SizedBox(
