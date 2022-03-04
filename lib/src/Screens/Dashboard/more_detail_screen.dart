@@ -189,16 +189,16 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 30),
-                        child: Text(
-                          "my coupons aenean\n net vec leo",
-                          style: TextStyle(color: Colors.black, fontSize: 15),
+                        child: Container(
+                          height: 30,
                         ),
                       ),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 15),
                         child: _getImageView(),
                       ),
-                      addDividerView(),
+                      SizedBox(height: 10,),
+                      //addDividerView(),
                       buildProductOfferView(),
                       addDividerView(),
                       Center(
