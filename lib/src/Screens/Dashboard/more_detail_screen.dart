@@ -79,6 +79,9 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
   }
 
   Widget build(BuildContext context) {
+    imageUrl = widget.product.imageType == "0"
+        ? widget.product.image
+        : widget.product.imageUrl;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -398,6 +401,9 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
         widget.product = product;
       }
       getDataFromDB();
+      print("widget.product.productImages=${widget.product.productImages.length}");
+      print("-----placeholderUrl---${AppConstant.placeholderUrl}");
+      print("-----imageUrl---${imageUrl}");
       setState(() {
         widget.product.productImages = product.productImages;
         widget.product.description = product.description;

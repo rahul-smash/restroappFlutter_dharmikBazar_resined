@@ -61,7 +61,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     super.initState();
     selctedTag = 0;
     showAddButton = false;
-    //print("-----product_offer----${widget.product.product_offer}");
+    print("-----ProductDetailsScreen---${AppConstant.placeholderUrl}");
     _carouselController = CarouselController();
     if (widget.product != null) getDataFromDB();
     getProductDetail(widget.product?.id ?? widget.productID);
@@ -817,6 +817,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         widget.product = product;
       }
       getDataFromDB();
+      print("product.productImages=${product.productImages.length}");
+      print("imageUrl-${imageUrl}");
       setState(() {
         widget.product.productImages = product.productImages;
         widget.product.description = product.description;
