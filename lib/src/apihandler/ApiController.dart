@@ -268,7 +268,7 @@ class ApiController {
       }
     } catch (e) {
       print(e);
-    }
+    } 
     return categoryResponse;
   }
 
@@ -281,6 +281,7 @@ class ApiController {
     SubCategoryResponse subCategoryResponse = SubCategoryResponse();
     bool isNetworkAviable = await Utils.isNetworkAvailable();
     try {
+      //print("-----dbProductCounts----- $dbProductCounts");
       if (dbProductCounts == 0 && isNetworkAviable) {
         StoreModel store = await SharedPrefs.getStore();
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -351,8 +352,7 @@ class ApiController {
     }
   }
 
-  static Future<SubCategoryResponse> getSubCategoryProductDetail(
-      String productID) async {
+  static Future<SubCategoryResponse> getSubCategoryProductDetail(String productID) async {
     SubCategoryResponse subCategoryResponse = SubCategoryResponse();
     bool isNetworkAviable = await Utils.isNetworkAvailable();
     try {
@@ -382,9 +382,18 @@ class ApiController {
                 contentType: "application/json",
                 responseType: ResponseType.plain));
         print(response.data);
-        subCategoryResponse =
-            SubCategoryResponse.fromJson(json.decode(response.data));
+        subCategoryResponse = SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
+          Product product = subCategoryResponse.subCategories.first.products.first;
+          DatabaseHelper databaseHelper = new DatabaseHelper();
+          int productOffer = await databaseHelper.getProductOfferInProductTable(productID);
+          //print("----getProductOfferInProductTable---${productOffer}");
+          if(productOffer == 1 && product.product_offer == 0){
+            Map<String, dynamic> row = {
+              DatabaseHelper.ProductOffer: "${product.product_offer}",
+            };
+            await databaseHelper.updateProductOfferValueInProductsTable(row,productID);
+          }
           return subCategoryResponse;
         }
       }

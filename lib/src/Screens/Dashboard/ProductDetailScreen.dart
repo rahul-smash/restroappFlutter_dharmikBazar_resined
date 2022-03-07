@@ -61,7 +61,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     super.initState();
     selctedTag = 0;
     showAddButton = false;
-    //print("-----ProductDetailsScreen---${AppConstant.placeholderUrl}");
+    print("-----product.product_offer---${widget.product.product_offer}");
     _carouselController = CarouselController();
     if (widget.product != null) getDataFromDB();
     getProductDetail(widget.product?.id ?? widget.productID);
@@ -308,12 +308,15 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         ),
         Visibility(
           visible: true,
-          child: addDividerView(),
+          child: _isProductOutOfStock ? SizedBox() : addDividerView(),
         ),
-        buildProductOfferView(),
+
+        _isProductOutOfStock ? SizedBox() : buildProductOfferView(),
+
+
         Visibility(
           visible: isVisible,
-          child: addDividerView(),
+          child: _isProductOutOfStock ? SizedBox() : addDividerView(),
         ),
         Visibility(
           visible: isVisible,
@@ -812,13 +815,19 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     _storeModel = AppVersionSingleton.instance.appVersion.store;
     ApiController.getSubCategoryProductDetail(productID).then((value) {
       Product product = value.subCategories.first.products.first;
+      try {
+        if(widget.product.product_offer == 1 && product.product_offer == 0){
+          widget.product.product_offer = 0;
+        }
+      } catch (e) {
+        print(e);
+      }
+      //print("------getProductDetail----=${product.product_offer}");
       this.offerDetails = product.offerDetails;
       if (widget.product == null) {
         widget.product = product;
       }
       getDataFromDB();
-      print("product.productImages=${product.productImages.length}");
-      print("imageUrl-${imageUrl}");
       setState(() {
         widget.product.productImages = product.productImages;
         widget.product.description = product.description;

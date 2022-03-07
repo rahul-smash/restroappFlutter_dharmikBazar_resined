@@ -47,6 +47,8 @@ class DatabaseHelper {
   static final String imageUrl = "imageUrl";
   static final String image_100_80 = "image_100_80";
   static final String image_300_200 = "image_300_200";
+  static final String ProductOffer = "product_offer";
+
 
   Future<Database> get db async {
     if (_db != null) return _db;
@@ -555,8 +557,8 @@ class DatabaseHelper {
 
   Future<int> updateProductInCart(Map<String, dynamic> row, String variantId) async {
     var dbClient = await db;
-      return dbClient.update(CART_Table, row,
-          where: "${VARIENT_ID} = ?", whereArgs: [variantId]);
+    return dbClient.update(CART_Table, row,
+        where: "${VARIENT_ID} = ?", whereArgs: [variantId]);
   }
 
   Future<CartData> getProductQuantitiy(String variantId) async {
@@ -765,6 +767,11 @@ class DatabaseHelper {
       });
     }
     return productOffer;
+  }
+
+  Future<int> updateProductOfferValueInProductsTable(Map<String, dynamic> row, String productId) async {
+    var dbClient = await db;
+    return dbClient.update(Products_Table, row, where: "${ID} = ?", whereArgs: [productId]);
   }
 
   Future<List<Product>> getFavouritesList() async {

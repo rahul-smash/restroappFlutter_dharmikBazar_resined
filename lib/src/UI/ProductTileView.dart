@@ -62,11 +62,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
       counter = int.parse(cartData.QUANTITY);
       showAddButton = counter == 0 ? true : false;
       //print("-QUANTITY-${counter}=");
+      if(this.mounted)
       setState(() {});
     });
     databaseHelper.checkProductsExistInFavTable(
             DatabaseHelper.Favorite_Table, widget.product.id).then((favValue) {
       //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
+      if(this.mounted)
       setState(() {
         widget.product.isFav = favValue.toString();
         //print("-isFav-${widget.product.isFav}");
@@ -478,7 +480,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             visible: AppVersionSingleton.instance.appVersion.store.product_coupon
                                 == "1" && widget.product.product_offer == 1
                                 ? true : false,
-                            child: Container(
+                            child: _isProductOutOfStock ? Container() : Container(
                               width: 60,
                               child: Center(
                                   child: Text("OFFER", style: TextStyle(color: Colors.white, fontSize: 10.0),)
@@ -492,6 +494,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               ),
                             ),
                           ),
+
                           //0 => subscription is on
                           //1 => subscription is off
                           Padding(
