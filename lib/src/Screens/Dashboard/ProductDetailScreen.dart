@@ -61,7 +61,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     super.initState();
     selctedTag = 0;
     showAddButton = false;
-    print("-----product.product_offer---${widget.product.product_offer}");
+    //print("-----product.product_offer---${widget.product.product_offer}");
     _carouselController = CarouselController();
     if (widget.product != null) getDataFromDB();
     getProductDetail(widget.product?.id ?? widget.productID);
