@@ -308,16 +308,17 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         ),
         Visibility(
           visible: true,
-          child: _isProductOutOfStock ? SizedBox() : addDividerView(),
+          child: /*_isProductOutOfStock ? SizedBox() : */addDividerView(),
         ),
 
-        _isProductOutOfStock ? SizedBox() : buildProductOfferView(),
+        /*_isProductOutOfStock ? SizedBox() : */buildProductOfferView(),
 
 
         Visibility(
           visible: isVisible,
-          child: _isProductOutOfStock ? SizedBox() : addDividerView(),
+          child: /*_isProductOutOfStock ? SizedBox() : */addDividerView(),
         ),
+
         Visibility(
           visible: isVisible,
           child: Row(

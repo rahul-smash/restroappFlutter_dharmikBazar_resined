@@ -480,7 +480,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             visible: AppVersionSingleton.instance.appVersion.store.product_coupon
                                 == "1" && widget.product.product_offer == 1
                                 ? true : false,
-                            child: _isProductOutOfStock ? Container() : Container(
+                            child: /*_isProductOutOfStock ? Container() : */Container(
                               width: 60,
                               child: Center(
                                   child: Text("OFFER", style: TextStyle(color: Colors.white, fontSize: 10.0),)
