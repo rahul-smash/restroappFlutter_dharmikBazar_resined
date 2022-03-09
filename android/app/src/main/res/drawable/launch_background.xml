@@ -10,13 +10,18 @@
             android:src="@mipmap/splash" />
     </item>
 -->
-    <item
+    <item>
+        <bitmap
+            android:gravity="fill"
+            android:src="@mipmap/splash" />
+    </item>
+  <!--  <item
         android:width="250dp"
         android:height="250dp"
         android:gravity="center">
         <bitmap
             android:gravity="fill"
             android:src="@drawable/splash_logo"/>
-    </item>
+    </item>-->
 
 </layer-list>
