@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:badges/badges.dart';
 import 'package:carousel_pro/carousel_pro.dart';
@@ -10,6 +12,7 @@ import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
+import 'package:restroapp/src/Screens/Dashboard/widgets/order_time_popup.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
@@ -35,7 +38,6 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'SearchScreen.dart';
-import 'dart:io';
 import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -219,28 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ? Center(child: CircularProgressIndicator())
                 : categoryResponse == null
                     ? SingleChildScrollView(child: Center(child: Text("")))
-                    : Container(
-                        color: grayLightColor,
-//                        decoration: BoxDecoration(
-//                          image: DecorationImage(
-//                            image: AssetImage("images/backgroundimg.png"),
-//                            fit: BoxFit.cover,
-//                          ),
-//                        ),
-                        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                        child: GridView.count(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1.1,
-                            padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
-                            mainAxisSpacing: 5.0,
-                            crossAxisSpacing: 8.0,
-                            shrinkWrap: true,
-                            children: categoryResponse.categories
-                                .map((CategoryModel model) {
-                              return GridTile(
-                                  child: CategoryView(model, store, false, 0));
-                            }).toList()),
-                      ),
+                    : showGridView(),
           ),
         ],
       ),
@@ -253,6 +234,32 @@ class _HomeScreenState extends State<HomeScreen> {
       bottomNavigationBar: SafeArea(
         child: addBottomBar(),
       ),
+    );
+  }
+
+  Widget showGridView() {
+    return Stack(
+      children: [
+        Container(
+          color: grayLightColor,
+          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+          child: GridView.count(
+              crossAxisCount: 2,
+              childAspectRatio: 1.1,
+              padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 150.0),
+              mainAxisSpacing: 5.0,
+              crossAxisSpacing: 8.0,
+              shrinkWrap: true,
+              children: categoryResponse.categories.map((CategoryModel model) {
+                return GridTile(child: CategoryView(model, store, false, 0));
+              }).toList()),
+        ),
+        AppConstant.isLoggedIn
+            ? store.delivery_expected_times == '1'
+                ? OrderTimePopup()
+                : SizedBox()
+            : SizedBox(),
+      ],
     );
   }
 
@@ -384,19 +391,21 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _currentIndex,
           backgroundColor: bottomBarBackgroundColor,
           type: BottomNavigationBarType.fixed,
+          selectedItemColor: bottomBarTextColor,
+          unselectedItemColor: bottomBarTextColor,
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
               icon: Image.asset('images/contacticon.png',
                   width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              title:
-                  Text('Contact', style: TextStyle(color: bottomBarTextColor)),
+              //title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
+              label: 'Contact',
             ),
             BottomNavigationBarItem(
               icon: Image.asset('images/searchcion.png',
                   width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              title:
-                  Text('Search', style: TextStyle(color: bottomBarTextColor)),
+              //title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
+              label: 'Search',
             ),
             BottomNavigationBarItem(
               icon: Icon(
@@ -404,13 +413,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: Colors.white,
                 size: 0,
               ),
-              title: Text(''),
+              //title: Text(''),
+              label: '',
             ),
             BottomNavigationBarItem(
               icon: Image.asset('images/historyicon.png',
                   width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              title: Text('My Orders',
-                  style: TextStyle(color: bottomBarTextColor)),
+              //title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
+              label: 'My Orders',
             ),
             BottomNavigationBarItem(
               icon: Badge(
@@ -423,25 +433,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     fit: BoxFit.scaleDown,
                     color: bottomBarIconColor),
               ),
-              title: Padding(
+              /*title: Padding(
                 padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
                 child:
                     Text('Cart', style: TextStyle(color: bottomBarTextColor)),
-              ),
+              ),*/
+              label: 'Cart',
             ),
           ],
         ),
         Container(
           padding: EdgeInsets.all(10.0),
-          decoration: BoxDecoration(shape: BoxShape.circle, color: appTheme),
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: appTheme,
+                  offset: const Offset(
+                    0.0,
+                    0.0,
+                  ),
+                  blurRadius: 10.0,
+                  spreadRadius: 2.0,
+                ), //BoxShadow
+                BoxShadow(
+                  color: Colors.white,
+                  offset: const Offset(0.0, 0.0),
+                  blurRadius: 0.0,
+                  spreadRadius: 0.0,
+                ), //BoxShadow
+              ]),
           margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
           //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: widget.configObject.isGroceryApp == "true"
               ? Image.asset(
-                  "images/groceryicon.png",
+                  "images/app_icon.jpg",
                   height: 40,
                   width: 40,
-                  color: whiteColor,
                 )
               : Image.asset("images/restauranticon.png",
                   height: 40, width: 40, color: whiteColor),
@@ -912,6 +941,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _getWellet() async {
-   welleModel= await ApiController.getUserWallet();
+    welleModel = await ApiController.getUserWallet();
   }
 }

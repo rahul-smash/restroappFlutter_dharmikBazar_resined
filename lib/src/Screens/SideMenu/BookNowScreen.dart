@@ -33,7 +33,7 @@ class BookNowState extends State<BookNowScreen> {
           bottom: false,
           child: new Form(
               key: _formKey,
-              autovalidate: true,
+              autovalidateMode: AutovalidateMode.always,
               child: new ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 children: <Widget>[
@@ -57,7 +57,7 @@ class BookNowState extends State<BookNowScreen> {
                     validator: (val) =>
                         val.isEmpty ? 'Phone is required' : null,
                     inputFormatters: [
-                      WhitelistingTextInputFormatter.digitsOnly,
+                      FilteringTextInputFormatter.digitsOnly,
                     ],
                     onSaved: (val) {
                       model.phoneNumber = val;
