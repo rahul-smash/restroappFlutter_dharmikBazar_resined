@@ -335,6 +335,9 @@ class Utils {
     }
   }
 
+  static double width;
+  static double height;
+
   static double getDeviceWidth(BuildContext context) {
     return MediaQuery.of(context).size.width;
   }

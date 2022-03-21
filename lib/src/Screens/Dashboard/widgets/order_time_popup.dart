@@ -43,92 +43,85 @@ class _OrderTimePopupState extends State<OrderTimePopup> {
   @override
   void dispose() {
     super.dispose();
-    if(_timer != null){
-      _timer.cancel();
-    }
+   if(_timer != null){
+     _timer.cancel();
+   }
   }
 
   @override
   Widget build(BuildContext context) {
 
     return Visibility(
-        visible: AppConstant.isLoggedIn ? true : false,
-        child: !this.isAnyPendingOrder ? Container() : Positioned(child: Align(
-          alignment: Alignment.bottomRight,
-          child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xff464D55),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10.0),
-                ),
-              ),
-              margin: EdgeInsets.only(right:20, bottom: 20),
-              width: 150, height: 120,
-              child: Column(
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left:10, bottom: 3,right: 10,top: 10),
-                    child: Row(
+      visible: AppConstant.isLoggedIn ?  true : false,
+      child: !isAnyPendingOrder ? Container() : Container(
+          decoration: BoxDecoration(
+            color: Color(0xff464D55),
+            borderRadius: BorderRadius.all(
+              Radius.circular(10.0),
+            ),
+          ),
+          margin: EdgeInsets.only(right:20, bottom: 20),
+          width: 150, height: 120,
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.only(left:10, bottom: 3,right: 10,top: 10),
+                child: Row(
+                  children: [
+                    //Icon(Icons.account_box),
+                    Container(
+                      //margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: Image.asset("images/boxicon.png", height: 30.0,width: 35,),
+                    ),
+                    SizedBox(width: 10,),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        //Icon(Icons.account_box),
-                        Container(
-                          //margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                          child: Image.asset("images/boxicon.png", height: 30.0,width: 35,),
-                        ),
-                        SizedBox(width: 10,),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Order",style: TextStyle(color: Color(0xffD3D4D6)),),
-                            Text("Arriving in",style: TextStyle(color: Color(0xffD3D4D6)),),
-                          ],
-                        ),
+                        Text("Order",style: TextStyle(color: Color(0xffD3D4D6)),),
+                        Text("Arriving in",style: TextStyle(color: Color(0xffD3D4D6)),),
                       ],
                     ),
-                  ),
-
-                  Container(
-                      child: Text("${remainingOrderTime}",
-                        style: TextStyle(fontSize: 16,color: Colors.white),
-                      )
-                  ),
-
-                  Spacer(),
-
-                  InkWell(
-                    onTap: (){
-                      Utils.isNetworkAvailable().then((isNetworkAvailable){
-                        if (isNetworkAvailable) {
-                          openOrderDetail();
-                        }else{
-                          Utils.showToast(AppConstant.noInternet, false);
-                        }
-                      });
-                    },
-                    child: Container(
-                        width: double.infinity,
-                        margin: EdgeInsets.only(right:10, left: 10,),
-                        padding: EdgeInsets.only(top: 2,bottom: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(4.0),
-                          ),
-                        ),
-                        child: Center(
-                          child: Text("VIEW DETAIL",
-                            style: TextStyle(fontSize: 16,color: Colors.black),
-                          ),
-                        )
+                  ],
+                ),
+              ),
+              Container(
+                  child: Text("${remainingOrderTime}",
+                    style: TextStyle(fontSize: 16,color: Colors.white),
+                  )
+              ),
+              Spacer(),
+              InkWell(
+                onTap: (){
+                  Utils.isNetworkAvailable().then((isNetworkAvailable){
+                    if (isNetworkAvailable) {
+                      openOrderDetail();
+                    }else{
+                      Utils.showToast(AppConstant.noInternet, false);
+                    }
+                  });
+                },
+                child: Container(
+                    width: double.infinity,
+                    margin: EdgeInsets.only(right:10, left: 10,),
+                    padding: EdgeInsets.only(top: 2,bottom: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(4.0),
+                      ),
                     ),
-                  ),
-
-                  SizedBox(height: 10,),
-
-                ],
-              )
-          ),
-        )));
+                    child: Center(
+                      child: Text("VIEW DETAIL",
+                        style: TextStyle(fontSize: 16,color: Colors.black),
+                      ),
+                    )
+                ),
+              ),
+              SizedBox(height: 10,),
+            ],
+          )
+      ),
+    );
   }
 
   //TimeOfDay _timeOfDay;

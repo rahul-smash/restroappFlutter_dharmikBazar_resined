@@ -72,12 +72,14 @@ class _HomeScreenState extends State<HomeScreen> {
   CategoryResponse categoryResponse;
   WalleModel welleModel;
   SocialModel socialModel;
+  Offset _offset;
 
   _HomeScreenState(this.store);
 
   @override
   void initState() {
     super.initState();
+    _offset = Offset(Utils.width/1.7, Utils.height/1.7);
     isStoreClosed = false;
     initFirebase();
     _setSetCurrentScreen();
@@ -213,15 +215,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _key,
       appBar: getAppBar(),
-      body: Column(
-        children: <Widget>[
-          addBanners(),
-          Expanded(
-            child: isLoading
-                ? Center(child: CircularProgressIndicator())
-                : categoryResponse == null
-                    ? SingleChildScrollView(child: Center(child: Text("")))
-                    : showGridView(),
+      body: Stack(
+        children: [
+          Column(
+            children: <Widget>[
+              addBanners(),
+              Expanded(
+                child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : categoryResponse == null
+                        ? SingleChildScrollView(child: Center(child: Text("")))
+                        : showGridView(),
+              ),
+            ],
+          ),
+          Positioned(
+            left: _offset.dx,
+            top: _offset.dy,
+            child: GestureDetector(
+              onPanUpdate: (d) {
+                setState(() {
+                  return _offset += Offset(d.delta.dx, d.delta.dy);
+                });
+              },
+              child: AppConstant.isLoggedIn
+                  ? store.delivery_expected_times == '1' ? OrderTimePopup() : SizedBox()
+                  : SizedBox(),
+            ),
           ),
         ],
       ),
@@ -237,29 +257,25 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget showGridView() {
-    return Stack(
-      children: [
-        Container(
-          color: grayLightColor,
-          padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-          child: GridView.count(
-              crossAxisCount: 2,
-              childAspectRatio: 1.1,
-              padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 150.0),
-              mainAxisSpacing: 5.0,
-              crossAxisSpacing: 8.0,
-              shrinkWrap: true,
-              children: categoryResponse.categories.map((CategoryModel model) {
-                return GridTile(child: CategoryView(model, store, false, 0));
-              }).toList()),
-        ),
-        AppConstant.isLoggedIn
-            ? store.delivery_expected_times == '1'
-                ? OrderTimePopup()
-                : SizedBox()
-            : SizedBox(),
-      ],
+
+
+  Widget showGridView(){
+
+    return Container(
+      color: grayLightColor,
+      padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+      child: GridView.count(
+          crossAxisCount: 2,
+          childAspectRatio: 1.1,
+          padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+          mainAxisSpacing: 5.0,
+          crossAxisSpacing: 8.0,
+          shrinkWrap: true,
+          children: categoryResponse.categories
+              .map((CategoryModel model) {
+            return GridTile(child: CategoryView(model, store, false, 0));
+          }).toList()
+      ),
     );
   }
 

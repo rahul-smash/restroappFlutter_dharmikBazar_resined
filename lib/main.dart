@@ -80,7 +80,7 @@ Future<void> main() async {
   }, onError: Crashlytics.instance.recordError);
 }
 
-class ValueApp extends StatelessWidget {
+class ValueApp extends StatefulWidget {
   ConfigModel configObject;
   static FirebaseAnalytics analytics = FirebaseAnalytics();
   static FirebaseAnalyticsObserver observer =
@@ -91,18 +91,47 @@ class ValueApp extends StatelessWidget {
   ValueApp(this.packageInfo, this.configObject, this.storeData);
 
   @override
+  State<ValueApp> createState() => _ValueAppState();
+}
+
+class _ValueAppState extends State<ValueApp> {
+  // GlobalKey<NavigatorState> _globalKey;
+
+  @override
+  void initState() {
+    // _globalKey = GlobalKey<NavigatorState>();
+    // NotificationServiceHelper.instance.setGlobalNavigationKey(_globalKey);
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // define it once at root level.
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: '${storeData.store.storeName}',
+      title: '${widget.storeData.store.storeName}',
       theme: ThemeData(
         primaryColor: appTheme,
       ),
-      navigatorObservers: <NavigatorObserver>[observer],
       //home: isAdminLogin == true? LoginEmailScreen("menu"):SplashScreen(configObject,storeData),
-      home: showHomeScreen(storeData, configObject,
-          packageInfo), //SplashScreen(configObject,storeData),
+      home: MyWidget(widget.storeData, widget.configObject, widget.packageInfo),
+    );
+  }
+}
+
+class MyWidget extends StatelessWidget {
+  StoreResponse storeData;
+  PackageInfo packageInfo;
+  ConfigModel configObject;
+  MyWidget(this.storeData, this.configObject, this.packageInfo);
+
+  @override
+  Widget build(BuildContext context) {
+    //print("getDeviceWidth-${Utils.getDeviceWidth(context)} X ${Utils.getDeviceHeight(context)}");
+    Utils.width = Utils.getDeviceWidth(context);
+    Utils.height = Utils.getDeviceHeight(context);
+    return Scaffold(
+      body: showHomeScreen(storeData, configObject, packageInfo),
     );
   }
 }
