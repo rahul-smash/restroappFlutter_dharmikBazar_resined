@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
   WalleModel welleModel;
   SocialModel socialModel;
   Offset _offset;
+  int _current = 0;
 
   _HomeScreenState(this.store);
 
@@ -280,122 +283,139 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget addBanners() {
-    return Stack(
-      children: <Widget>[
-        Center(
-          child: SizedBox(
-            height: 200.0,
-            width: Utils.getDeviceWidth(context),
-            child: Carousel(
-              boxFit: BoxFit.fitWidth,
-              autoplay: true,
-              animationCurve: Curves.ease,
-              autoplayDuration: Duration(milliseconds: 5000),
-              animationDuration: Duration(milliseconds: 3000),
-              dotSize: 6.0,
-              dotIncreasedColor: dotIncreasedColor,
-              dotBgColor: Colors.transparent,
-              dotPosition: DotPosition.bottomCenter,
-              dotVerticalPadding: 10.0,
-              showIndicator: imgList.length == 1 ? false : true,
-              indicatorBgPadding: 7.0,
-              images: imgList,
-              onImageTap: (position) {
-                print("onImageTap ${position}");
-                print("linkTo=${store.banners[position].linkTo}");
+    if (imgList.length == 0) {
+      return Container();
+    } else
+      return Center(
+        child: SizedBox(
+          height: 200.0,
+          width: Utils.getDeviceWidth(context),
+          child: _CarouselView(),
+        ),
+      );
+  }
 
-                if (store.banners[position].linkTo.isNotEmpty) {
-                  if (store.banners[position].linkTo == "category") {
-                    if (store.banners[position].categoryId == "0" &&
-                        store.banners[position].subCategoryId == "0" &&
-                        store.banners[position].productId == "0") {
-                      print("return");
-                      return;
-                    }
+  Widget _CarouselView() {
+    return CarouselSlider.builder(
+      itemCount: imgList.length,
+      options: CarouselOptions(
+        aspectRatio: 16 / 9,
+        height: 200,
+        initialPage: 0,
+        enableInfiniteScroll: true,
+        reverse: false,
+        autoPlay: true,
+        onPageChanged: (index, reason) {
+          setState(() {
+            _current = index;
+          });
+        },
+        enlargeCenterPage: false,
+        autoPlayInterval: Duration(seconds: 3),
+        autoPlayAnimationDuration: Duration(milliseconds: 800),
+        autoPlayCurve: Curves.ease,
+        scrollDirection: Axis.horizontal,
+      ),
+      itemBuilder: (BuildContext context, int itemIndex) => Container(
+        child: _makeBanner(context, itemIndex),
+      ),
+    );
+  }
 
-                    if (store.banners[position].categoryId != "0" &&
-                        store.banners[position].subCategoryId != "0" &&
-                        store.banners[position].productId != "0") {
-                      // here we have to open the product detail
-                      print("open the product detail ${position}");
-                    } else if (store.banners[position].categoryId != "0" &&
-                        store.banners[position].subCategoryId != "0" &&
-                        store.banners[position].productId == "0") {
-                      //here open the banner sub category
-                      print("open the subCategory ${position}");
+  Widget _makeBanner(BuildContext context, int _index) {
+    return InkWell(
+      onTap: () => _onBannerTap(_index),
+      child: Container(
+          margin:
+              EdgeInsets.only(top: 0.0, bottom: 15.0, left: 7.5, right: 7.5),
+          width: Utils.getDeviceWidth(context) -
+              (Utils.getDeviceWidth(context) / 4),
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: CachedNetworkImage(
+              imageUrl: "${imgList[_index].url}",
+              fit: BoxFit.fill,
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
+          )),
+    );
+  }
 
-                      for (int i = 0;
-                          i < categoryResponse.categories.length;
-                          i++) {
-                        CategoryModel categories =
-                            categoryResponse.categories[i];
-                        if (store.banners[position].categoryId ==
-                            categories.id) {
-                          print(
-                              "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
-                          if (categories.subCategory != null) {
-                            for (int j = 0;
-                                j < categories.subCategory.length;
-                                j++) {
-                              SubCategory subCategory =
-                                  categories.subCategory[j];
-                              if (subCategory.id ==
-                                  store.banners[position].subCategoryId) {
-                                print(
-                                    "open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.banners[position].subCategoryId}");
+  void _onBannerTap(position) {
+    print("onImageTap ${position}");
+    print("linkTo=${store.banners[position].linkTo}");
 
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) {
-                                    return SubCategoryProductScreen(
-                                        categories, true, j);
-                                  }),
-                                );
+    if (store.banners[position].linkTo.isNotEmpty) {
+      if (store.banners[position].linkTo == "category") {
+        if (store.banners[position].categoryId == "0" &&
+            store.banners[position].subCategoryId == "0" &&
+            store.banners[position].productId == "0") {
+          print("return");
+          return;
+        }
 
-                                break;
-                              }
-                            }
-                          }
-                        }
-                        //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
-                      }
-                    } else if (store.banners[position].categoryId != "0" &&
-                        store.banners[position].subCategoryId == "0" &&
-                        store.banners[position].productId == "0") {
-                      print("open the Category ${position}");
+        if (store.banners[position].categoryId != "0" &&
+            store.banners[position].subCategoryId != "0" &&
+            store.banners[position].productId != "0") {
+          // here we have to open the product detail
+          print("open the product detail ${position}");
+        } else if (store.banners[position].categoryId != "0" &&
+            store.banners[position].subCategoryId != "0" &&
+            store.banners[position].productId == "0") {
+          //here open the banner sub category
+          print("open the subCategory ${position}");
 
-                      for (int i = 0;
-                          i < categoryResponse.categories.length;
-                          i++) {
-                        CategoryModel categories =
-                            categoryResponse.categories[i];
-                        if (store.banners[position].categoryId ==
-                            categories.id) {
-                          print(
-                              "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-                              return SubCategoryProductScreen(
-                                  categories, true, 0);
-                            }),
-                          );
-                          break;
-                        }
-                      }
-                    }
-                    //-----------------------------------------------
+          for (int i = 0; i < categoryResponse.categories.length; i++) {
+            CategoryModel categories = categoryResponse.categories[i];
+            if (store.banners[position].categoryId == categories.id) {
+              print(
+                  "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+              if (categories.subCategory != null) {
+                for (int j = 0; j < categories.subCategory.length; j++) {
+                  SubCategory subCategory = categories.subCategory[j];
+
+                  if (subCategory.id == store.banners[position].subCategoryId) {
+                    print(
+                        "open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.banners[position].subCategoryId}");
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return SubCategoryProductScreen(categories, true, j);
+                      }),
+                    );
+
+                    break;
                   }
                 }
-                /*print("categoryId=${store.banners[position].categoryId}");
-                print("subCategoryId=${store.banners[position].subCategoryId}");
-                print("productId=${store.banners[position].productId}");*/
-              },
-            ),
-          ),
-        ),
-      ],
-    );
+              }
+            }
+            //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
+          }
+        } else if (store.banners[position].categoryId != "0" &&
+            store.banners[position].subCategoryId == "0" &&
+            store.banners[position].productId == "0") {
+          print("open the Category ${position}");
+
+          for (int i = 0; i < categoryResponse.categories.length; i++) {
+            CategoryModel categories = categoryResponse.categories[i];
+            if (store.banners[position].categoryId == categories.id) {
+              print(
+                  "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return SubCategoryProductScreen(categories, true, 0);
+                }),
+              );
+              break;
+            }
+          }
+        }
+      }
+    }
   }
 
   Widget addBottomBar() {
