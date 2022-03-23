@@ -40,6 +40,8 @@ class ApiConstants {
   static String orderHistory = 'orderHistory';
   static String getLoyalityPoints = 'getLoyalityPoints';
 
+  static String deliveryTimeDetails = 'orders/deliveryTimeDetails';
+
   static String login = 'userLogin';
   static String signUp = 'userSignup';
   static String forgetPassword = 'forgetPassword';

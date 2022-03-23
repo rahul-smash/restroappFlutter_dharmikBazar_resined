@@ -140,9 +140,9 @@ class _ProfileState extends State<ProfileScreen> {
     //print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     return WillPopScope(
         onWillPop: () async {
-          if (!widget.isComingFromOtpScreen) {
-            return Future(() => true);
-          } else {
+          if(!widget.isComingFromOtpScreen){
+            return Future(()=>true);
+          }else {
             return await nameValidation() &&
                 isValidEmail(emailController.text) &&
                 emailValidation();
@@ -190,7 +190,7 @@ class _ProfileState extends State<ProfileScreen> {
                 bottom: false,
                 child: new Form(
                   key: _formKey,
-                  autovalidate: true,
+                  autovalidateMode: AutovalidateMode.always,
                   child: Padding(
                     padding: EdgeInsets.all(0),
                     child: SingleChildScrollView(
