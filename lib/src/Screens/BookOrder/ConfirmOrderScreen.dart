@@ -37,6 +37,8 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../singleton/app_version_singleton.dart';
+
 class ConfirmOrderScreen extends StatefulWidget {
   StoreModel storeModel;
   bool isComingFromPickUpScreen;
@@ -449,8 +451,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                   if (index == widget.cartList.length) {
                                     return addItemPrice();
                                   } else {
-                                    return addProductCart(
-                                        widget.cartList[index]);
+                                    return addProductCart(widget.cartList[index]);
                                   }
                                 },
                               ),
@@ -468,13 +469,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   addEnterCouponCodeView(),
                   addCouponCodeRow(),
                   addPaymentOptions(),
-                  addConfirmOrder()
+                  //addConfirmOrder()
                 ],
               ),
             ),
           ),
         ],
       ),
+      bottomNavigationBar: addConfirmOrder(),
     );
   }
 
@@ -733,6 +735,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addProductCart(Product product) {
+    //print("product_offer=${product.product_offer}");
     OrderDetail detail;
     if (product.id != null)
       for (int i = 0; i < responseOrderDetail.length; i++) {
@@ -881,9 +884,28 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           )),
                     ),
                     Padding(
-                        padding: EdgeInsets.only(top: 5, bottom: 20),
+                        padding: EdgeInsets.only(top: 5, bottom: 10),
                         child: Text(
-                            "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(price).toStringAsFixed(2)}")),
+                            "Quantity: ${product.quantity} X ${AppConstant.currency}${double.parse(price).toStringAsFixed(2)}")
+                    ),
+                    Visibility(
+                      visible: AppVersionSingleton.instance.appVersion.store.product_coupon
+                          == "1" && product.product_offer == 1
+                          ? true : false,
+                      child: Container(
+                        width: 60,
+                        child: Center(
+                            child: Text("OFFER", style: TextStyle(color: Colors.white, fontSize: 10.0),)
+                        ),
+                        margin: EdgeInsets.only(left: 5,top: 0,bottom: 15),
+                        padding: EdgeInsets.all(5),
+                        decoration: new BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: appThemeSecondary,
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        ),
+                      ),
+                    ),
                     //
                     /*Padding(
                     padding: EdgeInsets.only(top: 5, bottom: 20),
@@ -1319,8 +1341,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                         print("===couponCode=== ${model.couponCode}");
                         print("taxModel.total=${taxModel.total}");
                       });
-                    }, appliedCouponCodeList, isOrderVariations,
-                        responseOrderDetail, shippingCharges),
+                    }, appliedCouponCodeList,
+                        isOrderVariations,
+                        responseOrderDetail,
+                        shippingCharges,cartListFromDB: cartListFromDB,
+                    ),
                   );
                 }
               },

@@ -1,29 +1,28 @@
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/UI/SelectLocation.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreAreaResponse.dart';
-import 'package:restroapp/src/models/StoreDeliveryAreasResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/BaseState.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:app_settings/app_settings.dart';
 
 class SaveDeliveryAddress extends StatefulWidget {
   final DeliveryAddressData selectedAddress;
   final VoidCallback callback;
   String addressValue;
-  Coordinates coordinates;
 
-  SaveDeliveryAddress(
-      this.selectedAddress, this.callback, this.addressValue, this.coordinates);
+  // Coordinates coordinates;
+  final double latitude;
+  final double longitude;
+
+  SaveDeliveryAddress(this.selectedAddress, this.callback, this.addressValue,
+      this.latitude, this.longitude);
 
   @override
   _SaveDeliveryAddressState createState() => _SaveDeliveryAddressState();
@@ -61,7 +60,6 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       locationData.address = widget.selectedAddress.address;
       locationData.lat = widget.selectedAddress.lat.toString();
       locationData.lng = widget.selectedAddress.lng.toString();
-
     } else {
       print("-2222222222222222-------");
       locationData = new LocationData();
@@ -73,15 +71,16 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
         locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
         address2Controller.text = widget.addressValue;
-        locationData.lat = widget.coordinates.latitude.toString();
-        locationData.lng = widget.coordinates.longitude.toString();
+        locationData.lat = widget.latitude.toString();
+        locationData.lng = widget.longitude.toString();
       }
     }
     //getLocation();
   }
+
   void getUserData() {
     try {
-      SharedPrefs.getUser().then((user){
+      SharedPrefs.getUser().then((user) {
         setState(() {
           fullnameController.text = user.fullName;
         });
@@ -188,9 +187,10 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                           padding: EdgeInsets.fromLTRB(0, 20, 0, 5),
                           child: InkWell(
                             onTap: () async {
-                              if(selectedCity == null){
-                                Utils.showToast("Please select Town/City first!", false);
-                                return ;
+                              if (selectedCity == null) {
+                                Utils.showToast(
+                                    "Please select Town/City first!", false);
+                                return;
                               }
                               if (dataObject == null) {
                                 Utils.showProgressDialog(context);
@@ -241,13 +241,11 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       SizedBox(height: 20),
                       InkWell(
                           onTap: () {
-                            Geolocator()
-                                .isLocationServiceEnabled()
+                            Geolocator.isLocationServiceEnabled()
                                 .then((value) async {
                               if (value == true) {
                                 var geoLocator = Geolocator();
-                                var status = await geoLocator
-                                    .checkGeolocationPermissionStatus();
+                                var status = await Geolocator.checkPermission();
                                 print("--status--=${status}");
                                 /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){
                                   Utils.showToast("Please accept location permissions to get your location from settings!", false);
@@ -285,7 +283,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       decoration: TextDecoration.underline,
                                     )),
                                 TextSpan(
-                                    text: '*',
+                                  text: '*',
                                 ),
                                 // can add more TextSpans here...
                               ],
@@ -306,7 +304,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               focusedBorder: InputBorder.none,
                               contentPadding: EdgeInsets.only(
                                   left: 10, bottom: 10, top: 10, right: 10),
-                              hintText:'' /*AppConstant.enterAddress*/),
+                              hintText: '' /*AppConstant.enterAddress*/),
                         ),
                       ),
                       Divider(color: Colors.grey, height: 2.0),
@@ -402,8 +400,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 Utils.showToast(AppConstant.selectArea, false);
                                 return;
                               }
-                              if (addressController.text.trim().isEmpty
-                                  &&address2Controller.text.trim().isEmpty) {
+                              if (addressController.text.trim().isEmpty &&
+                                  address2Controller.text.trim().isEmpty) {
                                 Utils.showToast(
                                     AppConstant.pleaseEnterAddress, false);
                                 return;
@@ -437,7 +435,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                       selectedCity.city,
                                       selectedCity.id,
                                       "${locationData.lat}",
-                                      "${locationData.lng}",address2: address2Controller.text)
+                                      "${locationData.lng}",
+                                      address2: address2Controller.text)
                                   .then((response) {
                                 Utils.hideProgressDialog(context);
                                 //print('@@REsonsesss'+response.toString());
@@ -466,8 +465,6 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                   ))),
         ));
   }
-
-
 }
 
 class CityDialog extends StatefulWidget {

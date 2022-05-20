@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoder/geocoder.dart';
+// import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:package_info/package_info.dart';
+import 'package:location/location.dart';
+// import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -36,20 +37,22 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   int selectedIndex = 0;
   List<DeliveryAddressData> addressList = [];
   Area radiusArea;
-  Coordinates coordinates;
+
+  // Coordinates coordinates;
   bool isLoading = false;
   DeliveryAddressResponse responsesData;
   BranchData branchData;
   StoreModel store;
   CategoryResponse categoryResponse;
+  Location location = new Location();
 
   ConfigModel configObject;
-  PackageInfo packageInfo;
+  PermissionStatus _permissionGranted;
 
   @override
   void initState() {
     super.initState();
-    coordinates = new Coordinates(0.0, 0.0);
+    // coordinates = new Coordinates(0.0, 0.0);
     callDeliverListApi();
   }
 
@@ -200,7 +203,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                   builder: (BuildContext context) =>
                       SaveDeliveryAddress(null, () {
                     print("--Route-SaveDeliveryAddress-------");
-                  }, "", coordinates),
+                  }, "", 0.0, 0.0),
                   fullscreenDialog: true,
                 ));
             print("--result--${result}-------");
@@ -228,15 +231,13 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                   Utils.hideProgressDialog(context);
                   if (response != null && response.success) {
                     StoreRadiousResponse data = response;
-                    Geolocator()
-                        .isLocationServiceEnabled()
+                    Geolocator.isLocationServiceEnabled()
                         .then((isLocationServiceEnabled) async {
                       print(
                           "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
                       if (isLocationServiceEnabled) {
                         var geoLocator = Geolocator();
-                        var status =
-                            await geoLocator.checkGeolocationPermissionStatus();
+                        var status = await Geolocator.checkPermission();
                         print("--status--=${status}");
 
                         var result = await Navigator.push(
@@ -452,7 +453,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                       builder: (BuildContext context) =>
                           SaveDeliveryAddress(area, () {
                         print('@@---Edit---SaveDeliveryAddress----------');
-                      }, "", coordinates),
+                      }, "", 0.0, 0.0),
                       fullscreenDialog: true,
                     ));
                 print("-Edit-result--${result}-------");

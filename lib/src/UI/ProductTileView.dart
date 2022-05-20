@@ -15,6 +15,7 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import '../singleton/app_version_singleton.dart';
 import 'AddSubscriptionScreen.dart';
 
 class ProductTileItem extends StatefulWidget {
@@ -34,19 +35,19 @@ class _ProductTileItemState extends State<ProductTileItem> {
   CartData cartData;
   Variant variant;
   bool showAddButton;
-  StoreModel storeModel;
-  bool _isSubscriptionActive = false;
+  StoreModel storeModel = AppVersionSingleton.instance.appVersion.store;
+  //bool _isSubscriptionActive = false;
   bool _isProductOutOfStock = false;
 
   @override
   initState() {
     super.initState();
-
-    SharedPrefs.getStore().then((value) {
+    //if (mounted) setState(() {});
+    /*SharedPrefs.getStore().then((value) {
       storeModel = value;
       _isSubscriptionActive = storeModel.subscription.status == '1';
-      if (mounted) setState(() {});
-    });
+    });*/
+
     showAddButton = false;
     //print("--_ProductTileItemState-- initState ${widget.classType}");
     getDataFromDB();
@@ -61,13 +62,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
       counter = int.parse(cartData.QUANTITY);
       showAddButton = counter == 0 ? true : false;
       //print("-QUANTITY-${counter}=");
+      if(this.mounted)
       setState(() {});
     });
-    databaseHelper
-        .checkProductsExistInFavTable(
-            DatabaseHelper.Favorite_Table, widget.product.id)
-        .then((favValue) {
+    databaseHelper.checkProductsExistInFavTable(
+            DatabaseHelper.Favorite_Table, widget.product.id).then((favValue) {
       //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
+      if(this.mounted)
       setState(() {
         widget.product.isFav = favValue.toString();
         //print("-isFav-${widget.product.isFav}");
@@ -111,7 +112,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
     }
 
     //print("==variantMap=${widget.product.variantId} and ${widget.product.variantMap[widget.product.variantId]}");
-
+    //print("=====product_offer====${widget.product.product_offer}=");
     return Container(
       color: Colors.white,
       child: Column(children: [
@@ -440,6 +441,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               ),
                             ),
                           ),
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
@@ -474,6 +476,25 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             ],
                           ),
 
+                          Visibility(
+                            visible: AppVersionSingleton.instance.appVersion.store.product_coupon
+                                == "1" && widget.product.product_offer == 1
+                                ? true : false,
+                            child: /*_isProductOutOfStock ? Container() : */Container(
+                              width: 60,
+                              child: Center(
+                                  child: Text("OFFER", style: TextStyle(color: Colors.white, fontSize: 10.0),)
+                              ),
+                              margin: EdgeInsets.only(left: 5,top: 5),
+                              padding: EdgeInsets.all(5),
+                              decoration: new BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                color: appThemeSecondary,
+                                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                              ),
+                            ),
+                          ),
+
                           //0 => subscription is on
                           //1 => subscription is off
                           Padding(
@@ -483,7 +504,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               children: [
                                 Visibility(
                                     visible: (!_isProductOutOfStock) &&
-                                            _isSubscriptionActive &&
+                                        storeModel.subscription.status == '1' &&
                                             widget.product.variantMap[variant ==
                                                         null
                                                     ? widget.product.variantId

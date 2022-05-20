@@ -47,6 +47,8 @@ class DatabaseHelper {
   static final String imageUrl = "imageUrl";
   static final String image_100_80 = "image_100_80";
   static final String image_300_200 = "image_300_200";
+  static final String ProductOffer = "product_offer";
+
 
   Future<Database> get db async {
     if (_db != null) return _db;
@@ -62,8 +64,7 @@ class DatabaseHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "RestroApp.db");
     // Open/create the database at a given path
-    var theDb = await openDatabase(path,
-        version: 2, onCreate: _onCreate, onUpgrade: _onUpgrade);
+    var theDb = await openDatabase(path, version: 3, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -119,6 +120,7 @@ class DatabaseHelper {
         "price TEXT, "
         "discount TEXT, "
         "isUnitType TEXT, "
+        "product_offer TEXT, "
         "variants TEXT"
         ")");
     /* await db.execute("CREATE TABLE ${Products_Table}("
@@ -186,6 +188,10 @@ class DatabaseHelper {
 
   void _onUpgrade(Database db, int oldVersion, int newVersion) async {
 //    db.execute("ALTER TABLE ${Products_Table} ADD COLUMN newCol TEXT;");
+    if (oldVersion < newVersion) {
+      // you can execute drop table and create table
+      db.execute("ALTER TABLE ${Products_Table} ADD COLUMN product_offer TEXT;");
+    }
   }
 
   Future<int> saveCategories(CategoryModel categoryModel) async {
@@ -233,8 +239,7 @@ class DatabaseHelper {
       for (SubCategoryModel category in subCategoriesList) {
         if (category.products != null) {
           for (int j = 0; j < category.products.length; j++) {
-            batch.insert(
-                Products_Table, category.products[j].toMap(category.id));
+            batch.insert(Products_Table, category.products[j].toMap(category.id));
           }
 //          batch.commit();
         }
@@ -425,6 +430,7 @@ class DatabaseHelper {
       "price",
       "discount",
       "isUnitType",
+      "product_offer",
       "variants"
     ];
 
@@ -470,6 +476,7 @@ class DatabaseHelper {
         product.isSubscriptionOn = row["is_subscription_on"];
         product.discount = row["discount"];
         product.isUnitType = row["isUnitType"];
+        product.product_offer = int.parse(row["product_offer"]);
 
         for (var i = 0; i < variantsList.length; i++) {
           productMap[variantsList[i].id] = variantsList[i].isSubscriptionOn;
@@ -550,8 +557,8 @@ class DatabaseHelper {
 
   Future<int> updateProductInCart(Map<String, dynamic> row, String variantId) async {
     var dbClient = await db;
-      return dbClient.update(CART_Table, row,
-          where: "${VARIENT_ID} = ?", whereArgs: [variantId]);
+    return dbClient.update(CART_Table, row,
+        where: "${VARIENT_ID} = ?", whereArgs: [variantId]);
   }
 
   Future<CartData> getProductQuantitiy(String variantId) async {
@@ -706,9 +713,9 @@ class DatabaseHelper {
     ];
 
     List<Map> resultList;
-      resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
+    resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
     if (resultList != null && resultList.isNotEmpty) {
-      resultList.forEach((row) {
+      await Future.forEach(resultList, (row) async {
         Product product = new Product();
         product.mrpPrice = row[MRP_PRICE];
         product.price = row[PRICE];
@@ -727,13 +734,44 @@ class DatabaseHelper {
         product.imageUrl = row[imageUrl];
         product.image10080 = row[image_100_80];
         product.image300200 = row[image_300_200];
-
+        try {
+          int productOffer = await getProductOfferInProductTable(product.id);
+          product.product_offer = productOffer;
+        } catch (e) {
+          print(e);
+        }
         cartList.add(product);
       });
     } else {
       //print("-empty cart-in db--");
     }
     return cartList;
+  }
+
+  Future<int> getProductOfferInProductTable(String id) async {
+    int productOffer = 0;
+    var dbClient = await db;
+    List<String> columnsToSelect = [
+      "id",
+      "product_offer",
+    ];
+    List<Map> resultList = await dbClient.query(Products_Table,
+        columns: columnsToSelect,
+        where: '$ID = ?',
+        whereArgs: [id]);
+
+    if (resultList != null && resultList.isNotEmpty) {
+      resultList.forEach((row) {
+        productOffer = int.parse(row["product_offer"]);
+        //print("-product.product_offer--=${productOffer}");
+      });
+    }
+    return productOffer;
+  }
+
+  Future<int> updateProductOfferValueInProductsTable(Map<String, dynamic> row, String productId) async {
+    var dbClient = await db;
+    return dbClient.update(Products_Table, row, where: "${ID} = ?", whereArgs: [productId]);
   }
 
   Future<List<Product>> getFavouritesList() async {

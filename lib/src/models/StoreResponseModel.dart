@@ -27,6 +27,7 @@ class StoreModel {
   String location;
   String city;
   String state;
+  String product_coupon;
   String country;
   String wallet_setting;
   Subscription subscription;
@@ -149,6 +150,7 @@ class StoreModel {
   String promiseToPayForAll;
   StoreModel({
     this.id,
+    this.product_coupon,
     this.storeName,
     this.aboutusBanner,
     this.location,
@@ -279,6 +281,7 @@ class StoreModel {
             json["aboutus_banner"].map((x) => Banner.fromJson(x)));
     location = json['location'];
     city = json['city'];
+    product_coupon = json['product_coupon'];
     state = json['state'];
     country = json['country'];
     zipcode = json['zipcode'];
@@ -465,6 +468,7 @@ class StoreModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['id'] = this.id;
+    data['product_coupon'] = this.product_coupon;
     data['store_name'] = this.storeName;
     data['cod'] = this.cod;
     data['location'] = this.location;

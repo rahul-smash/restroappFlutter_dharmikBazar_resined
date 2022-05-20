@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:compressimage/compressimage.dart';
 import 'package:dio/dio.dart';
+// import 'package:compressimage/compressimage.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/LoginMobileScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
@@ -20,6 +22,7 @@ import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/DeviceInfo.dart';
+import 'package:restroapp/src/models/EligibleProductResponse.dart';
 import 'package:restroapp/src/models/FAQModel.dart';
 import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
@@ -28,6 +31,7 @@ import 'package:restroapp/src/models/LoyalityPointsModel.dart';
 import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
+import 'package:restroapp/src/models/OfferDetailResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/ProductRatingResponse.dart';
 import 'package:restroapp/src/models/PromiseToPayUserResponse.dart';
@@ -217,18 +221,17 @@ class ApiController {
 
   static Future<CategoryResponse> getCategoriesApiRequest(
       String storeId) async {
-    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId).replaceAll('api_v1', 'api_v11') +
         ApiConstants.getCategories;
     CategoryResponse categoryResponse = CategoryResponse();
     DatabaseHelper databaseHelper = new DatabaseHelper();
-
+    print("url=${url}");
     try {
       int dbCount =
           await databaseHelper.getCount(DatabaseHelper.Categories_Table);
       bool isNetworkAviable = await Utils.isNetworkAvailable();
       if (dbCount == 0 && isNetworkAviable) {
         print("*************database zero*************");
-        print("catttttt  $url");
         Response response = await Dio()
             .get(url, options: new Options(responseType: ResponseType.plain));
         //print(response);
@@ -252,23 +255,20 @@ class ApiController {
         categoryResponse.success = false;
         return categoryResponse;
       } else {
-        print(
-            "1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
+        print("1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
         //prepare model object
         List<CategoryModel> categoryList = await databaseHelper.getCategories();
         categoryResponse.categories = categoryList;
         for (var i = 0; i < categoryResponse.categories.length; i++) {
           String parent_id = categoryResponse.categories[i].id;
-          categoryResponse.categories[i].subCategory =
-              await databaseHelper.getSubCategories(parent_id);
+          categoryResponse.categories[i].subCategory = await databaseHelper.getSubCategories(parent_id);
         }
         categoryResponse.success = true;
-        print(
-            "2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
+        print("2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
       }
     } catch (e) {
       print(e);
-    }
+    } 
     return categoryResponse;
   }
 
@@ -281,6 +281,7 @@ class ApiController {
     SubCategoryResponse subCategoryResponse = SubCategoryResponse();
     bool isNetworkAviable = await Utils.isNetworkAvailable();
     try {
+      //print("-----dbProductCounts----- $dbProductCounts");
       if (dbProductCounts == 0 && isNetworkAviable) {
         StoreModel store = await SharedPrefs.getStore();
         SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -289,9 +290,8 @@ class ApiController {
         String deviceToken = prefs.getString(AppConstant.deviceToken);
         print("deviceToken $deviceToken");
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
-            ApiConstants.getProducts +
-            subCategoryId;
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+            ApiConstants.getProducts + subCategoryId;
         print(url);
         FormData formData = new FormData.fromMap({
           "user_id": "",
@@ -305,12 +305,11 @@ class ApiController {
             options: new Options(
                 contentType: "application/json",
                 responseType: ResponseType.plain));
-        //print(response.data);
+        print(response.data);
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-          await databaseHelper
-              .batchInsertProducts(subCategoryResponse.subCategories);
+          await databaseHelper.batchInsertProducts(subCategoryResponse.subCategories);
 
           /*for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
             for (int j = 0;j < subCategoryResponse.subCategories[i].products.length; j++) {
@@ -336,8 +335,7 @@ class ApiController {
 
         for (var i = 0; i < subCategoryResponse.subCategories.length; i++) {
           String parent_id = subCategoryResponse.subCategories[i].id;
-          subCategoryResponse.subCategories[i].products =
-              await databaseHelper.getProducts(parent_id);
+          subCategoryResponse.subCategories[i].products = await databaseHelper.getProducts(parent_id);
 //          for (int j = 0;
 //              j < subCategoryResponse.subCategories[i].products.length;
 //              j++) {
@@ -354,8 +352,7 @@ class ApiController {
     }
   }
 
-  static Future<SubCategoryResponse> getSubCategoryProductDetail(
-      String productID) async {
+  static Future<SubCategoryResponse> getSubCategoryProductDetail(String productID) async {
     SubCategoryResponse subCategoryResponse = SubCategoryResponse();
     bool isNetworkAviable = await Utils.isNetworkAvailable();
     try {
@@ -366,8 +363,9 @@ class ApiController {
         print("deviceID $deviceId");
         String deviceToken = prefs.getString(AppConstant.deviceToken);
         print("deviceToken $deviceToken");
+        print("productID $productID");
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
             ApiConstants.getProductDetail;
         print(url);
         FormData formData = new FormData.fromMap({
@@ -384,10 +382,99 @@ class ApiController {
                 contentType: "application/json",
                 responseType: ResponseType.plain));
         print(response.data);
-        subCategoryResponse =
-            SubCategoryResponse.fromJson(json.decode(response.data));
+        subCategoryResponse = SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
+          Product product = subCategoryResponse.subCategories.first.products.first;
+          DatabaseHelper databaseHelper = new DatabaseHelper();
+          int productOffer = await databaseHelper.getProductOfferInProductTable(productID);
+          //print("----getProductOfferInProductTable---${productOffer}");
+          if(productOffer == 1 && product.product_offer == 0){
+            Map<String, dynamic> row = {
+              DatabaseHelper.ProductOffer: "${product.product_offer}",
+            };
+            await databaseHelper.updateProductOfferValueInProductsTable(row,productID);
+          }
           return subCategoryResponse;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<EligibleProductResponse> getEligibleProductDetail(
+      String offerID) async {
+    EligibleProductResponse eligibleProductResponse = EligibleProductResponse();
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+            ApiConstants.getEligibleProductDetail;
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "user_id": "",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android",
+          "offer_id": offerID
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                contentType: "application/json",
+                responseType: ResponseType.plain));
+        print(response.data);
+        eligibleProductResponse =
+            EligibleProductResponse.fromJson(json.decode(response.data));
+        if (eligibleProductResponse.success) {
+          return eligibleProductResponse;
+        }
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  static Future<OfferDetailResponse> getOfferDetail(
+      String offerID) async {
+    OfferDetailResponse eligibleProductResponse = OfferDetailResponse();
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        String deviceId = prefs.getString(AppConstant.deviceId);
+        String deviceToken = prefs.getString(AppConstant.deviceToken);
+
+
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+            ApiConstants.getOfferDetail;
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "user_id": "",
+          "device_id": deviceId,
+          "device_token": deviceToken,
+          "platform": Platform.isIOS ? "IOS" : "Android",
+          "offer_id": offerID
+        });
+        Dio dio = new Dio();
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(
+                contentType: "application/json",
+                responseType: ResponseType.plain));
+        print(response.data);
+        eligibleProductResponse =
+            OfferDetailResponse.fromJson(json.decode(response.data));
+        if (eligibleProductResponse.success) {
+          return eligibleProductResponse;
         }
       }
     } catch (e) {
@@ -593,11 +680,11 @@ class ApiController {
   }
 
   static Future<StoreOffersResponse> storeOffersApiRequest(
-      String areaId) async {
+      String areaId, {jsonProductIds}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.storeOffers;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
@@ -605,12 +692,41 @@ class ApiController {
       request.fields.addAll({
         "store_id": store.id,
         "user_id": user.id,
+        "productIds": jsonProductIds,
         "order_facility": "Delivery"
       });
 
       if (areaId != null) {
         request.fields["area_id"] = areaId;
       }
+      print("----url---${url}");
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      final parsed = json.decode(respStr);
+      print("----respStr---${respStr}");
+      StoreOffersResponse res = StoreOffersResponse.fromJson(parsed);
+      return res;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<StoreOffersResponse> storeOfferApiRequest() async {
+    StoreModel store = await SharedPrefs.getStore();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+        ApiConstants.storeOffers;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+
+    try {
+      UserModel user = await SharedPrefs.getUser();
+      request.fields.addAll({
+        "store_id": store.id,
+        "user_id": user.id,
+        "order_facility": "Delivery"
+      });
+
       print("----url---${url}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -634,7 +750,7 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.validateCoupon;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
@@ -840,7 +956,9 @@ class ApiController {
             isComingFromPickUpScreen == true ? '0' /*areaId */ : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
-        "payment_method": paymentMethod == "2" ? "COD" :(paymentMethod == "4" ? "promise_to_pay" : "online"),
+        "payment_method": paymentMethod == "2"
+            ? "COD"
+            : (paymentMethod == "4" ? "promise_to_pay" : "online"),
         "discount": taxModel == null ? "" : '${taxModel.discount}',
         "payment_request_id": razorpay_order_id,
         "payment_id": razorpay_payment_id,
@@ -1026,11 +1144,15 @@ class ApiController {
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     if (isNetworkAvailable) {
       if (imageFile != null) {
-        //print("====FILE SIZE BEFORE: " + imageFile.lengthSync().toString());
-        await CompressImage.compress(
-            imageSrc: imageFile.path,
-            desiredQuality: 80); //desiredQuality ranges from 0 to 100
-        //print("====FILE SIZE  AFTER: " + imageFile.lengthSync().toString());
+        final dir = await path_provider.getTemporaryDirectory();
+        File file = createFile("${dir.absolute.path}/test.png");
+        final targetPath = dir.absolute.path + "/temp.jpg";
+        var result = await FlutterImageCompress.compressAndGetFile(
+          imageFile.absolute.path,
+          targetPath,
+          quality: 80,
+        );
+        imageFile = result;
       }
       try {
         request.fields.addAll({
@@ -1361,9 +1483,9 @@ class ApiController {
 
   static Future<SearchTagsModel> searchTagsAPI() async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.getTagsList;
-
+    print("----url---${url}");
     var request = new http.MultipartRequest("GET", Uri.parse(url));
     try {
       final response = await request.send().timeout(Duration(seconds: timeout));
@@ -1386,7 +1508,7 @@ class ApiController {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.search;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
@@ -1690,7 +1812,7 @@ class ApiController {
         String deviceId = prefs.getString(AppConstant.deviceId);
         String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
+        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll("api_v1", "api_v11") +
             ApiConstants.recommendedProduct;
         var request = new http.MultipartRequest("POST", Uri.parse(url));
         request.fields.addAll({
@@ -2164,7 +2286,9 @@ class ApiController {
             isComingFromPickUpScreen == true ? areaId : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
-        "payment_method": paymentMethod == "2" ? "COD" : (paymentMethod == "4" ? "promise_to_pay" : "online"),
+        "payment_method": paymentMethod == "2"
+            ? "COD"
+            : (paymentMethod == "4" ? "promise_to_pay" : "online"),
         "discount": taxModel == null ? "" : '${taxModel.discount}',
         "payment_request_id": razorpay_order_id,
         "payment_id": razorpay_payment_id,
@@ -2484,11 +2608,20 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       PromiseToPayUserResponse promiseToPayUserResponse =
-      PromiseToPayUserResponse.fromJson(json.decode(response.data));
+          PromiseToPayUserResponse.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${promiseToPayUserResponse.success}");
       return promiseToPayUserResponse;
     } catch (e) {
       print(e);
     }
+  }
+
+  static File createFile(String path) {
+    final file = File(path);
+    if (!file.existsSync()) {
+      file.createSync(recursive: true);
+    }
+
+    return file;
   }
 }

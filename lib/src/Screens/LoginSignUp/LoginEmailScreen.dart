@@ -1,9 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+// import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:keyboard_visibility/keyboard_visibility.dart';
+// import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/ForgotPasswordScreen.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/RegisterScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/ProfileScreen.dart';
@@ -20,6 +24,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 
 class LoginEmailScreen extends StatefulWidget {
   String menu;
+
   LoginEmailScreen(this.menu);
 
   @override
@@ -31,14 +36,17 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   StoreModel storeModel;
-  KeyboardVisibilityNotification _keyboardVisibility =
-      new KeyboardVisibilityNotification();
-  int _keyboardVisibilitySubscriberId;
+
+  // KeyboardVisibilityNotification _keyboardVisibility =
+  //     new KeyboardVisibilityNotification();
+  // int _keyboardVisibilitySubscriberId;
   bool _keyboardState;
   GoogleSignIn _googleSignIn;
   GoogleSignInAccount _currentUser;
-  FacebookLogin facebookSignIn = new FacebookLogin();
+  FacebookAuth facebookSignIn = FacebookAuth.instance;
   String hideSign_up;
+  StreamSubscription<bool> keyboardSubscription;
+
   _LoginEmailScreenState(this.menu);
 
   @override
@@ -60,15 +68,16 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
       });
     });
 
-    _keyboardState = _keyboardVisibility.isKeyboardVisible;
-    _keyboardVisibilitySubscriberId = _keyboardVisibility.addNewListener(
-      onChange: (bool visible) {
-        setState(() {
-          _keyboardState = visible;
-          print("_keyboardState= ${_keyboardState}");
-        });
-      },
-    );
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    _keyboardState = keyboardVisibilityController.isVisible;
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
+      setState(() {
+        _keyboardState = visible;
+        print("_keyboardState= $_keyboardState");
+      });
+    });
+
     SharedPrefs.getStore().then((value) {
       setState(() {
         storeModel = value;
@@ -233,12 +242,13 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                                   return;
                                 }
 
-                                bool isFbLoggedIn =
-                                    await facebookSignIn.isLoggedIn;
-                                print("isFbLoggedIn=${isFbLoggedIn}");
-                                if (isFbLoggedIn) {
-                                  await facebookSignIn.logOut();
-                                }
+                                // bool isFbLoggedIn =
+                                //     await facebookSignIn.isLoggedIn;
+                                // print("isFbLoggedIn=${isFbLoggedIn}");
+                                // if (isFbLoggedIn) {
+                                //   await facebookSignIn.logOut();
+                                // }
+                                await facebookSignIn.logOut();
 
                                 fblogin();
                               },
@@ -384,11 +394,12 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   }
 
   Future<Null> fblogin() async {
-    final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
+    final result = await facebookSignIn.login(permissions: ['email']);
+    // final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
 
     switch (result.status) {
-      case FacebookLoginStatus.loggedIn:
-        FacebookAccessToken accessToken = result.accessToken;
+      case LoginStatus.success:
+        AccessToken accessToken = result.accessToken;
         Utils.showProgressDialog(context);
         FacebookModel fbModel =
             await ApiController.getFbUserData(accessToken.token);
@@ -424,11 +435,14 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
           Utils.hideProgressDialog(context);
         }
         break;
-      case FacebookLoginStatus.cancelledByUser:
+      case LoginStatus.cancelled:
         Utils.showToast("Login cancelled", false);
         break;
-      case FacebookLoginStatus.error:
-        Utils.showToast("Something went wrong ${result.errorMessage}", false);
+      case LoginStatus.failed:
+        Utils.showToast("Something went wrong ${result.message}", false);
+        break;
+      case LoginStatus.operationInProgress:
+        // TODO: Handle this case.
         break;
     }
   }

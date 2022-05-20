@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:geocoder/geocoder.dart';
+import 'package:geocoding/geocoding.dart';
+// import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class SelectLocationOnMap extends StatefulWidget {
-
   SelectLocationOnMap();
 
   @override
@@ -17,7 +17,6 @@ class SelectLocationOnMap extends StatefulWidget {
 }
 
 class SelectLocationOnMapState extends State<SelectLocationOnMap> {
-
   GoogleMapController _mapController;
   Set<Marker> markers = Set();
   LatLng center, selectedLocation;
@@ -54,7 +53,8 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Padding(
-                padding: EdgeInsets.only(left: 10.0,right: 10,top: 5,bottom: 5),
+                padding:
+                    EdgeInsets.only(left: 10.0, right: 10, top: 5, bottom: 5),
                 child: RichText(
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
@@ -70,7 +70,10 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
             child: GoogleMap(
               onMapCreated: _onMapCreated,
               myLocationEnabled: true,
-              initialCameraPosition: CameraPosition(target: center,zoom: 15.0,),
+              initialCameraPosition: CameraPosition(
+                target: center,
+                zoom: 15.0,
+              ),
               mapType: MapType.normal,
               markers: markers,
               onCameraMove: _onCameraMove,
@@ -82,7 +85,7 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
       bottomNavigationBar: BottomAppBar(
         child: InkWell(
           onTap: () async {
-            Navigator.pop(context,  locationData);
+            Navigator.pop(context, locationData);
           },
           child: Container(
             height: 40,
@@ -93,7 +96,10 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
                 child: RichText(
                   text: TextSpan(
                     text: "Select Location",
-                    style: TextStyle(fontWeight: FontWeight.bold,fontSize: 16,color: Colors.white),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white),
                   ),
                 ),
               ),
@@ -106,8 +112,8 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
 
   Future<void> getLocation() async {
     Utils.showToast("Getting your location...", true);
-    Position position = await Geolocator()
-        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
     // final coordinates = new Coordinates(position.latitude, position.longitude);
     center = LatLng(position.latitude, position.longitude);
     getAddressFromLocation(position.latitude, position.longitude);
@@ -117,28 +123,31 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
           icon: BitmapDescriptor.defaultMarker,
           markerId: MarkerId('value'),
           position: center,
-          onDragEnd: (value){
+          onDragEnd: (value) {
             print(value.latitude);
             print(value.longitude);
-            getAddressFromLocation(value.latitude,value.longitude);
-          })]);
+            getAddressFromLocation(value.latitude, value.longitude);
+          })
+    ]);
     setState(() {
       _mapController.moveCamera(CameraUpdate.newLatLng(center));
     });
   }
 
-  getAddressFromLocation(double latitude,double longitude) async {
+  getAddressFromLocation(double latitude, double longitude) async {
     try {
       selectedLocation = LatLng(latitude, longitude);
       locationData.lat = "${latitude}";
       locationData.lng = "${longitude}";
-      Coordinates coordinates = new Coordinates(latitude, longitude);
-      var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      // Coordinates coordinates = new Coordinates(latitude, longitude);
+      // var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      var addresses = await placemarkFromCoordinates(latitude, longitude);
       var first = addresses.first;
-      //print("--addresses-${addresses} and ${first}");
-      print("----------${first.featureName} and ${first.addressLine}-postalCode-${first.postalCode}------");
+      // print("--addresses-${addresses} and ${first}");
+      print(
+          "----------${first.name} and ${first.street}-postalCode-${first.postalCode}------");
       setState(() {
-        address = first.addressLine;
+        address = first.street;
         locationData.address = address;
       });
     } catch (e) {
@@ -147,29 +156,23 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
   }
 
   void _onCameraMove(CameraPosition position) {
-    CameraPosition newPos = CameraPosition(
-        target: position.target
-    );
+    CameraPosition newPos = CameraPosition(target: position.target);
     Marker marker = markers.first;
 
-    setState((){
-      markers.first.copyWith(
-          positionParam: newPos.target
-      );
+    setState(() {
+      markers.first.copyWith(positionParam: newPos.target);
     });
   }
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
   }
-
 }
 
-class LocationData{
-
-  String _address="";
-  String _lat="";
-  String _lng="";
+class LocationData {
+  String _address = "";
+  String _lat = "";
+  String _lng = "";
 
   String get address => _address;
 
@@ -188,5 +191,4 @@ class LocationData{
   set lng(String value) {
     _lng = value;
   }
-
 }

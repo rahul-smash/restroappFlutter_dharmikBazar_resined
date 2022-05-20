@@ -4,13 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:flutter_share/flutter_share.dart';
-import 'package:flutter_tags/flutter_tags.dart';
-import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
-import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
-import 'package:restroapp/src/UI/CartBottomView.dart';
+import 'package:restroapp/src/Screens/Dashboard/more_detail_screen.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
-import 'package:restroapp/src/apihandler/ApiConstants.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -19,11 +14,11 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
-import 'package:restroapp/src/utils/Callbacks.dart';
-import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:dotted_border/dotted_border.dart';
 
-import 'HomeScreen.dart';
+import '../../singleton/app_version_singleton.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   Product product;
@@ -59,12 +54,14 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   CarouselController _carouselController;
 
   var _pageController;
+  OfferDetails offerDetails;
 
   @override
   initState() {
     super.initState();
     selctedTag = 0;
     showAddButton = false;
+    //print("-----product.product_offer---${widget.product.product_offer}");
     _carouselController = CarouselController();
     if (widget.product != null) getDataFromDB();
     getProductDetail(widget.product?.id ?? widget.productID);
@@ -270,7 +267,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Padding(
-                  padding: EdgeInsets.only(top: 10.0, left: 20.0,bottom: 10.0),
+                  padding: EdgeInsets.only(top: 10.0, left: 20.0, bottom: 10.0),
                   child: (discount == "0.00" ||
                           discount == "0" ||
                           discount == "0.0")
@@ -310,9 +307,18 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           ],
         ),
         Visibility(
-          visible: isVisible,
-          child: addDividerView(),
+          visible: true,
+          child: /*_isProductOutOfStock ? SizedBox() : */addDividerView(),
         ),
+
+        /*_isProductOutOfStock ? SizedBox() : */buildProductOfferView(),
+
+
+        Visibility(
+          visible: isVisible,
+          child: /*_isProductOutOfStock ? SizedBox() : */addDividerView(),
+        ),
+
         Visibility(
           visible: isVisible,
           child: Row(
@@ -334,7 +340,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
             ],
           ),
         ),
-
         !widget.isApiLoading &&
                 widget.product.description != null &&
                 widget.product.description.isNotEmpty
@@ -398,6 +403,102 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               )
             : Container(),
       ],
+    );
+  }
+
+  Widget buildProductOfferView(){
+
+    return Visibility(
+      visible: AppVersionSingleton.instance.appVersion.store.product_coupon == "1" && widget.product.product_offer == 1
+          ? true : false,
+      child: this.offerDetails == null ? Container() : Container(
+        margin: EdgeInsets.only(top: 10.0, left: 20.0, bottom: 10.0,right: 10),
+        width: Utils.getDeviceWidth(context),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                //Icon(Icons.ac_unit,color: appThemeSecondary),
+                Image.asset("images/offericon_dis.png",
+                  height: 22,
+                  width: 22,
+                  fit: BoxFit.fill,
+                ),
+                SizedBox(width: 5,),
+                Expanded(
+                  child: Text("${this.offerDetails.name}",
+                    maxLines: 1,overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 16)),
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+                    if (!isNetworkAvailable) {
+                      Utils.showToast(AppConstant.noInternet, false);
+                      return;
+                    }
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              MoreDetailScreen(widget.product),
+                        ));
+                  },
+                  child: Text("MORE",
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: appThemeSecondary,
+                          fontWeight: FontWeight.w500,fontSize: 16)),
+                ),
+                Icon(Icons.arrow_forward_ios_sharp,color: appThemeSecondary,size: 16),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Row(
+              children: [
+                Text("COUPON",
+                    style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500)),
+                SizedBox(width: 10,),
+                Text("(use at checkout)",
+                    style: TextStyle(fontSize: 16,color: Colors.black54)),
+              ],
+            ),
+            SizedBox(height: 10,),
+
+            InkWell(
+              child: Row(
+                children: [
+                  Container(
+                    width: 100,
+                    height: 30,
+                    color: appThemeSecondary.withOpacity(0.15),
+                    child: DottedBorder(
+                      color: appThemeSecondary,
+                      strokeWidth: 1,
+                      child: Center(
+                        child: Text("${this.offerDetails.couponCode}",
+                            maxLines: 1,overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500)),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 20,),
+                  Text("Copy",
+                      style: TextStyle(
+                          decoration: TextDecoration.underline,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,fontSize: 16)),
+                ],
+              ),
+              onTap: (){
+                print(this.offerDetails.couponCode);
+                Utils.copyToClipboard(context,this.offerDetails.couponCode);
+              },
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -711,9 +812,19 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   void getProductDetail(String productID) async {
-    _storeModel = await SharedPrefs.getStore();
+    //_storeModel = await SharedPrefs.getStore();
+    _storeModel = AppVersionSingleton.instance.appVersion.store;
     ApiController.getSubCategoryProductDetail(productID).then((value) {
       Product product = value.subCategories.first.products.first;
+      try {
+        if(widget.product.product_offer == 1 && product.product_offer == 0){
+          widget.product.product_offer = 0;
+        }
+      } catch (e) {
+        print(e);
+      }
+      //print("------getProductDetail----=${product.product_offer}");
+      this.offerDetails = product.offerDetails;
       if (widget.product == null) {
         widget.product = product;
       }
@@ -748,11 +859,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   Future<void> share(Product product, String link) async {
-    await FlutterShare.share(
-        title: product.title,
-        text: 'You may like this ${product.title}',
-        linkUrl: link,
-        chooserTitle: 'Share');
+    Share.share('You may like this ${product.title} $link', subject: 'Share');
   }
 
   Widget _getImageView() {
@@ -782,10 +889,11 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                     autoPlayCurve: Curves.ease,
                     scrollDirection: Axis.horizontal,
                   ),
-                  itemBuilder: (BuildContext context, int itemIndex) =>
-                      Container(
-                    child: _makeBanner(context, itemIndex),
-                  ),
+                  itemBuilder: (context, index, realIndex) {
+                    return Container(
+                      child: _makeBanner(context, index),
+                    );
+                  },
                 ),
               ),
               Visibility(

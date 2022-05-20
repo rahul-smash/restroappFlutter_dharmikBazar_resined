@@ -10,14 +10,16 @@ class ApiConstants {
   static String version = 'version';
   static String storeLogin = 'storeLogin';
 
-  static String getCategories = 'getCategories';
-  static String getProducts = 'getSubCategoryProducts/';
-  static String getProductDetail = 'productDetail/';
+  static String getCategories = 'inventory/getCategories';
+  static String getProducts = 'inventory/getSubCategoryProducts/';
+  static String getProductDetail = 'inventory/productDetail/';
+  static String getEligibleProductDetail = 'coupons/eligibleProducts';
+  static String getOfferDetail = 'coupons/offerDetail';
 
   static String getStoreBranches = 'getStoreBranches';
 
-  static String search = 'searchProducts';
-  static String getTagsList = 'getTagsList';
+  static String search = 'inventory/searchProducts';
+  static String getTagsList = 'inventory/getTagsList';
 
   static String getAddress = 'deliveryAddress';
   static String getAddressArea = 'deliveryAreas/Area';
@@ -25,8 +27,8 @@ class ApiConstants {
   static String getStoreRadius = 'storeRadius';
   static String getStoreArea = 'storearea';
 
-  static String storeOffers = 'storeOffers';
-  static String validateCoupon = 'validateAllCoupons';
+  static String storeOffers = 'coupons/storeOffers';
+  static String validateCoupon = 'coupons/validateProductsCoupons';
   static String multipleTaxCalculation = 'multiple_tax_calculation';
   static String multipleTaxCalculation_2 = 'multiple_tax_calculation_new';
   static String subscriptionTaxCalculation = 'tax_calculation';
@@ -68,7 +70,7 @@ class ApiConstants {
 
   static String faqs = 'faqs';
   static String allNotifications = 'allNotifications';
-  static String recommendedProduct = 'recommendedProduct';
+  static String recommendedProduct = 'inventory/recommendedProduct';
   static String orderDetailHistory = 'orderDetailHistory';
   static String reviewRating = 'review_rating';
   static String userWallet = 'user_wallet';

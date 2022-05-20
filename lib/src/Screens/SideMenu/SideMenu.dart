@@ -2,8 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import 'package:flutter_share/flutter_share.dart';
+import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
+// import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+// import 'package:flutter_share/flutter_share.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
@@ -25,6 +26,7 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'AdditionalInformations.dart';
 import 'LoyalityPoints.dart';
@@ -661,40 +663,30 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   }
 
   Future<void> share() async {
-    await FlutterShare.share(
-        title: 'Kindly download',
-        text: 'Kindly download' + widget.store.storeName + 'app from',
-        linkUrl: Platform.isIOS
-            ? widget.store.iphoneShareLink
-            : widget.store.androidShareLink,
-        chooserTitle: 'Share');
+    Share.share(
+        'Kindly download ${widget.store.storeName} app from ${Platform.isIOS ? widget.store.iphoneShareLink : widget.store.androidShareLink}',
+        subject: 'Share');
   }
 
   Future<void> share2(String referEarn, StoreModel store) async {
     if (referEarn != null && store.isRefererFnEnable) {
-      await FlutterShare.share(
-          title: '${store.storeName}',
-          linkUrl: referEarn,
-          chooserTitle: 'Refer & Earn');
+      Share.share('${store.storeName} $referEarn', subject: 'Refer & Earn');
     } else {
-      await FlutterShare.share(
-          title: 'Kindly download',
-          text: 'Kindly download' + widget.store.storeName + 'app from',
-          linkUrl: Platform.isIOS
-              ? widget.store.iphoneShareLink
-              : widget.store.androidShareLink,
-          chooserTitle: 'Share');
+      Share.share(
+          'Kindly download ${store.storeName} app from ${Platform.isIOS ? store.iphoneShareLink : store.androidShareLink}',
+          subject: 'Share');
     }
   }
 
   Future logout(BuildContext context) async {
     try {
-      FacebookLogin facebookSignIn = new FacebookLogin();
-      bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
-      print("isFbLoggedIn=${isFbLoggedIn}");
-      if (isFbLoggedIn) {
-        await facebookSignIn.logOut();
-      }
+      // FacebookLogin facebookSignIn = new FacebookLogin();
+      var facebookSignIn = FacebookAuth.instance;
+      // bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
+      // print("isFbLoggedIn=${isFbLoggedIn}");
+      // if (isFbLoggedIn) {
+      await facebookSignIn.logOut();
+      // }
 
       bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
       print("isGoogleSignedIn=${isGoogleSignedIn}");
@@ -733,7 +725,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
     try {
       if (AppConstant.isLoggedIn) {
         UserModel user = await SharedPrefs.getUser();
-        await Utils.analytics.setUserId('${user.id}');
+        await Utils.analytics.setUserId(id: '${user.id}');
         await Utils.analytics.setUserProperty(name: "userid", value: user.id);
         await Utils.analytics
             .setUserProperty(name: "useremail", value: user.email);

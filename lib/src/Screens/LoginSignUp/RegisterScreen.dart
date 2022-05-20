@@ -1,18 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:keyboard_visibility/keyboard_visibility.dart';
-import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
+// import 'package:keyboard_visibility/keyboard_visibility.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
-import 'package:restroapp/src/models/FacebookModel.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class RegisterUser extends StatefulWidget {
-
   RegisterUser();
 
   @override
@@ -20,9 +19,8 @@ class RegisterUser extends StatefulWidget {
 }
 
 class _RegisterUserState extends State<RegisterUser> {
-
-  KeyboardVisibilityNotification _keyboardVisibility = new KeyboardVisibilityNotification();
-  int _keyboardVisibilitySubscriberId;
+  // KeyboardVisibilityNotification _keyboardVisibility = new KeyboardVisibilityNotification();
+  // int _keyboardVisibilitySubscriberId;
   bool _keyboardState;
   final GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
   UserData userData = new UserData();
@@ -36,30 +34,44 @@ class _RegisterUserState extends State<RegisterUser> {
 
   bool showReferralCodeView = false;
   StoreModel storeModel;
+  StreamSubscription<bool> keyboardSubscription;
 
   @override
   void initState() {
     super.initState();
-    _keyboardState = _keyboardVisibility.isKeyboardVisible;
-    _keyboardVisibilitySubscriberId = _keyboardVisibility.addNewListener(
-      onChange: (bool visible) {
-        setState(() {
-          _keyboardState = visible;
-          print("_keyboardState= ${_keyboardState}");
-        });
-      },
-    );
-    SharedPrefs.getStore().then((store){
-      this.storeModel = store;
-      if(storeModel.isRefererFnEnable){
-        showReferralCodeView = true;
-      }else{
-        showReferralCodeView = false;
-      }
+    // _keyboardState = _keyboardVisibility.isKeyboardVisible;
+    // _keyboardVisibilitySubscriberId = _keyboardVisibility.addNewListener(
+    //   onChange: (bool visible) {
+    //     setState(() {
+    //       _keyboardState = visible;
+    //       print("_keyboardState= ${_keyboardState}");
+    //     });
+    //   },
+    // );
+    var keyboardVisibilityController = KeyboardVisibilityController();
+    _keyboardState = keyboardVisibilityController.isVisible;
+    keyboardSubscription =
+        keyboardVisibilityController.onChange.listen((bool visible) {
       setState(() {
+        _keyboardState = visible;
+        print("_keyboardState= $_keyboardState");
       });
     });
+    SharedPrefs.getStore().then((store) {
+      this.storeModel = store;
+      if (storeModel.isRefererFnEnable) {
+        showReferralCodeView = true;
+      } else {
+        showReferralCodeView = false;
+      }
+      setState(() {});
+    });
+  }
 
+  @override
+  void dispose() {
+    keyboardSubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -84,10 +96,10 @@ class _RegisterUserState extends State<RegisterUser> {
             child: SafeArea(
               child: Container(
                 color: _keyboardState ? whiteColor : Colors.transparent,
-                padding: EdgeInsets.only(left: 30,right: 30),
+                padding: EdgeInsets.only(left: 30, right: 30),
                 child: Form(
                     key: _formKey,
-                    autovalidate: true,
+                    autovalidateMode: AutovalidateMode.always,
                     child: ListView(
                       shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -97,7 +109,9 @@ class _RegisterUserState extends State<RegisterUser> {
                             labelText: 'Name *',
                           ),
                           controller: _usernameController,
-                          inputFormatters: [new LengthLimitingTextInputFormatter(30)],
+                          inputFormatters: [
+                            new LengthLimitingTextInputFormatter(30)
+                          ],
                         ),
                         TextFormField(
                           decoration: const InputDecoration(
@@ -121,7 +135,9 @@ class _RegisterUserState extends State<RegisterUser> {
                               labelText: 'Referral Code',
                             ),
                             controller: _referralCodeeController,
-                            inputFormatters: [new LengthLimitingTextInputFormatter(30)],
+                            inputFormatters: [
+                              new LengthLimitingTextInputFormatter(30)
+                            ],
                           ),
                         ),
                         TextFormField(
@@ -144,7 +160,8 @@ class _RegisterUserState extends State<RegisterUser> {
                         Container(
                           color: grayColor,
                           height: 40.0,
-                          margin: EdgeInsets.only(left:0, right:0,bottom: 20),
+                          margin:
+                              EdgeInsets.only(left: 0, right: 0, bottom: 20),
                           child: ButtonTheme(
                             child: RaisedButton(
                               shape: RoundedRectangleBorder(
@@ -176,9 +193,8 @@ class _RegisterUserState extends State<RegisterUser> {
   }
 
   Future<void> _submitForm() async {
-
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
-    if(!isNetworkAvailable){
+    if (!isNetworkAvailable) {
       Utils.showToast(AppConstant.noInternet, false);
       return;
     }
@@ -188,7 +204,7 @@ class _RegisterUserState extends State<RegisterUser> {
     userData.email = _emailController.text.trim();
     userData.password = _passwordController.text.trim();
     userData.confirmPassword = _confirmpasswordController.text.trim();
-    if(userData.name.isEmpty){
+    if (userData.name.isEmpty) {
       Utils.showToast("Please enter name", false);
       return;
     }
@@ -196,42 +212,39 @@ class _RegisterUserState extends State<RegisterUser> {
       Utils.showToast("Please enter phone", false);
       return;
     }*/
-    if(userData.email.isEmpty){
+    if (userData.email.isEmpty) {
       Utils.showToast("Please enter email", false);
       return;
     }
-    if(!Utils.validateEmail(userData.email.trim())){
+    if (!Utils.validateEmail(userData.email.trim())) {
       Utils.showToast("Please enter valid email", true);
       return;
     }
-    if(userData.password.isEmpty){
+    if (userData.password.isEmpty) {
       Utils.showToast("Please enter password", false);
       return;
     }
-    if(userData.confirmPassword.isEmpty){
+    if (userData.confirmPassword.isEmpty) {
       Utils.showToast("Please enter confirm password", false);
       return;
     }
 
     String referralCode;
-    if(showReferralCodeView){
+    if (showReferralCodeView) {
       referralCode = _referralCodeeController.text.trim();
-    }else{
+    } else {
       referralCode = "";
     }
 
     if (userData.confirmPassword.trim() != userData.password.trim()) {
       Utils.showToast(AppConstant.passwordMatch, true);
     } else {
-
-      if(loginViaSocial){
-
-
-      }else{
+      if (loginViaSocial) {
+      } else {
         Utils.isNetworkAvailable().then((isNetworkAvailable) async {
           if (isNetworkAvailable) {
             Utils.showProgressDialog(context);
-            ApiController.registerApiRequest(userData,referralCode)
+            ApiController.registerApiRequest(userData, referralCode)
                 .then((response) async {
               Utils.hideProgressDialog(context);
               if (response != null && response.success) {

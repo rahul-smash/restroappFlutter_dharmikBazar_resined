@@ -2,16 +2,21 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 import 'dart:math';
-
+import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:connectivity/connectivity.dart';
-import 'package:device_info/device_info.dart';
+// import 'package:connectivity/connectivity.dart';
+import 'package:flutter/services.dart';
+import 'package:clipboard/clipboard.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
+// import 'package:device_info/device_info.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:package_info/package_info.dart';
+// import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
@@ -267,7 +272,7 @@ class Utils {
     return isNetworkAvailable;
   }
 
-  static void showProgressDialog(BuildContext context) {
+  static void showProgressDialog1(BuildContext context) {
     //For normal dialog
     if (pr != null && pr.isShowing()) {
       pr.hide();
@@ -277,7 +282,7 @@ class Utils {
     pr.show();
   }
 
-  static void hideProgressDialog(BuildContext context) {
+  static void hideProgressDialog1(BuildContext context) {
     //For normal dialog
     try {
       if (pr != null && pr.isShowing()) {
@@ -291,6 +296,21 @@ class Utils {
     } catch (e) {
       print(e);
     }
+  }
+
+  static void showProgressDialog(BuildContext context) {
+    Loader.show(context,
+        isAppbarOverlay: true,
+        isBottomBarOverlay: true,
+        progressIndicator: CircularProgressIndicator(
+          backgroundColor: Color(0xFFFF7443),
+        ),
+        themeData: Theme.of(context).copyWith(accentColor: Colors.black38),
+        overlayColor: Color(0x99E8EAF6));
+  }
+
+  static void hideProgressDialog(BuildContext context) {
+    Loader.hide();
   }
 
   static double roundOffPrice(double val, int places) {
@@ -445,6 +465,7 @@ class Utils {
   }
 
   static convertOrderDateTime(String date) {
+    //print("convertOrderDateTime=$date");
     String formatted = date;
     try {
       DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
@@ -470,6 +491,23 @@ class Utils {
       time = time.toLocal();
       //print("time.toLocal()=   ${time.toLocal()}");
       DateFormat formatter = new DateFormat('dd MMM, yyyy');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+
+    return formatted;
+  }
+
+  static convertValidTillDate(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM yyyy');
       formatted = formatter.format(time.toLocal());
     } catch (e) {
       print(e);
@@ -913,7 +951,7 @@ class Utils {
     );
   }
 
-  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
 
@@ -936,29 +974,33 @@ class Utils {
 
   static Future<void> sendAnalyticsAddToCart(
       Product product, int quantity) async {
-    await analytics.logAddToCart(
-        itemId: product.id,
-        itemName: product.title,
-        itemCategory: product.categoryIds,
-        quantity: quantity);
+    await analytics.logAddToCart(items: [
+      AnalyticsEventItem(
+          itemId: product.id,
+          itemName: product.title,
+          itemCategory: product.categoryIds,
+          quantity: quantity),
+    ], currency: AppConstant.currency);
   }
 
   static Future<void> sendAnalyticsRemovedToCart(
       Product product, int quantity) async {
-    await analytics.logRemoveFromCart(
-        itemId: product.id,
-        itemName: product.title,
-        itemCategory: product.categoryIds,
-        quantity: quantity);
+    await analytics.logRemoveFromCart(items: [
+      AnalyticsEventItem(
+          itemId: product.id,
+          itemName: product.title,
+          itemCategory: product.categoryIds,
+          quantity: quantity)
+    ], currency: AppConstant.currency);
   }
 
   static Future<void> sendAnalyticsCheckOut(
       double amount, String productJson) async {
     await analytics.logBeginCheckout(
-        //amount
-        value: amount,
-        currency: AppConstant.currency,
-        destination: productJson);
+      //amount
+      value: amount,
+      currency: AppConstant.currency,
+    );
   }
 
   //checkout step
@@ -1117,9 +1159,9 @@ class Utils {
   }
 
   static void reOrderItems(
-      String storeName, BuildContext context, OrderData orderData){
+      String storeName, BuildContext context, OrderData orderData) {
     Utils.showProgressDialog(context);
-    ApiController.getOrderDetail(orderData.orderId).then((respone) async{
+    ApiController.getOrderDetail(orderData.orderId).then((respone) async {
       Utils.hideProgressDialog(context);
       if (respone != null &&
           respone.success &&
@@ -1202,13 +1244,26 @@ class Utils {
     }
     return days;
   }
+
+  static copyToClipboard(BuildContext context,String text){
+    FlutterClipboard.copy('$text').then(( value ) => ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text("Copied to clipboard"))));
+  }
+  static Widget showSpinner({Color color = Colors.black}) {
+    return Center(
+      child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(color)),
+    );
+  }
+
+
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }
 
 enum OrderType { Delivery, PickUp, Menu, SubScription }
 
-enum PaymentType { COD, ONLINE, ONLINE_PAYTM,PROMISE_TO_PAY, NONE }
+enum PaymentType { COD, ONLINE, ONLINE_PAYTM, PROMISE_TO_PAY, NONE }
 enum RadioButtonEnum { SELECTD, UNSELECTED }
 
 class AdditionItemsConstants {
