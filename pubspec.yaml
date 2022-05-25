@@ -181,6 +181,8 @@ flutter:
     - images/available_coupon_icon.png
     - images/boxicon.png
     - images/app_icon.jpg
+    - images/viewmore_arrow.png
+    - images/order_icon.png
     - assets/en.json
     - assets/malay.json
 

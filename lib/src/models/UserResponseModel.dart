@@ -1,15 +1,18 @@
 class ResponseModel {
   bool success;
   String message;
+  String notification;
 
   ResponseModel({
     this.success,
     this.message,
+    this.notification,
   });
 
   factory ResponseModel.fromJson(Map<String, dynamic> json) => ResponseModel(
         success: json["success"],
         message: json["message"],
+        notification: json["notification"],
       );
 }
 

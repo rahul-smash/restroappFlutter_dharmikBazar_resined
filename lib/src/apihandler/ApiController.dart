@@ -67,6 +67,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/order_time_response.dart';
 
 import '../models/home_screen_orders_model.dart';
+import '../notifications/notification_service_helper.dart';
 
 class ApiController {
   static final int timeout = 18;
@@ -589,8 +590,8 @@ class ApiController {
 
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
         ApiConstants.getHomeScreenOdrders;
-    print("----user.id---${user.id}");
-    print("----url---${url}");
+    //print("----user.id---${user.id}");
+    //print("----url---${url}");
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
       request.fields.addAll({
@@ -600,7 +601,7 @@ class ApiController {
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print("--getHomeScreenOdrders---${respStr}");
+      //print("--getHomeScreenOdrders---${respStr}");
       final parsed = json.decode(respStr);
       HomeScreenOrdersModel homeScreenOrdersModel =
       HomeScreenOrdersModel.fromJson(parsed);
@@ -1050,14 +1051,16 @@ class ApiController {
         "cart_saving": cart_saving,
       });
 
-      //print("----${url}");
+      print("----${url}");
       //print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
-      //print("--respStr--${respStr}--");
+      print("--respStr--${respStr}--");
       final parsed = json.decode(respStr);
-
       ResponseModel model = ResponseModel.fromJson(parsed);
+      if(model!= null && model.success){
+        NotificationServiceHelper.instance.showLocalNotification(model.notification);
+      }
       return model;
     } catch (e) {
       print("-x-fields--${e.toString()}--");

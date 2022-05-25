@@ -15,11 +15,11 @@ class HomeScreenOrdersModel {
   });
 
   bool success;
-  List<Datum> data;
+  List<HomeOrderData> data;
 
   factory HomeScreenOrdersModel.fromJson(Map<String, dynamic> json) => HomeScreenOrdersModel(
     success: json["success"],
-    data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+    data: json["data"] == null ? null : List<HomeOrderData>.from(json["data"].map((x) => HomeOrderData.fromJson(x))),
   );
 
   Map<String, dynamic> toJson() => {
@@ -28,8 +28,8 @@ class HomeScreenOrdersModel {
   };
 }
 
-class Datum {
-  Datum({
+class HomeOrderData {
+  HomeOrderData({
     this.id,
     this.status,
     this.displayOrderId,
@@ -41,7 +41,7 @@ class Datum {
   String displayOrderId;
   String total;
 
-  factory Datum.fromJson(Map<String, dynamic> json) => Datum(
+  factory HomeOrderData.fromJson(Map<String, dynamic> json) => HomeOrderData(
     id: json["id"],
     status: json["status"],
     displayOrderId: json["display_order_id"],

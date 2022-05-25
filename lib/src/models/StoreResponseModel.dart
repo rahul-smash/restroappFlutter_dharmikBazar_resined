@@ -26,6 +26,7 @@ class StoreModel {
   String storeName;
   String location;
   String city;
+  String show_order_on_home_screen;
   String state;
   String product_coupon;
   String country;
@@ -156,6 +157,7 @@ class StoreModel {
     this.aboutusBanner,
     this.location,
     this.wallet_setting,
+    this.show_order_on_home_screen,
     this.subscription,
     this.city,
     this.state,
@@ -276,6 +278,7 @@ class StoreModel {
 
   StoreModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    show_order_on_home_screen = json['show_order_on_home_screen'];
     storeName = json['store_name'];
     aboutusBanner = json["aboutus_banner"] == null
         ? null
@@ -476,6 +479,7 @@ class StoreModel {
     data['cod'] = this.cod;
     data['location'] = this.location;
     data['city'] = this.city;
+    data['show_order_on_home_screen'] = this.show_order_on_home_screen;
     data['state'] = this.state;
     data['country'] = this.country;
     data['zipcode'] = this.zipcode;

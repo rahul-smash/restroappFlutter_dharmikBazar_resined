@@ -6,6 +6,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../singleton/app_version_singleton.dart';
+
 abstract class NotificationService {
   FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin;
   bool _isAuthorized = false;
@@ -151,7 +153,29 @@ abstract class NotificationService {
         remoteMessage.notification.title,
         remoteMessage.notification.body,
         notificationDetails,
-        payload: jsonEncode(remoteMessage.data ?? ""));
+        payload: jsonEncode(remoteMessage.data ?? "")
+    );
+  }
+
+
+  void showLocalNotification(String message) {
+    if (message == null) {
+      return;
+    }
+
+    final AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails(_channel.id, _channel.name,
+        channelDescription: _channel.description);
+    const IOSNotificationDetails iosNotificationDetails =
+    IOSNotificationDetails();
+    NotificationDetails notificationDetails = NotificationDetails(
+        android: androidNotificationDetails, iOS: iosNotificationDetails);
+    _flutterLocalNotificationsPlugin.show(
+        1,
+        AppVersionSingleton.instance.appVersion.store.storeName,
+        message,
+        notificationDetails,
+         );
   }
 
   /// Print error message information
