@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 // import 'package:compressimage/compressimage.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+// import 'package:compressimage/compressimage.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart' as path_provider;
@@ -62,6 +63,8 @@ import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/order_time_response.dart';
 
 class ApiController {
   static final int timeout = 18;
@@ -219,6 +222,51 @@ class ApiController {
     }
   }
 
+  static Future<OrderTimeResponse> getOrderTime() async {
+    StoreModel store = await SharedPrefs.getStore();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String deviceId = prefs.getString(AppConstant.deviceId);
+    String deviceToken = prefs.getString(AppConstant.deviceToken);
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+        ApiConstants.deliveryTimeDetails;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    //print('---url--${url}');
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "device_id": deviceId,
+        "device_token": "${deviceToken}",
+        "platform": Platform.isIOS ? "IOS" : "Android"
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      //print('---OrderTimeResponse--${respStr}');
+      final parsed = json.decode(respStr);
+      bool success = parsed['success'];
+      //print('---success--${success}');
+
+      OrderTimeResponse userResponse;
+      if(success){
+        userResponse = OrderTimeResponse.fromJson(parsed);
+      }else{
+        userResponse = OrderTimeResponse();
+        userResponse.success = false;
+        OrderTimeData data = new OrderTimeData();
+        data.orderId = '';
+        data.deliverySlot = '';
+        data.orderProcessTime = '';
+        userResponse.data = data;
+      }
+      return userResponse;
+    } catch (e) {
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
   static Future<CategoryResponse> getCategoriesApiRequest(
       String storeId) async {
     var url = ApiConstants.baseUrl.replaceAll("storeId", storeId).replaceAll('api_v1', 'api_v11') +
@@ -268,7 +316,7 @@ class ApiController {
       }
     } catch (e) {
       print(e);
-    } 
+    }
     return categoryResponse;
   }
 
@@ -766,7 +814,7 @@ class ApiController {
         "platform": Platform.isIOS ? "IOS" : "Android"
       });
 
-      print("----url---${request.fields.toString()}");
+      print("----fields---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
       print("----respStr---${respStr}");

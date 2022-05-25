@@ -177,6 +177,8 @@ flutter:
     - images/coupon_detail_graphic.png
     - images/coupon_icon.png
     - images/available_coupon_icon.png
+    - images/boxicon.png
+    - images/app_icon.jpg
     - assets/en.json
     - assets/malay.json
 

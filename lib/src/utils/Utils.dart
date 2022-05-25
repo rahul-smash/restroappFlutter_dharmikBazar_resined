@@ -355,6 +355,9 @@ class Utils {
     }
   }
 
+  static double width;
+  static double height;
+
   static double getDeviceWidth(BuildContext context) {
     return MediaQuery.of(context).size.width;
   }
@@ -437,6 +440,14 @@ class Utils {
     return formatted;
   }
 
+  static String getCurrentDateTime2() {
+    var now = new DateTime.now();
+    var formatter = new DateFormat('dd MMM yyyy, hh:mm a');
+    String formatted = formatter.format(now);
+    //print(formatted); // something like 2013-04-20
+    return formatted;
+  }
+
   static convertStringToDate2(String dateObj) {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);
@@ -480,6 +491,34 @@ class Utils {
     }
 
     return formatted;
+  }
+
+  static convertOrderDateTime2(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd HH:mm:ss");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm a');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+    return formatted;
+  }
+
+  static String durationToString(int minutes) {
+    var d = Duration(minutes: minutes);
+    List<String> parts = d.toString().split(':');
+    return '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}';
+  }
+
+  static TimeOfDay minutesToTimeOfDay(int minutes) {
+    Duration duration = Duration(minutes: minutes);
+    List<String> parts = duration.toString().split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
   static convertOrderDate(String date) {

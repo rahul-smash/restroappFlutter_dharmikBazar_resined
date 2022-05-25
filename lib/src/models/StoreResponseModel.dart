@@ -49,6 +49,7 @@ class StoreModel {
   String iphoneShareLink;
   String theme;
   String cod;
+  String delivery_expected_times;
   String webTheme;
   String type;
   String catType;
@@ -163,6 +164,7 @@ class StoreModel {
     this.zipcode,
     this.lat,
     this.lng,
+    this.delivery_expected_times,
     this.social_login,
     this.appThemeColors,
     this.webAppThemeColors,
@@ -288,6 +290,7 @@ class StoreModel {
     cod = json['cod'];
     lat = json['lat'];
     lng = json['lng'];
+    delivery_expected_times = json['delivery_expected_times'];
     social_login = json['social_login'];
     wallet_setting = json['wallet_setting'];
     contactPerson = json['contact_person'];
@@ -482,6 +485,7 @@ class StoreModel {
     data['contact_person'] = this.contactPerson;
     data['contact_number'] = this.contactNumber;
     data['contact_email'] = this.contactEmail;
+    data['delivery_expected_times'] = this.delivery_expected_times;
     data['about_us'] = this.aboutUs;
     data['wallet_setting'] = this.wallet_setting;
     data['otp_skip'] = this.otpSkip;
