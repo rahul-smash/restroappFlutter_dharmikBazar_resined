@@ -40,7 +40,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import 'SearchScreen.dart';
 // import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
-import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
@@ -388,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> {
         autoPlayCurve: Curves.ease,
         scrollDirection: Axis.horizontal,
       ),
-      itemBuilder: (BuildContext context, int itemIndex) => Container(
+      itemBuilder: (BuildContext context, int itemIndex,realIndex) => Container(
         child: _makeBanner(context, itemIndex),
       ),
     );
@@ -576,9 +575,10 @@ class _HomeScreenState extends State<HomeScreen> {
           //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: widget.configObject.isGroceryApp == "true"
               ? Image.asset(
-                  "images/app_icon.jpg",
+                  "images/groceryicon.png",
                   height: 40,
                   width: 40,
+            color: appTheme,
                 )
               : Image.asset("images/restauranticon.png",
                   height: 40, width: 40, color: whiteColor),
@@ -1016,9 +1016,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  //TODO - open whatsapp
-                  // FlutterOpenWhatsapp.sendSingleMessage(
-                  //     store.homePageDisplayNumber, "");
+                  Utils.launchWhatsApp(store.homePageDisplayNumber);
                 },
               )),
         ),

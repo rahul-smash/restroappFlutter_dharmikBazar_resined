@@ -36,6 +36,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 import 'Callbacks.dart';
 import 'DialogUtils.dart';
@@ -190,6 +191,16 @@ class Utils {
         );
       },
     );
+  }
+ static launchWhatsApp(String number) async {
+    final link = WhatsAppUnilink(
+      phoneNumber: number,
+      text: "Hey! I'm inquiring about the apartment listing",
+    );
+    // Convert the WhatsAppUnilink instance to a string.
+    // Use either Dart's string interpolation or the toString() method.
+    // The "launch" method is part of "url_launcher".
+    await launch('$link');
   }
 
   static void showBlockedDialog(BuildContext context, String message) {

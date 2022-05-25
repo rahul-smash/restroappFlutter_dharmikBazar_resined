@@ -126,17 +126,33 @@ class _ValueAppState extends State<ValueApp> {
       navigatorKey: _globalKey,
       theme: ThemeData(
         primaryColor: appTheme,
+        appBarTheme: AppBarTheme(color: appTheme)
       ),
       navigatorObservers: <NavigatorObserver>[ValueApp.observer],
       //home: isAdminLogin == true? LoginEmailScreen("menu"):SplashScreen(configObject,storeData),
-      home: showHomeScreen(widget.storeData, widget.configObject,
-          widget.packageInfo), //SplashScreen(configObject,storeData),
+      home: MyWidget(widget.storeData, widget.configObject, widget.packageInfo),
     );
   }
 }
 
-Widget showHomeScreen(
-    StoreResponse model, ConfigModel configObject, PackageInfo packageInfo) {
+class MyWidget extends StatelessWidget {
+  StoreResponse storeData;
+  PackageInfo packageInfo;
+  ConfigModel configObject;
+  MyWidget(this.storeData, this.configObject, this.packageInfo);
+
+  @override
+  Widget build(BuildContext context) {
+    //print("getDeviceWidth-${Utils.getDeviceWidth(context)} X ${Utils.getDeviceHeight(context)}");
+    Utils.width = Utils.getDeviceWidth(context);
+    Utils.height = Utils.getDeviceHeight(context);
+    return Scaffold(
+      body: showHomeScreen(storeData, configObject, packageInfo),
+    );
+  }
+}
+
+Widget showHomeScreen(StoreResponse model, ConfigModel configObject, PackageInfo packageInfo) {
   String version = packageInfo.version;
   if (model.success) {
     setStoreCurrency(model.store, configObject);
