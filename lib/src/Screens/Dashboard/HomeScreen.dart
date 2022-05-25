@@ -1,8 +1,11 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:badges/badges.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +13,7 @@ import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
+import 'package:restroapp/src/Screens/Dashboard/widgets/order_time_popup.dart';
 import 'package:restroapp/src/Screens/Dashboard/widgets/bottom_order_status_bar.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
@@ -71,12 +75,15 @@ class _HomeScreenState extends State<HomeScreen> {
   CategoryResponse categoryResponse;
   WalleModel welleModel;
   SocialModel socialModel;
+  Offset _offset;
+  int _current = 0;
 
   _HomeScreenState(this.store);
 
   @override
   void initState() {
     super.initState();
+    _offset = Offset(Utils.width/1.7, Utils.height/1.7);
     isStoreClosed = false;
     // initFirebase();
     NotificationServiceHelper.instance.initialize();
@@ -283,36 +290,33 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       key: _key,
       appBar: getAppBar(),
-      body: Column(
-        children: <Widget>[
-          addBanners(),
-          Expanded(
-            child: isLoading
-                ? Center(child: CircularProgressIndicator())
-                : categoryResponse == null
-                    ? SingleChildScrollView(child: Center(child: Text("")))
-                    : Container(
-                        color: grayLightColor,
-//                        decoration: BoxDecoration(
-//                          image: DecorationImage(
-//                            image: AssetImage("images/backgroundimg.png"),
-//                            fit: BoxFit.cover,
-//                          ),
-//                        ),
-                        padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                        child: GridView.count(
-                            crossAxisCount: 2,
-                            childAspectRatio: 1.1,
-                            padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
-                            mainAxisSpacing: 5.0,
-                            crossAxisSpacing: 8.0,
-                            shrinkWrap: true,
-                            children: categoryResponse.categories
-                                .map((CategoryModel model) {
-                              return GridTile(
-                                  child: CategoryView(model, store, false, 0));
-                            }).toList()),
-                      ),
+      body: Stack(
+        children: [
+          Column(
+            children: <Widget>[
+              addBanners(),
+              Expanded(
+                child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : categoryResponse == null
+                        ? SingleChildScrollView(child: Center(child: Text("")))
+                        : showGridView(),
+              ),
+            ],
+          ),
+          Positioned(
+            left: _offset.dx,
+            top: _offset.dy,
+            child: GestureDetector(
+              onPanUpdate: (d) {
+                setState(() {
+                  return _offset += Offset(d.delta.dx, d.delta.dy);
+                });
+              },
+              child: AppConstant.isLoggedIn
+                  ? store.delivery_expected_times == '1' ? OrderTimePopup() : SizedBox()
+                  : SizedBox(),
+            ),
           ),
         ],
       ),
@@ -323,136 +327,167 @@ class _HomeScreenState extends State<HomeScreen> {
         walleModel: welleModel,
       ),
       bottomNavigationBar: SafeArea(
-        child: Container(
-          height: kBottomNavigationBarHeight+5+60,
-            child: Column(
-              children: [
-                BottomOrderStatusBar(),
-                addBottomBar(),
-              ],
-            )
-        ),
+        child: addBottomBar(),
+      ),
+    );
+  }
+
+
+
+  Widget showGridView(){
+
+    return Container(
+      color: grayLightColor,
+      padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+      child: GridView.count(
+          crossAxisCount: 2,
+          childAspectRatio: 1.1,
+          padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
+          mainAxisSpacing: 5.0,
+          crossAxisSpacing: 8.0,
+          shrinkWrap: true,
+          children: categoryResponse.categories
+              .map((CategoryModel model) {
+            return GridTile(child: CategoryView(model, store, false, 0));
+          }).toList()
       ),
     );
   }
 
   Widget addBanners() {
-    return Stack(
-      children: <Widget>[
-        Center(
-          child: SizedBox(
-            height: 200.0,
-            width: Utils.getDeviceWidth(context),
-            child: Carousel(
-              boxFit: BoxFit.fitWidth,
-              autoplay: true,
-              animationCurve: Curves.ease,
-              autoplayDuration: Duration(milliseconds: 5000),
-              animationDuration: Duration(milliseconds: 3000),
-              dotSize: 6.0,
-              dotIncreasedColor: dotIncreasedColor,
-              dotBgColor: Colors.transparent,
-              dotPosition: DotPosition.bottomCenter,
-              dotVerticalPadding: 10.0,
-              showIndicator: imgList.length == 1 ? false : true,
-              indicatorBgPadding: 7.0,
-              images: imgList,
-              onImageTap: (position) {
-                print("onImageTap ${position}");
-                print("linkTo=${store.banners[position].linkTo}");
+    if (imgList.length == 0) {
+      return Container();
+    } else
+      return Center(
+        child: SizedBox(
+          height: 200.0,
+          width: Utils.getDeviceWidth(context),
+          child: _CarouselView(),
+        ),
+      );
+  }
 
-                if (store.banners[position].linkTo.isNotEmpty) {
-                  if (store.banners[position].linkTo == "category") {
-                    if (store.banners[position].categoryId == "0" &&
-                        store.banners[position].subCategoryId == "0" &&
-                        store.banners[position].productId == "0") {
-                      print("return");
-                      return;
-                    }
+  Widget _CarouselView() {
+    return CarouselSlider.builder(
+      itemCount: imgList.length,
+      options: CarouselOptions(
+        aspectRatio: 16 / 9,
+        height: 200,
+        initialPage: 0,
+        enableInfiniteScroll: true,
+        reverse: false,
+        autoPlay: true,
+        onPageChanged: (index, reason) {
+          setState(() {
+            _current = index;
+          });
+        },
+        enlargeCenterPage: false,
+        autoPlayInterval: Duration(seconds: 3),
+        autoPlayAnimationDuration: Duration(milliseconds: 800),
+        autoPlayCurve: Curves.ease,
+        scrollDirection: Axis.horizontal,
+      ),
+      itemBuilder: (BuildContext context, int itemIndex,realIndex) => Container(
+        child: _makeBanner(context, itemIndex),
+      ),
+    );
+  }
 
-                    if (store.banners[position].categoryId != "0" &&
-                        store.banners[position].subCategoryId != "0" &&
-                        store.banners[position].productId != "0") {
-                      // here we have to open the product detail
-                      print("open the product detail ${position}");
-                    } else if (store.banners[position].categoryId != "0" &&
-                        store.banners[position].subCategoryId != "0" &&
-                        store.banners[position].productId == "0") {
-                      //here open the banner sub category
-                      print("open the subCategory ${position}");
+  Widget _makeBanner(BuildContext context, int _index) {
+    return InkWell(
+      onTap: () => _onBannerTap(_index),
+      child: Container(
+          margin:
+              EdgeInsets.only(top: 0.0, bottom: 15.0, left: 7.5, right: 7.5),
+          width: Utils.getDeviceWidth(context) -
+              (Utils.getDeviceWidth(context) / 4),
+          decoration: BoxDecoration(
+              color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10.0),
+            child: CachedNetworkImage(
+              imageUrl: "${imgList[_index].url}",
+              fit: BoxFit.fill,
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
+          )),
+    );
+  }
 
-                      for (int i = 0;
-                          i < categoryResponse.categories.length;
-                          i++) {
-                        CategoryModel categories =
-                            categoryResponse.categories[i];
-                        if (store.banners[position].categoryId ==
-                            categories.id) {
-                          print(
-                              "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
-                          if (categories.subCategory != null) {
-                            for (int j = 0;
-                                j < categories.subCategory.length;
-                                j++) {
-                              SubCategory subCategory =
-                                  categories.subCategory[j];
-                              if (subCategory.id ==
-                                  store.banners[position].subCategoryId) {
-                                print(
-                                    "open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.banners[position].subCategoryId}");
+  void _onBannerTap(position) {
+    print("onImageTap ${position}");
+    print("linkTo=${store.banners[position].linkTo}");
 
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) {
-                                    return SubCategoryProductScreen(
-                                        categories, true, j);
-                                  }),
-                                );
+    if (store.banners[position].linkTo.isNotEmpty) {
+      if (store.banners[position].linkTo == "category") {
+        if (store.banners[position].categoryId == "0" &&
+            store.banners[position].subCategoryId == "0" &&
+            store.banners[position].productId == "0") {
+          print("return");
+          return;
+        }
 
-                                break;
-                              }
-                            }
-                          }
-                        }
-                        //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
-                      }
-                    } else if (store.banners[position].categoryId != "0" &&
-                        store.banners[position].subCategoryId == "0" &&
-                        store.banners[position].productId == "0") {
-                      print("open the Category ${position}");
+        if (store.banners[position].categoryId != "0" &&
+            store.banners[position].subCategoryId != "0" &&
+            store.banners[position].productId != "0") {
+          // here we have to open the product detail
+          print("open the product detail ${position}");
+        } else if (store.banners[position].categoryId != "0" &&
+            store.banners[position].subCategoryId != "0" &&
+            store.banners[position].productId == "0") {
+          //here open the banner sub category
+          print("open the subCategory ${position}");
 
-                      for (int i = 0;
-                          i < categoryResponse.categories.length;
-                          i++) {
-                        CategoryModel categories =
-                            categoryResponse.categories[i];
-                        if (store.banners[position].categoryId ==
-                            categories.id) {
-                          print(
-                              "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-                              return SubCategoryProductScreen(
-                                  categories, true, 0);
-                            }),
-                          );
-                          break;
-                        }
-                      }
-                    }
-                    //-----------------------------------------------
+          for (int i = 0; i < categoryResponse.categories.length; i++) {
+            CategoryModel categories = categoryResponse.categories[i];
+            if (store.banners[position].categoryId == categories.id) {
+              print(
+                  "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+              if (categories.subCategory != null) {
+                for (int j = 0; j < categories.subCategory.length; j++) {
+                  SubCategory subCategory = categories.subCategory[j];
+
+                  if (subCategory.id == store.banners[position].subCategoryId) {
+                    print(
+                        "open the subCategory ${subCategory.title} and ${subCategory.id} = ${store.banners[position].subCategoryId}");
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        return SubCategoryProductScreen(categories, true, j);
+                      }),
+                    );
+
+                    break;
                   }
                 }
-                /*print("categoryId=${store.banners[position].categoryId}");
-                print("subCategoryId=${store.banners[position].subCategoryId}");
-                print("productId=${store.banners[position].productId}");*/
-              },
-            ),
-          ),
-        ),
-      ],
-    );
+              }
+            }
+            //print("Category ${categories.id} = ${categories.title} = ${categories.subCategory.length}");
+          }
+        } else if (store.banners[position].categoryId != "0" &&
+            store.banners[position].subCategoryId == "0" &&
+            store.banners[position].productId == "0") {
+          print("open the Category ${position}");
+
+          for (int i = 0; i < categoryResponse.categories.length; i++) {
+            CategoryModel categories = categoryResponse.categories[i];
+            if (store.banners[position].categoryId == categories.id) {
+              print(
+                  "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return SubCategoryProductScreen(categories, true, 0);
+                }),
+              );
+              break;
+            }
+          }
+        }
+      }
+    }
   }
 
   Widget addBottomBar() {
@@ -464,6 +499,8 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _currentIndex,
           backgroundColor: bottomBarBackgroundColor,
           type: BottomNavigationBarType.fixed,
+          selectedItemColor: bottomBarTextColor,
+          unselectedItemColor: bottomBarTextColor,
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
@@ -515,7 +552,26 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Container(
           padding: EdgeInsets.all(10.0),
-          decoration: BoxDecoration(shape: BoxShape.circle, color: appTheme),
+          decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: appTheme,
+                  offset: const Offset(
+                    0.0,
+                    0.0,
+                  ),
+                  blurRadius: 10.0,
+                  spreadRadius: 2.0,
+                ), //BoxShadow
+                BoxShadow(
+                  color: Colors.white,
+                  offset: const Offset(0.0, 0.0),
+                  blurRadius: 0.0,
+                  spreadRadius: 0.0,
+                ), //BoxShadow
+              ]),
           margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
           //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: widget.configObject.isGroceryApp == "true"
@@ -523,7 +579,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   "images/groceryicon.png",
                   height: 40,
                   width: 40,
-                  color: whiteColor,
+            color: appTheme,
                 )
               : Image.asset("images/restauranticon.png",
                   height: 40, width: 40, color: whiteColor),
@@ -961,9 +1017,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  //TODO - open whatsapp
-                  // FlutterOpenWhatsapp.sendSingleMessage(
-                  //     store.homePageDisplayNumber, "");
+                  Utils.launchWhatsApp(store.homePageDisplayNumber);
                 },
               )),
         ),

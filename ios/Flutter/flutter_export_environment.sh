@@ -1,9 +1,9 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=C:\Users\ABC\Documents\flutter"
-export "FLUTTER_APPLICATION_PATH=C:\Users\ABC\AndroidStudioProjects\singal_store_flutter"
+export "FLUTTER_ROOT=/home/signity/flutter_development/flutter"
+export "FLUTTER_APPLICATION_PATH=/home/signity/workspace_signity/1_Flutter_projects/restro_flutter_updated_code"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
-export "FLUTTER_TARGET=lib\main.dart"
+export "FLUTTER_TARGET=lib/main.dart"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.0.0"
 export "FLUTTER_BUILD_NUMBER=1"
