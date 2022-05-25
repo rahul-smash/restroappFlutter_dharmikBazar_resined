@@ -63,6 +63,8 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/home_screen_orders_model.dart';
+
 class ApiController {
   static final int timeout = 18;
 
@@ -526,6 +528,36 @@ class ApiController {
       StoreDeliveryAreasResponse storeArea =
           StoreDeliveryAreasResponse.fromJson(parsed);
       return storeArea;
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<HomeScreenOrdersModel> getHomeScreenOrderApiRequest() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+        ApiConstants.getHomeScreenOdrders;
+    print("----user.id---${user.id}");
+    print("----url---${url}");
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "platform": Platform.isIOS ? "IOS" : "Android",
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print("--getHomeScreenOdrders---${respStr}");
+      final parsed = json.decode(respStr);
+      HomeScreenOrdersModel homeScreenOrdersModel =
+      HomeScreenOrdersModel.fromJson(parsed);
+      //print("----respStr---${deliveryAddressResponse.success}");
+      return homeScreenOrdersModel;
     } catch (e) {
       print("----catch---${e.toString()}");
       //Utils.showToast(e.toString(), true);

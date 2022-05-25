@@ -10,6 +10,7 @@ import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
+import 'package:restroapp/src/Screens/Dashboard/widgets/bottom_order_status_bar.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
@@ -322,7 +323,15 @@ class _HomeScreenState extends State<HomeScreen> {
         walleModel: welleModel,
       ),
       bottomNavigationBar: SafeArea(
-        child: addBottomBar(),
+        child: Container(
+          height: kBottomNavigationBarHeight+5+60,
+            child: Column(
+              children: [
+                BottomOrderStatusBar(),
+                addBottomBar(),
+              ],
+            )
+        ),
       ),
     );
   }
