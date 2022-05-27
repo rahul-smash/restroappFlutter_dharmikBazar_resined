@@ -66,6 +66,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/order_time_response.dart';
 
+import '../models/home_screen_orders_model.dart';
+import '../notifications/notification_service_helper.dart';
+
 class ApiController {
   static final int timeout = 18;
 
@@ -316,7 +319,7 @@ class ApiController {
       }
     } catch (e) {
       print(e);
-    }
+    } 
     return categoryResponse;
   }
 
@@ -574,6 +577,36 @@ class ApiController {
       StoreDeliveryAreasResponse storeArea =
           StoreDeliveryAreasResponse.fromJson(parsed);
       return storeArea;
+    } catch (e) {
+      print("----catch---${e.toString()}");
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<HomeScreenOrdersModel> getHomeScreenOrderApiRequest() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+
+    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll('api_v1', 'api_v11') +
+        ApiConstants.getHomeScreenOdrders;
+    //print("----user.id---${user.id}");
+    //print("----url---${url}");
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    try {
+      request.fields.addAll({
+        "user_id": user.id,
+        "platform": Platform.isIOS ? "IOS" : "Android",
+      });
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      //print("--getHomeScreenOdrders---${respStr}");
+      final parsed = json.decode(respStr);
+      HomeScreenOrdersModel homeScreenOrdersModel =
+      HomeScreenOrdersModel.fromJson(parsed);
+      //print("----respStr---${deliveryAddressResponse.success}");
+      return homeScreenOrdersModel;
     } catch (e) {
       print("----catch---${e.toString()}");
       //Utils.showToast(e.toString(), true);
@@ -1018,14 +1051,16 @@ class ApiController {
         "cart_saving": cart_saving,
       });
 
-      //print("----${url}");
+      print("----${url}");
       //print("--fields--${request.fields.toString()}--");
       final response = await request.send();
       final respStr = await response.stream.bytesToString();
-      //print("--respStr--${respStr}--");
+      print("--respStr--${respStr}--");
       final parsed = json.decode(respStr);
-
       ResponseModel model = ResponseModel.fromJson(parsed);
+      if(model!= null && model.success){
+        NotificationServiceHelper.instance.showLocalNotification(model.notification,type: 'order_placed');
+      }
       return model;
     } catch (e) {
       print("-x-fields--${e.toString()}--");

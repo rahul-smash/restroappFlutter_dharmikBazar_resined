@@ -1,7 +1,7 @@
 class ApiConstants {
 //  static String base = "https://app.restroapp.com/storeId";
-    static String base = "https://app.restroapp.com/storeId";
-  //static String base = "https://stage.grocersapp.com/storeId";
+    //static String base = "https://app.restroapp.com/storeId";
+  static String base = "https://stage.grocersapp.com/storeId";
   //static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
 
   static String baseUrl = base + '/api_v1/';
@@ -20,6 +20,8 @@ class ApiConstants {
 
   static String search = 'inventory/searchProducts';
   static String getTagsList = 'inventory/getTagsList';
+
+  static String getHomeScreenOdrders = 'orders/getHomeScreenOdrders';
 
   static String getAddress = 'deliveryAddress';
   static String getAddressArea = 'deliveryAreas/Area';

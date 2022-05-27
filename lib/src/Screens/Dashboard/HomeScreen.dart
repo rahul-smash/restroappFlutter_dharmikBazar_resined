@@ -14,6 +14,7 @@ import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/widgets/order_time_popup.dart';
+import 'package:restroapp/src/Screens/Dashboard/widgets/bottom_order_status_bar.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
@@ -38,6 +39,7 @@ import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../singleton/app_version_singleton.dart';
 import 'SearchScreen.dart';
 // import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 
@@ -331,7 +333,11 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-
+  bool showBottomBar = false;
+  callBack(bool showBottomBar) {
+    this.showBottomBar = showBottomBar;
+    //print("--------showBottomBar---------=${showBottomBar}");
+  }
 
   Widget showGridView(){
 
@@ -490,100 +496,100 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget addBottomBar() {
-    return Stack(
-      overflow: Overflow.visible,
-      alignment: new FractionalOffset(.5, 1.0),
-      children: <Widget>[
-        BottomNavigationBar(
-          currentIndex: _currentIndex,
-          backgroundColor: bottomBarBackgroundColor,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: bottomBarTextColor,
-          unselectedItemColor: bottomBarTextColor,
-          onTap: onTabTapped,
-          items: [
-            BottomNavigationBarItem(
-              icon: Image.asset('images/contacticon.png',
-                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              //title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
-              label: 'Contact',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset('images/searchcion.png',
-                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              //title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
-              label: 'Search',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(
-                Icons.shopping_cart,
-                color: Colors.white,
-                size: 0,
+    return Container(
+      child: Stack(
+        overflow: Overflow.visible,
+        alignment: new FractionalOffset(.5, 1.0),
+        children: <Widget>[
+          Container(
+              margin: EdgeInsets.only(bottom: kBottomNavigationBarHeight),
+              child: BottomOrderStatusBar(callback: callBack)
+          ),
+          BottomNavigationBar(
+            currentIndex: _currentIndex,
+            backgroundColor: bottomBarBackgroundColor,
+            type: BottomNavigationBarType.fixed,
+            selectedItemColor: bottomBarTextColor,
+            unselectedItemColor: bottomBarTextColor,
+            onTap: onTabTapped,
+            items: [
+              BottomNavigationBarItem(
+                icon: Image.asset('images/contacticon.png',
+                    width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+                //title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
+                label: 'Contact',
               ),
-              //title: Text(''),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset('images/historyicon.png',
-                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-              //title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
-              label: 'My Orders',
-            ),
-            BottomNavigationBarItem(
-              icon: Badge(
-                showBadge: cartBadgeCount == 0 ? false : true,
-                badgeColor: appThemeSecondary,
-                badgeContent: Text('${cartBadgeCount}',
-                    style: TextStyle(color: Colors.white)),
-                child: Image.asset('images/carticon.png',
-                    width: 24,
-                    fit: BoxFit.scaleDown,
-                    color: bottomBarIconColor),
+              BottomNavigationBarItem(
+                icon: Image.asset('images/searchcion.png',
+                    width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+                //title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
+                label: 'Search',
               ),
-              /*title: Padding(
-                padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
-                child:
-                    Text('Cart', style: TextStyle(color: bottomBarTextColor)),
-              ),*/
-              label: 'Cart',
-            ),
-          ],
-        ),
-        Container(
-          padding: EdgeInsets.all(10.0),
-          decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: appTheme,
-                  offset: const Offset(
-                    0.0,
-                    0.0,
-                  ),
-                  blurRadius: 10.0,
-                  spreadRadius: 2.0,
-                ), //BoxShadow
-                BoxShadow(
+              BottomNavigationBarItem(
+                icon: Icon(
+                  Icons.shopping_cart,
                   color: Colors.white,
-                  offset: const Offset(0.0, 0.0),
-                  blurRadius: 0.0,
-                  spreadRadius: 0.0,
-                ), //BoxShadow
-              ]),
-          margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-          child: widget.configObject.isGroceryApp == "true"
-              ? Image.asset(
-                  "images/groceryicon.png",
-                  height: 40,
-                  width: 40,
-            color: appTheme,
-                )
-              : Image.asset("images/restauranticon.png",
-                  height: 40, width: 40, color: whiteColor),
-        ),
-      ],
+                  size: 0,
+                ),
+                //title: Text(''),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Image.asset('images/historyicon.png',
+                    width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+                //title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
+                label: 'My Orders',
+              ),
+              BottomNavigationBarItem(
+                icon: Badge(
+                  showBadge: cartBadgeCount == 0 ? false : true,
+                  badgeColor: appThemeSecondary,
+                  badgeContent: Text('${cartBadgeCount}',
+                      style: TextStyle(color: Colors.white)),
+                  child: Image.asset('images/carticon.png',
+                      width: 24,
+                      fit: BoxFit.scaleDown,
+                      color: bottomBarIconColor),
+                ),
+                /*title: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                  child:
+                      Text('Cart', style: TextStyle(color: bottomBarTextColor)),
+                ),*/
+                label: 'Cart',
+              ),
+            ],
+          ),
+          Container(
+              height: 65, width: 65,
+            //padding: EdgeInsets.all(15.0),
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                //color: appTheme,
+                border: Border.all(width: 2, color: Colors.white)
+                ),
+            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+            child: Container(
+              padding: EdgeInsets.all(10.0),
+              margin: EdgeInsets.all(0.5),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: appTheme,
+              ),
+              child: widget.configObject.isGroceryApp == "true"
+                  ? Image.asset(
+                      "images/groceryicon.png",
+                      height: 30,
+                      width: 30,
+                color: whiteColor,
+                    )
+                  : Image.asset("images/restauranticon.png",
+                      height: 30, width: 30, color: whiteColor),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1050,4 +1056,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void _getWellet() async {
     welleModel = await ApiController.getUserWallet();
   }
+
+
 }

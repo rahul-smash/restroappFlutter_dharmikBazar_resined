@@ -18,6 +18,8 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import '../../notifications/notification_service_helper.dart';
+
 class OrderDetailScreenVersion2 extends StatefulWidget {
   OrderData orderHistoryData;
   String orderId = '';
@@ -1137,6 +1139,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         widget.orderHistoryData.orderId,
         order_rejection_note: orderRejectionNote);
     if (cancelOrder != null && cancelOrder.success) {
+      NotificationServiceHelper.instance.showLocalNotification(cancelOrder.notification,type: 'order_placed');
       setState(() {
         widget.orderHistoryData.status = '6';
       });

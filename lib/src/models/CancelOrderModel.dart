@@ -13,21 +13,25 @@ class CancelOrderModel {
     this.success,
     this.data,
     this.paymentMethod,
+    this.notification
   });
 
   bool success;
   String data;
   String paymentMethod;
+  String notification;
 
   factory CancelOrderModel.fromJson(Map<String, dynamic> json) => CancelOrderModel(
     success: json["success"],
     data: json["data"],
     paymentMethod: json["payment_method"],
+    notification: json["notification"],
   );
 
   Map<String, dynamic> toJson() => {
     "success": success,
     "data": data,
     "payment_method": paymentMethod,
+    "notification": notification,
   };
 }
