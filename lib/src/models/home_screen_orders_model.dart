@@ -33,23 +33,26 @@ class HomeOrderData {
     this.id,
     this.status,
     this.displayOrderId,
-    this.total,
+    this.total,this.statusCode
   });
 
   String id;
   String status;
   String displayOrderId;
   String total;
+  String statusCode;
 
   factory HomeOrderData.fromJson(Map<String, dynamic> json) => HomeOrderData(
     id: json["id"],
     status: json["status"],
     displayOrderId: json["display_order_id"],
     total: json["total"],
+    statusCode: json["status_code"],
   );
 
   Map<String, dynamic> toJson() => {
     "id": id,
+    "status_code": statusCode,
     "status": status,
     "display_order_id": displayOrderId,
     "total": total,

@@ -27,14 +27,14 @@ class BottomOrderStatusBar extends StatefulWidget {
 class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
 
   List<HomeOrderData> list = [];
-  double currentIndexPage;
+  //double currentIndexPage;
   Timer _timer;
   HomeScreenOrdersModel homeScreenOrdersModel;
 
   @override
   void initState() {
     super.initState();
-    currentIndexPage = 0;
+    //currentIndexPage = 0;
     widget.callback(false);
     Utils.isNetworkAvailable().then((isNetworkAvailable){
       if (!isNetworkAvailable) {
@@ -98,12 +98,12 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
                     child: CarouselSlider(
                       options: CarouselOptions(
                         autoPlay: list.length == 1 ? false : true,
-                        onPageChanged: (int index, CarouselPageChangedReason reason){
+                        /*onPageChanged: (int index, CarouselPageChangedReason reason){
                           print("index=${index} reason=${reason}");
                           setState(() {
                             currentIndexPage = index.toDouble();
                           });
-                        },
+                        },*/
                         viewportFraction: 1.0,
                       ),
                       items: list.map((item) {
@@ -113,19 +113,22 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
                 ),
               ],
             ),
-            list.length == 1 ? Container() : Align(
-              alignment: Alignment.bottomCenter,
-              child: DotsIndicator(
-                dotsCount: list.length,
-                position: currentIndexPage,
-                decorator: DotsDecorator(
-                  size: const Size.square(4.0),
-                  activeSize: const Size.square(5.0),
-                  color: Color(0xFF878A8D), // Inactive color
-                  activeColor: Color(0xFF41474E),
+            /*Container(
+              margin: EdgeInsets.only(right: 15),
+              child: Align(
+                alignment: Alignment.bottomRight,
+                child: DotsIndicator(
+                  dotsCount: list.length,
+                  position: currentIndexPage,
+                  decorator: DotsDecorator(
+                    size: const Size.square(4.0),
+                    activeSize: const Size.square(5.0),
+                    color: Color(0xFF878A8D), // Inactive color
+                    activeColor: Color(0xFF41474E),
+                  ),
                 ),
               ),
-            )
+            )*/
           ],
         ),
       ),
@@ -143,8 +146,8 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
             padding: EdgeInsets.all(7),
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white),
-            child: Image.asset('images/order_icon.png',width: 30,height: 30,),
+                color: Color(0xFF41474E)),
+            child: Image.asset('images/order_icon.png',width: 30,height: 30,color: Colors.white),
             margin: EdgeInsets.only(left: 25),
           ),
           Container(
@@ -154,8 +157,16 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text("Order id- ${homeOrderData.displayOrderId}",style: TextStyle(fontSize: 13,color: Color(0xFF878A8D)),),
-                Text("• ${homeOrderData.status}",style: TextStyle(fontSize: 17,color: Color(0xFF41474E),
-                    fontWeight: FontWeight.w600),),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text("• ",style: TextStyle(fontSize: 22, color: getStatusColor(homeOrderData.statusCode),
+                        fontWeight: FontWeight.w600),),
+                    Text("${homeOrderData.status}",style: TextStyle(fontSize: 17,color: Color(0xFF41474E),
+                        fontWeight: FontWeight.w600),),
+                  ],
+                ),
               ],
             ),
           ),
@@ -181,10 +192,41 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
               child: Image.asset('images/viewmore_arrow.png',width: 22,height: 18,),
             ),
           )
-
         ],
       ),
     );
+  }
+
+  Color getStatusColor(String status) {
+    /*
+    0 => 'pending' ,
+    1 =>'processing',
+    4 =>'delivering',
+    7 => 'on the way'
+    */
+    /*
+    Active, Accepted- #75990B
+    Cancelled - #D21515
+    Pending - #A5C055
+    Processing, On the way - #D2D02C
+    Delivered - #2ABE99
+    */
+    switch (status) {
+      case '0':
+        return Color(0xFFA5C055); //=> 'pending'
+        break;
+      case '1':
+      return Color(0xFFD2D02C);  //=> 'processing'
+      break;
+      case '4':
+      return Color(0xFFD2D02C);  //=> 'delivering'
+      break;
+      case '7':
+        return Color(0xFFD2D02C);  //=> 'on the way'
+        break;
+      default:
+        return Color(0xFFA5C055);
+    }
   }
 
   void getOrdersDataFromApi() {

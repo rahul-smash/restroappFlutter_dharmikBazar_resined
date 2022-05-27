@@ -158,14 +158,22 @@ abstract class NotificationService {
   }
 
 
-  void showLocalNotification(String message) {
+  void showLocalNotification(String message,{String type}) {
     if (message == null) {
       return;
     }
 
+    String redirectionType;
+    if(type == 'order_placed'){
+      redirectionType = '{"type": "order_placed", "id": "1"}';
+    }
+
     final AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails(_channel.id, _channel.name,
-        channelDescription: _channel.description);
+    AndroidNotificationDetails(_channel.id,
+        _channel.name,
+        channelDescription: _channel.description,
+      sound: RawResourceAndroidNotificationSound('slow_spring_board'),
+    );
     const IOSNotificationDetails iosNotificationDetails =
     IOSNotificationDetails();
     NotificationDetails notificationDetails = NotificationDetails(
@@ -175,6 +183,7 @@ abstract class NotificationService {
         AppVersionSingleton.instance.appVersion.store.storeName,
         message,
         notificationDetails,
+        payload: '${redirectionType}'
          );
   }
 

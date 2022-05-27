@@ -11,6 +11,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import '../Screens/Offers/MyOrderScreenVersion2.dart';
 import 'notification_service.dart';
 
 class NotificationServiceHelper extends NotificationService {
@@ -35,7 +36,7 @@ class NotificationServiceHelper extends NotificationService {
 
   @override
   Future<void> handleNotificationClick(RemoteMessage message) async {
-    debugPrint('On Notification Tap');
+    debugPrint('------On Notification Tap-------');
     if (message == null || message.data == null) return;
     debugPrint('On Notification Data: ${message.data.toString()}');
     try {
@@ -88,6 +89,7 @@ class NotificationServiceHelper extends NotificationService {
     if (payload == null || payload.isEmpty) {
       return;
     }
+    debugPrint('------payload------${payload}');
     try {
       Map<String, dynamic> map = jsonDecode(payload);
       String id = '';
@@ -112,6 +114,12 @@ class NotificationServiceHelper extends NotificationService {
                       store,
                       orderId: id,
                     )),
+          );
+          break;
+        case 'order_placed':
+          _globalKey.currentState.push(
+            MaterialPageRoute(
+                builder: (context) => MyOrderScreenVersion2(store)),
           );
           break;
         case 'subscription':

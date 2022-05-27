@@ -1139,7 +1139,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         widget.orderHistoryData.orderId,
         order_rejection_note: orderRejectionNote);
     if (cancelOrder != null && cancelOrder.success) {
-      NotificationServiceHelper.instance.showLocalNotification(cancelOrder.notification);
+      NotificationServiceHelper.instance.showLocalNotification(cancelOrder.notification,type: 'order_placed');
       setState(() {
         widget.orderHistoryData.status = '6';
       });

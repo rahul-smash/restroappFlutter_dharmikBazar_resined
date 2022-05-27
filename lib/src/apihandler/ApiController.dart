@@ -1059,7 +1059,7 @@ class ApiController {
       final parsed = json.decode(respStr);
       ResponseModel model = ResponseModel.fromJson(parsed);
       if(model!= null && model.success){
-        NotificationServiceHelper.instance.showLocalNotification(model.notification);
+        NotificationServiceHelper.instance.showLocalNotification(model.notification,type: 'order_placed');
       }
       return model;
     } catch (e) {

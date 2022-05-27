@@ -185,6 +185,7 @@ flutter:
     - images/order_icon.png
     - assets/en.json
     - assets/malay.json
+    - sound/slow_spring_board.mp3
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

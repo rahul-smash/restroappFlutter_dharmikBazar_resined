@@ -336,7 +336,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool showBottomBar = false;
   callBack(bool showBottomBar) {
     this.showBottomBar = showBottomBar;
-    print("--------showBottomBar---------=${showBottomBar}");
+    //print("--------showBottomBar---------=${showBottomBar}");
   }
 
   Widget showGridView(){
@@ -501,6 +501,10 @@ class _HomeScreenState extends State<HomeScreen> {
         overflow: Overflow.visible,
         alignment: new FractionalOffset(.5, 1.0),
         children: <Widget>[
+          Container(
+              margin: EdgeInsets.only(bottom: kBottomNavigationBarHeight),
+              child: BottomOrderStatusBar(callback: callBack)
+          ),
           BottomNavigationBar(
             currentIndex: _currentIndex,
             backgroundColor: bottomBarBackgroundColor,
@@ -557,26 +561,32 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           Container(
-            padding: EdgeInsets.all(10.0),
+              height: 65, width: 65,
+            //padding: EdgeInsets.all(15.0),
             decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: appTheme,
+                //color: appTheme,
+                border: Border.all(width: 2, color: Colors.white)
                 ),
             margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
             //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            child: widget.configObject.isGroceryApp == "true"
-                ? Image.asset(
-                    "images/groceryicon.png",
-                    height: 40,
-                    width: 40,
-              color: whiteColor,
-                  )
-                : Image.asset("images/restauranticon.png",
-                    height: 40, width: 40, color: whiteColor),
-          ),
-          Container(
-              margin: EdgeInsets.only(bottom: kBottomNavigationBarHeight),
-              child: BottomOrderStatusBar(callback: callBack)
+            child: Container(
+              padding: EdgeInsets.all(10.0),
+              margin: EdgeInsets.all(0.5),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: appTheme,
+              ),
+              child: widget.configObject.isGroceryApp == "true"
+                  ? Image.asset(
+                      "images/groceryicon.png",
+                      height: 30,
+                      width: 30,
+                color: whiteColor,
+                    )
+                  : Image.asset("images/restauranticon.png",
+                      height: 30, width: 30, color: whiteColor),
+            ),
           ),
         ],
       ),
