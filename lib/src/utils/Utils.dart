@@ -14,6 +14,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 // import 'package:package_info/package_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -1245,10 +1246,11 @@ class Utils {
     return days;
   }
 
-  static copyToClipboard(BuildContext context,String text){
-    FlutterClipboard.copy('$text').then(( value ) => ScaffoldMessenger.of(context)
+  static copyToClipboard(BuildContext context, String text) {
+    FlutterClipboard.copy('$text').then((value) => ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text("Copied to clipboard"))));
   }
+
   static Widget showSpinner({Color color = Colors.black}) {
     return Center(
       child: CircularProgressIndicator(
@@ -1256,7 +1258,35 @@ class Utils {
     );
   }
 
+  static dynamic determinePosition() async {
+    print("determine postion called::::::::::::::::");
+    bool serviceEnabled;
+    LocationPermission permission;
 
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Utils.showToast('Location services are disabled.', true);
+    }
+
+    permission = await Geolocator.checkPermission();
+    permission = await Geolocator.requestPermission();
+
+    if (permission == LocationPermission.denied) {
+      return Utils.showToast('Location permissions are denied', true);
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Utils.showToast(
+          'Location permissions are permanently denied, we cannot request permissions.',
+          true);
+    }
+    return await Geolocator.getLastKnownPosition();
+    // Position position = await Geolocator.getCurrentPosition(
+    //     desiredAccuracy: LocationAccuracy.low);
+    // print(position);
+
+    // return await Geolocator.getCurrentPosition();
+  }
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }

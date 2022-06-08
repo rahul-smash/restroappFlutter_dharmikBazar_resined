@@ -36,6 +36,33 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
     getLocation();
   }
 
+  void _getLastKnownPosition() async {
+    Position position = await Geolocator.getLastKnownPosition();
+
+    if (position != null) {
+      center = LatLng(position.latitude, position.longitude);
+      getAddressFromLocation(position.latitude, position.longitude);
+      markers.addAll([
+        Marker(
+            draggable: true,
+            icon: BitmapDescriptor.defaultMarker,
+            markerId: MarkerId('value'),
+            position: center,
+            onDragEnd: (value) {
+              print(value.latitude);
+              print(value.longitude);
+              getAddressFromLocation(value.latitude, value.longitude);
+            })
+      ]);
+      if (mounted)
+        setState(() {
+          _mapController.moveCamera(CameraUpdate.newLatLng(center));
+        });
+    } else {
+      //Utils.showToast("No last known position available...", true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,6 +139,8 @@ class SelectLocationOnMapState extends State<SelectLocationOnMap> {
 
   Future<void> getLocation() async {
     Utils.showToast("Getting your location...", true);
+    await Utils.determinePosition();
+    _getLastKnownPosition();
     Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     // final coordinates = new Coordinates(position.latitude, position.longitude);
