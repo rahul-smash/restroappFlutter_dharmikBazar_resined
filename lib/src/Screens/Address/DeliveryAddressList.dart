@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 // import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
+
 // import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/UI/DragMarkerMap.dart';
@@ -21,6 +23,8 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import '../../models/SubCategoryResponse.dart';
+import '../../models/weight_wise_charges_response.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
 class DeliveryAddressList extends StatefulWidget {
@@ -527,6 +531,26 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       color: appTheme,
       child: InkWell(
         onTap: () async {
+          Utils.showProgressDialog(context);
+          DatabaseHelper databaseHelper = new DatabaseHelper();
+          List<Product> cartList = await databaseHelper.getCartItemList();
+          String orderJson = await Utils.getCartListToJson(cartList);
+          WeightWiseChargesResponse chargesResponse =
+              await ApiController.getWeightWiseShippingCharges(
+                  orderDetail: orderJson,
+                  areaShippingCharge:
+                      addressList[selectedIndex].isShippingMandatory == '0'
+                          ? '0'
+                          : addressList[selectedIndex].areaCharges);
+          if (chargesResponse != null &&
+              chargesResponse.success &&
+              chargesResponse.data != null) {
+            //update changes according to weight
+            addressList[selectedIndex].areaCharges =
+                chargesResponse.data.totalDeliveryCharge;
+          }
+          Utils.hideProgressDialog(context);
+
           StoreModel storeModel = await SharedPrefs.getStore();
           if (addressList.length == 0) {
             Utils.showToast(AppConstant.selectAddress, false);

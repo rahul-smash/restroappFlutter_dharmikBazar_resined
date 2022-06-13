@@ -1,10 +1,20 @@
 class ApiConstants {
 //  static String base = "https://app.restroapp.com/storeId";
-    //static String base = "https://app.restroapp.com/storeId";
+  //static String base = "https://app.restroapp.com/storeId";
   static String base = "https://stage.grocersapp.com/storeId";
+
   //static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
 
   static String baseUrl = base + '/api_v1/';
+  static String apiV1Route = '/v1/';
+
+  static String getVIRoute({String storeID}){
+    if(storeID!=null)
+    return '$base$apiV1Route'.replaceAll("storeId", storeID);
+    else{
+      return '$base$apiV1Route';
+    }
+  }
 
   static String storeList = 'storeList';
   static String version = 'version';
@@ -119,4 +129,8 @@ class ApiConstants {
       '/api_v1_online_subscription/razorpayCreateSubscription';
   static String subscriptionRazorpayVerifyTransaction =
       '/api_v1_online_subscription/razorpayVerifyTransaction';
+
+  //--------------------------------
+   //weight shipping charge calculation
+  static String shippingChargesApi = 'delivery_charges/index';
 }

@@ -258,12 +258,14 @@ class _OtpScreen extends State<OtpScreen> {
     print('@@MENUGET' + widget.menu);
     if (widget.menu == ("menu")) {
       Navigator.pop(context);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ProfileScreen(true, widget.response.user.id,
-                widget.response.user.fullName, null, null)),
-      );
+      if (widget.response.userExists != 1) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ProfileScreen(true, widget.response.user.id,
+                  widget.response.user.fullName, null, null)),
+        );
+      }
       //Navigator.pop(context);
     }
   }

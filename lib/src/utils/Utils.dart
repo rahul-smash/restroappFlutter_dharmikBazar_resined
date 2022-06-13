@@ -4,10 +4,12 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 // import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+
 // import 'package:device_info/device_info.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -15,6 +17,7 @@ import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+
 // import 'package:package_info/package_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -192,7 +195,8 @@ class Utils {
       },
     );
   }
- static launchWhatsApp(String number) async {
+
+  static launchWhatsApp(String number) async {
     final link = WhatsAppUnilink(
       phoneNumber: number,
       text: "Hey! I'm inquiring about the apartment listing",
@@ -1126,9 +1130,33 @@ class Utils {
         }
       }
     }
-
     List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
         removeOutOfStockProducts: true);
+    if (jsonList.length != 0) {
+      String encodedDoughnut = jsonEncode(jsonList);
+      return encodedDoughnut;
+    } else {
+      return null;
+    }
+  }
+  // this method is for weight wise delivery charges
+  static Future<String> getCartListToJson(List<Product> cartList) async {
+    List jsonList = List.empty(growable: true);
+    cartList.map((item) {
+      jsonList.add({
+        "product_id": item.id == null ? null : item.id,
+        "product_name": item.title == null ? null : item.title,
+        "variant_id": item.variantId == null ? null : item.variantId,
+        "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
+        "quantity": item.quantity,
+        "price": item.price == null ? null : item.price,
+        "weight": item.weight == null ? null : item.weight,
+        "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
+        "unit_type": item.isUnitType == null ? null : item.isUnitType,
+        "product_status": item.status == null ? null : item.status,
+      });
+    });
+
     if (jsonList.length != 0) {
       String encodedDoughnut = jsonEncode(jsonList);
       return encodedDoughnut;
@@ -1295,18 +1323,17 @@ class Utils {
     return days;
   }
 
-  static copyToClipboard(BuildContext context,String text){
-    FlutterClipboard.copy('$text').then(( value ) => ScaffoldMessenger.of(context)
+  static copyToClipboard(BuildContext context, String text) {
+    FlutterClipboard.copy('$text').then((value) => ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text("Copied to clipboard"))));
   }
+
   static Widget showSpinner({Color color = Colors.black}) {
     return Center(
       child: CircularProgressIndicator(
           valueColor: new AlwaysStoppedAnimation<Color>(color)),
     );
   }
-
-
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }
