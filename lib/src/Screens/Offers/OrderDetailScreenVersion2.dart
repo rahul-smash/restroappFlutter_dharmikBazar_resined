@@ -17,6 +17,7 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../notifications/notification_service_helper.dart';
 
@@ -187,6 +188,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       firstRow(widget.orderHistoryData),
+                      widget.orderHistoryData.trackingData != null
+                          ? trackingDetails(widget.orderHistoryData)
+                          : Container(),
                       Container(
                         color: Colors.white,
                         margin: EdgeInsets.only(top: 5),
@@ -255,6 +259,76 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
               ),
             ),
           );
+  }
+
+  Widget trackingDetails(OrderData orderHistoryData) {
+    return Container(
+      color: Colors.white,
+      width: Utils.getDeviceWidth(context),
+      margin: EdgeInsets.only(top: 5),
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Tracking Id',
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                    ),
+                    Text(
+                      orderHistoryData.trackingData.trackingId,
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF7A7C80),
+                          fontWeight: FontWeight.w300),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Expected Delivery Date',
+                      style:
+                          TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                    ),
+                    Text(
+                      orderHistoryData.trackingData.expectedDeliiveryDate,
+                      style: TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF7A7C80),
+                          fontWeight: FontWeight.w300),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          InkWell(
+              child: Text(
+                'Order live tracking',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+              // onTap: () => launch(orderHistoryData.trackingData.trackingUrl)),
+              onTap: () => launch('www.google.com')),
+        ],
+      ),
+    );
   }
 
   Widget firstRow(OrderData orderHistoryData) {
@@ -1139,7 +1213,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         widget.orderHistoryData.orderId,
         order_rejection_note: orderRejectionNote);
     if (cancelOrder != null && cancelOrder.success) {
-      NotificationServiceHelper.instance.showLocalNotification(cancelOrder.notification,type: 'order_placed');
+      NotificationServiceHelper.instance.showLocalNotification(
+          cancelOrder.notification,
+          type: 'order_placed');
       setState(() {
         widget.orderHistoryData.status = '6';
       });

@@ -95,9 +95,9 @@ class OrderDetail {
   String price;
   String discount;
   String unitType;
-  int quantity;
-  int productType;
-  int deliveryCharges;
+  dynamic quantity;
+  dynamic productType;
+  dynamic deliveryCharges;
 
   OrderDetail copyWith({
     String productId,
@@ -109,9 +109,9 @@ class OrderDetail {
     String price,
     String discount,
     String unitType,
-    int quantity,
-    int productType,
-    int deliveryCharges,
+    dynamic quantity,
+    dynamic productType,
+    dynamic deliveryCharges,
   }) =>
       OrderDetail(
         productId: productId ?? this.productId,
@@ -142,9 +142,9 @@ class OrderDetail {
     price: json["price"] == null ? null : json["price"],
     discount: json["discount"] == null ? null : json["discount"],
     unitType: json["unit_type"] == null ? null : json["unit_type"],
-    quantity: json["quantity"] == null ? null : json["quantity"],
-    productType: json["product_type"] == null ? null : json["product_type"],
-    deliveryCharges: json["delivery_charges"] == null ? null : json["delivery_charges"],
+    quantity: json["quantity"] == null ? null : json["quantity"].toString(),
+    productType: json["product_type"] == null ? null : json["product_type"].toString(),
+    deliveryCharges: json["delivery_charges"] == null ? null : json["delivery_charges"].toString(),
   );
 
   Map<String, dynamic> toJson() => {

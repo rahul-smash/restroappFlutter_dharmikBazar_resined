@@ -1142,20 +1142,22 @@ class Utils {
   // this method is for weight wise delivery charges
   static Future<String> getCartListToJson(List<Product> cartList) async {
     List jsonList = List.empty(growable: true);
-    cartList.map((item) {
-      jsonList.add({
-        "product_id": item.id == null ? null : item.id,
-        "product_name": item.title == null ? null : item.title,
-        "variant_id": item.variantId == null ? null : item.variantId,
-        "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
-        "quantity": item.quantity,
-        "price": item.price == null ? null : item.price,
-        "weight": item.weight == null ? null : item.weight,
-        "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
-        "unit_type": item.isUnitType == null ? null : item.isUnitType,
-        "product_status": item.status == null ? null : item.status,
-      });
-    });
+   for(int i=0;i<cartList.length;i++){
+     var item=cartList[i];
+     jsonList.add({
+       "product_id": item.id == null ? null : item.id,
+       "product_name": item.title == null ? null : item.title,
+       "variant_id": item.variantId == null ? null : item.variantId,
+       "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
+       "quantity": item.quantity,
+       "price": item.price == null ? null : item.price,
+       "weight": item.weight == null ? null : item.weight,
+       "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
+       "unit_type": item.isUnitType == null ? null : item.isUnitType,
+       "product_status": item.status == null ? null : item.status,
+     });
+
+   }
 
     if (jsonList.length != 0) {
       String encodedDoughnut = jsonEncode(jsonList);

@@ -55,9 +55,10 @@ class DeliveryAddressData {
   String lat;
   String lng;
   String isShippingMandatory;
+
   //new added fields as required feature
-  String areaWisePaymentMethod;// 1=both, 2=COD, 3=Online
-  String defaultPaymentMethod;//1=COD, 2=Online
+  String areaWisePaymentMethod; // 1=both, 2=COD, 3=Online
+  String defaultPaymentMethod; //1=COD, 2=Online
 
   //DeliveryTimeSlot deliveryTimeSlot;
 
@@ -90,6 +91,37 @@ class DeliveryAddressData {
     this.defaultPaymentMethod,
     //this.deliveryTimeSlot
   });
+
+ static DeliveryAddressData copyWith({DeliveryAddressData item}) =>
+      DeliveryAddressData(
+        id: item.id,
+        userId: item.userId,
+        storeId: item.storeId,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        mobile: item.mobile,
+        email: item.email,
+        address: item.address,
+        address2: item.address2,
+        areaId: item.areaId,
+        areaName: item.areaName,
+        city: item.city,
+        state: item.state,
+        zipCode: item.zipCode,
+        country: item.country,
+        lat: item.lat,
+        lng: item.lng,
+        notAllow: item.notAllow,
+        areaCharges: item.areaCharges,
+        minAmount: item.minAmount,
+        note: item.note,
+        cityId: item.cityId,
+        isDeleted: item.isDeleted,
+        isShippingMandatory: item.isShippingMandatory,
+        areaWisePaymentMethod: item.areaWisePaymentMethod,
+        defaultPaymentMethod: item.defaultPaymentMethod,
+//item.deliveryTimeSlot);
+      );
 
   factory DeliveryAddressData.fromJson(Map<String, dynamic> json) =>
       DeliveryAddressData(

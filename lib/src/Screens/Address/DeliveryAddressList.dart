@@ -531,27 +531,29 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       color: appTheme,
       child: InkWell(
         onTap: () async {
-          Utils.showProgressDialog(context);
-          DatabaseHelper databaseHelper = new DatabaseHelper();
-          List<Product> cartList = await databaseHelper.getCartItemList();
-          String orderJson = await Utils.getCartListToJson(cartList);
-          WeightWiseChargesResponse chargesResponse =
-              await ApiController.getWeightWiseShippingCharges(
-                  orderDetail: orderJson,
-                  areaShippingCharge:
-                      addressList[selectedIndex].isShippingMandatory == '0'
-                          ? '0'
-                          : addressList[selectedIndex].areaCharges);
-          if (chargesResponse != null &&
-              chargesResponse.success &&
-              chargesResponse.data != null) {
-            //update changes according to weight
-            addressList[selectedIndex].areaCharges =
-                chargesResponse.data.totalDeliveryCharge;
-          }
-          Utils.hideProgressDialog(context);
-
           StoreModel storeModel = await SharedPrefs.getStore();
+          DeliveryAddressData addressData =
+              DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
+          if (storeModel.enableWeightWiseCharges == '1') {
+            Utils.showProgressDialog(context);
+            DatabaseHelper databaseHelper = new DatabaseHelper();
+            List<Product> cartList = await databaseHelper.getCartItemList();
+            String orderJson = await Utils.getCartListToJson(cartList);
+
+            WeightWiseChargesResponse chargesResponse =
+                await ApiController.getWeightWiseShippingCharges(
+                    orderDetail: orderJson,
+                    areaShippingCharge: addressList[selectedIndex].areaCharges);
+            if (chargesResponse != null &&
+                chargesResponse.success &&
+                chargesResponse.data != null) {
+              //update changes according to weight
+              addressData.areaCharges =
+                  chargesResponse.data.totalDeliveryCharge;
+            }
+            Utils.hideProgressDialog(context);
+          }
+
           if (addressList.length == 0) {
             Utils.showToast(AppConstant.selectAddress, false);
           } else {
@@ -566,7 +568,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => ConfirmOrderScreen(
-                            addressList[selectedIndex],
+                            addressData,
                             false,
                             "",
                             widget.delivery,
@@ -589,7 +591,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => ConfirmOrderScreen(
-                              addressList[selectedIndex],
+                              addressData,
                               false,
                               "",
                               widget.delivery,
