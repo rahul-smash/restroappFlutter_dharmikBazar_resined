@@ -18,6 +18,7 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
 
 import '../../notifications/notification_service_helper.dart';
 
@@ -325,7 +326,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 ),
               ),
               // onTap: () => launch(orderHistoryData.trackingData.trackingUrl)),
-              onTap: () => launch('www.google.com')),
+              onTap: () {
+                launch('www.google.com');}),
         ],
       ),
     );
