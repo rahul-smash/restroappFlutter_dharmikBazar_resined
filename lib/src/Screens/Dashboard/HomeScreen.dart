@@ -594,7 +594,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   onTabTapped(int index) {
-    if (/*checkIfStoreClosed()*/false) {
+    if (checkIfStoreClosed()) {
       DialogUtils.displayCommonDialog(context, store.storeName, store.storeMsg);
     } else {
       setState(() {
