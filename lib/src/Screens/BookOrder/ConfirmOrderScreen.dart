@@ -876,7 +876,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       ),
                     ),
                     Visibility(
-                      visible: product.weight.isEmpty ? false : true,
+                      visible: (AppVersionSingleton.instance.appVersion.store
+                                      .displayVariantWeight ==
+                                  '0' ||
+                              product.weight.isEmpty)
+                          ? false
+                          : true,
                       child: Padding(
                           padding: EdgeInsets.only(top: 10),
                           child: Text(

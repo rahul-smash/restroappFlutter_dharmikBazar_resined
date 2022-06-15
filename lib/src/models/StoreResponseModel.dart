@@ -140,7 +140,7 @@ class StoreModel {
 
   String domain;
   String poweredByText;
-  bool areaWisePaymentOption;//true, false
+  bool areaWisePaymentOption; //true, false
   String poweredByLink;
   String reviewRatingDisplay;
   String allowCustomerForGst;
@@ -151,6 +151,8 @@ class StoreModel {
   String promiseToPay;
   String promiseToPayForAll;
   String enableWeightWiseCharges;
+  String displayVariantWeight;
+
   StoreModel({
     this.id,
     this.product_coupon,
@@ -472,6 +474,9 @@ class StoreModel {
             : WalletSettings.fromJson(json["wallet_settings"]);
     hideSignup = json["hide_signup"];
     enableWeightWiseCharges = json["enable_weightwise_charges"];
+    displayVariantWeight = json["display_variant_weight"] == null
+        ? null
+        : json['display_variant_weight'];
   }
 
   Map<String, dynamic> toJson() {
@@ -623,6 +628,7 @@ class StoreModel {
         walletSettings == null ? null : walletSettings.toJson();
     data['hide_signup'] = this.hideSignup;
     data['enable_weightwise_charges'] = this.enableWeightWiseCharges;
+    data['display_variant_weight'] = this.displayVariantWeight;
     return data;
   }
 }

@@ -119,6 +119,9 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     if (weight.isEmpty) {
       isVisible = false;
     }
+    if(_storeModel.displayVariantWeight=='0'){
+      isVisible = false;
+    }
     return WillPopScope(
       onWillPop: () {
         print("onWillPop onWillPop");
