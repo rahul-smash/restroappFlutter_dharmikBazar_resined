@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
@@ -275,23 +276,30 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           Row(
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Tracking Id',
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                    ),
-                    Text(
-                      orderHistoryData.trackingData.trackingId,
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF7A7C80),
-                          fontWeight: FontWeight.w300),
-                    ),
-                  ],
+                child: InkWell(
+                  onTap: () {
+                    Clipboard.setData(ClipboardData(
+                        text: orderHistoryData.trackingData.trackingId));
+                    Utils.showToast('Tracking ID copied!',false);
+                  },
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Tracking Id',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w300),
+                      ),
+                      Text(
+                        orderHistoryData.trackingData.trackingId,
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF7A7C80),
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               SizedBox(width: 10),
@@ -326,8 +334,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 ),
               ),
               onTap: () => launch(orderHistoryData.trackingData.trackingUrl)),
-              // onTap: () {
-              //   launch('www.google.com');}),
+          // onTap: () {
+          //   launch('www.google.com');}),
         ],
       ),
     );

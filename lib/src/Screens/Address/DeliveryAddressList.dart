@@ -535,6 +535,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           DeliveryAddressData addressData =
               DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
           if (storeModel.enableWeightWiseCharges == '1') {
+            String shippingCharges =
+                await calculateShipping(addressList[selectedIndex]);
             Utils.showProgressDialog(context);
             DatabaseHelper databaseHelper = new DatabaseHelper();
             List<Product> cartList = await databaseHelper.getCartItemList();
@@ -543,7 +545,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             WeightWiseChargesResponse chargesResponse =
                 await ApiController.getWeightWiseShippingCharges(
                     orderDetail: orderJson,
-                    areaShippingCharge: addressList[selectedIndex].areaCharges);
+                    areaShippingCharge: shippingCharges);
             if (chargesResponse != null &&
                 chargesResponse.success &&
                 chargesResponse.data != null) {
@@ -666,5 +668,49 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         ),
       ),
     );
+  }
+
+  Future<String> calculateShipping(DeliveryAddressData addressList) async {
+    int minAmount = 0;
+    String shippingCharges = addressList.areaCharges;
+    try {
+      minAmount = double.parse(addressList.minAmount).toInt();
+    } catch (e) {
+      print(e);
+    }
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    double totalPrice = await databaseHelper.getTotalPrice();
+    int mtotalPrice = totalPrice.round();
+
+    print("----minAmount=${minAmount}");
+    print("--Cart--mtotalPrice=${mtotalPrice}");
+    print("----shippingCharges=${shippingCharges}");
+
+    if (addressList.notAllow) {
+      if (mtotalPrice <= minAmount) {
+        print("---Cart-totalPrice is less than min amount----}");
+        // then Store will charge shipping charges.
+
+        totalPrice = mtotalPrice.toDouble();
+      } else {
+        totalPrice = mtotalPrice.toDouble();
+      }
+    } else {
+      if (mtotalPrice <= minAmount) {
+        print("---Cart-totalPrice is less than min amount----}");
+        // then Store will charge shipping charges.
+        totalPrice = totalPrice + int.parse(shippingCharges);
+      } else {
+        print("-Cart-totalPrice is greater than min amount---}");
+        //then Store will not charge shipping.
+        totalPrice = totalPrice;
+        print("---------- shipping mandatory ----------- ${addressList.isShippingMandatory}");
+        if (addressList.isShippingMandatory == '0') {
+          shippingCharges = "0";
+          addressList.areaCharges = "0";
+        }
+      }
+    }
+    return shippingCharges;
   }
 }
