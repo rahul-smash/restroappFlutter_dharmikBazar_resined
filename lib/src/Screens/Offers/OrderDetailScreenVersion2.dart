@@ -325,9 +325,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   decoration: TextDecoration.underline,
                 ),
               ),
-              // onTap: () => launch(orderHistoryData.trackingData.trackingUrl)),
-              onTap: () {
-                launch('www.google.com');}),
+              onTap: () => launch(orderHistoryData.trackingData.trackingUrl)),
+              // onTap: () {
+              //   launch('www.google.com');}),
         ],
       ),
     );
