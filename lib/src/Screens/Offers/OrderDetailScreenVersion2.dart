@@ -22,6 +22,7 @@ import 'package:url_launcher/url_launcher.dart';
 // import 'package:url_launcher/url_launcher.dart';
 
 import '../../notifications/notification_service_helper.dart';
+import '../../singleton/app_version_singleton.dart';
 
 class OrderDetailScreenVersion2 extends StatefulWidget {
   OrderData orderHistoryData;
@@ -738,13 +739,18 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Flexible(
-                      child: Text(
-                          'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
-                          style: TextStyle(
-                            color: Color(0xFF818387),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300,
-                          )),
+                      child: Visibility(
+                        visible: AppVersionSingleton.instance.appVersion.store
+                            .displayVariantWeight !=
+                            '0',
+                        child: Text(
+                            'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
+                            style: TextStyle(
+                              color: Color(0xFF818387),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            )),
+                      ),
                     ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
