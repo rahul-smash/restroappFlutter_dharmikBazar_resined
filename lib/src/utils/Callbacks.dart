@@ -44,3 +44,12 @@ class onPayTMPageFinished {
 
   onPayTMPageFinished(this.url, this.orderId, this.txnId,{this.amount=''});
 }
+
+class onDPOCreateFinished {
+  String url;
+  String orderId;
+  String chargeID;
+  String amount;
+
+  onDPOCreateFinished(this.url, this.chargeID,{this.amount=''});
+}
