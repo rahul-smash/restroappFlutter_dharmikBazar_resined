@@ -191,11 +191,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       firstRow(widget.orderHistoryData),
-                      widget.orderHistoryData.trackingData != null &&
-                              widget.orderHistoryData.trackingData.trackingId !=
-                                  null &&
-                              widget.orderHistoryData.trackingData.trackingId
-                                  .isNotEmpty
+                      widget.orderHistoryData.trackingData != null
                           ? trackingDetails(widget.orderHistoryData)
                           : Container(),
                       Container(
@@ -280,34 +276,44 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         children: <Widget>[
           Row(
             children: [
-              Expanded(
-                child: InkWell(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(
-                        text: orderHistoryData.trackingData.trackingId));
-                    Utils.showToast('Tracking ID copied!', false);
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
+              Visibility(
+                visible: orderHistoryData.trackingData.trackingId!=null&&orderHistoryData.trackingData.trackingId.isNotEmpty,
+                child: Expanded(
+                  child: Row(
                     children: [
-                      Text(
-                        'Tracking Id',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.w300),
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(
+                                text: orderHistoryData.trackingData.trackingId));
+                            Utils.showToast('Tracking ID copied!', false);
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Tracking Id',
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w300),
+                              ),
+                              Text(
+                                orderHistoryData.trackingData?.trackingId??'',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF7A7C80),
+                                    fontWeight: FontWeight.w300),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      Text(
-                        orderHistoryData.trackingData.trackingId,
-                        style: TextStyle(
-                            fontSize: 14,
-                            color: Color(0xFF7A7C80),
-                            fontWeight: FontWeight.w300),
-                      ),
+                      SizedBox(width: 10),
                     ],
                   ),
                 ),
               ),
-              SizedBox(width: 10),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
