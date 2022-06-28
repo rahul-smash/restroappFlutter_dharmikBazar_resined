@@ -191,7 +191,11 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       firstRow(widget.orderHistoryData),
-                      widget.orderHistoryData.trackingData != null
+                      widget.orderHistoryData.trackingData != null &&
+                              widget.orderHistoryData.trackingData.trackingId !=
+                                  null &&
+                              widget.orderHistoryData.trackingData.trackingId
+                                  .isNotEmpty
                           ? trackingDetails(widget.orderHistoryData)
                           : Container(),
                       Container(
@@ -281,7 +285,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   onTap: () {
                     Clipboard.setData(ClipboardData(
                         text: orderHistoryData.trackingData.trackingId));
-                    Utils.showToast('Tracking ID copied!',false);
+                    Utils.showToast('Tracking ID copied!', false);
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -328,13 +332,16 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           ),
           SizedBox(height: 10),
           InkWell(
-              child: Text(
-                'Order live tracking',
-                style: TextStyle(
-                  decoration: TextDecoration.underline,
-                ),
+            child: Text(
+              'Order live tracking',
+              style: TextStyle(
+                decoration: TextDecoration.underline,
               ),
-              onTap: () => launch(orderHistoryData.trackingData.trackingUrl)),
+            ),
+            onTap: () {
+              launch(orderHistoryData.trackingData.trackingUrl);
+            },
+          )
           // onTap: () {
           //   launch('www.google.com');}),
         ],
@@ -741,7 +748,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     Flexible(
                       child: Visibility(
                         visible: AppVersionSingleton.instance.appVersion.store
-                            .displayVariantWeight !=
+                                .displayVariantWeight !=
                             '0',
                         child: Text(
                             'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
