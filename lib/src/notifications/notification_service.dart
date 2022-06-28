@@ -137,10 +137,24 @@ abstract class NotificationService {
     if (remoteMessage == null && remoteMessage.notification == null) {
       return;
     }
+    BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
+      remoteMessage.notification.body,
+      contentTitle: remoteMessage.notification.title,
+      summaryText: '',
+      /*_channel.description,
+      // contentTitle: _channel.name,
+      contentTitle: _channel.name,
+      summaryText: _channel.description,*/
+    );
 
-    final AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(_channel.id, _channel.name,
-            channelDescription: _channel.description);
+            channelDescription: _channel.description,
+            styleInformation: bigTextStyleInformation);
+    // final AndroidNotificationDetails androidNotificationDetails =
+    //     AndroidNotificationDetails(_channel.id, _channel.name,
+    //         channelDescription: _channel.description,
+    //         styleInformation: bigTextStyleInformation);
 
     const IOSNotificationDetails iosNotificationDetails =
         IOSNotificationDetails();
@@ -153,29 +167,28 @@ abstract class NotificationService {
         remoteMessage.notification.title,
         remoteMessage.notification.body,
         notificationDetails,
-        payload: jsonEncode(remoteMessage.data ?? "")
-    );
+        payload: jsonEncode(remoteMessage.data ?? ""));
   }
 
-
-  void showLocalNotification(String message,{String type}) {
+  void showLocalNotification(String message, {String type}) {
     if (message == null) {
       return;
     }
 
     String redirectionType;
-    if(type == 'order_placed'){
+    if (type == 'order_placed') {
       redirectionType = '{"type": "order_placed", "id": "1"}';
     }
 
     final AndroidNotificationDetails androidNotificationDetails =
-    AndroidNotificationDetails(_channel.id,
-        _channel.name,
-        channelDescription: _channel.description,
+        AndroidNotificationDetails(
+      _channel.id,
+      _channel.name,
+      channelDescription: _channel.description,
       sound: RawResourceAndroidNotificationSound('slow_spring_board'),
     );
     const IOSNotificationDetails iosNotificationDetails =
-    IOSNotificationDetails();
+        IOSNotificationDetails();
     NotificationDetails notificationDetails = NotificationDetails(
         android: androidNotificationDetails, iOS: iosNotificationDetails);
     _flutterLocalNotificationsPlugin.show(
@@ -183,8 +196,7 @@ abstract class NotificationService {
         AppVersionSingleton.instance.appVersion.store.storeName,
         message,
         notificationDetails,
-        payload: '${redirectionType}'
-         );
+        payload: '${redirectionType}');
   }
 
   /// Print error message information

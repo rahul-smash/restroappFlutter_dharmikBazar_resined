@@ -277,7 +277,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           Row(
             children: [
               Visibility(
-                visible: orderHistoryData.trackingData.trackingId!=null&&orderHistoryData.trackingData.trackingId.isNotEmpty,
+                visible: orderHistoryData.trackingData.trackingId != null &&
+                    orderHistoryData.trackingData.trackingId.isNotEmpty,
                 child: Expanded(
                   child: Row(
                     children: [
@@ -285,7 +286,8 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                         child: InkWell(
                           onTap: () {
                             Clipboard.setData(ClipboardData(
-                                text: orderHistoryData.trackingData.trackingId));
+                                text:
+                                    orderHistoryData.trackingData.trackingId));
                             Utils.showToast('Tracking ID copied!', false);
                           },
                           child: Column(
@@ -298,7 +300,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                     fontSize: 14, fontWeight: FontWeight.w300),
                               ),
                               Text(
-                                orderHistoryData.trackingData?.trackingId??'',
+                                orderHistoryData.trackingData?.trackingId ?? '',
                                 style: TextStyle(
                                     fontSize: 14,
                                     color: Color(0xFF7A7C80),
@@ -313,7 +315,6 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   ),
                 ),
               ),
-
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -337,16 +338,20 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
             ],
           ),
           SizedBox(height: 10),
-          InkWell(
-            child: Text(
-              'Order live tracking',
-              style: TextStyle(
-                decoration: TextDecoration.underline,
+          Visibility(
+            visible: orderHistoryData.trackingData.trackingUrl != null &&
+                orderHistoryData.trackingData.trackingUrl.isNotEmpty,
+            child: InkWell(
+              child: Text(
+                'Open Tracking link',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                ),
               ),
+              onTap: () {
+                launch(orderHistoryData.trackingData.trackingUrl);
+              },
             ),
-            onTap: () {
-              launch(orderHistoryData.trackingData.trackingUrl);
-            },
           )
           // onTap: () {
           //   launch('www.google.com');}),
