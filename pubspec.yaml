@@ -70,7 +70,7 @@ dependencies:
   flutter_calendar_carousel: ^2.1.0
   flutter_image_compress: ^1.1.0
   flutter_keyboard_visibility: ^5.1.1
-  share_plus: ^3.0.4
+  share_plus: ^4.0.4
   geocoding: ^2.0.2
   flutter_facebook_auth: ^4.0.1
   disable_battery_optimization: ^0.2.0

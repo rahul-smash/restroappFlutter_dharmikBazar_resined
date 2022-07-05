@@ -178,7 +178,7 @@ class _MyCouponState extends State<MyCouponScreen> {
               ],
             ),
           ],
-          overflow: Overflow.clip,
+          clipBehavior: Clip.none,
         ),
 
       ],

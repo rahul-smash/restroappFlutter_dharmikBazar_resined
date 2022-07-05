@@ -290,8 +290,14 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   }
 
   Widget _googleSignInButton() {
-    return OutlineButton(
-      splashColor: Colors.grey,
+    //return OutlineButton(
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        primary: Colors.grey, // <- this changes the splash color
+
+      ),
+
+      //splashColor: Colors.grey,
       onPressed: () async {
         bool isNetworkAvailable = await Utils.isNetworkAvailable();
         if (!isNetworkAvailable) {
@@ -345,9 +351,9 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           }
         }
       },
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
-      highlightElevation: 0,
-      borderSide: BorderSide(color: Colors.grey),
+    //  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      //highlightElevation: 0,
+      //borderSide: BorderSide(color: Colors.grey),
       child: Padding(
         padding: EdgeInsets.fromLTRB(0, 5, 0, 5),
         child: Row(

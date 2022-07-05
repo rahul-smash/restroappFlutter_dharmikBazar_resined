@@ -496,100 +496,79 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget addBottomBar() {
-    return Container(
-      child: Stack(
-        overflow: Overflow.visible,
-        alignment: new FractionalOffset(.5, 1.0),
-        children: <Widget>[
-          Container(
-              margin: EdgeInsets.only(bottom: kBottomNavigationBarHeight),
-              child: BottomOrderStatusBar(callback: callBack)
-          ),
-          BottomNavigationBar(
-            currentIndex: _currentIndex,
-            backgroundColor: bottomBarBackgroundColor,
-            type: BottomNavigationBarType.fixed,
-            selectedItemColor: bottomBarTextColor,
-            unselectedItemColor: bottomBarTextColor,
-            onTap: onTabTapped,
-            items: [
-              BottomNavigationBarItem(
-                icon: Image.asset('images/contacticon.png',
-                    width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-                //title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
-                label: 'Contact',
-              ),
-              BottomNavigationBarItem(
-                icon: Image.asset('images/searchcion.png',
-                    width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-                //title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
-                label: 'Search',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(
-                  Icons.shopping_cart,
-                  color: Colors.white,
-                  size: 0,
-                ),
-                //title: Text(''),
-                label: '',
-              ),
-              BottomNavigationBarItem(
-                icon: Image.asset('images/historyicon.png',
-                    width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
-                //title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
-                label: 'My Orders',
-              ),
-              BottomNavigationBarItem(
-                icon: Badge(
-                  showBadge: cartBadgeCount == 0 ? false : true,
-                  badgeColor: appThemeSecondary,
-                  badgeContent: Text('${cartBadgeCount}',
-                      style: TextStyle(color: Colors.white)),
-                  child: Image.asset('images/carticon.png',
-                      width: 24,
-                      fit: BoxFit.scaleDown,
-                      color: bottomBarIconColor),
-                ),
-                /*title: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
-                  child:
-                      Text('Cart', style: TextStyle(color: bottomBarTextColor)),
-                ),*/
-                label: 'Cart',
-              ),
-            ],
-          ),
-          Container(
-              height: 65, width: 65,
-            //padding: EdgeInsets.all(15.0),
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                //color: appTheme,
-                border: Border.all(width: 2, color: Colors.white)
-                ),
-            margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            child: Container(
-              padding: EdgeInsets.all(10.0),
-              margin: EdgeInsets.all(0.5),
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: appTheme,
-              ),
-              child: widget.configObject.isGroceryApp == "true"
-                  ? Image.asset(
-                      "images/groceryicon.png",
-                      height: 30,
-                      width: 30,
-                color: whiteColor,
-                    )
-                  : Image.asset("images/restauranticon.png",
-                      height: 30, width: 30, color: whiteColor),
+    return Stack(
+      clipBehavior: Clip.none,
+      alignment: new FractionalOffset(.5, 1.0),
+      children: <Widget>[
+        BottomNavigationBar(
+          currentIndex: _currentIndex,
+          backgroundColor: bottomBarBackgroundColor,
+          type: BottomNavigationBarType.fixed,
+          onTap: onTabTapped,
+          items: [
+            BottomNavigationBarItem(
+              icon: Image.asset('images/contacticon.png',
+                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+              //title: Text('Contact', style: TextStyle(color: bottomBarTextColor)),
+              label: 'Contact',
             ),
-          ),
-        ],
-      ),
+            BottomNavigationBarItem(
+              icon: Image.asset('images/searchcion.png',
+                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+              //title: Text('Search', style: TextStyle(color: bottomBarTextColor)),
+              label: 'Search',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.shopping_cart,
+                color: Colors.white,
+                size: 0,
+              ),
+              //title: Text(''),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Image.asset('images/historyicon.png',
+                  width: 24, fit: BoxFit.scaleDown, color: bottomBarIconColor),
+              //title: Text('My Orders', style: TextStyle(color: bottomBarTextColor)),
+              label: 'My Orders',
+            ),
+            BottomNavigationBarItem(
+              icon: Badge(
+                showBadge: cartBadgeCount == 0 ? false : true,
+                badgeColor: appThemeSecondary,
+                badgeContent: Text('${cartBadgeCount}',
+                    style: TextStyle(color: Colors.white)),
+                child: Image.asset('images/carticon.png',
+                    width: 24,
+                    fit: BoxFit.scaleDown,
+                    color: bottomBarIconColor),
+              ),
+              /*title: Padding(
+                padding: EdgeInsets.fromLTRB(0, 2, 0, 0),
+                child:
+                    Text('Cart', style: TextStyle(color: bottomBarTextColor)),
+              ),*/
+              label: 'Cart',
+            ),
+          ],
+        ),
+        Container(
+          padding: EdgeInsets.all(10.0),
+          decoration: BoxDecoration(shape: BoxShape.circle, color: appTheme),
+          margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+          child: widget.configObject.isGroceryApp == "true"
+              ? Image.asset(
+                  "images/groceryicon.png",
+                  height: 40,
+                  width: 40,
+                  color: whiteColor,
+                )
+              : Image.asset("images/restauranticon.png",
+                  height: 40, width: 40, color: whiteColor),
+        ),
+      ],
     );
   }
 
