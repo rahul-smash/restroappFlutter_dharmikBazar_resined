@@ -84,7 +84,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _offset = Offset(Utils.width/1.7, Utils.height/1.7);
+    _offset = Offset(Utils.width / 1.7, Utils.height / 1.7);
     isStoreClosed = false;
     // initFirebase();
     NotificationServiceHelper.instance.initialize();
@@ -315,7 +315,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
               child: AppConstant.isLoggedIn
-                  ? store.delivery_expected_times == '1' ? OrderTimePopup() : SizedBox()
+                  ? store.delivery_expected_times == '1'
+                      ? OrderTimePopup()
+                      : SizedBox()
                   : SizedBox(),
             ),
           ),
@@ -339,8 +341,7 @@ class _HomeScreenState extends State<HomeScreen> {
     //print("--------showBottomBar---------=${showBottomBar}");
   }
 
-  Widget showGridView(){
-
+  Widget showGridView() {
     return Container(
       color: grayLightColor,
       padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
@@ -351,11 +352,9 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisSpacing: 5.0,
           crossAxisSpacing: 8.0,
           shrinkWrap: true,
-          children: categoryResponse.categories
-              .map((CategoryModel model) {
+          children: categoryResponse.categories.map((CategoryModel model) {
             return GridTile(child: CategoryView(model, store, false, 0));
-          }).toList()
-      ),
+          }).toList()),
     );
   }
 
@@ -393,7 +392,8 @@ class _HomeScreenState extends State<HomeScreen> {
         autoPlayCurve: Curves.ease,
         scrollDirection: Axis.horizontal,
       ),
-      itemBuilder: (BuildContext context, int itemIndex,realIndex) => Container(
+      itemBuilder: (BuildContext context, int itemIndex, realIndex) =>
+          Container(
         child: _makeBanner(context, itemIndex),
       ),
     );
@@ -504,6 +504,7 @@ class _HomeScreenState extends State<HomeScreen> {
           currentIndex: _currentIndex,
           backgroundColor: bottomBarBackgroundColor,
           type: BottomNavigationBarType.fixed,
+          selectedItemColor: bottomBarTextColor,
           onTap: onTabTapped,
           items: [
             BottomNavigationBarItem(
@@ -1035,6 +1036,4 @@ class _HomeScreenState extends State<HomeScreen> {
   void _getWellet() async {
     welleModel = await ApiController.getUserWallet();
   }
-
-
 }
