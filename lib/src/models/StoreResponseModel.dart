@@ -450,7 +450,7 @@ class StoreModel {
     homePageDisplayNumberType = json['home_page_display_number_type'];
     domain = json["domain"];
     poweredByText = json["powered_by_text"];
-    areaWisePaymentOption:
+    areaWisePaymentOption=
     json["area_wise_payment_option"] == null
         ? null
         : json["area_wise_payment_option"];
