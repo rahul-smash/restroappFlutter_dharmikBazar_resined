@@ -72,7 +72,7 @@ dependencies:
   flutter_keyboard_visibility: ^5.1.1
   share_plus: ^4.0.4
   geocoding: ^2.0.2
-  flutter_facebook_auth: ^4.0.1
+  flutter_facebook_auth: ^4.4.0
   disable_battery_optimization: ^0.2.0
   dotted_border: ^2.0.0+2
   clipboard: ^0.1.3

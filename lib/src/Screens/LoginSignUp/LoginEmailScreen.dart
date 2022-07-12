@@ -248,7 +248,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
                                 // if (isFbLoggedIn) {
                                 //   await facebookSignIn.logOut();
                                 // }
-                                await facebookSignIn.logOut();
+                                // await facebookSignIn.logOut();
 
                                 fblogin();
                               },
@@ -399,7 +399,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
   }
 
   Future<Null> fblogin() async {
-    final result = await facebookSignIn.login(permissions: ['email']);
+    final result = await facebookSignIn.login();
     // final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
 
     switch (result.status) {
