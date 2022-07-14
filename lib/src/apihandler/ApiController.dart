@@ -71,6 +71,7 @@ import '../models/DPOCreateResponse.dart';
 import '../models/order_time_response.dart';
 
 import '../models/home_screen_orders_model.dart';
+import '../models/third_party_delivery_response.dart';
 import '../models/weight_wise_charges_response.dart';
 import '../notifications/notification_service_helper.dart';
 
@@ -2772,7 +2773,7 @@ class ApiController {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     var url = ApiConstants.getVIRoute(storeID: store.id) +
-        ApiConstants.shippingChargesApi;
+        ApiConstants.deliveryShippingChargesApi;
     print(url);
     try {
       FormData formData = new FormData.fromMap({
@@ -2796,6 +2797,38 @@ class ApiController {
     } catch (e) {
       print(e);
     }
+  }
+
+
+  //third party charges
+  static Future<ThirdPartyDeliveryResponse> getDeliveryShippingChargesApi({@required String userZipcode,@required String orderDetail})async{
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.getVIRoute(storeID: store.id) +
+        ApiConstants.deliveryShippingChargesApi;
+    print(url);
+    try {
+      FormData formData = new FormData.fromMap({
+        "user_zipcode": userZipcode,
+        "order_detail":orderDetail,
+        "platform": Platform.isIOS ? "IOS" : "android",
+      });
+      print(formData.fields);
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(
+              contentType: "application/json",
+              responseType: ResponseType.plain));
+      print(response.statusCode);
+      print(response.data);
+      ThirdPartyDeliveryResponse chargesResponse =
+      ThirdPartyDeliveryResponse.fromJson(json.decode(response.data));
+      print("-----ThirdPartyDeliveryResponse---${chargesResponse.success}");
+      return chargesResponse;
+    } catch (e) {
+      print(e);
+    }
+
   }
 
   static File createFile(String path) {

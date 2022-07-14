@@ -134,6 +134,10 @@ class ApiConstants {
    //weight shipping charge calculation
   static String shippingChargesApi = 'delivery_charges/index';
 
+  //--------------------------------
+   //third party shipping charge calculation
+  static String deliveryShippingChargesApi = '/delivery_partner_shipping_charges/index';
+
   //new payment gateway
   static String dpoCreateOrderApi = '/dpo/dpoCreateOrder';
 

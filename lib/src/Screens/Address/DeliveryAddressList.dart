@@ -24,6 +24,7 @@ import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 import '../../models/SubCategoryResponse.dart';
+import '../../models/third_party_delivery_response.dart';
 import '../../models/weight_wise_charges_response.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
@@ -534,27 +535,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           StoreModel storeModel = await SharedPrefs.getStore();
           DeliveryAddressData addressData =
               DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
-          if (storeModel.enableWeightWiseCharges == '1') {
-            String shippingCharges =
-                await calculateShipping(addressList[selectedIndex]);
-            Utils.showProgressDialog(context);
-            DatabaseHelper databaseHelper = new DatabaseHelper();
-            List<Product> cartList = await databaseHelper.getCartItemList();
-            String orderJson = await Utils.getCartListToJson(cartList);
-
-            WeightWiseChargesResponse chargesResponse =
-                await ApiController.getWeightWiseShippingCharges(
-                    orderDetail: orderJson,
-                    areaShippingCharge: shippingCharges);
-            if (chargesResponse != null &&
-                chargesResponse.success &&
-                chargesResponse.data != null) {
-              //update changes according to weight
-              addressData.areaCharges =
-                  chargesResponse.data.totalDeliveryCharge;
-            }
-            Utils.hideProgressDialog(context);
-          }
+          addressData =
+              await checkingStoreDeliverymodel(storeModel, addressData);
 
           if (addressList.length == 0) {
             Utils.showToast(AppConstant.selectAddress, false);
@@ -704,7 +686,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         print("-Cart-totalPrice is greater than min amount---}");
         //then Store will not charge shipping.
         totalPrice = totalPrice;
-        print("---------- shipping mandatory ----------- ${addressList.isShippingMandatory}");
+        print(
+            "---------- shipping mandatory ----------- ${addressList.isShippingMandatory}");
         if (addressList.isShippingMandatory == '0') {
           shippingCharges = "0";
           addressList.areaCharges = "0";
@@ -712,5 +695,65 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       }
     }
     return shippingCharges;
+  }
+
+  Future<DeliveryAddressData> checkingStoreDeliverymodel(
+      StoreModel storeModel, DeliveryAddressData addressData) async {
+    switch (storeModel.storeDeliveryModel) {
+      case AppConstant.DELIVERY_WEIGHTWISE:
+        {
+          if (storeModel.enableWeightWiseCharges == '1') {
+            String shippingCharges =
+                await calculateShipping(addressList[selectedIndex]);
+            Utils.showProgressDialog(context);
+            DatabaseHelper databaseHelper = new DatabaseHelper();
+            List<Product> cartList = await databaseHelper.getCartItemList();
+            String orderJson = await Utils.getCartListToJson(cartList);
+
+            WeightWiseChargesResponse chargesResponse =
+                await ApiController.getWeightWiseShippingCharges(
+                    orderDetail: orderJson,
+                    areaShippingCharge: shippingCharges);
+            if (chargesResponse != null &&
+                chargesResponse.success &&
+                chargesResponse.data != null) {
+              //update changes according to weight
+              addressData.areaCharges =
+                  chargesResponse.data.totalDeliveryCharge;
+              Utils.hideProgressDialog(context);
+
+              return addressData;
+            } else {
+              return addressData;
+            }
+          }
+          break;
+        }
+      case AppConstant.DELIVERY_VALUEAPP:
+        return addressData;
+        break;
+      case AppConstant.DELIVERY_THIRD_PARTY:
+        String shippingCharges =
+            await calculateShipping(addressList[selectedIndex]);
+        Utils.showProgressDialog(context);
+        DatabaseHelper databaseHelper = new DatabaseHelper();
+        List<Product> cartList = await databaseHelper.getCartItemList();
+        String orderJson = await Utils.getCartListToJson(cartList);
+        ThirdPartyDeliveryResponse chargesResponse =
+            await ApiController.getDeliveryShippingChargesApi(
+                orderDetail: orderJson, userZipcode: addressData.zipCode);
+        Utils.hideProgressDialog(context);
+        if (chargesResponse != null &&
+            chargesResponse.success &&
+            chargesResponse.data != null) {
+          //update changes according to weight
+          // addressData.areaCharges = chargesResponse.data.totalDeliveryCharge;
+          return addressData;
+        } else {
+          return addressData;
+        }
+
+        break;
+    }
   }
 }
