@@ -14,8 +14,8 @@ import '../../../utils/AppConstants.dart';
 import '../../Offers/OrderDetailScreenVersion2.dart';
 
 class BottomOrderStatusBar extends StatefulWidget {
-
   final Function(bool showBottomBar) callback;
+
   BottomOrderStatusBar({this.callback});
 
   @override
@@ -25,8 +25,8 @@ class BottomOrderStatusBar extends StatefulWidget {
 }
 
 class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
-
   List<HomeOrderData> list = [];
+
   //double currentIndexPage;
   Timer _timer;
   HomeScreenOrdersModel homeScreenOrdersModel;
@@ -36,84 +36,90 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
     super.initState();
     //currentIndexPage = 0;
     widget.callback(false);
-    Utils.isNetworkAvailable().then((isNetworkAvailable){
+    Utils.isNetworkAvailable().then((isNetworkAvailable) {
       if (!isNetworkAvailable) {
         Utils.showToast(AppConstant.noInternet, false);
         return;
-      }else{
-        getOrdersDataFromApi();
-        _checkLoginState();
+      } else {
+        if (AppConstant.isLoggedIn) {
+          getOrdersDataFromApi();
+          _checkLoginState();
+        }
       }
     });
-
   }
 
   @override
   void dispose() {
     super.dispose();
-    if(_timer != null){
+    if (_timer != null) {
       _timer.cancel();
     }
   }
 
   void _checkLoginState() {
-    print('--show_order_on_home_screen-=${AppVersionSingleton.instance.appVersion.store.show_order_on_home_screen}');
+    print(
+        '--show_order_on_home_screen-=${AppVersionSingleton.instance.appVersion.store.show_order_on_home_screen}');
     int interval = 5;
     var duration = Duration(seconds: interval);
     _timer = new Timer.periodic(
-      duration, (Timer timer) {
-      if (AppConstant.isLoggedIn) {
-        //print('------Timer.periodic------');
-        Utils.isNetworkAvailable().then((isNetworkAvailable){
-          if (isNetworkAvailable) {
-            getOrdersDataFromApi();
-          }
-        });
-      }
-    },
+      duration,
+      (Timer timer) {
+        if (AppConstant.isLoggedIn) {
+          //print('------Timer.periodic------');
+          Utils.isNetworkAvailable().then((isNetworkAvailable) {
+            if (isNetworkAvailable) {
+              getOrdersDataFromApi();
+            }
+          });
+        }
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Visibility(
-      visible: AppConstant.isLoggedIn ?  true : false,
-      child: list.isEmpty ? Container(height: 0,width: 0,) : Container(
-        height: 60,
-        color: Color(0xFFebebeb),
-        child: Stack(
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 2,
-                  padding: EdgeInsets.only(top: 5),
-                  color: Color(0xFFd1d1d1),
-                ),
-                Container(
-                    height: 58,
-                    width: Utils.getDeviceWidth(context),
-                    child: CarouselSlider(
-                      options: CarouselOptions(
-                        autoPlay: list.length == 1 ? false : true,
-                        /*onPageChanged: (int index, CarouselPageChangedReason reason){
+      visible: AppConstant.isLoggedIn ? true : false,
+      child: list.isEmpty
+          ? Container(
+              height: 0,
+              width: 0,
+            )
+          : Container(
+              height: 60,
+              color: Color(0xFFebebeb),
+              child: Stack(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 2,
+                        padding: EdgeInsets.only(top: 5),
+                        color: Color(0xFFd1d1d1),
+                      ),
+                      Container(
+                          height: 58,
+                          width: Utils.getDeviceWidth(context),
+                          child: CarouselSlider(
+                            options: CarouselOptions(
+                              autoPlay: list.length == 1 ? false : true,
+                              /*onPageChanged: (int index, CarouselPageChangedReason reason){
                           print("index=${index} reason=${reason}");
                           setState(() {
                             currentIndexPage = index.toDouble();
                           });
                         },*/
-                        viewportFraction: 1.0,
-                      ),
-                      items: list.map((item) {
-                        return buildOrderStatusBar(item);
-                      }).toList(),
-                    )
-                ),
-              ],
-            ),
-            /*Container(
+                              viewportFraction: 1.0,
+                            ),
+                            items: list.map((item) {
+                              return buildOrderStatusBar(item);
+                            }).toList(),
+                          )),
+                    ],
+                  ),
+                  /*Container(
               margin: EdgeInsets.only(right: 15),
               child: Align(
                 alignment: Alignment.bottomRight,
@@ -129,13 +135,13 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
                 ),
               ),
             )*/
-          ],
-        ),
-      ),
+                ],
+              ),
+            ),
     );
   }
 
-  Widget buildOrderStatusBar(HomeOrderData homeOrderData){
+  Widget buildOrderStatusBar(HomeOrderData homeOrderData) {
     return Container(
       width: Utils.getDeviceWidth(context),
       child: Row(
@@ -144,10 +150,10 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
             width: 40,
             height: 40,
             padding: EdgeInsets.all(7),
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Color(0xFF41474E)),
-            child: Image.asset('images/order_icon.png',width: 30,height: 30,color: Colors.white),
+            decoration:
+                BoxDecoration(shape: BoxShape.circle, color: Color(0xFF41474E)),
+            child: Image.asset('images/order_icon.png',
+                width: 30, height: 30, color: Colors.white),
             margin: EdgeInsets.only(left: 25),
           ),
           Container(
@@ -156,15 +162,28 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Order id- ${homeOrderData.displayOrderId}",style: TextStyle(fontSize: 13,color: Color(0xFF878A8D)),),
+                Text(
+                  "Order id- ${homeOrderData.displayOrderId}",
+                  style: TextStyle(fontSize: 13, color: Color(0xFF878A8D)),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text("• ",style: TextStyle(fontSize: 22, color: getStatusColor(homeOrderData.statusCode),
-                        fontWeight: FontWeight.w600),),
-                    Text("${homeOrderData.status}",style: TextStyle(fontSize: 17,color: Color(0xFF41474E),
-                        fontWeight: FontWeight.w600),),
+                    Text(
+                      "• ",
+                      style: TextStyle(
+                          fontSize: 22,
+                          color: getStatusColor(homeOrderData.statusCode),
+                          fontWeight: FontWeight.w600),
+                    ),
+                    Text(
+                      "${homeOrderData.status}",
+                      style: TextStyle(
+                          fontSize: 17,
+                          color: Color(0xFF41474E),
+                          fontWeight: FontWeight.w600),
+                    ),
                   ],
                 ),
               ],
@@ -174,22 +193,29 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
             child: Container(),
           ),
           InkWell(
-            onTap: (){
+            onTap: () {
               openOrderDetail(homeOrderData.id);
             },
             child: Container(
-              child: Text("VIEW DETAIL",style: TextStyle(fontSize: 16,
-                  fontWeight: FontWeight.w600,color: appTheme),),
+              child: Text(
+                "VIEW DETAIL",
+                style: TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w600, color: appTheme),
+              ),
             ),
           ),
           InkWell(
-            onTap: (){
+            onTap: () {
               openOrderDetail(homeOrderData.id);
             },
             child: Container(
-              margin: EdgeInsets.only(right: 20,left: 5),
+              margin: EdgeInsets.only(right: 20, left: 5),
               //child: Icon(Icons.arrow_right_alt,color: Color(0xFF41474E))
-              child: Image.asset('images/viewmore_arrow.png',width: 22,height: 18,),
+              child: Image.asset(
+                'images/viewmore_arrow.png',
+                width: 22,
+                height: 18,
+              ),
             ),
           )
         ],
@@ -216,13 +242,13 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
         return Color(0xFFA5C055); //=> 'pending'
         break;
       case '1':
-      return Color(0xFFD2D02C);  //=> 'processing'
-      break;
+        return Color(0xFFD2D02C); //=> 'processing'
+        break;
       case '4':
-      return Color(0xFFD2D02C);  //=> 'delivering'
-      break;
+        return Color(0xFFD2D02C); //=> 'delivering'
+        break;
       case '7':
-        return Color(0xFFD2D02C);  //=> 'on the way'
+        return Color(0xFFD2D02C); //=> 'on the way'
         break;
       default:
         return Color(0xFFA5C055);
@@ -230,26 +256,27 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
   }
 
   void getOrdersDataFromApi() {
-    if(AppVersionSingleton.instance.appVersion.store.show_order_on_home_screen == '1'){
-      ApiController.getHomeScreenOrderApiRequest().then((value){
-        if(value != null){
+    if (AppVersionSingleton
+            .instance.appVersion.store.show_order_on_home_screen ==
+        '1') {
+      ApiController.getHomeScreenOrderApiRequest().then((value) {
+        if (value != null) {
           setState(() {
             this.homeScreenOrdersModel = value;
-            if(value.success){
+            if (value.success) {
               this.list = homeScreenOrdersModel.data;
             }
-            if(!value.success){
+            if (!value.success) {
               list.clear();
               widget.callback(false);
             }
           });
-        }else{
+        } else {
           widget.callback(false);
         }
       });
     }
   }
-
 
   Future<void> openOrderDetail(String orderID) async {
     StoreModel store = await SharedPrefs.getStore();
@@ -259,12 +286,10 @@ class _BottomOrderStatusBarState extends State<BottomOrderStatusBar> {
       context,
       MaterialPageRoute(
           builder: (context) => OrderDetailScreenVersion2(
-            isRatingEnable,
-            store,
-            orderId: orderID,
-          )),
+                isRatingEnable,
+                store,
+                orderId: orderID,
+              )),
     );
   }
-
 }
-

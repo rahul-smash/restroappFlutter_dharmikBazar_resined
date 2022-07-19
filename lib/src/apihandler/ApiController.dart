@@ -68,6 +68,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/DPOCreateResponse.dart';
+import '../models/DeleteUserResponse.dart';
 import '../models/order_time_response.dart';
 
 import '../models/home_screen_orders_model.dart';
@@ -2829,6 +2830,35 @@ class ApiController {
       print(e);
     }
 
+  }
+
+  static Future<DeleteUserResponse> deleteUser() async {
+    StoreModel store = await SharedPrefs.getStore();
+    UserModel user = await SharedPrefs.getUser();
+    var url = ApiConstants.getDeleteRoute(storeID: store.id) +
+        ApiConstants.deleteUser;
+    print(url);
+    try {
+      FormData formData = new FormData.fromMap({
+        "id": user.id,
+        "platform": Platform.isIOS ? "IOS" : "android",
+      });
+      print(formData.fields);
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(
+              contentType: "application/json",
+              responseType: ResponseType.plain));
+      print(response.statusCode);
+      print(response.data);
+      DeleteUserResponse deleteUserResponse =
+      DeleteUserResponse.fromJson(json.decode(response.data));
+      print("-----deleteUserResponse---${deleteUserResponse.success}");
+      return deleteUserResponse;
+    } catch (e) {
+      print(e);
+    }
   }
 
   static File createFile(String path) {
