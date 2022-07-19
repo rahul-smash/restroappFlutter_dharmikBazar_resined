@@ -218,7 +218,7 @@ class DialogUtils {
                       children: [
                         InkWell(
                           onTap: onButtonPressed ??
-                                  () {
+                              () {
                                 Navigator.of(context).pop(true);
                               },
                           child: Container(
@@ -247,7 +247,6 @@ class DialogUtils {
                             ),
                           ),
                         ),
-
                       ],
                     ),
                     Padding(
@@ -1860,6 +1859,100 @@ class DialogUtils {
                         ),
                       ],
                     )
+                  ],
+                ))),
+          );
+        });
+  }
+
+  static Future<bool> showDeleteUserPopUp(BuildContext context,
+      {Function button1,
+      String buttonText1 = '',
+      Function cancelButton}) async {
+    return await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop: () {
+              return Future(() => false);
+            },
+            child: Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                //title: Text(title,textAlign: TextAlign.center,),
+                child: Container(
+                    child: Wrap(
+                  children: <Widget>[
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: InkWell(
+                        onTap: cancelButton ??
+                            () {
+                              Navigator.pop(context,false);
+                            },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(5, 15, 15, 5),
+                          child: Image.asset(
+                            'images/cancelicon.png',
+                            fit: BoxFit.scaleDown,
+                            height: 15,
+                            width: 15,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Center(child: Text('Delete Account',style: TextStyle(fontSize: 20),)),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20, top: 20,left: 25,right: 25),
+                      child: RichText(textAlign: TextAlign.center,
+                        text: TextSpan(
+                          text:
+                              'Are you sure you want to delete your account? If you delete your account, you will ',
+                          style: TextStyle(fontSize: 16, color: Colors.black),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: 'permanently lose',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16)),
+                            TextSpan(
+                                text: ' your profile.',
+                                style:
+                                    TextStyle(color: Colors.black, fontSize: 16)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 40, top: 10),
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: ButtonTheme(
+                          minWidth: 180.0,
+                          height: 40.0,
+                          child: RaisedButton(
+                            shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(5.0),
+                                side: BorderSide(color: appThemeSecondary)),
+                            onPressed: button1 ??
+                                () async {
+                                  Navigator.pop(context, true);
+                                },
+                            color: appThemeSecondary,
+                            padding: EdgeInsets.all(5.0),
+                            textColor: Colors.white,
+                            child: Text(buttonText1.isNotEmpty
+                                ? buttonText1
+                                : "Yes, Delete",),
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ))),
           );
