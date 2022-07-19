@@ -957,11 +957,12 @@ class DatabaseHelper {
     return await dbClient.delete(table);
   }
 
-  void clearDataBase() async {
+  void clearDataBase({bool isRemoveAll=true}) async {
     var dbClient = await db;
     dbClient.delete(Categories_Table);
     dbClient.delete(Sub_Categories_Table);
     dbClient.delete(Products_Table);
+    if(isRemoveAll)
     dbClient.delete(Favorite_Table);
 //    dbClient.delete(CART_Table);
   }

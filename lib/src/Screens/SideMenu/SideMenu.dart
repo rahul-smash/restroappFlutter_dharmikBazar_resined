@@ -703,11 +703,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
-      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
-      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+      // databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+      // databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
       databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      // databaseHelper.deleteTable(DatabaseHelper.Products_Table);
       eventBus.fire(updateCartCount());
       Utils.showToast(AppConstant.logoutSuccess, true);
 

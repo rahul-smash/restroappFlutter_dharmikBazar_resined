@@ -271,7 +271,7 @@ class Product {
         "deleted": deleted,
         "image_100_80": image10080,
         "image_300_200": image300200,
-        "offer_details": offerDetails.toJson(),
+        "offer_details":offerDetails!=null? offerDetails.toJson():null,
         "variants": List<dynamic>.from(variants.map((x) => x.toJson())),
         "selectedVariant": selectedVariant.toJson(),
       };

@@ -276,24 +276,63 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         children: <Widget>[
           Row(
             children: [
+              Visibility(
+                visible: orderHistoryData.trackingData.trackingId != null &&
+                    orderHistoryData.trackingData.trackingId.isNotEmpty,
+                child: Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(
+                                text:
+                                    orderHistoryData.trackingData.trackingId));
+                            Utils.showToast('Tracking ID copied!', false);
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Tracking Id',
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w300),
+                              ),
+                              Text(
+                                orderHistoryData.trackingData?.trackingId ?? '',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF7A7C80),
+                                    fontWeight: FontWeight.w300),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                    ],
+                  ),
+                ),
+              ),
               Expanded(
-                child: InkWell(
-                  onTap: () {
-                    Clipboard.setData(ClipboardData(
-                        text: orderHistoryData.trackingData.trackingId));
-                    Utils.showToast('Tracking ID copied!',false);
-                  },
+                child: Visibility(
+                  visible:
+                      orderHistoryData.trackingData.expectedDeliiveryDate !=
+                              null &&
+                          orderHistoryData
+                              .trackingData.expectedDeliiveryDate.isNotEmpty,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Tracking Id',
+                        'Expected Delivery Date',
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w300),
                       ),
                       Text(
-                        orderHistoryData.trackingData.trackingId,
+                        orderHistoryData.trackingData.expectedDeliiveryDate,
                         style: TextStyle(
                             fontSize: 14,
                             color: Color(0xFF7A7C80),
@@ -303,38 +342,24 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   ),
                 ),
               ),
-              SizedBox(width: 10),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Expected Delivery Date',
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                    ),
-                    Text(
-                      orderHistoryData.trackingData.expectedDeliiveryDate,
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF7A7C80),
-                          fontWeight: FontWeight.w300),
-                    ),
-                  ],
-                ),
-              ),
             ],
           ),
           SizedBox(height: 10),
-          InkWell(
+          Visibility(
+            visible: orderHistoryData.trackingData.trackingUrl != null &&
+                orderHistoryData.trackingData.trackingUrl.isNotEmpty,
+            child: InkWell(
               child: Text(
                 'Order live tracking',
                 style: TextStyle(
                   decoration: TextDecoration.underline,
                 ),
               ),
-              onTap: () => launch(orderHistoryData.trackingData.trackingUrl)),
+              onTap: () {
+                launch(orderHistoryData.trackingData.trackingUrl);
+              },
+            ),
+          )
           // onTap: () {
           //   launch('www.google.com');}),
         ],
@@ -741,7 +766,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     Flexible(
                       child: Visibility(
                         visible: AppVersionSingleton.instance.appVersion.store
-                            .displayVariantWeight !=
+                                .displayVariantWeight !=
                             '0',
                         child: Text(
                             'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
