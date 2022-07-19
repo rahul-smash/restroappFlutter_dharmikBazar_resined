@@ -681,11 +681,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   Future logout(BuildContext context) async {
     try {
       // FacebookLogin facebookSignIn = new FacebookLogin();
-      var facebookSignIn = FacebookAuth.instance;
+      // var facebookSignIn = FacebookAuth.instance;
       // bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
       // print("isFbLoggedIn=${isFbLoggedIn}");
       // if (isFbLoggedIn) {
-      await facebookSignIn.logOut();
+      // await facebookSignIn.logOut();
       // }
 
       bool isGoogleSignedIn = await _googleSignIn.isSignedIn();

@@ -144,4 +144,16 @@ class ApiConstants {
     }
   }
 
+
+  //new payment gateway
+  static String dpoCreateOrderApi = '/dpo/dpoCreateOrder';
+
+  static String getDpoRoute({String storeID}){
+    if(storeID!=null)
+      return '$base$dpoCreateOrderApi'.replaceAll("storeId", storeID);
+    else{
+      return '$base$dpoCreateOrderApi';
+    }
+  }
+
 }

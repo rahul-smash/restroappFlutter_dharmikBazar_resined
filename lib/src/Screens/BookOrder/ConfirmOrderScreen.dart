@@ -10,6 +10,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
 import 'package:restroapp/src/Screens/Offers/RedeemPointsScreen.dart';
+import 'package:restroapp/src/Screens/gateways/dpo_webview.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -1893,6 +1894,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 return;
               }
               paymentGateway = result;
+              bool isNetworkAvailable = await Utils.isNetworkAvailable();
+              if (!isNetworkAvailable) {
+                Utils.showToast(AppConstant.noInternet, false);
+                return;
+              }
+
               callPaymentGateWay(paymentGateway, storeObject);
             }
           }
@@ -1915,13 +1922,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.hideProgressDialog(context);
     switch (paymentGateway) {
       case "Razorpay":
-        callOrderIdApi(storeObject);
+        callOrderIdApi(storeObject, "Razorpay");
         break;
       case "Stripe":
         callStripeApi();
         break;
       case "Paytmpay":
         callPaytmPayApi();
+        break;
+
+      case "DPO":
+        callOrderIdApi(storeObject, "DPO");
         break;
     }
   }
@@ -2251,7 +2262,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         msg: "EXTERNAL_WALLET: " + response.walletName, timeInSecForIos: 4);*/
   }
 
-  void callOrderIdApi(StoreModel storeObject) async {
+  void callOrderIdApi(StoreModel storeObject, String paymentGateWay) async {
+    bool isNetworkAvailable = await Utils.isNetworkAvailable();
+    if (!isNetworkAvailable) {
+      Utils.showToast(AppConstant.noInternet, false);
+      return;
+    }
+
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total); //totalPrice ;
     print("=======1===${price}===total==${taxModel.total}======");
@@ -2304,24 +2321,47 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           "",
           "",
           deviceId,
-          "Razorpay",
+          paymentGateWay,
           userId,
           deviceToken,
           storeAddress,
           selectedDeliverSlotValue,
           totalSavingsText);
-      ApiController.razorpayCreateOrderApi(
-              mPrice, orderJson, detailsModel.orderDetails)
-          .then((response) {
-        CreateOrderData model = response;
-        if (model != null && response.success) {
-          print("----razorpayCreateOrderApi----${response.data.id}--");
-          openCheckout(model.data.id, storeObject);
-        } else {
-          Utils.showToast("${model.message}", true);
-          Utils.hideProgressDialog(context);
-        }
-      });
+
+      switch (paymentGateWay) {
+        case "Razorpay":
+          ApiController.razorpayCreateOrderApi(
+                  mPrice, orderJson, detailsModel.orderDetails)
+              .then((response) {
+            CreateOrderData model = response;
+            if (model != null && response.success) {
+              print("----razorpayCreateOrderApi----${response.data.id}--");
+              openCheckout(model.data.id, storeObject);
+            } else {
+              Utils.showToast("${model.message}", true);
+              Utils.hideProgressDialog(context);
+            }
+          });
+          break;
+
+        case "DPO":
+          ApiController.createDPOToken(
+              taxModel.total, orderJson, detailsModel.orderDetails,storeModel.currencyAbbr.trim())
+              .then((value) async {
+            Utils.hideProgressDialog(context);
+            if (value != null && value.success) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => DPOWedview(value, storeModel)),
+              );
+            } else {
+              Utils.hideProgressDialog(context);
+              Utils.showToast("Api Error", false);
+            }
+          });
+          break;
+      }
     });
   }
 
@@ -2428,6 +2468,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     eventBus.on<onPayTMPageFinished>().listen((event) {
       print("Event Bus called");
       callPaytmApi(event.url, event.orderId, event.txnId);
+    });
+
+    eventBus.on<onDPOCreateFinished>().listen((event) async{
+      bool isNetworkAvailable = await Utils.isNetworkAvailable();
+      if (!isNetworkAvailable) {
+        Utils.showToast(AppConstant.noInternet, false);
+        return;
+      }
+
+      Utils.showProgressDialog(context);
+      placeOrderApiCall(event.chargeID, event.chargeID, 'DPO');
     });
   }
 

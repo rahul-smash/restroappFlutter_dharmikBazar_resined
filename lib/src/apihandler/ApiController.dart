@@ -68,6 +68,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/DeleteUserResponse.dart';
+import '../models/DPOCreateResponse.dart';
 import '../models/order_time_response.dart';
 
 import '../models/home_screen_orders_model.dart';
@@ -1827,6 +1828,48 @@ class ApiController {
         CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
         if (txnTokenResponse.success) {
           return txnTokenResponse;
+        } else {
+          return null;
+        }
+      } else {
+        Utils.showToast(AppConstant.noInternet, true);
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+
+  static Future<DpoCreateResponse> createDPOToken(String amount, String orderJson, dynamic detailsJson,String currency) async {
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    try {
+      if (isNetworkAviable) {
+        StoreModel store = await SharedPrefs.getStore();
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        UserModel user = await SharedPrefs.getUser();
+        var url = ApiConstants.getDpoRoute(storeID: store.id);
+        print(url);
+        FormData formData = new FormData.fromMap({
+          "amount": amount,
+          "currency": currency,
+          "order_info": detailsJson, //JSONObject details
+          "orders": orderJson,
+          "user_id":user.id
+        });
+        print(formData.fields);
+        Dio dio = new Dio();
+        dio.options.headers['Accept'] = 'application/json';
+        dio.options.contentType = "application/json";
+        dio.options.followRedirects = false;
+        Response response = await dio.post(url,
+            data: formData,
+            options: new Options(responseType: ResponseType.plain));
+        print(response.data);
+        DpoCreateResponse createResponse =
+        DpoCreateResponse.fromJson(json.decode(response.data));
+        if (createResponse.success) {
+          return createResponse;
         } else {
           return null;
         }

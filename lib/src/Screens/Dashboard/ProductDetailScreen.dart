@@ -247,7 +247,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               ),
             ),
           ],
-          overflow: Overflow.clip,
+          clipBehavior: Clip.none,
         ),
 
         //addDivideView(),

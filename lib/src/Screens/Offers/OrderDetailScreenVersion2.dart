@@ -350,7 +350,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 orderHistoryData.trackingData.trackingUrl.isNotEmpty,
             child: InkWell(
               child: Text(
-                'Order live tracking',
+                'Open Tracking link',
                 style: TextStyle(
                   decoration: TextDecoration.underline,
                 ),

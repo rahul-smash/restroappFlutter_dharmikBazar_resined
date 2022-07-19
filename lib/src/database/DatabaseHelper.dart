@@ -49,7 +49,6 @@ class DatabaseHelper {
   static final String image_300_200 = "image_300_200";
   static final String ProductOffer = "product_offer";
 
-
   Future<Database> get db async {
     if (_db != null) return _db;
     // if _database is null we instantiate it
@@ -64,7 +63,8 @@ class DatabaseHelper {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, "RestroApp.db");
     // Open/create the database at a given path
-    var theDb = await openDatabase(path, version: 3, onCreate: _onCreate, onUpgrade: _onUpgrade);
+    var theDb = await openDatabase(path,
+        version: 3, onCreate: _onCreate, onUpgrade: _onUpgrade);
     return theDb;
   }
 
@@ -190,7 +190,8 @@ class DatabaseHelper {
 //    db.execute("ALTER TABLE ${Products_Table} ADD COLUMN newCol TEXT;");
     if (oldVersion < newVersion) {
       // you can execute drop table and create table
-      db.execute("ALTER TABLE ${Products_Table} ADD COLUMN product_offer TEXT;");
+      db.execute(
+          "ALTER TABLE ${Products_Table} ADD COLUMN product_offer TEXT;");
     }
   }
 
@@ -239,7 +240,8 @@ class DatabaseHelper {
       for (SubCategoryModel category in subCategoriesList) {
         if (category.products != null) {
           for (int j = 0; j < category.products.length; j++) {
-            batch.insert(Products_Table, category.products[j].toMap(category.id));
+            batch.insert(
+                Products_Table, category.products[j].toMap(category.id));
           }
 //          batch.commit();
         }
@@ -544,7 +546,7 @@ class DatabaseHelper {
   Future<int> addProductToCart(Map<String, dynamic> row) async {
     var dbClient = await db;
     int res = 0;
-      res = await dbClient.insert(CART_Table, row);
+    res = await dbClient.insert(CART_Table, row);
     print("-insert Products-- ${res}");
     return res;
   }
@@ -555,7 +557,8 @@ class DatabaseHelper {
     return res;
   }
 
-  Future<int> updateProductInCart(Map<String, dynamic> row, String variantId) async {
+  Future<int> updateProductInCart(
+      Map<String, dynamic> row, String variantId) async {
     var dbClient = await db;
     return dbClient.update(CART_Table, row,
         where: "${VARIENT_ID} = ?", whereArgs: [variantId]);
@@ -580,10 +583,10 @@ class DatabaseHelper {
 
     List<dynamic> whereArguments = [variantId];
     List<Map> result;
-      result = await dbClient.query(CART_Table,
-          columns: columnsToSelect,
-          where: whereClause,
-          whereArgs: whereArguments);
+    result = await dbClient.query(CART_Table,
+        columns: columnsToSelect,
+        where: whereClause,
+        whereArgs: whereArguments);
     // print the results
     if (result != null && result.isNotEmpty) {
       //print("---result.length--- ${result.length}");
@@ -608,9 +611,10 @@ class DatabaseHelper {
     this method will get all the data from cart table and it will calculate the cart total price
     for the item added in the cart by the user
   * */
-  Future<double> getTotalPrice(
-      {bool isOrderVariations = false,
-      List<OrderDetail> responseOrderDetail,}) async {
+  Future<double> getTotalPrice({
+    bool isOrderVariations = false,
+    List<OrderDetail> responseOrderDetail,
+  }) async {
     double totalPrice = 0.00;
     //database connection
     var dbClient = await db;
@@ -623,7 +627,7 @@ class DatabaseHelper {
       VARIENT_ID
     ];
     List<Map> resultList;
-      resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
+    resultList = await dbClient.query(CART_Table, columns: columnsToSelect);
     // print the results
     if (resultList != null && resultList.isNotEmpty) {
       //print("--TotalPrice-result.length--- ${resultList.length}");
@@ -756,9 +760,7 @@ class DatabaseHelper {
       "product_offer",
     ];
     List<Map> resultList = await dbClient.query(Products_Table,
-        columns: columnsToSelect,
-        where: '$ID = ?',
-        whereArgs: [id]);
+        columns: columnsToSelect, where: '$ID = ?', whereArgs: [id]);
 
     if (resultList != null && resultList.isNotEmpty) {
       resultList.forEach((row) {
@@ -769,9 +771,11 @@ class DatabaseHelper {
     return productOffer;
   }
 
-  Future<int> updateProductOfferValueInProductsTable(Map<String, dynamic> row, String productId) async {
+  Future<int> updateProductOfferValueInProductsTable(
+      Map<String, dynamic> row, String productId) async {
     var dbClient = await db;
-    return dbClient.update(Products_Table, row, where: "${ID} = ?", whereArgs: [productId]);
+    return dbClient.update(Products_Table, row,
+        where: "${ID} = ?", whereArgs: [productId]);
   }
 
   Future<List<Product>> getFavouritesList() async {
@@ -994,8 +998,8 @@ class DatabaseHelper {
 //    List<Map> resultList = await dbClient.query(Products_Table,
 //        columns: columnsToSelect, where: 'id = ?', whereArgs: ids);
 
-    List<Map> resultList = await dbClient.rawQuery(
-        'SELECT * from ${Products_Table} where ${ID} in (${id})');
+    List<Map> resultList = await dbClient
+        .rawQuery('SELECT * from ${Products_Table} where ${ID} in (${id})');
     if (resultList != null && resultList.isNotEmpty) {
       resultList.forEach((row) {
         Product product = Product();
@@ -1067,7 +1071,7 @@ class DatabaseHelper {
         }
       }
       return cartList;
-    }else{
+    } else {
       return cartList;
     }
   }
