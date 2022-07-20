@@ -77,7 +77,7 @@ import '../models/weight_wise_charges_response.dart';
 import '../notifications/notification_service_helper.dart';
 
 class ApiController {
-  static final int timeout = 18;
+  static final int timeout = 60;
 
   static Future<StoreResponse> versionApiRequest(String storeId) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

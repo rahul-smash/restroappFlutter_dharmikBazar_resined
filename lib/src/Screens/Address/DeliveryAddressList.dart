@@ -535,6 +535,18 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           StoreModel storeModel = await SharedPrefs.getStore();
           DeliveryAddressData addressData =
               DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
+          if (storeModel.storeDeliveryModel ==
+              AppConstant.DELIVERY_THIRD_PARTY) {
+            if (addressData.zipCode == null ||
+                (addressData.zipCode != null && addressData.zipCode.isEmpty)) {
+              Utils.showToast('ZipCode is mandatory ', false);
+              return addressData;
+            } else if (addressData.zipCode != null &&
+                addressData.zipCode.length != 6) {
+              Utils.showToast('Please add valid ZipCode', false);
+              return addressData;
+            }
+          }
           addressData =
               await checkingStoreDeliverymodel(storeModel, addressData);
 
@@ -747,7 +759,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             chargesResponse.success &&
             chargesResponse.data != null) {
           //update changes according to weight
-          // addressData.areaCharges = chargesResponse.data.totalDeliveryCharge;
+          addressData.thirdPartyDeliveryData = chargesResponse.data;
           return addressData;
         } else {
           return addressData;
