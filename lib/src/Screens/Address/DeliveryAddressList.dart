@@ -550,6 +550,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           addressData =
               await checkingStoreDeliverymodel(storeModel, addressData);
 
+          // print(addressData.thirdPartyDeliveryData.shippingCharges.first.rate);
           if (addressList.length == 0) {
             Utils.showToast(AppConstant.selectAddress, false);
           } else {
@@ -745,8 +746,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         return addressData;
         break;
       case AppConstant.DELIVERY_THIRD_PARTY:
-        String shippingCharges =
-            await calculateShipping(addressList[selectedIndex]);
         Utils.showProgressDialog(context);
         DatabaseHelper databaseHelper = new DatabaseHelper();
         List<Product> cartList = await databaseHelper.getCartItemList();
@@ -759,6 +758,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             chargesResponse.success &&
             chargesResponse.data != null) {
           //update changes according to weight
+          print('----------All right');
+          if(chargesResponse.data.errorMsg!=null){
+            Utils.showToast(chargesResponse.data.errorMsg, false);
+          }
           addressData.thirdPartyDeliveryData = chargesResponse.data;
           return addressData;
         } else {

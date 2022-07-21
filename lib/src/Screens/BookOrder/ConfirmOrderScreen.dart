@@ -105,6 +105,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   String thirdOptionPGText = 'Paytm';
 
+  bool thirdPartyDeliverySystemEnable = false;
+
   ConfirmOrderState({this.storeModel});
 
   void callPaytmPayApi() async {
@@ -267,6 +269,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     print("You are on confirm order screen");
     //print("-deliveryType--${widget.deliveryType}---");
     constraints();
+
+    //thirdPartyView bool
+    thirdPartyDeliverySystemEnable =
+        storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY &&
+            widget.deliveryType != OrderType.PickUp;
     try {
       SharedPrefs.getStore().then((storeData) {
         storeModel = storeData;
@@ -420,7 +427,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       ),
       body: Column(
         children: <Widget>[
-          Expanded(
+          Flexible(
             child: Column(children: [
               Expanded(
                 child: isLoading
@@ -462,16 +469,18 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               ),
             ]),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: Wrap(
+          addTotalPrice(),
+          addEnterCouponCodeView(),
+          addCouponCodeRow(),
+          ConstrainedBox(
+            constraints:
+                BoxConstraints(maxHeight: Utils.getDeviceHeight(context) / 7),
+            child: SingleChildScrollView(
+              child: Column(
                 children: [
-                  addTotalPrice(),
-                  addEnterCouponCodeView(),
-                  addCouponCodeRow(),
-                  addPaymentOptions(),
-                  //addConfirmOrder()
+                  thirdPartyDeliverySystemEnable
+                      ? addSecondModelPaymentOptions()
+                      : addPaymentOptions()
                 ],
               ),
             ),
@@ -1560,6 +1569,208 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
+  Widget addSecondModelPaymentOptions() {
+    bool showOptions = false;
+    if (widget.storeModel.onlinePayment != null) {
+      if (widget.storeModel.onlinePayment == "1") {
+        showOptions = true;
+      } else {
+        showOptions = false; //cod
+      }
+    } else {
+      if (isPayTmActive) {
+        showOptions = true;
+      }
+    }
+    if (isPromiseToPay) {
+      showOptions = true;
+    }
+    bool isFoundCOD = false;
+    bool isFoundOnline = false;
+
+    //Check visibility from response
+    if (widget.address != null &&
+        widget.address.thirdPartyDeliveryData != null &&
+        widget.address.thirdPartyDeliveryData.shippingCharges != null &&
+        widget.address.thirdPartyDeliveryData.shippingCharges.isNotEmpty) {
+      //find cod and find online
+      for (int i = 0;
+          i < widget.address.thirdPartyDeliveryData.shippingCharges.length;
+          i++) {
+        if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
+                .orderPaymentMode
+                .toLowerCase() ==
+            'cod') {
+          isFoundCOD = true;
+        }
+        if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
+                .orderPaymentMode
+                .toLowerCase() ==
+            'online') {
+          isFoundOnline = true;
+        }
+      }
+    } else {
+      //not found cod and not found online
+      isFoundOnline=false;
+      isFoundCOD=false;
+    }
+
+    return Visibility(
+      visible: showOptions,
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(15, 0, 15, 5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Utils.showDivider(context),
+            Container(
+              child: Text("Select Payment",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: appTheme,
+                    fontWeight: FontWeight.w600,
+                  )),
+            ),
+            Visibility(
+              visible: showCOD&&isFoundCOD,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Radio(
+                          value: PaymentType.COD,
+                          groupValue: widget._selectedPaymentTypeValue,
+                          activeColor: appTheme,
+                          onChanged: (PaymentType value) async {
+                            bool proceed = await couponAppliedCheck();
+                            if (proceed) {
+                              setState(() {
+                                widget._selectedPaymentTypeValue = value;
+                                if (value == PaymentType.COD) {
+                                  widget.paymentMode = "2";
+                                  ispaytmSelected = false;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                        Text('COD',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            )),
+                      ],
+                    ),
+                  ),
+                  Text(
+                      widget.address.thirdPartyDeliveryData.shippingCharges
+                          .first.rate,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: showOnline&&isFoundOnline,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE,
+                    activeColor: appTheme,
+                    groupValue: widget._selectedPaymentTypeValue,
+                    onChanged: (PaymentType value) async {
+                      bool proceed = await couponAppliedCheck();
+                      if (proceed) {
+                        setState(() {
+                          widget._selectedPaymentTypeValue = value;
+                          if (value == PaymentType.ONLINE) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = false;
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  Text('Online',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: isPayTmActive&&isFoundOnline,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE_PAYTM,
+                    activeColor: appTheme,
+                    groupValue: widget._selectedPaymentTypeValue,
+                    onChanged: (PaymentType value) async {
+                      bool proceed = await couponAppliedCheck();
+                      if (proceed) {
+                        setState(() {
+                          widget._selectedPaymentTypeValue = value;
+                          if (value == PaymentType.ONLINE_PAYTM) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = true;
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  Text(thirdOptionPGText,
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: isPromiseToPay&&isFoundCOD,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.PROMISE_TO_PAY,
+                    activeColor: appTheme,
+                    groupValue: widget._selectedPaymentTypeValue,
+                    onChanged: (PaymentType value) async {
+                      bool proceed = await couponAppliedCheck();
+                      if (proceed) {
+                        setState(() {
+                          widget._selectedPaymentTypeValue = value;
+                          if (value == PaymentType.PROMISE_TO_PAY) {
+                            widget.paymentMode = "4";
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  Text("Promise To Pay",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   bool isCouponsApplied = false;
 
   Widget addEnterCouponCodeView() {
@@ -2345,8 +2556,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           break;
 
         case "DPO":
-          ApiController.createDPOToken(
-              taxModel.total, orderJson, detailsModel.orderDetails,storeModel.currencyAbbr.trim())
+          ApiController.createDPOToken(taxModel.total, orderJson,
+                  detailsModel.orderDetails, storeModel.currencyAbbr.trim())
               .then((value) async {
             Utils.hideProgressDialog(context);
             if (value != null && value.success) {
@@ -2470,7 +2681,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       callPaytmApi(event.url, event.orderId, event.txnId);
     });
 
-    eventBus.on<onDPOCreateFinished>().listen((event) async{
+    eventBus.on<onDPOCreateFinished>().listen((event) async {
       bool isNetworkAvailable = await Utils.isNetworkAvailable();
       if (!isNetworkAvailable) {
         Utils.showToast(AppConstant.noInternet, false);

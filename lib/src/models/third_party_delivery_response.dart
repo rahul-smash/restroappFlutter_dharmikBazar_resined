@@ -42,31 +42,46 @@ class ThirdPartyDeliveryData {
     this.orderDetail,
     this.totalDimensions,
     this.shippingCharges,
+    this.errorMsg
   });
 
   List<OrderDetail> orderDetail;
   TotalDimensions totalDimensions;
   List<ShippingCharge> shippingCharges;
+  String errorMsg;
+
 
   ThirdPartyDeliveryData copyWith({
     List<OrderDetail> orderDetail,
     TotalDimensions totalDimensions,
     List<ShippingCharge> shippingCharges,
+    String errorMsg,
+
   }) =>
       ThirdPartyDeliveryData(
         orderDetail: orderDetail ?? this.orderDetail,
         totalDimensions: totalDimensions ?? this.totalDimensions,
         shippingCharges: shippingCharges ?? this.shippingCharges,
+        errorMsg: errorMsg ?? this.errorMsg,
       );
 
-  factory ThirdPartyDeliveryData.fromRawJson(String str) => ThirdPartyDeliveryData.fromJson(json.decode(str));
 
   String toRawJson() => json.encode(toJson());
 
   factory ThirdPartyDeliveryData.fromJson(Map<String, dynamic> json) => ThirdPartyDeliveryData(
     orderDetail: json["order_detail"] == null ? null : List<OrderDetail>.from(json["order_detail"].map((x) => OrderDetail.fromJson(x))),
     totalDimensions: json["total_dimensions"] == null ? null : TotalDimensions.fromJson(json["total_dimensions"]),
-    shippingCharges: json["shipping_charges"] == null ? null : List<ShippingCharge>.from(json["shipping_charges"].map((x) => ShippingCharge.fromJson(x))),
+    shippingCharges: json["shipping_charges"] == null
+        ? null
+        : json["shipping_charges"] is List
+        ? List<ShippingCharge>.from(json["shipping_charges"]
+        .map((x) => ShippingCharge.fromJson(x)))
+        : null,
+    errorMsg: json["shipping_charges"] == null
+        ? null
+        : json["shipping_charges"] is String
+        ? json["shipping_charges"]
+        : null,
   );
 
   Map<String, dynamic> toJson() => {
@@ -103,8 +118,8 @@ class OrderDetail {
   String price;
   String discount;
   String unitType;
-  int quantity;
-  int productType;
+  String quantity;
+  String productType;
   String length;
   String breadth;
   String height;
@@ -119,8 +134,8 @@ class OrderDetail {
     String price,
     String discount,
     String unitType,
-    int quantity,
-    int productType,
+    String quantity,
+    String productType,
     String length,
     String breadth,
     String height,
@@ -147,20 +162,20 @@ class OrderDetail {
   String toRawJson() => json.encode(toJson());
 
   factory OrderDetail.fromJson(Map<String, dynamic> json) => OrderDetail(
-    productId: json["product_id"] == null ? null : json["product_id"],
-    productName: json["product_name"] == null ? null : json["product_name"],
-    isTaxEnable: json["isTaxEnable"] == null ? null : json["isTaxEnable"],
-    variantId: json["variant_id"] == null ? null : json["variant_id"],
-    weight: json["weight"] == null ? null : json["weight"],
-    mrpPrice: json["mrp_price"] == null ? null : json["mrp_price"],
-    price: json["price"] == null ? null : json["price"],
-    discount: json["discount"] == null ? null : json["discount"],
-    unitType: json["unit_type"] == null ? null : json["unit_type"],
-    quantity: json["quantity"] == null ? null : json["quantity"],
-    productType: json["product_type"] == null ? null : json["product_type"],
-    length: json["length"] == null ? null : json["length"],
-    breadth: json["breadth"] == null ? null : json["breadth"],
-    height: json["height"] == null ? null : json["height"],
+    productId: json["product_id"] == null ? null : json["product_id"].toString(),
+    productName: json["product_name"] == null ? null : json["product_name"].toString(),
+    isTaxEnable: json["isTaxEnable"] == null ? null : json["isTaxEnable"].toString(),
+    variantId: json["variant_id"] == null ? null : json["variant_id"].toString(),
+    weight: json["weight"] == null ? null : json["weight"].toString(),
+    mrpPrice: json["mrp_price"] == null ? null : json["mrp_price"].toString(),
+    price: json["price"] == null ? null : json["price"].toString(),
+    discount: json["discount"] == null ? null : json["discount"].toString(),
+    unitType: json["unit_type"] == null ? null : json["unit_type"].toString(),
+    quantity: json["quantity"] == null ? null : json["quantity"].toString(),
+    productType: json["product_type"] == null ? null : json["product_type"].toString(),
+    length: json["length"] == null ? null : json["length"].toString(),
+    breadth: json["breadth"] == null ? null : json["breadth"].toString(),
+    height: json["height"] == null ? null : json["height"].toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -197,28 +212,28 @@ class ShippingCharge {
     this.orderPaymentMode,
   });
 
-  int courierCompanyId;
+  String courierCompanyId;
   String courierName;
   String estimatedDeliveryDays;
   String etd;
-  int etdHours;
-  double freightCharge;
-  double rate;
-  double rtoCharges;
+  String etdHours;
+  String freightCharge;
+  String rate;
+  String rtoCharges;
   String postcode;
   String city;
   String state;
   String orderPaymentMode;
 
   ShippingCharge copyWith({
-    int courierCompanyId,
+    String courierCompanyId,
     String courierName,
     String estimatedDeliveryDays,
     String etd,
-    int etdHours,
-    double freightCharge,
-    double rate,
-    double rtoCharges,
+    String etdHours,
+    String freightCharge,
+    String rate,
+    String rtoCharges,
     String postcode,
     String city,
     String state,
@@ -244,18 +259,18 @@ class ShippingCharge {
   String toRawJson() => json.encode(toJson());
 
   factory ShippingCharge.fromJson(Map<String, dynamic> json) => ShippingCharge(
-    courierCompanyId: json["courier_company_id"] == null ? null : json["courier_company_id"],
-    courierName: json["courier_name"] == null ? null : json["courier_name"],
-    estimatedDeliveryDays: json["estimated_delivery_days"] == null ? null : json["estimated_delivery_days"],
-    etd: json["etd"] == null ? null : json["etd"],
-    etdHours: json["etd_hours"] == null ? null : json["etd_hours"],
-    freightCharge: json["freight_charge"] == null ? null : json["freight_charge"].toDouble(),
-    rate: json["rate"] == null ? null : json["rate"].toDouble(),
-    rtoCharges: json["rto_charges"] == null ? null : json["rto_charges"].toDouble(),
-    postcode: json["postcode"] == null ? null : json["postcode"],
-    city: json["city"] == null ? null : json["city"],
-    state: json["state"] == null ? null : json["state"],
-    orderPaymentMode: json["order_payment_mode"] == null ? null : json["order_payment_mode"],
+    courierCompanyId: json["courier_company_id"] == null ? null : json["courier_company_id"].toString(),
+    courierName: json["courier_name"] == null ? null : json["courier_name"].toString(),
+    estimatedDeliveryDays: json["estimated_delivery_days"] == null ? null : json["estimated_delivery_days"].toString(),
+    etd: json["etd"] == null ? null : json["etd"].toString(),
+    etdHours: json["etd_hours"] == null ? null : json["etd_hours"].toString(),
+    freightCharge: json["freight_charge"] == null ? null : json["freight_charge"].toString(),
+    rate: json["rate"] == null ? null : json["rate"].toString(),
+    rtoCharges: json["rto_charges"] == null ? null : json["rto_charges"].toString(),
+    postcode: json["postcode"] == null ? null : json["postcode"].toString(),
+    city: json["city"] == null ? null : json["city"].toString(),
+    state: json["state"] == null ? null : json["state"].toString(),
+    orderPaymentMode: json["order_payment_mode"] == null ? null : json["order_payment_mode"].toString(),
   );
 
   Map<String, dynamic> toJson() => {
@@ -282,16 +297,16 @@ class TotalDimensions {
     this.totalWeight,
   });
 
-  int totalLength;
-  int totalBreadth;
-  int totalHeight;
-  int totalWeight;
+  String totalLength;
+  String totalBreadth;
+  String totalHeight;
+  String totalWeight;
 
   TotalDimensions copyWith({
-    int totalLength,
-    int totalBreadth,
-    int totalHeight,
-    int totalWeight,
+    String totalLength,
+    String totalBreadth,
+    String totalHeight,
+    String totalWeight,
   }) =>
       TotalDimensions(
         totalLength: totalLength ?? this.totalLength,
@@ -305,10 +320,10 @@ class TotalDimensions {
   String toRawJson() => json.encode(toJson());
 
   factory TotalDimensions.fromJson(Map<String, dynamic> json) => TotalDimensions(
-    totalLength: json["total_length"] == null ? null : json["total_length"],
-    totalBreadth: json["total_breadth"] == null ? null : json["total_breadth"],
-    totalHeight: json["total_height"] == null ? null : json["total_height"],
-    totalWeight: json["total_weight"] == null ? null : json["total_weight"],
+    totalLength: json["total_length"] == null ? null : json["total_length"].toString(),
+    totalBreadth: json["total_breadth"] == null ? null : json["total_breadth"].toString(),
+    totalHeight: json["total_height"] == null ? null : json["total_height"].toString(),
+    totalWeight: json["total_weight"] == null ? null : json["total_weight"].toString(),
   );
 
   Map<String, dynamic> toJson() => {

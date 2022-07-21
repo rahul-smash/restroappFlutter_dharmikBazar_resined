@@ -136,7 +136,7 @@ class ApiConstants {
 
   //--------------------------------
    //third party shipping charge calculation
-  static String deliveryShippingChargesApi = '/delivery_partner_shipping_charges/index';
+  static String deliveryShippingChargesApi = 'shiprocket_delivery/index';
 
   //new payment gateway
   static String dpoCreateOrderApi = '/dpo/dpoCreateOrder';
