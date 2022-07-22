@@ -187,6 +187,9 @@ class OrderDetail {
     this.igst,
     this.gst_type,
     this.hsn_code,
+    this.length,
+    this.breadth,
+    this.height,
   });
 
   String productId;
@@ -211,6 +214,9 @@ class OrderDetail {
   dynamic igst;
   String gst_type;
   String hsn_code;
+  String length;
+  String breadth;
+  String height;
 
   OrderDetail copyWith({
     String productId,
@@ -235,6 +241,9 @@ class OrderDetail {
     dynamic igst,
     String gst_type,
     String hsn_code,
+    String length,
+    String breadth,
+    String height,
   }) =>
       OrderDetail(
         productId: productId ?? this.productId,
@@ -259,6 +268,10 @@ class OrderDetail {
         igst: igst ?? this.igst,
         gst_type: gst_type ?? this.gst_type,
         hsn_code: hsn_code ?? this.hsn_code,
+        length: length ?? this.length,
+        breadth: breadth ?? this.breadth,
+        height: height ?? this.height,
+
       );
 
   factory OrderDetail.fromRawJson(String str) =>
@@ -292,6 +305,9 @@ class OrderDetail {
         igst: json["igst"] == null ? 0 : json["igst"],
         gst_type: json["gst_type"] == null ? null : json["gst_type"],
         hsn_code: json["hsn_code"] == null ? "" : json["hsn_code"],
+    length: json["length"] == null ? null : json["length"].toString(),
+    breadth: json["breadth"] == null ? null : json["breadth"].toString(),
+    height: json["height"] == null ? null : json["height"].toString(),
       );
 
   Map<String, dynamic> toJson() => {
@@ -317,6 +333,9 @@ class OrderDetail {
         "igst": igst == null ? 0 : igst,
         "gst_type": gst_type == null ? null : gst_type,
         "hsn_code": hsn_code == null ? "" : hsn_code,
+    "length": length == null ? null : length,
+    "breadth": breadth == null ? null : breadth,
+    "height": height == null ? null : height,
       };
 
   static List encodeToJson(List<OrderDetail> list,

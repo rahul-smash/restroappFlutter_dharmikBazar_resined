@@ -38,6 +38,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import '../../models/third_party_delivery_response.dart';
 import '../../singleton/app_version_singleton.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
@@ -108,6 +109,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool thirdPartyDeliverySystemEnable = false;
 
   ConfirmOrderState({this.storeModel});
+
+//--------Declaring Third-party delivery system variables
+  ShippingCharge codShippingCharges,
+      onlineShippingCharges,
+      _selectedShippingCharges;
+  bool isFoundCOD = false;
+  bool isFoundOnline = false;
+
+//--------- Third-party delivery system variables ENDS--------
 
   void callPaytmPayApi() async {
     String address = "NA", pin = "NA";
@@ -394,6 +404,41 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         isPromiseToPay = false;
       }
     }
+    if (thirdPartyDeliverySystemEnable) {
+      //Check visibility from response
+      if (widget.address != null &&
+          widget.address.thirdPartyDeliveryData != null &&
+          widget.address.thirdPartyDeliveryData.shippingCharges != null &&
+          widget.address.thirdPartyDeliveryData.shippingCharges.isNotEmpty) {
+        //find cod and find online
+        for (int i = 0;
+            i < widget.address.thirdPartyDeliveryData.shippingCharges.length;
+            i++) {
+          if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
+                  .orderPaymentMode
+                  .toLowerCase() ==
+              'cod') {
+            isFoundCOD = true;
+            //get COD object
+            codShippingCharges =
+                widget.address.thirdPartyDeliveryData.shippingCharges[i];
+          }
+          if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
+                  .orderPaymentMode
+                  .toLowerCase() ==
+              'online') {
+            isFoundOnline = true;
+            //get online object
+            onlineShippingCharges =
+                widget.address.thirdPartyDeliveryData.shippingCharges[i];
+          }
+        }
+      } else {
+        //not found cod and not found online
+        isFoundOnline = false;
+        isFoundCOD = false;
+      }
+    }
   }
 
   @override
@@ -425,67 +470,57 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           ),
         ],
       ),
-      body: Column(
-        children: <Widget>[
-          Flexible(
-            child: Column(children: [
-              Expanded(
-                child: isLoading
-                    ? Utils.getIndicatorView()
-                    : widget.cartList == null
-                        ? Text("")
-                        : ListView(
-                            children: <Widget>[
-                              addCommentWidget(context),
-                              showDeliverySlot(),
-                              ListView.separated(
-                                separatorBuilder:
-                                    (BuildContext context, int index) {
-                                  if (widget.cartList[index].taxDetail ==
-                                          null ||
-                                      widget.cartList[index].taxDetail ==
-                                          null) {
-                                    return Divider(
-                                        color: Colors.grey, height: 1);
-                                  } else {
-                                    return Divider(
-                                        color: Colors.white, height: 1);
-                                  }
-                                },
-                                shrinkWrap: true,
-                                physics: ScrollPhysics(),
-                                itemCount: widget.cartList.length + 1,
-                                itemBuilder: (context, index) {
-                                  if (index == widget.cartList.length) {
-                                    return addItemPrice();
-                                  } else {
-                                    return addProductCart(
-                                        widget.cartList[index]);
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-              ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Column(children: [
+              isLoading
+                  ? Utils.getIndicatorView()
+                  : widget.cartList == null
+                      ? Text("")
+                      : ListView(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: <Widget>[
+                            addCommentWidget(context),
+                            showDeliverySlot(),
+                            ListView.separated(
+                              separatorBuilder:
+                                  (BuildContext context, int index) {
+                                if (widget.cartList[index].taxDetail == null ||
+                                    widget.cartList[index].taxDetail == null) {
+                                  return Divider(color: Colors.grey, height: 1);
+                                } else {
+                                  return Divider(
+                                      color: Colors.white, height: 1);
+                                }
+                              },
+                              shrinkWrap: true,
+                              physics: ScrollPhysics(),
+                              itemCount: widget.cartList.length + 1,
+                              itemBuilder: (context, index) {
+                                if (index == widget.cartList.length) {
+                                  return addItemPrice();
+                                } else {
+                                  return addProductCart(widget.cartList[index]);
+                                }
+                              },
+                            ),
+                          ],
+                        ),
             ]),
-          ),
-          addTotalPrice(),
-          addEnterCouponCodeView(),
-          addCouponCodeRow(),
-          ConstrainedBox(
-            constraints:
-                BoxConstraints(maxHeight: Utils.getDeviceHeight(context) / 7),
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  thirdPartyDeliverySystemEnable
-                      ? addSecondModelPaymentOptions()
-                      : addPaymentOptions()
-                ],
-              ),
+            addTotalPrice(),
+            addEnterCouponCodeView(),
+            addCouponCodeRow(),
+            Column(
+              children: [
+                thirdPartyDeliverySystemEnable
+                    ? addSecondModelPaymentOptions()
+                    : addPaymentOptions()
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: addConfirmOrder(),
     );
@@ -1073,7 +1108,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   String getUserRemaningWallet() {
     double balance = (double.parse(userWalleModel.data.userWallet) -
         double.parse(taxModel.wallet_refund) -
-        double.parse(taxModel.shipping));
+        double.parse(taxModel.shipping.isNotEmpty ? taxModel.shipping : '0'));
     //print("balance=${balance}");
     if (balance > 0.0) {
       // USer balance is greater than zero.
@@ -1571,6 +1606,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   Widget addSecondModelPaymentOptions() {
     bool showOptions = false;
+    //TODO: re-think again
     if (widget.storeModel.onlinePayment != null) {
       if (widget.storeModel.onlinePayment == "1") {
         showOptions = true;
@@ -1585,36 +1621,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     if (isPromiseToPay) {
       showOptions = true;
     }
-    bool isFoundCOD = false;
-    bool isFoundOnline = false;
-
-    //Check visibility from response
-    if (widget.address != null &&
-        widget.address.thirdPartyDeliveryData != null &&
-        widget.address.thirdPartyDeliveryData.shippingCharges != null &&
-        widget.address.thirdPartyDeliveryData.shippingCharges.isNotEmpty) {
-      //find cod and find online
-      for (int i = 0;
-          i < widget.address.thirdPartyDeliveryData.shippingCharges.length;
-          i++) {
-        if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
-                .orderPaymentMode
-                .toLowerCase() ==
-            'cod') {
-          isFoundCOD = true;
-        }
-        if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
-                .orderPaymentMode
-                .toLowerCase() ==
-            'online') {
-          isFoundOnline = true;
-        }
-      }
-    } else {
-      //not found cod and not found online
-      isFoundOnline=false;
-      isFoundCOD=false;
-    }
 
     return Visibility(
       visible: showOptions,
@@ -1625,50 +1631,70 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           children: <Widget>[
             Utils.showDivider(context),
             Container(
-              child: Text("Select Payment",
+              child: Text("Pay With",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: appTheme,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   )),
             ),
+            SizedBox(height: 5),
             Visibility(
-              visible: showCOD&&isFoundCOD,
+              visible: showCOD && isFoundCOD,
               child: Row(
                 children: [
                   Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Radio(
-                          value: PaymentType.COD,
-                          groupValue: widget._selectedPaymentTypeValue,
-                          activeColor: appTheme,
-                          onChanged: (PaymentType value) async {
-                            bool proceed = await couponAppliedCheck();
-                            if (proceed) {
-                              setState(() {
-                                widget._selectedPaymentTypeValue = value;
-                                if (value == PaymentType.COD) {
-                                  widget.paymentMode = "2";
-                                  ispaytmSelected = false;
-                                }
-                              });
-                            }
-                          },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Container(
+                              color: Colors.red,
+                              child: Radio(
+                                value: PaymentType.COD,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                groupValue: widget._selectedPaymentTypeValue,
+                                activeColor: appTheme,
+                                onChanged: (PaymentType value) async {
+                                  bool proceed = await couponAppliedCheck();
+                                  if (proceed) {
+                                    setState(() {
+                                      widget._selectedPaymentTypeValue = value;
+                                      if (value == PaymentType.COD) {
+                                        widget.paymentMode = "2";
+                                        ispaytmSelected = false;
+                                      }
+                                    });
+                                  }
+                                },
+                              ),
+                            ),
+                            Text('COD',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w600,
+                                )),
+                          ],
                         ),
-                        Text('COD',
+                        Text('pay Extra',
                             style: TextStyle(
-                              color: Colors.black,
+                              color: Colors.grey,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                             )),
                       ],
                     ),
                   ),
                   Text(
-                      widget.address.thirdPartyDeliveryData.shippingCharges
-                          .first.rate,
+                      // codShippingCharges != null
+                      //     ? codShippingCharges.rate
+                      //     : '--',
+                      taxModel != null ? taxModel.total : '--',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -1676,14 +1702,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 ],
               ),
             ),
+            Utils.showDivider(context),
             Visibility(
-              visible: showOnline&&isFoundOnline,
+              visible: showOnline && isFoundOnline,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Radio(
                     value: PaymentType.ONLINE,
                     activeColor: appTheme,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     groupValue: widget._selectedPaymentTypeValue,
                     onChanged: (PaymentType value) async {
                       bool proceed = await couponAppliedCheck();
@@ -1707,7 +1735,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               ),
             ),
             Visibility(
-              visible: isPayTmActive&&isFoundOnline,
+              visible: isPayTmActive && isFoundOnline,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
@@ -1737,7 +1765,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               ),
             ),
             Visibility(
-              visible: isPromiseToPay&&isFoundCOD,
+              visible: isPromiseToPay && isFoundCOD,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
