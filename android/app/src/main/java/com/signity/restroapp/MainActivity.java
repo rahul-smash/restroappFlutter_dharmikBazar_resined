@@ -1,4 +1,4 @@
-package com.signity.restroapp;
+package com.app.goyalStore;
 
 import io.flutter.embedding.android.FlutterActivity;
 

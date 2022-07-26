@@ -4,7 +4,7 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.signity.restroapp",
+  "applicationId": "com.app.goyalStore",
   "variantName": "processReleaseResources",
   "elements": [
     {
