@@ -535,9 +535,22 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           StoreModel storeModel = await SharedPrefs.getStore();
           DeliveryAddressData addressData =
               DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
+          if (storeModel.storeDeliveryModel ==
+              AppConstant.DELIVERY_THIRD_PARTY) {
+            if (addressData.zipCode == null ||
+                (addressData.zipCode != null && addressData.zipCode.isEmpty)) {
+              Utils.showToast('ZipCode is mandatory ', false);
+              return addressData;
+            } else if (addressData.zipCode != null &&
+                addressData.zipCode.length != 6) {
+              Utils.showToast('Please add valid ZipCode', false);
+              return addressData;
+            }
+          }
           addressData =
               await checkingStoreDeliverymodel(storeModel, addressData);
 
+          // print(addressData.thirdPartyDeliveryData.shippingCharges.first.rate);
           if (addressList.length == 0) {
             Utils.showToast(AppConstant.selectAddress, false);
           } else {
@@ -733,8 +746,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         return addressData;
         break;
       case AppConstant.DELIVERY_THIRD_PARTY:
-        String shippingCharges =
-            await calculateShipping(addressList[selectedIndex]);
         Utils.showProgressDialog(context);
         DatabaseHelper databaseHelper = new DatabaseHelper();
         List<Product> cartList = await databaseHelper.getCartItemList();
@@ -747,7 +758,11 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             chargesResponse.success &&
             chargesResponse.data != null) {
           //update changes according to weight
-          // addressData.areaCharges = chargesResponse.data.totalDeliveryCharge;
+          print('----------All right');
+          if(chargesResponse.data.errorMsg!=null){
+            Utils.showToast(chargesResponse.data.errorMsg, false);
+          }
+          addressData.thirdPartyDeliveryData = chargesResponse.data;
           return addressData;
         } else {
           return addressData;

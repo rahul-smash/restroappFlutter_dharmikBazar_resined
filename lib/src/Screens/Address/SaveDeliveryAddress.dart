@@ -355,7 +355,7 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(
-                          "Zip/Postal Code:",
+                          "Zip/Postal Code:*",
                           style: TextStyle(color: infoLabel, fontSize: 17.0),
                         ),
                       ),
@@ -411,10 +411,17 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                     AppConstant.pleaseFullname, false);
                                 return;
                               }
-                              /*if(zipCodeController.text.trim().isEmpty) {
-                                Utils.showToast(AppConstant.enterZipCode, false);
+                              if (zipCodeController.text.trim().isEmpty) {
+                                Utils.showToast(
+                                    AppConstant.enterZipCode, false);
                                 return;
-                              }*/
+                              }
+                              if (zipCodeController.text.trim().isNotEmpty &&
+                                  zipCodeController.text.length!=6) {
+                                Utils.showToast(
+                                    AppConstant.enterValidZipCode, false);
+                                return;
+                              }
 
                               print(
                                   "--addressController---${addressController.text}---");

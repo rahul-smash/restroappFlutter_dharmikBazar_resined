@@ -55,6 +55,7 @@ class AppConstant {
   static final String selectCity = 'Please select city';
   static final String pleaseEnterAddress = "Enter complete address";
   static final String enterZipCode = "Enter zipcode";
+  static final String enterValidZipCode = "Enter valid zipcode";
 
   static final String txt_mobile = "Login With Phone";
   static final String txt_Submit = "Submit";
