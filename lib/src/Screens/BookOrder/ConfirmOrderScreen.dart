@@ -1640,6 +1640,38 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             ),
             SizedBox(height: 5),
             Visibility(
+              visible: showOnline && isFoundOnline,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Radio(
+                    value: PaymentType.ONLINE,
+                    activeColor: appTheme,
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    groupValue: widget._selectedPaymentTypeValue,
+                    onChanged: (PaymentType value) async {
+                      bool proceed = await couponAppliedCheck();
+                      if (proceed) {
+                        setState(() {
+                          widget._selectedPaymentTypeValue = value;
+                          if (value == PaymentType.ONLINE) {
+                            widget.paymentMode = "3";
+                            ispaytmSelected = false;
+                          }
+                        });
+                      }
+                    },
+                  ),
+                  Text('Online',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      )),
+                ],
+              ),
+            ),
+            Utils.showDivider(context),
+            Visibility(
               visible: showCOD && isFoundCOD,
               child: Row(
                 children: [
@@ -1652,7 +1684,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: <Widget>[
                             Container(
-                              color: Colors.red,
                               child: Radio(
                                 value: PaymentType.COD,
                                 materialTapTargetSize:
@@ -1681,7 +1712,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                 )),
                           ],
                         ),
-                        Text('pay Extra',
+                        Text(
+                            'COD extra charges ${codShippingCharges != null ? codShippingCharges.rate : '--'}',
                             style: TextStyle(
                               color: Colors.grey,
                               fontSize: 14,
@@ -1695,38 +1727,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       //     ? codShippingCharges.rate
                       //     : '--',
                       taxModel != null ? taxModel.total : '--',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                      )),
-                ],
-              ),
-            ),
-            Utils.showDivider(context),
-            Visibility(
-              visible: showOnline && isFoundOnline,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Radio(
-                    value: PaymentType.ONLINE,
-                    activeColor: appTheme,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    groupValue: widget._selectedPaymentTypeValue,
-                    onChanged: (PaymentType value) async {
-                      bool proceed = await couponAppliedCheck();
-                      if (proceed) {
-                        setState(() {
-                          widget._selectedPaymentTypeValue = value;
-                          if (value == PaymentType.ONLINE) {
-                            widget.paymentMode = "3";
-                            ispaytmSelected = false;
-                          }
-                        });
-                      }
-                    },
-                  ),
-                  Text('Online',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
