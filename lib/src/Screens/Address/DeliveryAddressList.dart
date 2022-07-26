@@ -27,6 +27,7 @@ import '../../models/SubCategoryResponse.dart';
 import '../../models/weight_wise_charges_response.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
+//DeliveryAddressList
 class DeliveryAddressList extends StatefulWidget {
   final bool showProceedBar;
   OrderType delivery;
@@ -52,6 +53,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   ConfigModel configObject;
   PermissionStatus _permissionGranted;
+
+  bool _serviceEnabled;
 
   @override
   void initState() {
@@ -200,7 +203,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
           StoreModel store = await SharedPrefs.getStore();
           print("--deliveryArea->--${store.deliveryArea}-------");
-          if (store.deliveryArea == "0") {
+          if (store.deliveryArea == "1") {
             var result = await Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -227,7 +230,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             } else {
               print("--result--else------");
             }
-          } else if (store.deliveryArea == "1") {
+          } else if (store.deliveryArea == "0") {
             Utils.isNetworkAvailable().then((isConnected) {
               if (isConnected) {
                 Utils.showProgressDialog(context);
@@ -240,9 +243,28 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                       print(
                           "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
                       if (isLocationServiceEnabled) {
-                        var geoLocator = Geolocator();
-                        var status = await Geolocator.checkPermission();
-                        print("--status--=${status}");
+                        //------permission checking------
+                        _serviceEnabled = await location.serviceEnabled();
+                        if (!_serviceEnabled) {
+                          _serviceEnabled = await location.requestService();
+                          if (!_serviceEnabled) {
+                            print("----!_serviceEnabled----$_serviceEnabled");
+                            return;
+                          }
+                        }
+                        _permissionGranted = await location.hasPermission();
+                        print("permission sttsu $_permissionGranted");
+                        if (_permissionGranted == PermissionStatus.denied) {
+                          print("permission deniedddd");
+                          _permissionGranted =
+                              await location.requestPermission();
+                          if (_permissionGranted != PermissionStatus.granted) {
+                            print("permission not grantedd");
+
+                            return;
+                          }
+                        }
+                        //------permission checking over------
 
                         var result = await Navigator.push(
                             context,
@@ -704,7 +726,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         print("-Cart-totalPrice is greater than min amount---}");
         //then Store will not charge shipping.
         totalPrice = totalPrice;
-        print("---------- shipping mandatory ----------- ${addressList.isShippingMandatory}");
+        print(
+            "---------- shipping mandatory ----------- ${addressList.isShippingMandatory}");
         if (addressList.isShippingMandatory == '0') {
           shippingCharges = "0";
           addressList.areaCharges = "0";

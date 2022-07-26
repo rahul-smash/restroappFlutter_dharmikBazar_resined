@@ -316,23 +316,30 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 ),
               ),
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Expected Delivery Date',
-                      style:
-                          TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                    ),
-                    Text(
-                      orderHistoryData.trackingData.expectedDeliiveryDate,
-                      style: TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF7A7C80),
-                          fontWeight: FontWeight.w300),
-                    ),
-                  ],
+                child: Visibility(
+                  visible:
+                      orderHistoryData.trackingData.expectedDeliiveryDate !=
+                              null &&
+                          orderHistoryData
+                              .trackingData.expectedDeliiveryDate.isNotEmpty,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Expected Delivery Date',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w300),
+                      ),
+                      Text(
+                        orderHistoryData.trackingData.expectedDeliiveryDate,
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF7A7C80),
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
