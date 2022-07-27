@@ -116,6 +116,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       _selectedShippingCharges;
   bool isFoundCOD = false;
   bool isFoundOnline = false;
+  String codDifferenceAmount = '0.0',
+      codTPRShipping = '0',
+      onlineTPRShipping = '0';
+  String displayShipping = '0';
 
 //--------- Third-party delivery system variables ENDS--------
 
@@ -277,7 +281,43 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     selctedTag = 0;
     hideRemoveCouponFirstTime = true;
     print("You are on confirm order screen");
-    //print("-deliveryType--${widget.deliveryType}---");
+
+    if (thirdPartyDeliverySystemEnable) {
+      //Check visibility from response
+      if (widget.address != null &&
+          widget.address.thirdPartyDeliveryData != null &&
+          widget.address.thirdPartyDeliveryData.shippingCharges != null &&
+          widget.address.thirdPartyDeliveryData.shippingCharges.isNotEmpty) {
+        //find cod and find online
+        for (int i = 0;
+            i < widget.address.thirdPartyDeliveryData.shippingCharges.length;
+            i++) {
+          if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
+                  .orderPaymentMode
+                  .toLowerCase() ==
+              'cod') {
+            isFoundCOD = true;
+            //get COD object
+            codShippingCharges =
+                widget.address.thirdPartyDeliveryData.shippingCharges[i];
+          }
+          if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
+                  .orderPaymentMode
+                  .toLowerCase() ==
+              'online') {
+            isFoundOnline = true;
+            //get online object
+            onlineShippingCharges =
+                widget.address.thirdPartyDeliveryData.shippingCharges[i];
+          }
+        }
+      } else {
+        //not found cod and not found online
+        isFoundOnline = false;
+        isFoundCOD = false;
+      }
+    }
+
     constraints();
 
     //thirdPartyView bool
@@ -402,41 +442,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         checkPromiseToPayForUser();
       } else {
         isPromiseToPay = false;
-      }
-    }
-    if (thirdPartyDeliverySystemEnable) {
-      //Check visibility from response
-      if (widget.address != null &&
-          widget.address.thirdPartyDeliveryData != null &&
-          widget.address.thirdPartyDeliveryData.shippingCharges != null &&
-          widget.address.thirdPartyDeliveryData.shippingCharges.isNotEmpty) {
-        //find cod and find online
-        for (int i = 0;
-            i < widget.address.thirdPartyDeliveryData.shippingCharges.length;
-            i++) {
-          if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
-                  .orderPaymentMode
-                  .toLowerCase() ==
-              'cod') {
-            isFoundCOD = true;
-            //get COD object
-            codShippingCharges =
-                widget.address.thirdPartyDeliveryData.shippingCharges[i];
-          }
-          if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
-                  .orderPaymentMode
-                  .toLowerCase() ==
-              'online') {
-            isFoundOnline = true;
-            //get online object
-            onlineShippingCharges =
-                widget.address.thirdPartyDeliveryData.shippingCharges[i];
-          }
-        }
-      } else {
-        //not found cod and not found online
-        isFoundOnline = false;
-        isFoundCOD = false;
       }
     }
   }
@@ -1627,7 +1632,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         double codShippingChargesRate = double.parse(codShippingCharges.rate);
         double totalAmount = double.parse(taxModel.total);
         return (codShippingChargesRate - totalAmount).toStringAsFixed(2);
-      }else{
+      } else {
         return '--';
       }
     }
@@ -2320,6 +2325,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             });
           } else {
             minOrderCheck = true;
+            if (storeModel.enableWeightWiseCharges != '1') {
+              if (widget.address.isShippingMandatory == '0') {
+                shippingCharges = "0";
+                widget.address.areaCharges = "0";
+              }
+            }
             setState(() {
               this.totalPrice = mtotalPrice.toDouble();
             });
@@ -2328,27 +2339,101 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if (mtotalPrice <= minAmount) {
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
+
+            _validateTPD();
+
             setState(() {
               this.totalPrice = totalPrice + int.parse(shippingCharges);
             });
-            //TODO: check here
-
           } else {
             print("-Cart-totalPrice is greater than min amount---}");
             //then Store will not charge shipping.
-            setState(() {
-              this.totalPrice = totalPrice;
-              // if (widget.address.isShippingMandatory == '0') {
-              //   shippingCharges = "0";
-              //   widget.address.areaCharges = "0";
-              // }
-            });
+            this.totalPrice = totalPrice;
+            if (storeModel.enableWeightWiseCharges != '1') {
+              if (widget.address.isShippingMandatory == '0') {
+                shippingCharges = "0";
+                widget.address.areaCharges = "0";
+              }
+            }
+
             //TODO: check here
-            isShippingFree=true;
+            // isShippingFree=true;
+
           }
         }
       } catch (e) {
         print(e);
+      }
+    }
+  }
+
+  void _validateTPD(String shippingType) {
+    // case not allowed for min order
+    //- shipping mandatory
+    //-
+    // case allowed of min order
+    // - shipping not mandatory
+    // - shipping mandatory
+
+    if (storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
+      if (codShippingCharges != null && onlineShippingCharges != null) {
+        String codRate = codShippingCharges.rate;
+        String codFRate = codShippingCharges.freightCharge;
+
+        String onlineRate = onlineShippingCharges.rate;
+        String onlineFRate = onlineShippingCharges.freightCharge;
+
+        double diffCOD = databaseHelper.roundOffPrice(
+            (double.parse(codRate) - double.parse(codFRate)), 2);
+
+        double diffOnline = databaseHelper.roundOffPrice(
+            (double.parse(onlineRate) - double.parse(onlineFRate)), 2);
+
+        codDifferenceAmount = diffCOD.toStringAsFixed(2);
+        switch (shippingType) {
+          case AppConstant.shippingMandatoryMinOrderAllowed:
+          case AppConstant.shippingNotMandatoryMinOrderNotAllowed:
+          case AppConstant.shippingMandatoryMinOrderNotAllowed:
+            if (widget.paymentMode == '2') {
+              // case not allowed for min order
+
+              //case shipping mandatory
+              shippingCharges = databaseHelper
+                  .roundOffPrice(
+                      (double.parse(shippingCharges) + double.parse(codRate)),
+                      2)
+                  .toString();
+            } else if (widget.paymentMode == '3') {
+              //case not allowed for order
+              shippingCharges = databaseHelper
+                  .roundOffPrice(
+                      (double.parse(shippingCharges) +
+                          double.parse(onlineRate)),
+                      2)
+                  .toString();
+            }
+            break;
+          case AppConstant.shippingNotMandatoryMinOrderAllowed:
+            if (widget.paymentMode == '2') {
+              // case not allowed for min order
+
+              //case shipping mandatory
+              displayShipping = databaseHelper
+                  .roundOffPrice(
+                      (double.parse(shippingCharges) + double.parse(codRate)),
+                      2)
+                  .toString();
+            } else if (widget.paymentMode == '3') {
+              //case not allowed for order
+              displayShipping = databaseHelper
+                  .roundOffPrice(
+                      (double.parse(shippingCharges) +
+                          double.parse(onlineRate)),
+                      2)
+                  .toString();
+            }
+            break;
+        }
       }
     }
   }

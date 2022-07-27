@@ -689,6 +689,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         totalPrice = mtotalPrice.toDouble();
       } else {
         totalPrice = mtotalPrice.toDouble();
+        if (addressList.isShippingMandatory == '0') {
+          shippingCharges = "0";
+          addressList.areaCharges = "0";
+        }
       }
     } else {
       if (mtotalPrice <= minAmount) {

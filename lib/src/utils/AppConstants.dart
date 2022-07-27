@@ -38,7 +38,8 @@ class AppConstant {
 
   static final String logoutConfirm = "Are you sure you want to Logout?";
   static final String logoutSuccess = "You have logged out successfully";
-  static final String deleteUserSuccess = "Your profile is deleted successfully";
+  static final String deleteUserSuccess =
+      "Your profile is deleted successfully";
   static final String addItems = "Please add items in cart";
 
   static final String pleaseLogin = "Please login to proceed further";
@@ -119,7 +120,15 @@ class AppConstant {
   static final String txt_share = "SHARE";
 
 /*store_delivery_model types*/
-  static  const DELIVERY_VALUEAPP = "valueapp_delivery_system";
+  static const DELIVERY_VALUEAPP = "valueapp_delivery_system";
   static const DELIVERY_WEIGHTWISE = "weightwise_delivery_system";
   static const DELIVERY_THIRD_PARTY = "third_party_delivery_system";
+
+  //----------------------------TPD system-----------------------------------
+  static const shippingMandatoryMinOrderNotAllowed =
+      "shipping_mandatory_min_order_not_allowed";
+  static const shippingNotMandatoryMinOrderNotAllowed =
+      "shipping_not_mandatory_min_order_not_allowed";
+  static const shippingMandatoryMinOrderAllowed = "shipping_mandatory_min_order_allowed";
+  static const shippingNotMandatoryMinOrderAllowed = "shipping_not_mandatory_min_order_allowed";
 }
