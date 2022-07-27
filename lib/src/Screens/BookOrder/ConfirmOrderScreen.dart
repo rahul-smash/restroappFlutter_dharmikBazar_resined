@@ -1622,6 +1622,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       showOptions = true;
     }
 
+    String _getCODTotal() {
+      if (codShippingCharges != null && taxModel != null) {
+        double codShippingChargesRate = double.parse(codShippingCharges.rate);
+        double totalAmount = double.parse(taxModel.total);
+        return (codShippingChargesRate - totalAmount).toStringAsFixed(2);
+      }else{
+        return '--';
+      }
+    }
+
     return Visibility(
       visible: showOptions,
       child: Padding(
@@ -1644,25 +1654,42 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Radio(
-                    value: PaymentType.ONLINE,
-                    activeColor: appTheme,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    groupValue: widget._selectedPaymentTypeValue,
-                    onChanged: (PaymentType value) async {
-                      bool proceed = await couponAppliedCheck();
-                      if (proceed) {
-                        setState(() {
-                          widget._selectedPaymentTypeValue = value;
-                          if (value == PaymentType.ONLINE) {
-                            widget.paymentMode = "3";
-                            ispaytmSelected = false;
-                          }
-                        });
-                      }
-                    },
+                  Expanded(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Radio(
+                          value: PaymentType.ONLINE,
+                          activeColor: appTheme,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          groupValue: widget._selectedPaymentTypeValue,
+                          onChanged: (PaymentType value) async {
+                            bool proceed = await couponAppliedCheck();
+                            if (proceed) {
+                              setState(() {
+                                widget._selectedPaymentTypeValue = value;
+                                if (value == PaymentType.ONLINE) {
+                                  widget.paymentMode = "3";
+                                  ispaytmSelected = false;
+                                }
+                              });
+                            }
+                          },
+                        ),
+                        Text('Online',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            )),
+                      ],
+                    ),
                   ),
-                  Text('Online',
+                  Text(
+                      // codShippingCharges != null
+                      //     ? codShippingCharges.rate
+                      //     : '--',
+                      taxModel != null ? taxModel.total : '--',
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -1704,29 +1731,30 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                 },
                               ),
                             ),
-                            Text('COD',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                )),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('COD',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w600,
+                                    )),
+                                Text(
+                                    'COD extra charges ${codShippingCharges != null ? codShippingCharges.rate : '--'}',
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    )),
+                              ],
+                            ),
                           ],
                         ),
-                        Text(
-                            'COD extra charges ${codShippingCharges != null ? codShippingCharges.rate : '--'}',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            )),
                       ],
                     ),
                   ),
-                  Text(
-                      // codShippingCharges != null
-                      //     ? codShippingCharges.rate
-                      //     : '--',
-                      taxModel != null ? taxModel.total : '--',
+                  Text(_getCODTotal(),
                       style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w600,
@@ -2303,6 +2331,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             setState(() {
               this.totalPrice = totalPrice + int.parse(shippingCharges);
             });
+            //TODO: check here
+
           } else {
             print("-Cart-totalPrice is greater than min amount---}");
             //then Store will not charge shipping.
@@ -2313,6 +2343,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               //   widget.address.areaCharges = "0";
               // }
             });
+            //TODO: check here
+            isShippingFree=true;
           }
         }
       } catch (e) {
