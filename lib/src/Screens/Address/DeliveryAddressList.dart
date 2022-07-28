@@ -720,6 +720,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   Future<DeliveryAddressData> checkingStoreDeliverymodel(
       StoreModel storeModel, DeliveryAddressData addressData) async {
+    isTPDSError=false;
     switch (storeModel.storeDeliveryModel) {
       case AppConstant.DELIVERY_WEIGHTWISE:
         {
