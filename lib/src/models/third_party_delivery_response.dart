@@ -10,18 +10,22 @@ class ThirdPartyDeliveryResponse {
   ThirdPartyDeliveryResponse({
     this.success,
     this.data,
+    this.message
   });
 
   bool success;
   ThirdPartyDeliveryData data;
+  String message;
 
   ThirdPartyDeliveryResponse copyWith({
     bool success,
     ThirdPartyDeliveryData data,
+    String message,
   }) =>
       ThirdPartyDeliveryResponse(
         success: success ?? this.success,
         data: data ?? this.data,
+        message: message ?? this.message,
       );
 
   factory ThirdPartyDeliveryResponse.fromRawJson(String str) =>
@@ -32,6 +36,7 @@ class ThirdPartyDeliveryResponse {
   factory ThirdPartyDeliveryResponse.fromJson(Map<String, dynamic> json) =>
       ThirdPartyDeliveryResponse(
         success: json["success"] == null ? null : json["success"],
+        message: json["message"] == null ? null : json["message"],
         data: json["data"] == null
             ? null
             : ThirdPartyDeliveryData.fromJson(json["data"]),
@@ -226,6 +231,7 @@ class TotalDimensions {
   String totalBreadth;
   String totalHeight;
   String totalWeight;
+  String courierId;
 
   TotalDimensions copyWith({
     String totalLength,
@@ -266,5 +272,6 @@ class TotalDimensions {
         "total_breadth": totalBreadth == null ? null : totalBreadth,
         "total_height": totalHeight == null ? null : totalHeight,
         "total_weight": totalWeight == null ? null : totalWeight,
+        "courier_id": courierId == null ? null : courierId,
       };
 }

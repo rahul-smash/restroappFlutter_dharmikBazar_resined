@@ -117,9 +117,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   bool isFoundCOD = false;
   bool isFoundOnline = false;
   String codDifferenceAmount = '0.0',
-      codTPRShipping = '0',
-      onlineTPRShipping = '0';
+      onlineDifferenceAmount = '0.0',
+      codTotalWithShipping = '',
+      onlineTotalWithShipping = '';
   String displayShipping = '0';
+  bool isShippingFree = false;
 
 //--------- Third-party delivery system variables ENDS--------
 
@@ -281,7 +283,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     selctedTag = 0;
     hideRemoveCouponFirstTime = true;
     print("You are on confirm order screen");
-
+//thirdPartyView bool
+    thirdPartyDeliverySystemEnable =
+        storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY &&
+            widget.deliveryType != OrderType.PickUp;
     if (thirdPartyDeliverySystemEnable) {
       //Check visibility from response
       if (widget.address != null &&
@@ -320,10 +325,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
     constraints();
 
-    //thirdPartyView bool
-    thirdPartyDeliverySystemEnable =
-        storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY &&
-            widget.deliveryType != OrderType.PickUp;
     try {
       SharedPrefs.getStore().then((storeData) {
         storeModel = storeData;
@@ -397,7 +398,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         }
       } else {
         if (widget.deliveryType == OrderType.Delivery) {
-          if (widget.address.areaWisePaymentMethod == '1') {
+          if (thirdPartyDeliverySystemEnable) {
+            if (isFoundOnline) {
+              widget.paymentMode = '3';
+              widget._selectedPaymentTypeValue = PaymentType.ONLINE;
+              ispaytmSelected = false;
+              _selectedShippingCharges = onlineShippingCharges;
+            }
+          } else if (widget.address.areaWisePaymentMethod == '1') {
             showCOD = true;
             if (widget.storeModel.onlinePayment != null &&
                 widget.storeModel.onlinePayment.compareTo('1') == 0 &&
@@ -555,13 +563,17 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
-  Future<void> multiTaxCalculationApi() async {
+  Future<void> multiTaxCalculationApi(
+      {bool showLoader = false, BuildContext buildContext}) async {
     bool isNetworkAvailable = await Utils.isNetworkAvailable();
     if (!isNetworkAvailable) {
       Utils.showToast(AppConstant.noInternet, false);
       return;
     }
-    isLoading = true;
+    if (showLoader) {
+      Utils.showProgressDialog(buildContext);
+    }
+    if (!showLoader) isLoading = true;
 //    userWalleModel = await SharedPrefs.getUserWallet();
 //    if (userWalleModel == null) {
     userWalleModel = await ApiController.getUserWallet();
@@ -572,9 +584,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       cartListFromDB = cartList;
       List jsonList = Product.encodeToJson(cartList);
       String encodedDoughnut = jsonEncode(jsonList);
+
       ApiController.multipleTaxCalculationRequest(
               "", "0", "$shippingCharges", encodedDoughnut)
           .then((response) async {
+        if (showLoader) {
+          Utils.hideProgressDialog(buildContext);
+        }
         //{"success":false,"message":"Some products are not available."}
         TaxCalculationResponse model = response;
         if (model.success) {
@@ -619,6 +635,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           }
 
           calculateTotalSavings();
+          if (thirdPartyDeliverySystemEnable) {
+            _getCODTotal();
+            _getOnlineTotal();
+          }
           setState(() {
             isLoading = false;
           });
@@ -1016,9 +1036,41 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               children: [
                 Text("Delivery charges:",
                     style: TextStyle(color: Colors.black54)),
-                Text(
-                    "${AppConstant.currency}${widget.address == null ? "0" : widget.address.areaCharges}",
-                    style: TextStyle(color: Colors.black54)),
+                Row(
+                  children: [
+                    Text(
+                        thirdPartyDeliverySystemEnable
+                            ? "${AppConstant.currency}$displayShipping"
+                            : "${AppConstant.currency}${widget.address == null ? "0" : widget.address.areaCharges}",
+                        style: TextStyle(
+                            color: Colors.black54,
+                            decoration: isShippingFree
+                                ? TextDecoration.lineThrough
+                                : TextDecoration.none)),
+                    Visibility(
+                      visible: isShippingFree,
+                      child: RichText(
+                        text: TextSpan(
+                          text:'(',
+                          style: TextStyle(
+                               color: Colors.black),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: 'Free',
+                                style: TextStyle(
+                                    color: appTheme,
+                                    fontWeight: FontWeight.bold,
+
+                                    )),TextSpan(
+                                text: ')',
+                        style: TextStyle(
+                            color: Colors.black),)
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ],
             ),
           ),
@@ -1609,6 +1661,38 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     );
   }
 
+  void _getCODTotal() {
+    if (codShippingCharges != null && taxModel != null) {
+      double totalAmount = double.parse(taxModel.total);
+      switch (widget.paymentMode) {
+        case '2':
+          codTotalWithShipping = (totalAmount).toStringAsFixed(2);
+          break;
+        case '3':
+          codTotalWithShipping =
+              (totalAmount + double.parse(codDifferenceAmount))
+                  .toStringAsFixed(2);
+          break;
+      }
+    }
+  }
+
+  void _getOnlineTotal() {
+    if (codShippingCharges != null && taxModel != null) {
+      double totalAmount = double.parse(taxModel.total);
+      switch (widget.paymentMode) {
+        case '2':
+          onlineTotalWithShipping =
+              (totalAmount - double.parse(codDifferenceAmount))
+                  .toStringAsFixed(2);
+          break;
+        case '3':
+          onlineTotalWithShipping = (totalAmount).toStringAsFixed(2);
+          break;
+      }
+    }
+  }
+
   Widget addSecondModelPaymentOptions() {
     bool showOptions = false;
     //TODO: re-think again
@@ -1626,15 +1710,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     if (isPromiseToPay) {
       showOptions = true;
     }
-
-    String _getCODTotal() {
-      if (codShippingCharges != null && taxModel != null) {
-        double codShippingChargesRate = double.parse(codShippingCharges.rate);
-        double totalAmount = double.parse(taxModel.total);
-        return (codShippingChargesRate - totalAmount).toStringAsFixed(2);
-      } else {
-        return '--';
-      }
+    void updateValues(BuildContext buildContext) {
+      Future.delayed(Duration(microseconds: 1200), () {
+        constraints();
+        multiTaxCalculationApi(showLoader: true, buildContext: buildContext);
+      });
     }
 
     return Visibility(
@@ -1677,6 +1757,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                 if (value == PaymentType.ONLINE) {
                                   widget.paymentMode = "3";
                                   ispaytmSelected = false;
+                                  _selectedShippingCharges =
+                                      onlineShippingCharges;
+                                  updateValues(context);
                                 }
                               });
                             }
@@ -1690,15 +1773,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       ],
                     ),
                   ),
-                  Text(
-                      // codShippingCharges != null
-                      //     ? codShippingCharges.rate
-                      //     : '--',
-                      taxModel != null ? taxModel.total : '--',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                      )),
+                  Visibility(
+                    visible: !isShippingFree,
+                    child: Text(onlineTotalWithShipping,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ),
                 ],
               ),
             ),
@@ -1730,6 +1812,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                       if (value == PaymentType.COD) {
                                         widget.paymentMode = "2";
                                         ispaytmSelected = false;
+                                        _selectedShippingCharges =
+                                            codShippingCharges;
+
+                                        updateValues(context);
                                       }
                                     });
                                   }
@@ -1745,13 +1831,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600,
                                     )),
-                                Text(
-                                    'COD extra charges ${codShippingCharges != null ? codShippingCharges.rate : '--'}',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                    )),
+                                Visibility(
+                                  visible: !isShippingFree,
+                                  child: Text(
+                                      'COD extra charges ${codShippingCharges != null ? codDifferenceAmount : '--'}',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      )),
+                                ),
                               ],
                             ),
                           ],
@@ -1759,11 +1848,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       ],
                     ),
                   ),
-                  Text(_getCODTotal(),
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                      )),
+                  Visibility(
+                    visible: !isShippingFree,
+                    child: Text(codTotalWithShipping,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.w600,
+                        )),
+                  ),
                 ],
               ),
             ),
@@ -1784,6 +1876,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           if (value == PaymentType.ONLINE_PAYTM) {
                             widget.paymentMode = "3";
                             ispaytmSelected = true;
+                            _selectedShippingCharges = onlineShippingCharges;
+                            updateValues(context);
                           }
                         });
                       }
@@ -1813,6 +1907,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           widget._selectedPaymentTypeValue = value;
                           if (value == PaymentType.PROMISE_TO_PAY) {
                             widget.paymentMode = "4";
+                            _selectedShippingCharges = codShippingCharges;
+                            updateValues(context);
                           }
                         });
                       }
@@ -2070,51 +2166,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     attributeMap["shippingCharges"] = "${shippingCharges}";
     Utils.sendAnalyticsEvent("Clicked Place Order button", attributeMap);
 
-//    if (response.taxCalculation.orderDetail != null &&
-//        response.taxCalculation.orderDetail.isNotEmpty) {
-//      responseOrderDetail = response.taxCalculation.orderDetail;
-//      bool someProductsUpdated = false;
-//      bool previousValue=isOrderVariations;
-//      isOrderVariations = response.taxCalculation.isChanged;
-//      for (int i = 0; i < responseOrderDetail.length; i++) {
-//        if (responseOrderDetail[i].productStatus.compareTo('out_of_stock') ==
-//                0 ||
-//            responseOrderDetail[i].productStatus.compareTo('price_changed') ==
-//                0) {
-//          someProductsUpdated = true;
-//          break;
-//        }
-//      }
-//      //check any variation made
-//      if(previousValue){
-//        //check current value=
-//        if(!isOrderVariations){
-//          someProductsUpdated=true;
-//        }
-//      }
-//
-//      if (someProductsUpdated) {
-//        Utils.hideProgressDialog(context);
-//        DialogUtils.displayCommonDialog(
-//            context,
-//            storeModel == null ? "" : storeModel.storeName,
-//            "Some Cart items were updated. Please review the cart before procceeding.",
-//            buttonText: 'ok');
-//        constraints();
-//        //remove coupon
-//        setState(() {
-//          hideRemoveCouponFirstTime = true;
-//          taxModel = response.taxCalculation;
-//          appliedCouponCodeList.clear();
-//          appliedReddemPointsCodeList.clear();
-//          isCouponsApplied = false;
-//          couponCodeController.text = "";
-//        });
-//        return;
-//      }
-//    }
-//    calculateTotalSavings();
-
     if (taxModel != null &&
         taxModel.wallet_refund != "0" &&
         double.parse(taxModel.total) == 0 &&
@@ -2320,6 +2371,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
             minOrderCheck = false;
+            _validateTPD(AppConstant.shippingNotMandatoryMinOrderNotAllowed);
             setState(() {
               this.totalPrice = mtotalPrice.toDouble();
             });
@@ -2329,6 +2381,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               if (widget.address.isShippingMandatory == '0') {
                 shippingCharges = "0";
                 widget.address.areaCharges = "0";
+                _validateTPD(
+                    AppConstant.shippingNotMandatoryMinOrderNotAllowed);
+              } else {
+                _validateTPD(AppConstant.shippingMandatoryMinOrderNotAllowed);
               }
             }
             setState(() {
@@ -2339,8 +2395,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           if (mtotalPrice <= minAmount) {
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
-
-            _validateTPD();
+            isShippingFree = false;
+            _validateTPD(AppConstant.shippingMandatoryMinOrderAllowed);
 
             setState(() {
               this.totalPrice = totalPrice + int.parse(shippingCharges);
@@ -2353,12 +2409,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               if (widget.address.isShippingMandatory == '0') {
                 shippingCharges = "0";
                 widget.address.areaCharges = "0";
+                isShippingFree = true;
+                _validateTPD(AppConstant.shippingNotMandatoryMinOrderAllowed);
               }
             }
-
-            //TODO: check here
-            // isShippingFree=true;
-
           }
         }
       } catch (e) {
@@ -2392,12 +2446,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         codDifferenceAmount = diffCOD.toStringAsFixed(2);
         switch (shippingType) {
           case AppConstant.shippingMandatoryMinOrderAllowed:
-          case AppConstant.shippingNotMandatoryMinOrderNotAllowed:
           case AppConstant.shippingMandatoryMinOrderNotAllowed:
             if (widget.paymentMode == '2') {
-              // case not allowed for min order
-
-              //case shipping mandatory
               shippingCharges = databaseHelper
                   .roundOffPrice(
                       (double.parse(shippingCharges) + double.parse(codRate)),
@@ -2412,12 +2462,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       2)
                   .toString();
             }
+            displayShipping = shippingCharges;
+            print("----shippingCharges processed=${shippingCharges}");
+
             break;
+          case AppConstant.shippingNotMandatoryMinOrderNotAllowed:
           case AppConstant.shippingNotMandatoryMinOrderAllowed:
+            isShippingFree = true;
             if (widget.paymentMode == '2') {
-              // case not allowed for min order
-
-              //case shipping mandatory
               displayShipping = databaseHelper
                   .roundOffPrice(
                       (double.parse(shippingCharges) + double.parse(codRate)),
@@ -2432,6 +2484,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       2)
                   .toString();
             }
+            print("----shippingCharges processed=${shippingCharges}");
+
             break;
         }
       }
@@ -2734,7 +2788,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         Utils.getCartItemsListToJson(
                 isOrderVariations: isOrderVariations,
                 responseOrderDetail: responseOrderDetail,
-                cartList: cartListFromDB)
+                cartList: cartListFromDB,
+                thirdPartyDeliveryData: widget.address.thirdPartyDeliveryData)
             .then((json) {
           if (json == null) {
             print("--json == null-json == null-");
@@ -2765,7 +2820,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   payment_id,
                   onlineMethod,
                   selectedDeliverSlotValue,
-                  cart_saving: totalSavings.toStringAsFixed(2))
+                  cart_saving: totalSavings.toStringAsFixed(2),
+                  selectedShippingCharge: _selectedShippingCharges,
+                  thirdPartyDeliveryData: widget.address.thirdPartyDeliveryData)
               .then((response) async {
             Utils.hideProgressDialog(context);
             if (response == null) {

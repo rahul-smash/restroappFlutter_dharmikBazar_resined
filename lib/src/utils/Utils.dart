@@ -35,6 +35,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/third_party_delivery_response.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -1120,7 +1121,8 @@ class Utils {
   static Future<String> getCartItemsListToJson(
       {bool isOrderVariations = true,
       List<OrderDetail> responseOrderDetail,
-      List<Product> cartList}) async {
+      List<Product> cartList,
+      ThirdPartyDeliveryData thirdPartyDeliveryData}) async {
     for (int i = 0; i < cartList.length; i++) {
       for (int j = 0; j < responseOrderDetail.length; j++) {
         if (cartList[i].id == responseOrderDetail[j].productId &&
@@ -1130,6 +1132,25 @@ class Utils {
         }
       }
     }
+    if (thirdPartyDeliveryData != null) {
+      for (int i = 0; i < responseOrderDetail.length; i++) {
+        for (int j = 0; j < thirdPartyDeliveryData.orderDetail.length; j++) {
+          if (cartList[i].id ==
+                  thirdPartyDeliveryData.orderDetail[j].productId &&
+              cartList[i].variantId ==
+                  thirdPartyDeliveryData.orderDetail[j].variantId) {
+            responseOrderDetail[j].length =
+                thirdPartyDeliveryData.orderDetail[i].length;
+            responseOrderDetail[j].height =
+                thirdPartyDeliveryData.orderDetail[i].height;
+            responseOrderDetail[j].weight =
+                thirdPartyDeliveryData.orderDetail[i].weight;
+            break;
+          }
+        }
+      }
+    }
+
     List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
         removeOutOfStockProducts: true);
     if (jsonList.length != 0) {
@@ -1139,25 +1160,25 @@ class Utils {
       return null;
     }
   }
+
   // this method is for weight wise delivery charges
   static Future<String> getCartListToJson(List<Product> cartList) async {
     List jsonList = List.empty(growable: true);
-   for(int i=0;i<cartList.length;i++){
-     var item=cartList[i];
-     jsonList.add({
-       "product_id": item.id == null ? null : item.id,
-       "product_name": item.title == null ? null : item.title,
-       "variant_id": item.variantId == null ? null : item.variantId,
-       "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
-       "quantity": item.quantity,
-       "price": item.price == null ? null : item.price,
-       "weight": item.weight == null ? null : item.weight,
-       "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
-       "unit_type": item.isUnitType == null ? null : item.isUnitType,
-       "product_status": item.status == null ? null : item.status,
-     });
-
-   }
+    for (int i = 0; i < cartList.length; i++) {
+      var item = cartList[i];
+      jsonList.add({
+        "product_id": item.id == null ? null : item.id,
+        "product_name": item.title == null ? null : item.title,
+        "variant_id": item.variantId == null ? null : item.variantId,
+        "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
+        "quantity": item.quantity,
+        "price": item.price == null ? null : item.price,
+        "weight": item.weight == null ? null : item.weight,
+        "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
+        "unit_type": item.isUnitType == null ? null : item.isUnitType,
+        "product_status": item.status == null ? null : item.status,
+      });
+    }
 
     if (jsonList.length != 0) {
       String encodedDoughnut = jsonEncode(jsonList);

@@ -54,6 +54,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   ConfigModel configObject;
   PermissionStatus _permissionGranted;
 
+  bool isTPDSError = false;
+
   @override
   void initState() {
     super.initState();
@@ -549,37 +551,13 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           }
           addressData =
               await checkingStoreDeliverymodel(storeModel, addressData);
-
-          // print(addressData.thirdPartyDeliveryData.shippingCharges.first.rate);
-          if (addressList.length == 0) {
-            Utils.showToast(AppConstant.selectAddress, false);
-          } else {
-            print("minAmount=${addressList[selectedIndex].minAmount}");
-            print("notAllow=${addressList[selectedIndex].notAllow}");
-            if (addressList[selectedIndex].note.isEmpty) {
-              if (widget.delivery == OrderType.SubScription) {
-                eventBus.fire(onAddressSelected(addressList[selectedIndex]));
-                Navigator.pop(context);
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ConfirmOrderScreen(
-                            addressData,
-                            false,
-                            "",
-                            widget.delivery,
-                            storeModel: storeModel,
-                          )),
-                );
-              }
+          if (!isTPDSError) {
+            if (addressList.length == 0) {
+              Utils.showToast(AppConstant.selectAddress, false);
             } else {
-              var result = await DialogUtils.displayOrderConfirmationDialog(
-                context,
-                "Confirmation",
-                addressList[selectedIndex].note,
-              );
-              if (result == true) {
+              print("minAmount=${addressList[selectedIndex].minAmount}");
+              print("notAllow=${addressList[selectedIndex].notAllow}");
+              if (addressList[selectedIndex].note.isEmpty) {
                 if (widget.delivery == OrderType.SubScription) {
                   eventBus.fire(onAddressSelected(addressList[selectedIndex]));
                   Navigator.pop(context);
@@ -596,8 +574,34 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                             )),
                   );
                 }
+              } else {
+                var result = await DialogUtils.displayOrderConfirmationDialog(
+                  context,
+                  "Confirmation",
+                  addressList[selectedIndex].note,
+                );
+                if (result == true) {
+                  if (widget.delivery == OrderType.SubScription) {
+                    eventBus
+                        .fire(onAddressSelected(addressList[selectedIndex]));
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ConfirmOrderScreen(
+                                addressData,
+                                false,
+                                "",
+                                widget.delivery,
+                                storeModel: storeModel,
+                              )),
+                    );
+                  }
+                }
               }
             }
+
             //Code Commented Due to not approved by client
             /* StoreModel storeModel = await SharedPrefs.getStore();
             bool isPaymentModeOnline = false;
@@ -762,13 +766,17 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             chargesResponse.success &&
             chargesResponse.data != null) {
           //update changes according to weight
-          print('----------All right');
-          if(chargesResponse.data.errorMsg!=null){
+          if (chargesResponse.data.errorMsg != null) {
             Utils.showToast(chargesResponse.data.errorMsg, false);
+            isTPDSError = true;
           }
           addressData.thirdPartyDeliveryData = chargesResponse.data;
           return addressData;
         } else {
+          isTPDSError = true;
+          if (chargesResponse.message != null) {
+            Utils.showToast(chargesResponse.message, false);
+          }
           return addressData;
         }
 
