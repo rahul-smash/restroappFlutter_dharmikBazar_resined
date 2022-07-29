@@ -16,6 +16,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 // import 'package:package_info/package_info.dart';
@@ -51,10 +52,11 @@ class Utils {
 
   static void showToast(String msg, bool shortLength) {
     try {
+      Fluttertoast.cancel();
       if (shortLength) {
         Fluttertoast.showToast(
             msg: msg,
-            toastLength: Toast.LENGTH_LONG,
+            toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             backgroundColor: toastbgColor.withOpacity(0.9),
@@ -1356,6 +1358,36 @@ class Utils {
       child: CircularProgressIndicator(
           valueColor: new AlwaysStoppedAnimation<Color>(color)),
     );
+  }
+
+  static dynamic determinePosition() async {
+    print("determine postion called::::::::::::::::");
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Utils.showToast('Location services are disabled.', true);
+    }
+
+    permission = await Geolocator.checkPermission();
+    permission = await Geolocator.requestPermission();
+
+    if (permission == LocationPermission.denied) {
+      return Utils.showToast('Location permissions are denied', true);
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Utils.showToast(
+          'Location permissions are permanently denied, we cannot request permissions.',
+          true);
+    }
+    return await Geolocator.getLastKnownPosition();
+    // Position position = await Geolocator.getCurrentPosition(
+    //     desiredAccuracy: LocationAccuracy.low);
+    // print(position);
+
+    // return await Geolocator.getCurrentPosition();
   }
 }
 

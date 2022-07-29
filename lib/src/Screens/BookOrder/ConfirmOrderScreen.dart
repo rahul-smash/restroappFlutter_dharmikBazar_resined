@@ -488,7 +488,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           children: <Widget>[
             Column(children: [
               isLoading
-                  ? Utils.getIndicatorView()
+                  ? ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxHeight: Utils.getDeviceHeight(context) / 2),
+                      child: Utils.getIndicatorView())
                   : widget.cartList == null
                       ? Text("")
                       : ListView(
@@ -642,6 +645,25 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           setState(() {
             isLoading = false;
           });
+
+          //check min order
+          if (widget.deliveryType == OrderType.Delivery &&
+              widget.address.notAllow) {
+            if (!minOrderCheck) {
+              bool isClosed = await DialogUtils.displayCommonDialog(
+                  context,
+                  storeModel == null ? "" : storeModel.storeName,
+                  "Your order amount is too low. Minimum order amount is ${widget.address.minAmount}",
+                  buttonText: 'Ok', buttonPressed: () {
+                Navigator.pop(context, true);
+              });
+              if (isClosed) {
+                Navigator.pop(
+                  context,
+                );
+              }
+            }
+          }
         } else {
           var result = await DialogUtils.displayCommonDialog(
               context,
@@ -1051,20 +1073,19 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       visible: isShippingFree,
                       child: RichText(
                         text: TextSpan(
-                          text:'(',
-                          style: TextStyle(
-                               color: Colors.black),
+                          text: '(',
+                          style: TextStyle(color: Colors.black),
                           children: <TextSpan>[
                             TextSpan(
                                 text: 'Free',
                                 style: TextStyle(
-                                    color: appTheme,
-                                    fontWeight: FontWeight.bold,
-
-                                    )),TextSpan(
-                                text: ')',
-                        style: TextStyle(
-                            color: Colors.black),)
+                                  color: appTheme,
+                                  fontWeight: FontWeight.bold,
+                                )),
+                            TextSpan(
+                              text: ')',
+                              style: TextStyle(color: Colors.black),
+                            )
                           ],
                         ),
                       ),
@@ -1372,6 +1393,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               appliedReddemPointsCodeList.add(model.couponCode);
                               print("===discount=== ${model.discount}");
                               print("taxModel.total=${taxModel.total}");
+
+                              if (thirdPartyDeliverySystemEnable) {
+                                _getCODTotal();
+                                _getOnlineTotal();
+                              }
                             });
                           }, appliedReddemPointsCodeList, isOrderVariations,
                               responseOrderDetail, shippingCharges),
@@ -1453,6 +1479,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           appliedCouponCodeList.add(model.couponCode);
                           print("===couponCode=== ${model.couponCode}");
                           print("taxModel.total=${taxModel.total}");
+                          if (thirdPartyDeliverySystemEnable) {
+                            _getCODTotal();
+                            _getOnlineTotal();
+                          }
                         });
                       },
                       appliedCouponCodeList,
@@ -2015,6 +2045,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                   json);
                           Utils.hideProgressDialog(context);
                           if (model != null && !model.success) {
+                            taxModel = model.taxCalculation;
                             Utils.showToast(model.message, true);
                             databaseHelper
                                 .deleteTable(DatabaseHelper.Favorite_Table);
@@ -2026,6 +2057,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             Navigator.of(context)
                                 .popUntil((route) => route.isFirst);
                           } else {
+                            taxModel = model.taxCalculation;
                             await updateTaxDetails(model.taxCalculation);
                             if (model.taxCalculation.orderDetail != null &&
                                 model.taxCalculation.orderDetail.isNotEmpty) {
@@ -2061,6 +2093,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                               }
                             }
                             calculateTotalSavings();
+                            if (thirdPartyDeliverySystemEnable) {
+                              _getCODTotal();
+                              _getOnlineTotal();
+                            }
                             setState(() {
                               taxModel = model.taxCalculation;
                               isCouponsApplied = true;
@@ -2291,6 +2327,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       ApiController.multipleTaxCalculationRequest(
               "", "0", "${shippingCharges}", json)
           .then((response) async {
+        taxModel = response.taxCalculation;
         Utils.hideProgressDialog(context);
         Utils.hideKeyboard(context);
         if (response != null && !response.success) {
@@ -2330,7 +2367,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             }
           }
           calculateTotalSavings();
-
+          if (thirdPartyDeliverySystemEnable) {
+            _getCODTotal();
+            _getOnlineTotal();
+          }
           setState(() {
             hideRemoveCouponFirstTime = true;
             taxModel = response.taxCalculation;
@@ -2371,7 +2411,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             print("---Cart-totalPrice is less than min amount----}");
             // then Store will charge shipping charges.
             minOrderCheck = false;
-            _validateTPD(AppConstant.shippingNotMandatoryMinOrderNotAllowed);
+            _validateTPD(AppConstant.shippingMandatoryMinOrderAllowed);
             setState(() {
               this.totalPrice = mtotalPrice.toDouble();
             });
@@ -2411,6 +2451,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 widget.address.areaCharges = "0";
                 isShippingFree = true;
                 _validateTPD(AppConstant.shippingNotMandatoryMinOrderAllowed);
+              }else{
+                isShippingFree = false;
+                _validateTPD(AppConstant.shippingMandatoryMinOrderAllowed);
               }
             }
           }

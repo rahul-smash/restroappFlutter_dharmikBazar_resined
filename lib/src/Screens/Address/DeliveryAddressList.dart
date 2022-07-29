@@ -549,6 +549,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               return addressData;
             }
           }
+
           addressData =
               await checkingStoreDeliverymodel(storeModel, addressData);
           if (!isTPDSError) {

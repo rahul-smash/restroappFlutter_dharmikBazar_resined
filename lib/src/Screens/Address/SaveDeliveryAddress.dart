@@ -1,8 +1,10 @@
 import 'package:app_settings/app_settings.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:restroapp/src/UI/SelectLocation.dart';
+import 'package:geocoding/geocoding.dart' as geocoding;
+import 'package:geolocator/geolocator.dart' as geolocator;
+import 'package:location/location.dart';
+import 'package:restroapp/src/UI/SelectLocation.dart' as selectedLocationObj;
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
@@ -35,8 +37,13 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   TextEditingController zipCodeController = new TextEditingController();
   TextEditingController fullnameController = new TextEditingController();
   TextEditingController address2Controller = new TextEditingController();
-  LocationData locationData;
+  selectedLocationObj.LocationData locationData;
   Datum dataObject;
+  Location location = new Location();
+
+  PermissionStatus _permissionGranted;
+
+  bool _serviceEnabled;
 
   @override
   void initState() {
@@ -56,13 +63,13 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       fullnameController.text =
           "${widget.selectedAddress.firstName} ${widget.selectedAddress.lastName}";
 
-      locationData = new LocationData();
+      locationData = new selectedLocationObj.LocationData();
       locationData.address = widget.selectedAddress.address;
       locationData.lat = widget.selectedAddress.lat.toString();
       locationData.lng = widget.selectedAddress.lng.toString();
     } else {
       print("-2222222222222222-------");
-      locationData = new LocationData();
+      locationData = new selectedLocationObj.LocationData();
 
       getUserData();
 
@@ -241,11 +248,39 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                       SizedBox(height: 20),
                       InkWell(
                           onTap: () {
-                            Geolocator.isLocationServiceEnabled()
+                            geolocator.Geolocator.isLocationServiceEnabled()
                                 .then((value) async {
                               if (value == true) {
-                                var geoLocator = Geolocator();
-                                var status = await Geolocator.checkPermission();
+                                //------permission checking-------
+                                _serviceEnabled =
+                                    await location.serviceEnabled();
+                                if (!_serviceEnabled) {
+                                  _serviceEnabled =
+                                      await location.requestService();
+                                  if (!_serviceEnabled) {
+                                    print(
+                                        "----!_serviceEnabled----$_serviceEnabled");
+                                    return;
+                                  }
+                                }
+                                _permissionGranted =
+                                    await location.hasPermission();
+                                print("permission sttsu $_permissionGranted");
+                                if (_permissionGranted ==
+                                    PermissionStatus.denied) {
+                                  print("permission deniedddd");
+                                  _permissionGranted =
+                                      await location.requestPermission();
+                                  if (_permissionGranted !=
+                                      PermissionStatus.granted) {
+                                    print("permission not grantedd");
+                                    return;
+                                  }
+                                }
+                                //------permission checking over------
+                                var geoLocator = geolocator.Geolocator();
+                                var status = await geolocator.Geolocator
+                                    .checkPermission();
                                 print("--status--=${status}");
                                 /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){
                                   Utils.showToast("Please accept location permissions to get your location from settings!", false);
@@ -255,7 +290,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                     context,
                                     new MaterialPageRoute(
                                       builder: (BuildContext context) =>
-                                          SelectLocationOnMap(),
+                                          selectedLocationObj
+                                              .SelectLocationOnMap(),
                                       fullscreenDialog: true,
                                     ));
                                 if (result != null) {
@@ -388,38 +424,37 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               bool isNetworkAvailable =
                                   await Utils.isNetworkAvailable();
                               if (!isNetworkAvailable) {
-                                Utils.showToast(AppConstant.noInternet, false);
+                                Utils.showToast(AppConstant.noInternet, true);
                                 return;
                               }
 
                               if (selectedCity == null) {
-                                Utils.showToast(AppConstant.selectCity, false);
+                                Utils.showToast(AppConstant.selectCity, true);
                                 return;
                               }
                               if (selectedArea == null) {
-                                Utils.showToast(AppConstant.selectArea, false);
+                                Utils.showToast(AppConstant.selectArea, true);
                                 return;
                               }
                               if (addressController.text.trim().isEmpty &&
                                   address2Controller.text.trim().isEmpty) {
                                 Utils.showToast(
-                                    AppConstant.pleaseEnterAddress, false);
+                                    AppConstant.pleaseEnterAddress, true);
                                 return;
                               }
                               if (fullnameController.text.trim().isEmpty) {
                                 Utils.showToast(
-                                    AppConstant.pleaseFullname, false);
+                                    AppConstant.pleaseFullname, true);
                                 return;
                               }
                               if (zipCodeController.text.trim().isEmpty) {
-                                Utils.showToast(
-                                    AppConstant.enterZipCode, false);
+                                Utils.showToast(AppConstant.enterZipCode, true);
                                 return;
                               }
                               if (zipCodeController.text.trim().isNotEmpty &&
-                                  zipCodeController.text.length!=6) {
+                                  zipCodeController.text.length != 6) {
                                 Utils.showToast(
-                                    AppConstant.enterValidZipCode, false);
+                                    AppConstant.enterValidZipCode, true);
                                 return;
                               }
 
