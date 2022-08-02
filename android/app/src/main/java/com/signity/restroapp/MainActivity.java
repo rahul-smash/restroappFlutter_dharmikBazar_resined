@@ -1,4 +1,4 @@
-package com.app.goyalStore;
+package com.app.hotpot;
 
 import io.flutter.embedding.android.FlutterActivity;
 

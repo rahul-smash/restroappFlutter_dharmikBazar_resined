@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.app.goyalStore">
+    package="com.app.hotpot">
 
     <!-- io.flutter.app.FlutterApplication is an android.app.Application that
          calls FlutterMain.startInitialization(this); in its onCreate method.
@@ -37,7 +37,7 @@
 
     <application
         android:icon="@mipmap/ic_launcher"
-        android:label="Goyal Store">
+        android:label="Hotpot Catering">
         <!-- Add the following entry, with your API key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
