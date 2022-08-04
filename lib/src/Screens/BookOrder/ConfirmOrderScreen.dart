@@ -50,7 +50,7 @@ class ConfirmOrderScreen extends StatefulWidget {
   OrderType deliveryType;
   Area areaObject;
   List<Product> cartList = new List.empty(growable: true);
-  PaymentType _selectedPaymentTypeValue = PaymentType.COD;
+  PaymentType _selectedPaymentTypeValue = PaymentType.ONLINE;
 
   ConfirmOrderScreen(this.address, this.isComingFromPickUpScreen, this.areaId,
       this.deliveryType,
@@ -386,11 +386,13 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             widget.storeModel.cod == "0") {
           showCOD = true;
           widget.paymentMode = "2";
+          _selectedShippingCharges = codShippingCharges;
         }
         if (widget.storeModel.cod == "0" &&
             widget.storeModel.onlinePayment == "1") {
           widget._selectedPaymentTypeValue = PaymentType.ONLINE;
           widget.paymentMode = "3";
+          _selectedShippingCharges = onlineShippingCharges;
           if (widget.storeModel.onlinePayment.compareTo('1') == 0 &&
               isAnotherOnlinePaymentGatwayFound) {
             showOnline = true;
