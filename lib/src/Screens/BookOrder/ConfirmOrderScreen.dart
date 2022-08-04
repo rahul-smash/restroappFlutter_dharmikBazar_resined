@@ -106,11 +106,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   String thirdOptionPGText = 'Paytm';
 
-  bool thirdPartyDeliverySystemEnable = false;
 
   ConfirmOrderState({this.storeModel});
 
 //--------Declaring Third-party delivery system variables
+  bool thirdPartyDeliverySystemEnable = false;
+
   ShippingCharge codShippingCharges,
       onlineShippingCharges,
       _selectedShippingCharges;
@@ -594,7 +595,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         if (showLoader) {
           Utils.hideProgressDialog(buildContext);
         }
-        //{"success":false,"message":"Some products are not available."}
         TaxCalculationResponse model = response;
         if (model.success) {
           taxModel = model.taxCalculation;
@@ -1724,22 +1724,21 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   Widget addSecondModelPaymentOptions() {
-    bool showOptions = false;
-    //TODO: re-think again
-    if (widget.storeModel.onlinePayment != null) {
-      if (widget.storeModel.onlinePayment == "1") {
-        showOptions = true;
-      } else {
-        showOptions = false; //cod
-      }
-    } else {
-      if (isPayTmActive) {
-        showOptions = true;
-      }
-    }
-    if (isPromiseToPay) {
-      showOptions = true;
-    }
+    bool showOptions = true;
+    // if (widget.storeModel.onlinePayment != null) {
+    //   if (widget.storeModel.onlinePayment == "1") {
+    //     showOptions = true;
+    //   } else {
+    //     showOptions = false; //cod
+    //   }
+    // } else {
+    //   if (isPayTmActive) {
+    //     showOptions = true;
+    //   }
+    // }
+    // if (isPromiseToPay) {
+    //   showOptions = true;
+    // }
     void updateValues(BuildContext buildContext) {
       Future.delayed(Duration(microseconds: 1200), () {
         constraints();
@@ -2475,16 +2474,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     if (storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
       if (codShippingCharges != null && onlineShippingCharges != null) {
         String codRate = codShippingCharges.rate;
-        String codFRate = codShippingCharges.freightCharge;
 
         String onlineRate = onlineShippingCharges.rate;
-        String onlineFRate = onlineShippingCharges.freightCharge;
 
         double diffCOD = databaseHelper.roundOffPrice(
-            (double.parse(codRate) - double.parse(codFRate)), 2);
+            (double.parse(codRate) - double.parse(onlineRate)), 2);
 
-        double diffOnline = databaseHelper.roundOffPrice(
-            (double.parse(onlineRate) - double.parse(onlineFRate)), 2);
 
         codDifferenceAmount = diffCOD.toStringAsFixed(2);
         switch (shippingType) {
