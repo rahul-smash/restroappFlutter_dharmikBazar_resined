@@ -13,6 +13,10 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import '../../database/DatabaseHelper.dart';
+import '../../models/DeleteUserResponse.dart';
+import '../../utils/Callbacks.dart';
+
 class ProfileScreen extends StatefulWidget {
   bool isComingFromOtpScreen;
   String id;
@@ -61,6 +65,7 @@ class _ProfileState extends State<ProfileScreen> {
       print(e);
     }
     storeModel = await SharedPrefs.getStore();
+
     setState(() {
       if (user != null) {
         firstNameController.text = user.fullName;
@@ -139,9 +144,9 @@ class _ProfileState extends State<ProfileScreen> {
     //print("showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     return WillPopScope(
         onWillPop: () async {
-          if(!widget.isComingFromOtpScreen){
-            return Future(()=>true);
-          }else {
+          if (!widget.isComingFromOtpScreen) {
+            return Future(() => true);
+          } else {
             return await nameValidation() &&
                 isValidEmail(emailController.text) &&
                 emailValidation();
@@ -244,7 +249,7 @@ class _ProfileState extends State<ProfileScreen> {
                               keyboardType: TextInputType.emailAddress,
                               controller: emailController,
                               decoration: InputDecoration(
-                                labelText: 'Email *',
+                                labelText: 'Email',
                               ),
                               style: TextStyle(
                                   fontSize: 18,
@@ -313,7 +318,76 @@ class _ProfileState extends State<ProfileScreen> {
                                 ),
                               ),
                             ),
-                          )
+                          ),
+
+                          //---------------------
+                          Padding(
+                              padding: const EdgeInsets.only(
+                                  top: 45.0, left: 20, right: 20),
+                              child: Center(
+                                child: InkWell(
+                                  child: Text('Delete Account',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: appThemeSecondary,
+                                        decoration: TextDecoration.underline,
+                                      )),
+                                  onTap: () async {
+                                    bool isDeleteProfile =
+                                        await DialogUtils.showDeleteUserPopUp(
+                                      context,
+                                    );
+
+                                    if (isDeleteProfile != null &&
+                                        isDeleteProfile) {
+                                      bool isNetworkAvailable =
+                                          await Utils.isNetworkAvailable();
+                                      if (!isNetworkAvailable) {
+                                        Utils.showToast(
+                                            AppConstant.noInternet, false);
+                                        return;
+                                      }
+                                      Utils.showProgressDialog(context);
+                                      DeleteUserResponse deleteUserResponse =
+                                          await ApiController.deleteUser();
+                                      Utils.hideProgressDialog(context);
+                                      if (deleteUserResponse != null &&
+                                          deleteUserResponse.success) {
+                                        SharedPrefs.setUserLoggedIn(false);
+                                        SharedPrefs.storeSharedValue(
+                                            AppConstant.isAdminLogin, "false");
+                                        SharedPrefs.removeKey(
+                                            AppConstant.showReferEarnAlert);
+                                        SharedPrefs.removeKey(
+                                            AppConstant.referEarnMsg);
+                                        SharedPrefs.removeKey("user_wallet");
+                                        SharedPrefs.removeKey("user");
+
+                                        AppConstant.isLoggedIn = false;
+                                        DatabaseHelper databaseHelper =
+                                            new DatabaseHelper();
+                                        databaseHelper.deleteTable(
+                                            DatabaseHelper.Categories_Table);
+                                        databaseHelper.deleteTable(
+                                            DatabaseHelper
+                                                .Sub_Categories_Table);
+                                        databaseHelper.deleteTable(
+                                            DatabaseHelper.Favorite_Table);
+                                        databaseHelper.deleteTable(
+                                            DatabaseHelper.CART_Table);
+                                        databaseHelper.deleteTable(
+                                            DatabaseHelper.Products_Table);
+                                        eventBus.fire(updateCartCount());
+                                        Utils.showToast(
+                                            AppConstant.deleteUserSuccess,
+                                            true);
+                                        Navigator.of(context)
+                                            .popUntil((route) => route.isFirst);
+                                      }
+                                    }
+                                  },
+                                ),
+                              )),
                         ],
                       ),
                     ),
@@ -357,10 +431,11 @@ class _ProfileState extends State<ProfileScreen> {
     if (!nameValidation()) {
       return;
     }
-    if (!emailValidation()) {
-      return;
-    }
-    if (!isValidEmail(emailController.text.trim())) {
+    // if (!emailValidation()) {
+    //   return;
+    // }
+    if (emailController.text.trim().isNotEmpty &&
+        !isValidEmail(emailController.text.trim())) {
       Utils.showToast("Please enter valid email", false);
       return;
     }

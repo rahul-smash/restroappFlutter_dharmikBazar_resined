@@ -681,11 +681,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   Future logout(BuildContext context) async {
     try {
       // FacebookLogin facebookSignIn = new FacebookLogin();
-      var facebookSignIn = FacebookAuth.instance;
+      // var facebookSignIn = FacebookAuth.instance;
       // bool isFbLoggedIn = await facebookSignIn.isLoggedIn;
       // print("isFbLoggedIn=${isFbLoggedIn}");
       // if (isFbLoggedIn) {
-      await facebookSignIn.logOut();
+      // await facebookSignIn.logOut();
       // }
 
       bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
@@ -703,11 +703,11 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
 
       AppConstant.isLoggedIn = false;
       DatabaseHelper databaseHelper = new DatabaseHelper();
-      databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
-      databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
+      // databaseHelper.deleteTable(DatabaseHelper.Categories_Table);
+      // databaseHelper.deleteTable(DatabaseHelper.Sub_Categories_Table);
       databaseHelper.deleteTable(DatabaseHelper.Favorite_Table);
       databaseHelper.deleteTable(DatabaseHelper.CART_Table);
-      databaseHelper.deleteTable(DatabaseHelper.Products_Table);
+      // databaseHelper.deleteTable(DatabaseHelper.Products_Table);
       eventBus.fire(updateCartCount());
       Utils.showToast(AppConstant.logoutSuccess, true);
 

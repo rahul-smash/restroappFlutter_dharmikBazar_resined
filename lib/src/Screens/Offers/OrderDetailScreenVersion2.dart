@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +18,11 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:url_launcher/url_launcher.dart';
+// import 'package:url_launcher/url_launcher.dart';
+
+import '../../notifications/notification_service_helper.dart';
+import '../../singleton/app_version_singleton.dart';
 
 class OrderDetailScreenVersion2 extends StatefulWidget {
   OrderData orderHistoryData;
@@ -185,6 +191,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       firstRow(widget.orderHistoryData),
+                      widget.orderHistoryData.trackingData != null
+                          ? trackingDetails(widget.orderHistoryData)
+                          : Container(),
                       Container(
                         color: Colors.white,
                         margin: EdgeInsets.only(top: 5),
@@ -253,6 +262,109 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
               ),
             ),
           );
+  }
+
+  Widget trackingDetails(OrderData orderHistoryData) {
+    return Container(
+      color: Colors.white,
+      width: Utils.getDeviceWidth(context),
+      margin: EdgeInsets.only(top: 5),
+      padding: EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          Row(
+            children: [
+              Visibility(
+                visible: orderHistoryData.trackingData.trackingId != null &&
+                    orderHistoryData.trackingData.trackingId.isNotEmpty,
+                child: Expanded(
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: InkWell(
+                          onTap: () {
+                            Clipboard.setData(ClipboardData(
+                                text:
+                                    orderHistoryData.trackingData.trackingId));
+                            Utils.showToast('Tracking ID copied!', false);
+                          },
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                'Tracking Id',
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w300),
+                              ),
+                              Text(
+                                orderHistoryData.trackingData?.trackingId ?? '',
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: Color(0xFF7A7C80),
+                                    fontWeight: FontWeight.w300),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Visibility(
+                  visible:
+                      orderHistoryData.trackingData.expectedDeliiveryDate !=
+                              null &&
+                          orderHistoryData
+                              .trackingData.expectedDeliiveryDate.isNotEmpty,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Expected Delivery Date',
+                        style: TextStyle(
+                            fontSize: 14, fontWeight: FontWeight.w300),
+                      ),
+                      Text(
+                        orderHistoryData.trackingData.expectedDeliiveryDate,
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF7A7C80),
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10),
+          Visibility(
+            visible: orderHistoryData.trackingData.trackingUrl != null &&
+                orderHistoryData.trackingData.trackingUrl.isNotEmpty,
+            child: InkWell(
+              child: Text(
+                'Open Tracking link',
+                style: TextStyle(
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+              onTap: () {
+                launch(orderHistoryData.trackingData.trackingUrl);
+              },
+            ),
+          )
+          // onTap: () {
+          //   launch('www.google.com');}),
+        ],
+      ),
+    );
   }
 
   Widget firstRow(OrderData orderHistoryData) {
@@ -652,13 +764,18 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Flexible(
-                      child: Text(
-                          'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
-                          style: TextStyle(
-                            color: Color(0xFF818387),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w300,
-                          )),
+                      child: Visibility(
+                        visible: AppVersionSingleton.instance.appVersion.store
+                                .displayVariantWeight !=
+                            '0',
+                        child: Text(
+                            'Weight: ${cardOrderHistoryItems.orderItems[index].weight}',
+                            style: TextStyle(
+                              color: Color(0xFF818387),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                            )),
+                      ),
                     ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
@@ -1137,6 +1254,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         widget.orderHistoryData.orderId,
         order_rejection_note: orderRejectionNote);
     if (cancelOrder != null && cancelOrder.success) {
+      NotificationServiceHelper.instance.showLocalNotification(
+          cancelOrder.notification,
+          type: 'order_placed');
       setState(() {
         widget.orderHistoryData.status = '6';
       });

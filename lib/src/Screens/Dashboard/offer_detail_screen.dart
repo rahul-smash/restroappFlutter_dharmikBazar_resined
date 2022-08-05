@@ -116,7 +116,7 @@ class _OfferDetailState extends State<OfferDetailScreen> {
               ],
             ),
           ],
-          overflow: Overflow.clip,
+          clipBehavior: Clip.none,
         ),
       ],
     );

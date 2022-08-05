@@ -55,15 +55,13 @@ class CategoryView extends StatelessWidget {
                 child: Container(
                   margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
                   width: Utils.getDeviceWidth(context),
-//                  height: 80.0,
-                  child: CachedNetworkImage(
-                      imageUrl: "${categoryModel.image300200}",
-                      width: Utils.getDeviceWidth(context),
-//                      height: 80.0,
-                      fit: BoxFit.cover
-                      //placeholder: (context, url) => CircularProgressIndicator(),
-                      //errorWidget: (context, url, error) => Icon(Icons.error),
-                      ),
+                  child: categoryModel.image300200 != null &&
+                          categoryModel.image300200.isNotEmpty
+                      ? CachedNetworkImage(
+                          imageUrl: "${categoryModel.image300200}",
+                          width: Utils.getDeviceWidth(context),
+                          fit: BoxFit.cover)
+                      : Container(),
                 ),
               ),
               Expanded(

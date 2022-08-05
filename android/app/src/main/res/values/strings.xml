@@ -3,15 +3,16 @@
     <string name="app_name">My Grocerie</string>
 
     <!-- Replace "000000000000" with your Facebook App ID here. -->
-    <string name="facebook_app_id">3262024257231451</string>
-
+<!--    <string name="facebook_app_id">3262024257231451</string>-->
+    <string name="facebook_app_id">743269263668120</string>
+    <string name="facebook_client_token">59fae503657dc4d0a0533505091fff4f</string>
     <!--
      <string name="facebook_app_id">3262024257231451</string>
      <string name="facebook_app_id">3522925701099597</string>
       Replace "000000000000" with your Facebook App ID here.
       **NOTE**: The scheme needs to start with `fb` and then your ID.
     -->
-    <string name="fb_login_protocol_scheme">fb3262024257231451</string>
+    <string name="fb_login_protocol_scheme">fb743269263668120</string>
     <!--<string name="facebook_app_id">3522925701099597</string>
 
     &lt;!&ndash;

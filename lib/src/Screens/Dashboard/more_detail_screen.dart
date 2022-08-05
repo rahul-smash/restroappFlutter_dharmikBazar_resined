@@ -241,7 +241,7 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                     ],
                   ),
           ],
-          overflow: Overflow.clip,
+          clipBehavior: Clip.none,
         ),
       ],
     );

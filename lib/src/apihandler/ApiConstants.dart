@@ -1,10 +1,20 @@
 class ApiConstants {
 //  static String base = "https://app.restroapp.com/storeId";
-    static String base = "https://app.restroapp.com/storeId";
-  //static String base = "https://stage.grocersapp.com/storeId";
+  //static String base = "https://app.restroapp.com/storeId";
+  static String base = "https://stage.grocersapp.com/storeId";
+
   //static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
 
   static String baseUrl = base + '/api_v1/';
+  static String apiV1Route = '/v1/';
+
+  static String getVIRoute({String storeID}){
+    if(storeID!=null)
+    return '$base$apiV1Route'.replaceAll("storeId", storeID);
+    else{
+      return '$base$apiV1Route';
+    }
+  }
 
   static String storeList = 'storeList';
   static String version = 'version';
@@ -20,6 +30,8 @@ class ApiConstants {
 
   static String search = 'inventory/searchProducts';
   static String getTagsList = 'inventory/getTagsList';
+
+  static String getHomeScreenOdrders = 'orders/getHomeScreenOdrders';
 
   static String getAddress = 'deliveryAddress';
   static String getAddressArea = 'deliveryAreas/Area';
@@ -41,6 +53,8 @@ class ApiConstants {
   static String setStoreQuery = 'setStoreQuery';
   static String orderHistory = 'orderHistory';
   static String getLoyalityPoints = 'getLoyalityPoints';
+
+  static String deliveryTimeDetails = 'orders/deliveryTimeDetails';
 
   static String login = 'userLogin';
   static String signUp = 'userSignup';
@@ -116,4 +130,31 @@ class ApiConstants {
       '/api_v1_online_subscription/razorpayCreateSubscription';
   static String subscriptionRazorpayVerifyTransaction =
       '/api_v1_online_subscription/razorpayVerifyTransaction';
+
+  //--------------------------------
+   //weight shipping charge calculation
+  static String shippingChargesApi = 'delivery_charges/index';
+
+  //delete account
+  static String deleteUser = '/apiv1/user_authentication/deleteuser';
+  static String getDeleteRoute({String storeID}){
+    if(storeID!=null)
+      return '$base$deleteUser'.replaceAll("storeId", storeID);
+    else{
+      return '$base$deleteUser';
+    }
+  }
+
+
+  //new payment gateway
+  static String dpoCreateOrderApi = '/dpo/dpoCreateOrder';
+
+  static String getDpoRoute({String storeID}){
+    if(storeID!=null)
+      return '$base$dpoCreateOrderApi'.replaceAll("storeId", storeID);
+    else{
+      return '$base$dpoCreateOrderApi';
+    }
+  }
+
 }

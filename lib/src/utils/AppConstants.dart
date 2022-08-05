@@ -39,6 +39,7 @@ class AppConstant {
 
   static final String logoutConfirm = "Are you sure you want to Logout?";
   static final String logoutSuccess = "You have logged out successfully";
+  static final String deleteUserSuccess = "Your profile is deleted successfully";
   static final String addItems = "Please add items in cart";
 
   static final String pleaseLogin = "Please login to proceed further";

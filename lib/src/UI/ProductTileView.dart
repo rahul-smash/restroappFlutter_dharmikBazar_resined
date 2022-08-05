@@ -111,6 +111,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
       variantsVisibility = false;
     }
 
+    if(storeModel.displayVariantWeight=='0'){
+      variantsVisibility = false;
+    }
+
     //print("==variantMap=${widget.product.variantId} and ${widget.product.variantMap[widget.product.variantId]}");
     //print("=====product_offer====${widget.product.product_offer}=");
     return Container(

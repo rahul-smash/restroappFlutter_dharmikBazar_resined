@@ -4,10 +4,12 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 // import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+
 // import 'package:device_info/device_info.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -16,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+
 // import 'package:package_info/package_info.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -37,6 +40,7 @@ import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:whatsapp_unilink/whatsapp_unilink.dart';
 
 import 'Callbacks.dart';
 import 'DialogUtils.dart';
@@ -191,6 +195,17 @@ class Utils {
         );
       },
     );
+  }
+
+  static launchWhatsApp(String number) async {
+    final link = WhatsAppUnilink(
+      phoneNumber: number,
+      text: "Hey! I'm inquiring about the apartment listing",
+    );
+    // Convert the WhatsAppUnilink instance to a string.
+    // Use either Dart's string interpolation or the toString() method.
+    // The "launch" method is part of "url_launcher".
+    await launch('$link');
   }
 
   static void showBlockedDialog(BuildContext context, String message) {
@@ -356,6 +371,9 @@ class Utils {
     }
   }
 
+  static double width;
+  static double height;
+
   static double getDeviceWidth(BuildContext context) {
     return MediaQuery.of(context).size.width;
   }
@@ -438,6 +456,14 @@ class Utils {
     return formatted;
   }
 
+  static String getCurrentDateTime2() {
+    var now = new DateTime.now();
+    var formatter = new DateFormat('dd MMM yyyy, hh:mm a');
+    String formatted = formatter.format(now);
+    //print(formatted); // something like 2013-04-20
+    return formatted;
+  }
+
   static convertStringToDate2(String dateObj) {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy");
     DateTime dateTime = dateFormat.parse(dateObj);
@@ -481,6 +507,34 @@ class Utils {
     }
 
     return formatted;
+  }
+
+  static convertOrderDateTime2(String date) {
+    String formatted = date;
+    try {
+      DateFormat format = new DateFormat("yyyy-MM-dd HH:mm:ss");
+      //UTC time true
+      DateTime time = format.parse(date, true);
+      time = time.toLocal();
+      //print("time.toLocal()=   ${time.toLocal()}");
+      DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm a');
+      formatted = formatter.format(time.toLocal());
+    } catch (e) {
+      print(e);
+    }
+    return formatted;
+  }
+
+  static String durationToString(int minutes) {
+    var d = Duration(minutes: minutes);
+    List<String> parts = d.toString().split(':');
+    return '${parts[0].padLeft(2, '0')}:${parts[1].padLeft(2, '0')}';
+  }
+
+  static TimeOfDay minutesToTimeOfDay(int minutes) {
+    Duration duration = Duration(minutes: minutes);
+    List<String> parts = duration.toString().split(':');
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
   }
 
   static convertOrderDate(String date) {
@@ -1077,9 +1131,35 @@ class Utils {
         }
       }
     }
-
     List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
         removeOutOfStockProducts: true);
+    if (jsonList.length != 0) {
+      String encodedDoughnut = jsonEncode(jsonList);
+      return encodedDoughnut;
+    } else {
+      return null;
+    }
+  }
+
+  // this method is for weight wise delivery charges
+  static Future<String> getCartListToJson(List<Product> cartList) async {
+    List jsonList = List.empty(growable: true);
+    for (int i = 0; i < cartList.length; i++) {
+      var item = cartList[i];
+      jsonList.add({
+        "product_id": item.id == null ? null : item.id,
+        "product_name": item.title == null ? null : item.title,
+        "variant_id": item.variantId == null ? null : item.variantId,
+        "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
+        "quantity": item.quantity,
+        "price": item.price == null ? null : item.price,
+        "weight": item.weight == null ? null : item.weight,
+        "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
+        "unit_type": item.isUnitType == null ? null : item.isUnitType,
+        "product_status": item.status == null ? null : item.status,
+      });
+    }
+
     if (jsonList.length != 0) {
       String encodedDoughnut = jsonEncode(jsonList);
       return encodedDoughnut;
@@ -1294,6 +1374,7 @@ enum ClassType { CART, SubCategory, Favourites, Search }
 enum OrderType { Delivery, PickUp, Menu, SubScription }
 
 enum PaymentType { COD, ONLINE, ONLINE_PAYTM, PROMISE_TO_PAY, NONE }
+
 enum RadioButtonEnum { SELECTD, UNSELECTED }
 
 class AdditionItemsConstants {

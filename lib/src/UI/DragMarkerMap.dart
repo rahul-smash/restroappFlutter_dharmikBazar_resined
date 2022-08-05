@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geocoding/geocoding.dart';
+
 // import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -13,6 +14,8 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+
+import '../utils/AutoSearch.dart';
 
 class DragMarkerMap extends StatefulWidget {
   StoreRadiousResponse data;
@@ -34,10 +37,12 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
   bool enableDialog;
   List<Area> areaList;
 
+  String localAddress = '';
+
   @override
   void initState() {
     super.initState();
-    areaList = List();
+    areaList = List.empty(growable: true);
     center = LatLng(0.0, 0.0);
     selectedLocation = LatLng(0.0, 0.0);
     address = "";
@@ -62,6 +67,57 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
       appBar: AppBar(
         title: Text('Choose Your Location'),
         backgroundColor: appTheme,
+        actions: [
+          InkWell(
+            onTap: () async {
+              var result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) {
+                      return CustomSearchScaffold();
+                    },
+                    fullscreenDialog: true,
+                  ));
+              if (result != null) {
+                LatLng detail = result;
+                double lat = detail.latitude;
+                double lng = detail.longitude;
+                print("location = ${lat},${lng}");
+                selectedLocation = LatLng(lat, lng);
+                getAddressFromLocation(lat, lng);
+                setState(() {
+                  _mapController
+                      .moveCamera(CameraUpdate.newLatLng(selectedLocation));
+                });
+                // localCenter = LatLng(lat, lng);
+                // localSelectedLocation = LatLng(lat, lng);
+                // getAddressFromLocationFromMap(lat, lng,
+                //     setState: setState);
+                // markers.clear();
+                // markers.addAll([
+                //   Marker(
+                //       draggable: true,
+                //       icon: BitmapDescriptor.defaultMarker,
+                //       markerId: MarkerId('value'),
+                //       position: localCenter,
+                //       onDragEnd: (value) {
+                //         getAddressFromLocationFromMap(
+                //             value.latitude, value.longitude,
+                //             setState: setState);
+                //       })
+                // ]);
+                // setState(() {
+                //   _mapController.moveCamera(
+                //       CameraUpdate.newLatLng(localCenter));
+                // });
+              }
+            },
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(3, 3, 10, 3),
+                child: Image.asset('images/searchicon.png',
+                    width: 20, fit: BoxFit.scaleDown, color: Colors.white)),
+          ),
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -132,17 +188,28 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
             ),
           ),
           Expanded(
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              myLocationEnabled: true,
-              initialCameraPosition: CameraPosition(
-                target: center,
-                zoom: 15.0,
-              ),
-              mapType: MapType.normal,
-              markers: markers,
-              onCameraMove: _onCameraMove,
-              //onCameraMove: _onCameraMove,
+            child: Stack(
+              children: [
+                GoogleMap(
+                  onMapCreated: _onMapCreated,
+                  // myLocationEnabled: true,
+                  initialCameraPosition: CameraPosition(
+                    target: center,
+                    zoom: 15.0,
+                  ),
+                  mapType: MapType.normal,
+                  markers: markers,
+                  onCameraMove: _onCameraMove,
+                  //onCameraMove: _onCameraMove,
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Image.asset(
+                    "images/marker.png",
+                    height: 50,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -197,37 +264,25 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
     // final coordinates = new Coordinates(position.latitude, position.longitude);
     center = LatLng(position.latitude, position.longitude);
     getAddressFromLocation(position.latitude, position.longitude);
-    markers.addAll([
-      Marker(
-          draggable: true,
-          icon: BitmapDescriptor.defaultMarker,
-          markerId: MarkerId('value'),
-          position: center,
-          onDragEnd: (value) {
-            print(value.latitude);
-            print(value.longitude);
-            getAddressFromLocation(value.latitude, value.longitude);
-          })
-    ]);
-    setState(() {
-      _mapController.moveCamera(CameraUpdate.newLatLng(center));
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        _mapController.moveCamera(CameraUpdate.newLatLng(center));
+      });
     });
   }
 
   getAddressFromLocation(double latitude, double longitude) async {
     try {
-      selectedLocation = LatLng(latitude, longitude);
-      // Coordinates coordinates = new Coordinates(latitude, longitude);
-      // var addresses = await Geocoder.local.findAddressesFromCoordinates(
-      //     coordinates);
+      print("--widget.initialPosition != null----");
       var addresses = await placemarkFromCoordinates(latitude, longitude);
       var first = addresses.first;
-      //print("--addresses-${addresses} and ${first}");
       print(
-          "----------${first.name} and ${first.street}-postalCode-${first.postalCode}------");
-
+          "---getAddressFromLocation-------${first.name} and ${first.street}-postalCode-${first.postalCode}------");
       setState(() {
-        address = first.street;
+        address =
+            '${first.subLocality != null ? first.subLocality : ''}${first.locality != null ? ', ' + first.locality : ''}${first.subAdministrativeArea != null ? ', ' + first.subAdministrativeArea : ''}${first.administrativeArea != null ? ', ' + first.administrativeArea : ''}';
+        if (address.length > 0)
+          address = address[0] == ',' ? address.replaceFirst(',', '') : address;
         zipCode = first.postalCode;
       });
     } catch (e) {
@@ -238,11 +293,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
 
   void _onCameraMove(CameraPosition position) {
     CameraPosition newPos = CameraPosition(target: position.target);
-    Marker marker = markers.first;
-
-    setState(() {
-      markers.first.copyWith(positionParam: newPos.target);
-    });
+    getAddressFromLocation(position.target.latitude, position.target.longitude);
   }
 
   void _onMapCreated(GoogleMapController controller) {

@@ -47,6 +47,7 @@ class OrderData {
   List<DeliveryAddress> deliveryAddress;
   String rating;
   String subscription_order_id;
+  TrackingData trackingData;
 
 //  List<SubscriptionOrderData> subscriptionDetail;
 
@@ -79,6 +80,7 @@ class OrderData {
     this.orderRejectionNote,
     this.walletRefund,
     this.subscription_order_id,
+    this.trackingData
   });
 
   OrderData.fromJson(Map<String, dynamic> json) {
@@ -117,6 +119,8 @@ class OrderData {
         deliveryAddress.add(new DeliveryAddress.fromJson(v));
       });
     }
+    trackingData= json["trackingData"] == null ? null : TrackingData.fromJson(json["trackingData"]);
+
 //    if (json["subscriptionDetail"] != null) {
 //      subscriptionDetail = List<SubscriptionOrderData>.from(
 //          json["subscriptionDetail"]
@@ -467,3 +471,42 @@ class Review {
         "modified": modified == null ? null : modified.toIso8601String(),
       };
 }
+class TrackingData {
+  TrackingData({
+    this.expectedDeliiveryDate,
+    this.trackingId,
+    this.trackingUrl,
+  });
+
+  String expectedDeliiveryDate;
+  String trackingId;
+  String trackingUrl;
+
+  TrackingData copyWith({
+    String expectedDeliiveryDate,
+    String trackingId,
+    String trackingUrl,
+  }) =>
+      TrackingData(
+        expectedDeliiveryDate: expectedDeliiveryDate ?? this.expectedDeliiveryDate,
+        trackingId: trackingId ?? this.trackingId,
+        trackingUrl: trackingUrl ?? this.trackingUrl,
+      );
+
+  factory TrackingData.fromRawJson(String str) => TrackingData.fromJson(json.decode(str));
+
+  String toRawJson() => json.encode(toJson());
+
+  factory TrackingData.fromJson(Map<String, dynamic> json) => TrackingData(
+    expectedDeliiveryDate: json["expected_delivery_date"] == null ? null : json["expected_delivery_date"],
+    trackingId: json["tracking_id"] == null ? null : json["tracking_id"],
+    trackingUrl: json["tracking_url"] == null ? null : json["tracking_url"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "expected_delivery_date": expectedDeliiveryDate == null ? null : expectedDeliiveryDate,
+    "tracking_id": trackingId == null ? null : trackingId,
+    "tracking_url": trackingUrl == null ? null : trackingUrl,
+  };
+}
+

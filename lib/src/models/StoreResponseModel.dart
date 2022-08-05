@@ -26,6 +26,7 @@ class StoreModel {
   String storeName;
   String location;
   String city;
+  String show_order_on_home_screen;
   String state;
   String product_coupon;
   String country;
@@ -49,6 +50,7 @@ class StoreModel {
   String iphoneShareLink;
   String theme;
   String cod;
+  String delivery_expected_times;
   String webTheme;
   String type;
   String catType;
@@ -138,7 +140,7 @@ class StoreModel {
 
   String domain;
   String poweredByText;
-  bool areaWisePaymentOption;//true, false
+  bool areaWisePaymentOption; //true, false
   String poweredByLink;
   String reviewRatingDisplay;
   String allowCustomerForGst;
@@ -148,6 +150,9 @@ class StoreModel {
   String hideSignup;
   String promiseToPay;
   String promiseToPayForAll;
+  String enableWeightWiseCharges;
+  String displayVariantWeight;
+
   StoreModel({
     this.id,
     this.product_coupon,
@@ -155,6 +160,7 @@ class StoreModel {
     this.aboutusBanner,
     this.location,
     this.wallet_setting,
+    this.show_order_on_home_screen,
     this.subscription,
     this.city,
     this.state,
@@ -163,6 +169,7 @@ class StoreModel {
     this.zipcode,
     this.lat,
     this.lng,
+    this.delivery_expected_times,
     this.social_login,
     this.appThemeColors,
     this.webAppThemeColors,
@@ -270,10 +277,12 @@ class StoreModel {
     this.storeOffer,
     this.walletSettings,
     this.hideSignup,
+    this.enableWeightWiseCharges,
   });
 
   StoreModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    show_order_on_home_screen = json['show_order_on_home_screen'];
     storeName = json['store_name'];
     aboutusBanner = json["aboutus_banner"] == null
         ? null
@@ -288,6 +297,7 @@ class StoreModel {
     cod = json['cod'];
     lat = json['lat'];
     lng = json['lng'];
+    delivery_expected_times = json['delivery_expected_times'];
     social_login = json['social_login'];
     wallet_setting = json['wallet_setting'];
     contactPerson = json['contact_person'];
@@ -440,7 +450,7 @@ class StoreModel {
     homePageDisplayNumberType = json['home_page_display_number_type'];
     domain = json["domain"];
     poweredByText = json["powered_by_text"];
-    areaWisePaymentOption:
+    areaWisePaymentOption=
     json["area_wise_payment_option"] == null
         ? null
         : json["area_wise_payment_option"];
@@ -463,6 +473,10 @@ class StoreModel {
             ? null
             : WalletSettings.fromJson(json["wallet_settings"]);
     hideSignup = json["hide_signup"];
+    enableWeightWiseCharges = json["enable_weightwise_charges"];
+    displayVariantWeight = json["display_variant_weight"] == null
+        ? null
+        : json['display_variant_weight'];
   }
 
   Map<String, dynamic> toJson() {
@@ -473,6 +487,7 @@ class StoreModel {
     data['cod'] = this.cod;
     data['location'] = this.location;
     data['city'] = this.city;
+    data['show_order_on_home_screen'] = this.show_order_on_home_screen;
     data['state'] = this.state;
     data['country'] = this.country;
     data['zipcode'] = this.zipcode;
@@ -482,6 +497,7 @@ class StoreModel {
     data['contact_person'] = this.contactPerson;
     data['contact_number'] = this.contactNumber;
     data['contact_email'] = this.contactEmail;
+    data['delivery_expected_times'] = this.delivery_expected_times;
     data['about_us'] = this.aboutUs;
     data['wallet_setting'] = this.wallet_setting;
     data['otp_skip'] = this.otpSkip;
@@ -611,6 +627,8 @@ class StoreModel {
     data['wallet_settings'] =
         walletSettings == null ? null : walletSettings.toJson();
     data['hide_signup'] = this.hideSignup;
+    data['enable_weightwise_charges'] = this.enableWeightWiseCharges;
+    data['display_variant_weight'] = this.displayVariantWeight;
     return data;
   }
 }
