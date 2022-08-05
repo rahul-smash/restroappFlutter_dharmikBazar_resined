@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         // TODO: Specifcom.app.hotpot"
-        // applicationId "com.signity.hungerbits"
+        applicationId "com.app.libertyGold"
         minSdkVersion 21
         targetSdkVersion 32
         multiDexEnabled true

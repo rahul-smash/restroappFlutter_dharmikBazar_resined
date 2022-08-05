@@ -227,6 +227,50 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:50471815282:android:299134ecf17860d2f0daeb",
+        "android_client_info": {
+          "package_name": "com.app.libertyGold"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "50471815282-b8do8kbhu0v8f02a5obk8166a6b8151e.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.app.libertyGold",
+            "certificate_hash": "cbdbac81f667b49e89715f0143b087d8309d78f0"
+          }
+        },
+        {
+          "client_id": "50471815282-8qv0hk9oekve2fbbclpaari6me1occdk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDNU3l_kuW2-T_SUf6FleNtvPg85CANtuc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "50471815282-8qv0hk9oekve2fbbclpaari6me1occdk.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "50471815282-02t4mn6b7rl9d6hqhfjc4ei0lqj24gel.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.app.clickDeliverPak"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:50471815282:android:f253338f035e695af0daeb",
         "android_client_info": {
           "package_name": "com.app.nativeTreat"
