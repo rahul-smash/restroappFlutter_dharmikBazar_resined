@@ -61,7 +61,7 @@ dependencies:
   flutter_rating_bar: ^4.0.0
   image_picker: ^0.8.4+7
   permission_handler: ^8.3.0
-  location: ^4.2.0
+  location: ^4.4.0
   #  compressimage: ^0.1.1
   #  flutter_facebook_login: ^3.0.0
   google_sign_in: ^5.2.3
@@ -70,7 +70,7 @@ dependencies:
   flutter_calendar_carousel: ^2.1.0
   flutter_image_compress: ^1.1.0
   flutter_keyboard_visibility: ^5.1.1
-  share_plus: ^4.0.4
+  share_plus: ^4.0.10
   geocoding: ^2.0.2
   flutter_facebook_auth: ^4.4.0
   disable_battery_optimization: ^0.2.0

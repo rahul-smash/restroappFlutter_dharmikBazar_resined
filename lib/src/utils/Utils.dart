@@ -16,6 +16,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 
 // import 'package:package_info/package_info.dart';
@@ -1139,25 +1140,25 @@ class Utils {
       return null;
     }
   }
+
   // this method is for weight wise delivery charges
   static Future<String> getCartListToJson(List<Product> cartList) async {
     List jsonList = List.empty(growable: true);
-   for(int i=0;i<cartList.length;i++){
-     var item=cartList[i];
-     jsonList.add({
-       "product_id": item.id == null ? null : item.id,
-       "product_name": item.title == null ? null : item.title,
-       "variant_id": item.variantId == null ? null : item.variantId,
-       "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
-       "quantity": item.quantity,
-       "price": item.price == null ? null : item.price,
-       "weight": item.weight == null ? null : item.weight,
-       "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
-       "unit_type": item.isUnitType == null ? null : item.isUnitType,
-       "product_status": item.status == null ? null : item.status,
-     });
-
-   }
+    for (int i = 0; i < cartList.length; i++) {
+      var item = cartList[i];
+      jsonList.add({
+        "product_id": item.id == null ? null : item.id,
+        "product_name": item.title == null ? null : item.title,
+        "variant_id": item.variantId == null ? null : item.variantId,
+        "isTaxEnable": item.isTaxEnable == null ? null : item.isTaxEnable,
+        "quantity": item.quantity,
+        "price": item.price == null ? null : item.price,
+        "weight": item.weight == null ? null : item.weight,
+        "mrp_price": item.mrpPrice == null ? null : item.mrpPrice,
+        "unit_type": item.isUnitType == null ? null : item.isUnitType,
+        "product_status": item.status == null ? null : item.status,
+      });
+    }
 
     if (jsonList.length != 0) {
       String encodedDoughnut = jsonEncode(jsonList);
@@ -1336,6 +1337,36 @@ class Utils {
           valueColor: new AlwaysStoppedAnimation<Color>(color)),
     );
   }
+
+  static dynamic determinePosition() async {
+    print("determine postion called::::::::::::::::");
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return Utils.showToast('Location services are disabled.', true);
+    }
+
+    permission = await Geolocator.checkPermission();
+    permission = await Geolocator.requestPermission();
+
+    if (permission == LocationPermission.denied) {
+      return Utils.showToast('Location permissions are denied', true);
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return Utils.showToast(
+          'Location permissions are permanently denied, we cannot request permissions.',
+          true);
+    }
+    return await Geolocator.getLastKnownPosition();
+    // Position position = await Geolocator.getCurrentPosition(
+    //     desiredAccuracy: LocationAccuracy.low);
+    // print(position);
+
+    // return await Geolocator.getCurrentPosition();
+  }
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }
@@ -1343,6 +1374,7 @@ enum ClassType { CART, SubCategory, Favourites, Search }
 enum OrderType { Delivery, PickUp, Menu, SubScription }
 
 enum PaymentType { COD, ONLINE, ONLINE_PAYTM, PROMISE_TO_PAY, NONE }
+
 enum RadioButtonEnum { SELECTD, UNSELECTED }
 
 class AdditionItemsConstants {
