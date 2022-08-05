@@ -106,7 +106,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   String thirdOptionPGText = 'Paytm';
 
-
   ConfirmOrderState({this.storeModel});
 
 //--------Declaring Third-party delivery system variables
@@ -392,7 +391,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             widget.storeModel.onlinePayment == "1") {
           widget._selectedPaymentTypeValue = PaymentType.ONLINE;
           widget.paymentMode = "3";
-          _selectedShippingCharges = onlineShippingCharges;
           if (widget.storeModel.onlinePayment.compareTo('1') == 0 &&
               isAnotherOnlinePaymentGatwayFound) {
             showOnline = true;
@@ -406,7 +404,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               widget.paymentMode = '3';
               widget._selectedPaymentTypeValue = PaymentType.ONLINE;
               ispaytmSelected = false;
-              _selectedShippingCharges = onlineShippingCharges;
             }
           } else if (widget.address.areaWisePaymentMethod == '1') {
             showCOD = true;
@@ -453,6 +450,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         checkPromiseToPayForUser();
       } else {
         isPromiseToPay = false;
+      }
+    }
+    if (thirdPartyDeliverySystemEnable) {
+      if (widget._selectedPaymentTypeValue == PaymentType.ONLINE) {
+        _selectedShippingCharges = onlineShippingCharges;
+      }
+      if (widget._selectedPaymentTypeValue == PaymentType.COD) {
+        _selectedShippingCharges = codShippingCharges;
       }
     }
   }
@@ -2452,7 +2457,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                 widget.address.areaCharges = "0";
                 isShippingFree = true;
                 _validateTPD(AppConstant.shippingNotMandatoryMinOrderAllowed);
-              }else{
+              } else {
                 isShippingFree = false;
                 _validateTPD(AppConstant.shippingMandatoryMinOrderAllowed);
               }
@@ -2481,7 +2486,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
         double diffCOD = databaseHelper.roundOffPrice(
             (double.parse(codRate) - double.parse(onlineRate)), 2);
-
 
         codDifferenceAmount = diffCOD.toStringAsFixed(2);
         switch (shippingType) {
