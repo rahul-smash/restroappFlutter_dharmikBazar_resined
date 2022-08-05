@@ -1,7 +1,7 @@
 class ApiConstants {
 //  static String base = "https://app.restroapp.com/storeId";
-  //static String base = "https://app.restroapp.com/storeId";
-  static String base = "https://stage.grocersapp.com/storeId";
+  static String base = "https://app.restroapp.com/storeId";
+  // static String base = "https://stage.grocersapp.com/storeId";
 
   //static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
 
@@ -135,16 +135,9 @@ class ApiConstants {
    //weight shipping charge calculation
   static String shippingChargesApi = 'delivery_charges/index';
 
-  //delete account
-  static String deleteUser = '/apiv1/user_authentication/deleteuser';
-  static String getDeleteRoute({String storeID}){
-    if(storeID!=null)
-      return '$base$deleteUser'.replaceAll("storeId", storeID);
-    else{
-      return '$base$deleteUser';
-    }
-  }
-
+  //--------------------------------
+   //third party shipping charge calculation
+  static String deliveryShippingChargesApi = 'shiprocket_delivery/index';
 
   //new payment gateway
   static String dpoCreateOrderApi = '/dpo/dpoCreateOrder';
@@ -155,6 +148,19 @@ class ApiConstants {
     else{
       return '$base$dpoCreateOrderApi';
     }
+  }
+
+
+  //delete account
+  static String deleteUser = '/apiv1/user_authentication/deleteuser';
+  static String getDeleteRoute({String storeID}){
+    if(storeID!=null)
+      return '$base$deleteUser'.replaceAll("storeId", storeID);
+    else{
+      return '$base$deleteUser';
+    }
+  }
+
   }
 
 }

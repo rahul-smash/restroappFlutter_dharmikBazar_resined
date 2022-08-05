@@ -152,6 +152,7 @@ class StoreModel {
   String promiseToPayForAll;
   String enableWeightWiseCharges;
   String displayVariantWeight;
+  String storeDeliveryModel;
 
   StoreModel({
     this.id,
@@ -278,6 +279,7 @@ class StoreModel {
     this.walletSettings,
     this.hideSignup,
     this.enableWeightWiseCharges,
+    this.storeDeliveryModel,
   });
 
   StoreModel.fromJson(Map<String, dynamic> json) {
@@ -477,6 +479,9 @@ class StoreModel {
     displayVariantWeight = json["display_variant_weight"] == null
         ? null
         : json['display_variant_weight'];
+    storeDeliveryModel = json["store_delivery_model"] == null
+        ? null
+        : json['store_delivery_model'];
   }
 
   Map<String, dynamic> toJson() {
@@ -629,6 +634,7 @@ class StoreModel {
     data['hide_signup'] = this.hideSignup;
     data['enable_weightwise_charges'] = this.enableWeightWiseCharges;
     data['display_variant_weight'] = this.displayVariantWeight;
+    data['store_delivery_model'] = this.storeDeliveryModel;
     return data;
   }
 }

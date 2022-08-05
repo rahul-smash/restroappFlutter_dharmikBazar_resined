@@ -741,7 +741,7 @@ class DialogUtils {
 
   static Future<bool> displayCommonDialog(
       BuildContext context, String title, String message,
-      {String buttonText = 'OK'}) async {
+      {String buttonText = 'OK', Function buttonPressed}) async {
     return await showDialog<bool>(
       context: context,
       barrierDismissible: true,
@@ -796,9 +796,10 @@ class DialogUtils {
                               child: Text('$buttonText'),
                               color: appThemeSecondary,
                               textColor: Colors.white,
-                              onPressed: () {
-                                Navigator.pop(context, true);
-                              },
+                              onPressed: buttonPressed ??
+                                  () {
+                                    Navigator.pop(context, true);
+                                  },
                             ),
                           )
                         ],
@@ -1889,7 +1890,7 @@ class DialogUtils {
                       child: InkWell(
                         onTap: cancelButton ??
                             () {
-                              Navigator.pop(context,false);
+                              Navigator.pop(context, false);
                             },
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(5, 15, 15, 5),
@@ -1902,13 +1903,19 @@ class DialogUtils {
                         ),
                       ),
                     ),
-                    Center(child: Text('Delete Account',style: TextStyle(fontSize: 20),)),
+                    Center(
+                        child: Text(
+                      'Delete Account',
+                      style: TextStyle(fontSize: 20),
+                    )),
                     SizedBox(
                       height: 20,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 20, top: 20,left: 25,right: 25),
-                      child: RichText(textAlign: TextAlign.center,
+                      padding: const EdgeInsets.only(
+                          bottom: 20, top: 20, left: 25, right: 25),
+                      child: RichText(
+                        textAlign: TextAlign.center,
                         text: TextSpan(
                           text:
                               'Are you sure you want to delete your account? If you delete your account, you will ',
@@ -1922,8 +1929,8 @@ class DialogUtils {
                                     fontSize: 16)),
                             TextSpan(
                                 text: ' your profile.',
-                                style:
-                                    TextStyle(color: Colors.black, fontSize: 16)),
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 16)),
                           ],
                         ),
                       ),
@@ -1946,9 +1953,11 @@ class DialogUtils {
                             color: appThemeSecondary,
                             padding: EdgeInsets.all(5.0),
                             textColor: Colors.white,
-                            child: Text(buttonText1.isNotEmpty
-                                ? buttonText1
-                                : "Yes, Delete",),
+                            child: Text(
+                              buttonText1.isNotEmpty
+                                  ? buttonText1
+                                  : "Yes, Delete",
+                            ),
                           ),
                         ),
                       ),

@@ -24,6 +24,7 @@ import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 import '../../models/SubCategoryResponse.dart';
+import '../../models/third_party_delivery_response.dart';
 import '../../models/weight_wise_charges_response.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
@@ -53,6 +54,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   ConfigModel configObject;
   PermissionStatus _permissionGranted;
+
+  bool isTPDSError = false;
 
   bool _serviceEnabled;
 
@@ -556,57 +559,28 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           StoreModel storeModel = await SharedPrefs.getStore();
           DeliveryAddressData addressData =
               DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
-          if (storeModel.enableWeightWiseCharges == '1') {
-            String shippingCharges =
-                await calculateShipping(addressList[selectedIndex]);
-            Utils.showProgressDialog(context);
-            DatabaseHelper databaseHelper = new DatabaseHelper();
-            List<Product> cartList = await databaseHelper.getCartItemList();
-            String orderJson = await Utils.getCartListToJson(cartList);
-
-            WeightWiseChargesResponse chargesResponse =
-                await ApiController.getWeightWiseShippingCharges(
-                    orderDetail: orderJson,
-                    areaShippingCharge: shippingCharges);
-            if (chargesResponse != null &&
-                chargesResponse.success &&
-                chargesResponse.data != null) {
-              //update changes according to weight
-              addressData.areaCharges =
-                  chargesResponse.data.totalDeliveryCharge;
+          if (storeModel.storeDeliveryModel ==
+              AppConstant.DELIVERY_THIRD_PARTY) {
+            if (addressData.zipCode == null ||
+                (addressData.zipCode != null && addressData.zipCode.isEmpty)) {
+              Utils.showToast('ZipCode is mandatory ', false);
+              return addressData;
+            } else if (addressData.zipCode != null &&
+                addressData.zipCode.length != 6) {
+              Utils.showToast('Please add valid ZipCode', false);
+              return addressData;
             }
-            Utils.hideProgressDialog(context);
           }
 
-          if (addressList.length == 0) {
-            Utils.showToast(AppConstant.selectAddress, false);
-          } else {
-            print("minAmount=${addressList[selectedIndex].minAmount}");
-            print("notAllow=${addressList[selectedIndex].notAllow}");
-            if (addressList[selectedIndex].note.isEmpty) {
-              if (widget.delivery == OrderType.SubScription) {
-                eventBus.fire(onAddressSelected(addressList[selectedIndex]));
-                Navigator.pop(context);
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ConfirmOrderScreen(
-                            addressData,
-                            false,
-                            "",
-                            widget.delivery,
-                            storeModel: storeModel,
-                          )),
-                );
-              }
+          addressData =
+              await checkingStoreDeliverymodel(storeModel, addressData);
+          if (!isTPDSError) {
+            if (addressList.length == 0) {
+              Utils.showToast(AppConstant.selectAddress, false);
             } else {
-              var result = await DialogUtils.displayOrderConfirmationDialog(
-                context,
-                "Confirmation",
-                addressList[selectedIndex].note,
-              );
-              if (result == true) {
+              print("minAmount=${addressList[selectedIndex].minAmount}");
+              print("notAllow=${addressList[selectedIndex].notAllow}");
+              if (addressList[selectedIndex].note.isEmpty) {
                 if (widget.delivery == OrderType.SubScription) {
                   eventBus.fire(onAddressSelected(addressList[selectedIndex]));
                   Navigator.pop(context);
@@ -623,8 +597,34 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                             )),
                   );
                 }
+              } else {
+                var result = await DialogUtils.displayOrderConfirmationDialog(
+                  context,
+                  "Confirmation",
+                  addressList[selectedIndex].note,
+                );
+                if (result == true) {
+                  if (widget.delivery == OrderType.SubScription) {
+                    eventBus
+                        .fire(onAddressSelected(addressList[selectedIndex]));
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ConfirmOrderScreen(
+                                addressData,
+                                false,
+                                "",
+                                widget.delivery,
+                                storeModel: storeModel,
+                              )),
+                    );
+                  }
+                }
               }
             }
+
             //Code Commented Due to not approved by client
             /* StoreModel storeModel = await SharedPrefs.getStore();
             bool isPaymentModeOnline = false;
@@ -716,6 +716,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         totalPrice = mtotalPrice.toDouble();
       } else {
         totalPrice = mtotalPrice.toDouble();
+        if (addressList.isShippingMandatory == '0') {
+          shippingCharges = "0";
+          addressList.areaCharges = "0";
+        }
       }
     } else {
       if (mtotalPrice <= minAmount) {
@@ -735,5 +739,72 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       }
     }
     return shippingCharges;
+  }
+
+  Future<DeliveryAddressData> checkingStoreDeliverymodel(
+      StoreModel storeModel, DeliveryAddressData addressData) async {
+    isTPDSError=false;
+    switch (storeModel.storeDeliveryModel) {
+      case AppConstant.DELIVERY_WEIGHTWISE:
+        {
+          if (storeModel.enableWeightWiseCharges == '1') {
+            String shippingCharges =
+                await calculateShipping(addressList[selectedIndex]);
+            Utils.showProgressDialog(context);
+            DatabaseHelper databaseHelper = new DatabaseHelper();
+            List<Product> cartList = await databaseHelper.getCartItemList();
+            String orderJson = await Utils.getCartListToJson(cartList);
+
+            WeightWiseChargesResponse chargesResponse =
+                await ApiController.getWeightWiseShippingCharges(
+                    orderDetail: orderJson,
+                    areaShippingCharge: shippingCharges);
+            if (chargesResponse != null &&
+                chargesResponse.success &&
+                chargesResponse.data != null) {
+              //update changes according to weight
+              addressData.areaCharges =
+                  chargesResponse.data.totalDeliveryCharge;
+              Utils.hideProgressDialog(context);
+
+              return addressData;
+            } else {
+              return addressData;
+            }
+          }
+          break;
+        }
+      case AppConstant.DELIVERY_VALUEAPP:
+        return addressData;
+        break;
+      case AppConstant.DELIVERY_THIRD_PARTY:
+        Utils.showProgressDialog(context);
+        DatabaseHelper databaseHelper = new DatabaseHelper();
+        List<Product> cartList = await databaseHelper.getCartItemList();
+        String orderJson = await Utils.getCartListToJson(cartList);
+        ThirdPartyDeliveryResponse chargesResponse =
+            await ApiController.getDeliveryShippingChargesApi(
+                orderDetail: orderJson, userZipcode: addressData.zipCode);
+        Utils.hideProgressDialog(context);
+        if (chargesResponse != null &&
+            chargesResponse.success &&
+            chargesResponse.data != null) {
+          //update changes according to weight
+          if (chargesResponse.data.errorMsg != null) {
+            Utils.showToast(chargesResponse.data.errorMsg, false);
+            isTPDSError = true;
+          }
+          addressData.thirdPartyDeliveryData = chargesResponse.data;
+          return addressData;
+        } else {
+          isTPDSError = true;
+          if (chargesResponse.message != null) {
+            Utils.showToast(chargesResponse.message, false);
+          }
+          return addressData;
+        }
+
+        break;
+    }
   }
 }

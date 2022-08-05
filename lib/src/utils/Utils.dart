@@ -36,6 +36,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/third_party_delivery_response.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,10 +52,11 @@ class Utils {
 
   static void showToast(String msg, bool shortLength) {
     try {
+      Fluttertoast.cancel();
       if (shortLength) {
         Fluttertoast.showToast(
             msg: msg,
-            toastLength: Toast.LENGTH_LONG,
+            toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.BOTTOM,
             timeInSecForIosWeb: 1,
             backgroundColor: toastbgColor.withOpacity(0.9),
@@ -1121,7 +1123,8 @@ class Utils {
   static Future<String> getCartItemsListToJson(
       {bool isOrderVariations = true,
       List<OrderDetail> responseOrderDetail,
-      List<Product> cartList}) async {
+      List<Product> cartList,
+      ThirdPartyDeliveryData thirdPartyDeliveryData}) async {
     for (int i = 0; i < cartList.length; i++) {
       for (int j = 0; j < responseOrderDetail.length; j++) {
         if (cartList[i].id == responseOrderDetail[j].productId &&
@@ -1131,6 +1134,25 @@ class Utils {
         }
       }
     }
+    if (thirdPartyDeliveryData != null) {
+      for (int i = 0; i < responseOrderDetail.length; i++) {
+        for (int j = 0; j < thirdPartyDeliveryData.orderDetail.length; j++) {
+          if (cartList[i].id ==
+                  thirdPartyDeliveryData.orderDetail[j].productId &&
+              cartList[i].variantId ==
+                  thirdPartyDeliveryData.orderDetail[j].variantId) {
+            responseOrderDetail[j].length =
+                thirdPartyDeliveryData.orderDetail[i].length;
+            responseOrderDetail[j].height =
+                thirdPartyDeliveryData.orderDetail[i].height;
+            responseOrderDetail[j].weight =
+                thirdPartyDeliveryData.orderDetail[i].weight;
+            break;
+          }
+        }
+      }
+    }
+
     List jsonList = OrderDetail.encodeToJson(responseOrderDetail,
         removeOutOfStockProducts: true);
     if (jsonList.length != 0) {
