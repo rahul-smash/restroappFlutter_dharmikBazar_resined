@@ -117,169 +117,174 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
               ),
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Container(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Form(
-                      key: _formKey,
-                      autovalidateMode: AutovalidateMode.always,
-                      child: ListView(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        children: <Widget>[
-                          Container(
-                              padding: EdgeInsets.only(top: 40.0),
-                              child: Text(
-                                Language.localizedValues[
-                                    "Login_With_Phone_Btn_Txt"],
-                                /*AppConstant.txt_mobile*/
-                                textAlign: TextAlign.center,
-                                style: new TextStyle(
-                                  fontSize: 16.0,
-                                  color: Colors.black,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: Form(
+                          key: _formKey,
+                          autovalidateMode: AutovalidateMode.always,
+                          child: ListView(
+                            shrinkWrap: true,
+                            padding: EdgeInsets.symmetric(horizontal: 16.0),
+                            children: <Widget>[
+                              Container(
+                                  padding: EdgeInsets.only(top: 40.0),
+                                  child: Text(
+                                    Language.localizedValues[
+                                        "Login_With_Phone_Btn_Txt"],
+                                    /*AppConstant.txt_mobile*/
+                                    textAlign: TextAlign.center,
+                                    style: new TextStyle(
+                                      fontSize: 16.0,
+                                      color: Colors.black,
+                                    ),
+                                  )),
+                              TextFormField(
+                                controller: phoneController,
+                                decoration: const InputDecoration(
+                                  hintText: 'Mobile Number',
+                                  labelText: 'Mobile Number',
                                 ),
-                              )),
-                          TextFormField(
-                            controller: phoneController,
-                            decoration: const InputDecoration(
-                              hintText: 'Mobile Number',
-                              labelText: 'Mobile Number',
-                            ),
-                            maxLength: 10,
-                            keyboardType: TextInputType.phone,
-                            validator: (val) =>
-                                val.isEmpty ? AppConstant.enterPhone : null,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly,
-                            ],
-                            onSaved: (val) {
-                              loginMobile.phone = val;
-                            },
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(
-                                  left: 0.0, top: 0.0, right: 0.0),
-                              child: new RaisedButton(
-                                color: appThemeSecondary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
-                                ),
-                                textColor: Colors.white,
-                                child: Text(
-                                  'Submit',
-                                  style: TextStyle(
-                                    color: Colors.white,
+                                maxLength: 10,
+                                keyboardType: TextInputType.phone,
+                                validator: (val) =>
+                                    val.isEmpty ? AppConstant.enterPhone : null,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.digitsOnly,
+                                ],
+                                onSaved: (val) {
+                                  loginMobile.phone = val;
+                                },
+                              ),
+                              Container(
+                                  padding: EdgeInsets.only(
+                                      left: 0.0, top: 0.0, right: 0.0),
+                                  child: new RaisedButton(
+                                    color: appThemeSecondary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    textColor: Colors.white,
+                                    child: Text(
+                                      'Submit',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    onPressed: _submitForm,
+                                  )),
+                              Visibility(
+                                visible: Platform.isIOS
+                                    ? false
+                                    : store == null
+                                        ? false
+                                        : store.social_login == "0"
+                                            ? false
+                                            : true,
+                                child: Container(
+                                  margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                  width: Utils.getDeviceWidth(context),
+                                  child: Center(
+                                    child: Text(
+                                      "OR CONNECT WITH",
+                                      style: TextStyle(color: gray9),
+                                    ),
                                   ),
                                 ),
-                                onPressed: _submitForm,
-                              )),
-                          Visibility(
-                            visible: Platform.isIOS
-                                ? false
-                                : store == null
-                                    ? false
-                                    : store.social_login == "0"
-                                        ? false
-                                        : true,
-                            child: Container(
-                              margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                              width: Utils.getDeviceWidth(context),
-                              child: Center(
-                                child: Text(
-                                  "OR CONNECT WITH",
-                                  style: TextStyle(color: gray9),
-                                ),
                               ),
-                            ),
-                          ),
-                          Visibility(
-                            visible: Platform.isIOS
-                                ? false
-                                : store == null
-                                    ? false
-                                    : store.social_login == "0"
-                                        ? false
-                                        : true,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                InkWell(
-                                  onTap: () async {
-                                    print("------fblogin------");
-                                    bool isNetworkAvailable =
-                                        await Utils.isNetworkAvailable();
-                                    if (!isNetworkAvailable) {
-                                      Utils.showToast(
-                                          AppConstant.noInternet, true);
-                                      return;
-                                    }
-
-                                    // bool isFbLoggedIn =
-                                    //     await facebookSignIn.isLoggedIn;
-                                    // print("isFbLoggedIn=${isFbLoggedIn}");
-                                    // if (isFbLoggedIn) {
-                                    //   await facebookSignIn.logOut();
-                                    // }
-                                    await facebookSignIn.logOut();
-
-                                    fblogin();
-                                  },
-                                  child: Container(
-                                      height: 35,
-                                      width:
-                                          Utils.getDeviceWidth(context) / 2.6,
-                                      margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
-                                      decoration: BoxDecoration(
-                                          color: fbblue,
-                                          border: Border.all(
-                                            color: fbblue,
-                                          ),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5))),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Container(
-                                            margin: EdgeInsets.fromLTRB(
-                                                10, 0, 10, 0),
-                                            child: Image.asset(
-                                                "images/f_logo_white.png",
-                                                height: 25.0),
-                                          ),
-                                          Container(
-                                            margin:
-                                                EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                            child: Text(
-                                              "Facebook",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18),
-                                            ),
-                                          )
-                                        ],
-                                      )),
-                                ),
-                                Container(
-                                  height: 35,
-                                  width: Utils.getDeviceWidth(context) / 2.6,
-                                  margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
-                                  child: _googleSignInButton(),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Visibility(
-                          //   visible: hideSign_up == "0",
-                          //   child: InkWell(
-                          //     onTap: () {
-                          //       print(
-                          //           "************${hideSign_up}*********************");
-                          //     },
-                          //     child: addSignUpButton(),
-                          //   ),
+                              // Visibility(
+                              //   visible: hideSign_up == "0",
+                              //   child: InkWell(
+                              //     onTap: () {
+                              //       print(
+                              //           "************${hideSign_up}*********************");
+                              //     },
+                              //     child: addSignUpButton(),
+                              //   ),
+                              // ),
+                            ],
+                          )),
+                    ),
+                    Visibility(
+                      visible: Platform.isIOS
+                          ? false
+                          : store == null
+                          ? false
+                          : store.social_login == "0"
+                          ? false
+                          : true,
+                      child: Row(
+                       mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          // InkWell(
+                          //   onTap: () async {
+                          //     print("------fblogin------");
+                          //     bool isNetworkAvailable =
+                          //     await Utils.isNetworkAvailable();
+                          //     if (!isNetworkAvailable) {
+                          //       Utils.showToast(
+                          //           AppConstant.noInternet, true);
+                          //       return;
+                          //     }
+                          //
+                          //     // bool isFbLoggedIn =
+                          //     //     await facebookSignIn.isLoggedIn;
+                          //     // print("isFbLoggedIn=${isFbLoggedIn}");
+                          //     // if (isFbLoggedIn) {
+                          //     //   await facebookSignIn.logOut();
+                          //     // }
+                          //     await facebookSignIn.logOut();
+                          //
+                          //     fblogin();
+                          //   },
+                          //   child: Container(
+                          //       height: 35,
+                          //       // width:
+                          //       //     Utils.getDeviceWidth(context) / 2.6,
+                          //       margin: EdgeInsets.fromLTRB(0, 10, 10, 15),
+                          //       decoration: BoxDecoration(
+                          //           color: fbblue,
+                          //           border: Border.all(
+                          //             color: fbblue,
+                          //           ),
+                          //           borderRadius: BorderRadius.all(
+                          //               Radius.circular(5))),
+                          //       child: Row(
+                          //         mainAxisAlignment:
+                          //         MainAxisAlignment.center,
+                          //         children: [
+                          //           Container(
+                          //             margin: EdgeInsets.fromLTRB(
+                          //                 10, 0, 0, 0),
+                          //             padding: EdgeInsets.only(right: 10),
+                          //             child: Image.asset(
+                          //                 "images/f_logo_white.png",
+                          //                 height: 25.0),
+                          //           ),
+                          //           Container(
+                          //             margin:
+                          //             EdgeInsets.fromLTRB(0, 0, 10, 0),
+                          //             child: Text(
+                          //               "Facebook",
+                          //               style: TextStyle(
+                          //                   color: Colors.white,
+                          //                   fontSize: 18),
+                          //             ),
+                          //           )
+                          //         ],
+                          //       )),
                           // ),
+                          Container(
+                            height: 35,
+                            // width: Utils.getDeviceWidth(context) / 2.6,
+                            margin: EdgeInsets.fromLTRB(0, 10, 0, 15),
+                            child: _googleSignInButton(),
+                          ),
                         ],
-                      )),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
