@@ -85,6 +85,7 @@ Future<void> main() async {
 
   PackageInfo packageInfo = await Utils.getAppVersionDetails(storeData);
 
+
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   await Utils.getDeviceInfo(storeData);
   // To turn off landscape mode
