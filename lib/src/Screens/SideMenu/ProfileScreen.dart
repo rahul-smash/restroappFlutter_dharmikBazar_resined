@@ -273,7 +273,8 @@ class _ProfileState extends State<ProfileScreen> {
                           ),
                           Visibility(
                             visible:
-                                widget.isComingFromOtpScreen && showGstNumber,
+                                //widget.isComingFromOtpScreen && showGstNumber,
+                            showGstNumber,
                             child: Padding(
                               padding: const EdgeInsets.only(top: 15.0),
                               child: TextField(
