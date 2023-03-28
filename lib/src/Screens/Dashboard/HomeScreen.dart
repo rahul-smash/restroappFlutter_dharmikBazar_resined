@@ -295,6 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Column(
             children: <Widget>[
+              SizedBox(height: 20.0),
               addBanners(),
               Expanded(
                 child: isLoading

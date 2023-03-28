@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         // TODO: Specifcom.app.hotpot"
-        applicationId "com.app.libertyGold"
+        applicationId "com.dharmik.bazaar"
         minSdkVersion 21
         targetSdkVersion 33
         multiDexEnabled true

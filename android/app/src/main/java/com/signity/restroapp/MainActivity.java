@@ -1,4 +1,4 @@
-package com.app.libertyGold;
+package com.signity.restroapp;
 
 import io.flutter.embedding.android.FlutterActivity;
 
