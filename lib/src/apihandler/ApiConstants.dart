@@ -134,6 +134,22 @@ class ApiConstants {
   //weight shipping charge calculation
   static String shippingChargesApi = 'delivery_charges/index';
 
+  //--------------------------------
+   //third party shipping charge calculation
+  static String deliveryShippingChargesApi = 'shiprocket_delivery/index';
+
+  //new payment gateway
+  static String dpoCreateOrderApi = '/dpo/dpoCreateOrder';
+
+  static String getDpoRoute({String storeID}){
+    if(storeID!=null)
+      return '$base$dpoCreateOrderApi'.replaceAll("storeId", storeID);
+    else{
+      return '$base$dpoCreateOrderApi';
+    }
+  }
+
+
   //delete account
   static String deleteUser = '/apiv1/user_authentication/deleteuser';
   static String getDeleteRoute({String storeID}) {
@@ -144,14 +160,4 @@ class ApiConstants {
     }
   }
 
-  //new payment gateway
-  static String dpoCreateOrderApi = '/dpo/dpoCreateOrder';
-
-  static String getDpoRoute({String storeID}) {
-    if (storeID != null)
-      return '$base$dpoCreateOrderApi'.replaceAll("storeId", storeID);
-    else {
-      return '$base$dpoCreateOrderApi';
-    }
-  }
 }

@@ -1,3 +1,5 @@
+import 'package:restroapp/src/models/ThirdPartyDeliveryResponse.dart';
+
 class DeliveryAddressResponse {
   bool success;
   String message;
@@ -59,6 +61,8 @@ class DeliveryAddressData {
   //new added fields as required feature
   String areaWisePaymentMethod; // 1=both, 2=COD, 3=Online
   String defaultPaymentMethod; //1=COD, 2=Online
+
+  ThirdPartyDeliveryData thirdPartyDeliveryData;
 
   //DeliveryTimeSlot deliveryTimeSlot;
 

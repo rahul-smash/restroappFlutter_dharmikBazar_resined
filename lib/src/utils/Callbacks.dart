@@ -12,6 +12,10 @@ class updateCartCount {
   updateCartCount();
 }
 
+class onCartRefresh {
+  onCartRefresh();
+}
+
 class refreshOrderHistory {
   refreshOrderHistory();
 }

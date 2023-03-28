@@ -849,7 +849,7 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         cartBadgeCount = value;
       });
-      //print("--getCARTCount---${value}------");
+      print("--getCARTCount---${cartBadgeCount}------");
     });
   }
 

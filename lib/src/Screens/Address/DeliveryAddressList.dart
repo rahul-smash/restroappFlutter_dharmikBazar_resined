@@ -17,6 +17,7 @@ import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/ThirdPartyDeliveryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -54,7 +55,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   ConfigModel configObject;
   PermissionStatus _permissionGranted;
 
-  bool _serviceEnabled;
+  bool isTPDSError = false;
 
   @override
   void initState() {
@@ -204,14 +205,14 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
           StoreModel store = await SharedPrefs.getStore();
           print("--deliveryArea->--${store.deliveryArea}-------");
-         // if (store.deliveryArea != "1") {
+          if (store.deliveryArea == "0") {
             var result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (BuildContext context) =>
                       SaveDeliveryAddress(null, () {
-                    print("--Route-SaveDeliveryAddress-------");
-                  }, "", 0.0, 0.0),
+                        print("--Route-SaveDeliveryAddress-------");
+                      }, "", 0.0, 0.0),
                   fullscreenDialog: true,
                 ));
             print("--result--${result}-------");
@@ -221,7 +222,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 isLoading = true;
               });
               DeliveryAddressResponse response =
-                  await ApiController.getAddressApiRequest();
+              await ApiController.getAddressApiRequest();
               //Utils.hideProgressDialog(context);
               setState(() {
                 //addressList = null;
@@ -231,84 +232,84 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             } else {
               print("--result--else------");
             }
-         // }
+            // }
 
 
-          //
-          // else if (store.deliveryArea == "0") {
-          //   Utils.isNetworkAvailable().then((isConnected) {
-          //     if (isConnected) {
-          //       Utils.showProgressDialog(context);
-          //       ApiController.storeRadiusApi().then((response) async {
-          //         Utils.hideProgressDialog(context);
-          //         if (response != null && response.success) {
-          //           StoreRadiousResponse data = response;
-          //           Geolocator.isLocationServiceEnabled()
-          //               .then((isLocationServiceEnabled) async {
-          //             print(
-          //                 "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
-          //             if (isLocationServiceEnabled) {
-          //               //------permission checking------
-          //               _serviceEnabled = await location.serviceEnabled();
-          //               if (!_serviceEnabled) {
-          //                 _serviceEnabled = await location.requestService();
-          //                 if (!_serviceEnabled) {
-          //                   print("----!_serviceEnabled----$_serviceEnabled");
-          //                   return;
-          //                 }
-          //               }
-          //               _permissionGranted = await location.hasPermission();
-          //               print("permission sttsu $_permissionGranted");
-          //               if (_permissionGranted == PermissionStatus.denied) {
-          //                 print("permission deniedddd");
-          //                 _permissionGranted =
-          //                     await location.requestPermission();
-          //                 if (_permissionGranted != PermissionStatus.granted) {
-          //                   print("permission not grantedd");
-          //
-          //                   return;
-          //                 }
-          //               }
-          //               //------permission checking over------
-          //
-          //               var result = await Navigator.push(
-          //                   context,
-          //                   new MaterialPageRoute(
-          //                     builder: (BuildContext context) =>
-          //                         DragMarkerMap(data),
-          //                     fullscreenDialog: true,
-          //                   ));
-          //               if (result != null) {
-          //                 radiusArea = result;
-          //                 print("----radiusArea = result-------");
-          //                 //Utils.showProgressDialog(context);
-          //                 setState(() {
-          //                   isLoading = true;
-          //                 });
-          //                 DeliveryAddressResponse response =
-          //                     await ApiController.getAddressApiRequest();
-          //                 //Utils.hideProgressDialog(context);
-          //                 setState(() {
-          //                   print("----setState-------");
-          //                   isLoading = false;
-          //                   //addressList = null;
-          //                   addressList = response.data;
-          //                 });
-          //               }
-          //             } else {
-          //               Utils.showToast("Please turn on gps!", false);
-          //             }
-          //           });
-          //         } else {
-          //           Utils.showToast("No data found!", false);
-          //         }
-          //       });
-          //     } else {
-          //       Utils.showToast(AppConstant.noInternet, false);
-          //     }
-          //   });
-          // }
-        },
+            //
+            // else if (store.deliveryArea == "0") {
+            //   Utils.isNetworkAvailable().then((isConnected) {
+            //     if (isConnected) {
+            //       Utils.showProgressDialog(context);
+            //       ApiController.storeRadiusApi().then((response) async {
+            //         Utils.hideProgressDialog(context);
+            //         if (response != null && response.success) {
+            //           StoreRadiousResponse data = response;
+            //           Geolocator.isLocationServiceEnabled()
+            //               .then((isLocationServiceEnabled) async {
+            //             print(
+            //                 "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
+            //             if (isLocationServiceEnabled) {
+            //               //------permission checking------
+            //               _serviceEnabled = await location.serviceEnabled();
+            //               if (!_serviceEnabled) {
+            //                 _serviceEnabled = await location.requestService();
+            //                 if (!_serviceEnabled) {
+            //                   print("----!_serviceEnabled----$_serviceEnabled");
+            //                   return;
+            //                 }
+            //               }
+            //               _permissionGranted = await location.hasPermission();
+            //               print("permission sttsu $_permissionGranted");
+            //               if (_permissionGranted == PermissionStatus.denied) {
+            //                 print("permission deniedddd");
+            //                 _permissionGranted =
+            //                     await location.requestPermission();
+            //                 if (_permissionGranted != PermissionStatus.granted) {
+            //                   print("permission not grantedd");
+            //
+            //                   return;
+            //                 }
+            //               }
+            //               //------permission checking over------
+            //
+            //               var result = await Navigator.push(
+            //                   context,
+            //                   new MaterialPageRoute(
+            //                     builder: (BuildContext context) =>
+            //                         DragMarkerMap(data),
+            //                     fullscreenDialog: true,
+            //                   ));
+            //               if (result != null) {
+            //                 radiusArea = result;
+            //                 print("----radiusArea = result-------");
+            //                 //Utils.showProgressDialog(context);
+            //                 setState(() {
+            //                   isLoading = true;
+            //                 });
+            //                 DeliveryAddressResponse response =
+            //                     await ApiController.getAddressApiRequest();
+            //                 //Utils.hideProgressDialog(context);
+            //                 setState(() {
+            //                   print("----setState-------");
+            //                   isLoading = false;
+            //                   //addressList = null;
+            //                   addressList = response.data;
+            //                 });
+            //               }
+            //             } else {
+            //               Utils.showToast("Please turn on gps!", false);
+            //             }
+            //           });
+            //         } else {
+            //           Utils.showToast("No data found!", false);
+            //         }
+            //       });
+            //     } else {
+            //       Utils.showToast(AppConstant.noInternet, false);
+            //     }
+            //   });
+            // }
+          }},
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -559,59 +560,26 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: InkWell(
         onTap: () async {
           StoreModel storeModel = await SharedPrefs.getStore();
-          DeliveryAddressData addressData =
-              DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
-          if (storeModel.enableWeightWiseCharges == '1') {
-            String shippingCharges =
-                await calculateShipping(addressList[selectedIndex]);
-            Utils.showProgressDialog(context);
-            DatabaseHelper databaseHelper = new DatabaseHelper();
-            List<Product> cartList = await databaseHelper.getCartItemList();
-            String orderJson = await Utils.getCartListToJson(cartList);
-
-            WeightWiseChargesResponse chargesResponse =
-                await ApiController.getWeightWiseShippingCharges(
-                    orderDetail: orderJson,
-                    areaShippingCharge: shippingCharges);
-            if (chargesResponse != null &&
-                chargesResponse.success &&
-                chargesResponse.data != null) {
-              //update changes according to weight
-              addressData.areaCharges =
-                  chargesResponse.data.totalDeliveryCharge;
+        DeliveryAddressData addressData = DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
+          if (storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
+            if (addressData.zipCode == null ||
+                (addressData.zipCode != null && addressData.zipCode.isEmpty)) {
+              Utils.showToast('ZipCode is mandatory ', false);
+              return addressData;
+            } else if (addressData.zipCode != null &&
+                addressData.zipCode.length != 6) {
+              Utils.showToast('Please add valid ZipCode', false);
+              return addressData;
             }
-            Utils.hideProgressDialog(context);
           }
 
-          if (addressList.length == 0) {
-            Utils.showToast(AppConstant.selectAddress, false);
-          } else {
-            print("minAmount=${addressList[selectedIndex].minAmount}");
-            print("notAllow=${addressList[selectedIndex].notAllow}");
-            if (addressList[selectedIndex].note.isEmpty) {
-              if (widget.delivery == OrderType.SubScription) {
-                eventBus.fire(onAddressSelected(addressList[selectedIndex]));
-                Navigator.pop(context);
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ConfirmOrderScreen(
-                            addressData,
-                            false,
-                            "",
-                            widget.delivery,
-                            storeModel: storeModel,
-                          )),
-                );
-              }
+          addressData =
+              await checkingStoreDeliverymodel(storeModel, addressData);
+          if (!isTPDSError) {
+            if (addressList.length == 0) {
+              Utils.showToast(AppConstant.selectAddress, false);
             } else {
-              var result = await DialogUtils.displayOrderConfirmationDialog(
-                context,
-                "Confirmation",
-                addressList[selectedIndex].note,
-              );
-              if (result == true) {
+              if (addressList[selectedIndex].note.isEmpty) {
                 if (widget.delivery == OrderType.SubScription) {
                   eventBus.fire(onAddressSelected(addressList[selectedIndex]));
                   Navigator.pop(context);
@@ -628,8 +596,34 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                             )),
                   );
                 }
+              } else {
+                var result = await DialogUtils.displayOrderConfirmationDialog(
+                  context,
+                  "Confirmation",
+                  addressList[selectedIndex].note,
+                );
+                if (result == true) {
+                  if (widget.delivery == OrderType.SubScription) {
+                    eventBus
+                        .fire(onAddressSelected(addressList[selectedIndex]));
+                    Navigator.pop(context);
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => ConfirmOrderScreen(
+                                addressData,
+                                false,
+                                "",
+                                widget.delivery,
+                                storeModel: storeModel,
+                              )),
+                    );
+                  }
+                }
               }
             }
+
             //Code Commented Due to not approved by client
             /* StoreModel storeModel = await SharedPrefs.getStore();
             bool isPaymentModeOnline = false;
@@ -721,6 +715,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         totalPrice = mtotalPrice.toDouble();
       } else {
         totalPrice = mtotalPrice.toDouble();
+        if (addressList.isShippingMandatory == '0') {
+          shippingCharges = "0";
+          addressList.areaCharges = "0";
+        }
       }
     } else {
       if (mtotalPrice <= minAmount) {
@@ -740,5 +738,103 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       }
     }
     return shippingCharges;
+  }
+
+  Future<DeliveryAddressData> checkingStoreDeliverymodel(
+      StoreModel storeModel, DeliveryAddressData addressData) async {
+    isTPDSError = false;
+    switch (storeModel.storeDeliveryModel) {
+      case AppConstant.DELIVERY_WEIGHTWISE:
+        {
+          if (storeModel.enableWeightWiseCharges == '1') {
+            String shippingCharges =
+                await calculateShipping(addressList[selectedIndex]);
+            Utils.showProgressDialog(context);
+            DatabaseHelper databaseHelper = new DatabaseHelper();
+            List<Product> cartList = await databaseHelper.getCartItemList();
+            String orderJson = await Utils.getCartListToJson(cartList);
+
+            WeightWiseChargesResponse chargesResponse =
+                await ApiController.getWeightWiseShippingCharges(
+                    orderDetail: orderJson,
+                    areaShippingCharge: shippingCharges);
+            if (chargesResponse != null &&
+                chargesResponse.success &&
+                chargesResponse.data != null) {
+              //update changes according to weight
+              addressData.areaCharges =
+                  chargesResponse.data.totalDeliveryCharge;
+              Utils.hideProgressDialog(context);
+
+              return addressData;
+            } else {
+              return addressData;
+            }
+          }
+          break;
+        }
+      case AppConstant.DELIVERY_VALUEAPP:
+        return addressData;
+        break;
+      case AppConstant.DELIVERY_THIRD_PARTY:
+        Utils.showProgressDialog(context);
+        DatabaseHelper databaseHelper = new DatabaseHelper();
+        List<Product> cartList = await databaseHelper.getCartItemList();
+        String orderJson = await Utils.getCartListToJson(cartList);
+        ThirdPartyDeliveryResponse chargesResponse =
+            await ApiController.getDeliveryShippingChargesApi(
+                orderDetail: orderJson, userZipcode: addressData.zipCode);
+        Utils.hideProgressDialog(context);
+        if (chargesResponse != null &&
+            chargesResponse.success &&
+            chargesResponse.data != null) {
+          //update changes according to weight
+          if (chargesResponse.data.errorMsg != null) {
+            Utils.showToast(chargesResponse.data.errorMsg, false);
+            isTPDSError = true;
+          }
+          addressData.thirdPartyDeliveryData = chargesResponse.data;
+          return addressData;
+        } else {
+          isTPDSError = true;
+          if (chargesResponse.message != null) {
+            Utils.showToast(chargesResponse.message, false);
+            DialogUtils.displayLocationNotAvailbleDialog(
+                context, chargesResponse.message, buttonText1: 'Change Zipcode',
+                button1: () {
+              Navigator.pop(context);
+              _editAddress(addressData);
+            });
+          }
+          return addressData;
+        }
+
+        break;
+    }
+  }
+
+  void _editAddress(DeliveryAddressData area) async {
+    var result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (BuildContext context) => SaveDeliveryAddress(area, () {
+            print('@@---Edit---SaveDeliveryAddress----------');
+          }, "", 0.0, 0.0),
+          fullscreenDialog: true,
+        ));
+    print("-Edit-result--${result}-------");
+    if (result == true) {
+      setState(() {
+        isLoading = true;
+      });
+      DeliveryAddressResponse response =
+          await ApiController.getAddressApiRequest();
+      //Utils.hideProgressDialog(context);
+      setState(() {
+        //addressList = null;
+        isLoading = false;
+        addressList = response.data;
+      });
+    }
   }
 }

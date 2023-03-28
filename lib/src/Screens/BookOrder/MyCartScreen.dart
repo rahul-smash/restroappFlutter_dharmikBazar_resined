@@ -32,7 +32,18 @@ class _MyCartScreenState extends State<MyCartScreen> {
   void initState() {
     super.initState();
     isLoading = false;
+    listenEvent();
     getCartListFromDB();
+  }
+  void listenEvent() {
+    eventBus.on<onCartRefresh>().listen((event) {
+      cartList.clear();
+      isLoading = true;
+      if (mounted) setState(() {});
+      Future.delayed(const Duration(milliseconds: 50), () {
+        getCartListFromDB();
+      });
+    });
   }
 
   @override
@@ -76,7 +87,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
           child: Column(
             children: <Widget>[
               Divider(color: Colors.white, height: 2.0),
-              isLoading ? Utils.getIndicatorView(): showCartList(),
+              isLoading ? Expanded(child: Utils.getIndicatorView()): showCartList(),
               //TODO: add here
               Align(
                 alignment: Alignment.bottomCenter,
@@ -103,7 +114,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
   void getCartListFromDB() {
     isLoading = true;
     databaseHelper.getCartItemList().then((response) {
-      setState(() {
+     if(mounted) setState(() {
         cartList = response;
         isLoading = true;
         eventBus.fire(updateCartCount());

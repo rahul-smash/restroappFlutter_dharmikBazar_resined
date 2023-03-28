@@ -2012,4 +2012,124 @@ class DialogUtils {
           );
         });
   }
+  static Future<bool> displayLocationNotAvailbleDialog(
+      BuildContext context, String message,
+      {Function button1, String buttonText1 = 'Change Location'}) async {
+    return await showDialog<bool>(
+        context: context,
+        barrierDismissible: true,
+        builder: (BuildContext context) {
+          return WillPopScope(
+            onWillPop: () {
+              return Future(() => false);
+            },
+            child: Dialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(5.0))),
+                //title: Text(title,textAlign: TextAlign.center,),
+                child: Container(
+                    margin: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                    child: Wrap(
+                      children: <Widget>[
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).pop(false);
+                            },
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                              child: Icon(
+                                Icons.cancel,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.fromLTRB(10.0, 00.0, 10.0, 10.0),
+                          padding: EdgeInsets.all(10.0),
+                          child: new Row(
+                            children: [
+                              new Expanded(
+                                child: new Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    Text(
+                                      'Oops!\nSorry',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                          color: Colors.black),
+                                    ),
+                                    Container(
+                                      width: 30,
+                                      margin: EdgeInsets.only(
+                                        top: 5,
+                                      ),
+                                      height: 2,
+                                      decoration: BoxDecoration(
+                                          border: Border.all(color: appTheme),
+                                          borderRadius:
+                                          BorderRadius.circular(5)),
+                                    ),
+                                    // Code to create the view for address.
+                                  ],
+                                ),
+                              ),
+                              // Icon to indicate the phone number.
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(30, 0, 30, 10),
+                          child: Center(
+                            child: Text(
+                              "${message}",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 20, top: 20),
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: ButtonTheme(
+                              minWidth: 180.0,
+                              height: 40.0,
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(appTheme),
+                                    padding: MaterialStateProperty.all(EdgeInsets.all(5.0)),
+                                    shape: MaterialStateProperty.all( RoundedRectangleBorder(
+                                        borderRadius:
+                                        new BorderRadius.circular(5.0),
+                                        side: BorderSide(color: appTheme)))
+                                ),
+                                onPressed: button1 ??
+                                        () async {
+                                      Navigator.pop(context, true);
+                                    },
+                                child: Text(buttonText1.isNotEmpty
+                                    ? buttonText1
+                                    : "Change Location"),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ))),
+          );
+        });
+  }
+
 }

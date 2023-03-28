@@ -58,6 +58,7 @@ import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/SubscriptionUpdationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
+import 'package:restroapp/src/models/ThirdPartyDeliveryResponse.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/models/ValidateCouponsResponse.dart';
 import 'package:restroapp/src/models/WalleModel.dart';
@@ -933,21 +934,26 @@ class ApiController {
     }
   }
 
-  static Future<ResponseModel> placeOrderRequest(String shipping_charges,
-      String note,
-      String totalPrice,
-      String paymentMethod,
-      TaxCalculationModel taxModel,
-      DeliveryAddressData address,
-      String orderJson,
-      bool isComingFromPickUpScreen,
-      String areaId,
-      OrderType deliveryType,
-      String razorpay_order_id,
-      String razorpay_payment_id,
-      String online_method,
-      String selectedDeliverSlotValue,
-      {String cart_saving = "0.00"}) async {
+  static Future<ResponseModel> placeOrderRequest(
+    String shipping_charges,
+    String note,
+    String totalPrice,
+    String paymentMethod,
+    TaxCalculationModel taxModel,
+    DeliveryAddressData address,
+    String orderJson,
+    bool isComingFromPickUpScreen,
+    String areaId,
+    OrderType deliveryType,
+    String razorpay_order_id,
+    String razorpay_payment_id,
+    String online_method,
+    String selectedDeliverSlotValue, {
+    String cart_saving = "0.00",
+    ShippingCharge selectedShippingCharge,
+    ThirdPartyDeliveryData thirdPartyDeliveryData,
+    List<ShippingCharge> selectedShippingChargeList,
+  }) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -985,7 +991,7 @@ class ApiController {
 
       try {
         List jsonfixedTaxList =
-        taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+            taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
         encodedFixedTax = jsonEncode(jsonfixedTaxList);
         //print("encodedFixedTax= ${encodedFixedTax}");
       } catch (e) {
@@ -994,7 +1000,7 @@ class ApiController {
 
       try {
         List jsontaxDetailList =
-        taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+            taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
         encodedtaxDetail = jsonEncode(jsontaxDetailList);
         //print("encodedtaxDetail= ${encodedtaxDetail}");
       } catch (e) {
@@ -1003,7 +1009,7 @@ class ApiController {
 
       try {
         List jsontaxLabelList =
-        taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+            taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
         encodedtaxLabel = jsonEncode(jsontaxLabelList);
         //print("encodedtaxLabel= ${encodedtaxLabel}");
       } catch (e) {
@@ -1013,8 +1019,7 @@ class ApiController {
       print(e);
     }
 
-    String userDeliveryAddress = '',
-        pin = '';
+    String userDeliveryAddress = '', pin = '';
     if (address != null && !isComingFromPickUpScreen) {
       if (address.address2 != null && address.address2.isNotEmpty) {
         if (address.address != null && address.address.isNotEmpty) {
@@ -1040,14 +1045,16 @@ class ApiController {
         pin = " " + address.zipCode;
     }
     try {
-      request.fields.addAll({
+      Map<String, dynamic> map = Map();
+
+      map = {
         "shipping_charges": "${shipping_charges}",
         "note": note,
         "wallet_refund": store.wallet_setting == "0"
             ? ""
             : taxModel == null
-            ? "0"
-            : "${taxModel.wallet_refund}",
+                ? "0"
+                : "${taxModel.wallet_refund}",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
         "user_address": isComingFromPickUpScreen == true
@@ -1062,7 +1069,7 @@ class ApiController {
         "user_id": user.id,
         "device_token": deviceToken,
         "user_address_id":
-        isComingFromPickUpScreen == true ? '0' /*areaId */ : address.id,
+            isComingFromPickUpScreen == true ? '0' /*areaId */ : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
         "payment_method": paymentMethod == "2"
@@ -1077,18 +1084,34 @@ class ApiController {
         "store_tax_rate_detail": encodedtaxLabel,
         "calculated_tax_detail": encodedtaxDetail,
         "cart_saving": cart_saving,
-      });
+      };
+      if (selectedShippingCharge != null &&
+          selectedShippingChargeList != null &&
+          selectedShippingChargeList.isNotEmpty)
+        map.putIfAbsent('shipping_charges_companies',
+            () => jsonEncode(selectedShippingChargeList));
 
+      if (selectedShippingCharge != null && thirdPartyDeliveryData != null) {
+        thirdPartyDeliveryData.totalDimensions.courierId =
+            selectedShippingCharge.courierCompanyId;
+        map.putIfAbsent('total_dimensions',
+            () => jsonEncode(thirdPartyDeliveryData.totalDimensions.toJson()));
+      }
+      print(map);
+      FormData formData = new FormData.fromMap(map);
       print("----${url}");
-      //print("--fields--${request.fields.toString()}--");
-      final response = await request.send();
-      final respStr = await response.stream.bytesToString();
-      print("--respStr--${respStr}--");
-      final parsed = json.decode(respStr);
-      ResponseModel model = ResponseModel.fromJson(parsed);
+
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(
+              contentType: "application/json",
+              responseType: ResponseType.plain));
+
+      ResponseModel model = ResponseModel.fromJson(json.decode(response.data));
       if (model != null && model.success) {
-        NotificationServiceHelper.instance.showLocalNotification(
-            model.notification, type: 'order_placed');
+        NotificationServiceHelper.instance
+            .showLocalNotification(model.notification, type: 'order_placed');
       }
       return model;
     } catch (e) {
@@ -2793,6 +2816,37 @@ class ApiController {
       WeightWiseChargesResponse chargesResponse =
       WeightWiseChargesResponse.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${chargesResponse.success}");
+      return chargesResponse;
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  //third party charges
+  static Future<ThirdPartyDeliveryResponse> getDeliveryShippingChargesApi(
+      {@required String userZipcode, @required String orderDetail}) async {
+    StoreModel store = await SharedPrefs.getStore();
+    var url = ApiConstants.getVIRoute(storeID: store.id) +
+        ApiConstants.deliveryShippingChargesApi;
+    print(url);
+    try {
+      FormData formData = new FormData.fromMap({
+        "user_zipcode": userZipcode,
+        "order_detail": orderDetail,
+        "platform": Platform.isIOS ? "IOS" : "android",
+      });
+      print(formData.fields);
+      Dio dio = new Dio();
+      Response response = await dio.post(url,
+          data: formData,
+          options: new Options(
+              contentType: "application/json",
+              responseType: ResponseType.plain));
+      print(response.statusCode);
+      print(response.data);
+      ThirdPartyDeliveryResponse chargesResponse =
+          ThirdPartyDeliveryResponse.fromJson(json.decode(response.data));
+      print("-----ThirdPartyDeliveryResponse---${chargesResponse.success}");
       return chargesResponse;
     } catch (e) {
       print(e);

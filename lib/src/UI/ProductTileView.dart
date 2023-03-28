@@ -798,6 +798,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {
         widget.callback();
         eventBus.fire(updateCartCount());
+        eventBus.fire(onCartRefresh());
       });
     } catch (e) {
       print(e);
