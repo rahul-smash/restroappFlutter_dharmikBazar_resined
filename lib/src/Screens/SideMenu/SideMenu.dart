@@ -643,13 +643,13 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           content: new Text(AppConstant.logoutConfirm),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
-            new FlatButton(
+            new TextButton(
               child: new Text("CANCEL"),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            FlatButton(
+            TextButton(
               child: const Text('YES'),
               onPressed: () async {
                 Navigator.of(context).pop();

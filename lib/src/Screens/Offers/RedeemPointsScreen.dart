@@ -197,14 +197,15 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
                             trailing: Container(
                               child: Padding(
                                 padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                child: RaisedButton(
-                                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                  textColor: Colors.white,
-                                  color: redeemButtonColor,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18.0),
-                                    //side: BorderSide(color: Colors.red)
+                                child: ElevatedButton(
+                                  style: Utils.getButtonDecoration(
+                                    color:redeemButtonColor,
+                                    edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    border: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                    ),
                                   ),
+
                                   onPressed: () async {
                                     bool isNetworkAvailable =
                                         await Utils.isNetworkAvailable();

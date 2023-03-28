@@ -278,10 +278,14 @@ class PickUpBottomSheet {
                       child: ButtonTheme(
                         minWidth: 180.0,
                         height: 40.0,
-                        child: RaisedButton(
-                          shape: new RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(25.0),
-                              side: BorderSide(color: appTheme)),
+                        child: ElevatedButton(
+                          style: Utils.getButtonDecoration(
+                              edgeInsets: EdgeInsets.all(5.0),
+                              color:  appTheme,
+                              border:RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(25.0),
+                                  side: BorderSide(color: appTheme))
+                          ),
                           onPressed: () async {
                             if (areaObject.note.isEmpty) {
                               Navigator.pop(context);
@@ -300,9 +304,7 @@ class PickUpBottomSheet {
                             eventBus.fire(onAddressSelected(null,
                                 areaObject: areaObject));
                           },
-                          color: appTheme,
-                          padding: EdgeInsets.all(5.0),
-                          textColor: Colors.white,
+
                           child: Text("Submit"),
                         ),
                       ),

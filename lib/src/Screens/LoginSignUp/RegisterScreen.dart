@@ -163,16 +163,18 @@ class _RegisterUserState extends State<RegisterUser> {
                           margin:
                               EdgeInsets.only(left: 0, right: 0, bottom: 20),
                           child: ButtonTheme(
-                            child: RaisedButton(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(5.0),
+                            child: ElevatedButton(
+                              style: Utils.getButtonDecoration(
+                                color: appThemeSecondary,
+                                border: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(5.0),
+                                ),
                               ),
                               child: const Text(
                                 'Submit',
                                 style: TextStyle(color: Colors.white),
                               ),
                               onPressed: _submitForm,
-                              color: appThemeSecondary,
                             ),
                           ),
                         ),

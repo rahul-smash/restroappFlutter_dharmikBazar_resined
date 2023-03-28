@@ -252,7 +252,7 @@ class _MyOrderScreen extends State<MyOrderScreen> {
                   child:  SizedBox(
                     width: 110,
                     height: 30,
-                    child: FlatButton(
+                    child: TextButton(
                       onPressed: (){
                         print("OrderDetailScreen");
                         Navigator.push( context,
@@ -262,9 +262,11 @@ class _MyOrderScreen extends State<MyOrderScreen> {
                         );
                       },
                       child: Text("View Order",style: TextStyle(color: Colors.white),),
-                      color: Color(0xFFFD5401),
-                      shape:  RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3.0),
+                      style: Utils.getButtonDecoration(
+                        color: Color(0xFFFD5401),
+                        border: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                        ),
                       ),
                     ),
                   ),

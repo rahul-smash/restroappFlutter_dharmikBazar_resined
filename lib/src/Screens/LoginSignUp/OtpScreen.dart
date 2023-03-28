@@ -135,7 +135,7 @@ class _OtpScreen extends State<OtpScreen> {
                         children: [
 //                          Container(
 //                              padding: EdgeInsets.only( left: 0.0, top: 10.0, right: 20.0),
-//                              child: new RaisedButton(
+//                              child: new ElevatedButton(
 //                                color: appThemeSecondary,
 //                                shape: RoundedRectangleBorder(
 //                                  borderRadius: BorderRadius.circular(5.0),
@@ -150,12 +150,13 @@ class _OtpScreen extends State<OtpScreen> {
                           Container(
                               padding: EdgeInsets.only(
                                   left: 0.0, top: 10.0, right: 0.0),
-                              child: new RaisedButton(
-                                color: appThemeSecondary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(5.0),
+                              child: new ElevatedButton(
+                                style: Utils.getButtonDecoration(
+                                  color: appThemeSecondary,
+                                  border: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(5.0),
+                                  ),
                                 ),
-                                textColor: Colors.white,
                                 child: const Text(
                                   'Submit',
                                   style: TextStyle(

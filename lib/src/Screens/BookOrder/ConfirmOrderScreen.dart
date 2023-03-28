@@ -1598,13 +1598,14 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             child: Container(
               height: 40.0,
               margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
-              child: RaisedButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
+              child: ElevatedButton(
+                style: Utils.getButtonDecoration(
+                  color: appTheme,
+                  border:  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  edgeInsets:EdgeInsets.fromLTRB(5, 0, 5, 0),
                 ),
-                padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                textColor: Colors.white,
-                color: appTheme,
                 onPressed: () async {
                   print("---Apply Coupon----");
                   if (couponCodeController.text.trim().isEmpty) {
@@ -1742,10 +1743,15 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         onTap: () async {},
         child: ButtonTheme(
           minWidth: Utils.getDeviceWidth(context),
-          child: RaisedButton(
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            textColor: Colors.white,
-            color: appTheme,
+          child: ElevatedButton(
+            style: Utils.getButtonDecoration(
+              color: appTheme,
+              border:  RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0),
+              ),
+              edgeInsets:EdgeInsets.fromLTRB(0, 0, 0, 0),
+            ),
+
             onPressed: () async {
               actionConfirmOrder();
             },

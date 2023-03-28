@@ -348,9 +348,9 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text("Cancel"),
-                textColor: Colors.blue,
+
                 onPressed: () {
                   Navigator.pop(context, null);
                   // true here means you clicked ok

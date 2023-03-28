@@ -104,7 +104,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
               )),
               Container(
                   color: appTheme,
-                  child: FlatButton(
+                  child: TextButton(
                     child: Row(children: <Widget>[
                       Image.asset("images/my_order.png", width: 25),
                       SizedBox(width: 5),

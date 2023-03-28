@@ -160,7 +160,7 @@ class Utils {
           title: Text("Login"),
           content: Text(AppConstant.pleaseLogin),
           actions: [
-            FlatButton(
+            TextButton(
               child: new Text("YES"),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -185,7 +185,7 @@ class Utils {
                 });
               },
             ),
-            FlatButton(
+            TextButton(
               child: const Text('NO'),
               onPressed: () {
                 Navigator.of(context).pop();
@@ -253,10 +253,12 @@ class Utils {
                       children: <Widget>[
                         Container(
                           margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                          child: FlatButton(
+                          child: TextButton(
                             child: Text('OK'),
-                            color: appThemeSecondary,
-                            textColor: Colors.white,
+                            style: Utils.getButtonDecoration(
+                              color: appThemeSecondary,
+                            ),
+
                             onPressed: () {
                               Navigator.pop(context);
                               // Navigator.push(
@@ -1366,7 +1368,16 @@ class Utils {
     // print(position);
 
     // return await Geolocator.getCurrentPosition();
+  }  
+  static getButtonDecoration({EdgeInsets edgeInsets,color, border})
+  {
+    return ButtonStyle(
+        shape: MaterialStateProperty.all(border),
+        padding: MaterialStateProperty.all(edgeInsets),
+        backgroundColor: MaterialStateProperty.all(color)
+    );
   }
+
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }

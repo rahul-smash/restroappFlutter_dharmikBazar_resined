@@ -76,11 +76,11 @@ _showVersionDialog(context) async {
               title: Text(title),
               content: Text(message),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text(btnLabel),
                   onPressed: () => _launchURL(PLAY_STORE_URL_ios),
                 ),
-                FlatButton(
+                TextButton(
                   child: Text(btnLabelCancel),
                   onPressed: () => Navigator.pop(context),
                 ),
@@ -90,11 +90,11 @@ _showVersionDialog(context) async {
               title: Text(title),
               content: Text(message),
               actions: <Widget>[
-                FlatButton(
+                TextButton(
                   child: Text(btnLabel),
                   onPressed: () => _launchURL(PLAY_STORE_URL_android),
                 ),
-                FlatButton(
+                TextButton(
                   child: Text(btnLabelCancel),
                   onPressed: () => Navigator.pop(context),
                 ),

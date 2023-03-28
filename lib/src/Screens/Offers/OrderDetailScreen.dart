@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
+import 'package:restroapp/src/utils/Utils.dart';
 
 class OrderDetailScreen extends StatelessWidget {
   final OrderData orderHistoryData;
@@ -186,7 +187,7 @@ class OrderDetailScreen extends StatelessWidget {
           child: SizedBox(
             width: 80,
             //height: 35,
-            child: FlatButton(
+            child: TextButton(
               onPressed: () {},
               child: Padding(
                 padding: EdgeInsets.only(top: 3.0, bottom: 3.0),
@@ -198,10 +199,13 @@ class OrderDetailScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              color: item.weight.isEmpty ? whiteColor : Color(0xFFEAEEEF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(3.0),
+              style: Utils.getButtonDecoration(
+                color:item.weight.isEmpty ? whiteColor : Color(0xFFEAEEEF),
+                border: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(3.0),
+                ),
               ),
+
             ),
           ),
         )

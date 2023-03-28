@@ -1036,13 +1036,19 @@ class _SubscriptionHistoryState extends State<SubscriptionHistory> {
                               borderRadius: new BorderRadius.all(
                                   new Radius.circular(5.0)),
                             ),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text(
                                 'Save',
                                 style: TextStyle(fontSize: 17),
                               ),
-                              color: orangeColor,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                  color:orangeColor,
+                                  edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  border:RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3.0),
+                                  )
+                              ),
+
                               onPressed: () {
                                 Navigator.pop(context);
                                 updateSubscriptionOrderDeliverySlots(

@@ -273,13 +273,15 @@ class _ContactUsState extends State<ContactUs> {
 
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 0, 20, 10),
-                  child: FlatButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(5.0),
-                        side: BorderSide(color: appThemeSecondary)),
+                  child: TextButton(
+                    style: Utils.getButtonDecoration(
+                      color:appThemeSecondary,
+                      border: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                          side: BorderSide(color: appThemeSecondary))
+
+                    ),
                     child: Text('Send Your Message'),
-                    color: appThemeSecondary,
-                    textColor: Colors.white,
                     onPressed: () async {
                       bool isNetworkAvailable = await Utils.isNetworkAvailable();
                       if(!isNetworkAvailable){

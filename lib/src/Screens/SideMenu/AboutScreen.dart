@@ -80,10 +80,14 @@ class _AboutScreenState extends State<AboutScreen> {
               children: <Widget>[
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                  child: FlatButton(
+                  child: TextButton(
                     child: Text('Contact Us'),
-                    color: appThemeSecondary,
-                    textColor: Colors.white,
+                    style: Utils.getButtonDecoration(
+                      color:appThemeSecondary,
+
+                    ),
+
+
                     onPressed: () async {
                       //Navigator.pop(context, false);
                       if (AppConstant.isLoggedIn) {
@@ -104,12 +108,15 @@ class _AboutScreenState extends State<AboutScreen> {
                 ),
                 Container(
                   margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                  child: FlatButton(
+                  child: TextButton(
                     child: Text('Locate Us',style: TextStyle(
                       decoration: TextDecoration.underline,
                     ),),
-                    color: Colors.white,
-                    textColor: Colors.black,
+                    style: Utils.getButtonDecoration(
+                      color:whiteColor,
+
+                    ),
+
                     onPressed: () {
                       try {
                         if (widget.store != null) {

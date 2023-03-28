@@ -1641,10 +1641,13 @@ class _SubscriptionHistoryDetailsState
                                 margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                                 padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                                 width: 130,
-                                child: FlatButton(
+                                child: TextButton(
                                   child: Text('Submit'),
-                                  color: appThemeSecondary,
-                                  textColor: Colors.white,
+                                  style: Utils.getButtonDecoration(
+                                      edgeInsets: EdgeInsets.all(5.0),
+                                      color:  appThemeSecondary,
+                                  ),
+
                                   onPressed: () {
                                     if (_rating == 0) {
                                       Utils.showToast(
@@ -1827,13 +1830,16 @@ class _SubscriptionHistoryDetailsState
                               borderRadius: new BorderRadius.all(
                                   new Radius.circular(5.0)),
                             ),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text(
                                 'Save',
                                 style: TextStyle(fontSize: 17),
                               ),
-                              color: orangeColor,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  orangeColor,
+                              ),
+
                               onPressed: () {
                                 Navigator.pop(context);
                                 updateSubscriptionOrderDeliverySlots(

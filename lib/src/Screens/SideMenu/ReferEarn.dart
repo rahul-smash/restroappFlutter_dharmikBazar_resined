@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+
 // import 'package:flutter_share/flutter_share.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -134,9 +135,13 @@ class _ReferEarnState extends State<ReferEarn> {
                             width: double.infinity,
                             padding: const EdgeInsets.only(
                                 left: 30.0, top: 20.0, right: 40.0),
-                            child: RaisedButton(
-                              color: appTheme,
-                              disabledColor: appTheme,
+                            child: ElevatedButton(
+                              style: Utils.getButtonDecoration(
+                                  color: appTheme,
+                                  edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                  border: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(3.0),
+                                  )),
                               child: Text(
                                 AppConstant.txt_share,
                                 style: TextStyle(

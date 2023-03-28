@@ -158,10 +158,11 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                                 children: <Widget>[
                                   Container(
                                     margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                    child: FlatButton(
+                                    child: TextButton(
                                       child: Text('OK'),
-                                      color: appThemeSecondary,
-                                      textColor: Colors.white,
+                                      style: Utils.getButtonDecoration(
+                                          color: appThemeSecondary
+                                      ),
                                       onPressed: () {
                                         logout(context, branchData);
                                         Navigator.popUntil(

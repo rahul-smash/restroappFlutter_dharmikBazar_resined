@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as b;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -188,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: <Widget>[
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('OK'),
                               color: appThemeSecondary,
                               textColor: Colors.white,
@@ -535,7 +535,7 @@ class _HomeScreenState extends State<HomeScreen> {
               label: 'My Orders',
             ),
             BottomNavigationBarItem(
-              icon: Badge(
+              icon:  b.Badge(
                 showBadge: cartBadgeCount == 0 ? false : true,
                 badgeColor: appThemeSecondary,
                 badgeContent: Text('${cartBadgeCount}',

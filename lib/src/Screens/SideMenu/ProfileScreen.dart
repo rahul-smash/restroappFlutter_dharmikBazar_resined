@@ -295,14 +295,18 @@ class _ProfileState extends State<ProfileScreen> {
                             child: ButtonTheme(
                               height: 40,
                               minWidth: MediaQuery.of(context).size.width,
-                              child: RaisedButton(
+                              child: ElevatedButton(
                                 onPressed: () {
                                   _submitForm();
                                 },
-                                color: appThemeSecondary,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(3.0),
+                                style: Utils.getButtonDecoration(
+                                    color:appThemeSecondary,
+                                    edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    border:RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3.0),
+                                    )
                                 ),
+
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[

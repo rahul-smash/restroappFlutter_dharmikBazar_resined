@@ -79,14 +79,17 @@ class _LoyalityPointsScreenState extends BaseState<LoyalityPointsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  RaisedButton(
-                    padding:EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    textColor: Colors.black,
-                    color: Color(0xffdbdbdb),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18.0),
-                      //side: BorderSide(color: Colors.red)
-                    ),
+                  ElevatedButton(
+              style: Utils.getButtonDecoration(
+                  color: Color(0xffdbdbdb),
+                  edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  border: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                    //side: BorderSide(color: Colors.red)
+                  )
+
+              ),
+
                     onPressed: () => null,
                     child: new Text(loyalityPointsModel == null ? "0" : "${loyalityPointsModel.loyalityPoints}"),
                   ),

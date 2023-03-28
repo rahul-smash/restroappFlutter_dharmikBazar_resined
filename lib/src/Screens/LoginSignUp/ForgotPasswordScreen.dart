@@ -113,12 +113,15 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                                       new Container(
                                           padding: const EdgeInsets.only(bottom: 20,
                                               left: 10.0, top: 10.0, right: 40.0),
-                                          child: new RaisedButton(
-                                            color: appThemeSecondary,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(5.0),
+                                          child: new ElevatedButton(
+                                            style: Utils.getButtonDecoration(
+                                              color: appThemeSecondary,
+                                              border: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(5.0),
+                                              ),
                                             ),
-                                            textColor: Colors.white,
+
+
                                             child: Text(AppConstant.txtSendEmail,style: TextStyle(
                                               color: Colors.white,
                                             ),
@@ -184,7 +187,7 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
           title: new Text("Success"),
           content: new Text(message),
           actions: <Widget>[
-            new FlatButton(
+            new TextButton(
               child: new Text("OK"),
               onPressed: () {
                 Navigator.of(context).pop();

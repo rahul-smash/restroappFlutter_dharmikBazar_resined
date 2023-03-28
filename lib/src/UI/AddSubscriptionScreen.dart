@@ -389,10 +389,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                   color: appTheme,
                                   child: ButtonTheme(
                                     minWidth: 80,
-                                    child: RaisedButton(
-                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                      textColor: Colors.grey[600],
-                                      color: Colors.grey[300],
+                                    child: ElevatedButton(
+                                      style: Utils.getButtonDecoration(
+                                        edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                        color: Colors.grey[300]
+                                      ),
+
                                       onPressed: () async {
                                         if (AppConstant.isLoggedIn) {
                                           Navigator.push(
@@ -843,10 +845,12 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
         onTap: () async {},
         child: ButtonTheme(
           minWidth: Utils.getDeviceWidth(context),
-          child: RaisedButton(
-            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-            textColor: Colors.white,
-            color: appTheme,
+          child: ElevatedButton(
+            style: Utils.getButtonDecoration(
+                edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                color: appTheme
+            ),
+
             onPressed: () async {
               StoreModel model = await SharedPrefs.getStore();
               bool status = Utils.checkStoreSubsTaxOpenTime(
@@ -1259,13 +1263,14 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                   borderRadius: new BorderRadius.all(
                                       new Radius.circular(5.0)),
                                 ),
-                                child: FlatButton(
+                                child: TextButton(
                                   child: Text(
                                     'Place Order',
                                     style: TextStyle(fontSize: 17),
                                   ),
-                                  color: appTheme,
-                                  textColor: Colors.white,
+                                  style: Utils.getButtonDecoration(
+                                      color: appTheme
+                                  ),
                                   onPressed: () {
                                     //todo:hit api
                                     taxModel.storeStatus == "0"
@@ -1426,13 +1431,16 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                 borderRadius: new BorderRadius.all(
                                     new Radius.circular(5.0)),
                               ),
-                              child: FlatButton(
+                              child: TextButton(
                                 child: Text(
                                   'Place Order',
                                   style: TextStyle(fontSize: 17),
                                 ),
-                                color: appTheme,
-                                textColor: Colors.white,
+                                style: Utils.getButtonDecoration(
+                                    edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                    color: appTheme,
+
+                                ),
                                 onPressed: () {
                                   //todo:hit api
                                   taxModel.storeStatus == "0"
@@ -2204,13 +2212,15 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
             child: Container(
               height: 40.0,
               margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
-              child: RaisedButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
+              child: ElevatedButton(
+                style: Utils.getButtonDecoration(
+                    edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    color: appTheme,
+                  border: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  )
                 ),
-                padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                textColor: Colors.white,
-                color: appTheme,
+
                 onPressed: () async {
                   print("---Apply Coupon----");
                   if (selectedStartDate == null) {

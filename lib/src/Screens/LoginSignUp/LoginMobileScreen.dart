@@ -160,12 +160,14 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                               Container(
                                   padding: EdgeInsets.only(
                                       left: 0.0, top: 0.0, right: 0.0),
-                                  child: new RaisedButton(
-                                    color: appThemeSecondary,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(5.0),
+                                  child: new ElevatedButton(
+                                    style: Utils.getButtonDecoration(
+                                      color: appThemeSecondary,
+                                      border: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(5.0),
+                                      ),
                                     ),
-                                    textColor: Colors.white,
+
                                     child: Text(
                                       'Submit',
                                       style: TextStyle(

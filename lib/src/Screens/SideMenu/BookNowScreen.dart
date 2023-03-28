@@ -111,13 +111,16 @@ class BookNowState extends State<BookNowScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: <Widget>[
-                          new RaisedButton(
+                          new ElevatedButton(
                             child: const Text(
                               'Submit',
                               style: TextStyle(color: Colors.white),
                             ),
                             onPressed: _submitForm,
-                            color: appTheme,
+                            style: Utils.getButtonDecoration(
+                              color:appTheme,
+
+                            ),
                           ),
                         ],
                       ),

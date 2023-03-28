@@ -1089,10 +1089,15 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                 margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                                 padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                                 width: 130,
-                                child: FlatButton(
+                                child: TextButton(
                                   child: Text('Submit'),
-                                  color: appThemeSecondary,
-                                  textColor: Colors.white,
+                                  style: Utils.getButtonDecoration(
+                                    color:appThemeSecondary,
+                                    border: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3.0),
+                                    ),
+                                  ),
+
                                   onPressed: () {
                                     if (_rating == 0) {
                                       Utils.showToast(
@@ -1197,13 +1202,17 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                   borderRadius: new BorderRadius.all(
                                       new Radius.circular(5.0)),
                                 ),
-                                child: FlatButton(
+                                child: TextButton(
                                   child: Text(
                                     'Cancel',
                                     style: TextStyle(fontSize: 17),
                                   ),
-                                  color: Colors.grey,
-                                  textColor: Colors.white,
+                                  style: Utils.getButtonDecoration(
+                                    color:Colors.grey,
+                                    border: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3.0),
+                                    ),
+                                  ),
                                   onPressed: () {
                                     Utils.hideKeyboard(context);
                                     Navigator.pop(context);
@@ -1219,13 +1228,17 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                   borderRadius: new BorderRadius.all(
                                       new Radius.circular(5.0)),
                                 ),
-                                child: FlatButton(
+                                child: TextButton(
                                   child: Text(
                                     'Yes, cancel my order',
                                     style: TextStyle(fontSize: 17),
                                   ),
-                                  color: orangeColor,
-                                  textColor: Colors.white,
+                                  style: Utils.getButtonDecoration(
+                                    color:orangeColor,
+                                    border: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(3.0),
+                                    ),
+                                  ),
                                   onPressed: () {
                                     String comment = commentController.text;
                                     Utils.hideKeyboard(context);

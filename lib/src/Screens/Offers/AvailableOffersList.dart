@@ -195,16 +195,14 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                       child: Padding(
                                         padding:
                                             EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                        child: RaisedButton(
-                                          padding:
-                                              EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                          textColor: Colors.black,
-                                          color: Color(0xffdbdbdb),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(18.0),
-                                            //side: BorderSide(color: Colors.red)
+                                        child: ElevatedButton(
+                                          style: Utils.getButtonDecoration(
+                                            color: Color(0xffdbdbdb),
+                                            border: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(18.0),
+                                            ),
                                           ),
+
                                           onPressed: () async {
                                             bool isNetworkAvailable =
                                                 await Utils

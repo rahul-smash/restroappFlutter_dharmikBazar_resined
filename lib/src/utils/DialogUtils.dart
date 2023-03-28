@@ -37,18 +37,18 @@ class DialogUtils {
               textAlign: TextAlign.center,
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text(buttonText1),
-                textColor: Colors.blue,
+              
                 onPressed: button1 ??
                     () {
                       Navigator.of(context).pop(false);
                       // true here means you clicked ok
                     },
               ),
-              new FlatButton(
+              new TextButton(
                 child: Text(buttonText2),
-                textColor: Colors.blue,
+              
                 onPressed: button2 ??
                     () {
                       Navigator.of(context).pop(true);
@@ -86,9 +86,9 @@ class DialogUtils {
               textAlign: TextAlign.center,
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text(buttonText1),
-                textColor: Colors.blue,
+              
                 onPressed: button1 ??
                     () {
                       Navigator.of(context).pop(false);
@@ -177,10 +177,13 @@ class DialogUtils {
                             child: Padding(
                               padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                               child: Container(
-                                child: FlatButton(
+                                child: TextButton(
                                   child: Text('Ok'),
-                                  color: appThemeSecondary,
-                                  textColor: Colors.white,
+                                  style: Utils.getButtonDecoration(
+                                      edgeInsets: EdgeInsets.all(5.0),
+                                      color:  appThemeSecondary,
+
+                                  ),
                                   onPressed: () {
                                     Navigator.of(context).pop(true);
                                   },
@@ -341,25 +344,25 @@ class DialogUtils {
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text(buttonText1,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     )),
-                textColor: Colors.blue,
+              
                 onPressed: () {
                   Navigator.of(context).pop(false);
                   // true here means you clicked ok
                 },
               ),
-              new FlatButton(
+              new TextButton(
                 child: Text(buttonText2,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                     )),
-                textColor: Colors.blue,
+              
                 onPressed: () {
                   Navigator.of(context).pop(true);
                   // true here means you clicked ok
@@ -402,10 +405,13 @@ class DialogUtils {
                       children: <Widget>[
                         Container(
                           //margin: EdgeInsets.all(10),
-                          child: FlatButton(
+                          child: TextButton(
                             child: Text('COD'),
-                            color: appTheme,
-                            textColor: Colors.white,
+                  style: Utils.getButtonDecoration(
+                    edgeInsets: EdgeInsets.all(5.0),
+                    color:  appTheme,
+
+                  ),
                             onPressed: () {
                               Navigator.pop(context, PaymentType.COD);
                             },
@@ -413,10 +419,13 @@ class DialogUtils {
                         ),
                         Container(
                           //margin: EdgeInsets.all(10),
-                          child: FlatButton(
+                          child: TextButton(
                             child: Text('Online'),
-                            color: appTheme,
-                            textColor: Colors.white,
+                            style: Utils.getButtonDecoration(
+                              edgeInsets: EdgeInsets.all(5.0),
+                              color:  appTheme,
+
+                            ),
                             onPressed: () {
                               Navigator.pop(context, PaymentType.ONLINE);
                             },
@@ -477,9 +486,9 @@ class DialogUtils {
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text("Cancel"),
-                textColor: Colors.blue,
+              
                 onPressed: () {
                   Navigator.pop(context, null);
                   // true here means you clicked ok
@@ -537,9 +546,9 @@ class DialogUtils {
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text("Cancel"),
-                textColor: Colors.blue,
+              
                 onPressed: () {
                   Navigator.pop(context, null);
                   // true here means you clicked ok
@@ -637,9 +646,9 @@ class DialogUtils {
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text("Cancel"),
-                textColor: Colors.blue,
+              
                 onPressed: () {
                   Navigator.pop(context, selectedVariant);
                   // true here means you clicked ok
@@ -703,15 +712,18 @@ class DialogUtils {
                         children: <Widget>[
                           Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text(
                                 'Guide Me',
                                 style: TextStyle(
                                   decoration: TextDecoration.underline,
                                 ),
                               ),
-                              color: Colors.white,
-                              textColor: appThemeSecondary,
+                                style: Utils.getButtonDecoration(
+                                  edgeInsets: EdgeInsets.all(5.0),
+                                  color:  Colors.white,
+
+                                ),
                               onPressed: () {
                                 Navigator.pop(context, true);
                               },
@@ -719,10 +731,13 @@ class DialogUtils {
                           ),
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('OK'),
-                              color: appThemeSecondary,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appThemeSecondary,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, false);
                               },
@@ -792,10 +807,13 @@ class DialogUtils {
                         children: <Widget>[
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('$buttonText'),
-                              color: appThemeSecondary,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appThemeSecondary,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, true);
                               },
@@ -863,10 +881,13 @@ class DialogUtils {
                         children: <Widget>[
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('OK'),
-                              color: appThemeSecondary,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appThemeSecondary,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, true);
                               },
@@ -935,10 +956,13 @@ class DialogUtils {
                         children: <Widget>[
                           Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('Cancel'),
-                              color: appThemeSecondary,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appThemeSecondary,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, false);
                               },
@@ -946,10 +970,13 @@ class DialogUtils {
                           ),
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('Proceed'),
-                              color: appTheme,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appTheme,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, true);
                               },
@@ -1019,9 +1046,9 @@ class DialogUtils {
               ),
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: new Text("Cancel"),
-                textColor: Colors.blue,
+              
                 onPressed: () {
                   Navigator.pop(context);
                   // true here means you clicked ok
@@ -1086,10 +1113,13 @@ class DialogUtils {
                         children: <Widget>[
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('${button1}'),
-                              color: appThemeSecondary,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appThemeSecondary,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, false);
                               },
@@ -1097,10 +1127,13 @@ class DialogUtils {
                           ),
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('${button2}'),
-                              color: appThemeSecondary,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appThemeSecondary,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, true);
                               },
@@ -1169,10 +1202,13 @@ class DialogUtils {
                         children: <Widget>[
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('Update'),
-                              color: appThemeSecondary,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appThemeSecondary,
+
+                              ),
                               onPressed: () {
                                 String urlString = "";
                                 if (Platform.isIOS) {
@@ -1296,10 +1332,13 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
                             padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('Go For Login'),
-                              color: appTheme,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appTheme,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, true);
                                 Utils.showLoginDialog(context);
@@ -1444,10 +1483,13 @@ class DialogUtils {
                           Container(
                             margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
                             padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            child: FlatButton(
+                            child: TextButton(
                               child: Text('Sign up'),
-                              color: appTheme,
-                              textColor: Colors.white,
+                              style: Utils.getButtonDecoration(
+                                edgeInsets: EdgeInsets.all(5.0),
+                                color:  appTheme,
+
+                              ),
                               onPressed: () {
                                 Navigator.pop(context, true);
                                 Utils.showLoginDialog(context);
@@ -1462,15 +1504,18 @@ class DialogUtils {
                       child: Center(
                         child: Container(
                           margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                          child: FlatButton(
+                          child: TextButton(
                             child: Text(
                               'Skip',
                               style: TextStyle(
                                 decoration: TextDecoration.underline,
                               ),
                             ),
-                            color: Colors.white,
-                            textColor: appTheme,
+                            style: Utils.getButtonDecoration(
+                              edgeInsets: EdgeInsets.all(5.0),
+                              color:  Colors.white,
+
+                            ),
                             onPressed: () {
                               Navigator.pop(context, false);
                             },
@@ -1592,10 +1637,13 @@ class DialogUtils {
                                   margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
                                   padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
                                   width: 130,
-                                  child: FlatButton(
+                                  child: TextButton(
                                     child: Text('Submit'),
-                                    color: appThemeSecondary,
-                                    textColor: Colors.white,
+                                    style: Utils.getButtonDecoration(
+                                      edgeInsets: EdgeInsets.all(5.0),
+                                      color:  appThemeSecondary,
+
+                                    ),
                                     onPressed: () {
                                       Utils.hideKeyboard(context);
                                       Navigator.pop(context,
@@ -1666,9 +1714,9 @@ class DialogUtils {
                 ),
               ),
               actions: <Widget>[
-                new FlatButton(
+                new TextButton(
                   child: new Text("Cancel"),
-                  textColor: Colors.blue,
+                
                   onPressed: () {
                     Navigator.pop(context, "");
                     // true here means you clicked ok
@@ -1701,9 +1749,9 @@ class DialogUtils {
               textAlign: TextAlign.center,
             ),
             actions: <Widget>[
-              new FlatButton(
+              new TextButton(
                 child: Text("OK"),
-                textColor: Colors.blue,
+              
                 onPressed: () {
                   Navigator.of(context).pop(true);
                   // true here means you clicked ok
@@ -1838,18 +1886,21 @@ class DialogUtils {
                             child: ButtonTheme(
                               minWidth: 180.0,
                               height: 40.0,
-                              child: RaisedButton(
-                                shape: new RoundedRectangleBorder(
-                                    borderRadius:
-                                        new BorderRadius.circular(5.0),
-                                    side: BorderSide(color: appTheme)),
+                              child: ElevatedButton(
+                                style: Utils.getButtonDecoration(
+                                  edgeInsets: EdgeInsets.all(5.0),
+                                  color:  appTheme,
+                                  border: RoundedRectangleBorder(
+                                      borderRadius:
+                                      new BorderRadius.circular(5.0),
+                                      side: BorderSide(color: appTheme))
+                                ),
+                               
                                 onPressed: button1 ??
                                     () async {
                                       Navigator.pop(context, true);
                                     },
-                                color: appTheme,
-                                padding: EdgeInsets.all(5.0),
-                                textColor: Colors.white,
+                         
                                 child: Text(buttonText1.isNotEmpty
                                     ? buttonText1
                                     : "Change Location"),
@@ -1935,17 +1986,20 @@ class DialogUtils {
                         child: ButtonTheme(
                           minWidth: 180.0,
                           height: 40.0,
-                          child: RaisedButton(
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(5.0),
-                                side: BorderSide(color: appThemeSecondary)),
+                          child: ElevatedButton(
+                            style: Utils.getButtonDecoration(
+                              edgeInsets: EdgeInsets.all(5.0),
+                              color:  appThemeSecondary,
+                              border: RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(5.0),
+                                  side: BorderSide(color: appThemeSecondary))
+
+                            ),
                             onPressed: button1 ??
                                 () async {
                                   Navigator.pop(context, true);
                                 },
-                            color: appThemeSecondary,
-                            padding: EdgeInsets.all(5.0),
-                            textColor: Colors.white,
+
                             child: Text(buttonText1.isNotEmpty
                                 ? buttonText1
                                 : "Yes, Delete",),

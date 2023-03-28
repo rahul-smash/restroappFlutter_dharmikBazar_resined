@@ -28,9 +28,9 @@ class ForceUpdateAlertState extends BaseState<ForceUpdateAlert> {
         textAlign: TextAlign.center,
       ),
       actions: <Widget>[
-        new FlatButton(
+        new TextButton(
           child: Text("OK"),
-          textColor: Colors.blue,
+
           onPressed: () {
             SystemNavigator.pop();
             //Navigator.of(context).pop(true);

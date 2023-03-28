@@ -211,7 +211,7 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                   child:  SizedBox(
                     width: 110,
                     height: 30,
-                    child: FlatButton(
+                    child: TextButton(
                       onPressed: (){
                         print("OrderDetailScreen");
                         Navigator.push( context,
@@ -221,10 +221,14 @@ class CardOrderHistoryState extends State<CardOrderHistoryItems> {
                         );
                       },
                       child: Text("View Order",style: TextStyle(color: Colors.white),),
-                      color: Color(0xFFFD5401),
-                      shape:  RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3.0),
+                      style: Utils.getButtonDecoration(
+                          edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          color:  Color(0xFFFD5401),
+                          border: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                          )
                       ),
+
                     ),
                   ),
                 ),

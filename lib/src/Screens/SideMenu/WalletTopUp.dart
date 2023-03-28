@@ -333,7 +333,7 @@ class _WalletTopUpState extends State<WalletTopUp> {
 //minTopUpLimit
     if (topupAmount < 1) {
       print("Min top Up amount is ${minTopUpLimit}");
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
               'Min top Up amount is ${widget.store.walletSettings.minTopUpAmount}'),
@@ -341,14 +341,14 @@ class _WalletTopUpState extends State<WalletTopUp> {
       );
     } else if (topupAmount > maxTopUpLimit) {
       print("Maximum topup limit is ${maxTopUpLimit}");
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
               'Maximum topup limit is ${widget.store.walletSettings.maxTopUpAmount}'),
         ),
       );
     } else if (maxWalletHoldingLimit < (topupAmount + wallet_balance)) {
-      Scaffold.of(context).showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
               'Your total wallet holding capacity is ${widget.store.walletSettings.maxTopUpHoldAmount}'),

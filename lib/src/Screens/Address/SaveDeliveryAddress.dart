@@ -380,10 +380,15 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                         child: ButtonTheme(
                           minWidth: 180.0,
                           height: 40.0,
-                          child: RaisedButton(
-                            shape: new RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(25.0),
-                                side: BorderSide(color: appTheme)),
+                          child: ElevatedButton(
+                            style: Utils.getButtonDecoration(
+                                color: appTheme,
+                                edgeInsets: EdgeInsets.all(5.0),
+                              border: RoundedRectangleBorder(
+                                  borderRadius: new BorderRadius.circular(25.0),
+                                  side: BorderSide(color: appTheme))
+                            ),
+
                             onPressed: () async {
                               bool isNetworkAvailable =
                                   await Utils.isNetworkAvailable();
@@ -453,9 +458,8 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                                 }
                               });
                             },
-                            color: appTheme,
-                            padding: EdgeInsets.all(5.0),
-                            textColor: Colors.white,
+
+
                             child: Text("Done"),
                           ),
                         ),
