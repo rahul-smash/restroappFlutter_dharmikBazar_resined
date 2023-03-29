@@ -1292,7 +1292,7 @@ class Utils {
       param['model'] = androidInfo.model;
       param['manufacturer'] = androidInfo.manufacturer;
       param['isPhysicalDevice'] = androidInfo.isPhysicalDevice;
-      param['androidId'] = androidInfo.androidId;
+      param['androidId'] = androidInfo.id;
       param['brand'] = androidInfo.brand;
       param['device'] = androidInfo.device;
       param['display'] = androidInfo.display;

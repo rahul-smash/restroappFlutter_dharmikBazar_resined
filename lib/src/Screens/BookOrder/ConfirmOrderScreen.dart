@@ -2,10 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:restroapp/src/Screens/Offers/AvailableOffersList.dart';
@@ -761,8 +759,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       scrollDirection: Axis.horizontal,
                       itemBuilder: (context, index) {
                         Timeslot slotsObject = timeslotList[index];
-                        print("----${slotsObject.label}-and ${selctedTag}--");
-
                         //selectedTimeSlot
                         Color textColor;
                         if (!slotsObject.isEnable) {
@@ -828,10 +824,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         detail != null && detail.productStatus.contains('out_of_stock')
             ? Colors.black12
             : Colors.transparent;
-    String mrpPrice =
-        detail != null && detail.productStatus.contains('price_changed')
-            ? detail.newMrpPrice
-            : product.mrpPrice;
     String price =
         detail != null && detail.productStatus.contains('price_changed')
             ? detail.newPrice
@@ -928,7 +920,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       width: 70.0,
                       height: 80.0,
                       child: CachedNetworkImage(
-                          imageUrl: "${imageUrl}", fit: BoxFit.fill
+                          imageUrl: "$imageUrl", fit: BoxFit.fill
                           //placeholder: (context, url) => CircularProgressIndicator(),
                           //errorWidget: (context, url, error) => Icon(Icons.error),
                           ),
@@ -1324,7 +1316,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       //Y is P% of X
       //P% = Y/X
       //P= (Y/X)*100
-      double totalSavedPercentage = (totalSavings / totalMRpPrice) * 100;
       totalSavingsText =
 //          "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)} (${totalSavedPercentage.toStringAsFixed(2)}%)";
           "${databaseHelper.roundOffPrice(totalSavings, 2).toStringAsFixed(2)}";
@@ -1359,7 +1350,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       appliedReddemPointsCodeList.isNotEmpty) {
                     removeCoupon();
                   } else {
-                    var result = await Navigator.push(
+                 Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) => RedeemPointsScreen(
@@ -2167,7 +2158,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
     TaxCalculationResponse response =
         await ApiController.multipleTaxCalculationRequest(
-            "${couponCode}", "${discount}", shippingCharges, json);
+            "$couponCode", "$discount", shippingCharges, json);
 
     if (response != null && !response.success) {
       Utils.showToast(response.message, true);
@@ -2184,10 +2175,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Map<String, dynamic> attributeMap = new Map<String, dynamic>();
     attributeMap["ScreenName"] = "Order Confirm Screen";
     attributeMap["action"] = "Place Order Request";
-    attributeMap["totalPrice"] = "${totalPrice}";
-    attributeMap["deliveryType"] = "${widget.deliveryType}";
-    attributeMap["paymentMode"] = "${widget.paymentMode}";
-    attributeMap["shippingCharges"] = "${shippingCharges}";
+    attributeMap["totalPrice"] = "$totalPrice";
+    attributeMap["deliveryType"] = "$widget.deliveryType";
+    attributeMap["paymentMode"] = "$widget.paymentMode";
+    attributeMap["shippingCharges"] = "$shippingCharges";
     Utils.sendAnalyticsEvent("Clicked Place Order button", attributeMap);
 
 //    if (response.taxCalculation.orderDetail != null &&
@@ -2333,11 +2324,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.showProgressDialog(context);
     ApiController.getAddressApiRequest().then((responses) async {
       int length = responses.data.length;
-      List<DeliveryAddressData> list = await Utils.checkDeletedAreaFromStore(
-          context, responses.data,
-          showDialogBool: true, hitApi: false, id: addressId);
       if (length != responses.data.length) {
-//        print("Area deleted list.length${list.length}");
         Navigator.of(context).pop();
       } else {
         performPlaceOrderOperation(storeObject);
@@ -2358,7 +2345,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             responseOrderDetail: responseOrderDetail)
         .then((json) {
       ApiController.multipleTaxCalculationRequest(
-              "", "0", "${shippingCharges}", json)
+              "", "0", "$shippingCharges", json)
           .then((response) async {
         Utils.hideProgressDialog(context);
         Utils.hideKeyboard(context);
@@ -2433,10 +2420,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail);
         int mtotalPrice = totalPrice.round();
-
-        print("----minAmount=${minAmount}");
-        print("--Cart--mtotalPrice=${mtotalPrice}");
-        print("----shippingCharges=${shippingCharges}");
 
         if (widget.address.notAllow) {
           if (mtotalPrice <= minAmount) {
@@ -2533,8 +2516,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   .toString();
             }
             displayShipping = shippingCharges;
-            print("----shippingCharges processed=${shippingCharges}");
-
             break;
           case AppConstant.shippingNotMandatoryMinOrderNotAllowed:
           case AppConstant.shippingNotMandatoryMinOrderAllowed:
@@ -2554,7 +2535,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       2)
                   .toString();
             }
-            print("----shippingCharges processed=${shippingCharges}");
 
             break;
         }
@@ -2579,13 +2559,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             isOrderVariations: isOrderVariations,
             responseOrderDetail: responseOrderDetail);
         int mtotalPrice = totalPrice.round();
-
-        print("----minAmount=${minAmount}");
-        print("--Cart--mtotalPrice=${mtotalPrice}");
-        //TODO:In Future check here "not allow".
         if (mtotalPrice <= minAmount) {
-          print("---Cart-totalPrice is less than min amount----}");
-          // then Store will charge shipping charges.
           minOrderCheck = false;
           setState(() {
             this.totalPrice = mtotalPrice.toDouble();
@@ -2606,10 +2580,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total);
     price = price * 100;
-    print("----taxModel.total----${taxModel.total}--");
     String mPrice =
         price.toString().substring(0, price.toString().indexOf('.')).trim();
-    print("----mPrice----${mPrice}--");
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);

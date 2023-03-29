@@ -59,7 +59,7 @@ class _HtmlDisplayScreenState extends State<HtmlDisplayScreen> {
                       child: SingleChildScrollView(
                         child: Html(
                           data: htmlData,
-                          padding: EdgeInsets.all(10.0),
+
                         ),
                       ),
                     ));

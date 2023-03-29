@@ -61,7 +61,6 @@ class _AboutScreenState extends State<AboutScreen> {
                   ? Container()
                   : Html(
                 data: widget.store.aboutUs,
-                padding: EdgeInsets.all(10.0),
               ),
             ],
           ),

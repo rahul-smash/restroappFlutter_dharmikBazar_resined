@@ -232,7 +232,7 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                         child: Html(
                           data:
                               "${(widget.product.offerDetails != null) ? widget.product.offerDetails.offerTermCondition : ''}",
-                          padding: EdgeInsets.all(10.0),
+
                         ),
                       ),
                       SizedBox(

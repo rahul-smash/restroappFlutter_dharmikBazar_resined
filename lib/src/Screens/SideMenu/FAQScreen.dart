@@ -149,11 +149,12 @@ class _FAQScreenState extends State<FAQScreen> {
                                         Html(
                                           data:
                                               "${widget.faqCategoryList[index].answer}",
-                                          padding: EdgeInsets.only(top: 2),
-                                          defaultTextStyle: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.normal,
-                                          ),
+                                          style:{
+                                            "data":Style(
+                                              fontSize: FontSize(16),
+                                              fontWeight: FontWeight.normal,
+                                            )
+                                          },
                                         )
                                       ],
                                     ),

@@ -1,11 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
-// import 'package:device_info/device_info.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -22,7 +19,6 @@ import 'package:restroapp/src/singleton/app_version_singleton.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-
 import 'src/UI/Language.dart';
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -56,8 +52,7 @@ Future<void> main() async {
         AppConstant.deviceId, iosDeviceInfo.identifierForVendor);
   } else {
     AndroidDeviceInfo androidDeviceInfo = await deviceInfo.androidInfo;
-    SharedPrefs.storeSharedValue(
-        AppConstant.deviceId, androidDeviceInfo.androidId);
+    SharedPrefs.storeSharedValue(AppConstant.deviceId, androidDeviceInfo.id);
   }
 
   if (configObject.isGroceryApp == "true") {
@@ -75,23 +70,23 @@ Future<void> main() async {
   //print(configObject.storeId);
 
   // Crashlytics.instance.enableInDevMode = true;
-  StoreResponse storeData = await ApiController.versionApiRequest("${configObject.storeId}");
+  StoreResponse storeData =
+      await ApiController.versionApiRequest("${configObject.storeId}");
   AppVersionSingleton.instance.appVersion = storeData;
   setAppThemeColors(storeData.store);
   // Pass all uncaught errors to Crashlytics.
   // FlutterError.onError = Crashlytics.instance.recordFlutterError;
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterError;
-  SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "${isAdminLogin}");
+  SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "$isAdminLogin");
 
   PackageInfo packageInfo = await Utils.getAppVersionDetails(storeData);
 
-
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  await Utils.getDeviceInfo(storeData);
+   Utils.getDeviceInfo(storeData);
   // To turn off landscape mode
-  runZoned(() {
+  runZonedGuarded(() {
     runApp(ValueApp(packageInfo, configObject, storeData));
-  }, onError: FirebaseCrashlytics.instance.recordError);
+  },(error, stack) =>  FirebaseCrashlytics.instance.recordError);
 }
 
 class ValueApp extends StatefulWidget {
@@ -126,9 +121,7 @@ class _ValueAppState extends State<ValueApp> {
       title: '${widget.storeData.store.storeName}',
       navigatorKey: _globalKey,
       theme: ThemeData(
-        primaryColor: appTheme,
-        appBarTheme: AppBarTheme(color: appTheme)
-      ),
+          primaryColor: appTheme, appBarTheme: AppBarTheme(color: appTheme)),
       navigatorObservers: <NavigatorObserver>[ValueApp.observer],
       //home: isAdminLogin == true? LoginEmailScreen("menu"):SplashScreen(configObject,storeData),
       home: MyWidget(widget.storeData, widget.configObject, widget.packageInfo),
@@ -140,6 +133,7 @@ class MyWidget extends StatelessWidget {
   StoreResponse storeData;
   PackageInfo packageInfo;
   ConfigModel configObject;
+
   MyWidget(this.storeData, this.configObject, this.packageInfo);
 
   @override
@@ -153,7 +147,8 @@ class MyWidget extends StatelessWidget {
   }
 }
 
-Widget showHomeScreen(StoreResponse model, ConfigModel configObject, PackageInfo packageInfo) {
+Widget showHomeScreen(
+    StoreResponse model, ConfigModel configObject, PackageInfo packageInfo) {
   String version = packageInfo.version;
   if (model.success) {
     setStoreCurrency(model.store, configObject);

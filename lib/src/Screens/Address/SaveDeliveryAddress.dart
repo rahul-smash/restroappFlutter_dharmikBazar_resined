@@ -1,5 +1,4 @@
 import 'package:app_settings/app_settings.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:restroapp/src/UI/SelectLocation.dart';
@@ -244,7 +243,6 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                             Geolocator.isLocationServiceEnabled()
                                 .then((value) async {
                               if (value == true) {
-                                var geoLocator = Geolocator();
                                 var status = await Geolocator.checkPermission();
                                 print("--status--=${status}");
                                 /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){

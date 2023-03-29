@@ -1,13 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-// import 'package:geocoder/geocoder.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:location/location.dart';
-
-// import 'package:package_info/package_info.dart';
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
-import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -53,7 +46,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   Location location = new Location();
 
   ConfigModel configObject;
-  PermissionStatus _permissionGranted;
 
   bool isTPDSError = false;
 
@@ -162,8 +154,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                                     child: TextButton(
                                       child: Text('OK'),
                                       style: Utils.getButtonDecoration(
-                                          color: appThemeSecondary
-                                      ),
+                                          color: appThemeSecondary),
                                       onPressed: () {
                                         logout(context, branchData);
                                         Navigator.popUntil(
@@ -211,18 +202,17 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 MaterialPageRoute(
                   builder: (BuildContext context) =>
                       SaveDeliveryAddress(null, () {
-                        print("--Route-SaveDeliveryAddress-------");
-                      }, "", 0.0, 0.0),
+                    print("--Route-SaveDeliveryAddress-------");
+                  }, "", 0.0, 0.0),
                   fullscreenDialog: true,
                 ));
-            print("--result--${result}-------");
             if (result == true) {
               //Utils.showProgressDialog(context);
               setState(() {
                 isLoading = true;
               });
               DeliveryAddressResponse response =
-              await ApiController.getAddressApiRequest();
+                  await ApiController.getAddressApiRequest();
               //Utils.hideProgressDialog(context);
               setState(() {
                 //addressList = null;
@@ -233,7 +223,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               print("--result--else------");
             }
             // }
-
 
             //
             // else if (store.deliveryArea == "0") {
@@ -309,7 +298,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             //     }
             //   });
             // }
-          }},
+          }
+        },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -426,7 +416,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                       value: selectedIndex == index,
                       onChanged: (value) {
                         setState(() {
-                          print("index = ${index}");
                           selectedIndex = index;
                         });
                       },
@@ -488,7 +477,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                       }, "", 0.0, 0.0),
                       fullscreenDialog: true,
                     ));
-                print("-Edit-result--${result}-------");
                 if (result == true) {
                   setState(() {
                     isLoading = true;
@@ -519,7 +507,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                       TextStyle(color: infoLabel, fontWeight: FontWeight.w500)),
             ),
             onTap: () async {
-              print("--selectedIndex ${selectedIndex} and ${index}");
               var results = await DialogUtils.displayDialog(
                   context, "Delete", AppConstant.deleteAddress, "Cancel", "OK");
               if (results == true) {
@@ -531,7 +518,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                     print("---showDialogForDelete-----");
                     setState(() {
                       addressList.removeAt(index);
-                      print("--selectedIndex ${selectedIndex} and ${index}");
                       if (selectedIndex == index && addressList.isNotEmpty) {
                         selectedIndex = 0;
                       }
@@ -560,8 +546,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: InkWell(
         onTap: () async {
           StoreModel storeModel = await SharedPrefs.getStore();
-        DeliveryAddressData addressData = DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
-          if (storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
+          DeliveryAddressData addressData =
+              DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
+          if (storeModel.storeDeliveryModel ==
+              AppConstant.DELIVERY_THIRD_PARTY) {
             if (addressData.zipCode == null ||
                 (addressData.zipCode != null && addressData.zipCode.isEmpty)) {
               Utils.showToast('ZipCode is mandatory ', false);
@@ -703,9 +691,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     double totalPrice = await databaseHelper.getTotalPrice();
     int mtotalPrice = totalPrice.round();
 
-    print("----minAmount=${minAmount}");
-    print("--Cart--mtotalPrice=${mtotalPrice}");
-    print("----shippingCharges=${shippingCharges}");
 
     if (addressList.notAllow) {
       if (mtotalPrice <= minAmount) {
@@ -822,7 +807,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           }, "", 0.0, 0.0),
           fullscreenDialog: true,
         ));
-    print("-Edit-result--${result}-------");
     if (result == true) {
       setState(() {
         isLoading = true;

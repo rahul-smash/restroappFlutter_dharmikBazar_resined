@@ -538,7 +538,10 @@ class _HomeScreenState extends State<HomeScreen> {
             BottomNavigationBarItem(
               icon:  b.Badge(
                 showBadge: cartBadgeCount == 0 ? false : true,
-                badgeColor: appThemeSecondary,
+                badgeStyle: b.BadgeStyle
+                  (
+                  badgeColor: appThemeSecondary
+                ),
                 badgeContent: Text('${cartBadgeCount}',
                     style: TextStyle(color: Colors.white)),
                 child: Image.asset('images/carticon.png',

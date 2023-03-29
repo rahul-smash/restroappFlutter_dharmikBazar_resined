@@ -365,7 +365,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                         top: 5.0, left: 10.0, right: 10.0),
                     child: Html(
                       data: "${widget.product.description}",
-                      padding: EdgeInsets.all(10.0),
                     ),
                   )
                 ],
