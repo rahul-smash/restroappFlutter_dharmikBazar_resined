@@ -82,11 +82,11 @@ Future<void> main() async {
   PackageInfo packageInfo = await Utils.getAppVersionDetails(storeData);
 
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-   Utils.getDeviceInfo(storeData);
+  Utils.getDeviceInfo(storeData);
   // To turn off landscape mode
   runZonedGuarded(() {
     runApp(ValueApp(packageInfo, configObject, storeData));
-  },(error, stack) =>  FirebaseCrashlytics.instance.recordError);
+  }, (error, stack) => FirebaseCrashlytics.instance.recordError);
 }
 
 class ValueApp extends StatefulWidget {
