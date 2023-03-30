@@ -80,16 +80,15 @@ android {
         println "*************BUILD FINISHED*************"
         println "build failure - " + buildResult.failure
     }
+    configurations.all {
+        resolutionStrategy.force 'com.google.android.gms:play-services-location:21.0.1'
+    }
 }
 
 flutter {
     source '../..'
 }
-configurations.all {
-    resolutionStrategy {
-        force 'com.google.android.gms:play-services-location:19.0.1'
-    }
-}
+
 dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
@@ -97,7 +96,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:20.1.5'
     implementation 'com.google.firebase:firebase-analytics:17.3.0'
     implementation 'com.android.support:multidex:1.0.3'
-    implementation 'com.google.android.gms:play-services-location:19.0.1'
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
 }
 // ADD THIS AT THE BOTTOM
 apply plugin: 'com.google.gms.google-services'

@@ -15,7 +15,6 @@ buildscript {
         maven {
             url 'https://maven.fabric.io/public'
         }
-
     }
 
     dependencies {
@@ -35,6 +34,13 @@ allprojects {
 //        jcenter()
 //        mavenLocal()
         mavenCentral()
+
+        configurations.all {
+            resolutionStrategy {
+                force "com.google.android.gms:play-services-location:21.0.1"
+            }
+
+        }
     }
 }
 
