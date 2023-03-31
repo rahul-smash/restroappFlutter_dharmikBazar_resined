@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:location/location.dart';
+
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/UI/DragMarkerMap.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -18,7 +19,6 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-
 import '../../models/SubCategoryResponse.dart';
 import '../../models/weight_wise_charges_response.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
@@ -38,14 +38,12 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   int selectedIndex = 0;
   List<DeliveryAddressData> addressList = [];
   Area radiusArea;
-
-  // Coordinates coordinates;
+  Coordinates coordinates;
   bool isLoading = false;
   DeliveryAddressResponse responsesData;
   BranchData branchData;
   StoreModel store;
   CategoryResponse categoryResponse;
-  Location location = new Location();
 
   ConfigModel configObject;
 
@@ -54,7 +52,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   @override
   void initState() {
     super.initState();
-    // coordinates = new Coordinates(0.0, 0.0);
+    coordinates = new Coordinates(0.0, 0.0);
     callDeliverListApi();
   }
 
@@ -195,15 +193,15 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: InkWell(
         onTap: () async {
           StoreModel store = await SharedPrefs.getStore();
-        print("--deliveryArea->--${store.deliveryArea}-------");
-          if (store.deliveryArea == "1") {
+          print("--deliveryArea->--${store.deliveryArea}-------");
+          if (store.deliveryArea == "0") {
             var result = await Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (BuildContext context) =>
                       SaveDeliveryAddress(null, () {
                     print("--Route-SaveDeliveryAddress-------");
-                  }, "", 0.0, 0.0),
+                  }, "", coordinates.latitude,coordinates.longitude),
                   fullscreenDialog: true,
                 ));
             if (result == true) {
@@ -222,80 +220,61 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             } else {
               print("--result--else------");
             }
-             }
-            else if (store.deliveryArea == "0") {
-              Utils.isNetworkAvailable().then((isConnected) {
-                if (isConnected) {
-                  Utils.showProgressDialog(context);
-                  ApiController.storeRadiusApi().then((response) async {
-                    Utils.hideProgressDialog(context);
-                    if (response != null && response.success) {
-                      StoreRadiousResponse data = response;
-                      Geolocator.isLocationServiceEnabled()
-                          .then((isLocationServiceEnabled) async {
-                        // print(
-                        //     "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
-                        // if (isLocationServiceEnabled) {
-                        //   //------permission checking------
-                        //   _serviceEnabled = await location.serviceEnabled();
-                        //   if (!_serviceEnabled) {
-                        //     _serviceEnabled = await location.requestService();
-                        //     if (!_serviceEnabled) {
-                        //       print("----!_serviceEnabled----$_serviceEnabled");
-                        //       return;
-                        //     }
-                        //   }
-                        //   _permissionGranted = await location.hasPermission();
-                        //   print("permission sttsu $_permissionGranted");
-                        //   if (_permissionGranted == PermissionStatus.denied) {
-                        //     print("permission deniedddd");
-                        //     _permissionGranted =
-                        //         await location.requestPermission();
-                        //     if (_permissionGranted != PermissionStatus.granted) {
-                        //       print("permission not grantedd");
-                        //
-                        //       return;
-                        //     }
-                        //   }
-                          //------permission checking over------
+          } else if (store.deliveryArea == "1") {
+            Utils.isNetworkAvailable().then((isConnected) {
+              if (isConnected) {
+                Utils.showProgressDialog(context);
+                ApiController.storeRadiusApi().then((response) async {
+                  Utils.hideProgressDialog(context);
+                  if (response != null && response.success) {
+                    StoreRadiousResponse data = response;
+                    Geolocator.isLocationServiceEnabled()
+                        .then((isLocationServiceEnabled) async {
+                      print(
+                          "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
+                      if (isLocationServiceEnabled) {
+                        Geolocator geoLocator = Geolocator();
+                        var status =
+                            await Geolocator.checkPermission();
+                        print("--status--=${status}");
 
-                          var result = await Navigator.push(
-                              context,
-                              new MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    DragMarkerMap(data),
-                                fullscreenDialog: true,
-                              ));
-                          if (result != null) {
-                            radiusArea = result;
-                            print("----radiusArea = result-------");
-                            //Utils.showProgressDialog(context);
-                            setState(() {
-                              isLoading = true;
-                            });
-                            DeliveryAddressResponse response =
-                                await ApiController.getAddressApiRequest();
-                            //Utils.hideProgressDialog(context);
-                            setState(() {
-                              print("----setState-------");
-                              isLoading = false;
-                              //addressList = null;
-                              addressList = response.data;
-                            });
-                          }
-                        // } else {
-                        //   Utils.showToast("Please turn on gps!", false);
-                        // }
-                      });
-                    } else {
-                      Utils.showToast("No data found!", false);
-                    }
-                  });
-                } else {
-                  Utils.showToast(AppConstant.noInternet, false);
-                }
-              });
-            }
+                        var result = await Navigator.push(
+                            context,
+                            new MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  DragMarkerMap(data),
+                              fullscreenDialog: true,
+                            ));
+                        if (result != null) {
+                          radiusArea = result;
+                          print("----radiusArea = result-------");
+                          //Utils.showProgressDialog(context);
+                          setState(() {
+                            isLoading = true;
+                          });
+                          DeliveryAddressResponse response =
+                              await ApiController.getAddressApiRequest();
+                          //Utils.hideProgressDialog(context);
+                          setState(() {
+                            print("----setState-------");
+                            isLoading = false;
+                            //addressList = null;
+                            addressList = response.data;
+                          });
+                        }
+                      } else {
+                        Utils.showToast("Please turn on gps!", false);
+                      }
+                    });
+                  } else {
+                    Utils.showToast("No data found!", false);
+                  }
+                });
+              } else {
+                Utils.showToast(AppConstant.noInternet, false);
+              }
+            });
+          }
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

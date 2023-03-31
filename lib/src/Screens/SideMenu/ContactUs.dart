@@ -71,7 +71,7 @@ class _ContactUsState extends State<ContactUs> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
+                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -105,7 +105,8 @@ class _ContactUsState extends State<ContactUs> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
+                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -139,7 +140,8 @@ class _ContactUsState extends State<ContactUs> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
+                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -174,7 +176,8 @@ class _ContactUsState extends State<ContactUs> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
+                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -209,7 +212,8 @@ class _ContactUsState extends State<ContactUs> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
+                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -245,12 +249,15 @@ class _ContactUsState extends State<ContactUs> {
                       ),
                     ),
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 0, 15.0, 0),
+                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+
+
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Padding(
-                            padding: EdgeInsets.fromLTRB(0.0, 15, 10.0, 0),
+                            padding: EdgeInsets.fromLTRB(0.0, 0, 5.0, 0),
+
                             child: Icon(Icons.chat_bubble),
                           ),
                           Expanded(

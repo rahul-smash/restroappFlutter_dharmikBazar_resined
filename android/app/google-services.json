@@ -14,7 +14,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "477525630810-4btkn11f6t7a2vjvgmoc54vnugche53u.apps.googleusercontent.com",
+          "client_id": "477525630810-o2u9lm838kv2peqdbd2h4k52v3eem81v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dharmik.bazaar",
+            "certificate_hash": "4628cca6fd95698ed44271216f8f796054859c57"
+          }
+        },
+        {
+          "client_id": "477525630810-8jf1cp7hq6h9m1qrf2mt97pmggb1p7uu.apps.googleusercontent.com",
           "client_type": 3
         }
       ],

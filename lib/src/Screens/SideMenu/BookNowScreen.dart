@@ -33,7 +33,8 @@ class BookNowState extends State<BookNowScreen> {
           bottom: false,
           child: new Form(
               key: _formKey,
-              autovalidateMode: AutovalidateMode.always,
+              autovalidateMode: AutovalidateMode.onUserInteraction
+,
               child: new ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 children: <Widget>[

@@ -197,6 +197,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
                     target: center,
                     zoom: 15.0,
                   ),
+
                   mapType: MapType.normal,
                   markers: markers,
                   onCameraMove: _onCameraMove,
@@ -366,18 +367,24 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
   Future<void> checkIfOrderDeliveryWithInRadious(int distanceInKms) async {
     try {
       Area area;
-      //print("---${areaList.length}---and-- ${distanceInKms}---");
+      print("---${areaList.length}---and-- ${distanceInKms}---");
       for (int i = 0; i < areaList.length; i++) {
         Area areaObject = areaList[i];
+        print("dkjkdjk ${areaObject.radius}");
         int radius = int.parse(areaObject.radius);
+        print("=${distanceInKms}=${radius}==${areaObject.radiusCircle}");
         if (distanceInKms < radius && areaObject.radiusCircle == "Within") {
           //print("--if-${radius}---and-- ${distanceInKms}---");
           area = areaObject;
+          setState(() {
+
+          });
           break;
         } else {
           //print("--else-${radius}---and-- ${distanceInKms}---");
         }
       }
+      print("==${area}");
       if (area != null) {
         Utils.showProgressDialog(context);
         UserModel user = await SharedPrefs.getUser();
@@ -406,7 +413,6 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
       } else {
         Utils.showToast("We can not deliver at your location!", false);
       }
-      print("---radius-- ${area.radius}-charges.and ${area.charges}--");
     } catch (e) {
       print(e);
     }

@@ -71,7 +71,8 @@ class _ForgotPasswordScreen extends State<ForgotPasswordScreen> {
                   alignment: Alignment.bottomCenter,
                   child: Form(
                     key: _formKey,
-                    autovalidateMode: AutovalidateMode.always,
+                    autovalidateMode: AutovalidateMode.onUserInteraction
+,
                     child: new ListView(
                       shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),

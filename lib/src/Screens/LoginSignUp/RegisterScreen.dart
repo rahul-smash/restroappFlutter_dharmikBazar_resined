@@ -99,7 +99,8 @@ class _RegisterUserState extends State<RegisterUser> {
                 padding: EdgeInsets.only(left: 30, right: 30),
                 child: Form(
                     key: _formKey,
-                    autovalidateMode: AutovalidateMode.always,
+                    autovalidateMode: AutovalidateMode.onUserInteraction
+,
                     child: ListView(
                       shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),

@@ -365,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } else
       return Center(
         child: SizedBox(
-          height: 200.0,
+          height: 220.0,
           width: Utils.getDeviceWidth(context),
           child: _CarouselView(),
         ),
@@ -376,8 +376,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return CarouselSlider.builder(
       itemCount: imgList.length,
       options: CarouselOptions(
-        aspectRatio: 16 / 9,
-        height: 200,
+        viewportFraction: 1.0,
         initialPage: 0,
         enableInfiniteScroll: true,
         reverse: false,
@@ -404,10 +403,9 @@ class _HomeScreenState extends State<HomeScreen> {
     return InkWell(
       onTap: () => _onBannerTap(_index),
       child: Container(
-          margin:
-              EdgeInsets.only(top: 0.0, bottom: 15.0, left: 7.5, right: 7.5),
-          width: Utils.getDeviceWidth(context) -
-              (Utils.getDeviceWidth(context) / 4),
+          padding:
+              EdgeInsets.only(top: 0.0, bottom: 15.0, left: 15.0, right: 15.0),
+
           decoration: BoxDecoration(
               color: Colors.white, borderRadius: BorderRadius.circular(10.0)),
           child: ClipRRect(

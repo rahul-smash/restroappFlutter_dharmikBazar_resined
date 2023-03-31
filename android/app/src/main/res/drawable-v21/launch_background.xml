@@ -3,6 +3,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@android:color/black" />
 
+
     <!-- You can insert your own image assets here -->
     <!--     <item>-->
     <!--        <bitmap-->
@@ -11,13 +12,10 @@
     <!--    </item>-->
 
     <item
-
         android:gravity="center">
         <bitmap
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="fill"
-            android:src="@mipmap/splash" />
+            android:gravity="center"
+            android:src="@drawable/splash" />
     </item>
 
 </layer-list>

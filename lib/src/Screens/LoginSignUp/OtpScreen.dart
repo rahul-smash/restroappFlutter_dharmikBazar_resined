@@ -99,7 +99,8 @@ class _OtpScreen extends State<OtpScreen> {
               alignment: Alignment.topCenter,
               child: Form(
                   key: _formKey,
-                  autovalidateMode: AutovalidateMode.always,
+                  autovalidateMode: AutovalidateMode.onUserInteraction
+,
                   child: new ListView(
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),

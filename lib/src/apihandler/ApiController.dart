@@ -564,6 +564,7 @@ class ApiController {
 
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getAddress;
+    print("url is ${url}");
     print("----user.id---${user.id}");
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
@@ -736,7 +737,7 @@ class ApiController {
         request.fields["address_id"] = addressId;
       }
       print(
-          '@@saveDeliveryAddressApiRequest' + url + request.fields.toString());
+          '@@saveDeliveryAddressApiRequest  ' + url + request.fields.toString());
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -1429,12 +1430,12 @@ class ApiController {
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
         ApiConstants.getStoreRadius;
     var request = new http.MultipartRequest("GET", Uri.parse(url));
-    print('@@storeRadiusApi' + url);
+    print('@@storeRadiusApi  ' + url);
 
     try {
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print('@@respStr' + respStr);
+      print('@@respStr  ' + respStr);
       final parsed = json.decode(respStr);
 
       StoreRadiousResponse res = StoreRadiousResponse.fromJson(parsed);

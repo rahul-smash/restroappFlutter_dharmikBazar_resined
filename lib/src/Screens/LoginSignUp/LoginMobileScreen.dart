@@ -1,10 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-// import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
@@ -123,7 +121,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                       padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                       child: Form(
                           key: _formKey,
-                          autovalidateMode: AutovalidateMode.always,
+                          autovalidateMode: AutovalidateMode.onUserInteraction,
                           child: ListView(
                             shrinkWrap: true,
                             padding: EdgeInsets.symmetric(horizontal: 16.0),
@@ -148,8 +146,9 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                                 ),
                                 maxLength: 10,
                                 keyboardType: TextInputType.phone,
-                                validator: (val) =>
-                                    val.isEmpty ? AppConstant.enterPhone : null,
+                                validator: (val) => val.trim().isEmpty
+                                    ? AppConstant.enterPhone
+                                    : null,
                                 inputFormatters: [
                                   FilteringTextInputFormatter.digitsOnly,
                                 ],
@@ -164,10 +163,10 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                                     style: Utils.getButtonDecoration(
                                       color: appThemeSecondary,
                                       border: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(5.0),
+                                        borderRadius:
+                                            BorderRadius.circular(5.0),
                                       ),
                                     ),
-
                                     child: Text(
                                       'Submit',
                                       style: TextStyle(
@@ -212,12 +211,12 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
                       visible: Platform.isIOS
                           ? false
                           : store == null
-                          ? false
-                          : store.social_login == "0"
-                          ? false
-                          : true,
+                              ? false
+                              : store.social_login == "0"
+                                  ? false
+                                  : true,
                       child: Row(
-                       mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           // InkWell(
                           //   onTap: () async {
@@ -301,7 +300,6 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
         primary: Colors.grey, // <- this changes the splash color
-
       ),
 
       //splashColor: Colors.grey,
@@ -358,7 +356,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           }
         }
       },
-    //  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+      //  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       //highlightElevation: 0,
       //borderSide: BorderSide(color: Colors.grey),
       child: Padding(

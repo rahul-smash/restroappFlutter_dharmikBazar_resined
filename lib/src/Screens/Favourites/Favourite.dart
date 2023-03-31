@@ -37,7 +37,7 @@ class _FavouritesState extends State<Favourites> {
 
     return Scaffold(
       appBar: AppBar(
-          title: Text("MY Favourites"),
+          title: Text("My Favourites"),
           centerTitle: true,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios),
