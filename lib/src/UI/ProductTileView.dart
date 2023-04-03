@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -36,6 +35,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
   Variant variant;
   bool showAddButton;
   StoreModel storeModel = AppVersionSingleton.instance.appVersion.store;
+
   //bool _isSubscriptionActive = false;
   bool _isProductOutOfStock = false;
 
@@ -62,17 +62,18 @@ class _ProductTileItemState extends State<ProductTileItem> {
       counter = int.parse(cartData.QUANTITY);
       showAddButton = counter == 0 ? true : false;
       //print("-QUANTITY-${counter}=");
-      if(this.mounted)
-      setState(() {});
+      if (this.mounted) setState(() {});
     });
-    databaseHelper.checkProductsExistInFavTable(
-            DatabaseHelper.Favorite_Table, widget.product.id).then((favValue) {
+    databaseHelper
+        .checkProductsExistInFavTable(
+            DatabaseHelper.Favorite_Table, widget.product.id)
+        .then((favValue) {
       //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
-      if(this.mounted)
-      setState(() {
-        widget.product.isFav = favValue.toString();
-        //print("-isFav-${widget.product.isFav}");
-      });
+      if (this.mounted)
+        setState(() {
+          widget.product.isFav = favValue.toString();
+          //print("-isFav-${widget.product.isFav}");
+        });
     });
   }
 
@@ -111,7 +112,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
       variantsVisibility = false;
     }
 
-    if(storeModel.displayVariantWeight=='0'){
+    if (storeModel.displayVariantWeight == '0') {
       variantsVisibility = false;
     }
 
@@ -179,21 +180,33 @@ class _ProductTileItemState extends State<ProductTileItem> {
                       SizedBox(width: 10),
                       addVegNonVegOption(),
                       Stack(
+                        alignment: Alignment.topLeft,
                         children: <Widget>[
                           imageUrl == ""
-                              ? Container(
-                                  width: 70.0,
-                                  height: 80.0,
-                                  child: Utils.getImgPlaceHolder(),
-                                )
+                              ? Padding(
+                            padding: EdgeInsets.only(
+                                left: 5,
+                                right: 5,
+                                top: 5.0,
+                                bottom: 5.0),
+                                child: Container(
+                                    width: 80.0,
+                                    height: 80.0,
+                                    child: Utils.getImgPlaceHolder(),
+                                  ),
+                              )
                               : Padding(
-                                  padding: EdgeInsets.only(left: 5, right: 20),
+                                  padding: EdgeInsets.only(
+                                      left: 5,
+                                      right: 5,
+                                      top: 5.0,
+                                      bottom: 5.0),
                                   child: Container(
-                                    width: 70.0,
+                                    width: 80.0,
                                     height: 80.0,
                                     child: CachedNetworkImage(
                                         imageUrl: "${imageUrl}",
-                                        fit: BoxFit.fill
+                                        fit: BoxFit.contain
                                         //placeholder: (context, url) => CircularProgressIndicator(),
                                         //errorWidget: (context, url, error) => Icon(Icons.error),
                                         ),
@@ -212,7 +225,6 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 10.0),
                               ),
-                              margin: EdgeInsets.only(left: 5),
                               padding: EdgeInsets.all(5),
                               decoration: new BoxDecoration(
                                 shape: BoxShape.rectangle,
@@ -248,6 +260,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                           )
                         ],
                       ),
+                      SizedBox(width: 10.0),
                       Flexible(
                           child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -358,7 +371,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             ],
                           ),
                           SizedBox(
-                            height: variantsVisibility == true ? 0 : 20,
+                            height: variantsVisibility == true ? 5 : 20,
                           ),
                           Visibility(
                             visible: variantsVisibility,
@@ -481,20 +494,28 @@ class _ProductTileItemState extends State<ProductTileItem> {
                           ),
 
                           Visibility(
-                            visible: AppVersionSingleton.instance.appVersion.store.product_coupon
-                                == "1" && widget.product.product_offer == 1
-                                ? true : false,
-                            child: /*_isProductOutOfStock ? Container() : */Container(
+                            visible: AppVersionSingleton.instance.appVersion
+                                            .store.product_coupon ==
+                                        "1" &&
+                                    widget.product.product_offer == 1
+                                ? true
+                                : false,
+                            child: /*_isProductOutOfStock ? Container() : */
+                                Container(
                               width: 60,
                               child: Center(
-                                  child: Text("OFFER", style: TextStyle(color: Colors.white, fontSize: 10.0),)
-                              ),
-                              margin: EdgeInsets.only(left: 5,top: 5),
+                                  child: Text(
+                                "OFFER",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 10.0),
+                              )),
+                              margin: EdgeInsets.only(left: 5, top: 5),
                               padding: EdgeInsets.all(5),
                               decoration: new BoxDecoration(
                                 shape: BoxShape.rectangle,
                                 color: appThemeSecondary,
-                                borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0)),
                               ),
                             ),
                           ),
@@ -508,7 +529,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               children: [
                                 Visibility(
                                     visible: (!_isProductOutOfStock) &&
-                                        storeModel.subscription.status == '1' &&
+                                            storeModel.subscription.status ==
+                                                '1' &&
                                             widget.product.variantMap[variant ==
                                                         null
                                                     ? widget.product.variantId
@@ -596,7 +618,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                     showAddButton = false;
                     insertInCartTable(widget.product, counter);
                     widget.callback();
-                    Utils.sendAnalyticsAddToCart(widget.product,counter);
+                    Utils.sendAnalyticsAddToCart(widget.product, counter);
                   }
                 },
                 child: Container(
@@ -623,11 +645,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
                               if (counter == 0) {
                                 // delete from cart table
                                 removeFromCartTable(widget.product.variantId);
-                                Utils.sendAnalyticsRemovedToCart(widget.product,counter);
+                                Utils.sendAnalyticsRemovedToCart(
+                                    widget.product, counter);
                               } else {
                                 // insert/update to cart table
                                 insertInCartTable(widget.product, counter);
-                                Utils.sendAnalyticsAddToCart(widget.product,counter);
+                                Utils.sendAnalyticsAddToCart(
+                                    widget.product, counter);
                               }
                               widget.callback();
                             }
@@ -677,11 +701,13 @@ class _ProductTileItemState extends State<ProductTileItem> {
                             if (counter == 0) {
                               // delete from cart table
                               removeFromCartTable(widget.product.variantId);
-                              Utils.sendAnalyticsRemovedToCart(widget.product,counter);
+                              Utils.sendAnalyticsRemovedToCart(
+                                  widget.product, counter);
                             } else {
                               // insert/update to cart table
                               insertInCartTable(widget.product, counter);
-                              Utils.sendAnalyticsAddToCart(widget.product,counter);
+                              Utils.sendAnalyticsAddToCart(
+                                  widget.product, counter);
                             }
                           }
                         },
@@ -712,7 +738,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
     Color foodOption =
         widget.product.nutrient == "Non Veg" ? Colors.red : Colors.green;
     return Visibility(
-      visible: widget.product.nutrient!=null&&widget.product.nutrient.isNotEmpty,
+      visible:
+          widget.product.nutrient != null && widget.product.nutrient.isNotEmpty,
       child: Padding(
         padding: EdgeInsets.only(left: 0, right: 7),
         child: widget.product.nutrient == "None"
@@ -732,7 +759,8 @@ class _ProductTileItemState extends State<ProductTileItem> {
                   child: Container(
                       decoration: new BoxDecoration(
                     color: foodOption,
-                    borderRadius: new BorderRadius.all(new Radius.circular(5.0)),
+                    borderRadius:
+                        new BorderRadius.all(new Radius.circular(5.0)),
                   )),
                 )),
       ),
@@ -906,9 +934,12 @@ class _ProductTileItemState extends State<ProductTileItem> {
     if (selectedVariant != null &&
         selectedVariant.stockType != null &&
         selectedVariant.stockType.isNotEmpty) {
-      if (selectedVariant.maxQuantityPerOrder.isNotEmpty&& counter >= int.parse(selectedVariant.maxQuantityPerOrder)) {
+      if (selectedVariant.maxQuantityPerOrder.isNotEmpty &&
+          counter >= int.parse(selectedVariant.maxQuantityPerOrder)) {
         Utils.showToast(
-            "Maximum quantity per order is " + selectedVariant.maxQuantityPerOrder.toString(), true);
+            "Maximum quantity per order is " +
+                selectedVariant.maxQuantityPerOrder.toString(),
+            true);
         return false;
       }
       switch (selectedVariant.stockType) {

@@ -230,6 +230,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   @override
   void initState() {
+    debugPrint("address charges ${widget.address.areaCharges}");
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkInternetConnection();
@@ -283,6 +284,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 //thirdPartyView bool
     thirdPartyDeliverySystemEnable =
         storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY &&
+            widget.address.thirdPartyDeliveryData != null &&
             widget.deliveryType != OrderType.PickUp;
     if (thirdPartyDeliverySystemEnable) {
       //Check visibility from response
@@ -1350,7 +1352,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                       appliedReddemPointsCodeList.isNotEmpty) {
                     removeCoupon();
                   } else {
-                 Navigator.push(
+                    Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) => RedeemPointsScreen(
@@ -1561,6 +1563,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             ispaytmSelected = false;
                           }
                         });
+                        constraints();
                       }
                     },
                   ),
@@ -1591,6 +1594,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             ispaytmSelected = false;
                           }
                         });
+                        constraints();
                       }
                     },
                   ),
@@ -1621,6 +1625,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             ispaytmSelected = true;
                           }
                         });
+                        constraints();
                       }
                     },
                   ),
@@ -1650,6 +1655,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             widget.paymentMode = "4";
                           }
                         });
+                        constraints();
                       }
                     },
                   ),
@@ -1780,11 +1786,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   ),
                   Visibility(
                     visible: !isShippingFree,
-                    child: Text('${AppConstant.currency} $onlineTotalWithShipping',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                        )),
+                    child:
+                        Text('${AppConstant.currency} $onlineTotalWithShipping',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                            )),
                   ),
                 ],
               ),
@@ -1974,10 +1981,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               child: ElevatedButton(
                 style: Utils.getButtonDecoration(
                   color: appTheme,
-                  border:  RoundedRectangleBorder(
+                  border: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(5.0),
                   ),
-                  edgeInsets:EdgeInsets.fromLTRB(5, 0, 5, 0),
+                  edgeInsets: EdgeInsets.fromLTRB(5, 0, 5, 0),
                 ),
                 onPressed: () async {
                   print("---Apply Coupon----");
@@ -2123,12 +2130,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           child: ElevatedButton(
             style: Utils.getButtonDecoration(
               color: appTheme,
-              border:  RoundedRectangleBorder(
+              border: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(5.0),
               ),
-              edgeInsets:EdgeInsets.fromLTRB(0, 0, 0, 0),
+              edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
             ),
-
             onPressed: () async {
               actionConfirmOrder();
             },
@@ -2486,60 +2492,64 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     // case allowed of min order
     // - shipping not mandatory
     // - shipping mandatory
+    if (mounted)
+      setState(() {
+        if (storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
+          if (codShippingCharges != null && onlineShippingCharges != null) {
+            String codRate = codShippingCharges.rate;
 
-    if (storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
-      if (codShippingCharges != null && onlineShippingCharges != null) {
-        String codRate = codShippingCharges.rate;
+            String onlineRate = onlineShippingCharges.rate;
 
-        String onlineRate = onlineShippingCharges.rate;
+            double diffCOD = databaseHelper.roundOffPrice(
+                (double.parse(codRate) - double.parse(onlineRate)), 2);
 
-        double diffCOD = databaseHelper.roundOffPrice(
-            (double.parse(codRate) - double.parse(onlineRate)), 2);
+            codDifferenceAmount = diffCOD.toStringAsFixed(2);
+            switch (shippingType) {
+              case AppConstant.shippingMandatoryMinOrderAllowed:
+              case AppConstant.shippingMandatoryMinOrderNotAllowed:
+                if (widget.paymentMode == '2') {
+                  shippingCharges = databaseHelper
+                      .roundOffPrice(
+                          (double.parse(shippingCharges) +
+                              double.parse(codRate)),
+                          2)
+                      .toString();
+                } else if (widget.paymentMode == '3') {
+                  //case not allowed for order
+                  shippingCharges = databaseHelper
+                      .roundOffPrice(
+                          (double.parse(shippingCharges) +
+                              double.parse(onlineRate)),
+                          2)
+                      .toString();
+                }
+                displayShipping = shippingCharges;
+                break;
+              case AppConstant.shippingNotMandatoryMinOrderNotAllowed:
+              case AppConstant.shippingNotMandatoryMinOrderAllowed:
+                isShippingFree = true;
+                if (widget.paymentMode == '2') {
+                  displayShipping = databaseHelper
+                      .roundOffPrice(
+                          (double.parse(shippingCharges) +
+                              double.parse(codRate)),
+                          2)
+                      .toString();
+                } else if (widget.paymentMode == '3') {
+                  //case not allowed for order
+                  displayShipping = databaseHelper
+                      .roundOffPrice(
+                          (double.parse(shippingCharges) +
+                              double.parse(onlineRate)),
+                          2)
+                      .toString();
+                }
 
-        codDifferenceAmount = diffCOD.toStringAsFixed(2);
-        switch (shippingType) {
-          case AppConstant.shippingMandatoryMinOrderAllowed:
-          case AppConstant.shippingMandatoryMinOrderNotAllowed:
-            if (widget.paymentMode == '2') {
-              shippingCharges = databaseHelper
-                  .roundOffPrice(
-                      (double.parse(shippingCharges) + double.parse(codRate)),
-                      2)
-                  .toString();
-            } else if (widget.paymentMode == '3') {
-              //case not allowed for order
-              shippingCharges = databaseHelper
-                  .roundOffPrice(
-                      (double.parse(shippingCharges) +
-                          double.parse(onlineRate)),
-                      2)
-                  .toString();
+                break;
             }
-            displayShipping = shippingCharges;
-            break;
-          case AppConstant.shippingNotMandatoryMinOrderNotAllowed:
-          case AppConstant.shippingNotMandatoryMinOrderAllowed:
-            isShippingFree = true;
-            if (widget.paymentMode == '2') {
-              displayShipping = databaseHelper
-                  .roundOffPrice(
-                      (double.parse(shippingCharges) + double.parse(codRate)),
-                      2)
-                  .toString();
-            } else if (widget.paymentMode == '3') {
-              //case not allowed for order
-              displayShipping = databaseHelper
-                  .roundOffPrice(
-                      (double.parse(shippingCharges) +
-                          double.parse(onlineRate)),
-                      2)
-                  .toString();
-            }
-
-            break;
+          }
         }
-      }
-    }
+      });
   }
 
   Future<void> checkMinOrderPickAmount() async {
@@ -2797,8 +2807,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           break;
 
         case "DPO":
-          ApiController.createDPOToken(
-              taxModel.total, orderJson, detailsModel.orderDetails,storeModel.currencyAbbr.trim())
+          ApiController.createDPOToken(taxModel.total, orderJson,
+                  detailsModel.orderDetails, storeModel.currencyAbbr.trim())
               .then((value) async {
             Utils.hideProgressDialog(context);
             if (value != null && value.success) {
@@ -2846,8 +2856,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
           print("-paymentMode-${widget.paymentMode}");
           List<ShippingCharge> selectedShippingChargeList = List.empty();
-          if (thirdPartyDeliverySystemEnable&&widget.address!=null&&widget.address.thirdPartyDeliveryData!=null) {
-            selectedShippingChargeList=widget.address.thirdPartyDeliveryData.shippingCharges;
+          if (thirdPartyDeliverySystemEnable &&
+              widget.address != null &&
+              widget.address.thirdPartyDeliveryData != null) {
+            selectedShippingChargeList =
+                widget.address.thirdPartyDeliveryData.shippingCharges;
           }
           ApiController.placeOrderRequest(
                   shippingCharges,
@@ -2866,7 +2879,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   selectedDeliverSlotValue,
                   cart_saving: totalSavings.toStringAsFixed(2),
                   selectedShippingCharge: _selectedShippingCharges,
-                  thirdPartyDeliveryData: widget.address.thirdPartyDeliveryData,selectedShippingChargeList: selectedShippingChargeList)
+                  thirdPartyDeliveryData: widget.address.thirdPartyDeliveryData,
+                  selectedShippingChargeList: selectedShippingChargeList)
               .then((response) async {
             Utils.hideProgressDialog(context);
             if (response == null) {
@@ -2927,7 +2941,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       callPaytmApi(event.url, event.orderId, event.txnId);
     });
 
-    eventBus.on<onDPOCreateFinished>().listen((event) async{
+    eventBus.on<onDPOCreateFinished>().listen((event) async {
       bool isNetworkAvailable = await Utils.isNetworkAvailable();
       if (!isNetworkAvailable) {
         Utils.showToast(AppConstant.noInternet, false);

@@ -9,8 +9,8 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 class ContactUs extends StatefulWidget {
-
   UserModel model;
+
   ContactUs(this.model);
 
   @override
@@ -44,7 +44,6 @@ class _ContactUsState extends State<ContactUs> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: whiteColor,
       appBar: AppBar(
@@ -58,7 +57,6 @@ class _ContactUsState extends State<ContactUs> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-
                 Text("First Name*"),
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 5, 0, 20),
@@ -66,9 +64,8 @@ class _ContactUsState extends State<ContactUs> {
                     //width: width,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      border: Border.all(color: Colors.black,width: 1.0),
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)
-                      ),
+                      border: Border.all(color: Colors.black, width: 1.0),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
@@ -92,7 +89,6 @@ class _ContactUsState extends State<ContactUs> {
                     ),
                   ),
                 ),
-
                 Text("Last Name*"),
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 5, 0, 20),
@@ -100,13 +96,11 @@ class _ContactUsState extends State<ContactUs> {
                     //width: width,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      border: Border.all(color: Colors.black,width: 1.0),
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)
-                      ),
+                      border: Border.all(color: Colors.black, width: 1.0),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -127,7 +121,6 @@ class _ContactUsState extends State<ContactUs> {
                     ),
                   ),
                 ),
-
                 Text("Mobile*"),
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 5, 0, 20),
@@ -135,13 +128,11 @@ class _ContactUsState extends State<ContactUs> {
                     //width: width,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      border: Border.all(color: Colors.black,width: 1.0),
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)
-                      ),
+                      border: Border.all(color: Colors.black, width: 1.0),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -163,7 +154,6 @@ class _ContactUsState extends State<ContactUs> {
                     ),
                   ),
                 ),
-
                 Text("Email*"),
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 5, 0, 20),
@@ -171,13 +161,11 @@ class _ContactUsState extends State<ContactUs> {
                     //width: width,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      border: Border.all(color: Colors.black,width: 1.0),
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)
-                      ),
+                      border: Border.all(color: Colors.black, width: 1.0),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -199,7 +187,6 @@ class _ContactUsState extends State<ContactUs> {
                     ),
                   ),
                 ),
-
                 Text("City*"),
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 5, 0, 20),
@@ -207,13 +194,11 @@ class _ContactUsState extends State<ContactUs> {
                     //width: width,
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      border: Border.all(color: Colors.black,width: 1.0),
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)
-                      ),
+                      border: Border.all(color: Colors.black, width: 1.0),
+                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
                     ),
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-
                       child: Row(
                         children: <Widget>[
                           Padding(
@@ -235,96 +220,103 @@ class _ContactUsState extends State<ContactUs> {
                     ),
                   ),
                 ),
-
                 Text("Write Your Message"),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(0, 5, 0, 20),
-                  child: Container(
-                    //width: width,
-                    height: 140,
-                    decoration: BoxDecoration(
-                      color: Colors.transparent,
-                      border: Border.all(color: Colors.black,width: 1.0),
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-
-
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(0.0, 0, 5.0, 0),
-
-                            child: Icon(Icons.chat_bubble),
-                          ),
-                          Expanded(
-                            child: TextField(
-                              controller: messagetNameController,
-                              keyboardType: TextInputType.multiline,
-                              maxLines: null,
-                              textAlign: TextAlign.left,
-                              decoration: new InputDecoration.collapsed(
-                                hintText: "Enter your message",
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  padding: EdgeInsets.fromLTRB(0.0, 5.0,0.0, 0.0),
+                  child: TextField(
+                      controller: messagetNameController,
+                      keyboardType: TextInputType.multiline,
+                      maxLines: 6,
+                      minLines: 6,
+                      textAlignVertical: TextAlignVertical.center,
+                      textAlign: TextAlign.left,
+                      decoration: new InputDecoration(
+                        alignLabelWithHint: true,
+                        contentPadding:
+                            EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 10.0),
+                        prefixIcon: Padding(
+                          padding: EdgeInsetsDirectional.only(bottom: 90.0),
+                          child: Icon(Icons.chat_bubble,
+                          color: Colors.black),
+                        ),
+                        hintText: "Enter your message",
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.black,
+                              width: 1.0,
+                              style: BorderStyle.solid),
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.black,
+                              width: 1.0,
+                              style: BorderStyle.solid),
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.black,
+                              width: 1.0,
+                              style: BorderStyle.solid),
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        ),
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Colors.black,
+                              width: 1.0,
+                              style: BorderStyle.solid),
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                        ),
+                      )),
                 ),
-
-
                 Container(
                   margin: EdgeInsets.fromLTRB(0, 0, 20, 10),
                   child: TextButton(
                     style: Utils.getButtonDecoration(
-                      color:appThemeSecondary,
-                      border: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5.0),
-                          side: BorderSide(color: appThemeSecondary))
-
-                    ),
+                        color: appThemeSecondary,
+                        border: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(5.0),
+                            side: BorderSide(color: appThemeSecondary))),
                     child: Text('Send Your Message'),
                     onPressed: () async {
-                      bool isNetworkAvailable = await Utils.isNetworkAvailable();
-                      if(!isNetworkAvailable){
+                      bool isNetworkAvailable =
+                          await Utils.isNetworkAvailable();
+                      if (!isNetworkAvailable) {
                         Utils.showToast(AppConstant.noInternet, true);
                         return;
                       }
-                      if(firstNameController.text.trim().isEmpty){
+                      if (firstNameController.text.trim().isEmpty) {
                         Utils.showToast("Please enter first name", true);
                         return;
                       }
-                      if(lastNameController.text.trim().isEmpty){
+                      if (lastNameController.text.trim().isEmpty) {
                         Utils.showToast("Please enter last name", true);
                         return;
                       }
-                      if(mobileNameController.text.trim().isEmpty){
+                      if (mobileNameController.text.trim().isEmpty) {
                         Utils.showToast("Please enter mobile number", true);
                         return;
                       }
-                      if(emailNameController.text.isEmpty){
+                      if (emailNameController.text.isEmpty) {
                         Utils.showToast("Please enter email", true);
                         return;
                       }
-                      if(!Utils.validateEmail(emailNameController.text.trim())){
+                      if (!Utils.validateEmail(
+                          emailNameController.text.trim())) {
                         Utils.showToast("Please enter valid email", true);
                         return;
                       }
-                      if(cityNameController.text.trim().isEmpty){
+                      if (cityNameController.text.trim().isEmpty) {
                         Utils.showToast("Please enter city", true);
                         return;
                       }
 
-
                       Utils.showProgressDialog(context);
 
                       String queryString = json.encode({
-                        "name": "${firstNameController.text} ${lastNameController.text}",
+                        "name":
+                            "${firstNameController.text} ${lastNameController.text}",
                         "email": emailNameController.text,
                         "mobile": mobileNameController.text,
                         "city": cityNameController.text,
@@ -337,15 +329,13 @@ class _ContactUsState extends State<ContactUs> {
                         if (response.success) {
                           Utils.hideProgressDialog(context);
                           ResponseModel resModel = response;
-                          Utils.showToast(resModel.message , true);
+                          Utils.showToast(resModel.message, true);
                           Navigator.pop(context);
                         }
                       });
-
                     },
                   ),
                 ),
-
               ],
             ),
           ),

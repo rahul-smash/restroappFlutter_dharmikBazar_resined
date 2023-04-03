@@ -136,6 +136,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
                   }
                   areaList.addAll(areaObject.area);
                 });
+                print("areaList ${areaList}");
               }
             },
             child: Align(
@@ -220,8 +221,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
           child: InkWell(
             onTap: () async {
               StoreModel store = await SharedPrefs.getStore();
-
-              print(
+    print(
                   "====${selectedLocation.latitude},${selectedLocation.longitude}===");
               double distanceInKm = Utils.calculateDistance(
                   selectedLocation.latitude,
@@ -385,6 +385,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
         }
       }
       print("==${area}");
+      print("==${zipCode}");
       if (area != null) {
         Utils.showProgressDialog(context);
         UserModel user = await SharedPrefs.getUser();

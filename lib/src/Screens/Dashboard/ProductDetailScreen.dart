@@ -119,7 +119,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     if (weight.isEmpty) {
       isVisible = false;
     }
-    if(_storeModel.displayVariantWeight=='0'){
+    if (_storeModel.displayVariantWeight == '0') {
       isVisible = false;
     }
     return WillPopScope(
@@ -187,79 +187,91 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 // add Product Details top view 
   Widget getProductDetailsView() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        Stack(
-          children: <Widget>[
-            Padding(
-              padding:
-                  EdgeInsets.only(top: 10.0, bottom: 10.0, left: 0, right: 0),
-//              EdgeInsets.all(0),
-              child: _getImageView(),
-            ),
-            Visibility(
-              visible:
-                  (discount == "0.00" || discount == "0" || discount == "0.0")
-                      ? false
-                      : true,
-              child: Container(
-                child: Text(
-                  "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
-                  style: TextStyle(color: Colors.white),
-                ),
-                margin: EdgeInsets.only(left: 10, top: 10),
-                padding: EdgeInsets.all(10),
-                decoration: new BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  color: appThemeSecondary,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(15.0),
-                      bottomRight: Radius.circular(15.0)),
-                ),
-              ),
-            ),
-            Visibility(
-              visible: _checkOutOfStock(),
-              child: Container(
-                height: 280.0,
-                color: Colors.white54,
-                child: Center(
-                  child: Container(
+        Container(
+          height: 320.0,
+          width: 320.0,
+          margin: EdgeInsets.all(10.0),
+          child: Stack(
+            alignment: Alignment.topCenter,
+            children: <Widget>[
+              _getImageView(),
+              Positioned(
+                top: 5.0,
+                left: 5.0,
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Visibility(
+                    visible: (discount == "0.00" ||
+                            discount == "0" ||
+                            discount == "0.0")
+                        ? false
+                        : true,
+                    child: Container(
+                      child: Text(
+                        "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      padding: EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                          border: Border.all(color: Colors.red, width: 2),
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(5)),
-                      child: Padding(
-                        padding: EdgeInsets.all(5),
-                        child: Text(
-                          "Out of Stock",
-                          style: TextStyle(color: Colors.red, fontSize: 18),
-                        ),
-                      )),
+                        shape: BoxShape.rectangle,
+                        color: appThemeSecondary,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15.0),
+                            bottomRight: Radius.circular(15.0)),
+                      ),
+                    ),
+                  ),
                 ),
               ),
-            ),
-            Container(
-              padding: EdgeInsets.all(20),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: addVegNonVegOption(),
+              Visibility(
+                visible: _checkOutOfStock(),
+                child: Container(
+                  height: 280.0,
+                  alignment: Alignment.center,
+                  color: Colors.white54,
+                  child: Center(
+                    child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.red, width: 2),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(5)),
+                        child: Padding(
+                          padding: EdgeInsets.all(5),
+                          child: Text(
+                            "Out of Stock",
+                            style: TextStyle(color: Colors.red, fontSize: 18),
+                          ),
+                        )),
+                  ),
+                ),
               ),
-            ),
-          ],
-          clipBehavior: Clip.none,
+              Container(
+                padding: EdgeInsets.all(20),
+                child: Align(
+                  alignment: Alignment.topRight,
+                  child: addVegNonVegOption(),
+                ),
+              ),
+            ],
+            clipBehavior: Clip.none,
+          ),
         ),
 
         //addDivideView(),
         Padding(
           padding: const EdgeInsets.only(top: 15.0, left: 20),
-          child: Text(
-            "${widget.product.title}",
-            style: TextStyle(
-              fontSize: 16.0,
-              color: grayColorTitle,
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Text(
+              "${widget.product.title}",
+              style: TextStyle(
+                fontSize: 16.0,
+                color: grayColorTitle,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
           ),
         ),
         Row(
@@ -309,18 +321,18 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
             addQuantityView(),
           ],
         ),
+        SizedBox(height: 10.0),
         Visibility(
           visible: true,
-          child: /*_isProductOutOfStock ? SizedBox() : */addDividerView(),
+          child: /*_isProductOutOfStock ? SizedBox() : */ addDividerView(),
         ),
 
-        /*_isProductOutOfStock ? SizedBox() : */buildProductOfferView(),
+        /*_isProductOutOfStock ? SizedBox() : */ buildProductOfferView(),
 
-
-        Visibility(
-          visible: isVisible,
-          child: /*_isProductOutOfStock ? SizedBox() : */addDividerView(),
-        ),
+        // Visibility(
+        //   visible: isVisible,
+        //   child: /*_isProductOutOfStock ? SizedBox() : */addDividerView(),
+        // ),
 
         Visibility(
           visible: isVisible,
@@ -343,6 +355,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
             ],
           ),
         ),
+
         !widget.isApiLoading &&
                 widget.product.description != null &&
                 widget.product.description.isNotEmpty
@@ -408,99 +421,125 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget buildProductOfferView(){
-
+  Widget buildProductOfferView() {
     return Visibility(
-      visible: AppVersionSingleton.instance.appVersion.store.product_coupon == "1" && widget.product.product_offer == 1
-          ? true : false,
-      child: this.offerDetails == null ? Container() : Container(
-        margin: EdgeInsets.only(top: 10.0, left: 20.0, bottom: 10.0,right: 10),
-        width: Utils.getDeviceWidth(context),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                //Icon(Icons.ac_unit,color: appThemeSecondary),
-                Image.asset("images/offericon_dis.png",
-                  height: 22,
-                  width: 22,
-                  fit: BoxFit.fill,
-                ),
-                SizedBox(width: 5,),
-                Expanded(
-                  child: Text("${this.offerDetails.name}",
-                    maxLines: 1,overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 16)),
-                ),
-                GestureDetector(
-                  onTap: () async {
-                    bool isNetworkAvailable = await Utils.isNetworkAvailable();
-                    if (!isNetworkAvailable) {
-                      Utils.showToast(AppConstant.noInternet, false);
-                      return;
-                    }
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              MoreDetailScreen(widget.product),
-                        ));
-                  },
-                  child: Text("MORE",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: appThemeSecondary,
-                          fontWeight: FontWeight.w500,fontSize: 16)),
-                ),
-                Icon(Icons.arrow_forward_ios_sharp,color: appThemeSecondary,size: 16),
-              ],
-            ),
-            SizedBox(height: 10,),
-            Row(
-              children: [
-                Text("COUPON",
-                    style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500)),
-                SizedBox(width: 10,),
-                Text("(use at checkout)",
-                    style: TextStyle(fontSize: 16,color: Colors.black54)),
-              ],
-            ),
-            SizedBox(height: 10,),
-
-            InkWell(
-              child: Row(
+      visible:
+          AppVersionSingleton.instance.appVersion.store.product_coupon == "1" &&
+                  widget.product.product_offer == 1
+              ? true
+              : false,
+      child: this.offerDetails == null
+          ? Container()
+          : Container(
+              margin: EdgeInsets.only(
+                  top: 10.0, left: 20.0, bottom: 10.0, right: 10),
+              width: Utils.getDeviceWidth(context),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    width: 100,
-                    height: 30,
-                    color: appThemeSecondary.withOpacity(0.15),
-                    child: DottedBorder(
-                      color: appThemeSecondary,
-                      strokeWidth: 1,
-                      child: Center(
-                        child: Text("${this.offerDetails.couponCode}",
-                            maxLines: 1,overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 16,fontWeight: FontWeight.w500)),
+                  Row(
+                    children: [
+                      //Icon(Icons.ac_unit,color: appThemeSecondary),
+                      Image.asset(
+                        "images/offericon_dis.png",
+                        height: 22,
+                        width: 22,
+                        fit: BoxFit.fill,
                       ),
-                    ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Expanded(
+                        child: Text("${this.offerDetails.name}",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(fontSize: 16)),
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          bool isNetworkAvailable =
+                              await Utils.isNetworkAvailable();
+                          if (!isNetworkAvailable) {
+                            Utils.showToast(AppConstant.noInternet, false);
+                            return;
+                          }
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    MoreDetailScreen(widget.product),
+                              ));
+                        },
+                        child: Text("MORE",
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: appThemeSecondary,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16)),
+                      ),
+                      Icon(Icons.arrow_forward_ios_sharp,
+                          color: appThemeSecondary, size: 16),
+                    ],
                   ),
-                  SizedBox(width: 20,),
-                  Text("Copy",
-                      style: TextStyle(
-                          decoration: TextDecoration.underline,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500,fontSize: 16)),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    children: [
+                      Text("COUPON",
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.w500)),
+                      SizedBox(
+                        width: 10,
+                      ),
+                      Text("(use at checkout)",
+                          style:
+                              TextStyle(fontSize: 16, color: Colors.black54)),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  InkWell(
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 30,
+                          color: appThemeSecondary.withOpacity(0.15),
+                          child: DottedBorder(
+                            color: appThemeSecondary,
+                            strokeWidth: 1,
+                            child: Center(
+                              child: Text("${this.offerDetails.couponCode}",
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500)),
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 20,
+                        ),
+                        Text("Copy",
+                            style: TextStyle(
+                                decoration: TextDecoration.underline,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16)),
+                      ],
+                    ),
+                    onTap: () {
+                      print(this.offerDetails.couponCode);
+                      Utils.copyToClipboard(
+                          context, this.offerDetails.couponCode);
+                    },
+                  )
                 ],
               ),
-              onTap: (){
-                print(this.offerDetails.couponCode);
-                Utils.copyToClipboard(context,this.offerDetails.couponCode);
-              },
-            )
-          ],
-        ),
-      ),
+            ),
     );
   }
 
@@ -819,7 +858,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     ApiController.getSubCategoryProductDetail(productID).then((value) {
       Product product = value.subCategories.first.products.first;
       try {
-        if(widget.product.product_offer == 1 && product.product_offer == 0){
+        if (widget.product.product_offer == 1 && product.product_offer == 0) {
           widget.product.product_offer = 0;
         }
       } catch (e) {
@@ -867,111 +906,99 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   Widget _getImageView() {
     return widget.product.productImages != null &&
             widget.product.productImages.isNotEmpty
-        ? Column(
-            children: <Widget>[
-              Container(
-                child: CarouselSlider.builder(
-                  itemCount: widget.product.productImages.length,
-                  carouselController: _carouselController,
-                  options: CarouselOptions(
+        ? Container(
+      padding: EdgeInsets.symmetric(vertical: 20.0),
+      child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                  child: CarouselSlider.builder(
+                    itemCount: widget.product.productImages.length,
+                    carouselController: _carouselController,
+                    options: CarouselOptions(
 //                    aspectRatio: 16 / 9,
-                    height: 280,
-                    initialPage: 0,
-                    enableInfiniteScroll: false,
-                    reverse: false,
-                    autoPlay: false,
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _current = index;
-                      });
-                    },
-                    enlargeCenterPage: false,
-                    autoPlayInterval: Duration(seconds: 3),
-                    autoPlayAnimationDuration: Duration(milliseconds: 800),
-                    autoPlayCurve: Curves.ease,
-                    scrollDirection: Axis.horizontal,
-                  ),
-                  itemBuilder: (context, index, realIndex) {
-                    return Container(
-                      child: _makeBanner(context, index),
-                    );
-                  },
-                ),
-              ),
-              Visibility(
-                  visible: widget.product.productImages.length > 1,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: widget.product.productImages.map((url) {
-                        int index = widget.product.productImages.indexOf(url);
-                        return _current == index
-                            ? Container(
-                                width: 7.0,
-                                height: 7.0,
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 0.0, horizontal: 2.0),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: dotIncreasedColor,
-                                ),
-                              )
-                            : Container(
-                                width: 6.0,
-                                height: 6.0,
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 0.0, horizontal: 2.0),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: Color.fromRGBO(0, 0, 0, 0.4),
-                                ),
-                              );
-                      }).toList(),
+                      initialPage: 0,
+                      height: 280.0,
+                      viewportFraction: 1.0,
+                      enableInfiniteScroll: false,
+                      reverse: false,
+                      autoPlay: false,
+                      onPageChanged: (index, reason) {
+                        setState(() {
+                          _current = index;
+                        });
+                      },
+                      enlargeCenterPage: false,
+                      autoPlayInterval: Duration(seconds: 3),
+                      autoPlayAnimationDuration: Duration(milliseconds: 800),
+                      autoPlayCurve: Curves.ease,
+                      scrollDirection: Axis.horizontal,
                     ),
-                  ))
-            ],
+                    itemBuilder: (context, index, realIndex) {
+                      return _makeBanner(context, index);
+                    },
+                  ),
+                ),
+                Visibility(
+                    visible: widget.product.productImages.length > 1,
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: widget.product.productImages.map((url) {
+                          int index = widget.product.productImages.indexOf(url);
+                          return _current == index
+                              ? Container(
+                                  width: 7.0,
+                                  height: 7.0,
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 0.0, horizontal: 2.0),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: dotIncreasedColor,
+                                  ),
+                                )
+                              : Container(
+                                  width: 6.0,
+                                  height: 6.0,
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: 0.0, horizontal: 2.0),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Color.fromRGBO(0, 0, 0, 0.4),
+                                  ),
+                                );
+                        }).toList(),
+                      ),
+                    ))
+              ],
+            ),
           )
         : imageUrl == ""
             ? Container(
-                child: Center(
+      padding: EdgeInsets.symmetric(vertical: 20.0), child: Center(
                   child: Utils.getImgPlaceHolder(),
                 ),
               )
             : Padding(
-                padding: EdgeInsets.all(0),
-                child: Container(
-                  /*child: AspectRatio(
-                  aspectRatio: 16 / 9,
-                  child: CachedNetworkImage(
-                    imageUrl: "${imageUrl}", fit: BoxFit.cover
-                  ),
-                ),*/
-                  child: Center(
-                    child: CachedNetworkImage(
-                      imageUrl: "${imageUrl}",
-                      height: 280,
-                      fit: BoxFit.scaleDown,
-                      placeholder: (context, url) =>
-                          CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
-                    ),
-                  ),
-                ));
+      padding: EdgeInsets.symmetric(vertical: 20.0),
+              child: CachedNetworkImage(
+                imageUrl: "${imageUrl}",
+                fit: BoxFit.contain,
+                height: 280.0,
+                placeholder: (context, url) => CircularProgressIndicator(),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
+            );
   }
 
   Widget _makeBanner(BuildContext context, int _index) {
-    return Container(
-        height: 280,
-        child: Center(
-          child: CachedNetworkImage(
-            imageUrl: "${widget.product.productImages[_index].url}",
-            height: 280,
-            fit: BoxFit.scaleDown,
-            placeholder: (context, url) => CircularProgressIndicator(),
-            errorWidget: (context, url, error) => Icon(Icons.error),
-          ),
-        ));
+    return CachedNetworkImage(
+      imageUrl: "${widget.product.productImages[_index].url}",
+      fit: BoxFit.contain,
+      placeholder: (context, url) => CircularProgressIndicator(),
+      errorWidget: (context, url, error) => Icon(Icons.error),
+    );
   }
 
   bool _checkOutOfStock() {
