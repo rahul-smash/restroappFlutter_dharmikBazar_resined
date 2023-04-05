@@ -9,6 +9,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
 import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
@@ -288,52 +289,58 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _key,
-      appBar: getAppBar(),
-      body: Stack(
-        children: [
-          Column(
-            children: <Widget>[
-              SizedBox(height: 20.0),
-              addBanners(),
-              Expanded(
-                child: isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : categoryResponse == null
-                        ? SingleChildScrollView(child: Center(child: Text("")))
-                        : showGridView(),
-              ),
-            ],
-          ),
-          Positioned(
-            left: _offset.dx,
-            top: _offset.dy,
-            child: GestureDetector(
-              onPanUpdate: (d) {
-                setState(() {
-                  return _offset += Offset(d.delta.dx, d.delta.dy);
-                });
-              },
-              child: AppConstant.isLoggedIn
-                  ? store.delivery_expected_times == '1'
-                      ? OrderTimePopup()
-                      : SizedBox()
-                  : SizedBox(),
+    return AnnotatedRegion(
+        value: SystemUiOverlayStyle.light.copyWith(
+        statusBarColor: whiteColor,
+        statusBarIconBrightness: Brightness.dark
+    ),child: SafeArea(
+      child: Scaffold(
+        key: _key,
+        appBar: getAppBar(),
+        body: Stack(
+          children: [
+            Column(
+              children: <Widget>[
+                SizedBox(height: 20.0),
+                addBanners(),
+                Expanded(
+                  child: isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : categoryResponse == null
+                          ? SingleChildScrollView(child: Center(child: Text("")))
+                          : showGridView(),
+                ),
+              ],
             ),
-          ),
-        ],
+            Positioned(
+              left: _offset.dx,
+              top: _offset.dy,
+              child: GestureDetector(
+                onPanUpdate: (d) {
+                  setState(() {
+                    return _offset += Offset(d.delta.dx, d.delta.dy);
+                  });
+                },
+                child: AppConstant.isLoggedIn
+                    ? store.delivery_expected_times == '1'
+                        ? OrderTimePopup()
+                        : SizedBox()
+                    : SizedBox(),
+              ),
+            ),
+          ],
+        ),
+        drawer: NavDrawerMenu(
+          store,
+          user == null ? "" : user.fullName,
+          socialModel: socialModel,
+          walleModel: welleModel,
+        ),
+        bottomNavigationBar: SafeArea(
+          child: addBottomBar(),
+        ),
       ),
-      drawer: NavDrawerMenu(
-        store,
-        user == null ? "" : user.fullName,
-        socialModel: socialModel,
-        walleModel: welleModel,
-      ),
-      bottomNavigationBar: SafeArea(
-        child: addBottomBar(),
-      ),
-    );
+    ));
   }
 
   bool showBottomBar = false;

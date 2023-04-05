@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart';
 
 import 'package:restroapp/src/Screens/Address/SaveDeliveryAddress.dart';
 import 'package:restroapp/src/UI/DragMarkerMap.dart';
@@ -72,119 +74,132 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: addressList != null
-          ? AppBar(
-              title: Text("Delivery Addresses"),
-              centerTitle: true,
-              leading: IconButton(
-                icon: Icon(Icons.arrow_back_ios),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              actions: <Widget>[
-                InkWell(
-                  onTap: () {
-                    Navigator.of(context).popUntil((route) => route.isFirst);
-                  },
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: 0.0, bottom: 0.0, left: 0, right: 10),
-                    child: Icon(
-                      Icons.home,
-                      color: Colors.white,
-                      size: 30,
+    return AnnotatedRegion(
+        value: SystemUiOverlayStyle.light.copyWith(
+            statusBarColor: whiteColor,
+            statusBarIconBrightness: Brightness.dark),
+        child: SafeArea(
+          child: Scaffold(
+            appBar: addressList != null
+                ? AppBar(
+                    title: Text("Delivery Addresses"),
+                    centerTitle: true,
+                    leading: IconButton(
+                      icon: Icon(Icons.arrow_back_ios),
+                      onPressed: () => Navigator.pop(context, false),
                     ),
+                    actions: <Widget>[
+                      InkWell(
+                        onTap: () {
+                          Navigator.of(context)
+                              .popUntil((route) => route.isFirst);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.only(
+                              top: 0.0, bottom: 0.0, left: 0, right: 10),
+                          child: Icon(
+                            Icons.home,
+                            color: Colors.white,
+                            size: 30,
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : AppBar(
+                    title: Text("Account Issue"),
+                    centerTitle: true,
+                    automaticallyImplyLeading: false,
                   ),
-                ),
-              ],
-            )
-          : AppBar(
-              title: Text("Account Issue"),
-              centerTitle: true,
-              automaticallyImplyLeading: false,
-            ),
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : addressList == null
-              ? WillPopScope(
-                  onWillPop: () {
-                    logout(context, branchData);
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                  },
-                  child: Dialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(5.0))),
-                      //title: Text(title,textAlign: TextAlign.center,),
-                      child: Container(
-                        child: Wrap(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(10, 15, 10, 15),
-                              child: Center(
-                                child: Text(
-                                  "Account Issue",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      color: grayColorTitle, fontSize: 18),
-                                ),
-                              ),
-                            ),
-                            Container(
-                                height: 1,
-                                color: Colors.black45,
-                                width: MediaQuery.of(context).size.width),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(10, 15, 10, 10),
-                              child: Center(
-                                child: Text(
-                                  "${responsesData.message}",
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
+            body: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : addressList == null
+                    ? WillPopScope(
+                        onWillPop: () {
+                          logout(context, branchData);
+                          Navigator.popUntil(context, (route) => route.isFirst);
+                        },
+                        child: Dialog(
+                            shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(5.0))),
+                            //title: Text(title,textAlign: TextAlign.center,),
+                            child: Container(
+                              child: Wrap(
                                 children: <Widget>[
-                                  Container(
-                                    margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                                    child: TextButton(
-                                      child: Text('OK'),
-                                      style: Utils.getButtonDecoration(
-                                          color: appThemeSecondary),
-                                      onPressed: () {
-                                        logout(context, branchData);
-                                        Navigator.popUntil(
-                                            context, (route) => route.isFirst);
-                                      },
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.fromLTRB(10, 15, 10, 15),
+                                    child: Center(
+                                      child: Text(
+                                        "Account Issue",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: grayColorTitle,
+                                            fontSize: 18),
+                                      ),
                                     ),
-                                  )
+                                  ),
+                                  Container(
+                                      height: 1,
+                                      color: Colors.black45,
+                                      width: MediaQuery.of(context).size.width),
+                                  Padding(
+                                    padding:
+                                        EdgeInsets.fromLTRB(10, 15, 10, 10),
+                                    child: Center(
+                                      child: Text(
+                                        "${responsesData.message}",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        Container(
+                                          margin:
+                                              EdgeInsets.fromLTRB(20, 0, 0, 0),
+                                          child: TextButton(
+                                            child: Text('OK'),
+                                            style: Utils.getButtonDecoration(
+                                                color: appThemeSecondary),
+                                            onPressed: () {
+                                              logout(context, branchData);
+                                              Navigator.popUntil(context,
+                                                  (route) => route.isFirst);
+                                            },
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ),
-                      )),
-                )
-              : Column(
-                  children: <Widget>[
-                    Divider(color: Colors.white, height: 2.0),
-                    addCreateAddressButton(),
-                    addAddressList()
-                  ],
-                ),
-      bottomNavigationBar: addressList == null
-          ? Container(height: 5)
-          : SafeArea(
-              child: widget.showProceedBar
-                  ? addProceedBar()
-                  : Container(height: 5),
-            ),
-    );
+                            )),
+                      )
+                    : Column(
+                        children: <Widget>[
+                          Divider(color: Colors.white, height: 2.0),
+                          addCreateAddressButton(),
+                          addAddressList()
+                        ],
+                      ),
+            bottomNavigationBar: addressList == null
+                ? Container(height: 5)
+                : SafeArea(
+                    child: widget.showProceedBar
+                        ? addProceedBar()
+                        : Container(height: 5),
+                  ),
+          ),
+        ));
   }
 
   Widget addCreateAddressButton() {
@@ -235,32 +250,42 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                           "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
                       if (isLocationServiceEnabled) {
                         Geolocator geoLocator = Geolocator();
-                        var status = await Geolocator.checkPermission();
-                        print("--status--=${status}");
-
-                        var result = await Navigator.push(
-                            context,
-                            new MaterialPageRoute(
-                              builder: (BuildContext context) =>
-                                  DragMarkerMap(data),
-                              fullscreenDialog: true,
-                            ));
-                        if (result != null) {
-                          radiusArea = result;
-                          print("----radiusArea = result-------");
-                          //Utils.showProgressDialog(context);
-                          setState(() {
-                            isLoading = true;
-                          });
-                          DeliveryAddressResponse response =
-                              await ApiController.getAddressApiRequest();
-                          //Utils.hideProgressDialog(context);
-                          setState(() {
-                            print("----setState-------");
-                            isLoading = false;
-                            //addressList = null;
-                            addressList = response.data;
-                          });
+                        LocationPermission status =
+                            await Geolocator.checkPermission();
+                        print(
+                            "--status--=${status.name}==${PermissionStatus.denied}");
+                        if (status == LocationPermission.denied) {
+                          Geolocator.requestPermission();
+                        } else if (status == LocationPermission.deniedForever) {
+                          Geolocator.openAppSettings();
+                        } else if (status ==
+                            LocationPermission.unableToDetermine) {
+                          Geolocator.openAppSettings();
+                        } else {
+                          var result = await Navigator.push(
+                              context,
+                              new MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    DragMarkerMap(data),
+                                fullscreenDialog: true,
+                              ));
+                          if (result != null) {
+                            radiusArea = result;
+                            print("----radiusArea = result-------");
+                            //Utils.showProgressDialog(context);
+                            setState(() {
+                              isLoading = true;
+                            });
+                            DeliveryAddressResponse response =
+                                await ApiController.getAddressApiRequest();
+                            //Utils.hideProgressDialog(context);
+                            setState(() {
+                              print("----setState-------");
+                              isLoading = false;
+                              //addressList = null;
+                              addressList = response.data;
+                            });
+                          }
                         }
                       } else {
                         Utils.showToast("Please turn on gps!", false);
@@ -522,25 +547,24 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       child: InkWell(
         onTap: () async {
           StoreModel storeModel = await SharedPrefs.getStore();
-          if(addressList!=null && addressList.length!=0)
-            {
-              DeliveryAddressData addressData =
-              DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
-              if (storeModel.storeDeliveryModel ==
-                  AppConstant.DELIVERY_THIRD_PARTY) {
-                if (addressData.zipCode == null ||
-                    (addressData.zipCode != null && addressData.zipCode.isEmpty)) {
-                  Utils.showToast('ZipCode is mandatory ', false);
-                  return addressData;
-                } else if (addressData.zipCode != null &&
-                    addressData.zipCode.length != 6) {
-                  Utils.showToast('Please add valid ZipCode', false);
-                  return addressData;
-                }
+          if (addressList != null && addressList.length != 0) {
+            DeliveryAddressData addressData =
+                DeliveryAddressData.copyWith(item: addressList[selectedIndex]);
+            if (storeModel.storeDeliveryModel ==
+                AppConstant.DELIVERY_THIRD_PARTY) {
+              if (addressData.zipCode == null ||
+                  (addressData.zipCode != null &&
+                      addressData.zipCode.isEmpty)) {
+                Utils.showToast('ZipCode is mandatory ', false);
+                return addressData;
+              } else if (addressData.zipCode != null &&
+                  addressData.zipCode.length != 6) {
+                Utils.showToast('Please add valid ZipCode', false);
+                return addressData;
               }
-          await checkingStoreDeliverymodel(storeModel, addressData);
-
             }
+            await checkingStoreDeliverymodel(storeModel, addressData);
+          }
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -606,7 +630,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     return shippingCharges;
   }
 
- checkingStoreDeliverymodel(
+  checkingStoreDeliverymodel(
       StoreModel store, DeliveryAddressData addressData) async {
     isTPDSError = false;
     Utils.showProgressDialog(context);
@@ -614,136 +638,138 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       Utils.hideProgressDialog(context);
       if (response != null && response.success) {
         StoreRadiousResponse data = response;
-        double distanceInKm = Utils.calculateDistance(double.parse(addressData.lat),
-           double.parse( addressData.lng), double.parse(store.lat), double.parse(store.lng));
+        double distanceInKm = Utils.calculateDistance(
+            double.parse(addressData.lat),
+            double.parse(addressData.lng),
+            double.parse(store.lat),
+            double.parse(store.lng));
         int distanceInKms = distanceInKm.toInt();
 
         print("==distanceInKm==${distanceInKm}=AND=${distanceInKms}=");
 
-       if(distanceInKm>0)
-         {
-           Area area =
-           await checkIfOrderDeliveryWithInRadious(distanceInKms, data);
-           if (area != null) {
-             if (area.deliveryMode == "2" &&
-                 store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
-               Utils.showProgressDialog(context);
-               DatabaseHelper databaseHelper = new DatabaseHelper();
-               List<Product> cartList = await databaseHelper.getCartItemList();
-               String orderJson = await Utils.getCartListToJson(cartList);
-               ThirdPartyDeliveryResponse chargesResponse =
-               await ApiController.getDeliveryShippingChargesApi(
-                   orderDetail: orderJson, userZipcode: addressData.zipCode);
-               Utils.hideProgressDialog(context);
-               if (chargesResponse != null &&
-                   chargesResponse.success &&
-                   chargesResponse.data != null) {
-                 //update changes according to weight
-                 if (chargesResponse.data.errorMsg != null) {
-                   Utils.showToast(chargesResponse.data.errorMsg, false);
-                   isTPDSError = true;
-                 }
-                 addressData.thirdPartyDeliveryData = chargesResponse.data;
-               } else {
-                 isTPDSError = true;
-                 if (chargesResponse.message != null) {
-                   Utils.showToast(chargesResponse.message, false);
-                   DialogUtils.displayLocationNotAvailbleDialog(
-                       context, chargesResponse.message,
-                       buttonText1: 'Change Zipcode', button1: () {
-                     Navigator.pop(context);
-                     _editAddress(addressData);
-                   });
-                 }
-               }
-             } else if (area.deliveryMode == "1" &&
-                 store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
-               addressData.areaCharges = area.charges;
-             } else if (area.deliveryMode == "1" &&
-                 store.storeDeliveryModel == AppConstant.DELIVERY_WEIGHTWISE) {
-               if (store.enableWeightWiseCharges == '1') {
-                 String shippingCharges =
-                 await calculateShipping(addressList[selectedIndex]);
-                 Utils.showProgressDialog(context);
-                 DatabaseHelper databaseHelper = new DatabaseHelper();
-                 List<Product> cartList = await databaseHelper.getCartItemList();
-                 String orderJson = await Utils.getCartListToJson(cartList);
+        if (distanceInKm > 0) {
+          Area area =
+              await checkIfOrderDeliveryWithInRadious(distanceInKms, data);
+          if (area != null) {
+            if (area.deliveryMode == "2" &&
+                store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
+              Utils.showProgressDialog(context);
+              DatabaseHelper databaseHelper = new DatabaseHelper();
+              List<Product> cartList = await databaseHelper.getCartItemList();
+              String orderJson = await Utils.getCartListToJson(cartList);
+              ThirdPartyDeliveryResponse chargesResponse =
+                  await ApiController.getDeliveryShippingChargesApi(
+                      orderDetail: orderJson, userZipcode: addressData.zipCode);
+              Utils.hideProgressDialog(context);
+              if (chargesResponse != null &&
+                  chargesResponse.success &&
+                  chargesResponse.data != null) {
+                //update changes according to weight
+                if (chargesResponse.data.errorMsg != null) {
+                  Utils.showToast(chargesResponse.data.errorMsg, false);
+                  isTPDSError = true;
+                }
+                addressData.thirdPartyDeliveryData = chargesResponse.data;
+              } else {
+                isTPDSError = true;
+                if (chargesResponse.message != null) {
+                  Utils.showToast(chargesResponse.message, false);
+                  DialogUtils.displayLocationNotAvailbleDialog(
+                      context, chargesResponse.message,
+                      buttonText1: 'Change Zipcode', button1: () {
+                    Navigator.pop(context);
+                    _editAddress(addressData);
+                  });
+                }
+              }
+            } else if (area.deliveryMode == "1" &&
+                store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
+              addressData.areaCharges = area.charges;
+            } else if (area.deliveryMode == "1" &&
+                store.storeDeliveryModel == AppConstant.DELIVERY_WEIGHTWISE) {
+              if (store.enableWeightWiseCharges == '1') {
+                String shippingCharges =
+                    await calculateShipping(addressList[selectedIndex]);
+                Utils.showProgressDialog(context);
+                DatabaseHelper databaseHelper = new DatabaseHelper();
+                List<Product> cartList = await databaseHelper.getCartItemList();
+                String orderJson = await Utils.getCartListToJson(cartList);
 
-                 WeightWiseChargesResponse chargesResponse =
-                 await ApiController.getWeightWiseShippingCharges(
-                     orderDetail: orderJson,
-                     areaShippingCharge: shippingCharges);
-                 if (chargesResponse != null &&
-                     chargesResponse.success &&
-                     chargesResponse.data != null) {
-                   //update changes according to weight
-                   addressData.areaCharges =
-                       chargesResponse.data.totalDeliveryCharge;
-                   Utils.hideProgressDialog(context);
+                WeightWiseChargesResponse chargesResponse =
+                    await ApiController.getWeightWiseShippingCharges(
+                        orderDetail: orderJson,
+                        areaShippingCharge: shippingCharges);
+                if (chargesResponse != null &&
+                    chargesResponse.success &&
+                    chargesResponse.data != null) {
+                  //update changes according to weight
+                  addressData.areaCharges =
+                      chargesResponse.data.totalDeliveryCharge;
+                  Utils.hideProgressDialog(context);
+                }
+              }
+            } else if (area.deliveryMode == "1" &&
+                store.storeDeliveryModel == AppConstant.DELIVERY_VALUEAPP) {
+            } else {
+              addressData.areaCharges = area.charges;
+            }
+            if (addressData != null) {
+              debugPrint("and =${addressData}==${isTPDSError}");
+              if (!isTPDSError) {
+                if (addressList.length == 0) {
+                  Utils.showToast(AppConstant.selectAddress, false);
+                } else {
+                  if (addressList[selectedIndex].note.isEmpty) {
+                    if (widget.delivery == OrderType.SubScription) {
+                      eventBus
+                          .fire(onAddressSelected(addressList[selectedIndex]));
+                      Navigator.pop(context);
+                    } else {
+                      debugPrint("=areacharges ${addressData?.areaCharges}");
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ConfirmOrderScreen(
+                                  addressData,
+                                  false,
+                                  "",
+                                  widget.delivery,
+                                  storeModel: store,
+                                )),
+                      );
+                    }
+                  } else {
+                    var result =
+                        await DialogUtils.displayOrderConfirmationDialog(
+                      context,
+                      "Confirmation",
+                      addressList[selectedIndex].note,
+                    );
+                    if (result == true) {
+                      if (widget.delivery == OrderType.SubScription) {
+                        eventBus.fire(
+                            onAddressSelected(addressList[selectedIndex]));
+                        Navigator.pop(context);
+                      } else {
+                        debugPrint("address ${addressData}");
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => ConfirmOrderScreen(
+                        //         addressData,
+                        //         false,
+                        //         "",
+                        //         widget.delivery,
+                        //         storeModel: store,
+                        //       )),
+                        // );
+                      }
+                    }
+                  }
+                }
 
-                 }
-               }
-             } else if (area.deliveryMode == "1" &&
-                 store.storeDeliveryModel == AppConstant.DELIVERY_VALUEAPP) {
-             } else {
-               addressData.areaCharges = area.charges;
-             }
-             if(addressData!=null)
-             {
-               debugPrint("and =${addressData}==${isTPDSError}");
-               if (!isTPDSError) {
-                 if (addressList.length == 0) {
-                   Utils.showToast(AppConstant.selectAddress, false);
-                 } else {
-                   if (addressList[selectedIndex].note.isEmpty) {
-                     if (widget.delivery == OrderType.SubScription) {
-                       eventBus.fire(onAddressSelected(addressList[selectedIndex]));
-                       Navigator.pop(context);
-                     } else {
-                       debugPrint("=areacharges ${addressData?.areaCharges}");
-                       Navigator.push(
-                         context,
-                         MaterialPageRoute(
-                             builder: (context) => ConfirmOrderScreen(
-                                   addressData,
-                                   false,
-                                   "",
-                                   widget.delivery,
-                                   storeModel: store,
-                                 )),
-                       );
-                     }
-                   } else {
-                     var result = await DialogUtils.displayOrderConfirmationDialog(
-                       context,
-                       "Confirmation",
-                       addressList[selectedIndex].note,
-                     );
-                     if (result == true) {
-                       if (widget.delivery == OrderType.SubScription) {
-                         eventBus
-                             .fire(onAddressSelected(addressList[selectedIndex]));
-                         Navigator.pop(context);
-                       } else {
-                         debugPrint("address ${addressData}");
-                         // Navigator.push(
-                         //   context,
-                         //   MaterialPageRoute(
-                         //       builder: (context) => ConfirmOrderScreen(
-                         //         addressData,
-                         //         false,
-                         //         "",
-                         //         widget.delivery,
-                         //         storeModel: store,
-                         //       )),
-                         // );
-                       }
-                     }
-                   }
-                 }
-
-                 //Code Commented Due to not approved by client
-                 /* StoreModel storeModel = await SharedPrefs.getStore();
+                //Code Commented Due to not approved by client
+                /* StoreModel storeModel = await SharedPrefs.getStore();
             bool isPaymentModeOnline = false;
 
             if (storeModel.onlinePayment == "1") {
@@ -788,18 +814,14 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         paymentMode: widget.paymentMode,
                       )),
             );*/
-               }
-             }
-           }
-           else
-           {
-             Utils.showToast("We can not deliver at your location!", false);
-           }
-         }
-       else
-       {
-         Utils.showToast("We can not deliver at your location!", false);
-       }
+              }
+            }
+          } else {
+            Utils.showToast("We can not deliver at your location!", false);
+          }
+        } else {
+          Utils.showToast("We can not deliver at your location!", false);
+        }
       }
     });
   }
@@ -815,7 +837,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             Area areaObject = data.data[i].area[j];
             print("store area radius ${areaObject.radius}");
             int radius = int.parse(areaObject.radius);
-            print("=distanc ebetween${distanceInKms}= store radius ${radius}==${areaObject.radiusCircle}");
+            print(
+                "=distanc ebetween${distanceInKms}= store radius ${radius}==${areaObject.radiusCircle}");
             if (distanceInKms < radius && areaObject.radiusCircle == "Within") {
               //print("--if-${radius}---and-- ${distanceInKms}---");
               area = areaObject;

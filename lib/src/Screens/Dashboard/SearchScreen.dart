@@ -58,133 +58,135 @@ class _SearchScreenState extends BaseState<SearchScreen> {
           return false;
         });
       },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text("Search"),
-          centerTitle: true,
-        ),
-        body: Column(
-          children: <Widget>[
-            Container(
-              height: 40,
-              margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
-              //padding: EdgeInsets.all(5.0),
-              decoration: BoxDecoration(
-                  color: searchGrayColor,
-                  borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                  border: Border.all(
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: Text("Search"),
+            centerTitle: true,
+          ),
+          body: Column(
+            children: <Widget>[
+              Container(
+                height: 40,
+                margin: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                //padding: EdgeInsets.all(5.0),
+                decoration: BoxDecoration(
                     color: searchGrayColor,
-                  )),
-              child: Padding(
-                padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                child: Center(
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                            icon: Icon(
-                              Icons.search,
-                              color: appTheme,
+                    borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                    border: Border.all(
+                      color: searchGrayColor,
+                    )),
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                  child: Center(
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                              icon: Icon(
+                                Icons.search,
+                                color: appTheme,
+                              ),
+                              onPressed: () {
+                                if (controller.text.trim().isEmpty) {
+                                  Utils.showToast(
+                                      "Please enter some valid keyword",
+                                      false);
+                                } else {
+                                  selctedTag = -1;
+                                  callSearchAPI();
+                                }
+                              }),
+                          Flexible(
+                            child: TextField(
+                              textInputAction: TextInputAction.search,
+                              onSubmitted: (value) {
+                                if (value.trim().isEmpty) {
+                                  Utils.showToast(
+                                      "Please enter some valid keyword",
+                                      false);
+                                } else {
+                                  selctedTag = -1;
+                                  callSearchAPI();
+                                }
+                              },
+                              onChanged: (text) {
+                                print("onChanged ${text}");
+                                if (text.trim().isEmpty) {
+                                  isSearchEmpty = true;
+                                } else {
+                                  isSearchEmpty = false;
+                                }
+                                setState(() {});
+                              },
+                              controller: controller,
+                              cursorColor: Colors.black,
+                              keyboardType: TextInputType.text,
+                              decoration: new InputDecoration(
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  errorBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                  hintText: "Search"),
                             ),
-                            onPressed: () {
-                              if (controller.text.trim().isEmpty) {
-                                Utils.showToast(
-                                    "Please enter some valid keyword",
-                                    false);
-                              } else {
-                                selctedTag = -1;
-                                callSearchAPI();
-                              }
-                            }),
-                        Flexible(
-                          child: TextField(
-                            textInputAction: TextInputAction.search,
-                            onSubmitted: (value) {
-                              if (value.trim().isEmpty) {
-                                Utils.showToast(
-                                    "Please enter some valid keyword",
-                                    false);
-                              } else {
-                                selctedTag = -1;
-                                callSearchAPI();
-                              }
-                            },
-                            onChanged: (text) {
-                              print("onChanged ${text}");
-                              if (text.trim().isEmpty) {
-                                isSearchEmpty = true;
-                              } else {
-                                isSearchEmpty = false;
-                              }
-                              setState(() {});
-                            },
-                            controller: controller,
-                            cursorColor: Colors.black,
-                            keyboardType: TextInputType.text,
-                            decoration: new InputDecoration(
-                                border: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                enabledBorder: InputBorder.none,
-                                errorBorder: InputBorder.none,
-                                disabledBorder: InputBorder.none,
-                                hintText: "Search"),
                           ),
-                        ),
-                        IconButton(
-                            icon: Icon(
-                              Icons.clear,
-                              color: appTheme,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                controller.text = "";
+                          IconButton(
+                              icon: Icon(
+                                Icons.clear,
+                                color: appTheme,
+                              ),
+                              onPressed: () {
                                 setState(() {
-                                  subCategory = null;
-                                  productsList.clear();
+                                  controller.text = "";
+                                  setState(() {
+                                    subCategory = null;
+                                    productsList.clear();
+                                  });
                                 });
-                              });
-                            }),
-                      ]),
+                              }),
+                        ]),
+                  ),
                 ),
               ),
-            ),
-            Expanded(child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              controller: _scrollController,
-              child: Container(
-                child: Column(
-                  children: <Widget>[
+              Expanded(child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                controller: _scrollController,
+                child: Container(
+                  child: Column(
+                    children: <Widget>[
 
-                    Container(
-                      margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                      child: showTagsList(),
-                    ),
-                    Container(
-                      key: tagskey,
-                    ),
-                    productsList.length == 0
-                        ? Utils.getEmptyView2("")
-                        : ListView.builder(
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                        child: showTagsList(),
+                      ),
+                      Container(
+                        key: tagskey,
+                      ),
+                      productsList.length == 0
+                          ? Utils.getEmptyView2("")
+                          : ListView.builder(
 //                  controller: _scrollController,
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      itemCount: productsList.length,
-                      itemBuilder: (context, index) {
-                        Product product = productsList[index];
-                        return ProductTileItem(product, () {
-                          bottomBar.state.updateTotalPrice();
-                        }, ClassType.Search);
-                      },
-                    ),
-                  ],
+                        shrinkWrap: true,
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: productsList.length,
+                        itemBuilder: (context, index) {
+                          Product product = productsList[index];
+                          return ProductTileItem(product, () {
+                            bottomBar.state.updateTotalPrice();
+                          }, ClassType.Search);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),)
+              ),)
 
-          ],
+            ],
+          ),
+          bottomNavigationBar: bottomBar,
         ),
-        bottomNavigationBar: bottomBar,
       ),
     );
   }

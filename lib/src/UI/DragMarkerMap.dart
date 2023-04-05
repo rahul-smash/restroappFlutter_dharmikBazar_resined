@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
 
 // import 'package:geocoder/geocoder.dart';
@@ -62,200 +63,216 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text('Choose Your Location'),
-        backgroundColor: appTheme,
-        actions: [
-          InkWell(
-            onTap: () async {
-              var result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) {
-                      return CustomSearchScaffold();
-                    },
-                    fullscreenDialog: true,
-                  ));
-              if (result != null) {
-                LatLng detail = result;
-                double lat = detail.latitude;
-                double lng = detail.longitude;
-                print("location = ${lat},${lng}");
-                selectedLocation = LatLng(lat, lng);
-                getAddressFromLocation(lat, lng);
-                setState(() {
-                  _mapController
-                      .moveCamera(CameraUpdate.newLatLng(selectedLocation));
-                });
-                // localCenter = LatLng(lat, lng);
-                // localSelectedLocation = LatLng(lat, lng);
-                // getAddressFromLocationFromMap(lat, lng,
-                //     setState: setState);
-                // markers.clear();
-                // markers.addAll([
-                //   Marker(
-                //       draggable: true,
-                //       icon: BitmapDescriptor.defaultMarker,
-                //       markerId: MarkerId('value'),
-                //       position: localCenter,
-                //       onDragEnd: (value) {
-                //         getAddressFromLocationFromMap(
-                //             value.latitude, value.longitude,
-                //             setState: setState);
-                //       })
-                // ]);
-                // setState(() {
-                //   _mapController.moveCamera(
-                //       CameraUpdate.newLatLng(localCenter));
-                // });
-              }
-            },
-            child: Padding(
-                padding: EdgeInsets.fromLTRB(3, 3, 10, 3),
-                child: Image.asset('images/searchicon.png',
-                    width: 20, fit: BoxFit.scaleDown, color: Colors.white)),
-          ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          InkWell(
-            onTap: () async {
-              print("-------onTap---------");
-              if (enableDialog == true) {
-                RadiousData areaObject = await displayRadiusCityDialog(
-                    context, "Select City", widget.data.data);
-                //print("-------onTap----${areaObject.city.city}-----");
-                setState(() {
-                  cityValue = "${areaObject.city.city}";
-                  cityId = "${areaObject.city.id}";
-                  if (areaList != null && areaList.isNotEmpty) {
-                    areaList.clear();
-                  }
-                  areaList.addAll(areaObject.area);
-                });
-                print("areaList ${areaList}");
-              }
-            },
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                padding: EdgeInsets.fromLTRB(10, 15, 0, 10),
-                color: Colors.white,
-                child: cityValue.compareTo("Click here...") == 0
-                    ? RichText(
-                        text: TextSpan(
-                            text: "Select City:",
-                            style: TextStyle(
-                              color: Colors.black,
+    return AnnotatedRegion(
+        value: SystemUiOverlayStyle.light.copyWith(
+            statusBarColor: whiteColor,
+            statusBarIconBrightness: Brightness.dark),
+        child: SafeArea(
+          child: Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              title: Text('Choose Your Location'),
+              backgroundColor: appTheme,
+              actions: [
+                InkWell(
+                  onTap: () async {
+                    var result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) {
+                            return CustomSearchScaffold();
+                          },
+                          fullscreenDialog: true,
+                        ));
+                    if (result != null) {
+                      LatLng detail = result;
+                      double lat = detail.latitude;
+                      double lng = detail.longitude;
+                      print("location = ${lat},${lng}");
+                      selectedLocation = LatLng(lat, lng);
+                      getAddressFromLocation(lat, lng);
+                      setState(() {
+                        _mapController.moveCamera(
+                            CameraUpdate.newLatLng(selectedLocation));
+                      });
+                      // localCenter = LatLng(lat, lng);
+                      // localSelectedLocation = LatLng(lat, lng);
+                      // getAddressFromLocationFromMap(lat, lng,
+                      //     setState: setState);
+                      // markers.clear();
+                      // markers.addAll([
+                      //   Marker(
+                      //       draggable: true,
+                      //       icon: BitmapDescriptor.defaultMarker,
+                      //       markerId: MarkerId('value'),
+                      //       position: localCenter,
+                      //       onDragEnd: (value) {
+                      //         getAddressFromLocationFromMap(
+                      //             value.latitude, value.longitude,
+                      //             setState: setState);
+                      //       })
+                      // ]);
+                      // setState(() {
+                      //   _mapController.moveCamera(
+                      //       CameraUpdate.newLatLng(localCenter));
+                      // });
+                    }
+                  },
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(3, 3, 10, 3),
+                      child: Image.asset('images/searchicon.png',
+                          width: 20,
+                          fit: BoxFit.scaleDown,
+                          color: Colors.white)),
+                ),
+              ],
+            ),
+            body: Column(
+              children: <Widget>[
+                InkWell(
+                  onTap: () async {
+                    print("-------onTap---------");
+                    if (enableDialog == true) {
+                      RadiousData areaObject = await displayRadiusCityDialog(
+                          context, "Select City", widget.data.data);
+                      //print("-------onTap----${areaObject.city.city}-----");
+                      setState(() {
+                        cityValue = "${areaObject.city.city}";
+                        cityId = "${areaObject.city.id}";
+                        if (areaList != null && areaList.isNotEmpty) {
+                          areaList.clear();
+                        }
+                        areaList.addAll(areaObject.area);
+                      });
+                      print("areaList ${areaList}");
+                    }
+                  },
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(10, 15, 0, 10),
+                      color: Colors.white,
+                      child: cityValue.compareTo("Click here...") == 0
+                          ? RichText(
+                              text: TextSpan(
+                                  text: "Select City:",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: " ${cityValue}",
+                                      style: TextStyle(
+                                          color: Colors.blue,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ]),
+                              textAlign: TextAlign.left,
+                            )
+                          : Text(
+                              "Select City: ${cityValue}",
                             ),
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: " ${cityValue}",
-                                style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold),
-                              )
-                            ]),
-                        textAlign: TextAlign.left,
-                      )
-                    : Text(
-                        "Select City: ${cityValue}",
+                    ),
+                  ),
+                ),
+                Divider(color: Colors.grey, height: 2.0),
+                Container(
+                  margin: EdgeInsets.fromLTRB(0, 00, 0, 0),
+                  height: 50,
+                  color: Colors.white,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          left: 10.0, right: 10, top: 5, bottom: 5),
+                      child: RichText(
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 2,
+                        text: TextSpan(
+                          text: "Address: ${address}",
+                          style: TextStyle(color: Colors.black),
+                        ),
                       ),
-              ),
-            ),
-          ),
-          Divider(color: Colors.grey, height: 2.0),
-          Container(
-            margin: EdgeInsets.fromLTRB(0, 00, 0, 0),
-            height: 50,
-            color: Colors.white,
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding:
-                    EdgeInsets.only(left: 10.0, right: 10, top: 5, bottom: 5),
-                child: RichText(
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 2,
-                  text: TextSpan(
-                    text: "Address: ${address}",
-                    style: TextStyle(color: Colors.black),
+                    ),
                   ),
                 ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: Stack(
-              children: [
-                GoogleMap(
-                  onMapCreated: _onMapCreated,
-                  // myLocationEnabled: true,
-                  initialCameraPosition: CameraPosition(
-                    target: center,
-                    zoom: 15.0,
-                  ),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      GoogleMap(
+                        onMapCreated: _onMapCreated,
+                        // myLocationEnabled: true,
+                        initialCameraPosition: CameraPosition(
+                          target: center,
+                          zoom: 15.0,
+                        ),
 
-                  mapType: MapType.normal,
-                  markers: markers,
-                  onCameraMove: _onCameraMove,
-                  //onCameraMove: _onCameraMove,
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Image.asset(
-                    "images/marker.png",
-                    height: 50,
+                        mapType: MapType.normal,
+                        markers: markers,
+                        onCameraMove: _onCameraMove,
+                        //onCameraMove: _onCameraMove,
+                      ),
+                      Align(
+                        alignment: Alignment.center,
+                        child: Image.asset(
+                          "images/marker.png",
+                          height: 50,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: SafeArea(
-        child: BottomAppBar(
-          child: InkWell(
-            onTap: () async {
-              StoreModel store = await SharedPrefs.getStore();
-    print(
-                  "====${selectedLocation.latitude},${selectedLocation.longitude}===");
-              double distanceInKm = Utils.calculateDistance(
-                  selectedLocation.latitude,
-                  selectedLocation.longitude,
-                  double.parse(store.lat),
-                  double.parse(store.lng));
-              int distanceInKms = distanceInKm.toInt();
+            bottomNavigationBar: SafeArea(
+              child: BottomAppBar(
+                child: InkWell(
+                  onTap: () async {
+                 if(areaList.isEmpty)
+                   {
+                     Utils.showToast("Please select city.", false);
+                   }
+                 else
+                   {
+                     StoreModel store = await SharedPrefs.getStore();
+                     print(
+                         "====${selectedLocation.latitude},${selectedLocation.longitude}===");
+                     double distanceInKm = Utils.calculateDistance(
+                         selectedLocation.latitude,
+                         selectedLocation.longitude,
+                         double.parse(store.lat),
+                         double.parse(store.lng));
+                     int distanceInKms = distanceInKm.toInt();
 
-              print("==distanceInKm==${distanceInKm}=AND=${distanceInKms}=");
+                     print(
+                         "==distanceInKm==${distanceInKm}=AND=${distanceInKms}=");
 
-              checkIfOrderDeliveryWithInRadious(distanceInKms);
-            },
-            child: Container(
-              height: 40,
-              color: appTheme,
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 0.0),
-                  child: RichText(
-                    text: TextSpan(
-                      text: "Save Address",
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.white),
+                     checkIfOrderDeliveryWithInRadious(distanceInKms);
+                   }
+                  },
+                  child: Container(
+                    height: 40,
+                    color: appTheme,
+                    child: Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 0.0),
+                        child: RichText(
+                          text: TextSpan(
+                            text: "Save Address",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 
   Future<void> getLocation() async {
@@ -264,6 +281,8 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
         desiredAccuracy: LocationAccuracy.high);
     // final coordinates = new Coordinates(position.latitude, position.longitude);
     center = LatLng(position.latitude, position.longitude);
+    selectedLocation=LatLng(position.latitude, position.longitude);
+    debugPrint("current location ${center}");
     getAddressFromLocation(position.latitude, position.longitude);
     Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
@@ -351,7 +370,6 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
             actions: <Widget>[
               new TextButton(
                 child: new Text("Cancel"),
-
                 onPressed: () {
                   Navigator.pop(context, null);
                   // true here means you clicked ok
@@ -370,15 +388,11 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
       print("---${areaList.length}---and-- ${distanceInKms}---");
       for (int i = 0; i < areaList.length; i++) {
         Area areaObject = areaList[i];
-        print("dkjkdjk ${areaObject.radius}");
         int radius = int.parse(areaObject.radius);
-        print("=${distanceInKms}=${radius}==${areaObject.radiusCircle}");
         if (distanceInKms < radius && areaObject.radiusCircle == "Within") {
           //print("--if-${radius}---and-- ${distanceInKms}---");
           area = areaObject;
-          setState(() {
-
-          });
+          setState(() {});
           break;
         } else {
           //print("--else-${radius}---and-- ${distanceInKms}---");

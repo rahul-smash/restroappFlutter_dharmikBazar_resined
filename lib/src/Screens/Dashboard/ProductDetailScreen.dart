@@ -80,20 +80,22 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
   Widget build(BuildContext context) {
     if (widget.product == null) {
-      return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              return Navigator.pop(context, variant);
-            },
+      return SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                return Navigator.pop(context, variant);
+              },
+            ),
           ),
-        ),
-        body: Center(
-          child: CircularProgressIndicator(
-              backgroundColor: Colors.black26,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+          body: Center(
+            child: CircularProgressIndicator(
+                backgroundColor: Colors.black26,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.black26)),
+          ),
         ),
       );
     }
@@ -127,56 +129,58 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
         print("onWillPop onWillPop");
         Navigator.pop(context, variant);
       },
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          actions: <Widget>[
-            Visibility(
-                visible: _checkVisibility(),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.share,
-                    size: 25.0,
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            actions: <Widget>[
+              Visibility(
+                  visible: _checkVisibility(),
+                  child: IconButton(
+                    icon: Icon(
+                      Icons.share,
+                      size: 25.0,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      share(widget.product,
+                          '${_storeModel.domain}/shop/product/${widget.product.id}');
+                    },
+                  )),
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+                child: Padding(
+                  padding:
+                      EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+                  child: Icon(
+                    Icons.home,
                     color: Colors.white,
+                    size: 30,
                   ),
-                  onPressed: () {
-                    share(widget.product,
-                        '${_storeModel.domain}/shop/product/${widget.product.id}');
-                  },
-                )),
-            InkWell(
-              onTap: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-              child: Padding(
-                padding:
-                    EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
-                child: Icon(
-                  Icons.home,
-                  color: Colors.white,
-                  size: 30,
                 ),
               ),
+            ],
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                return Navigator.pop(context, variant);
+              },
             ),
-          ],
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.white),
-            onPressed: () {
-              return Navigator.pop(context, variant);
-            },
+            title: Text("${widget.product.title}"),
+            centerTitle: true,
           ),
-          title: Text("${widget.product.title}"),
-          centerTitle: true,
-        ),
-        body: Container(
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                getProductDetailsView(),
-              ],
+          body: Container(
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  getProductDetailsView(),
+                ],
+              ),
             ),
           ),
         ),
@@ -835,7 +839,10 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       String variantId;
       variantId = variant == null ? variant_Id : variant.id;
       databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {
-        //widget.callback();
+        showAddButton=true;
+        if(mounted) setState(() {
+
+        });
       });
     } catch (e) {
       print(e);

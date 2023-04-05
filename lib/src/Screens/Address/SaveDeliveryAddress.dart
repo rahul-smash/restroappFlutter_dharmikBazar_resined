@@ -41,11 +41,9 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
   void initState() {
     super.initState();
     if (widget.selectedAddress != null) {
-      print("-11111111111-------");
       selectedCity = City();
       selectedCity.city = widget.selectedAddress.city;
       selectedCity.id = widget.selectedAddress.cityId;
-
       selectedArea = Area();
       selectedArea.areaId = widget.selectedAddress.areaId;
       selectedArea.area = widget.selectedAddress.areaName;
@@ -60,13 +58,9 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
       locationData.lat = widget.selectedAddress.lat.toString();
       locationData.lng = widget.selectedAddress.lng.toString();
     } else {
-      print("-2222222222222222-------");
       locationData = new LocationData();
-
       getUserData();
-
       if (widget.addressValue != null && widget.addressValue.isNotEmpty) {
-        //print("-3333333333333333-------");
         locationData.address = widget.addressValue;
         addressController.text = widget.addressValue;
         address2Controller.text = widget.addressValue;
@@ -74,7 +68,6 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
         locationData.lng = widget.longitude.toString();
       }
     }
-    //getLocation();
   }
 
   void getUserData() {
@@ -91,381 +84,384 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        //resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          title: Text(
-            widget.selectedAddress != null ? "Edit Address" : "Add Address",
-            style: new TextStyle(
-              color: Colors.white,
-            ),
-          ),
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.pop(context),
-          ),
-          actions: <Widget>[
-            InkWell(
-              onTap: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-              child: Padding(
-                padding:
-                    EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
-                child: Icon(
-                  Icons.home,
-                  color: Colors.white,
-                  size: 30,
-                ),
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              widget.selectedAddress != null ? "Edit Address" : "Add Address",
+              style: new TextStyle(
+                color: Colors.white,
               ),
             ),
-          ],
-        ),
-        body: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).requestFocus(FocusNode());
-          },
-          child: SingleChildScrollView(
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      SizedBox(height: 20),
-                      Text(
-                        "Town/City*",
-                        style: TextStyle(color: infoLabel, fontSize: 17.0),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(0, 20, 0, 5),
-                          child: InkWell(
-                            onTap: () async {
-                              Utils.showProgressDialog(context);
-                              StoreAreaResponse storeArea =
-                                  await ApiController.getStoreAreaApiRequest();
-                              Utils.hideProgressDialog(context);
-                              List<Datum> data = storeArea.data;
-                              if (data.length == 1) {
-                                setState(() {
-                                  dataObject = data[0];
-                                  selectedCity = dataObject.city;
-                                });
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      CityDialog((area) {
-                                    setState(() {
-                                      dataObject = area;
-                                      selectedCity = dataObject.city;
-                                    });
-                                  }),
-                                );
-                              }
-                            },
-                            child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                child: Text(
-                                  selectedCity != null
-                                      ? selectedCity.city
-                                      : "Select",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 17.0,
-                                  ),
-                                )),
-                          )),
-                      Divider(color: Colors.grey, height: 2.0),
-                      SizedBox(height: 20),
-                      Text(
-                        "Area/Society Name*",
-                        style: TextStyle(color: infoLabel, fontSize: 17.0),
-                      ),
-                      Padding(
-                          padding: EdgeInsets.fromLTRB(0, 20, 0, 5),
-                          child: InkWell(
-                            onTap: () async {
-                              if (selectedCity == null) {
-                                Utils.showToast(
-                                    "Please select Town/City first!", false);
-                                return;
-                              }
-                              if (dataObject == null) {
+            centerTitle: true,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios),
+              onPressed: () => Navigator.pop(context),
+            ),
+            actions: <Widget>[
+              InkWell(
+                onTap: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(
+                      top: 0.0, bottom: 0.0, left: 0, right: 10),
+                  child: Icon(
+                    Icons.home,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          body: GestureDetector(
+            onTap: () {
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: SingleChildScrollView(
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        SizedBox(height: 20),
+                        Text(
+                          "Town/City*",
+                          style: TextStyle(color: infoLabel, fontSize: 17.0),
+                        ),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(0, 20, 0, 5),
+                            child: InkWell(
+                              onTap: () async {
                                 Utils.showProgressDialog(context);
                                 StoreAreaResponse storeArea =
                                     await ApiController
                                         .getStoreAreaApiRequest();
                                 Utils.hideProgressDialog(context);
                                 List<Datum> data = storeArea.data;
-                                //find city
-                                for (int i = 0; i < data.length; i++) {
-                                  if (data[i].city.id == selectedCity.id) {
-                                    dataObject = data[i];
-                                    break;
-                                  }
-                                }
-                              }
-                              if (selectedCity == null) {}
-                              print("-area.length-${dataObject.area.length}--");
-                              if (dataObject.area.length == 1) {
-                                setState(() {
-                                  selectedArea = dataObject.area[0];
-                                });
-                              } else {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) =>
-                                      AreaOptionDialog((area) {
-                                    setState(() {
-                                      selectedArea = area;
-                                    });
-                                  }, dataObject),
-                                );
-                              }
-                            },
-                            child: Container(
-                                width: MediaQuery.of(context).size.width,
-                                child: Text(
-                                  selectedArea != null
-                                      ? selectedArea.area
-                                      : "Select",
-                                  style: TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 17.0,
-                                  ),
-                                )),
-                          )),
-                      Divider(color: Colors.grey, height: 2.0),
-                      SizedBox(height: 20),
-                      InkWell(
-                          onTap: () {
-                            Geolocator.isLocationServiceEnabled()
-                                .then((value) async {
-                              if (value == true) {
-                                var status = await Geolocator.checkPermission();
-                                print("--status--=${status}");
-                                /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){
-                                  Utils.showToast("Please accept location permissions to get your location from settings!", false);
-                                }*/
-
-                                var result = await Navigator.push(
-                                    context,
-                                    new MaterialPageRoute(
-                                      builder: (BuildContext context) =>
-                                          SelectLocationOnMap(),
-                                      fullscreenDialog: true,
-                                    ));
-                                if (result != null) {
-                                  locationData = result;
-                                  if (locationData.address.isNotEmpty) {
-                                    addressController.text =
-                                        locationData.address;
-                                  }
-                                }
-                              } else {
-                                await AppSettings.openLocationSettings();
-                                Utils.showToast("Please turn on gps!", false);
-                              }
-                            });
-                          },
-                          child: Text.rich(
-                            TextSpan(
-                              text: 'Enter Address or Select Location - ',
-                              style: TextStyle(color: infoLabel, fontSize: 17),
-                              children: <TextSpan>[
-                                TextSpan(
-                                    text: 'Click here',
-                                    style: TextStyle(
-                                      color: Colors.lightBlue,
-                                      decoration: TextDecoration.underline,
-                                    )),
-                                TextSpan(
-                                  text: '*',
-                                ),
-                                // can add more TextSpans here...
-                              ],
-                            ),
-                          )),
-                      SizedBox(height: 10),
-                      Container(
-                        color: Colors.grey[200],
-                        height: 100.0,
-                        child: new TextField(
-                          controller: addressController,
-                          keyboardType: TextInputType.text,
-                          maxLength: 100,
-                          maxLines: null,
-                          decoration: new InputDecoration(
-                              border: InputBorder.none,
-                              hintStyle: TextStyle(color: Colors.grey),
-                              focusedBorder: InputBorder.none,
-                              contentPadding: EdgeInsets.only(
-                                  left: 10, bottom: 10, top: 10, right: 10),
-                              hintText: '' /*AppConstant.enterAddress*/),
-                        ),
-                      ),
-                      Divider(color: Colors.grey, height: 2.0),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text(
-                          "Address line2/House/flat no",
-                          style: TextStyle(color: infoLabel, fontSize: 17.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 0),
-                        child: Container(
-                          child: new TextField(
-                            controller: address2Controller,
-                            keyboardType: TextInputType.text,
-                            decoration: new InputDecoration(
-                                border: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.only(
-                                    left: 0, bottom: 0, top: 0, right: 0)),
-                          ),
-                        ),
-                      ),
-                      Divider(color: Colors.grey, height: 2.0),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text(
-                          "First name:*",
-                          style: TextStyle(color: infoLabel, fontSize: 17.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 0),
-                        child: Container(
-                          child: new TextField(
-                            controller: fullnameController,
-                            keyboardType: TextInputType.text,
-                            decoration: new InputDecoration(
-                                border: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.only(
-                                    left: 0, bottom: 0, top: 0, right: 0)),
-                          ),
-                        ),
-                      ),
-                      Divider(color: Colors.grey, height: 2.0),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20),
-                        child: Text(
-                          "Zip/Postal Code:",
-                          style: TextStyle(color: infoLabel, fontSize: 17.0),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 5),
-                        child: Container(
-                          child: new TextField(
-                            controller: zipCodeController,
-                            keyboardType: TextInputType.number,
-                            decoration: new InputDecoration(
-                                border: InputBorder.none,
-                                focusedBorder: InputBorder.none,
-                                contentPadding: EdgeInsets.only(
-                                    left: 0, bottom: 0, top: 0, right: 0)),
-                          ),
-                        ),
-                      ),
-                      Divider(color: Colors.grey, height: 2.0),
-                      SizedBox(height: 30),
-                      Align(
-                        alignment: Alignment.center,
-                        child: ButtonTheme(
-                          minWidth: 180.0,
-                          height: 40.0,
-                          child: ElevatedButton(
-                            style: Utils.getButtonDecoration(
-                                color: appTheme,
-                                edgeInsets: EdgeInsets.all(5.0),
-                              border: RoundedRectangleBorder(
-                                  borderRadius: new BorderRadius.circular(25.0),
-                                  side: BorderSide(color: appTheme))
-                            ),
-
-                            onPressed: () async {
-                              bool isNetworkAvailable =
-                                  await Utils.isNetworkAvailable();
-                              if (!isNetworkAvailable) {
-                                Utils.showToast(AppConstant.noInternet, false);
-                                return;
-                              }
-
-                              if (selectedCity == null) {
-                                Utils.showToast(AppConstant.selectCity, false);
-                                return;
-                              }
-                              if (selectedArea == null) {
-                                Utils.showToast(AppConstant.selectArea, false);
-                                return;
-                              }
-                              if (addressController.text.trim().isEmpty &&
-                                  address2Controller.text.trim().isEmpty) {
-                                Utils.showToast(
-                                    AppConstant.pleaseEnterAddress, false);
-                                return;
-                              }
-                              if (fullnameController.text.trim().isEmpty) {
-                                Utils.showToast(
-                                    AppConstant.pleaseFullname, false);
-                                return;
-                              }
-                              /*if(zipCodeController.text.trim().isEmpty) {
-                                Utils.showToast(AppConstant.enterZipCode, false);
-                                return;
-                              }*/
-
-                              print(
-                                  "--addressController---${addressController.text}---");
-
-                              Utils.showProgressDialog(context);
-                              ApiController.saveDeliveryAddressApiRequest(
-                                      widget.selectedAddress == null
-                                          ? "ADD"
-                                          : "EDIT",
-                                      zipCodeController.text,
-                                      addressController.text,
-                                      selectedArea.areaId,
-                                      selectedArea.area,
-                                      widget.selectedAddress == null
-                                          ? null
-                                          : widget.selectedAddress.id,
-                                      fullnameController.text,
-                                      selectedCity.city,
-                                      selectedCity.id,
-                                      "${locationData.lat}",
-                                      "${locationData.lng}",
-                                      address2: address2Controller.text)
-                                  .then((response) {
-                                Utils.hideProgressDialog(context);
-                                //print('@@REsonsesss'+response.toString());
-                                if (response != null && response.success) {
-                                  print('@@response.success');
-                                  //widget.callback();
-                                  Utils.showToast(response.message, true);
-                                  Navigator.pop(context, true);
-                                  //Navigator.of(context, rootNavigator: true)..pop()..pop();
+                                if (data.length == 1) {
+                                  setState(() {
+                                    dataObject = data[0];
+                                    selectedCity = dataObject.city;
+                                  });
                                 } else {
-                                  print('Not @@response.success');
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        CityDialog((area) {
+                                      setState(() {
+                                        dataObject = area;
+                                        selectedCity = dataObject.city;
+                                      });
+                                    }),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Text(
+                                    selectedCity != null
+                                        ? selectedCity.city
+                                        : "Select",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17.0,
+                                    ),
+                                  )),
+                            )),
+                        Divider(color: Colors.grey, height: 2.0),
+                        SizedBox(height: 20),
+                        Text(
+                          "Area/Society Name*",
+                          style: TextStyle(color: infoLabel, fontSize: 17.0),
+                        ),
+                        Padding(
+                            padding: EdgeInsets.fromLTRB(0, 20, 0, 5),
+                            child: InkWell(
+                              onTap: () async {
+                                if (selectedCity == null) {
                                   Utils.showToast(
-                                      "Error while saving address!", true);
+                                      "Please select Town/City first!", false);
+                                  return;
+                                }
+                                if (dataObject == null) {
+                                  Utils.showProgressDialog(context);
+                                  StoreAreaResponse storeArea =
+                                      await ApiController
+                                          .getStoreAreaApiRequest();
+                                  Utils.hideProgressDialog(context);
+                                  List<Datum> data = storeArea.data;
+                                  //find city
+                                  for (int i = 0; i < data.length; i++) {
+                                    if (data[i].city.id == selectedCity.id) {
+                                      dataObject = data[i];
+                                      break;
+                                    }
+                                  }
+                                }
+                                if (selectedCity == null) {}
+                                if (dataObject.area.length == 1) {
+                                  setState(() {
+                                    selectedArea = dataObject.area[0];
+                                  });
+                                } else {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) =>
+                                        AreaOptionDialog((area) {
+                                      setState(() {
+                                        selectedArea = area;
+                                      });
+                                    }, dataObject),
+                                  );
+                                }
+                              },
+                              child: Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  child: Text(
+                                    selectedArea != null
+                                        ? selectedArea.area
+                                        : "Select",
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 17.0,
+                                    ),
+                                  )),
+                            )),
+                        Divider(color: Colors.grey, height: 2.0),
+                        SizedBox(height: 20),
+                        InkWell(
+                            onTap: () {
+                              Geolocator.isLocationServiceEnabled()
+                                  .then((value) async {
+                                if (value == true) {
+                                  var status =
+                                      await Geolocator.checkPermission();
+                                  print("--status--=${status}");
+                                  /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){
+                                    Utils.showToast("Please accept location permissions to get your location from settings!", false);
+                                  }*/
+
+                                  var result = await Navigator.push(
+                                      context,
+                                      new MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            SelectLocationOnMap(),
+                                        fullscreenDialog: true,
+                                      ));
+                                  if (result != null) {
+                                    locationData = result;
+                                    if (locationData.address.isNotEmpty) {
+                                      addressController.text =
+                                          locationData.address;
+                                    }
+                                  }
+                                } else {
+                                  await AppSettings.openLocationSettings();
+                                  Utils.showToast("Please turn on gps!", false);
                                 }
                               });
                             },
-
-
-                            child: Text("Done"),
+                            child: Text.rich(
+                              TextSpan(
+                                text: 'Enter Address or Select Location - ',
+                                style:
+                                    TextStyle(color: infoLabel, fontSize: 17),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                      text: 'Click here',
+                                      style: TextStyle(
+                                        color: Colors.lightBlue,
+                                        decoration: TextDecoration.underline,
+                                      )),
+                                  TextSpan(
+                                    text: '*',
+                                  ),
+                                  // can add more TextSpans here...
+                                ],
+                              ),
+                            )),
+                        SizedBox(height: 10),
+                        Container(
+                          color: Colors.grey[200],
+                          height: 100.0,
+                          child: new TextField(
+                            controller: addressController,
+                            keyboardType: TextInputType.text,
+                            maxLength: 100,
+                            maxLines: null,
+                            decoration: new InputDecoration(
+                                border: InputBorder.none,
+                                hintStyle: TextStyle(color: Colors.grey),
+                                focusedBorder: InputBorder.none,
+                                contentPadding: EdgeInsets.only(
+                                    left: 10, bottom: 10, top: 10, right: 10),
+                                hintText: '' /*AppConstant.enterAddress*/),
                           ),
                         ),
-                      ),
-                      SizedBox(height: 20),
-                    ],
-                  ))),
-        ));
+                        Divider(color: Colors.grey, height: 2.0),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text(
+                            "Address line2/House/flat no",
+                            style: TextStyle(color: infoLabel, fontSize: 17.0),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 0),
+                          child: Container(
+                            child: new TextField(
+                              controller: address2Controller,
+                              keyboardType: TextInputType.text,
+                              decoration: new InputDecoration(
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(
+                                      left: 0, bottom: 0, top: 0, right: 0)),
+                            ),
+                          ),
+                        ),
+                        Divider(color: Colors.grey, height: 2.0),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text(
+                            "First name:*",
+                            style: TextStyle(color: infoLabel, fontSize: 17.0),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 0),
+                          child: Container(
+                            child: new TextField(
+                              controller: fullnameController,
+                              keyboardType: TextInputType.text,
+                              decoration: new InputDecoration(
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(
+                                      left: 0, bottom: 0, top: 0, right: 0)),
+                            ),
+                          ),
+                        ),
+                        Divider(color: Colors.grey, height: 2.0),
+                        Padding(
+                          padding: EdgeInsets.only(top: 20),
+                          child: Text(
+                            "Zip/Postal Code:",
+                            style: TextStyle(color: infoLabel, fontSize: 17.0),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 5),
+                          child: Container(
+                            child: new TextField(
+                              controller: zipCodeController,
+                              keyboardType: TextInputType.number,
+                              decoration: new InputDecoration(
+                                  border: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(
+                                      left: 0, bottom: 0, top: 0, right: 0)),
+                            ),
+                          ),
+                        ),
+                        Divider(color: Colors.grey, height: 2.0),
+                        SizedBox(height: 30),
+                        Align(
+                          alignment: Alignment.center,
+                          child: ButtonTheme(
+                            minWidth: 180.0,
+                            height: 40.0,
+                            child: ElevatedButton(
+                              style: Utils.getButtonDecoration(
+                                  color: appTheme,
+                                  edgeInsets: EdgeInsets.all(5.0),
+                                  border: RoundedRectangleBorder(
+                                      borderRadius:
+                                          new BorderRadius.circular(25.0),
+                                      side: BorderSide(color: appTheme))),
+                              onPressed: () async {
+                                bool isNetworkAvailable =
+                                    await Utils.isNetworkAvailable();
+                                if (!isNetworkAvailable) {
+                                  Utils.showToast(
+                                      AppConstant.noInternet, false);
+                                  return;
+                                }
+
+                                if (selectedCity == null) {
+                                  Utils.showToast(
+                                      AppConstant.selectCity, false);
+                                  return;
+                                }
+                                if (selectedArea == null) {
+                                  Utils.showToast(
+                                      AppConstant.selectArea, false);
+                                  return;
+                                }
+                                if (addressController.text.trim().isEmpty &&
+                                    address2Controller.text.trim().isEmpty) {
+                                  Utils.showToast(
+                                      AppConstant.pleaseEnterAddress, false);
+                                  return;
+                                }
+                                if (fullnameController.text.trim().isEmpty) {
+                                  Utils.showToast(
+                                      AppConstant.pleaseFullname, false);
+                                  return;
+                                }
+                                /*if(zipCodeController.text.trim().isEmpty) {
+                                  Utils.showToast(AppConstant.enterZipCode, false);
+                                  return;
+                                }*/
+
+                                print(
+                                    "--addressController---${addressController.text}---");
+
+                                Utils.showProgressDialog(context);
+                                ApiController.saveDeliveryAddressApiRequest(
+                                        widget.selectedAddress == null
+                                            ? "ADD"
+                                            : "EDIT",
+                                        zipCodeController.text,
+                                        addressController.text,
+                                        selectedArea.areaId,
+                                        selectedArea.area,
+                                        widget.selectedAddress == null
+                                            ? null
+                                            : widget.selectedAddress.id,
+                                        fullnameController.text,
+                                        selectedCity.city,
+                                        selectedCity.id,
+                                        "${locationData.lat}",
+                                        "${locationData.lng}",
+                                        address2: address2Controller.text)
+                                    .then((response) {
+                                  Utils.hideProgressDialog(context);
+                                  //print('@@REsonsesss'+response.toString());
+                                  if (response != null && response.success) {
+                                    print('@@response.success');
+                                    //widget.callback();
+                                    Utils.showToast(response.message, true);
+                                    Navigator.pop(context, true);
+                                    //Navigator.of(context, rootNavigator: true)..pop()..pop();
+                                  } else {
+                                    print('Not @@response.success');
+                                    Utils.showToast(
+                                        "Error while saving address!", true);
+                                  }
+                                });
+                              },
+                              child: Text("Done"),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20),
+                      ],
+                    ))),
+          )),
+    );
   }
 }
 
@@ -601,7 +597,7 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
         borderRadius: BorderRadius.circular(10.0),
       ),
       elevation: 0.0,
-      child: dialogContent(context, widget.dataObject.area),
+      child: dialogContent(context, widget?.dataObject?.area),
     );
   }
 
@@ -642,7 +638,7 @@ class AreaOptionDialogState extends State<AreaOptionDialog> {
           Expanded(
             child: ListView.builder(
               shrinkWrap: true,
-              itemCount: areaList.length,
+              itemCount: areaList?.length ?? 0,
               itemBuilder: (context, index) {
                 Area area = areaList[index];
                 return InkWell(

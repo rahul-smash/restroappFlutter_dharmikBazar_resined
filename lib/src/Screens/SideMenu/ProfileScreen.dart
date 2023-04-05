@@ -152,12 +152,13 @@ class _ProfileState extends State<ProfileScreen> {
                 emailValidation();
           }
         },
-        child: new Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            title: new Text("My Profile"),
-            centerTitle: true,
-            actions: [
+        child: SafeArea(
+          child: new Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              title: new Text("My Profile"),
+              centerTitle: true,
+              actions: [
 //              InkWell(
 //                onTap: () async {
 //                  var result;
@@ -184,57 +185,42 @@ class _ProfileState extends State<ProfileScreen> {
 //                  child: Icon(Icons.language,color: Colors.white,),
 //                ),
 //              ),
-            ],
-          ),
-          body: SingleChildScrollView(
-            child: Container(
-              margin: EdgeInsets.fromLTRB(20, 25, 20, 20),
-              child: SafeArea(
-                top: false,
-                bottom: false,
-                child: new Form(
-                  key: _formKey,
-                  autovalidateMode: AutovalidateMode.onUserInteraction
+              ],
+            ),
+            body: SingleChildScrollView(
+              child: Container(
+                margin: EdgeInsets.fromLTRB(20, 25, 20, 20),
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: new Form(
+                    key: _formKey,
+                    autovalidateMode: AutovalidateMode.onUserInteraction
 ,
-                  child: Padding(
-                    padding: EdgeInsets.all(0),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(top: 0),
-                            child: Center(
-                              child: Icon(
-                                Icons.account_circle,
-                                size: 100,
-                                color: Colors.grey,
+                    child: Padding(
+                      padding: EdgeInsets.all(0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(top: 0),
+                              child: Center(
+                                child: Icon(
+                                  Icons.account_circle,
+                                  size: 100,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: TextField(
-                              controller: firstNameController,
-                              decoration: InputDecoration(
-                                //labelText: 'Full name *',
-                                labelText:
-                                    Language.localizedValues["Full_name_txt"],
-                              ),
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color(0xFF495056),
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ),
-                          Visibility(
-                            visible: showReferralCodeView,
-                            child: Padding(
+                            Padding(
                               padding: const EdgeInsets.only(top: 10.0),
                               child: TextField(
-                                controller: referCodeController,
+                                controller: firstNameController,
                                 decoration: InputDecoration(
-                                  labelText: 'Referral Code',
+                                  //labelText: 'Full name *',
+                                  labelText:
+                                      Language.localizedValues["Full_name_txt"],
                                 ),
                                 style: TextStyle(
                                     fontSize: 18,
@@ -242,46 +228,44 @@ class _ProfileState extends State<ProfileScreen> {
                                     fontWeight: FontWeight.w500),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 10.0),
-                            child: TextField(
-                              readOnly: isEmailEditable,
-                              keyboardType: TextInputType.emailAddress,
-                              controller: emailController,
-                              decoration: InputDecoration(
-                                labelText: 'Email',
+                            Visibility(
+                              visible: showReferralCodeView,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 10.0),
+                                child: TextField(
+                                  controller: referCodeController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Referral Code',
+                                  ),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Color(0xFF495056),
+                                      fontWeight: FontWeight.w500),
+                                ),
                               ),
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color(0xFF495056),
-                                  fontWeight: FontWeight.w500),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 15.0),
-                            child: TextField(
-                              readOnly: isPhonereadOnly,
-                              controller: phoneController,
-                              decoration: InputDecoration(
-                                labelText: 'Phone number',
+                            Padding(
+                              padding: const EdgeInsets.only(top: 10.0),
+                              child: TextField(
+                                readOnly: isEmailEditable,
+                                keyboardType: TextInputType.emailAddress,
+                                controller: emailController,
+                                decoration: InputDecoration(
+                                  labelText: 'Email',
+                                ),
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    color: Color(0xFF495056),
+                                    fontWeight: FontWeight.w500),
                               ),
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color: Color(0xFF495056),
-                                  fontWeight: FontWeight.w500),
                             ),
-                          ),
-                          Visibility(
-                            visible:
-                                //widget.isComingFromOtpScreen && showGstNumber,
-                            showGstNumber,
-                            child: Padding(
+                            Padding(
                               padding: const EdgeInsets.only(top: 15.0),
                               child: TextField(
-                                controller: gstCodeController,
+                                readOnly: isPhonereadOnly,
+                                controller: phoneController,
                                 decoration: InputDecoration(
-                                  labelText: 'Enter Your GST number',
+                                  labelText: 'Phone number',
                                 ),
                                 style: TextStyle(
                                     fontSize: 18,
@@ -289,112 +273,130 @@ class _ProfileState extends State<ProfileScreen> {
                                     fontWeight: FontWeight.w500),
                               ),
                             ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 35.0, left: 20, right: 20),
-                            child: ButtonTheme(
-                              height: 40,
-                              minWidth: MediaQuery.of(context).size.width,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _submitForm();
-                                },
-                                style: Utils.getButtonDecoration(
-                                    color:appThemeSecondary,
-                                    edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                    border:RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(3.0),
-                                    )
-                                ),
-
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    Text("Update",
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 18)),
-                                    SizedBox(width: 6),
-                                    Image.asset(
-                                      "images/rightArrow.png",
-                                      width: 15,
-                                      height: 15,
-                                    ),
-                                  ],
+                            Visibility(
+                              visible:
+                                  //widget.isComingFromOtpScreen && showGstNumber,
+                              showGstNumber,
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 15.0),
+                                child: TextField(
+                                  controller: gstCodeController,
+                                  decoration: InputDecoration(
+                                    labelText: 'Enter Your GST number',
+                                  ),
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Color(0xFF495056),
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ),
                             ),
-                          ),
-
-                          //---------------------
-                          Padding(
+                            Padding(
                               padding: const EdgeInsets.only(
-                                  top: 45.0, left: 20, right: 20),
-                              child: Center(
-                                child: InkWell(
-                                  child: Text('Delete Account',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        color: appThemeSecondary,
-                                        decoration: TextDecoration.underline,
-                                      )),
-                                  onTap: () async {
-                                    bool isDeleteProfile =
-                                        await DialogUtils.showDeleteUserPopUp(
-                                      context,
-                                    );
-
-                                    if (isDeleteProfile != null &&
-                                        isDeleteProfile) {
-                                      bool isNetworkAvailable =
-                                          await Utils.isNetworkAvailable();
-                                      if (!isNetworkAvailable) {
-                                        Utils.showToast(
-                                            AppConstant.noInternet, false);
-                                        return;
-                                      }
-                                      Utils.showProgressDialog(context);
-                                      DeleteUserResponse deleteUserResponse =
-                                          await ApiController.deleteUser();
-                                      Utils.hideProgressDialog(context);
-                                      if (deleteUserResponse != null &&
-                                          deleteUserResponse.success) {
-                                        SharedPrefs.setUserLoggedIn(false);
-                                        SharedPrefs.storeSharedValue(
-                                            AppConstant.isAdminLogin, "false");
-                                        SharedPrefs.removeKey(
-                                            AppConstant.showReferEarnAlert);
-                                        SharedPrefs.removeKey(
-                                            AppConstant.referEarnMsg);
-                                        SharedPrefs.removeKey("user_wallet");
-                                        SharedPrefs.removeKey("user");
-
-                                        AppConstant.isLoggedIn = false;
-                                        DatabaseHelper databaseHelper =
-                                            new DatabaseHelper();
-                                        databaseHelper.deleteTable(
-                                            DatabaseHelper.Categories_Table);
-                                        databaseHelper.deleteTable(
-                                            DatabaseHelper
-                                                .Sub_Categories_Table);
-                                        databaseHelper.deleteTable(
-                                            DatabaseHelper.Favorite_Table);
-                                        databaseHelper.deleteTable(
-                                            DatabaseHelper.CART_Table);
-                                        databaseHelper.deleteTable(
-                                            DatabaseHelper.Products_Table);
-                                        eventBus.fire(updateCartCount());
-                                        Utils.showToast(
-                                            AppConstant.deleteUserSuccess,
-                                            true);
-                                        Navigator.of(context)
-                                            .popUntil((route) => route.isFirst);
-                                      }
-                                    }
+                                  top: 35.0, left: 20, right: 20),
+                              child: ButtonTheme(
+                                height: 40,
+                                minWidth: MediaQuery.of(context).size.width,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _submitForm();
                                   },
+                                  style: Utils.getButtonDecoration(
+                                      color:appThemeSecondary,
+                                      edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      border:RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(3.0),
+                                      )
+                                  ),
+
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      Text("Update",
+                                          style: TextStyle(
+                                              color: Colors.white, fontSize: 18)),
+                                      SizedBox(width: 6),
+                                      Image.asset(
+                                        "images/rightArrow.png",
+                                        width: 15,
+                                        height: 15,
+                                      ),
+                                    ],
+                                  ),
                                 ),
-                              )),
-                        ],
+                              ),
+                            ),
+
+                            //---------------------
+                            Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 45.0, left: 20, right: 20),
+                                child: Center(
+                                  child: InkWell(
+                                    child: Text('Delete Account',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: appThemeSecondary,
+                                          decoration: TextDecoration.underline,
+                                        )),
+                                    onTap: () async {
+                                      bool isDeleteProfile =
+                                          await DialogUtils.showDeleteUserPopUp(
+                                        context,
+                                      );
+
+                                      if (isDeleteProfile != null &&
+                                          isDeleteProfile) {
+                                        bool isNetworkAvailable =
+                                            await Utils.isNetworkAvailable();
+                                        if (!isNetworkAvailable) {
+                                          Utils.showToast(
+                                              AppConstant.noInternet, false);
+                                          return;
+                                        }
+                                        Utils.showProgressDialog(context);
+                                        DeleteUserResponse deleteUserResponse =
+                                            await ApiController.deleteUser();
+                                        Utils.hideProgressDialog(context);
+                                        if (deleteUserResponse != null &&
+                                            deleteUserResponse.success) {
+                                          SharedPrefs.setUserLoggedIn(false);
+                                          SharedPrefs.storeSharedValue(
+                                              AppConstant.isAdminLogin, "false");
+                                          SharedPrefs.removeKey(
+                                              AppConstant.showReferEarnAlert);
+                                          SharedPrefs.removeKey(
+                                              AppConstant.referEarnMsg);
+                                          SharedPrefs.removeKey("user_wallet");
+                                          SharedPrefs.removeKey("user");
+
+                                          AppConstant.isLoggedIn = false;
+                                          DatabaseHelper databaseHelper =
+                                              new DatabaseHelper();
+                                          databaseHelper.deleteTable(
+                                              DatabaseHelper.Categories_Table);
+                                          databaseHelper.deleteTable(
+                                              DatabaseHelper
+                                                  .Sub_Categories_Table);
+                                          databaseHelper.deleteTable(
+                                              DatabaseHelper.Favorite_Table);
+                                          databaseHelper.deleteTable(
+                                              DatabaseHelper.CART_Table);
+                                          databaseHelper.deleteTable(
+                                              DatabaseHelper.Products_Table);
+                                          eventBus.fire(updateCartCount());
+                                          Utils.showToast(
+                                              AppConstant.deleteUserSuccess,
+                                              true);
+                                          Navigator.of(context)
+                                              .popUntil((route) => route.isFirst);
+                                        }
+                                      }
+                                    },
+                                  ),
+                                )),
+                          ],
+                        ),
                       ),
                     ),
                   ),

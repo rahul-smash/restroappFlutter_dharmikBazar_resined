@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_webservice/places.dart';
@@ -41,72 +42,81 @@ class CustomSearchScaffoldState extends PlacesAutocompleteState {
       ),
     );
 
-    return Scaffold(
+    return AnnotatedRegion(
+    value: SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: whiteColor,
+      statusBarIconBrightness: Brightness.dark
+    ),
+       child: SafeArea(
+        child: Scaffold(
+          backgroundColor: whiteColor,
 //        appBar: appBar,
-        body: Container(
-            padding: EdgeInsets.only(top: 16, left: 5, right: 5, bottom: 16),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
-                      child: Icon(
-                        Icons.cancel,
-                        color: Colors.grey,
+            body: Container(
+                padding: EdgeInsets.only(top: 16, left: 5, right: 5, bottom: 16),
+                child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(5, 15, 5, 5),
+                          child: Icon(
+                            Icons.cancel,
+                            color: Colors.grey,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 5, 20, 10),
-                  child: Text(
-                    'Search',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ),
-                Container(
-                    margin: EdgeInsets.only(
-                        left: 20, right: 20, top: 10, bottom: 0),
-                    //padding: EdgeInsets.all(5.0),
-                    decoration: BoxDecoration(
-                        color: searchGrayColor,
-                        borderRadius: BorderRadius.all(Radius.circular(7.0)),
-                        border: Border.all(
-                          color: searchGrayColor,
-                        )),
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
-                      child: Center(
-                        child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Padding(
-                                  padding: EdgeInsets.fromLTRB(3, 3, 10, 3),
-                                  child: Image.asset('images/searchicon.png',
-                                      width: 20,
-                                      fit: BoxFit.scaleDown,
-                                      color: Colors.grey)),
-                              Expanded(
-                                child: AppBarPlacesAutoCompleteTextField(
-                                  textDecoration: _defaultDecoration('Search'),
-                                ),
-                              )
-                            ]),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 5, 20, 10),
+                      child: Text(
+                        'Search',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w500),
                       ),
-                    )),
-                Expanded(child: body)
-              ],
-            )));
+                    ),
+                    Container(
+                        margin: EdgeInsets.only(
+                            left: 20, right: 20, top: 10, bottom: 0),
+                        //padding: EdgeInsets.all(5.0),
+                        decoration: BoxDecoration(
+                            color: searchGrayColor,
+                            borderRadius: BorderRadius.all(Radius.circular(7.0)),
+                            border: Border.all(
+                              color: searchGrayColor,
+                            )),
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(5, 0, 5, 0),
+                          child: Center(
+                            child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Padding(
+                                      padding: EdgeInsets.fromLTRB(3, 3, 10, 3),
+                                      child: Image.asset('images/searchicon.png',
+                                          width: 20,
+                                          fit: BoxFit.scaleDown,
+                                          color: Colors.grey)),
+                                  Expanded(
+                                    child: AppBarPlacesAutoCompleteTextField(
+                                      textDecoration: _defaultDecoration('Search'),
+                                    ),
+                                  )
+                                ]),
+                          ),
+                        )),
+                    Expanded(child: body)
+                  ],
+                ))),
+      ),
+    );
   }
 
   InputDecoration _defaultDecoration(String hint) {

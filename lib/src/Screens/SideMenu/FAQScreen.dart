@@ -47,132 +47,134 @@ class _FAQScreenState extends State<FAQScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      appBar: AppBar(
-        title: new Text('FAQ'),
-        centerTitle: true,
-      ),
-      body: isLoadingApi
-          ? Container(
-              color: Colors.white,
-              child: Center(child: CircularProgressIndicator()))
-          : widget.faqData != null
-              ? SafeArea(
-                  child: Container(
-                    color: Colors.white,
-                    margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                    child: Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(35, 20, 30, 20),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
+    return SafeArea(
+      child: new Scaffold(
+        appBar: AppBar(
+          title: new Text('FAQ'),
+          centerTitle: true,
+        ),
+        body: isLoadingApi
+            ? Container(
+                color: Colors.white,
+                child: Center(child: CircularProgressIndicator()))
+            : widget.faqData != null
+                ? SafeArea(
+                    child: Container(
+                      color: Colors.white,
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: Column(
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(35, 20, 30, 20),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
 //                              Expanded(child:
-                              Text(
-                                "Category:",
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black),
-                              ),
-                              /*SizedBox(
-                                width: 50,
-                              ),*/
+                                Text(
+                                  "Category:",
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black),
+                                ),
+                                /*SizedBox(
+                                  width: 50,
+                                ),*/
 //                              ),
-                              Flexible(
-                                  child: Container(
-                                margin: EdgeInsets.only(left: 10),
-                                padding: EdgeInsets.only(left: 10),
+                                Flexible(
+                                    child: Container(
+                                  margin: EdgeInsets.only(left: 10),
+                                  padding: EdgeInsets.only(left: 10),
 //                                    horizontal: 10, vertical: 5),
-                                decoration: BoxDecoration(
-                                  border: Border.all(color: grayColor),
-                                    borderRadius: BorderRadius.circular(1)),
-                                child: DropdownButton<String>(
-                                  isExpanded: true,
-                                  elevation: 6,
-                                  dropdownColor: Colors.white,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: grayColor),
+                                      borderRadius: BorderRadius.circular(1)),
+                                  child: DropdownButton<String>(
+                                    isExpanded: true,
+                                    elevation: 6,
+                                    dropdownColor: Colors.white,
 //                                  underline: Utils.showDivider(context),
-                                  underline: SizedBox(),
-                                  icon: Icon(Icons.keyboard_arrow_down),
-                                  value: widget.faqSelectedCategory,
-                                  items: widget.faqData.data.keysList
-                                      .map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value,
-                                        overflow: TextOverflow.ellipsis,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black),
+                                    underline: SizedBox(),
+                                    icon: Icon(Icons.keyboard_arrow_down),
+                                    value: widget.faqSelectedCategory,
+                                    items: widget.faqData.data.keysList
+                                        .map((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Text(
+                                          value,
+                                          overflow: TextOverflow.ellipsis,
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) {
+                                      setState(() {
+                                        widget.faqSelectedCategory = value;
+                                        widget.faqCategoryList =
+                                            widget.faqData.data.faqCategoriesList[
+                                                widget.faqSelectedCategory];
+                                      });
+                                    },
+                                  ),
+                                ))
+                              ],
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              margin: EdgeInsets.only(left: 20, right: 20),
+                              child: ListView.builder(
+                                  itemBuilder: (context, index) {
+                                    return Container(
+                                      margin: EdgeInsets.all(5),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text(
+                                            "${widget
+                                                .faqCategoryList[index].question}",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          Html(
+                                            data:
+                                                "${widget.faqCategoryList[index].answer}",
+                                            style:{
+                                              "data":Style(
+                                                fontSize: FontSize(16),
+                                                fontWeight: FontWeight.normal,
+                                              )
+                                            },
+                                          )
+                                        ],
                                       ),
                                     );
-                                  }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      widget.faqSelectedCategory = value;
-                                      widget.faqCategoryList =
-                                          widget.faqData.data.faqCategoriesList[
-                                              widget.faqSelectedCategory];
-                                    });
                                   },
-                                ),
-                              ))
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.only(left: 20, right: 20),
-                            child: ListView.builder(
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    margin: EdgeInsets.all(5),
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          "${widget
-                                              .faqCategoryList[index].question}",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.black,
-                                          ),
-                                        ),
-                                        Html(
-                                          data:
-                                              "${widget.faqCategoryList[index].answer}",
-                                          style:{
-                                            "data":Style(
-                                              fontSize: FontSize(16),
-                                              fontWeight: FontWeight.normal,
-                                            )
-                                          },
-                                        )
-                                      ],
-                                    ),
-                                  );
-                                },
-                                /*Card2(widget.faqCategoryList[index])*/
-                                itemCount: widget.faqCategoryList.length,
-                                scrollDirection: Axis.vertical,
-                                shrinkWrap: true),
-                          ),
-                        )
-                      ],
+                                  /*Card2(widget.faqCategoryList[index])*/
+                                  itemCount: widget.faqCategoryList.length,
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
+                  )
+                : Container(
+                    color: appThemeLight,
                   ),
-                )
-              : Container(
-                  color: appThemeLight,
-                ),
+      ),
     );
   }
 }

@@ -126,142 +126,146 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           : '';
     }
     return isLoading
-        ? Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Order Details',
-                    style: TextStyle(),
-                    textAlign: TextAlign.left,
-                  ),
+        ? SafeArea(
+          child: Scaffold(
+              resizeToAvoidBottomInset: false,
+              appBar: AppBar(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Order Details',
+                      style: TextStyle(),
+                      textAlign: TextAlign.left,
+                    ),
+                  ],
+                ),
+                centerTitle: false,
+              ),
+              body: Center(child: CircularProgressIndicator()),
+            ),
+        )
+        : SafeArea(
+          child: new Scaffold(
+              backgroundColor: Color(0xffDCDCDC),
+              appBar: AppBar(
+                title: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Text(
+                      'Order - ${widget.orderHistoryData.displayOrderId}',
+                      style: TextStyle(),
+                      textAlign: TextAlign.left,
+                    ),
+                    Text(
+                      '$orderFacility$itemText${AppConstant.currency} ${widget.orderHistoryData.total}',
+                      style: TextStyle(fontSize: 13),
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                    ),
+                  ],
+                ),
+                centerTitle: false,
+                actions: <Widget>[
+                  Visibility(
+                    visible: showCancelButton(widget.orderHistoryData.status),
+                    child: InkWell(
+                        onTap: () async {
+                          cancelOrderBottomSheet(
+                              context, widget.orderHistoryData);
+                        },
+                        child: Center(
+                          child: Padding(
+                              padding: EdgeInsets.only(right: 16, left: 16),
+                              child: Text(
+                                'Cancel',
+                                style: TextStyle(
+                                    fontSize: 14, fontWeight: FontWeight.w400),
+                              )),
+                        )),
+                  )
                 ],
               ),
-              centerTitle: false,
-            ),
-            body: Center(child: CircularProgressIndicator()),
-          )
-        : new Scaffold(
-            backgroundColor: Color(0xffDCDCDC),
-            appBar: AppBar(
-              title: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    'Order - ${widget.orderHistoryData.displayOrderId}',
-                    style: TextStyle(),
-                    textAlign: TextAlign.left,
-                  ),
-                  Text(
-                    '$orderFacility$itemText${AppConstant.currency} ${widget.orderHistoryData.total}',
-                    style: TextStyle(fontSize: 13),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                  ),
-                ],
-              ),
-              centerTitle: false,
-              actions: <Widget>[
-                Visibility(
-                  visible: showCancelButton(widget.orderHistoryData.status),
-                  child: InkWell(
-                      onTap: () async {
-                        cancelOrderBottomSheet(
-                            context, widget.orderHistoryData);
-                      },
-                      child: Center(
-                        child: Padding(
-                            padding: EdgeInsets.only(right: 16, left: 16),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                  fontSize: 14, fontWeight: FontWeight.w400),
-                            )),
-                      )),
-                )
-              ],
-            ),
-            body: SafeArea(
-              child: SingleChildScrollView(
-                child: Container(
-                  color: Color(0xffDCDCDC),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      firstRow(widget.orderHistoryData),
-                      widget.orderHistoryData.trackingData != null
-                          ? trackingDetails(widget.orderHistoryData)
-                          : Container(),
-                      Container(
-                        color: Colors.white,
-                        margin: EdgeInsets.only(top: 5),
-                        padding: EdgeInsets.all(16),
-                        width: Utils.getDeviceWidth(context),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    'Track Order',
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                ),
-                                Visibility(
-                                  visible: widget.orderHistoryData
-                                              .subscription_order_id !=
-                                          null &&
-                                      widget.orderHistoryData
-                                              .subscription_order_id !=
-                                          '0' &&
-                                      widget.orderHistoryData
-                                          .subscription_order_id.isNotEmpty,
-                                  child: InkWell(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              SubscriptionHistoryDetails(
-                                            orderHistoryDataId: widget
-                                                .orderHistoryData
-                                                .subscription_order_id,
-                                            store: widget.store,
-                                          ),
-                                        ),
-                                      );
-                                    },
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  child: Container(
+                    color: Color(0xffDCDCDC),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        firstRow(widget.orderHistoryData),
+                        widget.orderHistoryData.trackingData != null
+                            ? trackingDetails(widget.orderHistoryData)
+                            : Container(),
+                        Container(
+                          color: Colors.white,
+                          margin: EdgeInsets.only(top: 5),
+                          padding: EdgeInsets.all(16),
+                          width: Utils.getDeviceWidth(context),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Row(
+                                children: [
+                                  Expanded(
                                     child: Text(
-                                      'Subscribed',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          color: appTheme,
-                                          fontStyle: FontStyle.italic),
+                                      'Track Order',
+                                      style: TextStyle(fontSize: 18),
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 16,
-                            ),
-                            _getTrackWidget(),
-                            SizedBox(
-                              height: 16,
-                            ),
-                          ],
+                                  Visibility(
+                                    visible: widget.orderHistoryData
+                                                .subscription_order_id !=
+                                            null &&
+                                        widget.orderHistoryData
+                                                .subscription_order_id !=
+                                            '0' &&
+                                        widget.orderHistoryData
+                                            .subscription_order_id.isNotEmpty,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                SubscriptionHistoryDetails(
+                                              orderHistoryDataId: widget
+                                                  .orderHistoryData
+                                                  .subscription_order_id,
+                                              store: widget.store,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Text(
+                                        'Subscribed',
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            color: appTheme,
+                                            fontStyle: FontStyle.italic),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 16,
+                              ),
+                              _getTrackWidget(),
+                              SizedBox(
+                                height: 16,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      secondRow(widget.orderHistoryData)
-                    ],
+                        secondRow(widget.orderHistoryData)
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          );
+        );
   }
 
   Widget trackingDetails(OrderData orderHistoryData) {

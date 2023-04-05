@@ -1,11 +1,9 @@
 import 'dart:convert';
-
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-
 import '../singleton/app_version_singleton.dart';
 
 abstract class NotificationService {
@@ -16,7 +14,6 @@ abstract class NotificationService {
   final String channelId;
   final String channelName;
   final String channelDescription;
-
   AndroidNotificationChannel _channel;
 
   NotificationService({
@@ -28,7 +25,6 @@ abstract class NotificationService {
   }) : assert(notificationIcon != null, 'notification icon can not be null');
 
   bool get isAuthorized => _isAuthorized;
-
   /// Handle notification when user click on it, for re-direction
   void handleNotificationClick(RemoteMessage message);
 

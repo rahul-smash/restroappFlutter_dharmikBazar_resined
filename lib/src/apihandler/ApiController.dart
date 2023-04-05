@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -102,7 +103,7 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       StoreResponse storeData =
-      StoreResponse.fromJson(json.decode(response.data));
+          StoreResponse.fromJson(json.decode(response.data));
       print("-------store.success ---${storeData.success}");
       SharedPrefs.saveStore(storeData.store);
       //check older version
@@ -111,8 +112,7 @@ class ApiController {
       if (version != storeData.store.version) {
         //TODO: store version saved
         print(
-            "version not matched older version is $version and new version is ${storeData
-                .store.version}.");
+            "version not matched older version is $version and new version is ${storeData.store.version}.");
         SharedPrefs.saveAPiDetailsVersion(storeData.store.version);
         DatabaseHelper databaseHelper = DatabaseHelper();
         databaseHelper.clearDataBase();
@@ -125,8 +125,8 @@ class ApiController {
     return null;
   }
 
-  static Future<UserResponse> registerApiRequest(UserData user,
-      String referralCode) async {
+  static Future<UserResponse> registerApiRequest(
+      UserData user, String referralCode) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -164,8 +164,8 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> loginApiRequest(String username,
-      String password) async {
+  static Future<UserResponse> loginApiRequest(
+      String username, String password) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -240,8 +240,9 @@ class ApiController {
     String deviceToken = prefs.getString(AppConstant.deviceToken);
     UserModel user = await SharedPrefs.getUser();
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll(
-        'api_v1', 'api_v11') +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", store.id)
+            .replaceAll('api_v1', 'api_v11') +
         ApiConstants.deliveryTimeDetails;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     //print('---url--${url}');
@@ -281,15 +282,16 @@ class ApiController {
 
   static Future<CategoryResponse> getCategoriesApiRequest(
       String storeId) async {
-    var url = ApiConstants.baseUrl.replaceAll("storeId", storeId).replaceAll(
-        'api_v1', 'api_v11') +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", storeId)
+            .replaceAll('api_v1', 'api_v11') +
         ApiConstants.getCategories;
     CategoryResponse categoryResponse = CategoryResponse();
     DatabaseHelper databaseHelper = new DatabaseHelper();
     print("url=${url}");
     try {
       int dbCount =
-      await databaseHelper.getCount(DatabaseHelper.Categories_Table);
+          await databaseHelper.getCount(DatabaseHelper.Categories_Table);
       bool isNetworkAviable = await Utils.isNetworkAvailable();
       if (dbCount == 0 && isNetworkAviable) {
         print("*************database zero*************");
@@ -316,21 +318,19 @@ class ApiController {
         categoryResponse.success = false;
         return categoryResponse;
       } else {
-        print("1-millisecondsSinceEpoch=${DateTime
-            .now()
-            .millisecondsSinceEpoch}");
+        print(
+            "1-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
         //prepare model object
         List<CategoryModel> categoryList = await databaseHelper.getCategories();
         categoryResponse.categories = categoryList;
         for (var i = 0; i < categoryResponse.categories.length; i++) {
           String parent_id = categoryResponse.categories[i].id;
           categoryResponse.categories[i].subCategory =
-          await databaseHelper.getSubCategories(parent_id);
+              await databaseHelper.getSubCategories(parent_id);
         }
         categoryResponse.success = true;
-        print("2-millisecondsSinceEpoch=${DateTime
-            .now()
-            .millisecondsSinceEpoch}");
+        print(
+            "2-millisecondsSinceEpoch=${DateTime.now().millisecondsSinceEpoch}");
       }
     } catch (e) {
       print(e);
@@ -356,9 +356,11 @@ class ApiController {
         String deviceToken = prefs.getString(AppConstant.deviceToken);
         print("deviceToken $deviceToken");
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)
-            .replaceAll('api_v1', 'api_v11') +
-            ApiConstants.getProducts + subCategoryId;
+        var url = ApiConstants.baseUrl
+                .replaceAll("storeId", store.id)
+                .replaceAll('api_v1', 'api_v11') +
+            ApiConstants.getProducts +
+            subCategoryId;
         print(url);
         FormData formData = new FormData.fromMap({
           "user_id": "",
@@ -376,8 +378,8 @@ class ApiController {
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-          await databaseHelper.batchInsertProducts(
-              subCategoryResponse.subCategories);
+          await databaseHelper
+              .batchInsertProducts(subCategoryResponse.subCategories);
 
           /*for (int i = 0; i < subCategoryResponse.subCategories.length; i++) {
             for (int j = 0;j < subCategoryResponse.subCategories[i].products.length; j++) {
@@ -397,14 +399,14 @@ class ApiController {
         subCategoryResponse = SubCategoryResponse();
         //prepare model object
         List<SubCategoryModel> categoryList =
-        await databaseHelper.getSubCategoriesFromID(subCategoryId);
+            await databaseHelper.getSubCategoriesFromID(subCategoryId);
 
         subCategoryResponse.subCategories = categoryList;
 
         for (var i = 0; i < subCategoryResponse.subCategories.length; i++) {
           String parent_id = subCategoryResponse.subCategories[i].id;
           subCategoryResponse.subCategories[i].products =
-          await databaseHelper.getProducts(parent_id);
+              await databaseHelper.getProducts(parent_id);
 //          for (int j = 0;
 //              j < subCategoryResponse.subCategories[i].products.length;
 //              j++) {
@@ -435,8 +437,9 @@ class ApiController {
         print("deviceToken $deviceToken");
         print("productID $productID");
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)
-            .replaceAll('api_v1', 'api_v11') +
+        var url = ApiConstants.baseUrl
+                .replaceAll("storeId", store.id)
+                .replaceAll('api_v1', 'api_v11') +
             ApiConstants.getProductDetail;
         print(url);
         FormData formData = new FormData.fromMap({
@@ -456,11 +459,11 @@ class ApiController {
         subCategoryResponse =
             SubCategoryResponse.fromJson(json.decode(response.data));
         if (subCategoryResponse.success) {
-          Product product = subCategoryResponse.subCategories.first.products
-              .first;
+          Product product =
+              subCategoryResponse.subCategories.first.products.first;
           DatabaseHelper databaseHelper = new DatabaseHelper();
-          int productOffer = await databaseHelper.getProductOfferInProductTable(
-              productID);
+          int productOffer =
+              await databaseHelper.getProductOfferInProductTable(productID);
           //print("----getProductOfferInProductTable---${productOffer}");
           if (productOffer == 1 && product.product_offer == 0) {
             Map<String, dynamic> row = {
@@ -488,9 +491,9 @@ class ApiController {
         String deviceId = prefs.getString(AppConstant.deviceId);
         String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)
-            .replaceAll('api_v1', 'api_v11') +
+        var url = ApiConstants.baseUrl
+                .replaceAll("storeId", store.id)
+                .replaceAll('api_v1', 'api_v11') +
             ApiConstants.getEligibleProductDetail;
         print(url);
         FormData formData = new FormData.fromMap({
@@ -528,9 +531,9 @@ class ApiController {
         String deviceId = prefs.getString(AppConstant.deviceId);
         String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)
-            .replaceAll('api_v1', 'api_v11') +
+        var url = ApiConstants.baseUrl
+                .replaceAll("storeId", store.id)
+                .replaceAll('api_v1', 'api_v11') +
             ApiConstants.getOfferDetail;
         print(url);
         FormData formData = new FormData.fromMap({
@@ -578,7 +581,7 @@ class ApiController {
       print("-1--getAddress-respStr---${respStr}");
       final parsed = json.decode(respStr);
       DeliveryAddressResponse deliveryAddressResponse =
-      DeliveryAddressResponse.fromJson(parsed);
+          DeliveryAddressResponse.fromJson(parsed);
       //print("----respStr---${deliveryAddressResponse.success}");
       return deliveryAddressResponse;
     } catch (e) {
@@ -601,7 +604,7 @@ class ApiController {
       print("----respStr---${respStr}");
       final parsed = json.decode(respStr);
       StoreDeliveryAreasResponse storeArea =
-      StoreDeliveryAreasResponse.fromJson(parsed);
+          StoreDeliveryAreasResponse.fromJson(parsed);
       return storeArea;
     } catch (e) {
       print("----catch---${e.toString()}");
@@ -614,8 +617,9 @@ class ApiController {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll(
-        'api_v1', 'api_v11') +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", store.id)
+            .replaceAll('api_v1', 'api_v11') +
         ApiConstants.getHomeScreenOdrders;
     //print("----user.id---${user.id}");
     //print("----url---${url}");
@@ -631,7 +635,7 @@ class ApiController {
       //print("--getHomeScreenOdrders---${respStr}");
       final parsed = json.decode(respStr);
       HomeScreenOrdersModel homeScreenOrdersModel =
-      HomeScreenOrdersModel.fromJson(parsed);
+          HomeScreenOrdersModel.fromJson(parsed);
       //print("----respStr---${deliveryAddressResponse.success}");
       return homeScreenOrdersModel;
     } catch (e) {
@@ -736,8 +740,9 @@ class ApiController {
       if (addressId != null) {
         request.fields["address_id"] = addressId;
       }
-      print(
-          '@@saveDeliveryAddressApiRequest  ' + url + request.fields.toString());
+      print('@@saveDeliveryAddressApiRequest  ' +
+          url +
+          request.fields.toString());
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
@@ -792,8 +797,9 @@ class ApiController {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll(
-        'api_v1', 'api_v11') +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", store.id)
+            .replaceAll('api_v1', 'api_v11') +
         ApiConstants.storeOffers;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
@@ -824,8 +830,9 @@ class ApiController {
   static Future<StoreOffersResponse> storeOfferApiRequest() async {
     StoreModel store = await SharedPrefs.getStore();
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll(
-        'api_v1', 'api_v11') +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", store.id)
+            .replaceAll('api_v1', 'api_v11') +
         ApiConstants.storeOffers;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
@@ -860,8 +867,9 @@ class ApiController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll(
-        'api_v1', 'api_v11') +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", store.id)
+            .replaceAll('api_v1', 'api_v11') +
         ApiConstants.validateCoupon;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
@@ -926,7 +934,7 @@ class ApiController {
       final parsed = json.decode(respStr);
 
       TaxCalculationResponse model =
-      TaxCalculationResponse.fromJson(couponCode, parsed);
+          TaxCalculationResponse.fromJson(couponCode, parsed);
       return model;
     } catch (e) {
       print("--multipleTax--respStr---${e.toString()}");
@@ -954,6 +962,7 @@ class ApiController {
     ShippingCharge selectedShippingCharge,
     ThirdPartyDeliveryData thirdPartyDeliveryData,
     List<ShippingCharge> selectedShippingChargeList,
+    bool isShipRocketintegrated,
   }) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -1049,6 +1058,10 @@ class ApiController {
       Map<String, dynamic> map = Map();
 
       map = {
+        "order_delivery_type":
+            deliveryType == OrderType.Delivery && isShipRocketintegrated == true
+                ? 2
+                : 1,
         "shipping_charges": "${shipping_charges}",
         "note": note,
         "wallet_refund": store.wallet_setting == "0"
@@ -1086,6 +1099,8 @@ class ApiController {
         "calculated_tax_detail": encodedtaxDetail,
         "cart_saving": cart_saving,
       };
+      debugPrint("map ${map}");
+      log(map.toString());
       if (selectedShippingCharge != null &&
           selectedShippingChargeList != null &&
           selectedShippingChargeList.isNotEmpty)
@@ -1122,7 +1137,8 @@ class ApiController {
     }
   }
 
-  static Future<UserResponse> updateProfileRequest(String fullName,
+  static Future<UserResponse> updateProfileRequest(
+      String fullName,
       String emailId,
       String phoneNumber,
       bool isComingFromOtpScreen,
@@ -1219,7 +1235,7 @@ class ApiController {
         print('--url===  $url');
         print('--user.id=== ${user.id}');
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
         print('--respStr===  $respStr');
@@ -1252,7 +1268,7 @@ class ApiController {
         print('--url===  $url');
         print('--user.id=== ${user.id}');
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
         print('--respStr===  $respStr');
@@ -1268,8 +1284,8 @@ class ApiController {
     }
   }
 
-  static Future<ProductRatingResponse> postProductRating(String orderID,
-      String productID, String rating,
+  static Future<ProductRatingResponse> postProductRating(
+      String orderID, String productID, String rating,
       {String desc = '', File imageFile}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -1310,12 +1326,12 @@ class ApiController {
         print('--url===  $url');
         print('--user.id=== ${user.id}');
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
         print('--respStr===  $respStr');
         ProductRatingResponse ratingResponse =
-        ProductRatingResponse.fromJson(parsed);
+            ProductRatingResponse.fromJson(parsed);
         return ratingResponse;
       } catch (e) {
         Utils.showToast(e.toString(), true);
@@ -1364,8 +1380,8 @@ class ApiController {
     }
   }
 
-  static Future<OtpVerified> otpVerified(OTPData otpData,
-      LoginMobile phone) async {
+  static Future<OtpVerified> otpVerified(
+      OTPData otpData, LoginMobile phone) async {
     UserModelMobile userMobile = await SharedPrefs.getUserMobile();
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1446,8 +1462,8 @@ class ApiController {
     }
   }
 
-  static Future<CreateOrderData> razorpayCreateOrderApi(String amount,
-      String orderJson, dynamic detailsJson,
+  static Future<CreateOrderData> razorpayCreateOrderApi(
+      String amount, String orderJson, dynamic detailsJson,
       {bool isWalletTopUP = false}) async {
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -1505,8 +1521,8 @@ class ApiController {
     }
   }
 
-  static Future<AdminLoginModel> getAdminApiRequest(String username,
-      String password) async {
+  static Future<AdminLoginModel> getAdminApiRequest(
+      String username, String password) async {
     var url = ApiConstants.baseUrl + ApiConstants.storeLogin;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     try {
@@ -1554,8 +1570,8 @@ class ApiController {
     }
   }
 
-  static Future<StripeCheckOutModel> stripePaymentApi(String amount,
-      String orderJson, dynamic detailsJson,
+  static Future<StripeCheckOutModel> stripePaymentApi(
+      String amount, String orderJson, dynamic detailsJson,
       {String currencyAbbr}) async {
     StoreModel store = await SharedPrefs.getStore();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1618,8 +1634,9 @@ class ApiController {
 
   static Future<SearchTagsModel> searchTagsAPI() async {
     StoreModel store = await SharedPrefs.getStore();
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll(
-        'api_v1', 'api_v11') +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", store.id)
+            .replaceAll('api_v1', 'api_v11') +
         ApiConstants.getTagsList;
     print("----url---${url}");
     var request = new http.MultipartRequest("GET", Uri.parse(url));
@@ -1644,8 +1661,9 @@ class ApiController {
     String deviceId = prefs.getString(AppConstant.deviceId);
     String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-    var url = ApiConstants.baseUrl.replaceAll("storeId", store.id).replaceAll(
-        'api_v1', 'api_v11') +
+    var url = ApiConstants.baseUrl
+            .replaceAll("storeId", store.id)
+            .replaceAll('api_v1', 'api_v11') +
         ApiConstants.search;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
 
@@ -1664,7 +1682,7 @@ class ApiController {
 
       final parsed = json.decode(respStr);
       SubCategoryResponse subCategoryResponse =
-      SubCategoryResponse.fromJson(parsed);
+          SubCategoryResponse.fromJson(parsed);
       return subCategoryResponse;
     } catch (e) {
       print(e.toString());
@@ -1740,7 +1758,7 @@ class ApiController {
       final parsed = json.decode(respStr);
 
       DeliveryAddressResponse deliveryAddressResponse =
-      DeliveryAddressResponse.fromJson(parsed);
+          DeliveryAddressResponse.fromJson(parsed);
       //print("----respStr---${deliveryAddressResponse.success}");
       return deliveryAddressResponse;
     } catch (e) {
@@ -1759,7 +1777,7 @@ class ApiController {
     print(url);
     print(response.data);
     StoreBranchesModel storeBranchesModel =
-    StoreBranchesModel.fromJson(json.decode(response.data));
+        StoreBranchesModel.fromJson(json.decode(response.data));
     print("---storeBranchesModel ---${storeBranchesModel.data.length}");
 
     return storeBranchesModel;
@@ -1787,7 +1805,7 @@ class ApiController {
       print(response.data);
 
       LoyalityPointsModel storeData =
-      LoyalityPointsModel.fromJson(json.decode(response.data));
+          LoyalityPointsModel.fromJson(json.decode(response.data));
       print("-----LoyalityPointsModel ---${storeData.success}");
 
       return storeData;
@@ -1808,8 +1826,8 @@ class ApiController {
         String email = user.email == null
             ? 'NA'
             : user.email.isEmpty
-            ? "NA"
-            : user.email;
+                ? "NA"
+                : user.email;
 //        address = "170,phase1";
         String firstName = user.fullName.contains(" ") == true
             ? user.fullName.substring(0, user.fullName.indexOf(" "))
@@ -1849,7 +1867,7 @@ class ApiController {
             options: new Options(responseType: ResponseType.plain));
         print(response.data);
         CreatePaytmTxnTokenResponse txnTokenResponse =
-        CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
+            CreatePaytmTxnTokenResponse.fromJson(json.decode(response.data));
         if (txnTokenResponse.success) {
           return txnTokenResponse;
         } else {
@@ -1864,8 +1882,8 @@ class ApiController {
     return null;
   }
 
-
-  static Future<DpoCreateResponse> createDPOToken(String amount, String orderJson, dynamic detailsJson,String currency) async {
+  static Future<DpoCreateResponse> createDPOToken(String amount,
+      String orderJson, dynamic detailsJson, String currency) async {
     bool isNetworkAviable = await Utils.isNetworkAvailable();
     try {
       if (isNetworkAviable) {
@@ -1879,7 +1897,7 @@ class ApiController {
           "currency": currency,
           "order_info": detailsJson, //JSONObject details
           "orders": orderJson,
-          "user_id":user.id
+          "user_id": user.id
         });
         print(formData.fields);
         Dio dio = new Dio();
@@ -1891,7 +1909,7 @@ class ApiController {
             options: new Options(responseType: ResponseType.plain));
         print(response.data);
         DpoCreateResponse createResponse =
-        DpoCreateResponse.fromJson(json.decode(response.data));
+            DpoCreateResponse.fromJson(json.decode(response.data));
         if (createResponse.success) {
           return createResponse;
         } else {
@@ -1927,7 +1945,7 @@ class ApiController {
         });
         print("${url}");
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
@@ -1965,12 +1983,12 @@ class ApiController {
         });
         print("${url}");
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
         NotificationResponseModel model =
-        NotificationResponseModel.fromJson(parsed);
+            NotificationResponseModel.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
@@ -1991,8 +2009,9 @@ class ApiController {
         String deviceId = prefs.getString(AppConstant.deviceId);
         String deviceToken = prefs.getString(AppConstant.deviceToken);
 
-        var url = ApiConstants.baseUrl.replaceAll("storeId", store.id)
-            .replaceAll("api_v1", "api_v11") +
+        var url = ApiConstants.baseUrl
+                .replaceAll("storeId", store.id)
+                .replaceAll("api_v1", "api_v11") +
             ApiConstants.recommendedProduct;
         var request = new http.MultipartRequest("POST", Uri.parse(url));
         request.fields.addAll({
@@ -2004,12 +2023,12 @@ class ApiController {
         });
         print("${url}");
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
         RecommendedProductsResponse model =
-        RecommendedProductsResponse.fromJson(parsed);
+            RecommendedProductsResponse.fromJson(parsed);
         return model;
       } else {
         Utils.showToast(AppConstant.noInternet, true);
@@ -2038,7 +2057,7 @@ class ApiController {
         print("fields=${request.fields.toString()}");
         print("${url}");
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
@@ -2074,7 +2093,7 @@ class ApiController {
         //print("fields=${request.fields.toString()}");
         print("${url}");
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
@@ -2135,7 +2154,8 @@ class ApiController {
     }
   }
 
-  static Future<MobileVerified> socialSignUp(FacebookModel fbModel,
+  static Future<MobileVerified> socialSignUp(
+      FacebookModel fbModel,
       GoogleSignInAccount googleResult,
       String fullName,
       String emailId,
@@ -2224,7 +2244,7 @@ class ApiController {
         });
         print("${url}");
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print("${respStr}");
         final parsed = json.decode(respStr);
@@ -2241,23 +2261,24 @@ class ApiController {
 
   /*Subscription module*/
   static Future<SubscriptionTaxCalculationResponse>
-  subscriptionMultipleTaxCalculationRequest({String couponCode = '',
-    String discount = '',
-    String shipping = '',
-    String orderJson = '',
-    String userAddressId = '',
-    String userAddress = '',
+      subscriptionMultipleTaxCalculationRequest(
+          {String couponCode = '',
+          String discount = '',
+          String shipping = '',
+          String orderJson = '',
+          String userAddressId = '',
+          String userAddress = '',
 //          String total='',
 //          String paymentMethod='',
 //          String checkout='',
-    String deliveryTimeSlot = '',
+          String deliveryTimeSlot = '',
 //          String paymentRequestId='',
 //          String paymentId='',
 //          String onlineMethod='',
 //          String note='',
 //          String walletRefund='',
-    String cartSaving = '',
-    String totalDeliveries = ''}) async {
+          String cartSaving = '',
+          String totalDeliveries = ''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     WalleModel userWallet = await SharedPrefs.getUserWallet();
@@ -2266,8 +2287,8 @@ class ApiController {
     String deviceToken = prefs.getString(AppConstant.deviceToken);
 
     var url = ApiConstants.baseUrl
-        .replaceAll("storeId", store.id)
-        .replaceAll("api_v1", "api_v1_tax") +
+            .replaceAll("storeId", store.id)
+            .replaceAll("api_v1", "api_v1_tax") +
         ApiConstants.subscriptionTaxCalculation;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     print("----url---${url}");
@@ -2308,7 +2329,7 @@ class ApiController {
       final parsed = json.decode(respStr);
 
       SubscriptionTaxCalculationResponse model =
-      SubscriptionTaxCalculationResponse.fromJson(couponCode, parsed);
+          SubscriptionTaxCalculationResponse.fromJson(couponCode, parsed);
       return model;
     } catch (e) {
       print("--multipleTax--respStr---${e.toString()}");
@@ -2333,16 +2354,16 @@ class ApiController {
       String online_method,
       String selectedDeliverSlotValue,
       {String cart_saving = "0.00",
-        String start_date = '',
-        String end_date = '',
-        String single_day_shipping_charges = '',
-        String single_day_total = '',
-        String single_day_discount = '',
-        String single_day_tax = '',
-        String single_day_checkout = '',
-        String subscription_type = '',
-        String delivery_dates = '',
-        String total_deliveries = ''}) async {
+      String start_date = '',
+      String end_date = '',
+      String single_day_shipping_charges = '',
+      String single_day_total = '',
+      String single_day_discount = '',
+      String single_day_tax = '',
+      String single_day_checkout = '',
+      String subscription_type = '',
+      String delivery_dates = '',
+      String total_deliveries = ''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -2380,7 +2401,7 @@ class ApiController {
 
       try {
         List jsonfixedTaxList =
-        taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
+            taxModel.fixedTax.map((fixedTax) => fixedTax.toJson()).toList();
         encodedFixedTax = jsonEncode(jsonfixedTaxList);
         //print("encodedFixedTax= ${encodedFixedTax}");
       } catch (e) {
@@ -2389,7 +2410,7 @@ class ApiController {
 
       try {
         List jsontaxDetailList =
-        taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
+            taxModel.taxDetail.map((taxDetail) => taxDetail.toJson()).toList();
         encodedtaxDetail = jsonEncode(jsontaxDetailList);
         //print("encodedtaxDetail= ${encodedtaxDetail}");
       } catch (e) {
@@ -2398,7 +2419,7 @@ class ApiController {
 
       try {
         List jsontaxLabelList =
-        taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
+            taxModel.taxLabel.map((taxLabel) => taxLabel.toJson()).toList();
         encodedtaxLabel = jsonEncode(jsontaxLabelList);
         //print("encodedtaxLabel= ${encodedtaxLabel}");
       } catch (e) {
@@ -2408,8 +2429,7 @@ class ApiController {
       print(e);
     }
 
-    String userDeliveryAddress = '',
-        pin = '';
+    String userDeliveryAddress = '', pin = '';
     if (address != null && !isComingFromPickUpScreen) {
       if (address.address2 != null && address.address2.isNotEmpty) {
         if (address.address != null && address.address.isNotEmpty) {
@@ -2441,8 +2461,8 @@ class ApiController {
         "wallet_refund": store.wallet_setting == "0"
             ? ""
             : taxModel == null
-            ? "0"
-            : "${taxModel.walletRefund}",
+                ? "0"
+                : "${taxModel.walletRefund}",
         "calculated_tax_detail": "",
         "coupon_code": taxModel == null ? "" : '${taxModel.couponCode}',
         "device_id": deviceId,
@@ -2458,7 +2478,7 @@ class ApiController {
         "user_id": user.id,
         "device_token": deviceToken,
         "user_address_id":
-        isComingFromPickUpScreen == true ? areaId : address.id,
+            isComingFromPickUpScreen == true ? areaId : address.id,
         "orders": orderJson,
         "checkout": /*totalPrice*/ "${taxModel.itemSubTotal}",
         "payment_method": paymentMethod == "2"
@@ -2517,12 +2537,12 @@ class ApiController {
         print('--url===  $url');
         print('--user.id=== ${user.id}');
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
         print('--respStr===  $respStr');
         SubscriptionDataResponse getOrderHistory =
-        SubscriptionDataResponse.fromJson(parsed);
+            SubscriptionDataResponse.fromJson(parsed);
         return getOrderHistory;
       } catch (e) {
         Utils.showToast(e.toString(), true);
@@ -2560,7 +2580,7 @@ class ApiController {
       print('--response===  $respStr');
       final parsed = json.decode(respStr);
       SubscriptionUpdationResponse referEarn =
-      SubscriptionUpdationResponse.fromJson(parsed);
+          SubscriptionUpdationResponse.fromJson(parsed);
       return referEarn;
     } catch (e) {
       //Utils.showToast(e.toString(), true);
@@ -2588,12 +2608,12 @@ class ApiController {
         });
         print(request.fields.toString());
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         print('--response===  $respStr');
         final parsed = json.decode(respStr);
         SubscriptionUpdationResponse referEarn =
-        SubscriptionUpdationResponse.fromJson(parsed);
+            SubscriptionUpdationResponse.fromJson(parsed);
         return referEarn;
       } catch (e) {
         //Utils.showToast(e.toString(), true);
@@ -2621,12 +2641,12 @@ class ApiController {
         print('--url===  $url');
         print('--user.id=== ${user.id}');
         final response =
-        await request.send().timeout(Duration(seconds: timeout));
+            await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
         print('--respStr===  $respStr');
         SubscriptionDataResponse getOrderHistory =
-        SubscriptionDataResponse.fromJson(parsed);
+            SubscriptionDataResponse.fromJson(parsed);
         return getOrderHistory;
       } catch (e) {
         Utils.showToast(e.toString(), true);
@@ -2694,8 +2714,8 @@ class ApiController {
     }
   }
 
-  static Future<RazorPayTopUP> createOnlineTopUPApi(String price,
-      dynamic Id) async {
+  static Future<RazorPayTopUP> createOnlineTopUPApi(
+      String price, dynamic Id) async {
     UserModel user = await SharedPrefs.getUser();
     StoreModel store = await SharedPrefs.getStore();
     var url = ApiConstants.baseUrl.replaceAll("storeId", store.id) +
@@ -2719,7 +2739,7 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       RazorPayTopUP razorTopStore =
-      RazorPayTopUP.fromJson(json.decode(response.data));
+          RazorPayTopUP.fromJson(json.decode(response.data));
       RazorPayTopUP.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${razorTopStore.success}");
       return razorTopStore;
@@ -2753,7 +2773,7 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       WalletOnlineTopUp razorTopStore =
-      WalletOnlineTopUp.fromJson(json.decode(response.data));
+          WalletOnlineTopUp.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${razorTopStore.success}");
       return razorTopStore;
     } catch (e) {
@@ -2783,7 +2803,7 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       PromiseToPayUserResponse promiseToPayUserResponse =
-      PromiseToPayUserResponse.fromJson(json.decode(response.data));
+          PromiseToPayUserResponse.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${promiseToPayUserResponse.success}");
       return promiseToPayUserResponse;
     } catch (e) {
@@ -2793,7 +2813,8 @@ class ApiController {
 
   //Weight wise charges
   static Future<WeightWiseChargesResponse> getWeightWiseShippingCharges(
-  {@required String areaShippingCharge,@required String orderDetail}) async {
+      {@required String areaShippingCharge,
+      @required String orderDetail}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
     var url = ApiConstants.getVIRoute(storeID: store.id) +
@@ -2802,7 +2823,7 @@ class ApiController {
     try {
       FormData formData = new FormData.fromMap({
         "area_shipping_charge": areaShippingCharge,
-        "order_detail":orderDetail,
+        "order_detail": orderDetail,
         "platform": Platform.isIOS ? "IOS" : "android",
       });
       print(formData.fields);
@@ -2815,7 +2836,7 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       WeightWiseChargesResponse chargesResponse =
-      WeightWiseChargesResponse.fromJson(json.decode(response.data));
+          WeightWiseChargesResponse.fromJson(json.decode(response.data));
       print("-----RazortopUpData---${chargesResponse.success}");
       return chargesResponse;
     } catch (e) {
@@ -2875,7 +2896,7 @@ class ApiController {
       print(response.statusCode);
       print(response.data);
       DeleteUserResponse deleteUserResponse =
-      DeleteUserResponse.fromJson(json.decode(response.data));
+          DeleteUserResponse.fromJson(json.decode(response.data));
       print("-----deleteUserResponse---${deleteUserResponse.success}");
       return deleteUserResponse;
     } catch (e) {

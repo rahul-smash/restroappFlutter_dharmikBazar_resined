@@ -37,32 +37,34 @@ class _HtmlDisplayScreenState extends State<HtmlDisplayScreen> {
   @override
   Widget build(BuildContext context) {
     try {
-      return new Scaffold(
-          appBar: AppBar(
-            title: new Text(widget.appScreen),
-            centerTitle: true,
-          ),
-          body: isLoadingApi
-              ? Container(
-                  color: Colors.white,
-                  child: Center(child: CircularProgressIndicator()))
-              : htmlData.isEmpty
-                  ? Center(
-                      child: Text("No ${widget.appScreen} Found",
-                          overflow: TextOverflow.ellipsis,
-                          style: new TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 18.0,
-                          )),
-                    )
-                  : Container(
-                      child: SingleChildScrollView(
-                        child: Html(
-                          data: htmlData,
+      return SafeArea(
+        child: new Scaffold(
+            appBar: AppBar(
+              title: new Text(widget.appScreen),
+              centerTitle: true,
+            ),
+            body: isLoadingApi
+                ? Container(
+                    color: Colors.white,
+                    child: Center(child: CircularProgressIndicator()))
+                : htmlData.isEmpty
+                    ? Center(
+                        child: Text("No ${widget.appScreen} Found",
+                            overflow: TextOverflow.ellipsis,
+                            style: new TextStyle(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 18.0,
+                            )),
+                      )
+                    : Container(
+                        child: SingleChildScrollView(
+                          child: Html(
+                            data: htmlData,
 
+                          ),
                         ),
-                      ),
-                    ));
+                      )),
+      );
     } catch (e, s) {
       print(s);
       return Utils.getEmptyView2("No ${widget.appScreen} Found");

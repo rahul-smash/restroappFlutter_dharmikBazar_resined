@@ -25,44 +25,46 @@ class SubCategoryProductScreen extends StatelessWidget {
     return DefaultTabController(
       length: categoryModel.subCategory.length,
       initialIndex: isComingFromBaner ? index : index,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: Text(categoryModel.title),
-          centerTitle: true,
-        ),
-        body: Column(children: <Widget>[
-          TabBar(
-            isScrollable: categoryModel.subCategory.length == 1 ? false : true,
-            labelColor: Colors.black,
-            unselectedLabelColor: grayColorTitle,
-            indicatorColor:
-                categoryModel.subCategory.length == 1 ? appTheme : appThemeSecondary,
-            indicatorWeight: 3,
-            tabs: List.generate(categoryModel.subCategory.length, (int index) {
-              bool isTabVisible;
-              if (categoryModel.subCategory.length == 1) {
-                isTabVisible = false;
-              } else {
-                isTabVisible = true;
-              }
-              return Visibility(
-                visible: isTabVisible,
-                child: Tab(
-                  text: categoryModel.subCategory[index].title,
-                ),
-              );
-            }),
+      child: SafeArea(
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            title: Text(categoryModel.title),
+            centerTitle: true,
           ),
-          Expanded(
-              child: TabBarView(
-            children:
-                List.generate(categoryModel.subCategory.length, (int index) {
-              return getProductsWidget(categoryModel.subCategory[index].id);
-            }),
-          ))
-        ]),
-        bottomNavigationBar: bottomBar,
+          body: Column(children: <Widget>[
+            TabBar(
+              isScrollable: categoryModel.subCategory.length == 1 ? false : true,
+              labelColor: Colors.black,
+              unselectedLabelColor: grayColorTitle,
+              indicatorColor:
+                  categoryModel.subCategory.length == 1 ? appTheme : appThemeSecondary,
+              indicatorWeight: 3,
+              tabs: List.generate(categoryModel.subCategory.length, (int index) {
+                bool isTabVisible;
+                if (categoryModel.subCategory.length == 1) {
+                  isTabVisible = false;
+                } else {
+                  isTabVisible = true;
+                }
+                return Visibility(
+                  visible: isTabVisible,
+                  child: Tab(
+                    text: categoryModel.subCategory[index].title,
+                  ),
+                );
+              }),
+            ),
+            Expanded(
+                child: TabBarView(
+              children:
+                  List.generate(categoryModel.subCategory.length, (int index) {
+                return getProductsWidget(categoryModel.subCategory[index].id);
+              }),
+            ))
+          ]),
+          bottomNavigationBar: bottomBar,
+        ),
       ),
     );
   }

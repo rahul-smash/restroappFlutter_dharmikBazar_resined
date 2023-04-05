@@ -28,39 +28,41 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        appBar: AppBar(
-          title: new Text('Notifications'),
-          centerTitle: true,
-        ),
-        backgroundColor: grayLightColor,
-        body: PullToRefreshView(
-          onRefresh: () {
-            return getNotificationApi();
-          },
-          child: isLoadingApi
-              ? Container( color: grayLightColor,
-              child: Center(child: CircularProgressIndicator()))
-              : resposneModel != null
-              ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Flexible(
-                  child: Container(
-                    color: grayLightColor,
-                      padding: EdgeInsets.fromLTRB(15, 15, 15, 10),
-                      child: ListView.builder(
-                        itemBuilder: (context, index) =>
-                            _makeCard(index),
-                        itemCount: resposneModel.data.length,
-                        scrollDirection: Axis.vertical,
-                        shrinkWrap: false,
-                      )))
-            ],
-          )
-              : Utils.getEmptyView2("No Notifications"),
-        ));
+    return SafeArea(
+      child: Scaffold(
+          appBar: AppBar(
+            title: new Text('Notifications'),
+            centerTitle: true,
+          ),
+          backgroundColor: grayLightColor,
+          body: PullToRefreshView(
+            onRefresh: () {
+              return getNotificationApi();
+            },
+            child: isLoadingApi
+                ? Container( color: grayLightColor,
+                child: Center(child: CircularProgressIndicator()))
+                : resposneModel != null
+                ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Flexible(
+                    child: Container(
+                      color: grayLightColor,
+                        padding: EdgeInsets.fromLTRB(15, 15, 15, 10),
+                        child: ListView.builder(
+                          itemBuilder: (context, index) =>
+                              _makeCard(index),
+                          itemCount: resposneModel.data.length,
+                          scrollDirection: Axis.vertical,
+                          shrinkWrap: false,
+                        )))
+              ],
+            )
+                : Utils.getEmptyView2("No Notifications"),
+          )),
+    );
   }
 
   _makeCard(int index) {

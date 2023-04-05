@@ -463,94 +463,96 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        title: Text("Confirm Order"),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context, false),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          title: Text("Confirm Order"),
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back_ios),
+            onPressed: () => Navigator.pop(context, false),
+          ),
+          actions: <Widget>[
+            InkWell(
+              onTap: () {
+                Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: Padding(
+                padding:
+                    EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+                child: Icon(
+                  Icons.home,
+                  color: Colors.white,
+                  size: 30,
+                ),
+              ),
+            ),
+          ],
         ),
-        actions: <Widget>[
-          InkWell(
-            onTap: () {
-              Navigator.of(context).popUntil((route) => route.isFirst);
-            },
-            child: Padding(
-              padding:
-                  EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
-              child: Icon(
-                Icons.home,
-                color: Colors.white,
-                size: 30,
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: Column(children: [
+                Expanded(
+                  child: isLoading
+                      ? Utils.getIndicatorView()
+                      : widget.cartList == null
+                          ? Text("")
+                          : ListView(
+                              children: <Widget>[
+                                addCommentWidget(context),
+                                showDeliverySlot(),
+                                ListView.separated(
+                                  separatorBuilder:
+                                      (BuildContext context, int index) {
+                                    if (widget.cartList[index].taxDetail ==
+                                            null ||
+                                        widget.cartList[index].taxDetail ==
+                                            null) {
+                                      return Divider(
+                                          color: Colors.grey, height: 1);
+                                    } else {
+                                      return Divider(
+                                          color: Colors.white, height: 1);
+                                    }
+                                  },
+                                  shrinkWrap: true,
+                                  physics: ScrollPhysics(),
+                                  itemCount: widget.cartList.length + 1,
+                                  itemBuilder: (context, index) {
+                                    if (index == widget.cartList.length) {
+                                      return addItemPrice();
+                                    } else {
+                                      return addProductCart(
+                                          widget.cartList[index]);
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                ),
+              ]),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Wrap(
+                  children: [
+                    addTotalPrice(),
+                    addEnterCouponCodeView(),
+                    addCouponCodeRow(),
+                    addPaymentOptions(),
+                    //addConfirmOrder()
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
+        bottomNavigationBar: addConfirmOrder(),
       ),
-      body: Column(
-        children: <Widget>[
-          Expanded(
-            child: Column(children: [
-              Expanded(
-                child: isLoading
-                    ? Utils.getIndicatorView()
-                    : widget.cartList == null
-                        ? Text("")
-                        : ListView(
-                            children: <Widget>[
-                              addCommentWidget(context),
-                              showDeliverySlot(),
-                              ListView.separated(
-                                separatorBuilder:
-                                    (BuildContext context, int index) {
-                                  if (widget.cartList[index].taxDetail ==
-                                          null ||
-                                      widget.cartList[index].taxDetail ==
-                                          null) {
-                                    return Divider(
-                                        color: Colors.grey, height: 1);
-                                  } else {
-                                    return Divider(
-                                        color: Colors.white, height: 1);
-                                  }
-                                },
-                                shrinkWrap: true,
-                                physics: ScrollPhysics(),
-                                itemCount: widget.cartList.length + 1,
-                                itemBuilder: (context, index) {
-                                  if (index == widget.cartList.length) {
-                                    return addItemPrice();
-                                  } else {
-                                    return addProductCart(
-                                        widget.cartList[index]);
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-              ),
-            ]),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: SafeArea(
-              child: Wrap(
-                children: [
-                  addTotalPrice(),
-                  addEnterCouponCodeView(),
-                  addCouponCodeRow(),
-                  addPaymentOptions(),
-                  //addConfirmOrder()
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: addConfirmOrder(),
     );
   }
 
@@ -2156,7 +2158,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       print("--json == null-json == null-");
       return;
     }
-
     String couponCode = taxModel == null ? "" : taxModel.couponCode;
     String discount = taxModel == null ? "0" : taxModel.discount;
     if (widget.deliveryType == OrderType.PickUp)
@@ -2880,7 +2881,11 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   cart_saving: totalSavings.toStringAsFixed(2),
                   selectedShippingCharge: _selectedShippingCharges,
                   thirdPartyDeliveryData: widget.address.thirdPartyDeliveryData,
-                  selectedShippingChargeList: selectedShippingChargeList)
+                  selectedShippingChargeList: selectedShippingChargeList,
+                  isShipRocketintegrated:
+                      widget.address.thirdPartyDeliveryData != null
+                          ? true
+                          : false)
               .then((response) async {
             Utils.hideProgressDialog(context);
             if (response == null) {

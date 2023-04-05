@@ -153,6 +153,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
           ),
           InkWell(
             onTap: () async {
+
               if (AppConstant.isLoggedIn) {
                 if (totalPrice == 0.0) {
                   Utils.showToast(AppConstant.addItems, false);
@@ -166,6 +167,7 @@ class _CartTotalPriceBottomBarState extends State<CartTotalPriceBottomBar> {
                   store = await SharedPrefs.getStore();
                   pickupfacility = store.pickupFacility;
                   delieveryAdress = store.deliveryFacility;
+                  debugPrint("==${store}");
 
                   //print('---------${pickupfacility} and ${delieveryAdress}--------');
                   if (delieveryAdress == "1" && pickupfacility == "1") {

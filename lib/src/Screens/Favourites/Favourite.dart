@@ -35,126 +35,128 @@ class _FavouritesState extends State<Favourites> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      appBar: AppBar(
-          title: Text("My Favourites"),
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_ios),
-            onPressed: () => Navigator.pop(context),
-          )),
-      body: WillPopScope(
-          child: Column(
-            children: <Widget>[
-              Divider(color: Colors.white, height: 2.0),
-              FutureBuilder(
-                future: databaseHelper.getFavouritesList(),
-                builder: (context, projectSnap) {
-                  if (projectSnap.connectionState == ConnectionState.none &&
-                      projectSnap.hasData == null) {
-                    return Container();
-                  } else {
-                    if (projectSnap.hasData) {
-                      if(projectSnap.data.length == 0){
-                        return Container(
-                          child: Expanded(
-                            child: Center(
-                              child: Text("No Favourites found!",
-                                  overflow: TextOverflow.ellipsis,
-                                  style: new TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 18.0,
-                                  )),
-                            ),
-                          ),
-                        );
-                      }else{
-                        return Expanded(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount: projectSnap.data.length,
-                            itemBuilder: (context, index) {
-
-                              Product product = projectSnap.data[index];
-                              Map<String, dynamic> map = jsonDecode(product.productJson);
-                              Product productData = Product.fromJson(map);
-                              //print("-1--Favs----ProductTileItem---------");
-                              return ProductTileItem(productData, () {
-                                //print("-2--Favs----updateTotalPrice---------");
-                                updateTotalPrice();
-                              },ClassType.Favourites);
-                            },
-                          ),
-                        );
-                      }
-
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(
+            title: Text("My Favourites"),
+            centerTitle: true,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_ios),
+              onPressed: () => Navigator.pop(context),
+            )),
+        body: WillPopScope(
+            child: Column(
+              children: <Widget>[
+                Divider(color: Colors.white, height: 2.0),
+                FutureBuilder(
+                  future: databaseHelper.getFavouritesList(),
+                  builder: (context, projectSnap) {
+                    if (projectSnap.connectionState == ConnectionState.none &&
+                        projectSnap.hasData == null) {
+                      return Container();
                     } else {
-                      return Center(
-                        child: CircularProgressIndicator(
-                            backgroundColor: Colors.black26,
-                            valueColor:
-                            AlwaysStoppedAnimation<Color>(Colors.black26)),
-                      );
-                    }
-                  }
-                },
-              ),
-            ],
-          ),
-          onWillPop: () async {
-            Navigator.pop(context);
-            return new Future(() => false);
-          }),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          height: 55,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 10.0),
-                    child: RichText(
-                      text: TextSpan(
-                        text: "Total: ",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: Colors.black),
-                        children: [
-                          TextSpan(
-                            text:
-                            "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
-                            style: TextStyle(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 18,
-                                color: Colors.black),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )),
-              Container(
-                  color: appTheme,
-                  child: TextButton(
-                    child: Row(
-                        children: <Widget>[
-                          Image.asset("images/my_order.png", width: 25),
-                          SizedBox(width: 5),
-                          Text("Proceed To Order",style: TextStyle(fontSize: 12, color: Colors.white)),
-                        ]),
-                    onPressed: () {
-                      if (totalPrice == 0.0) {
-                        Utils.showToast(AppConstant.addItems, false);
-                      } else {
-                        Navigator.pushReplacement(context,
-                            MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
+                      if (projectSnap.hasData) {
+                        if(projectSnap.data.length == 0){
+                          return Container(
+                            child: Expanded(
+                              child: Center(
+                                child: Text("No Favourites found!",
+                                    overflow: TextOverflow.ellipsis,
+                                    style: new TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 18.0,
+                                    )),
+                              ),
+                            ),
+                          );
+                        }else{
+                          return Expanded(
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: projectSnap.data.length,
+                              itemBuilder: (context, index) {
 
-                            })));
+                                Product product = projectSnap.data[index];
+                                Map<String, dynamic> map = jsonDecode(product.productJson);
+                                Product productData = Product.fromJson(map);
+                                //print("-1--Favs----ProductTileItem---------");
+                                return ProductTileItem(productData, () {
+                                  //print("-2--Favs----updateTotalPrice---------");
+                                  updateTotalPrice();
+                                },ClassType.Favourites);
+                              },
+                            ),
+                          );
+                        }
+
+                      } else {
+                        return Center(
+                          child: CircularProgressIndicator(
+                              backgroundColor: Colors.black26,
+                              valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.black26)),
+                        );
                       }
-                    },
-                  ))
-            ],
+                    }
+                  },
+                ),
+              ],
+            ),
+            onWillPop: () async {
+              Navigator.pop(context);
+              return new Future(() => false);
+            }),
+        bottomNavigationBar: SafeArea(
+          child: Container(
+            height: 55,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 10.0),
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Total: ",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.black),
+                          children: [
+                            TextSpan(
+                              text:
+                              "${AppConstant.currency}${databaseHelper.roundOffPrice(totalPrice, 2).toStringAsFixed(2)}",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 18,
+                                  color: Colors.black),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                Container(
+                    color: appTheme,
+                    child: TextButton(
+                      child: Row(
+                          children: <Widget>[
+                            Image.asset("images/my_order.png", width: 25),
+                            SizedBox(width: 5),
+                            Text("Proceed To Order",style: TextStyle(fontSize: 12, color: Colors.white)),
+                          ]),
+                      onPressed: () {
+                        if (totalPrice == 0.0) {
+                          Utils.showToast(AppConstant.addItems, false);
+                        } else {
+                          Navigator.pushReplacement(context,
+                              MaterialPageRoute(builder: (BuildContext context) => MyCartScreen(() {
+
+                              })));
+                        }
+                      },
+                    ))
+              ],
+            ),
           ),
         ),
       ),

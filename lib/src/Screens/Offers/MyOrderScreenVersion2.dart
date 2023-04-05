@@ -42,36 +42,38 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
       });
     });
 
-    return new Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: new Text('My Orders'),
-        centerTitle: true,
-      ),
-      body: PullToRefreshView(
-        child: isLoading
-            ? Center(child: CircularProgressIndicator())
-            : ordersList == null
-                ? SingleChildScrollView(
-                    child: Center(child: Text("Something went wrong!")))
-                : ordersList.isEmpty
-                    ? Utils.getEmptyView2("No data found!")
-                    : SafeArea(
-                        child: ListView.separated(
-                            itemCount: ordersList.length,
-                            separatorBuilder: (context, index) => Container(
-                                  height: 8,
-                                  color: Color(0xFFDBDCDD),
-                                ),
-                            itemBuilder: (context, index) {
-                              OrderData orderHistoryData = ordersList[index];
-                              return listItem(context, orderHistoryData);
-                            }),
-                      ),
-        onRefresh: () {
-          print("calleddd");
-          return getOrderListApi();
-        },
+    return SafeArea(
+      child: new Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          title: new Text('My Orders'),
+          centerTitle: true,
+        ),
+        body: PullToRefreshView(
+          child: isLoading
+              ? Center(child: CircularProgressIndicator())
+              : ordersList == null
+                  ? SingleChildScrollView(
+                      child: Center(child: Text("Something went wrong!")))
+                  : ordersList.isEmpty
+                      ? Utils.getEmptyView2("No data found!")
+                      : SafeArea(
+                          child: ListView.separated(
+                              itemCount: ordersList.length,
+                              separatorBuilder: (context, index) => Container(
+                                    height: 8,
+                                    color: Color(0xFFDBDCDD),
+                                  ),
+                              itemBuilder: (context, index) {
+                                OrderData orderHistoryData = ordersList[index];
+                                return listItem(context, orderHistoryData);
+                              }),
+                        ),
+          onRefresh: () {
+            print("calleddd");
+            return getOrderListApi();
+          },
+        ),
       ),
     );
   }

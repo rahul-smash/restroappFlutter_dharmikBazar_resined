@@ -37,66 +37,68 @@ class _LoyalityPointsScreenState extends BaseState<LoyalityPointsScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      backgroundColor: Color(0xffdbdbdb),
-      appBar: AppBar(
-          title: Text("Loyality Points"),
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
-      ),
-      body: Container(
-        child: Column(
-          children: <Widget>[
-            Image.asset('images/process_img.png',fit:BoxFit.fitWidth,),
-            Divider(color:Color(0xffdbdbdb),height: 1,),
-            isLoading
-                ? Center(child: CircularProgressIndicator())
-                : loyalityList == null
-                ? SingleChildScrollView(
-                child: Center(child: Padding(padding: EdgeInsets.only(top: 50),
-                  child: Text('No Data found!'),
-                ),
-                ))
-                : showListView(),
-          ],
-        ),
-      ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-            height: 100,
-            width: Utils.getDeviceWidth(context),
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("images/bottom_bg.png"),
-                fit: BoxFit.cover,
-              ),
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Color(0xffdbdbdb),
+        appBar: AppBar(
+            title: Text("Loyality Points"),
+            centerTitle: true,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
             ),
-            child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  ElevatedButton(
-              style: Utils.getButtonDecoration(
-                  color: Color(0xffdbdbdb),
-                  edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  border: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    //side: BorderSide(color: Colors.red)
-                  )
-
-              ),
-
-                    onPressed: () => null,
-                    child: new Text(loyalityPointsModel == null ? "0" : "${loyalityPointsModel.loyalityPoints}"),
+        ),
+        body: Container(
+          child: Column(
+            children: <Widget>[
+              Image.asset('images/process_img.png',fit:BoxFit.fitWidth,),
+              Divider(color:Color(0xffdbdbdb),height: 1,),
+              isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : loyalityList == null
+                  ? SingleChildScrollView(
+                  child: Center(child: Padding(padding: EdgeInsets.only(top: 50),
+                    child: Text('No Data found!'),
                   ),
-                  Text("AVAILABLE POINTS")
-                ],
+                  ))
+                  : showListView(),
+            ],
+          ),
+        ),
+        bottomNavigationBar: SafeArea(
+          child: Container(
+              height: 100,
+              width: Utils.getDeviceWidth(context),
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("images/bottom_bg.png"),
+                  fit: BoxFit.cover,
+                ),
               ),
-            )
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                style: Utils.getButtonDecoration(
+                    color: Color(0xffdbdbdb),
+                    edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    border: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      //side: BorderSide(color: Colors.red)
+                    )
+
+                ),
+
+                      onPressed: () => null,
+                      child: new Text(loyalityPointsModel == null ? "0" : "${loyalityPointsModel.loyalityPoints}"),
+                    ),
+                    Text("AVAILABLE POINTS")
+                  ],
+                ),
+              )
+          ),
         ),
       ),
     );
