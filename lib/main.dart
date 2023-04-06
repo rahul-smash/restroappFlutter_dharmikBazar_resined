@@ -80,10 +80,8 @@ Future<void> main() async {
   SharedPrefs.storeSharedValue(AppConstant.isAdminLogin, "$isAdminLogin");
 
   PackageInfo packageInfo = await Utils.getAppVersionDetails(storeData);
- SystemUiOverlayStyle.light.copyWith(
-   statusBarIconBrightness: Brightness.dark,
-   statusBarColor: whiteColor
- );
+  SystemUiOverlayStyle.light.copyWith(
+      statusBarIconBrightness: Brightness.dark, statusBarColor: whiteColor);
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   Utils.getDeviceInfo(storeData);
   // To turn off landscape mode
