@@ -1065,7 +1065,6 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   PageController getPageController() {
     //memory efficient
     if (_pageController != null) _pageController.dispose();
-
     return _pageController;
   }
 
