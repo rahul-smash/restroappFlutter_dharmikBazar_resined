@@ -80,6 +80,8 @@ dependencies:
   whatsapp_unilink: ^2.0.1+1
   flutter_google_places: ^0.3.0
   file: ^6.1.4
+  chewie: 1.4.0
+  video_player:
 
 dependency_overrides:
   firebase_core_platform_interface: 4.5.2

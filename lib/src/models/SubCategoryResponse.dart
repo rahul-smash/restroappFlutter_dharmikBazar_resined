@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'TaxCalulationResponse.dart';
-
+import 'package:chewie/chewie.dart';
 class SubCategoryResponse {
   bool success;
   List<SubCategoryModel> subCategories;
@@ -415,6 +415,7 @@ class ProductImage {
     this.productId,
     this.image10080,
     this.image300200,
+    this.chewieController,
   });
 
   String id;
@@ -423,6 +424,7 @@ class ProductImage {
   String productId;
   String image10080;
   String image300200;
+  ChewieController  chewieController;
 
   ProductImage copyWith({
     String id,

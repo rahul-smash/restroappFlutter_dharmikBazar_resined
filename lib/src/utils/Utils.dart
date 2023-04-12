@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
 import 'dart:math';
+import 'package:path/path.dart' as p;
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -258,7 +259,6 @@ class Utils {
                             style: Utils.getButtonDecoration(
                               color: appThemeSecondary,
                             ),
-
                             onPressed: () {
                               Navigator.pop(context);
                               // Navigator.push(
@@ -1368,16 +1368,29 @@ class Utils {
     // print(position);
 
     // return await Geolocator.getCurrentPosition();
-  }  
-  static getButtonDecoration({EdgeInsets edgeInsets,color, border})
-  {
+  }
+
+  static getButtonDecoration({EdgeInsets edgeInsets, color, border}) {
     return ButtonStyle(
         shape: MaterialStateProperty.all(border),
         padding: MaterialStateProperty.all(edgeInsets),
-        backgroundColor: MaterialStateProperty.all(color)
-    );
+        backgroundColor: MaterialStateProperty.all(color));
   }
 
+  static getFileExtension(String filePath) {
+    final path = filePath;
+
+    final extension = p.extension(path);
+    return extension ?? "";
+  }
+
+  static checkIfVideoExists(String ext) {
+    List extList = ['.mp4', '.webp', '.mov', '.MP4', '.WEBP', '.MOV'];
+    if (extList.contains(ext) == true) {
+      return true;
+    } else
+      return false;
+  }
 }
 
 enum ClassType { CART, SubCategory, Favourites, Search }

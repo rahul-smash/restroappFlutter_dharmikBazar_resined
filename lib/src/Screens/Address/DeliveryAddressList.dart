@@ -56,7 +56,12 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   void initState() {
     super.initState();
     coordinates = new Coordinates(0.0, 0.0);
+    getStoreData();
     callDeliverListApi();
+  }
+
+  getStoreData() async {
+    store = await SharedPrefs.getStore();
   }
 
   callDeliverListApi() {
@@ -208,97 +213,11 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       color: appTheme,
       child: InkWell(
         onTap: () async {
-          StoreModel store = await SharedPrefs.getStore();
-          print("--deliveryArea->--${store.deliveryArea}-------");
+          store = await SharedPrefs.getStore();
           if (store.deliveryArea == "0") {
-            var result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      SaveDeliveryAddress(null, () {
-                    print("--Route-SaveDeliveryAddress-------");
-                  }, "", coordinates.latitude, coordinates.longitude),
-                  fullscreenDialog: true,
-                ));
-            if (result == true) {
-              //Utils.showProgressDialog(context);
-              setState(() {
-                isLoading = true;
-              });
-              DeliveryAddressResponse response =
-                  await ApiController.getAddressApiRequest();
-              //Utils.hideProgressDialog(context);
-              setState(() {
-                //addressList = null;
-                isLoading = false;
-                addressList = response.data;
-              });
-            } else {
-              print("--result--else------");
-            }
+            _navigateToSaveDeliveryAddress();
           } else if (store.deliveryArea == "1") {
-            Utils.isNetworkAvailable().then((isConnected) {
-              if (isConnected) {
-                Utils.showProgressDialog(context);
-                ApiController.storeRadiusApi().then((response) async {
-                  Utils.hideProgressDialog(context);
-                  if (response != null && response.success) {
-                    StoreRadiousResponse data = response;
-                    Geolocator.isLocationServiceEnabled()
-                        .then((isLocationServiceEnabled) async {
-                      print(
-                          "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
-                      if (isLocationServiceEnabled) {
-                        Geolocator geoLocator = Geolocator();
-                        LocationPermission status =
-                            await Geolocator.checkPermission();
-                        print(
-                            "--status--=${status.name}==${PermissionStatus.denied}");
-                        if (status == LocationPermission.denied) {
-                          Geolocator.requestPermission();
-                        } else if (status == LocationPermission.deniedForever) {
-                          Geolocator.openAppSettings();
-                        } else if (status ==
-                            LocationPermission.unableToDetermine) {
-                          Geolocator.openAppSettings();
-                        } else {
-                          var result = await Navigator.push(
-                              context,
-                              new MaterialPageRoute(
-                                builder: (BuildContext context) =>
-                                    DragMarkerMap(data),
-                                fullscreenDialog: true,
-                              ));
-                          if (result != null) {
-                            radiusArea = result;
-                            print("----radiusArea = result-------");
-                            //Utils.showProgressDialog(context);
-                            setState(() {
-                              isLoading = true;
-                            });
-                            DeliveryAddressResponse response =
-                                await ApiController.getAddressApiRequest();
-                            //Utils.hideProgressDialog(context);
-                            setState(() {
-                              print("----setState-------");
-                              isLoading = false;
-                              //addressList = null;
-                              addressList = response.data;
-                            });
-                          }
-                        }
-                      } else {
-                        Utils.showToast("Please turn on gps!", false);
-                      }
-                    });
-                  } else {
-                    Utils.showToast("No data found!", false);
-                  }
-                });
-              } else {
-                Utils.showToast(AppConstant.noInternet, false);
-              }
-            });
+            _navigateToMapArea();
           }
         },
         child: Row(
@@ -405,22 +324,60 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         ? '${area.address != null && area.address.trim().isNotEmpty ? '${area.address}, ${area.address2}' : "${area.address2}"}'
                         : area.address,
                   ),
+                  addAddressInfoRow(
+                      Icons.location_on,
+                      area.zipCode != null && area.zipCode.trim().isNotEmpty
+                          ? '${area.zipCode != null && area.zipCode.trim().isNotEmpty ? '${area.zipCode}' : ""}'
+                          : ""),
                   addAddressInfoRow(Icons.email, area.email),
                 ],
               ),
-              Container(
-                child: Transform.scale(
-                    scale: 1.5,
-                    child: Checkbox(
-                      activeColor: Color(0xFFE0E0E0),
-                      checkColor: Colors.green,
-                      value: selectedIndex == index,
-                      onChanged: (value) {
-                        setState(() {
-                          selectedIndex = index;
-                        });
-                      },
-                    )),
+              Column(
+                children: [
+                  Container(
+                    child: Transform.scale(
+                        scale: 1.5,
+                        child: Checkbox(
+                          activeColor: Color(0xFFE0E0E0),
+                          checkColor: Colors.green,
+                          value: selectedIndex == index,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedIndex = index;
+                            });
+                          },
+                        )),
+                  ),
+                  Align(
+                      alignment: Alignment.topRight,
+                      child: Visibility(
+                        child: Wrap(
+                          children: [
+                            Container(
+//                        width: 70,
+                              padding: EdgeInsets.only(
+                                  left: 15, right: 15, top: 5, bottom: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                border:
+                                    Border.all(color: grayLightColorSecondary),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                area.addressType != null &&
+                                        area.addressType.isNotEmpty
+                                    ? area.addressType
+                                    : '',
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.black),
+                              ),
+                            ),
+                          ],
+                        ),
+                        visible: area.addressType != null &&
+                            area.addressType.isNotEmpty,
+                      ))
+                ],
               )
             ]),
             Padding(
@@ -469,27 +426,32 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         color: infoLabel, fontWeight: FontWeight.w500)),
               ),
               onTap: () async {
-                var result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (BuildContext context) =>
-                          SaveDeliveryAddress(area, () {
-                        print('@@---Edit---SaveDeliveryAddress----------');
-                      }, "", 0.0, 0.0),
-                      fullscreenDialog: true,
-                    ));
-                if (result == true) {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  DeliveryAddressResponse response =
-                      await ApiController.getAddressApiRequest();
-                  //Utils.hideProgressDialog(context);
-                  setState(() {
-                    //addressList = null;
-                    isLoading = false;
-                    addressList = response.data;
-                  });
+                // var result = await Navigator.push(
+                //     context,
+                //     MaterialPageRoute(
+                //       builder: (BuildContext context) =>
+                //           SaveDeliveryAddress(area, () {
+                //         print('@@---Edit---SaveDeliveryAddress----------');
+                //       }, "", 0.0, 0.0),
+                //       fullscreenDialog: true,
+                //     ));
+                // if (result == true) {
+                //   setState(() {
+                //     isLoading = true;
+                //   });
+                //   DeliveryAddressResponse response =
+                //       await ApiController.getAddressApiRequest();
+                //   //Utils.hideProgressDialog(context);
+                //   setState(() {
+                //     //addressList = null;
+                //     isLoading = false;
+                //     addressList = response.data;
+                //   });
+                // }
+                if (store.deliveryArea == "0") {
+                  _navigateToSaveDeliveryAddress(addressData: area);
+                } else if (store.deliveryArea == "1") {
+                  _navigateToMapArea(deliveryAddressData: area);
                 }
               },
             ),
@@ -648,8 +610,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         print("==distanceInKm==${distanceInKm}=AND=${distanceInKms}=");
 
         if (distanceInKm > 0) {
-          Area area =
-              await checkIfOrderDeliveryWithInRadious(distanceInKms, data);
+          Area area = await checkIfOrderDeliveryWithInRadious(
+              distanceInKms, data, addressData);
           if (area != null) {
             if (area.deliveryMode == "2" &&
                 store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
@@ -826,30 +788,23 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     });
   }
 
-  Future<Area> checkIfOrderDeliveryWithInRadious(
-      int distanceInKms, StoreRadiousResponse data) async {
+  Future<Area> checkIfOrderDeliveryWithInRadious(int distanceInKms,
+      StoreRadiousResponse data, DeliveryAddressData addressData) async {
     if (data != null) {
       try {
         Area area;
-        print("---${data.data.length}---and-- ${distanceInKms}---");
-        for (int i = 0; i < data.data.length; i++) {
-          for (int j = 0; j < data.data[i].area.length; j++) {
-            Area areaObject = data.data[i].area[j];
-            print("store area radius ${areaObject.radius}");
-            int radius = int.parse(areaObject.radius);
-            print(
-                "=distanc ebetween${distanceInKms}= store radius ${radius}==${areaObject.radiusCircle}");
-            if (distanceInKms < radius && areaObject.radiusCircle == "Within") {
-              //print("--if-${radius}---and-- ${distanceInKms}---");
-              area = areaObject;
-              setState(() {});
-              break;
-            } else {
-              //print("--else-${radius}---and-- ${distanceInKms}---");
-            }
-          }
+
+        RadiousData radiousData = data.data
+            .singleWhere((element) => element.city.id == addressData.cityId);
+        Area areaObject = radiousData.area
+            .singleWhere((element) => element.areaId == addressData.areaId);
+        int radius = int.parse(areaObject.radius);
+
+        if (distanceInKms < radius && areaObject.radiusCircle == "Within") {
+          area = areaObject;
+          setState(() {});
         }
-        print("==${area}");
+        print("area==${area}");
         if (area != null) {
           return area;
         } else {
@@ -862,11 +817,21 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   }
 
   void _editAddress(DeliveryAddressData area) async {
+    if (store.deliveryArea == "0") {
+      _navigateToSaveDeliveryAddress(addressData: area);
+    } else if (store.deliveryArea == "1") {
+      _navigateToMapArea(deliveryAddressData: area);
+    }
+  }
+
+  _navigateToSaveDeliveryAddress({DeliveryAddressData addressData}) async {
     var result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (BuildContext context) =>
-              SaveDeliveryAddress(area, () {}, "", 0.0, 0.0),
+              SaveDeliveryAddress(addressData, () {
+            print("--Route-SaveDeliveryAddress-------");
+          }, "", coordinates.latitude, coordinates.longitude),
           fullscreenDialog: true,
         ));
     if (result == true) {
@@ -875,12 +840,72 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       });
       DeliveryAddressResponse response =
           await ApiController.getAddressApiRequest();
-      //Utils.hideProgressDialog(context);
       setState(() {
-        //addressList = null;
         isLoading = false;
         addressList = response.data;
       });
     }
+  }
+
+  _navigateToMapArea({DeliveryAddressData deliveryAddressData}) {
+    return Utils.isNetworkAvailable().then((isConnected) {
+      if (isConnected) {
+        Utils.showProgressDialog(context);
+        ApiController.storeRadiusApi().then((response) async {
+          Utils.hideProgressDialog(context);
+          if (response != null && response.success) {
+            StoreRadiousResponse data = response;
+            Geolocator.isLocationServiceEnabled()
+                .then((isLocationServiceEnabled) async {
+              print(
+                  "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
+              if (isLocationServiceEnabled) {
+                Geolocator geoLocator = Geolocator();
+                LocationPermission status = await Geolocator.checkPermission();
+                print("--status--=${status.name}==${PermissionStatus.denied}");
+                if (status == LocationPermission.denied) {
+                  Geolocator.requestPermission();
+                } else if (status == LocationPermission.deniedForever) {
+                  Geolocator.openAppSettings();
+                } else if (status == LocationPermission.unableToDetermine) {
+                  Geolocator.openAppSettings();
+                } else {
+                  var result = await Navigator.push(
+                      context,
+                      new MaterialPageRoute(
+                        builder: (BuildContext context) => DragMarkerMap(data,
+                            addressData: deliveryAddressData),
+                        fullscreenDialog: true,
+                      ));
+                  if (result != null) {
+                    radiusArea = result;
+                    print("----radiusArea = result-------");
+                    //Utils.showProgressDialog(context);
+                    setState(() {
+                      isLoading = true;
+                    });
+                    DeliveryAddressResponse response =
+                        await ApiController.getAddressApiRequest();
+                    //Utils.hideProgressDialog(context);
+                    setState(() {
+                      print("----setState-------");
+                      isLoading = false;
+                      //addressList = null;
+                      addressList = response.data;
+                    });
+                  }
+                }
+              } else {
+                Utils.showToast("Please turn on gps!", false);
+              }
+            });
+          } else {
+            Utils.showToast("No data found!", false);
+          }
+        });
+      } else {
+        Utils.showToast(AppConstant.noInternet, false);
+      }
+    });
   }
 }

@@ -710,6 +710,8 @@ class ApiController {
       String cityId,
       String lat,
       String lng,
+      String mobile,
+      String addresstype,
       {String address2 = ''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -727,22 +729,23 @@ class ApiController {
         "address": address,
         "city": "${city}",
         "area_name": areaName,
-        "mobile": user.phone,
+        "mobile": mobile,
         "state": "",
         "lat": "${lat}",
         "lng": "${lng}",
         "area_id": areaId,
         "first_name": fullname,
         "email": user.email,
-        "address2": address2
+        "address2": address2,
+        "address_type":addresstype
       });
-
-      if (addressId != null) {
-        request.fields["address_id"] = addressId;
-      }
       print('@@saveDeliveryAddressApiRequest  ' +
           url +
           request.fields.toString());
+      if (addressId != null) {
+        request.fields["address_id"] = addressId;
+      }
+
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();

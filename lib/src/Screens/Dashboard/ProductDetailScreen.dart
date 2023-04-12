@@ -17,7 +17,8 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:dotted_border/dotted_border.dart';
-
+import 'package:chewie/chewie.dart';
+import 'package:video_player/video_player.dart';
 import '../../singleton/app_version_singleton.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -55,6 +56,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
 
   var _pageController;
   OfferDetails offerDetails;
+  ChewieController chewieController;
 
   @override
   initState() {
@@ -74,7 +76,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       cartData = cartDataObj;
       counter = int.parse(cartData.QUANTITY);
       showAddButton = counter == 0 ? true : false;
-      setState(() {});
+      if (mounted) setState(() {});
     });
   }
 
@@ -879,6 +881,16 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       getDataFromDB();
       setState(() {
         widget.product.productImages = product.productImages;
+        widget.product.productImages.forEach((element) async {
+          if (Utils.checkIfVideoExists(Utils.getFileExtension(element.url)) ==
+              true) {
+            final videoController = VideoPlayerController.network(element.url);
+            await videoController.initialize();
+            element.chewieController =
+                ChewieController(videoPlayerController: videoController);
+            if (mounted) setState(() {});
+          }
+        });
         widget.product.description = product.description;
         widget.isApiLoading = false;
       });
@@ -1000,12 +1012,26 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   }
 
   Widget _makeBanner(BuildContext context, int _index) {
-    return CachedNetworkImage(
-      imageUrl: "${widget.product.productImages[_index].url}",
-      fit: BoxFit.contain,
-      placeholder: (context, url) => CircularProgressIndicator(),
-      errorWidget: (context, url, error) => Icon(Icons.error),
-    );
+    return Container(
+        height: 280,
+        child: Utils.checkIfVideoExists(Utils.getFileExtension(
+                widget.product.productImages[_index].url))
+            ? widget.product.productImages[_index].chewieController != null
+                ? Chewie(
+                    controller:
+                        widget.product.productImages[_index].chewieController,
+                  )
+                : Center(child: CircularProgressIndicator())
+            : Center(
+                child: CachedNetworkImage(
+                  imageUrl: "${widget.product.productImages[_index].url}",
+                  fit: BoxFit.scaleDown,
+                  placeholder: (context, url) => Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+              ));
   }
 
   bool _checkOutOfStock() {
@@ -1133,5 +1159,21 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       }
       return isProductAvailable;
     }
+  }
+
+  @override
+  void dispose() {
+    if (widget.product.productImages != null &&
+        widget.product.productImages.length != 0) {
+      widget.product?.productImages.forEach((element) {
+        if (element.chewieController != null) {
+          element.chewieController.videoPlayerController.pause;
+          element.chewieController.videoPlayerController.dispose;
+          element.chewieController.dispose();
+          element.chewieController = null;
+        }
+      });
+    }
+    super.dispose();
   }
 }
