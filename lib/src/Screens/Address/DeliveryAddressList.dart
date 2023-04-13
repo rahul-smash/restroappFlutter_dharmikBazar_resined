@@ -595,143 +595,122 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   checkingStoreDeliverymodel(
       StoreModel store, DeliveryAddressData addressData) async {
     isTPDSError = false;
-    Utils.showProgressDialog(context);
-    ApiController.storeRadiusApi().then((response) async {
+
+    if (addressData.deliveryMode == "2" &&
+        store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
+      Utils.showProgressDialog(context);
+      DatabaseHelper databaseHelper = new DatabaseHelper();
+      List<Product> cartList = await databaseHelper.getCartItemList();
+      String orderJson = await Utils.getCartListToJson(cartList);
+      ThirdPartyDeliveryResponse chargesResponse =
+          await ApiController.getDeliveryShippingChargesApi(
+              orderDetail: orderJson, userZipcode: addressData.zipCode);
       Utils.hideProgressDialog(context);
-      if (response != null && response.success) {
-        StoreRadiousResponse data = response;
-        double distanceInKm = Utils.calculateDistance(
-            double.parse(addressData.lat),
-            double.parse(addressData.lng),
-            double.parse(store.lat),
-            double.parse(store.lng));
-        int distanceInKms = distanceInKm.toInt();
+      if (chargesResponse != null &&
+          chargesResponse.success &&
+          chargesResponse.data != null) {
+        //update changes according to weight
+        if (chargesResponse.data.errorMsg != null) {
+          Utils.showToast(chargesResponse.data.errorMsg, false);
+          isTPDSError = true;
+        }
+        addressData.thirdPartyDeliveryData = chargesResponse.data;
+      } else {
+        isTPDSError = true;
+        if (chargesResponse.message != null) {
+          Utils.showToast(chargesResponse.message, false);
+          DialogUtils.displayLocationNotAvailbleDialog(
+              context, chargesResponse.message, buttonText1: 'Change Zipcode',
+              button1: () {
+            Navigator.pop(context);
+            _editAddress(addressData);
+          });
+        }
+      }
+    } else if (addressData.deliveryMode  == "1" &&
+        store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
+      addressData.areaCharges = addressData.areaCharges;
+    } else if (addressData.deliveryMode  == "1" &&
+        store.storeDeliveryModel == AppConstant.DELIVERY_WEIGHTWISE) {
+      if (store.enableWeightWiseCharges == '1') {
+        String shippingCharges =
+            await calculateShipping(addressList[selectedIndex]);
+        Utils.showProgressDialog(context);
+        DatabaseHelper databaseHelper = new DatabaseHelper();
+        List<Product> cartList = await databaseHelper.getCartItemList();
+        String orderJson = await Utils.getCartListToJson(cartList);
 
-        print("==distanceInKm==${distanceInKm}=AND=${distanceInKms}=");
+        WeightWiseChargesResponse chargesResponse =
+            await ApiController.getWeightWiseShippingCharges(
+                orderDetail: orderJson, areaShippingCharge: shippingCharges);
+        Utils.hideProgressDialog(context);
+        if (chargesResponse != null &&
+            chargesResponse.success &&
+            chargesResponse.data != null) {
+          //update changes according to weight
+          addressData.areaCharges = chargesResponse.data.totalDeliveryCharge;
 
-        if (distanceInKm > 0) {
-          Area area = await checkIfOrderDeliveryWithInRadious(
-              distanceInKms, data, addressData);
-          if (area != null) {
-            if (area.deliveryMode == "2" &&
-                store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
-              Utils.showProgressDialog(context);
-              DatabaseHelper databaseHelper = new DatabaseHelper();
-              List<Product> cartList = await databaseHelper.getCartItemList();
-              String orderJson = await Utils.getCartListToJson(cartList);
-              ThirdPartyDeliveryResponse chargesResponse =
-                  await ApiController.getDeliveryShippingChargesApi(
-                      orderDetail: orderJson, userZipcode: addressData.zipCode);
-              Utils.hideProgressDialog(context);
-              if (chargesResponse != null &&
-                  chargesResponse.success &&
-                  chargesResponse.data != null) {
-                //update changes according to weight
-                if (chargesResponse.data.errorMsg != null) {
-                  Utils.showToast(chargesResponse.data.errorMsg, false);
-                  isTPDSError = true;
-                }
-                addressData.thirdPartyDeliveryData = chargesResponse.data;
-              } else {
-                isTPDSError = true;
-                if (chargesResponse.message != null) {
-                  Utils.showToast(chargesResponse.message, false);
-                  DialogUtils.displayLocationNotAvailbleDialog(
-                      context, chargesResponse.message,
-                      buttonText1: 'Change Zipcode', button1: () {
-                    Navigator.pop(context);
-                    _editAddress(addressData);
-                  });
-                }
-              }
-            } else if (area.deliveryMode == "1" &&
-                store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
-              addressData.areaCharges = area.charges;
-            } else if (area.deliveryMode == "1" &&
-                store.storeDeliveryModel == AppConstant.DELIVERY_WEIGHTWISE) {
-              if (store.enableWeightWiseCharges == '1') {
-                String shippingCharges =
-                    await calculateShipping(addressList[selectedIndex]);
-                Utils.showProgressDialog(context);
-                DatabaseHelper databaseHelper = new DatabaseHelper();
-                List<Product> cartList = await databaseHelper.getCartItemList();
-                String orderJson = await Utils.getCartListToJson(cartList);
-
-                WeightWiseChargesResponse chargesResponse =
-                    await ApiController.getWeightWiseShippingCharges(
-                        orderDetail: orderJson,
-                        areaShippingCharge: shippingCharges);
-                if (chargesResponse != null &&
-                    chargesResponse.success &&
-                    chargesResponse.data != null) {
-                  //update changes according to weight
-                  addressData.areaCharges =
-                      chargesResponse.data.totalDeliveryCharge;
-                  Utils.hideProgressDialog(context);
-                }
-              }
-            } else if (area.deliveryMode == "1" &&
-                store.storeDeliveryModel == AppConstant.DELIVERY_VALUEAPP) {
+        }
+      }
+    } else if (addressData.deliveryMode == "1" &&
+        store.storeDeliveryModel == AppConstant.DELIVERY_VALUEAPP) {
+    } else {
+      addressData.areaCharges = addressData.areaCharges;
+    }
+    if (addressData != null) {
+      debugPrint("and =${addressData}==${isTPDSError}");
+      if (!isTPDSError) {
+        if (addressList.length == 0) {
+          Utils.showToast(AppConstant.selectAddress, false);
+        } else {
+          if (addressList[selectedIndex].note.isEmpty) {
+            if (widget.delivery == OrderType.SubScription) {
+              eventBus.fire(onAddressSelected(addressList[selectedIndex]));
+              Navigator.pop(context);
             } else {
-              addressData.areaCharges = area.charges;
+              debugPrint("=areacharges ${addressData?.areaCharges}");
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ConfirmOrderScreen(
+                          addressData,
+                          false,
+                          "",
+                          widget.delivery,
+                          storeModel: store,
+                        )),
+              );
             }
-            if (addressData != null) {
-              debugPrint("and =${addressData}==${isTPDSError}");
-              if (!isTPDSError) {
-                if (addressList.length == 0) {
-                  Utils.showToast(AppConstant.selectAddress, false);
-                } else {
-                  if (addressList[selectedIndex].note.isEmpty) {
-                    if (widget.delivery == OrderType.SubScription) {
-                      eventBus
-                          .fire(onAddressSelected(addressList[selectedIndex]));
-                      Navigator.pop(context);
-                    } else {
-                      debugPrint("=areacharges ${addressData?.areaCharges}");
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ConfirmOrderScreen(
-                                  addressData,
-                                  false,
-                                  "",
-                                  widget.delivery,
-                                  storeModel: store,
-                                )),
-                      );
-                    }
-                  } else {
-                    var result =
-                        await DialogUtils.displayOrderConfirmationDialog(
-                      context,
-                      "Confirmation",
-                      addressList[selectedIndex].note,
-                    );
-                    if (result == true) {
-                      if (widget.delivery == OrderType.SubScription) {
-                        eventBus.fire(
-                            onAddressSelected(addressList[selectedIndex]));
-                        Navigator.pop(context);
-                      } else {
-                        debugPrint("address ${addressData}");
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //       builder: (context) => ConfirmOrderScreen(
-                        //         addressData,
-                        //         false,
-                        //         "",
-                        //         widget.delivery,
-                        //         storeModel: store,
-                        //       )),
-                        // );
-                      }
-                    }
-                  }
-                }
+          } else {
+            var result = await DialogUtils.displayOrderConfirmationDialog(
+              context,
+              "Confirmation",
+              addressList[selectedIndex].note,
+            );
+            if (result == true) {
+              if (widget.delivery == OrderType.SubScription) {
+                eventBus.fire(onAddressSelected(addressList[selectedIndex]));
+                Navigator.pop(context);
+              } else {
+                debugPrint("address ${addressData}");
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //       builder: (context) => ConfirmOrderScreen(
+                //         addressData,
+                //         false,
+                //         "",
+                //         widget.delivery,
+                //         storeModel: store,
+                //       )),
+                // );
+              }
+            }
+          }
+        }
 
-                //Code Commented Due to not approved by client
-                /* StoreModel storeModel = await SharedPrefs.getStore();
+        //Code Commented Due to not approved by client
+        /* StoreModel storeModel = await SharedPrefs.getStore();
             bool isPaymentModeOnline = false;
 
             if (storeModel.onlinePayment == "1") {
@@ -776,16 +755,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                         paymentMode: widget.paymentMode,
                       )),
             );*/
-              }
-            }
-          } else {
-            Utils.showToast("We can not deliver at your location!", false);
-          }
-        } else {
-          Utils.showToast("We can not deliver at your location!", false);
-        }
       }
-    });
+    } else {
+      Utils.showToast("We can not deliver at your location!", false);
+    }
   }
 
   Future<Area> checkIfOrderDeliveryWithInRadious(int distanceInKms,

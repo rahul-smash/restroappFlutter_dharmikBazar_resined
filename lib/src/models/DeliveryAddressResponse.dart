@@ -58,6 +58,7 @@ class DeliveryAddressData {
   String lng;
   String isShippingMandatory;
   String addressType;
+  String deliveryMode;
 
   //new added fields as required feature
   String areaWisePaymentMethod; // 1=both, 2=COD, 3=Online
@@ -95,6 +96,7 @@ class DeliveryAddressData {
     this.areaWisePaymentMethod,
     this.defaultPaymentMethod,
     this.addressType,
+    this.deliveryMode,
 
     //this.deliveryTimeSlot
   });
@@ -128,6 +130,7 @@ class DeliveryAddressData {
         areaWisePaymentMethod: item.areaWisePaymentMethod,
         defaultPaymentMethod: item.defaultPaymentMethod,
         addressType: item.addressType,
+        deliveryMode: item.deliveryMode,
 //item.deliveryTimeSlot);
       );
 
@@ -158,6 +161,7 @@ class DeliveryAddressData {
         isDeleted: json["is_deleted"],
         isShippingMandatory: json["is_shipping_mandatory"],
         addressType: json["address_type"],
+        deliveryMode: json["delivery_mode"],
 
         areaWisePaymentMethod: json["area_wise_payment_method"] == null
             ? null
@@ -193,6 +197,7 @@ class DeliveryAddressData {
         "city_id": cityId,
         "is_deleted": isDeleted,
     "address_type": addressType,
+    "delivery_mode": deliveryMode,
 
     "is_shipping_mandatory": isShippingMandatory,
         "area_wise_payment_method":

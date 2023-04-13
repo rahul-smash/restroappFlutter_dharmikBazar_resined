@@ -712,6 +712,7 @@ class ApiController {
       String lng,
       String mobile,
       String addresstype,
+      String deliveryMode,
       {String address2 = ''}) async {
     StoreModel store = await SharedPrefs.getStore();
     UserModel user = await SharedPrefs.getUser();
@@ -737,7 +738,8 @@ class ApiController {
         "first_name": fullname,
         "email": user.email,
         "address2": address2,
-        "address_type":addresstype
+        "address_type":addresstype,
+        "delivery_mode":deliveryMode
       });
       print('@@saveDeliveryAddressApiRequest  ' +
           url +

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -142,7 +144,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
           _fullName(),
           _mobile(),
           SizedBox(height: 10),
-          _city(),
+          // _city(),
           _selectedAddress(),
           Container(
             height: 300.0,
@@ -219,7 +221,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
             return;
           }
           if (areaList.isEmpty) {
-            Utils.showToast("Please select city.", false);
+            Utils.showToast("We can't deliver at your location!", false);
             return;
           }
           if (!Validator.validField(addressController.text)) {
@@ -231,8 +233,6 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
             return;
           }
           StoreModel store = await SharedPrefs.getStore();
-          print(
-              "====${selectedLocation.latitude},${selectedLocation.longitude}===");
           double distanceInKm = Utils.calculateDistance(
               selectedLocation.latitude,
               selectedLocation.longitude,
@@ -344,10 +344,20 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
               double lat = detail.latitude;
               double lng = detail.longitude;
               print("location = ${lat},${lng}");
-              selectedLocation = LatLng(lat, lng);
+              center = LatLng(lat, lng);
+              markers.addAll([
+                Marker(
+                    draggable: true,
+                    icon: BitmapDescriptor.defaultMarker,
+                    markerId: MarkerId('value'),
+                    position: center,
+                    onDragEnd: (value) {
+                      getAddressFromLocation(value.latitude, value.longitude);
+                      if (mounted) setState(() {});
+                    })
+              ]);
               getAddressFromLocation(lat, lng);
-              _mapController
-                  .moveCamera(CameraUpdate.newLatLng(selectedLocation));
+              _mapController.moveCamera(CameraUpdate.newLatLng(center));
               // localCenter = LatLng(lat, lng);
               // localSelectedLocation = LatLng(lat, lng);
               // getAddressFromLocationFromMap(lat, lng,
@@ -466,6 +476,11 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
 
   _mapView() {
     return GoogleMap(
+      gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+        Factory<OneSequenceGestureRecognizer>(
+          () => EagerGestureRecognizer(),
+        ),
+      },
       onMapCreated: _onMapCreated,
       myLocationEnabled: true,
       initialCameraPosition: CameraPosition(
@@ -474,6 +489,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
       ),
       mapType: MapType.normal,
       markers: markers,
+      myLocationButtonEnabled: false,
       onCameraMove: _onCameraMove,
       //onCameraMove: _onCameraMove,
     );
@@ -550,22 +566,19 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
         widget.addressData.lat.isNotEmpty &&
         widget.addressData.lng != null &&
         widget.addressData.lng.isNotEmpty) {
-      selectedLocation = LatLng(double.parse(widget.addressData.lat),
-          double.parse(widget.addressData.lng));
       center = LatLng(double.parse(widget.addressData.lat),
           double.parse(widget.addressData.lng));
-      getAddressFromLocation(
-          selectedLocation.latitude, selectedLocation.longitude);
+      getAddressFromLocation(double.parse(widget.addressData.lat),
+          double.parse(widget.addressData.lng));
       markers.addAll([
         Marker(
             draggable: true,
             icon: BitmapDescriptor.defaultMarker,
             markerId: MarkerId('value'),
-            position: selectedLocation,
+            position: center,
             onDragEnd: (value) {
-              selectedLocation=value;
               getAddressFromLocation(value.latitude, value.longitude);
-              if(mounted) setState(() { });
+              if (mounted) setState(() {});
             })
       ]);
 
@@ -578,24 +591,19 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
       Position position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high);
       center = LatLng(position.latitude, position.longitude);
-      selectedLocation = LatLng(position.latitude, position.longitude);
-      debugPrint("current location ${center}");
+      getAddressFromLocation(position.latitude, position.longitude);
       markers.addAll([
         Marker(
             draggable: true,
             icon: BitmapDescriptor.defaultMarker,
             markerId: MarkerId('value'),
-            position: selectedLocation,
+            position: center,
             onDragEnd: (value) {
               debugPrint("==${value.longitude}}");
-              selectedLocation=value;
               getAddressFromLocation(value.latitude, value.longitude);
-              if(mounted) setState(() {
-
-              });
+              if (mounted) setState(() {});
             })
       ]);
-      getAddressFromLocation(position.latitude, position.longitude);
       Future.delayed(const Duration(milliseconds: 500), () {
         setState(() {
           _mapController.moveCamera(CameraUpdate.newLatLng(center));
@@ -606,11 +614,9 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
 
   getAddressFromLocation(double latitude, double longitude) async {
     try {
-      print("--widget.initialPosition != null----");
+      selectedLocation = LatLng(latitude, longitude);
       var addresses = await placemarkFromCoordinates(latitude, longitude);
       var first = addresses.first;
-      print(
-          "---getAddressFromLocation-------${first.name} and ${first.street}-postalCode-${first.postalCode}------");
       setState(() {
         address =
             '${first.subLocality != null ? first.subLocality : ''}${first.locality != null ? ', ' + first.locality : ''}${first.subAdministrativeArea != null ? ', ' + first.subAdministrativeArea : ''}${first.administrativeArea != null ? ', ' + first.administrativeArea : ''}';
@@ -707,16 +713,12 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
         Area areaObject = areaList[i];
         int radius = int.parse(areaObject.radius);
         if (distanceInKms < radius && areaObject.radiusCircle == "Within") {
-          //print("--if-${radius}---and-- ${distanceInKms}---");
           area = areaObject;
           setState(() {});
           break;
-        } else {
-          //print("--else-${radius}---and-- ${distanceInKms}---");
         }
       }
-      print("==${area}");
-      print("==${zipCode}");
+
       if (area != null) {
         Utils.showProgressDialog(context);
         UserModel user = await SharedPrefs.getUser();
@@ -733,7 +735,9 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
                 "${selectedLocation.latitude}",
                 "${selectedLocation.longitude}",
                 mobileController.text.trim(),
-                selectedTag)
+                selectedTag,
+                area.deliveryMode,
+                address2: address)
             .then((response) {
           Utils.hideProgressDialog(context);
           if (response != null && response.success) {
@@ -745,7 +749,7 @@ class _DragMarkerMapState extends State<DragMarkerMap> {
           }
         });
       } else {
-        Utils.showToast("We can not deliver at your location!", false);
+        Utils.showToast("We can't deliver at your location!", false);
       }
     } catch (e) {
       print(e);
