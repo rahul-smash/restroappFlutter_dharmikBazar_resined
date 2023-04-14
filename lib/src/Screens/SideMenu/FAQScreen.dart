@@ -10,7 +10,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 class FAQScreen extends StatefulWidget {
   StoreModel store;
   FaqModel faqData;
-  List<FAQCategory> faqCategoryList = List();
+  List<FAQCategory> faqCategoryList = [];
   String faqSelectedCategory;
 
   FAQScreen(this.store);

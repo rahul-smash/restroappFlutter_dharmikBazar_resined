@@ -1,6 +1,4 @@
 import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
@@ -251,7 +249,7 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
                                               }
                                             }
                                           },
-                                          child: new Text("${applyText}"),
+                                          child: new Text("$applyText"),
                                         ),
                                       ),
                                     ),
@@ -291,7 +289,6 @@ class AvailableOffersState extends State<AvailableOffersDialog> {
   }
 
   void validateCouponApi(String couponCode, String json) {
-    print("----couponCode-----=>${couponCode}");
     Utils.showProgressDialog(context);
     ApiController.validateOfferApiRequest(couponCode, widget.paymentMode, json,widget.isComingFromPickUpScreen?'1':'2')
         .then((validCouponModel) {

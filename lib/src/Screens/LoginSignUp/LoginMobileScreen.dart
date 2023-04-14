@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/LoginSignUp/OtpScreen.dart';
@@ -67,8 +66,6 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
     setState(() {
       otpSkip = store.otpSkip;
       hideSign_up = store.hideSignup;
-      String delieveryAdress = store.deliveryFacility;
-      print('@@HomeModel   ${otpSkip} and ${delieveryAdress}');
     });
   }
 
@@ -299,7 +296,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
     //return OutlineButton(
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        primary: Colors.grey, // <- this changes the splash color
+        foregroundColor: Colors.grey, // <- this changes the splash color
       ),
 
       //splashColor: Colors.grey,
@@ -309,7 +306,6 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
           Utils.showToast(AppConstant.noInternet, true);
         } else {
           bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
-          print("isGoogleSignedIn=${isGoogleSignedIn}");
           if (isGoogleSignedIn) {
             await _googleSignIn.signOut();
           }
@@ -352,7 +348,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
               Utils.showToast("Something went wrong while login!", false);
             }
           } catch (error) {
-            print("catch.googleSignIn=${error}");
+            print("catch.googleSignIn=$error");
           }
         }
       },
@@ -521,9 +517,7 @@ class _LoginMobileScreen extends State<LoginMobileScreen> {
   }
 }
 
-void _showMessage(String s) {
-  print("_showMessage=${s}");
-}
+
 
 class LoginMobile {
   String phone;

@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:restroapp/src/UI/SubscriptionHistoryDetails.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
-import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubscriptionDataResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';

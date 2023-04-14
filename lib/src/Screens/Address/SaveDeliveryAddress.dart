@@ -236,9 +236,6 @@ class _SaveDeliveryAddressState extends State<SaveDeliveryAddress> {
                               Geolocator.isLocationServiceEnabled()
                                   .then((value) async {
                                 if (value == true) {
-                                  var status =
-                                      await Geolocator.checkPermission();
-                                  print("--status--=${status}");
                                   /*if (status == GeolocationStatus.denied || status == GeolocationStatus.restricted){
                                     Utils.showToast("Please accept location permissions to get your location from settings!", false);
                                   }*/

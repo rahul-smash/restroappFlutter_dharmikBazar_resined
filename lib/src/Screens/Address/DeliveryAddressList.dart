@@ -16,7 +16,6 @@ import 'package:restroapp/src/models/StoreBranchesModel.dart';
 import 'package:restroapp/src/models/StoreRadiousResponse.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/ThirdPartyDeliveryResponse.dart';
-import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
@@ -26,11 +25,9 @@ import '../../models/SubCategoryResponse.dart';
 import '../../models/weight_wise_charges_response.dart';
 import '../BookOrder/ConfirmOrderScreen.dart';
 
-//DeliveryAddressList
 class DeliveryAddressList extends StatefulWidget {
   final bool showProceedBar;
   OrderType delivery;
-
   DeliveryAddressList(this.showProceedBar, this.delivery);
 
   @override
@@ -47,9 +44,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
   BranchData branchData;
   StoreModel store;
   CategoryResponse categoryResponse;
-
   ConfigModel configObject;
-
   bool isTPDSError = false;
 
   @override
@@ -69,8 +64,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     ApiController.getAddressApiRequest().then((responses) async {
       responsesData = responses;
       addressList = responsesData.data;
-//      addressList = await Utils.checkDeletedAreaFromStore(context, addressList,
-//          showDialogBool: true, hitApi: false);
       setState(() {
         isLoading = false;
       });
@@ -602,6 +595,7 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       DatabaseHelper databaseHelper = new DatabaseHelper();
       List<Product> cartList = await databaseHelper.getCartItemList();
       String orderJson = await Utils.getCartListToJson(cartList);
+      debugPrint("orderJson===${orderJson}");
       ThirdPartyDeliveryResponse chargesResponse =
           await ApiController.getDeliveryShippingChargesApi(
               orderDetail: orderJson, userZipcode: addressData.zipCode);
@@ -639,7 +633,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
         DatabaseHelper databaseHelper = new DatabaseHelper();
         List<Product> cartList = await databaseHelper.getCartItemList();
         String orderJson = await Utils.getCartListToJson(cartList);
-
         WeightWiseChargesResponse chargesResponse =
             await ApiController.getWeightWiseShippingCharges(
                 orderDetail: orderJson, areaShippingCharge: shippingCharges);
@@ -657,8 +650,8 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
     } else {
       addressData.areaCharges = addressData.areaCharges;
     }
+
     if (addressData != null) {
-      debugPrint("and =${addressData}==${isTPDSError}");
       if (!isTPDSError) {
         if (addressList.length == 0) {
           Utils.showToast(AppConstant.selectAddress, false);
@@ -691,19 +684,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
               if (widget.delivery == OrderType.SubScription) {
                 eventBus.fire(onAddressSelected(addressList[selectedIndex]));
                 Navigator.pop(context);
-              } else {
-                debugPrint("address ${addressData}");
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //       builder: (context) => ConfirmOrderScreen(
-                //         addressData,
-                //         false,
-                //         "",
-                //         widget.delivery,
-                //         storeModel: store,
-                //       )),
-                // );
               }
             }
           }
@@ -777,7 +757,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           area = areaObject;
           setState(() {});
         }
-        print("area==${area}");
         if (area != null) {
           return area;
         } else {
@@ -830,8 +809,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             StoreRadiousResponse data = response;
             Geolocator.isLocationServiceEnabled()
                 .then((isLocationServiceEnabled) async {
-              print(
-                  "----isLocationServiceEnabled----${isLocationServiceEnabled}--");
               if (isLocationServiceEnabled) {
                 Geolocator geoLocator = Geolocator();
                 LocationPermission status = await Geolocator.checkPermission();

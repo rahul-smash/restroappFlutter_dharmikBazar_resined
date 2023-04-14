@@ -1,12 +1,7 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
-import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
-import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
+
 import 'package:restroapp/src/apihandler/ApiController.dart';
-import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/forgotPassword/GetForgotPwdData.dart';
 import 'package:restroapp/src/utils/AppColor.dart';

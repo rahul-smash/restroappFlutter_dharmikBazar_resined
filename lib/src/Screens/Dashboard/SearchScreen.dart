@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
@@ -21,10 +20,10 @@ class SearchScreen extends StatefulWidget {
 class _SearchScreenState extends BaseState<SearchScreen> {
   TextEditingController controller = TextEditingController();
   int selctedTag;
-  List<String> tagsList = List();
-  List<SubCategoryModel> subCategoryList = List();
+  List<String> tagsList = [];
+  List<SubCategoryModel> subCategoryList = [];
   SubCategoryModel subCategory;
-  List<Product> productsList = List();
+  List<Product> productsList = [];
   CartTotalPriceBottomBar bottomBar =
       CartTotalPriceBottomBar(ParentInfo.searchList);
   bool isSearchEmpty;
@@ -112,7 +111,6 @@ class _SearchScreenState extends BaseState<SearchScreen> {
                                 }
                               },
                               onChanged: (text) {
-                                print("onChanged ${text}");
                                 if (text.trim().isEmpty) {
                                   isSearchEmpty = true;
                                 } else {
@@ -192,8 +190,6 @@ class _SearchScreenState extends BaseState<SearchScreen> {
   }
 
   Widget showTagsList() {
-    Color chipSelectedColor, textColor;
-    print("---selctedTag-${selctedTag}---");
     Widget horizontalList = new Container(
       margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
       //height: 150.0,

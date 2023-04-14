@@ -41,7 +41,7 @@ class AddSubscriptionScreen extends StatefulWidget {
   StoreModel model;
   Product product;
   OrderType deliveryType = OrderType.Delivery;
-  List<Product> cartList = new List();
+  List<Product> cartList =  [];
 
   Variant selectedVariant;
 
@@ -310,7 +310,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                     MaterialPageRoute(
                                         builder: (context) =>
                                             DeliveryAddressList(
-                                                true, OrderType.SubScription)),
+                                                true, OrderType.SubScription,)),
                                   );
                                   Map<String, dynamic> attributeMap =
                                       new Map<String, dynamic>();
@@ -386,7 +386,7 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                 Container(
                                   height: 35.0,
                                   margin: EdgeInsets.fromLTRB(0, 20, 10, 0),
-                                  color: appTheme,
+
                                   child: ButtonTheme(
                                     minWidth: 80,
                                     child: ElevatedButton(
@@ -840,75 +840,73 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
   Widget addSubscriptionBtn() {
     return Container(
       height: 50.0,
+      width:MediaQuery.of(context).size.width,
       color: appTheme,
       child: InkWell(
         onTap: () async {},
-        child: ButtonTheme(
-          minWidth: Utils.getDeviceWidth(context),
-          child: ElevatedButton(
-            style: Utils.getButtonDecoration(
-                edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                color: appTheme
-            ),
+        child: ElevatedButton(
+          style: Utils.getButtonDecoration(
+              edgeInsets: EdgeInsets.fromLTRB(0, 0, 0, 0),
+              color: appTheme
+          ),
 
-            onPressed: () async {
-              StoreModel model = await SharedPrefs.getStore();
-              bool status = Utils.checkStoreSubsTaxOpenTime(
-                  taxModel, model, widget.deliveryType);
-              print("----checkStoreOpenTime----${status}--");
+          onPressed: () async {
+            StoreModel model = await SharedPrefs.getStore();
+            bool status = Utils.checkStoreSubsTaxOpenTime(
+                taxModel, model, widget.deliveryType);
+            print("----checkStoreOpenTime----${status}--");
 
-              if (!status) {
-                Utils.showToast(
-                    "${taxModel.storeTimeSetting.closehoursMessage}", false);
-                return;
-              }
+            if (!status) {
+              Utils.showToast(
+                  "${taxModel.storeTimeSetting.closehoursMessage}", false);
+              return;
+            }
 
-              if (_selectedDeliveryOption == 'Delivery' &&
-                  addressData == null) {
-                DialogUtils.displayErrorDialog(
-                    context, 'Please Select Delivery Address');
-              } else if (_selectedDeliveryOption
-                      .toLowerCase()
-                      .contains('pick') &&
-                  areaObject == null) {
-                DialogUtils.displayErrorDialog(
-                    context, 'Please Select Pick Up Address');
-              } else if (taxModel == null) {
-                DialogUtils.displayErrorDialog(
-                    context, 'Calculation are not done yet, Please try again');
-              } else if (selectedTimeSlotString.isEmpty) {
-                DialogUtils.displayErrorDialog(
-                    context, 'Please Select time slot');
-              } else if (selectedStartDate == null) {
-                DialogUtils.displayErrorDialog(
-                    context, 'Please Select Start Subscription Date');
-              } else if (selectedEndDate == null) {
-                DialogUtils.displayErrorDialog(
-                    context, 'Please Select End Subscription Date');
-              } else if (_markedDateMap.events.isEmpty) {
-                DialogUtils.displayErrorDialog(
-                    context, 'Please Select Variant Dates');
-              } else if (widget.cartList.isEmpty) {
-                DialogUtils.displayErrorDialog(
-                    context, 'Please add product to Subscription cart');
-              } else if (widget.cartList.first.quantity == '0') {
-                DialogUtils.displayErrorDialog(context, 'Please add Quantity');
-              } else if (double.parse(
-                      widget.model.subscription.minimumOrderDaily) >
-                  double.parse(taxModel.singleDayTotal) -
-                      double.parse(shippingCharges)) {
-                DialogUtils.displayErrorDialog(
-                  context,
-                  'Your Daily Minimum Order is very less for Subscription.',
-                );
-              } else {
-                bottomSheet(context);
-              }
-            },
-            child: Text(
-              "Subscribe",
-              style: TextStyle(color: Colors.white, fontSize: 18.0),
-            ),
+            if (_selectedDeliveryOption == 'Delivery' &&
+                addressData == null) {
+              DialogUtils.displayErrorDialog(
+                  context, 'Please Select Delivery Address');
+            } else if (_selectedDeliveryOption
+                    .toLowerCase()
+                    .contains('pick') &&
+                areaObject == null) {
+              DialogUtils.displayErrorDialog(
+                  context, 'Please Select Pick Up Address');
+            } else if (taxModel == null) {
+              DialogUtils.displayErrorDialog(
+                  context, 'Calculation are not done yet, Please try again');
+            } else if (selectedTimeSlotString.isEmpty) {
+              DialogUtils.displayErrorDialog(
+                  context, 'Please Select time slot');
+            } else if (selectedStartDate == null) {
+              DialogUtils.displayErrorDialog(
+                  context, 'Please Select Start Subscription Date');
+            } else if (selectedEndDate == null) {
+              DialogUtils.displayErrorDialog(
+                  context, 'Please Select End Subscription Date');
+            } else if (_markedDateMap.events.isEmpty) {
+              DialogUtils.displayErrorDialog(
+                  context, 'Please Select Variant Dates');
+            } else if (widget.cartList.isEmpty) {
+              DialogUtils.displayErrorDialog(
+                  context, 'Please add product to Subscription cart');
+            } else if (widget.cartList.first.quantity == '0') {
+              DialogUtils.displayErrorDialog(context, 'Please add Quantity');
+            } else if (double.parse(
+                    widget.model.subscription.minimumOrderDaily) >
+                double.parse(taxModel.singleDayTotal) -
+                    double.parse(shippingCharges)) {
+              DialogUtils.displayErrorDialog(
+                context,
+                'Your Daily Minimum Order is very less for Subscription.',
+              );
+            } else {
+              bottomSheet(context);
+            }
+          },
+          child: Text(
+            "Subscribe",
+            style: TextStyle(color: Colors.white, fontSize: 18.0),
           ),
         ),
       ),
@@ -1272,7 +1270,6 @@ class _AddSubscriptionScreenState extends BaseState<AddSubscriptionScreen> {
                                       color: appTheme
                                   ),
                                   onPressed: () {
-                                    //todo:hit api
                                     taxModel.storeStatus == "0"
                                         ? Utils.showToast(
                                             "${taxModel.storeMsg}", false)

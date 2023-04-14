@@ -1,24 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter_html/flutter_html.dart';
-import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
-import 'package:restroapp/src/database/DatabaseHelper.dart';
-import 'package:restroapp/src/database/SharedPrefs.dart';
-import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/EligibleProductResponse.dart';
-import 'package:restroapp/src/models/StoreResponseModel.dart';
-import 'package:restroapp/src/models/SubCategoryResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
-import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:dotted_border/dotted_border.dart';
-
-import '../../singleton/app_version_singleton.dart';
 
 class EligibleProductScreen extends StatefulWidget {
   final String offerId;

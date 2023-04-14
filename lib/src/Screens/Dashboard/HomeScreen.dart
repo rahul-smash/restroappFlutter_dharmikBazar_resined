@@ -1,13 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:badges/badges.dart' as b;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_pro/carousel_pro.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:restroapp/src/Screens/BookOrder/MyCartScreen.dart';
@@ -15,7 +12,6 @@ import 'package:restroapp/src/Screens/BookOrder/SubCategoryProductScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
 import 'package:restroapp/src/Screens/Dashboard/widgets/order_time_popup.dart';
-import 'package:restroapp/src/Screens/Dashboard/widgets/bottom_order_status_bar.dart';
 import 'package:restroapp/src/Screens/Notification/NotificationScreen.dart';
 import 'package:restroapp/src/Screens/Offers/MyOrderScreenVersion2.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
@@ -39,10 +35,7 @@ import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../singleton/app_version_singleton.dart';
 import 'SearchScreen.dart';
-// import 'package:flutter_open_whatsapp/flutter_open_whatsapp.dart';
 
 class HomeScreen extends StatefulWidget {
   final StoreModel store;
@@ -66,8 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   UserModel user;
   static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-  static FirebaseAnalyticsObserver observer =
-      FirebaseAnalyticsObserver(analytics: analytics);
+
   bool isStoreClosed;
   final DatabaseHelper databaseHelper = new DatabaseHelper();
   int cartBadgeCount;
@@ -78,7 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
   WalleModel welleModel;
   SocialModel socialModel;
   Offset _offset;
-  int _current = 0;
+
 
   _HomeScreenState(this.store);
 
@@ -125,7 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
             if (!AppConstant.isLoggedIn && store.isRefererFnEnable) {
               String showReferEarnAlert = await SharedPrefs.getStoreSharedValue(
                   AppConstant.showReferEarnAlert);
-              print("showReferEarnAlert=${showReferEarnAlert}");
               if (showReferEarnAlert == null) {
                 SharedPrefs.storeSharedValue(
                     AppConstant.showReferEarnAlert, "true");
@@ -389,9 +380,7 @@ class _HomeScreenState extends State<HomeScreen> {
         reverse: false,
         autoPlay: true,
         onPageChanged: (index, reason) {
-          setState(() {
-            _current = index;
-          });
+
         },
         enlargeCenterPage: false,
         autoPlayInterval: Duration(seconds: 3),
@@ -427,9 +416,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onBannerTap(position) {
-    print("onImageTap ${position}");
-    print("linkTo=${store.banners[position].linkTo}");
-
     if (store.banners[position].linkTo.isNotEmpty) {
       if (store.banners[position].linkTo == "category") {
         if (store.banners[position].categoryId == "0" &&
@@ -443,12 +429,10 @@ class _HomeScreenState extends State<HomeScreen> {
             store.banners[position].subCategoryId != "0" &&
             store.banners[position].productId != "0") {
           // here we have to open the product detail
-          print("open the product detail ${position}");
         } else if (store.banners[position].categoryId != "0" &&
             store.banners[position].subCategoryId != "0" &&
             store.banners[position].productId == "0") {
           //here open the banner sub category
-          print("open the subCategory ${position}");
 
           for (int i = 0; i < categoryResponse.categories.length; i++) {
             CategoryModel categories = categoryResponse.categories[i];
@@ -480,13 +464,10 @@ class _HomeScreenState extends State<HomeScreen> {
         } else if (store.banners[position].categoryId != "0" &&
             store.banners[position].subCategoryId == "0" &&
             store.banners[position].productId == "0") {
-          print("open the Category ${position}");
 
           for (int i = 0; i < categoryResponse.categories.length; i++) {
             CategoryModel categories = categoryResponse.categories[i];
             if (store.banners[position].categoryId == categories.id) {
-              print(
-                  "title ${categories.title} and ${categories.id} and ${store.banners[position].categoryId}");
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
@@ -547,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   (
                   badgeColor: appThemeSecondary
                 ),
-                badgeContent: Text('${cartBadgeCount}',
+                badgeContent: Text('$cartBadgeCount',
                     style: TextStyle(color: Colors.white)),
                 child: Image.asset('images/carticon.png',
                     width: 24,
@@ -857,7 +838,6 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         cartBadgeCount = value;
       });
-      print("--getCARTCount---${cartBadgeCount}------");
     });
   }
 
@@ -1034,9 +1014,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   _launchCaller(String call) async {
-    String url = "tel:${call}";
-    if (await canLaunch(url)) {
-      await launch(url);
+    String url = "tel:$call";
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       throw 'Could not launch $url';
     }

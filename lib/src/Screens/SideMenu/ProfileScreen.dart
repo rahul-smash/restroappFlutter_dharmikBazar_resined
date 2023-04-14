@@ -133,9 +133,6 @@ class _ProfileState extends State<ProfileScreen> {
           }
         }
       }
-
-      print(
-          "showReferralCodeView=${showReferralCodeView} and ${storeModel.isRefererFnEnable}");
     });
   }
 

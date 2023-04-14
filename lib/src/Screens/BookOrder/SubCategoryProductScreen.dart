@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:restroapp/src/Screens/Dashboard/SearchScreen.dart';
 import 'package:restroapp/src/UI/CartBottomView.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';

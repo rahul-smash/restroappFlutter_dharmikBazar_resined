@@ -1,15 +1,14 @@
-import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:maps_launcher/maps_launcher.dart';
-import 'package:restroapp/src/Screens/Dashboard/ContactScreen.dart';
+
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
-import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 import 'ContactUs.dart';
@@ -122,7 +121,6 @@ class _AboutScreenState extends State<AboutScreen> {
                           if (widget.store != null) {
                             String address = "${widget.store.storeName}, ${widget.store.location}"
                                 "${widget.store.city}, ${widget.store.state}, ${widget.store.country}";
-                            print("address= ${address}");
                             MapsLauncher.launchQuery(address);
                           }
                         } catch (e) {

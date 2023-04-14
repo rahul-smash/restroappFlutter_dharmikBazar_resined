@@ -319,7 +319,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
     //  return OutlineButton(
     return OutlinedButton(
       style: OutlinedButton.styleFrom(
-        primary: Colors.grey, // <- this changes the splash color
+        foregroundColor: Colors.grey, // <- this changes the splash color
 
       ),
       // splashColor: Colors.grey,
@@ -329,7 +329,6 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
           Utils.showToast(AppConstant.noInternet, true);
         } else {
           bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
-          print("isGoogleSignedIn=${isGoogleSignedIn}");
           if (isGoogleSignedIn) {
             await _googleSignIn.signOut();
           }
@@ -368,7 +367,7 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
               }
             }
           } catch (error) {
-            print("catch.googleSignIn=${error}");
+            print("catch.googleSignIn=$error");
           }
         }
       },
@@ -457,7 +456,6 @@ class _LoginEmailScreenState extends State<LoginEmailScreen> {
       onTap: () async {
         String isAdminLogin =
             await SharedPrefs.getStoreSharedValue(AppConstant.isAdminLogin);
-        print("${isAdminLogin}");
         if (isAdminLogin == "true") {
           performAdminLogin();
         } else {

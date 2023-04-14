@@ -22,7 +22,7 @@ class MyOrderScreenVersion2 extends StatefulWidget {
 }
 
 class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
-  List<OrderData> ordersList = List();
+  List<OrderData> ordersList = [];
   bool isLoading;
   bool isRatingEnable = false;
 
@@ -329,7 +329,7 @@ class _MyOrderScreenVersion2 extends State<MyOrderScreenVersion2> {
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(15.0)),
                               ),
-                              child: Text('${_rating}',
+                              child: Text('$_rating',
                                   style: TextStyle(
                                       color: Color(0xFF39444D),
                                       fontWeight: FontWeight.w500,

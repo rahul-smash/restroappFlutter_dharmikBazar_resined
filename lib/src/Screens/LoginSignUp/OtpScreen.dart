@@ -1,10 +1,6 @@
 import 'dart:async';
-import 'package:sms_autofill/sms_autofill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
-import 'package:restroapp/src/Screens/Address/PickUpOrderScreen.dart';
-import 'package:restroapp/src/Screens/Dashboard/HomeScreen.dart';
 import 'package:restroapp/src/Screens/SideMenu/ProfileScreen.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -13,9 +9,7 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-
 import 'LoginMobileScreen.dart';
-import 'RegisterScreen.dart';
 
 class OtpScreen extends StatefulWidget {
   String menu;

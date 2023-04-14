@@ -2734,12 +2734,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
     Utils.showProgressDialog(context);
     double price = double.parse(taxModel.total); //totalPrice ;
-    print("=======1===${price}===total==${taxModel.total}======");
     price = price * 100;
-    print("=======2===${price}===========");
     String mPrice =
         price.toString().substring(0, price.toString().indexOf('.'));
-    print("=======mPrice===${mPrice}===========");
     UserModel user = await SharedPrefs.getUser();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String deviceId = prefs.getString(AppConstant.deviceId);
@@ -3233,7 +3230,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
     bool status =
         Utils.checkStoreTaxOpenTime(taxModel, storeObject, widget.deliveryType);
-    print("----checkStoreOpenTime----${status}--*****************");
 
     if (!status) {
       Utils.showToast("${taxModel.storeTimeSetting.closehoursMessage}", false);
@@ -3310,8 +3306,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
           String timeSlot = deliverySlotModel.data
               .dateTimeCollection[selctedTag].timeslot[selectedTimeSlot].label;
           selectedDeliverSlotValue =
-              "${Utils.convertDateFormat(slotDate)} ${timeSlot}";
-          //print("selectedDeliverSlotValue= ${selectedDeliverSlotValue}");
+              "${Utils.convertDateFormat(slotDate)} $timeSlot";
         }
       }
     } else {

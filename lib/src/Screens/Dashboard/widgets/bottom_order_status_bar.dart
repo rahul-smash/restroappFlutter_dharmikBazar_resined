@@ -4,7 +4,6 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
-import 'package:dots_indicator/dots_indicator.dart';
 import '../../../apihandler/ApiController.dart';
 import '../../../database/SharedPrefs.dart';
 import '../../../models/StoreResponseModel.dart';

@@ -1,10 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/LoyalityPointsModel.dart';
-import 'package:restroapp/src/models/StoreOffersResponse.dart';
 import 'package:restroapp/src/models/SubscriptionTaxCalculationResponse.dart';
 import 'package:restroapp/src/models/TaxCalulationResponse.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
@@ -46,7 +44,7 @@ class RedeemPointsScreen extends StatefulWidget {
 class RedeemPointsScreenState extends State<RedeemPointsScreen> {
   DatabaseHelper databaseHelper = new DatabaseHelper();
   String area_id_value;
-  List<LoyalityData> loyalityList = List();
+  List<LoyalityData> loyalityList = [];
   bool isLoading = true;
   LoyalityPointsModel loyalityPointsModel;
 
@@ -215,8 +213,6 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
                                       return;
                                     }
                                     if (redeemButtonColor == appTheme) {
-                                      print(
-                                          "-1--redeemButtonColor=${redeemButtonColor}");
 
                                       if (widget.reddemPointsCodeList
                                           .contains(loyalityData.couponCode)) {
@@ -258,12 +254,9 @@ class RedeemPointsScreenState extends State<RedeemPointsScreen> {
                                               false);
                                         }
                                       }
-                                    } else {
-                                      print(
-                                          "-2--redeemButtonColor=${redeemButtonColor}");
                                     }
                                   },
-                                  child: new Text("${redeemText}"),
+                                  child: new Text("$redeemText"),
                                 ),
                               ),
                             ),

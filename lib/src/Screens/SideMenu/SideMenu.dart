@@ -1,10 +1,5 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-// import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-// import 'package:flutter_share/flutter_share.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:restroapp/src/Screens/Address/DeliveryAddressList.dart';
 import 'package:restroapp/src/Screens/Favourites/Favourite.dart';
@@ -49,7 +44,7 @@ class NavDrawerMenu extends StatefulWidget {
 }
 
 class _NavDrawerMenuState extends State<NavDrawerMenu> {
-  List<dynamic> _drawerItems = List();
+  List<dynamic> _drawerItems = [];
 
   WalleModel walleModel;
   double iconHeight = 25;
@@ -570,7 +565,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
           Navigator.pop(context);
           if (widget.store.isRefererFnEnable) {
             var result = await DialogUtils.showInviteEarnAlert(context);
-            print("showInviteEarnAlert=${result}");
           } else {
             share2(null, widget.store);
           }
@@ -689,7 +683,6 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       // }
 
       bool isGoogleSignedIn = await _googleSignIn.isSignedIn();
-      print("isGoogleSignedIn=${isGoogleSignedIn}");
       if (isGoogleSignedIn) {
         await _googleSignIn.signOut();
       }

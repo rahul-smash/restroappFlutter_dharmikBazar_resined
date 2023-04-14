@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -16,10 +14,8 @@ import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
-import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
-// import 'package:url_launcher/url_launcher.dart';
 
 import '../../notifications/notification_service_helper.dart';
 import '../../singleton/app_version_singleton.dart';
@@ -360,7 +356,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                 ),
               ),
               onTap: () {
-                launch(orderHistoryData.trackingData.trackingUrl);
+                launchUrl(Uri.parse(orderHistoryData.trackingData.trackingUrl));
               },
             ),
           )
@@ -596,7 +592,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                       fontWeight: FontWeight.w400,
                                     )),
                               ),
-                              Text("${AppConstant.currency} ${_totalPrice}",
+                              Text("$AppConstant.currency $_totalPrice",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 16,
@@ -689,7 +685,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                 child: Padding(
                                   padding: EdgeInsets.only(top: 3),
                                   child: Text(
-                                      "Cart Saving ${AppConstant.currency} ${_totalCartSaving}",
+                                      "Cart Saving $AppConstant.currency $_totalCartSaving",
                                       style: TextStyle(
                                           color: Color(0xff74BA33),
                                           fontSize: 12,
@@ -1330,7 +1326,6 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
   }
 
   String getStatus(status) {
-    print("---${status}---");
     /*0 =pending ,
     1= active,
     2 = rejected = show view only for this else hide status.*/
@@ -1703,7 +1698,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           onPressed: () async {
             Navigator.of(context).pop();
             var image =
-                await ImagePicker().getImage(source: ImageSource.camera);
+                await ImagePicker().pickImage(source: ImageSource.camera);
             if (image == null) {
               print("---image == null----");
             } else {
@@ -1720,7 +1715,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
           onPressed: () async {
             Navigator.of(context).pop();
             var image =
-                await ImagePicker().getImage(source: ImageSource.gallery);
+                await ImagePicker().pickImage(source: ImageSource.gallery);
             if (image == null) {
               print("---image == null----");
             } else {

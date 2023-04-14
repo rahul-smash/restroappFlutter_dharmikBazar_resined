@@ -1,21 +1,15 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:restroapp/src/Screens/Dashboard/eligible_product_screen.dart';
 import 'package:restroapp/src/Screens/Dashboard/my_coupons_screen.dart';
-import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
-import 'package:restroapp/src/models/UserResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
-import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:dotted_border/dotted_border.dart';
@@ -51,11 +45,6 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
 
   bool isLoading = true;
 
-  int _current = 0;
-
-  CarouselController _carouselController;
-
-  var _pageController;
   OfferDetails offerDetails;
 
   @override
@@ -92,12 +81,7 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
         ),
         bottomNavigationBar: InkWell(
           onTap: () async {
-            try {
-              UserModel user = await SharedPrefs.getUser();
-            } catch (e) {
-              Utils.showToast('You need to login first', true);
-              return;
-            }
+
 
             Navigator.push(
                 context,
@@ -401,9 +385,7 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
         widget.product = product;
       }
       getDataFromDB();
-      print("widget.product.productImages=${widget.product.productImages.length}");
-      print("-----placeholderUrl---${AppConstant.placeholderUrl}");
-      print("-----imageUrl---${imageUrl}");
+
       setState(() {
         widget.product.productImages = product.productImages;
         widget.product.description = product.description;
@@ -463,7 +445,7 @@ class _MoreDetailsState extends State<MoreDetailScreen> {
                     ),
                   ),*/
                     child: CachedNetworkImage(
-                      imageUrl: "${imageUrl}",
+                      imageUrl: "$imageUrl",
                       height: 100,
                       width: 100,
                       fit: BoxFit.scaleDown,

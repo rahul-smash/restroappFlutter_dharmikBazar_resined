@@ -85,7 +85,7 @@ class _OrderTimePopupState extends State<OrderTimePopup> {
                 ),
               ),
               Container(
-                  child: Text("${remainingOrderTime}",
+                  child: Text("$remainingOrderTime",
                     style: TextStyle(fontSize: 16,color: Colors.white),
                   )
               ),
@@ -168,15 +168,15 @@ class _OrderTimePopupState extends State<OrderTimePopup> {
         String hourValue = splitTimeValue[0];
         String minutesValue = splitTimeValue[1];
         //print("hourValue=${hourValue} : minutesValue${minutesValue}");
-        remainingOrderTime = '${hourValue}:${minutesValue} hours';
+        remainingOrderTime = '$hourValue:$minutesValue hours';
 
         if(hourValue == '01' && minutesValue == '00'){
-          remainingOrderTime = '${hourValue}:${minutesValue} hour';
+          remainingOrderTime = '$hourValue:$minutesValue hour';
         }
         if(hourValue == '00'){
-          remainingOrderTime = '${minutesValue} mins';
+          remainingOrderTime = '$minutesValue mins';
           if(hourValue == '00' && minutesValue == '01'){
-            remainingOrderTime = '${minutesValue} min';
+            remainingOrderTime = '$minutesValue min';
           }
         }
         if(hourValue == '00' && minutesValue == '00'){

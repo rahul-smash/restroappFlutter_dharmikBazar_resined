@@ -1,14 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:restroapp/src/Screens/Dashboard/more_detail_screen.dart';
 import 'package:restroapp/src/UI/ProductTileView.dart';
 import 'package:restroapp/src/apihandler/ApiController.dart';
 import 'package:restroapp/src/database/DatabaseHelper.dart';
-import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/CartTableData.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/models/SubCategoryResponse.dart';
@@ -127,9 +124,9 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       isVisible = false;
     }
     return WillPopScope(
-      onWillPop: () {
-        print("onWillPop onWillPop");
+      onWillPop: () async{
         Navigator.pop(context, variant);
+        return Future.value(true);
       },
       child: SafeArea(
         child: Scaffold(
@@ -293,7 +290,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                           discount == "0" ||
                           discount == "0.0")
                       ? Text(
-                          "${AppConstant.currency}${price}",
+                          "$AppConstant.currency$price",
                           style: TextStyle(
                               color: grayColorTitle,
                               fontWeight: FontWeight.w600),
@@ -301,13 +298,13 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                       : Row(
                           children: <Widget>[
                             Text(
-                              "${AppConstant.currency}${price}",
+                              "$AppConstant.currency$price",
                               style: TextStyle(
                                   color: grayColorTitle,
                                   fontWeight: FontWeight.w700),
                             ),
                             Text(" "),
-                            Text("${AppConstant.currency}${mrpPrice}",
+                            Text("$AppConstant.currency$mrpPrice",
                                 style: TextStyle(
                                     decoration: TextDecoration.lineThrough,
                                     color: grayColorTitle,
@@ -1002,7 +999,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
             : Padding(
       padding: EdgeInsets.symmetric(vertical: 20.0),
               child: CachedNetworkImage(
-                imageUrl: "${imageUrl}",
+                imageUrl: "$imageUrl",
                 fit: BoxFit.contain,
                 height: 280.0,
                 placeholder: (context, url) => CircularProgressIndicator(),
@@ -1126,7 +1123,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               } else if (stock <= counter) {
                 isProductAvailable = false;
                 Utils.showToast(
-                    "Only ${counter} Items Available in Stocks", true);
+                    "Only $counter Items Available in Stocks", true);
               } else {
                 isProductAvailable = true;
               }
@@ -1143,11 +1140,11 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
               } else if (counter >= (stock - minStockAlert)) {
                 isProductAvailable = false;
                 Utils.showToast(
-                    "Only ${counter} Items Available in Stocks", true);
+                    "Only $counter Items Available in Stocks", true);
               } else if (stock <= counter) {
                 isProductAvailable = false;
                 Utils.showToast(
-                    "Only ${counter} Items Available in Stocks", true);
+                    "Only $counter Items Available in Stocks", true);
               } else {
                 isProductAvailable = true;
               }
@@ -1165,7 +1162,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
   void dispose() {
     if (widget.product.productImages != null &&
         widget.product.productImages.length != 0) {
-      widget.product?.productImages.forEach((element) {
+      widget.product?.productImages?.forEach((element) {
         if (element.chewieController != null) {
           element.chewieController.videoPlayerController.pause;
           element.chewieController.videoPlayerController.dispose;

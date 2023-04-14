@@ -1,6 +1,7 @@
 class ApiConstants {
 //  static String base = "https://app.restroapp.com/storeId";
   static String base = "https://app.restroapp.com/storeId";
+
   // static String base = "https://stage.grocersapp.com/storeId";
 
   //static String baseUrl = 'https://app.restroapp.com/storeId/api_v1/';
@@ -135,23 +136,23 @@ class ApiConstants {
   static String shippingChargesApi = 'delivery_charges/index';
 
   //--------------------------------
-   //third party shipping charge calculation
+  //third party shipping charge calculation
   static String deliveryShippingChargesApi = 'shiprocket_delivery/index';
 
   //new payment gateway
   static String dpoCreateOrderApi = '/dpo/dpoCreateOrder';
 
-  static String getDpoRoute({String storeID}){
-    if(storeID!=null)
+  static String getDpoRoute({String storeID}) {
+    if (storeID != null)
       return '$base$dpoCreateOrderApi'.replaceAll("storeId", storeID);
-    else{
+    else {
       return '$base$dpoCreateOrderApi';
     }
   }
 
-
   //delete account
   static String deleteUser = '/apiv1/user_authentication/deleteuser';
+
   static String getDeleteRoute({String storeID}) {
     if (storeID != null)
       return '$base$deleteUser'.replaceAll("storeId", storeID);
@@ -159,5 +160,4 @@ class ApiConstants {
       return '$base$deleteUser';
     }
   }
-
 }

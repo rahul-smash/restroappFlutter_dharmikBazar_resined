@@ -67,7 +67,6 @@ class _WalletTopUpState extends State<WalletTopUp> {
     onPayTMPageFinishedStream =
         eventBus.on<onPayTMPageFinished>().listen((event) {
       callWalletOnlineTopApi(event.orderId, event.txnId, event.amount, 'paytm');
-
     });
   }
 
@@ -367,45 +366,54 @@ class _WalletTopUpState extends State<WalletTopUp> {
               color: Colors.white,
             ),
             height: 170,
-            child: ListView.builder(
-                itemCount: widget.store.paymentGatewaySettings.length,
-                itemBuilder: (context, index) {
-                  PaymentGatewaySettings paymentGatewaySettings =
-                      widget.store.paymentGatewaySettings[index];
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: appTheme,
-                      border: Border.all(
-                        color: appTheme,
-                        width: 0.5,
-                      ),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    margin: EdgeInsets.only(left: 10, right: 10, top: 20),
-                    child: ListTile(
-                      onTap: () {
-                        if (paymentGatewaySettings.paymentGateway
-                            .toLowerCase()
-                            .contains('paytm')) {
-                          Navigator.pop(context);
-                          callPayTmApi(amount, storeObject);
-                        } else if (paymentGatewaySettings.paymentGateway
-                            .toLowerCase()
-                            .contains('razorpay')) {
-                          Navigator.pop(context);
-                          callRazorPayToken(amount, storeObject);
-                        }
-                      },
-                      title: Text(
-                        '* ${paymentGatewaySettings.paymentGateway}',
+            child: widget.store?.paymentGatewaySettings != null &&
+                    widget.store?.paymentGatewaySettings?.length != 0
+                ? ListView.builder(
+                    itemCount:
+                        widget.store?.paymentGatewaySettings?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      PaymentGatewaySettings paymentGatewaySettings =
+                          widget.store.paymentGatewaySettings[index];
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: appTheme,
+                          border: Border.all(
+                            color: appTheme,
+                            width: 0.5,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        margin: EdgeInsets.only(left: 10, right: 10, top: 20),
+                        child: ListTile(
+                          onTap: () {
+                            if (paymentGatewaySettings.paymentGateway
+                                .toLowerCase()
+                                .contains('paytm')) {
+                              Navigator.pop(context);
+                              callPayTmApi(amount, storeObject);
+                            } else if (paymentGatewaySettings.paymentGateway
+                                .toLowerCase()
+                                .contains('razorpay')) {
+                              Navigator.pop(context);
+                              callRazorPayToken(amount, storeObject);
+                            }
+                          },
+                          title: Text(
+                            '* ${paymentGatewaySettings.paymentGateway}',
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      );
+                    })
+                : Center(
+                    child: Text("No Payment Options Found",
                         style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  );
-                }),
+                            fontSize: 18.0,
+                            color: Colors.grey.withOpacity(0.9))),
+                  ),
           );
         },
       );

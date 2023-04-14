@@ -24,7 +24,7 @@ class MyOrderScreen extends StatefulWidget {
 
 class _MyOrderScreen extends State<MyOrderScreen> {
 
-  List<OrderData> ordersList = List();
+  List<OrderData> ordersList = [];
   bool isLoading ;
 
   @override

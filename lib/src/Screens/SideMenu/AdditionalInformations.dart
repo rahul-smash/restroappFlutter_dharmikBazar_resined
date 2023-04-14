@@ -18,7 +18,7 @@ class AdditionalInformation extends StatefulWidget {
 }
 
 class _AdditionalInformationState extends State<AdditionalInformation> {
-  List<dynamic> _drawerItems = List();
+  List<dynamic> _drawerItems =[];
 
   @override
   void initState() {

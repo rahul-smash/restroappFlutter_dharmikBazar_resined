@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/Utils.dart';
@@ -31,7 +30,6 @@ class _ContactScreen extends State<ContactScreen> {
     center = LatLng(double.parse(lat), double.parse(lng));
     lat = widget.store.lat;
     lng = widget.store.lng;
-    print("lat lng= ${lat},${lng}");
     center = LatLng(double.parse(lat), double.parse(lng));
     markers.addAll([Marker(
       markerId: MarkerId('value'),
@@ -125,18 +123,18 @@ class _ContactScreen extends State<ContactScreen> {
   }
 
   _launchCaller(String call) async {
-    String url = "tel:${call}";
-    if (await canLaunch(url)) {
-      await launch(url);
+    String url = "tel:$call";
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       throw 'Could not launch $url';
     }
   }
 
   _launchEmail(String email) async {
-    String url = "mailto:${email}?subject=&body=";
-    if (await canLaunch(url)) {
-      await launch(url);
+    String url = "mailto:$email?subject=&body=";
+    if (await canLaunchUrl(Uri.parse(url))) {
+      await launchUrl(Uri.parse(url));
     } else {
       throw 'Could not launch $url';
     }

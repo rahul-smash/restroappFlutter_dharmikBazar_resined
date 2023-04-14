@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:restroapp/src/models/GetOrderHistory.dart';
 import 'package:restroapp/src/utils/AppColor.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
@@ -523,8 +522,7 @@ class OrderDetailScreen extends StatelessWidget {
     );
   }
 
-  String getStatus(status) {
-    print("---${status}---");
+   getStatus(status) {
     /*0 =pending ,
     1= active,
     2 = rejected = show view only for this else hide status.*/
