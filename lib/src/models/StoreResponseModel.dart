@@ -153,6 +153,7 @@ class StoreModel {
   String enableWeightWiseCharges;
   String displayVariantWeight;
   String storeDeliveryModel;
+  String subscriptionRadiusLimit;
 
   StoreModel({
     this.id,
@@ -280,6 +281,7 @@ class StoreModel {
     this.hideSignup,
     this.enableWeightWiseCharges,
     this.storeDeliveryModel,
+    this.subscriptionRadiusLimit,
   });
 
   StoreModel.fromJson(Map<String, dynamic> json) {
@@ -476,6 +478,7 @@ class StoreModel {
             : WalletSettings.fromJson(json["wallet_settings"]);
     hideSignup = json["hide_signup"];
     enableWeightWiseCharges = json["enable_weightwise_charges"];
+    subscriptionRadiusLimit = json["subscription_radius_limit"];
     displayVariantWeight = json["display_variant_weight"] == null
         ? null
         : json['display_variant_weight'];
@@ -635,6 +638,7 @@ class StoreModel {
     data['enable_weightwise_charges'] = this.enableWeightWiseCharges;
     data['display_variant_weight'] = this.displayVariantWeight;
     data['store_delivery_model'] = this.storeDeliveryModel;
+    data['subscription_radius_limit'] = this.subscriptionRadiusLimit;
     return data;
   }
 }

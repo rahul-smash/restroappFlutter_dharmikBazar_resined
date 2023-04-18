@@ -124,7 +124,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       isVisible = false;
     }
     return WillPopScope(
-      onWillPop: () async{
+      onWillPop: () async {
         Navigator.pop(context, variant);
         return Future.value(true);
       },
@@ -151,8 +151,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                   Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 child: Padding(
-                  padding:
-                      EdgeInsets.only(top: 0.0, bottom: 0.0, left: 0, right: 10),
+                  padding: EdgeInsets.only(
+                      top: 0.0, bottom: 0.0, left: 0, right: 10),
                   child: Icon(
                     Icons.home,
                     color: Colors.white,
@@ -290,7 +290,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                           discount == "0" ||
                           discount == "0.0")
                       ? Text(
-                          "$AppConstant.currency$price",
+                          "${AppConstant.currency}$price",
                           style: TextStyle(
                               color: grayColorTitle,
                               fontWeight: FontWeight.w600),
@@ -298,13 +298,13 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                       : Row(
                           children: <Widget>[
                             Text(
-                              "$AppConstant.currency$price",
+                              "${AppConstant.currency}$price",
                               style: TextStyle(
                                   color: grayColorTitle,
                                   fontWeight: FontWeight.w700),
                             ),
                             Text(" "),
-                            Text("$AppConstant.currency$mrpPrice",
+                            Text("${AppConstant.currency}$mrpPrice",
                                 style: TextStyle(
                                     decoration: TextDecoration.lineThrough,
                                     color: grayColorTitle,
@@ -353,7 +353,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
                 ),
               ),
               Expanded(
-                child: showTagsList(widget.product.variants),
+                child: showTagsList(widget?.product?.variants),
               ),
             ],
           ),
@@ -555,7 +555,7 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       //margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: variants.length,
+        itemCount: variants?.length??0,
         scrollDirection: Axis.horizontal,
         itemBuilder: (context, index) {
           Variant tagName = variants[index];
@@ -838,10 +838,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
       String variantId;
       variantId = variant == null ? variant_Id : variant.id;
       databaseHelper.delete(DatabaseHelper.CART_Table, variantId).then((count) {
-        showAddButton=true;
-        if(mounted) setState(() {
-
-        });
+        showAddButton = true;
+        if (mounted) setState(() {});
       });
     } catch (e) {
       print(e);
@@ -923,8 +921,8 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
     return widget.product.productImages != null &&
             widget.product.productImages.isNotEmpty
         ? Container(
-      padding: EdgeInsets.symmetric(vertical: 20.0),
-      child: Column(
+            padding: EdgeInsets.symmetric(vertical: 20.0),
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Container(
@@ -992,20 +990,21 @@ class _ProductDetailsState extends State<ProductDetailsScreen> {
           )
         : imageUrl == ""
             ? Container(
-      padding: EdgeInsets.symmetric(vertical: 20.0), child: Center(
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                child: Center(
                   child: Utils.getImgPlaceHolder(),
                 ),
               )
             : Padding(
-      padding: EdgeInsets.symmetric(vertical: 20.0),
-              child: CachedNetworkImage(
-                imageUrl: "$imageUrl",
-                fit: BoxFit.contain,
-                height: 280.0,
-                placeholder: (context, url) => CircularProgressIndicator(),
-                errorWidget: (context, url, error) => Icon(Icons.error),
-              ),
-            );
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                child: CachedNetworkImage(
+                  imageUrl: "$imageUrl",
+                  fit: BoxFit.contain,
+                  height: 280.0,
+                  placeholder: (context, url) => CircularProgressIndicator(),
+                  errorWidget: (context, url, error) => Icon(Icons.error),
+                ),
+              );
   }
 
   Widget _makeBanner(BuildContext context, int _index) {

@@ -1402,6 +1402,7 @@ enum RadioButtonEnum { SELECTD, UNSELECTED }
 
 class AdditionItemsConstants {
   static const ABOUT_US = "About Us";
+  static const CONTACT_US = "Contact Us";
   static const FAQ = "FAQ";
   static const TERMS_CONDITIONS = "Terms and Conditions";
   static const PRIVACY_POLICY = "Privacy Policy";

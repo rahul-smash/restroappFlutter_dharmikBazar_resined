@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/SideMenu/ContactUs.dart';
+import 'package:restroapp/src/database/SharedPrefs.dart';
 import 'package:restroapp/src/models/StoreResponseModel.dart';
+import 'package:restroapp/src/models/UserResponseModel.dart';
+import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
 import 'AboutScreen.dart';
@@ -31,6 +35,8 @@ class _AdditionalInformationState extends State<AdditionalInformation> {
         AdditionItemsConstants.REFUND_POLICY, "images/about_image.png"));
     _drawerItems.add(AdditionChildItem(
         AdditionItemsConstants.ABOUT_US, "images/about_image.png"));
+    _drawerItems.add(AdditionChildItem(
+        AdditionItemsConstants.CONTACT_US, "images/about_image.png"));
     _drawerItems.add(AdditionChildItem(
         AdditionItemsConstants.FAQ, "images/about_image.png"));
   }
@@ -96,6 +102,24 @@ class _AdditionalInformationState extends State<AdditionalInformation> {
         Map<String, dynamic> attributeMap = new Map<String, dynamic>();
         attributeMap["ScreenName"] = "AboutScreen";
         Utils.sendAnalyticsEvent("Clicked AboutScreen", attributeMap);
+        break;
+        case AdditionItemsConstants.CONTACT_US:
+          if (AppConstant.isLoggedIn) {
+
+            UserModel model = await SharedPrefs.getUser();
+
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ContactUs(model)),
+            );
+            Map<String, dynamic> attributeMap = new Map<String, dynamic>();
+            attributeMap["ScreenName"] = "ContactUsScreen";
+            Utils.sendAnalyticsEvent("Clicked ContactUsScreen", attributeMap);
+          }else{
+            Utils.showToast(AppConstant.pleaseLogin, true);
+            Utils.showLoginDialog(context);
+          }
+
         break;
       case AdditionItemsConstants.TERMS_CONDITIONS:
         Navigator.push(

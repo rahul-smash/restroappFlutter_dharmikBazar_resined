@@ -28,6 +28,7 @@ import '../BookOrder/ConfirmOrderScreen.dart';
 class DeliveryAddressList extends StatefulWidget {
   final bool showProceedBar;
   OrderType delivery;
+
   DeliveryAddressList(this.showProceedBar, this.delivery);
 
   @override
@@ -518,8 +519,18 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
                 return addressData;
               }
             }
-            await checkingStoreDeliverymodel(storeModel, addressData);
+           if(widget.delivery==OrderType.SubScription)
+             {
+               _calculateDistance(addressData,storeModel);
+             }
+           else{
+             await checkingStoreDeliverymodel(storeModel, addressData);
+           }
           }
+          else
+            {
+              Utils.showToast('Please add address.', false);
+            }
         },
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -539,7 +550,24 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
       ),
     );
   }
-
+  _calculateDistance(DeliveryAddressData addressData, StoreModel storeModel)
+  {
+    double distanceInKm = Utils.calculateDistance(
+        double.parse(addressData.lat),
+        double.parse(addressData.lng),
+        double.parse(store.lat),
+        double.parse(store.lng));
+    int distanceInKms = distanceInKm.toInt();
+    if(distanceInKms<=int.parse(store.subscriptionRadiusLimit))
+      {
+        eventBus.fire(onAddressSelected(addressData));
+        Navigator.pop(context);
+      }
+    else
+      {
+        Utils.showToast("We don't provide subscription for this location.", false);
+      }
+  }
   Future<String> calculateShipping(DeliveryAddressData addressList) async {
     int minAmount = 0;
     String shippingCharges = addressList.areaCharges;
@@ -621,10 +649,10 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
           });
         }
       }
-    } else if (addressData.deliveryMode  == "1" &&
+    } else if (addressData.deliveryMode == "1" &&
         store.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY) {
       addressData.areaCharges = addressData.areaCharges;
-    } else if (addressData.deliveryMode  == "1" &&
+    } else if (addressData.deliveryMode == "1" &&
         store.storeDeliveryModel == AppConstant.DELIVERY_WEIGHTWISE) {
       if (store.enableWeightWiseCharges == '1') {
         String shippingCharges =
@@ -642,7 +670,6 @@ class _AddDeliveryAddressState extends State<DeliveryAddressList> {
             chargesResponse.data != null) {
           //update changes according to weight
           addressData.areaCharges = chargesResponse.data.totalDeliveryCharge;
-
         }
       }
     } else if (addressData.deliveryMode == "1" &&

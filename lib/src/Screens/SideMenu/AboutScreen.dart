@@ -74,62 +74,28 @@ class _AboutScreenState extends State<AboutScreen> {
                   top: BorderSide(width: 1.0, color: whiteColor),
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                    child: TextButton(
-                      child: Text('Contact Us'),
-                      style: Utils.getButtonDecoration(
-                        color:appThemeSecondary,
+              child: Center(
+                child: TextButton(
+                  child: Text('Locate Us',style: TextStyle(
+                    decoration: TextDecoration.underline,
+                  ),),
+                  style: Utils.getButtonDecoration(
+                    color:whiteColor,
 
-                      ),
-
-
-                      onPressed: () async {
-                        //Navigator.pop(context, false);
-                        if (AppConstant.isLoggedIn) {
-
-                          UserModel model = await SharedPrefs.getUser();
-
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ContactUs(model)),
-                          );
-                        }else{
-                          Utils.showToast(AppConstant.pleaseLogin, true);
-                          Utils.showLoginDialog(context);
-                        }
-
-                      },
-                    ),
                   ),
-                  Container(
-                    margin: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                    child: TextButton(
-                      child: Text('Locate Us',style: TextStyle(
-                        decoration: TextDecoration.underline,
-                      ),),
-                      style: Utils.getButtonDecoration(
-                        color:whiteColor,
 
-                      ),
-
-                      onPressed: () {
-                        try {
-                          if (widget.store != null) {
-                            String address = "${widget.store.storeName}, ${widget.store.location}"
-                                "${widget.store.city}, ${widget.store.state}, ${widget.store.country}";
-                            MapsLauncher.launchQuery(address);
-                          }
-                        } catch (e) {
-                          print(e);
-                        }
-                      },
-                    ),
-                  ),
-                ],
+                  onPressed: () {
+                    try {
+                      if (widget.store != null) {
+                        String address = "${widget.store.storeName}, ${widget.store.location}"
+                            "${widget.store.city}, ${widget.store.state}, ${widget.store.country}";
+                        MapsLauncher.launchQuery(address);
+                      }
+                    } catch (e) {
+                      print(e);
+                    }
+                  },
+                ),
               ),
           ),
         ),

@@ -45,6 +45,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
 
   @override
   initState() {
+    debugPrint("==${widget.product}");
     super.initState();
     variant = widget.globelVariant;
     widget.product.variantId = widget.globelVariant == null
@@ -137,258 +138,207 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
     return Container(
       color: Colors.white,
       child: Column(children: [
-        InkWell(
-          onTap: () async {
-            //print("----print-----");
-            if (widget.classType != ClassType.CART) {
-              var result = await Navigator.push(
-                  context,
-                  new MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        ProductDetailsScreen(widget.product),
-                    fullscreenDialog: true,
-                  ));
-              setState(() {
-//                if (result != null) {
-//                  variant = result;
-//                  discount = variant.discount.toString();
-//                  price = variant.price.toString();
-//                  weight = variant.weight;
-//                  variantId = variant.id;
-//                } else {
-//                  variantId =
-//                      variant == null ? widget.product.variantId : variant.id;
-//                }
-//                _checkOutOfStock(findNext: false);
-                //TODO: Counter Update
-//                eventBus.fire(
-//                    onSubscribeProduct(widget.product, counter.toString()));
-//                databaseHelper
-//                    .getProductQuantitiy(variantId)
-//                    .then((cartDataObj) {
-//                  setState(() {
-//                    cartData = cartDataObj;
-//                    counter = int.parse(cartData.QUANTITY);
-//                    showAddButton = counter == 0 ? true : false;
-//                    //print("-QUANTITY-${counter}=");
-//                  });
-//                });
-                databaseHelper
-                    .checkProductsExistInFavTable(
-                        DatabaseHelper.Favorite_Table, widget.product.id)
-                    .then((favValue) {
-                  //print("--ProductFavValue-- ${favValue} and ${widget.product.isFav}");
-                  setState(() {
-                    widget.product.isFav = favValue.toString();
-                  });
-                });
-                widget.callback();
-                eventBus.fire(updateCartCount());
-              });
-              //print("--ProductDetails--result---${result}");
-            }
-          },
-          child: Padding(
-            padding: EdgeInsets.only(top: 0, bottom: 15),
-            child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Flexible(
-                      child: Row(
-                    children: [
-                      SizedBox(width: 10),
-                      Visibility(
-                        visible: AppConstant.isRestroApp,
-                        child: addVegNonVegOption(),
-                      ),
-                      Stack(
-                        children: <Widget>[
-                          imageUrl == ""
-                              ? Container(
+        Padding(
+          padding: EdgeInsets.only(top: 0, bottom: 15),
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Flexible(
+                    child: Row(
+                  children: [
+                    SizedBox(width: 10),
+                    Visibility(
+                      visible: AppConstant.isRestroApp,
+                      child: addVegNonVegOption(),
+                    ),
+                    Stack(
+                      children: <Widget>[
+                        imageUrl == ""
+                            ? Container(
+                                width: 70.0,
+                                height: 80.0,
+                                child: Utils.getImgPlaceHolder(),
+                              )
+                            : Padding(
+                                padding: EdgeInsets.only(left: 5, right: 20),
+                                child: Container(
                                   width: 70.0,
                                   height: 80.0,
-                                  child: Utils.getImgPlaceHolder(),
-                                )
-                              : Padding(
-                                  padding: EdgeInsets.only(left: 5, right: 20),
-                                  child: Container(
-                                    width: 70.0,
-                                    height: 80.0,
-                                    child: CachedNetworkImage(
-                                        imageUrl: "${imageUrl}",
-                                        fit: BoxFit.fill
-                                        //placeholder: (context, url) => CircularProgressIndicator(),
-                                        //errorWidget: (context, url, error) => Icon(Icons.error),
-                                        ),
-                                    /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
-                                          fit: BoxFit.cover),*/
-                                  )),
-                          Visibility(
-                            visible: (discount == "0.00" ||
-                                    discount == "0" ||
-                                    discount == "0.0")
-                                ? false
-                                : true,
-                            child: Container(
-                              child: Text(
-                                "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 10.0),
-                              ),
-                              margin: EdgeInsets.only(left: 5),
-                              padding: EdgeInsets.all(5),
-                              decoration: new BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                color: appThemeSecondary,
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(15.0),
-                                    bottomRight: Radius.circular(15.0)),
-                              ),
+                                  child: CachedNetworkImage(
+                                      imageUrl: "${imageUrl}",
+                                      fit: BoxFit.fill
+                                      //placeholder: (context, url) => CircularProgressIndicator(),
+                                      //errorWidget: (context, url, error) => Icon(Icons.error),
+                                      ),
+                                  /*child: Image.network(imageUrl,width: 60.0,height: 60.0,
+                                        fit: BoxFit.cover),*/
+                                )),
+                        Visibility(
+                          visible: (discount == "0.00" ||
+                                  discount == "0" ||
+                                  discount == "0.0")
+                              ? false
+                              : true,
+                          child: Container(
+                            child: Text(
+                              "${discount.contains(".00") ? discount.replaceAll(".00", "") : discount}% OFF",
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 10.0),
+                            ),
+                            margin: EdgeInsets.only(left: 5),
+                            padding: EdgeInsets.all(5),
+                            decoration: new BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: appThemeSecondary,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(15.0),
+                                  bottomRight: Radius.circular(15.0)),
                             ),
                           ),
-                          Visibility(
-                            visible: _isProductOutOfStock,
-                            child: Container(
-                              height: 80.0,
-                              color: Colors.white54,
-                              child: Center(
-                                child: Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: Colors.red, width: 1),
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(5)),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(2),
-                                      child: Text(
-                                        "Out of Stock",
-                                        style: TextStyle(
-                                            color: Colors.red, fontSize: 12),
-                                      ),
-                                    )),
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-                      Flexible(
-                          child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Flexible(
-                                child: Text(widget.product.title,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      color: grayColorTitle,
-                                    )),
-                              ),
-                              InkWell(
-                                onTap: () async {
-                                  int count = await databaseHelper
-                                      .checkProductsExistInFavTable(
-                                          DatabaseHelper.Favorite_Table,
-                                          widget.product.id);
-
-                                  Product product = widget.product;
-                                  print("--product.count-- ${count}");
-                                  if (count == 1) {
-                                    product.isFav = "0";
-                                    await databaseHelper.deleteFav(
-                                        DatabaseHelper.Favorite_Table,
-                                        product.id);
-                                  } else if (count == 0) {
-                                    String variantId,
-                                        weight,
-                                        mrpPrice,
-                                        price,
-                                        discount,
-                                        isUnitType;
-                                    variantId = variant == null
-                                        ? widget.product.variantId
-                                        : variant.id;
-                                    weight = variant == null
-                                        ? widget.product.weight
-                                        : variant.weight;
-                                    mrpPrice = variant == null
-                                        ? widget.product.mrpPrice
-                                        : variant.mrpPrice;
-                                    price = variant == null
-                                        ? widget.product.price
-                                        : variant.price;
-                                    discount = variant == null
-                                        ? widget.product.discount
-                                        : variant.discount;
-                                    isUnitType = variant == null
-                                        ? widget.product.isUnitType
-                                        : variant.unitType;
-
-                                    product.isFav = "1";
-                                    product.variantId = variantId;
-                                    product.weight = weight;
-                                    product.mrpPrice = mrpPrice;
-                                    product.price = price;
-                                    product.discount = discount;
-                                    product.isUnitType = isUnitType;
-                                    insertInFavTable(product, counter);
-                                  }
-                                  //print("--product.isFav-- ${product.isFav}");
-                                  widget.callback();
-                                  setState(() {});
-                                },
-                                child: Visibility(
-                                  visible: widget.classType == ClassType.CART
-                                      ? false
-                                      : true,
-                                  child: Container(
-                                    height: 30,
-                                    width: 30,
-                                    decoration: BoxDecoration(
-                                      color: widget.classType == ClassType.CART
-                                          ? Colors.white
-                                          : favGrayColor,
+                        ),
+                        Visibility(
+                          visible: _isProductOutOfStock,
+                          child: Container(
+                            height: 80.0,
+                            color: Colors.white54,
+                            child: Center(
+                              child: Container(
+                                  decoration: BoxDecoration(
                                       border: Border.all(
-                                        color: favGrayColor,
-                                        width: 1,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(5.0)),
+                                          color: Colors.red, width: 1),
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(2),
+                                    child: Text(
+                                      "Out of Stock",
+                                      style: TextStyle(
+                                          color: Colors.red, fontSize: 12),
                                     ),
-                                    margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
-                                    child: Visibility(
-                                      visible:
-                                          widget.classType == ClassType.CART
-                                              ? false
-                                              : true,
-                                      /* child: widget.product.isFav == null ? Icon(Icons.favorite_border)
-                                                        :Utils.showFavIcon(widget.product.isFav),*/
-                                      child: widget.classType ==
-                                              ClassType.Favourites
-                                          ? Icon(
-                                              Icons.favorite,
-                                              color: appThemeSecondary,
-                                            )
-                                          : Utils.showFavIcon(
-                                              widget.product.isFav),
+                                  )),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Flexible(
+                        child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Flexible(
+                              child: Text(widget.product.title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    color: grayColorTitle,
+                                  )),
+                            ),
+                            InkWell(
+                              onTap: () async {
+                                int count = await databaseHelper
+                                    .checkProductsExistInFavTable(
+                                        DatabaseHelper.Favorite_Table,
+                                        widget.product.id);
+
+                                Product product = widget.product;
+                                print("--product.count-- ${count}");
+                                if (count == 1) {
+                                  product.isFav = "0";
+                                  await databaseHelper.deleteFav(
+                                      DatabaseHelper.Favorite_Table,
+                                      product.id);
+                                } else if (count == 0) {
+                                  String variantId,
+                                      weight,
+                                      mrpPrice,
+                                      price,
+                                      discount,
+                                      isUnitType;
+                                  variantId = variant == null
+                                      ? widget.product.variantId
+                                      : variant.id;
+                                  weight = variant == null
+                                      ? widget.product.weight
+                                      : variant.weight;
+                                  mrpPrice = variant == null
+                                      ? widget.product.mrpPrice
+                                      : variant.mrpPrice;
+                                  price = variant == null
+                                      ? widget.product.price
+                                      : variant.price;
+                                  discount = variant == null
+                                      ? widget.product.discount
+                                      : variant.discount;
+                                  isUnitType = variant == null
+                                      ? widget.product.isUnitType
+                                      : variant.unitType;
+
+                                  product.isFav = "1";
+                                  product.variantId = variantId;
+                                  product.weight = weight;
+                                  product.mrpPrice = mrpPrice;
+                                  product.price = price;
+                                  product.discount = discount;
+                                  product.isUnitType = isUnitType;
+                                  insertInFavTable(product, counter);
+                                }
+                                //print("--product.isFav-- ${product.isFav}");
+                                widget.callback();
+                                setState(() {});
+                              },
+                              child: Visibility(
+                                visible: widget.classType == ClassType.CART
+                                    ? false
+                                    : true,
+                                child: Container(
+                                  height: 30,
+                                  width: 30,
+                                  decoration: BoxDecoration(
+                                    color: widget.classType == ClassType.CART
+                                        ? Colors.white
+                                        : favGrayColor,
+                                    border: Border.all(
+                                      color: favGrayColor,
+                                      width: 1,
                                     ),
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(5.0)),
+                                  ),
+                                  margin: EdgeInsets.fromLTRB(0, 5, 20, 0),
+                                  child: Visibility(
+                                    visible:
+                                        widget.classType == ClassType.CART
+                                            ? false
+                                            : true,
+                                    /* child: widget.product.isFav == null ? Icon(Icons.favorite_border)
+                                                      :Utils.showFavIcon(widget.product.isFav),*/
+                                    child: widget.classType ==
+                                            ClassType.Favourites
+                                        ? Icon(
+                                            Icons.favorite,
+                                            color: appThemeSecondary,
+                                          )
+                                        : Utils.showFavIcon(
+                                            widget.product.isFav),
                                   ),
                                 ),
                               ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: variantsVisibility == true ? 0 : 20,
-                          ),
-                          Visibility(
-                            visible: variantsVisibility,
-                            child: Padding(
-                              padding: EdgeInsets.only(top: 0, bottom: 10),
-                              child: InkWell(
-                                onTap: () async {
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: variantsVisibility == true ? 0 : 20,
+                        ),
+                        Visibility(
+                          visible: variantsVisibility,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 0, bottom: 10),
+                            child: InkWell(
+                              onTap: () async {
 //                                  //print("-variants.length--${widget.product.variants.length}");
 //                                  if (widget.product.variants.length != null) {
 //                                    if (widget.product.variants.length == 1) {
@@ -421,31 +371,31 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
 ////                                    });
 //                                  }
 //                                  _checkOutOfStock(findNext: false);
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: weight.trim() == ""
-                                          ? whiteColor
-                                          : appThemeSecondary,
-                                      width: 1,
-                                    ),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5.0)),
+                              },
+                              child: Container(
+                                padding: EdgeInsets.fromLTRB(10, 0, 5, 0),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: weight.trim() == ""
+                                        ? whiteColor
+                                        : appThemeSecondary,
+                                    width: 1,
                                   ),
-                                  child: Wrap(
-                                    children: <Widget>[
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            top: 5, right: 5, bottom: 5),
-                                        child: Text(
-                                          "${weight}",
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              color: appThemeSecondary),
-                                        ),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5.0)),
+                                ),
+                                child: Wrap(
+                                  children: <Widget>[
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 5, right: 5, bottom: 5),
+                                      child: Text(
+                                        "${weight}",
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: appThemeSecondary),
                                       ),
+                                    ),
 //                                      Visibility(
 //                                        visible:
 //                                            widget.classType == ClassType.CART
@@ -457,83 +407,82 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
 //                                              widget.classType, widget.product),
 //                                        ),
 //                                      ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              (discount == "0.00" ||
-                                      discount == "0" ||
-                                      discount == "0.0")
-                                  ? Text(
-                                      "${AppConstant.currency}${price}",
-                                      style: TextStyle(
-                                          color: grayColorTitle,
-                                          fontWeight: FontWeight.w600),
-                                    )
-                                  : Row(
-                                      children: <Widget>[
-                                        Text(
-                                          "${AppConstant.currency}${price}",
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            (discount == "0.00" ||
+                                    discount == "0" ||
+                                    discount == "0.0")
+                                ? Text(
+                                    "${AppConstant.currency}${price}",
+                                    style: TextStyle(
+                                        color: grayColorTitle,
+                                        fontWeight: FontWeight.w600),
+                                  )
+                                : Row(
+                                    children: <Widget>[
+                                      Text(
+                                        "${AppConstant.currency}${price}",
+                                        style: TextStyle(
+                                            color: grayColorTitle,
+                                            fontWeight: FontWeight.w700),
+                                      ),
+                                      Text(" "),
+                                      Text(
+                                          "${AppConstant.currency}${mrpPrice}",
                                           style: TextStyle(
+                                              decoration:
+                                                  TextDecoration.lineThrough,
                                               color: grayColorTitle,
-                                              fontWeight: FontWeight.w700),
-                                        ),
-                                        Text(" "),
-                                        Text(
-                                            "${AppConstant.currency}${mrpPrice}",
-                                            style: TextStyle(
-                                                decoration:
-                                                    TextDecoration.lineThrough,
-                                                color: grayColorTitle,
-                                                fontWeight: FontWeight.w400)),
-                                      ],
-                                    ),
-                              //addQuantityView(),
+                                              fontWeight: FontWeight.w400)),
+                                    ],
+                                  ),
+                            //addQuantityView(),
+                          ],
+                        ),
+
+                        //0 => subscription is on
+                        //1 => subscription is off
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Visibility(
+                                  visible: false,
+                                  child: InkWell(
+                                    onTap: () async {},
+                                    child: Container(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: appThemeSecondary,
+                                            ),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(5))),
+                                        width: 100,
+                                        height: 30,
+                                        child: Center(
+                                            child: Text(
+                                          "SUBSCRIBE",
+                                          style: TextStyle(
+                                              color: appThemeSecondary),
+                                        ))),
+                                  )),
+                              addQuantityView(),
                             ],
                           ),
-
-                          //0 => subscription is on
-                          //1 => subscription is off
-                          Padding(
-                            padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Visibility(
-                                    visible: false,
-                                    child: InkWell(
-                                      onTap: () async {},
-                                      child: Container(
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: appThemeSecondary,
-                                              ),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5))),
-                                          width: 100,
-                                          height: 30,
-                                          child: Center(
-                                              child: Text(
-                                            "SUBSCRIBE",
-                                            style: TextStyle(
-                                                color: appThemeSecondary),
-                                          ))),
-                                    )),
-                                addQuantityView(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )),
-                    ],
-                  )),
-                ]),
-          ),
+                        ),
+                      ],
+                    )),
+                  ],
+                )),
+              ]),
         ),
         Container(
             height: 0.1,
@@ -595,6 +544,7 @@ class _ProductSubcriptonTileViewState extends State<ProductSubcriptonTileView> {
                             if (proceed && counter != 0) {
                               setState(() => counter--);
                               if (counter == 0) {
+                                showAddButton=true;
                                 eventBus.fire(onSubscribeProduct(
                                     widget.product, counter.toString()));
                               } else {

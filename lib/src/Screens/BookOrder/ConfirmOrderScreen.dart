@@ -230,7 +230,6 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   @override
   void initState() {
-    debugPrint("address charges ${widget.address.areaCharges}");
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkInternetConnection();
@@ -284,7 +283,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 //thirdPartyView bool
     thirdPartyDeliverySystemEnable =
         storeModel.storeDeliveryModel == AppConstant.DELIVERY_THIRD_PARTY &&
-            widget.address.thirdPartyDeliveryData != null &&
+            widget?.address?.thirdPartyDeliveryData != null &&
             widget.deliveryType != OrderType.PickUp;
     if (thirdPartyDeliverySystemEnable) {
       //Check visibility from response

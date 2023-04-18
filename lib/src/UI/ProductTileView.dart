@@ -547,8 +547,10 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                         Product product = widget.product;
                                         StoreModel model =
                                             await SharedPrefs.getStore();
-//                                        await insertInSubscribeCartTable(
-//                                            product, counter);
+                                       List<Product> cartList=[];
+                                       product.quantity="1";
+                                       counter=1;
+                                       cartList.add(product);
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(
@@ -557,7 +559,7 @@ class _ProductTileItemState extends State<ProductTileItem> {
                                                       product,
                                                       model,
                                                       counter.toString(),
-                                                      variant)),
+                                                      variant,cartList)),
                                         );
                                       },
                                       child: Container(

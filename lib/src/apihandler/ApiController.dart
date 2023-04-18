@@ -395,7 +395,6 @@ class ApiController {
         subCategoryResponse.success = false;
         return subCategoryResponse;
       } else {
-        print("database has values");
         subCategoryResponse = SubCategoryResponse();
         //prepare model object
         List<SubCategoryModel> categoryList =
@@ -578,7 +577,7 @@ class ApiController {
 
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print("-1--getAddress-respStr---${respStr}");
+      log("-1--getAddress-respStr---${respStr}");
       final parsed = json.decode(respStr);
       DeliveryAddressResponse deliveryAddressResponse =
           DeliveryAddressResponse.fromJson(parsed);
@@ -2330,7 +2329,7 @@ class ApiController {
       print("--fields---${request.fields.toString()}");
       final response = await request.send().timeout(Duration(seconds: timeout));
       final respStr = await response.stream.bytesToString();
-      print("--Tax--respStr---${respStr}");
+      log("--Tax--respStr---${respStr}");
       final parsed = json.decode(respStr);
 
       SubscriptionTaxCalculationResponse model =
