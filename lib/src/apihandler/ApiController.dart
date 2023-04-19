@@ -1058,6 +1058,7 @@ class ApiController {
       if (address.zipCode != null && address.zipCode.isNotEmpty)
         pin = " " + address.zipCode;
     }
+    print("userDeliveryAddress ${userDeliveryAddress}");
     try {
       Map<String, dynamic> map = Map();
 
@@ -1103,7 +1104,7 @@ class ApiController {
         "calculated_tax_detail": encodedtaxDetail,
         "cart_saving": cart_saving,
       };
-      debugPrint("map ${map}");
+      log("map ${map}");
       log(map.toString());
       if (selectedShippingCharge != null &&
           selectedShippingChargeList != null &&

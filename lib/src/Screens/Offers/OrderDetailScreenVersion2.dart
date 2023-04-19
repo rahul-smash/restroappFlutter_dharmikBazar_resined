@@ -1364,7 +1364,6 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
         widget.orderHistoryData.deliveryAddress.isNotEmpty)
       return '${widget.orderHistoryData.address} '
           '${widget.orderHistoryData.deliveryAddress.first.areaName} '
-          '${widget.orderHistoryData.deliveryAddress.first.city} '
           '${widget.orderHistoryData.deliveryAddress.first.state}';
     else
       return widget.orderHistoryData.address;
@@ -1386,7 +1385,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
       if (orderHistoryData.deliveryAddress.first.city.isEmpty) city = "";
       if (orderHistoryData.deliveryAddress.first.zipcode.isEmpty) ZipCode = "";
 
-      return '$name$address$area$city$ZipCode';
+      return '$name$address$area$ZipCode';
     } else {
       String address = '${orderHistoryData.address}';
       return address;

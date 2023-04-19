@@ -304,7 +304,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             //get COD object
             codShippingCharges =
                 widget.address.thirdPartyDeliveryData.shippingCharges[i];
-            estimatedDeliveryDays=codShippingCharges.estimatedDeliveryDays;
+            estimatedDeliveryDays = codShippingCharges.estimatedDeliveryDays;
           }
           if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
                   .orderPaymentMode
@@ -314,7 +314,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             //get online object
             onlineShippingCharges =
                 widget.address.thirdPartyDeliveryData.shippingCharges[i];
-            estimatedDeliveryDays=codShippingCharges.estimatedDeliveryDays;
+            estimatedDeliveryDays = codShippingCharges.estimatedDeliveryDays;
           }
         }
       } else {
@@ -836,19 +836,22 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                     children: <Widget>[
                   Padding(
                     padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                    child: Text("Estimated Delivery Days:",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.bold
-                    ),),
+                    child: Text(
+                      "Estimated Delivery Days:",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 15.0,
+                          fontWeight: FontWeight.bold),
+                    ),
                   ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
-                    child: Text(estimatedDeliveryDays??"0",
-                    style: TextStyle(
-                      fontSize: 14.0,
-                    ),),
+                    child: Text(
+                      estimatedDeliveryDays ?? "0",
+                      style: TextStyle(
+                        fontSize: 14.0,
+                      ),
+                    ),
                   )
                 ]))));
   }
@@ -1125,7 +1128,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Coupon Discount:", style: TextStyle(color: Colors.black54)),
+                Text("Coupon Discount:",
+                    style: TextStyle(color: Colors.black54)),
                 Text(
                     "${AppConstant.currency}${taxModel == null ? "0" : taxModel.discount}",
                     style: TextStyle(color: Colors.black54)),
@@ -1206,10 +1210,10 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   }
 
   String getUserRemaningWallet() {
-    double balance = (double.parse(userWalleModel.data.userWallet) -
-        double.parse(taxModel.wallet_refund) -
-        double.parse(taxModel.shipping.isNotEmpty ? taxModel.shipping : '0'));
-    //print("balance=${balance}");
+    double balance = double.parse(userWalleModel.data.userWallet) -
+        (double.parse(taxModel.itemSubTotal.toString()) +
+            double.parse(taxModel.shipping.toString()));
+    // //print("balance=${balance}");
     if (balance > 0.0) {
       // USer balance is greater than zero.
       return databaseHelper.roundOffPrice(balance, 2).toStringAsFixed(2);
@@ -1869,7 +1873,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                         ispaytmSelected = false;
                                         _selectedShippingCharges =
                                             codShippingCharges;
-                                        estimatedDeliveryDays = codShippingCharges.estimatedDeliveryDays;
+                                        estimatedDeliveryDays =
+                                            codShippingCharges
+                                                .estimatedDeliveryDays;
                                         updateValues(context);
                                       }
                                     });
@@ -1932,7 +1938,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             widget.paymentMode = "3";
                             ispaytmSelected = true;
                             _selectedShippingCharges = onlineShippingCharges;
-                            estimatedDeliveryDays = onlineShippingCharges.estimatedDeliveryDays;
+                            estimatedDeliveryDays =
+                                onlineShippingCharges.estimatedDeliveryDays;
 
                             updateValues(context);
                           }
@@ -1965,7 +1972,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           if (value == PaymentType.PROMISE_TO_PAY) {
                             widget.paymentMode = "4";
                             _selectedShippingCharges = codShippingCharges;
-                            estimatedDeliveryDays=codShippingCharges.estimatedDeliveryDays;
+                            estimatedDeliveryDays =
+                                codShippingCharges.estimatedDeliveryDays;
                             updateValues(context);
                           }
                         });
@@ -2897,6 +2905,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 //              .then((response) {
 
           print("-paymentMode-${widget.paymentMode}");
+          print("-address-${widget.address}");
           List<ShippingCharge> selectedShippingChargeList = List.empty();
           if (thirdPartyDeliverySystemEnable &&
               widget.address != null &&
@@ -2918,7 +2927,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   payment_request_id,
                   payment_id,
                   onlineMethod,
-                 thirdPartyDeliverySystemEnable==true?"": selectedDeliverSlotValue,
+                  thirdPartyDeliverySystemEnable == true
+                      ? ""
+                      : selectedDeliverSlotValue,
                   cart_saving: totalSavings.toStringAsFixed(2),
                   selectedShippingCharge: _selectedShippingCharges,
                   thirdPartyDeliveryData:
