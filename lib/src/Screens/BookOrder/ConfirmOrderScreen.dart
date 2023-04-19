@@ -118,6 +118,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       codTotalWithShipping = '',
       onlineTotalWithShipping = '';
   String displayShipping = '0';
+  String estimatedDeliveryDays = '0';
   bool isShippingFree = false;
 
 //--------- Third-party delivery system variables ENDS--------
@@ -303,6 +304,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             //get COD object
             codShippingCharges =
                 widget.address.thirdPartyDeliveryData.shippingCharges[i];
+            estimatedDeliveryDays=codShippingCharges.estimatedDeliveryDays;
           }
           if (widget.address.thirdPartyDeliveryData.shippingCharges[i]
                   .orderPaymentMode
@@ -312,6 +314,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             //get online object
             onlineShippingCharges =
                 widget.address.thirdPartyDeliveryData.shippingCharges[i];
+            estimatedDeliveryDays=codShippingCharges.estimatedDeliveryDays;
           }
         }
       } else {
@@ -451,10 +454,12 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     if (thirdPartyDeliverySystemEnable) {
       if (widget._selectedPaymentTypeValue == PaymentType.ONLINE) {
         _selectedShippingCharges = onlineShippingCharges;
+        estimatedDeliveryDays = onlineShippingCharges.estimatedDeliveryDays;
         widget.paymentMode = "3";
       }
       if (widget._selectedPaymentTypeValue == PaymentType.COD) {
         _selectedShippingCharges = codShippingCharges;
+        estimatedDeliveryDays = codShippingCharges.estimatedDeliveryDays;
         widget.paymentMode = "2";
       }
     }
@@ -502,7 +507,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           : ListView(
                               children: <Widget>[
                                 addCommentWidget(context),
-                                showDeliverySlot(),
+                                Visibility(
+                                    child: showDeliverySlot(),
+                                    visible: thirdPartyDeliverySystemEnable
+                                        ? false
+                                        : true),
+                                // Visibility(
+                                //     child: showExpectedDeliverySlot(),
+                                //     visible: thirdPartyDeliverySystemEnable
+                                //         ? true
+                                //         : false),
                                 ListView.separated(
                                   separatorBuilder:
                                       (BuildContext context, int index) {
@@ -811,6 +825,34 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
     }
   }
 
+  showExpectedDeliverySlot() {
+    return Padding(
+        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+        child: Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+                child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    child: Text("Estimated Delivery Days:",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold
+                    ),),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(5, 0, 0, 10),
+                    child: Text(estimatedDeliveryDays??"0",
+                    style: TextStyle(
+                      fontSize: 14.0,
+                    ),),
+                  )
+                ]))));
+  }
+
   Widget addProductCart(Product product) {
     //print("product_offer=${product.product_offer}");
     OrderDetail detail;
@@ -1083,7 +1125,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Discount:", style: TextStyle(color: Colors.black54)),
+                Text("Coupon Discount:", style: TextStyle(color: Colors.black54)),
                 Text(
                     "${AppConstant.currency}${taxModel == null ? "0" : taxModel.discount}",
                     style: TextStyle(color: Colors.black54)),
@@ -1215,7 +1257,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Cart Discount",
+                  Text("MRP Discount",
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: appTheme,
@@ -1827,7 +1869,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                                         ispaytmSelected = false;
                                         _selectedShippingCharges =
                                             codShippingCharges;
-
+                                        estimatedDeliveryDays = codShippingCharges.estimatedDeliveryDays;
                                         updateValues(context);
                                       }
                                     });
@@ -1890,6 +1932,8 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                             widget.paymentMode = "3";
                             ispaytmSelected = true;
                             _selectedShippingCharges = onlineShippingCharges;
+                            estimatedDeliveryDays = onlineShippingCharges.estimatedDeliveryDays;
+
                             updateValues(context);
                           }
                         });
@@ -1921,6 +1965,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                           if (value == PaymentType.PROMISE_TO_PAY) {
                             widget.paymentMode = "4";
                             _selectedShippingCharges = codShippingCharges;
+                            estimatedDeliveryDays=codShippingCharges.estimatedDeliveryDays;
                             updateValues(context);
                           }
                         });
@@ -2873,13 +2918,16 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
                   payment_request_id,
                   payment_id,
                   onlineMethod,
-                  selectedDeliverSlotValue,
+                 thirdPartyDeliverySystemEnable==true?"": selectedDeliverSlotValue,
                   cart_saving: totalSavings.toStringAsFixed(2),
                   selectedShippingCharge: _selectedShippingCharges,
-                  thirdPartyDeliveryData: widget.address.thirdPartyDeliveryData,
+                  thirdPartyDeliveryData:
+                      widget?.deliveryType == OrderType.Delivery
+                          ? widget.address.thirdPartyDeliveryData
+                          : null,
                   selectedShippingChargeList: selectedShippingChargeList,
                   isShipRocketintegrated:
-                      widget.address.thirdPartyDeliveryData != null
+                      widget?.address?.thirdPartyDeliveryData != null
                           ? true
                           : false)
               .then((response) async {

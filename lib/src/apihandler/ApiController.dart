@@ -1242,7 +1242,7 @@ class ApiController {
             await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
-        print('--respStr===  $respStr');
+        log('--respStr===  $respStr');
         GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
         return getOrderHistory;
       } catch (e) {
@@ -1275,7 +1275,7 @@ class ApiController {
             await request.send().timeout(Duration(seconds: timeout));
         final respStr = await response.stream.bytesToString();
         final parsed = json.decode(respStr);
-        print('--respStr===  $respStr');
+        log('--respStr===  $respStr');
         GetOrderHistory getOrderHistory = GetOrderHistory.fromJson(parsed);
         return getOrderHistory;
       } catch (e) {

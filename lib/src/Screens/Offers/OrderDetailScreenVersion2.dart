@@ -85,6 +85,9 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
 
   calculateSaving() {
     try {
+      print("cartSaving==${widget.orderHistoryData.cartSaving}");
+      print("discount==${widget.orderHistoryData.discount}");
+      print("total==${widget.orderHistoryData.total}");
       double _cartSaving = widget.orderHistoryData.cartSaving != null
           ? double.parse(widget.orderHistoryData.cartSaving)
           : 0;
@@ -95,7 +98,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
       _totalCartSaving =
           _totalSaving != 0 ? _totalSaving.toStringAsFixed(2) : '0';
       double _totalPriceVar =
-          double.parse(widget.orderHistoryData.total) + _totalSaving;
+          double.parse(widget.orderHistoryData.checkout) + double.parse(widget.orderHistoryData.shippingCharges);
       if (_totalSaving != 0)
         _totalPrice = _totalPriceVar.toStringAsFixed(2);
       else {
@@ -105,6 +108,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
       _totalPrice = widget.orderHistoryData.total;
       print(e.toString());
     }
+    print("_totalPrice ${_totalPrice}");
   }
 
   @override
@@ -592,7 +596,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                       fontWeight: FontWeight.w400,
                                     )),
                               ),
-                              Text("$AppConstant.currency $_totalPrice",
+                              Text("${AppConstant.currency} $_totalPrice",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 16,
@@ -685,7 +689,7 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                                 child: Padding(
                                   padding: EdgeInsets.only(top: 3),
                                   child: Text(
-                                      "Cart Saving $AppConstant.currency $_totalCartSaving",
+                                      "Cart Saving ${AppConstant.currency} $_totalCartSaving",
                                       style: TextStyle(
                                           color: Color(0xff74BA33),
                                           fontSize: 12,
@@ -745,6 +749,14 @@ class _OrderDetailScreenVersion2State extends State<OrderDetailScreenVersion2> {
                           style: TextStyle(color: Colors.black, fontSize: 12))),
                   Text('X ${cardOrderHistoryItems.orderItems[index].price}',
                       style: TextStyle(
+                        color: Color(0xFF818387),
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      )),
+                  SizedBox(width: 5.0),
+                  Text('${cardOrderHistoryItems.orderItems[index].mrpPrice}',
+                      style: TextStyle(
+                        decoration: TextDecoration.lineThrough,
                         color: Color(0xFF818387),
                         fontSize: 13,
                         fontWeight: FontWeight.w300,

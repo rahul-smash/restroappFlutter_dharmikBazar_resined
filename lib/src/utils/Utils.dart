@@ -496,10 +496,12 @@ class Utils {
     //print("convertOrderDateTime=$date");
     String formatted = date;
     try {
-      DateFormat format = new DateFormat("yyyy-MM-dd hh:mm:ss");
+      DateFormat format = new DateFormat("yyyy-MM-dd HH:mm:ss");
       //UTC time true
       DateTime time = format.parse(date, true);
+      print("==time ${time}");
       time = time.toLocal();
+      print("==times ${time}");
       //print("time.toLocal()=   ${time.toLocal()}");
       DateFormat formatter = new DateFormat('dd MMM yyyy, hh:mm a');
       formatted = formatter.format(time.toLocal());
