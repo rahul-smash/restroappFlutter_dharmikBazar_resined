@@ -71,7 +71,7 @@ class _OrderSelectionScreen extends State<OrderSelectionScreen> {
         ),
         elevation: 0.0,
         backgroundColor: Colors.white,
-        title: Text("Select Delivery Option"),
+        title: Center(child: Text("Select Delivery Option")),
         content: Container(
             width: double.maxFinite,
             height: mheight,

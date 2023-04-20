@@ -49,7 +49,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
   WalleModel walleModel;
   double iconHeight = 25;
   GoogleSignIn _googleSignIn;
-
+  String walletBalance="0.0";
   _NavDrawerMenuState({this.walleModel});
 
   @override
@@ -101,6 +101,20 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
       ApiController.getUserWallet().then((response) {
         setState(() {
           this.walleModel = response;
+          if(walleModel!=null && walleModel?.data?.userWallet?.isNotEmpty)
+            {
+              if(double.parse(walleModel?.data?.userWallet)<=0.0)
+                {
+                  walletBalance="0.0";
+                }
+              else
+                {
+                  walletBalance=walleModel?.data?.userWallet??"0.0";
+                }
+            }
+          else{
+            walletBalance="0.0";
+          }
         });
       });
     }
@@ -371,7 +385,7 @@ class _NavDrawerMenuState extends State<NavDrawerMenu> {
                         AppConstant.isLoggedIn
                             ? walleModel == null
                                 ? "${AppConstant.currency}"
-                                : "${AppConstant.currency} ${walleModel.data.userWallet}"
+                                : "${AppConstant.currency} ${walletBalance??"0.0"}"
                             : "",
                         style: TextStyle(
                             color: leftMenuLabelTextColors, fontSize: 15)),

@@ -24,7 +24,7 @@ class WalletHistoryScreen extends StatefulWidget {
 //subscription_payment//subscription_refund
 class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
   WalleModel walleModel;
-
+ String walletBalance;
   @override
   void initState() {
     super.initState();
@@ -86,7 +86,7 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
                                                             0, 1, 0, 0),
                                                   ),
                                                   Text(
-                                                      "${walleModel.data.userWallet}",
+                                                      "${walletBalance??"0.0"}",
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontSize: 24)),
@@ -389,6 +389,20 @@ class _WalletHistoryScreenState extends State<WalletHistoryScreen> {
             walleModel.data.walletHistory.sort((a, b) {
               return b.dateTime.compareTo(a.dateTime);
             });
+          }
+          if(walleModel!=null && walleModel?.data?.userWallet?.isNotEmpty)
+          {
+            if(double.parse(walleModel?.data?.userWallet)<=0.0)
+            {
+              walletBalance="0.0";
+            }
+            else
+            {
+              walletBalance=walleModel?.data?.userWallet??"0.0";
+            }
+          }
+          else{
+            walletBalance="0.0";
           }
         });
     });
