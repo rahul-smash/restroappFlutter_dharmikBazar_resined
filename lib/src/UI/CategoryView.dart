@@ -45,15 +45,19 @@ class CategoryView extends StatelessWidget {
           }
         },
         child: Container(
-          color: Colors.white,
+         
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20.0)
+          ),
           width: Utils.getDeviceWidth(context),
-          margin: EdgeInsets.fromLTRB(10, 0, 10, 15),
+          margin: EdgeInsets.fromLTRB(10, 10, 10, 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               GestureDetector(
                 child: Container(
-                  margin: EdgeInsets.fromLTRB(5, 5, 5, 0),
+                  margin: EdgeInsets.fromLTRB(10, 10, 10, 10),
                   width: Utils.getDeviceWidth(context),
                   child: categoryModel.image300200 != null &&
                           categoryModel.image300200.isNotEmpty
@@ -66,7 +70,7 @@ class CategoryView extends StatelessWidget {
               ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+                  padding: EdgeInsets.fromLTRB(10.0, 10.0, 0.0, 0.0),
                   child: Center(
                     child: Text(categoryModel.title,
                         textAlign: TextAlign.center,

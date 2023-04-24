@@ -346,7 +346,7 @@ class _HomeScreenState extends State<HomeScreen> {
       padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       child: GridView.count(
           crossAxisCount: 2,
-          childAspectRatio: 1.1,
+          childAspectRatio: 1.05,
           padding: EdgeInsets.fromLTRB(10.0, 20.0, 10.0, 0.0),
           mainAxisSpacing: 5.0,
           crossAxisSpacing: 8.0,
