@@ -2892,7 +2892,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   void phonePePaymentApiCall(
       {String orderJson = '', String orderDetails = '', String userId = ''}) {
     ApiController.phonepeCreateOrderApi(double.parse(taxModel?.total?.toString()).toStringAsFixed(2),
-            orderJson, orderDetails, storeModel.id, AppConstant.currency,
+            orderJson, orderDetails, storeModel.id, storeModel.currencyAbbr.trim(),
             merchantUserId: userId)
         .then((response) async {
       Utils.hideProgressDialog(context);
