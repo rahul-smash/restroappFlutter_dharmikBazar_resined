@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -2891,7 +2890,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void phonePePaymentApiCall(
       {String orderJson = '', String orderDetails = '', String userId = ''}) {
-    ApiController.phonepeCreateOrderApi(double.parse("1.00").toStringAsFixed(2),
+    ApiController.phonepeCreateOrderApi(double.parse(taxModel?.total?.toString()).toStringAsFixed(2),
             orderJson, orderDetails, storeModel.id, AppConstant.currency,
             merchantUserId: userId)
         .then((response) async {
