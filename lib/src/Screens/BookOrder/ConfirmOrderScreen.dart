@@ -37,6 +37,7 @@ import 'package:restroapp/src/utils/Utils.dart';
 import 'package:restroapp/src/utils/web_view/PhonePeWebView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import '../../models/PhonePeVerifyResponse.dart';
 import '../../singleton/app_version_singleton.dart';
 
 class ConfirmOrderScreen extends StatefulWidget {
@@ -2890,7 +2891,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
 
   void phonePePaymentApiCall(
       {String orderJson = '', String orderDetails = '', String userId = ''}) {
-    ApiController.phonepeCreateOrderApi(double.parse(taxModel?.total?.toString()).toStringAsFixed(2),
+    ApiController.phonepeCreateOrderApi(double.parse("1.00").toStringAsFixed(2),
             orderJson, orderDetails, storeModel.id, AppConstant.currency,
             merchantUserId: userId)
         .then((response) async {
@@ -3053,12 +3054,84 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
         Utils.showToast(AppConstant.noInternet, false);
         return;
       }
-
       Utils.showProgressDialog(context);
       placeOrderApiCall(event.chargeID, event.chargeID, 'DPO');
     });
-  }
+    eventBus.on<onPhonePeFinished>().listen((event) {
+      callPhonePeFinishedOrderApi(event.paymentRequestId, event.transId);
+    });
 
+  }
+  void callPhonePeFinishedOrderApi(String paymentRequestId, String transId) {
+    Utils.showProgressDialog(context);
+    ApiController.phonePeVerifyTransactionApi(paymentRequestId, storeModel.id)
+        .then((response) async {
+      Utils.hideProgressDialog(context);
+      print("----phonePeVerifyTransactionApi----${response}--");
+      if (response != null) {
+        PhonePeVerifyResponse model = response;
+        if (model.success) {
+          /*
+          * INTERNAL SERVER ERROR": I am getting a successful response in the UI
+          "TRANSACTION_NOT_FOUND": I am getting a successful response in the UI
+"PAYMENT PENDING" : We are getting a proper message in the UI. Please confirm the workaround of polling the "check status" API.
+"PAYMENT_CANCELLED": I am getting a successful response in the UI
+"PAYMENT_ERROR": I am getting a successful response in the UI
+"PAYMENT_DECLINED": I am getting a successful response in the UI
+"AUTHORIZATION_FAILED": I am getting a successful response in the UI
+          * */
+          if (model.data.data.paymentState == 'PAYMENT_PENDING') {
+            bool inputResult = await DialogUtils.displayCommonDialog(
+                context,
+                'Alert',
+                'Your payment is in pending state and your payment id is ${model.paymentRequestId} and order will be placed soon once payment will be approved, or you can connect store admin.');
+            if (inputResult) {
+              await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              eventBus.fire(updateCartCount());
+            }
+          } else if (model.data.data.paymentState == 'INTERNAL_SERVER_ERROR') {
+            _phonePeErrorDisplay(
+                'Your payment is failed and your payment id is ${model.paymentRequestId},please connect to store admin.');
+          } else if (model.data.data.paymentState == 'TRANSACTION_NOT_FOUND') {
+            _phonePeErrorDisplay(
+                'Your transaction is not found and your payment id is ${model.paymentRequestId},please connect to store admin.');
+          } else if (model.data.data.paymentState == 'PAYMENT_CANCELLED') {
+            _phonePeErrorDisplay(
+                'Your payment is cancelled and your payment id is ${model.paymentRequestId},please connect to store admin.');
+          } else if (model.data.data.paymentState == 'PAYMENT_ERROR') {
+            _phonePeErrorDisplay(
+                'Your payment is failed and your payment id is ${model.paymentRequestId},please connect to store admin.');
+          } else if (model.data.data.paymentState == 'PAYMENT_DECLINED') {
+            _phonePeErrorDisplay(
+                'Your payment is declined and your payment id is ${model.paymentRequestId},please connect to store admin.');
+          } else if (model.data.data.paymentState == 'AUTHORIZATION_FAILED') {
+            _phonePeErrorDisplay(
+                'Your payment is failed and your payment id is ${model.paymentRequestId},please connect to store admin.');
+          } else {
+            placeOrderApiCall(response.paymentRequestId,
+                response.data.data.providerReferenceId, 'Phonepe');
+          }
+        } else {
+          Utils.showToast(
+              "Payment Failed.", true);
+        }
+      } else {
+        Utils.showToast(
+            "Something went wrong.",
+            true);
+      }
+    });
+  }
+  void _phonePeErrorDisplay(String errorMassage) async {
+    bool inputResult =
+    await DialogUtils.displayCommonDialog(context, 'Alert', errorMassage);
+    if (inputResult) {
+      await databaseHelper.deleteTable(DatabaseHelper.CART_Table);
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      eventBus.fire(updateCartCount());
+    }
+  }
   void callPaytmApi(String url, String orderId, String txnID) {
     Utils.showProgressDialog(context);
     placeOrderApiCall(orderId, txnID, 'paytm');

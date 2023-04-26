@@ -2954,12 +2954,12 @@ class ApiController {
 
   static Future<PhonePeVerifyResponse> phonePeVerifyTransactionApi(
       String paymentRequestId, String storeID) async {
-    var url = ApiConstants.baseUrl.replaceAll("storeId", storeID) +
+    var url = ApiConstants.base.replaceAll("storeId", storeID) +ApiConstants.apiV1Route+
         ApiConstants.checkPhonepeTransactionStatus;
     var request = new http.MultipartRequest("POST", Uri.parse(url));
     String selectedLangauge = await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);
 
-    print(url);
+    print("url is ${url}");
     try {
       request.fields.addAll({
         "payment_request_id": paymentRequestId,
