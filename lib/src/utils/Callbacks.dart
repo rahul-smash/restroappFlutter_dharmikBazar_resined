@@ -57,3 +57,10 @@ class onDPOCreateFinished {
 
   onDPOCreateFinished(this.url, this.chargeID,{this.amount=''});
 }
+class onPhonePeFinished {
+  String paymentRequestId;
+  String transId;
+  String amount;
+
+  onPhonePeFinished(this.paymentRequestId, this.transId, {this.amount});
+}

@@ -551,7 +551,7 @@ class _HomeScreenState extends State<HomeScreen> {
           //padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
           child: widget.configObject.isGroceryApp == "true"
               ? Image.asset(
-                  "images/groceryicon.png",
+                  "images/groceryicon2.png",
                   height: 40,
                   width: 40,
                   color: whiteColor,

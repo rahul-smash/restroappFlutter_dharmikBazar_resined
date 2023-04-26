@@ -192,6 +192,9 @@ flutter:
     - images/viewmore_arrow.png
     - images/marker.png
     - images/order_icon.png
+    - images/images/
+    - images/groceryicon2.png
+    - images/groceryicon3.png
     - assets/en.json
     - assets/malay.json
     - sound/slow_spring_board.mp3

@@ -37,6 +37,7 @@ import 'package:restroapp/src/models/MobileVerified.dart';
 import 'package:restroapp/src/models/NotificationResponseModel.dart';
 import 'package:restroapp/src/models/OTPVerified.dart';
 import 'package:restroapp/src/models/OfferDetailResponse.dart';
+import 'package:restroapp/src/models/PhonePeResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/ProductRatingResponse.dart';
 import 'package:restroapp/src/models/PromiseToPayUserResponse.dart';
@@ -71,6 +72,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/DeleteUserResponse.dart';
 import '../models/DPOCreateResponse.dart';
+import '../models/PhonePeVerifyResponse.dart';
 import '../models/order_time_response.dart';
 
 import '../models/home_screen_orders_model.dart';
@@ -2908,7 +2910,75 @@ class ApiController {
       print(e);
     }
   }
+  /*Phonepe*/
+  static Future<PhonePeResponse> phonepeCreateOrderApi(String amount,
+      String orderJson, dynamic detailsJson, storeId, String currencyAbr,
+      {String merchantUserId = ''}) async {
+    bool isNetworkAviable = await Utils.isNetworkAvailable();
+    if (!isNetworkAviable) {
+      return null;
+    }
+    var url = ApiConstants.base.replaceAll("storeId", storeId) +ApiConstants.apiV1Route+
+        ApiConstants.phonepeCreateOrder;
+    print("url is ${url}");
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    String selectedLangauge = await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);
 
+    try {
+      request.fields.addAll({
+        "amount": amount,
+        "merchantUserId": merchantUserId,
+        "currency": currencyAbr.trim(),
+        "order_info": detailsJson != null ? detailsJson : '',
+        //JSONObject details
+        "orders": orderJson != null ? orderJson : '',
+        "lang":    selectedLangauge??"en"  ,
+
+        //cart jsonObject
+      });
+      print(request.fields);
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      PhonePeResponse model = PhonePeResponse.fromJson(parsed);
+      return model;
+    } catch (e) {
+      print('---catch-phonepeCreateOrderApi-----' + e.toString());
+      //Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
+
+  static Future<PhonePeVerifyResponse> phonePeVerifyTransactionApi(
+      String paymentRequestId, String storeID) async {
+    var url = ApiConstants.baseUrl.replaceAll("storeId", storeID) +
+        ApiConstants.checkPhonepeTransactionStatus;
+    var request = new http.MultipartRequest("POST", Uri.parse(url));
+    String selectedLangauge = await SharedPrefs.getStoreSharedValue(AppConstant.SelectedLanguage);
+
+    print(url);
+    try {
+      request.fields.addAll({
+        "payment_request_id": paymentRequestId,
+        "lang": selectedLangauge,
+      });
+      print(request.fields.toString());
+
+      final response = await request.send().timeout(Duration(seconds: timeout));
+      final respStr = await response.stream.bytesToString();
+      print('----respStr-----' + respStr);
+      final parsed = json.decode(respStr);
+
+      PhonePeVerifyResponse model = PhonePeVerifyResponse.fromJson(parsed);
+      return model;
+    } catch (e) {
+      Utils.showToast(e.toString(), true);
+      return null;
+    }
+  }
   static File createFile(String path) {
     final file = File(path);
     if (!file.existsSync()) {

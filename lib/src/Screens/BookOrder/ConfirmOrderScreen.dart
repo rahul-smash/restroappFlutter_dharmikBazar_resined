@@ -17,6 +17,7 @@ import 'package:restroapp/src/models/CreatePaytmTxnTokenResponse.dart';
 import 'package:restroapp/src/models/DeliveryAddressResponse.dart';
 import 'package:restroapp/src/models/DeliveryTimeSlotModel.dart';
 import 'package:restroapp/src/models/OrderDetailsModel.dart';
+import 'package:restroapp/src/models/PhonePeResponse.dart';
 import 'package:restroapp/src/models/PickUpModel.dart';
 import 'package:restroapp/src/models/PromiseToPayUserResponse.dart';
 import 'package:restroapp/src/models/RazorpayOrderData.dart';
@@ -34,6 +35,7 @@ import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Callbacks.dart';
 import 'package:restroapp/src/utils/DialogUtils.dart';
 import 'package:restroapp/src/utils/Utils.dart';
+import 'package:restroapp/src/utils/web_view/PhonePeWebView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import '../../singleton/app_version_singleton.dart';
@@ -232,6 +234,7 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       checkInternetConnection();
     });
@@ -2366,6 +2369,9 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
       case "Razorpay":
         callOrderIdApi(storeObject, "Razorpay");
         break;
+      case "Phonepe":
+        callOrderIdApi(storeObject, "Phonepe");
+        break;
       case "Stripe":
         callStripeApi();
         break;
@@ -2873,6 +2879,47 @@ class ConfirmOrderState extends State<ConfirmOrderScreen> {
             }
           });
           break;
+        case "Phonepe":
+          phonePePaymentApiCall(
+              orderJson: orderJson,
+              orderDetails: detailsModel.orderDetails,
+              userId: userId);
+          break;
+      }
+    });
+  }
+
+  void phonePePaymentApiCall(
+      {String orderJson = '', String orderDetails = '', String userId = ''}) {
+    ApiController.phonepeCreateOrderApi(double.parse("1.00").toStringAsFixed(2),
+            orderJson, orderDetails, storeModel.id, AppConstant.currency,
+            merchantUserId: userId)
+        .then((response) async {
+      Utils.hideProgressDialog(context);
+      PhonePeResponse model = response;
+      if (model == null) {
+        Utils.showToast(AppConstant.noInternet, false);
+      } else if (model != null && response.success) {
+        bool result = await Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => PhonePeWebView(model, storeModel.id)),
+        );
+        if (result != null && !result) {
+          Utils.hideProgressDialog(context);
+        }
+      } else {
+        bool inputResult = await DialogUtils.displayCommonDialog2(
+            context,
+            'Payment Failed',
+            '${(model != null && model.data != null && model.data.message != null && model.data.message.isNotEmpty) ? model.data.message : model.message}',
+            'Cancel',
+            'Retry');
+        if (inputResult) {
+          Utils.showProgressDialog(context);
+          phonePePaymentApiCall(
+              orderJson: orderJson, orderDetails: orderDetails, userId: userId);
+        }
       }
     });
   }

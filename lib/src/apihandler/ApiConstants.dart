@@ -152,7 +152,9 @@ class ApiConstants {
 
   //delete account
   static String deleteUser = '/apiv1/user_authentication/deleteuser';
-
+  static String phonepeCreateOrder = 'phonepe/phonepeCreateOrder';
+  static String checkPhonepeTransactionStatus =
+      'phonepe/checkPhonepeTransactionStatus';
   static String getDeleteRoute({String storeID}) {
     if (storeID != null)
       return '$base$deleteUser'.replaceAll("storeId", storeID);
