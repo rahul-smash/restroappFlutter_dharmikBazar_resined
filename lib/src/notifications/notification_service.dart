@@ -1,4 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'dart:ui';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:disable_battery_optimization/disable_battery_optimization.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -14,6 +21,7 @@ abstract class NotificationService {
   final String channelId;
   final String channelName;
   final String channelDescription;
+
   AndroidNotificationChannel _channel;
 
   NotificationService({
@@ -25,8 +33,13 @@ abstract class NotificationService {
   }) : assert(notificationIcon != null, 'notification icon can not be null');
 
   bool get isAuthorized => _isAuthorized;
+
   /// Handle notification when user click on it, for re-direction
-  void handleNotificationClick(RemoteMessage message);
+  void handleNotificationClick(RemoteMessage message) {
+    // if(message.data.containsKey('products'))
+    // Navigator.pushAndRemoveUntil(navigatorKey.currentState.context,
+    //     MaterialPageRoute(builder: (context) => sc()), (route) => false);
+  }
 
   void onSelectNotification(String payload);
 
@@ -129,14 +142,34 @@ abstract class NotificationService {
   }
 
   /// Display notification locally
-  void showNotification(RemoteMessage remoteMessage) {
+  Future<void> showNotification(RemoteMessage remoteMessage) async {
+    //  final RemoteMessage. response = await http.get(Uri.parse(URL));
+    // BigPictureStyleInformation bigPictureStyleInformation =
+    // BigPictureStyleInformation(
+    //   ByteArrayAndroidBitmap.fromBase64String(base64Encode(image)),
+    //   largeIcon: ByteArrayAndroidBitmap.fromBase64String(base64Encode(image)),
+    // );
     if (remoteMessage == null && remoteMessage.notification == null) {
       return;
     }
+    Uint8List unitList =
+        await getUni8List(remoteMessage.notification.android?.imageUrl);
+    debugPrint("dkd ${unitList}");
+
+    BigPictureStyleInformation bigPictureStyleInformation =
+        BigPictureStyleInformation(
+      ByteArrayAndroidBitmap(unitList ?? ''),
+      contentTitle: remoteMessage.notification.title,
+      summaryText: remoteMessage.notification.body,
+    );
+
     BigTextStyleInformation bigTextStyleInformation = BigTextStyleInformation(
       remoteMessage.notification.body,
       contentTitle: remoteMessage.notification.title,
       summaryText: '',
+      // contentTitle: 'Notification with Image',
+      // summaryText: 'Check out this image!',
+
       /*_channel.description,
       // contentTitle: _channel.name,
       contentTitle: _channel.name,
@@ -144,12 +177,16 @@ abstract class NotificationService {
     );
 
     AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(_channel.id, _channel.name,
-            channelDescription: _channel.description,
-            styleInformation: bigTextStyleInformation);
+        AndroidNotificationDetails(
+      _channel.id,
+      _channel.name,
+      channelDescription: _channel.description,
+      styleInformation: bigPictureStyleInformation,
+    );
     // final AndroidNotificationDetails androidNotificationDetails =
     //     AndroidNotificationDetails(_channel.id, _channel.name,
     //         channelDescription: _channel.description,
+    //
     //         styleInformation: bigTextStyleInformation);
 
     const IOSNotificationDetails iosNotificationDetails =
@@ -193,6 +230,13 @@ abstract class NotificationService {
         message,
         notificationDetails,
         payload: '${redirectionType}');
+  }
+
+  getUni8List(url) async {
+    Uint8List bytes = (await NetworkAssetBundle(Uri.parse(url)).load(url))
+        .buffer
+        .asUint8List();
+    return bytes;
   }
 
   /// Print error message information

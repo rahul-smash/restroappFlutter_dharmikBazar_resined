@@ -4,6 +4,8 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:restroapp/src/Screens/Dashboard/ProductDetailScreen.dart';
+import 'package:restroapp/src/Screens/Offers/OfferScreen.dart';
 import 'package:restroapp/src/Screens/Offers/OrderDetailScreenVersion2.dart';
 import 'package:restroapp/src/UI/SubscriptionHistoryDetails.dart';
 import 'package:restroapp/src/database/SharedPrefs.dart';
@@ -11,7 +13,11 @@ import 'package:restroapp/src/models/StoreResponseModel.dart';
 import 'package:restroapp/src/utils/AppConstants.dart';
 import 'package:restroapp/src/utils/Utils.dart';
 
+import '../Screens/BookOrder/SubCategoryProductScreen.dart';
+import '../Screens/Dashboard/HomeScreen.dart';
 import '../Screens/Offers/MyOrderScreenVersion2.dart';
+import '../models/CategoryResponseModel.dart';
+import '../models/ConfigModel.dart';
 import 'notification_service.dart';
 
 class NotificationServiceHelper extends NotificationService {
@@ -44,36 +50,29 @@ class NotificationServiceHelper extends NotificationService {
       String id = '';
       String type = '';
       StoreModel store = await SharedPrefs.getStore();
+
       bool isRatingEnable = store.reviewRatingDisplay != null &&
           store.reviewRatingDisplay.compareTo('1') == 0;
       _globalKey.currentState.popUntil((route) => route.isFirst);
       if (Platform.isIOS) {
       } else {
         id = map['id'];
-        type = map['type'];
-        type = type.toLowerCase();
+        type = map['redirectTo'];
+        // type = type.toLowerCase();
       }
 
       switch (type) {
-        case 'order':
+        case 'offers':
           _globalKey.currentState.push(
-            MaterialPageRoute(
-                builder: (context) => OrderDetailScreenVersion2(
-                      isRatingEnable,
-                      store,
-                      orderId: id,
-                    )),
+            MaterialPageRoute(builder: (context) => MyOfferScreen(context)),
           );
           break;
-        case 'subscription':
-          _globalKey.currentState.push(
-            MaterialPageRoute(
-                builder: (context) => SubscriptionHistoryDetails(
-                      orderHistoryDataId: id,
-                      store: store,
-                    )),
-          );
-          break;
+        // case 'product':
+        //   _globalKey.currentState.push(
+        //     MaterialPageRoute(
+        //         builder: (context) => Home()),
+        //   );
+        //   break;
       }
     } catch (e) {
       print(e);
@@ -101,36 +100,32 @@ class NotificationServiceHelper extends NotificationService {
       if (Platform.isIOS) {
       } else {
         id = map['id'];
-        type = map['type'];
-        type = type.toLowerCase();
+        type = map['redirectTo'];
+        // type = type.toLowerCase();
       }
 
       switch (type) {
-        case 'order':
+        case 'offers':
           _globalKey.currentState.push(
-            MaterialPageRoute(
-                builder: (context) => OrderDetailScreenVersion2(
-                      isRatingEnable,
-                      store,
-                      orderId: id,
-                    )),
+            MaterialPageRoute(builder: (context) => MyOfferScreen(context)),
           );
           break;
-        case 'order_placed':
-          _globalKey.currentState.push(
-            MaterialPageRoute(
-                builder: (context) => MyOrderScreenVersion2(store)),
-          );
-          break;
-        case 'subscription':
-          _globalKey.currentState.push(
-            MaterialPageRoute(
-                builder: (context) => SubscriptionHistoryDetails(
-                      orderHistoryDataId: id,
-                      store: store,
-                    )),
-          );
-          break;
+        // case 'store':
+        //   _globalKey.currentState.push(
+        //     MaterialPageRoute(
+        //         builder: (context) => HomeScreen(
+        //            store,,true
+        //         )),
+        //   );
+        //   break;
+        // case 'product':
+        //   _globalKey.currentState.push(
+        //     MaterialPageRoute(
+        //         builder: (context) => HomeScreen(
+        //
+        //         )),
+        //   );
+        //   break;
       }
     } catch (e) {
       print(e);
